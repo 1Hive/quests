@@ -1,7 +1,9 @@
+import { useCallback } from "react";
 import { useEffect, useRef } from "react";
 
 export default function usePoller(fn, delay, extraWatch) {
   const savedCallback = useRef();
+  const stableFn = useCallback(fn, [])
   // Remember the latest fn.
   useEffect(() => {
     savedCallback.current = fn;
@@ -19,7 +21,9 @@ export default function usePoller(fn, delay, extraWatch) {
     }
   }, [delay]);
   // run at start too
+  // eslint-disable-next-line
   useEffect(() => {
-    fn();
-  },[ extraWatch ]);
+    // eslint-disable-next-line
+    stableFn();
+  }, [stableFn, extraWatch]);
 }

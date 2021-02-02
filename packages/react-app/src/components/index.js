@@ -10,6 +10,6 @@ export { default as Ramp } from "./Ramp";
 export { default as Faucet } from "./Faucet";
 export { default as Wallet } from "./Wallet";
 export { default as Blockie } from "./Blockie";
-export { default as Header } from "./Header";
+export { default as AppHeader } from "./AppHeader";
 export { default as Timeline } from "./Timeline";
 export { default as GasGauge } from "./GasGauge";
