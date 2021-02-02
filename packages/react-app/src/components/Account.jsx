@@ -1,8 +1,19 @@
+import "./Account.css";
 import React from "react";
-import { Button } from "antd";
+import { Button, Dropdown, Space, Menu, Divider } from "antd";
 import Address from "./Address";
 import Balance from "./Balance";
 import Wallet from "./Wallet";
+import { EllipsisOutlined } from '@ant-design/icons';
+
+
+const openProfileModal = () => {
+
+};
+
+const openSettingsModal = () => {
+
+};
 
 export default function Account({
   address,
@@ -16,50 +27,64 @@ export default function Account({
   logoutOfWeb3Modal,
   blockExplorer,
 }) {
-  const modalButtons = [];
-  if (web3Modal) {
-    if (web3Modal.cachedProvider) {
-      modalButtons.push(
-        <Button
-          key="logoutbutton"
-          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
-          shape="round"
-          size="large"
-          onClick={logoutOfWeb3Modal}
-        >
-          logout
-        </Button>,
-      );
-    } else {
-      modalButtons.push(
-        <Button
-          key="loginbutton"
-          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
-          shape="round"
-          size="large"
-          /*type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time*/
-          onClick={loadWeb3Modal}
-        >
-          connect
-        </Button>,
-      );
-    }
-  }
+
+  const loginButton = (<Button
+    className="btn-login"
+    key="loginbutton"
+    shape="round"
+    size="large"
+    onClick={loadWeb3Modal}
+  /*type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time*/
+
+  >
+    Connect
+  </Button>);
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="profile">
+        <a onClick={openProfileModal}>
+          Profile
+        </a>
+      </Menu.Item>
+      <Menu.Item key="settings">
+        <a onClick={openSettingsModal}>
+          Settings
+        </a>
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="selogoutttings">
+        <a onClick={logoutOfWeb3Modal}>
+          Logout
+          </a>
+      </Menu.Item>
+    </Menu>
+  );
 
   const display = minimized ? (
     ""
   ) : (
-    <span>
-      {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} /> : "Connecting..."}
-      <Balance address={address} provider={localProvider} dollarMultiplier={price} />
-      <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
-    </span>
-  );
+      <Space>
+        {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} /> : "Connecting..."}
+        <Balance address={address} provider={localProvider} dollarMultiplier={price} />
+        <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
+        <Dropdown key="more" overlay={menu}>
+          <Button
+            style={{
+              border: 'none',
+              padding: 0,
+            }}
+          >
+            <EllipsisOutlined
+              style={{
+                fontSize: 20,
+                verticalAlign: 'top',
+              }}
+            />
+          </Button>
+        </Dropdown>
+      </Space>
+    );
 
-  return (
-    <div>
-      {display}
-      {modalButtons}
-    </div>
-  );
+  return web3Modal.cachedProvider ? loginButton : display;
 }

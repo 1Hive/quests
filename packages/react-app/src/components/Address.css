@@ -1,0 +1,24 @@
+.identicon {
+  border-radius: 8px;
+}
+
+.ant-badge.ant-badge-status {
+  line-height: normal;
+  vertical-align: middle;
+}
+
+.address-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.address-detail > .text {
+  font-size: 16px;
+  line-height: normal;
+}
+
+.address-detail > .status {
+  font-size: 10px;
+  line-height: normal;
+  color: #30db9e;
+}

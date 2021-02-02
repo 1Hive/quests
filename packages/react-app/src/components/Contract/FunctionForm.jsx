@@ -66,7 +66,7 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
             </div>
         </Tooltip>
       )
-    } else if (input.type == "uint256") {
+    } else if (input.type === "uint256") {
       buttons = (
         <Tooltip placement="right" title={"to hex"}>
           <div
@@ -122,7 +122,7 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
                     style={{ cursor: "pointer" }}
                     onClick={async () => {
                       let floatValue = parseFloat(txValue)
-                      if(floatValue) setTxValue("" + floatValue * 10 ** 18);
+                      if (floatValue) setTxValue("" + floatValue * 10 ** 18);
                     }}
                   >
                     ✳️
@@ -171,12 +171,12 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
               const args = functionInfo.inputs.map((input) => {
                 const key = functionInfo.name + "_" + input.name + "_" + input.type + "_" + innerIndex++
                 let value = form[key]
-                if(input.baseType=="array"){
+                if (input.baseType === "array") {
                   value = JSON.parse(value)
-                } else if(input.type === "bool"){
-                  if(value==='true' || value==='1' || value ==="0x1"|| value ==="0x01"|| value ==="0x0001"){
+                } else if (input.type === "bool") {
+                  if (value === 'true' || value === '1' || value === "0x1" || value === "0x01" || value === "0x0001") {
                     value = 1;
-                  }else{
+                  } else {
                     value = 0;
                   }
                 }
@@ -184,10 +184,10 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
               });
 
               let result
-              if(functionInfo.stateMutability === "view"||functionInfo.stateMutability === "pure"){
+              if (functionInfo.stateMutability === "view" || functionInfo.stateMutability === "pure") {
                 const returned = await contractFunction(...args)
                 result = tryToDisplay(returned);
-              }else{
+              } else {
                 const overrides = {};
                 if (txValue) {
                   overrides.value = txValue; // ethers.utils.parseEther()
