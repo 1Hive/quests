@@ -1,9 +1,10 @@
 
-import "./Address.css";
+import "./Address.scss";
 import React from "react";
 import Blockies from "react-blockies";
 import { Typography, Skeleton, Badge, Space } from "antd";
 import { useLookupAddress } from "../hooks";
+import { If } from "../components"
 
 /*
 
@@ -75,12 +76,15 @@ export default function Address(props) {
 
   return (
     <Space wrap>
-      <Badge status="success" title="Connected" offset={[0, 32]} size="default" dot>
+      {props.showStatus ?
+        <Badge status="success" title="Connected" offset={[0, 32]} size="default" dot>
+          <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        </Badge> :
         <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
-      </Badge>
+      }
       <div className="address-detail">
         <span className="text">{text}</span>
-        <span className="status">Connected</span>
+        <If expression={props.showStatus}><span className="status">Connected</span></If>
       </div>
     </Space>
   );

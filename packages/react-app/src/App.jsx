@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "antd/dist/antd.css";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
-import "./App.css";
+import "./App.scss";
 import { Row, Col, Button, Layout } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";

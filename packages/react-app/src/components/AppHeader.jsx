@@ -1,5 +1,5 @@
 
-import "./AppHeader.css";
+import "./AppHeader.scss";
 import React from "react";
 import { Menu, Layout } from "antd";
 import { Link } from "react-router-dom";

@@ -1,4 +1,4 @@
-import "./Account.css";
+import "./Account.scss";
 import React from "react";
 import { Button, Dropdown, Space, Menu, Divider } from "antd";
 import Address from "./Address";
@@ -25,7 +25,7 @@ export default function Account({
   web3Modal,
   loadWeb3Modal,
   logoutOfWeb3Modal,
-  blockExplorer,
+  blockExplorer
 }) {
 
   const loginButton = (<Button
@@ -65,7 +65,7 @@ export default function Account({
     ""
   ) : (
       <Space>
-        {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} /> : "Connecting..."}
+        {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} showStatus /> : "Connecting..."}
         <Balance address={address} provider={localProvider} dollarMultiplier={price} />
         <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
         <Dropdown key="more" overlay={menu}>
