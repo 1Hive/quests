@@ -37,8 +37,6 @@ export default class GodTool extends Component {
     /* 🗺 Extra UI like gas price, eth price, faucet, and support: */
     return (
       <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 0, padding: 10 }}>
-        <Button className="hide-button" ref={this.hideButtonRef} onClick={() => this.hide()} type="link" icon={<DownCircleOutlined style={{ fontSize: '32px' }} />}></Button>
-        <Button className="show-button" ref={this.showButtonRef} onClick={() => this.show()} type="link" icon={<UpCircleOutlined style={{ fontSize: '32px' }} />}></Button>
         <div ref={this.wrapperRef} className="wrapper">
           <Row align="middle" gutter={[8, 8]}>
             <Col span={8}>
