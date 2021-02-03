@@ -81,7 +81,7 @@ export default function Account({
     }
   }
 
-  const display = minimized ? (
+  const display = minimized || !web3Modal?.cachedProvider ? (
     ""
   ) : (
       <span>
