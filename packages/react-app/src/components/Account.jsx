@@ -81,11 +81,11 @@ export default function Account({
     }
   }
 
-  const display = minimized || !web3Modal?.cachedProvider ? (
+  const display = minimized ? (
     ""
   ) : (
       <span>
-        {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} connected={web3Modal?.cachedProvider} /> : "Connecting..."}
+        {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} showStatus={web3Modal?.cachedProvider} /> : "Connecting..."}
         <Balance address={address} provider={localProvider} dollarMultiplier={price} />
         <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
       </span>

@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import "antd/dist/antd.css";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import "./App.scss";
-import { Layout } from "antd";
+import { Layout, Row, Col, Button } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
 import { Transactor } from "./helpers";
 import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useContractReader, useEventListener, useBalance } from "./hooks";
-import { AppHeader, Account, Contract, GodTool } from "./components";
+import { AppHeader, Contract, Ramp, GasGauge, Faucet } from "./components";
 import { formatEther } from "@ethersproject/units";
 import { Switch, Route } from "react-router-dom";
 import { Hints, ExampleUI, Subgraph } from "./views"
@@ -243,7 +243,46 @@ export default function App(props) {
           </Row>
         </div>
       </Layout>
-      <GodTool localProvider={localProvider} mainnetProvider={mainnetProvider} price={price} address={address} gasPrice={gasPrice} />
+      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
+      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+        <Row align="middle" gutter={[4, 4]}>
+          <Col span={8}>
+            <Ramp price={price} address={address} />
+          </Col>
+
+          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
+            <GasGauge gasPrice={gasPrice} />
+          </Col>
+          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+            <Button
+              onClick={() => {
+                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
+              }}
+              size="large"
+              shape="round"
+            >
+              <span style={{ marginRight: 8 }} role="img" aria-label="support">
+                💬
+              </span>
+              Support
+            </Button>
+          </Col>
+        </Row>
+
+        <Row align="middle" gutter={[4, 4]}>
+          <Col span={24}>
+            {
+
+              /*  if the local provider has a signer, let's show the faucet:  */
+              localProvider && localProvider.connection && localProvider.connection.url && localProvider.connection.url.indexOf(window.location.hostname) >= 0 && !process.env.REACT_APP_PROVIDER && price > 1 ? (
+                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+              ) : (
+                  ""
+                )
+            }
+          </Col>
+        </Row>
+      </div>
     </BrowserRouter>
   );
 }

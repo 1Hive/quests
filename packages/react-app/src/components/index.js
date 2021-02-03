@@ -14,4 +14,3 @@ export { default as AppHeader } from "./AppHeader";
 export { default as Timeline } from "./Timeline";
 export { default as GasGauge } from "./GasGauge";
 export { default as If } from "./helpers/If";
-export { default as GodTool } from "./GodTool";
