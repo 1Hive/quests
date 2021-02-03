@@ -128,6 +128,22 @@ export default function App(props) {
     setRoute(window.location.pathname)
   }, [setRoute]);
 
+  const wrapperRef = React.createRef();
+  const showButtonRef = React.createRef();
+  const hideButtonRef = React.createRef();
+
+  const hideFaucet = () => {
+    wrapperRef.current.style.display = 'none';
+    hideButtonRef.current.style.display = 'none';
+    showButtonRef.current.style.display = 'block';
+  }
+
+  const showFaucet = () => {
+    wrapperRef.current.style.display = 'block';
+    hideButtonRef.current.style.display = 'block';
+    showButtonRef.current.style.display = 'none';
+  }
+
   return (
     <BrowserRouter>
       <Layout>
@@ -203,8 +219,13 @@ export default function App(props) {
           </Switch>
         </Content>
         <Footer style={{ textAlign: 'center' }}>Honey Quest @2021 Founded by <a href="https://1hive.org/">1Hive</a></Footer>
-        {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-        <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+      </Layout>
+
+      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
+      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 0, padding: 10 }}>
+        <Button id="hide-faucet-button" ref={hideButtonRef} onClick={() => hideFaucet()} type="link" icon={<DownCircleOutlined style={{ fontSize: '32px' }} />}></Button>
+        <Button id="show-faucet-button" ref={showButtonRef} onClick={() => showFaucet()} type="link" icon={<UpCircleOutlined style={{ fontSize: '32px' }} />}></Button>
+        <div ref={wrapperRef} className="wrapper">
           <Row align="middle" gutter={[4, 4]}>
             <Col span={8}>
               <Ramp price={price} address={address} />
@@ -243,48 +264,8 @@ export default function App(props) {
             </Col>
           </Row>
         </div>
-      </Layout>
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={8}>
-            <Ramp price={price} address={address} />
-          </Col>
-
-          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-            <Button
-              onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-              }}
-              size="large"
-              shape="round"
-            >
-              <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                💬
-              </span>
-              Support
-            </Button>
-          </Col>
-        </Row>
-
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={24}>
-            {
-
-              /*  if the local provider has a signer, let's show the faucet:  */
-              localProvider && localProvider.connection && localProvider.connection.url && localProvider.connection.url.indexOf(window.location.hostname) >= 0 && !process.env.REACT_APP_PROVIDER && price > 1 ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                  ""
-                )
-            }
-          </Col>
-        </Row>
       </div>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 /*
