@@ -86,5 +86,5 @@ export default function Account({
       </Space>
     );
 
-  return web3Modal?.cachedProvider ? loginButton : display;
+  return web3Modal?.cachedProvider ? display : loginButton;
 }
