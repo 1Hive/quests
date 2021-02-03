@@ -73,18 +73,22 @@ export default function Address(props) {
       </Text>
     );
   }
-
+  let fontSize = props.fontSize ?? 16;
+  if (!props.showStatus)
+    fontSize *= 1.5;
   return (
-    <Space wrap>
+    <Space align="baseline">
       {props.showStatus ?
         <Badge status="success" title="Connected" offset={[0, 32]} size="default" dot>
           <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
-        </Badge> :
-        <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        </Badge>
+        : <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
       }
       <div className="address-detail">
-        <span className="text">{text}</span>
-        <If expression={props.showStatus}><span className="status">Connected</span></If>
+        <span className="text" style={{ fontSize }}>{text}</span>
+        <If expression={props.showStatus}>
+          <span className="status">Connected</span>
+        </If>
       </div>
     </Space>
   );
