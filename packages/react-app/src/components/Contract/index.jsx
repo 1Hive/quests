@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { Card } from "antd";
 import { useContractLoader, useContractExistsAtAddress } from "../../hooks";
-import Account from "../Account";
 import DisplayVariable from "./DisplayVariable";
 import FunctionForm from "./FunctionForm";
+import Address from "../Address"
 
 const noContractDisplay = (
   <div>
@@ -38,9 +38,9 @@ export default function Contract({ customContract, account, gasPrice, signer, pr
 
   const contracts = useContractLoader(provider);
   let contract
-  if(!customContract){
+  if (!customContract) {
     contract = contracts ? contracts[name] : "";
-  }else{
+  } else {
     contract = customContract
   }
 
@@ -51,8 +51,8 @@ export default function Contract({ customContract, account, gasPrice, signer, pr
     () =>
       contract
         ? Object.values(contract.interface.functions).filter(
-            fn => fn.type === "function" && !(show && show.indexOf(fn.name) < 0),
-          )
+          fn => fn.type === "function" && !(show && show.indexOf(fn.name) < 0),
+        )
         : [],
     [contract, show],
   );
@@ -61,13 +61,13 @@ export default function Contract({ customContract, account, gasPrice, signer, pr
   const contractDisplay = displayedContractFunctions.map(fn => {
     if (isQueryable(fn)) {
       // If there are no inputs, just display return value
-      return <DisplayVariable key={fn.name} contractFunction={contract[fn.name]} functionInfo={fn} refreshRequired={refreshRequired} triggerRefresh={triggerRefresh}/>;
+      return <DisplayVariable key={fn.name} contractFunction={contract[fn.name]} functionInfo={fn} refreshRequired={refreshRequired} triggerRefresh={triggerRefresh} />;
     }
     // If there are inputs, display a form to allow users to provide these
     return (
       <FunctionForm
         key={"FF" + fn.name}
-        contractFunction={(fn.stateMutability === "view" || fn.stateMutability === "pure")?contract[fn.name]:contract.connect(signer)[fn.name]}
+        contractFunction={(fn.stateMutability === "view" || fn.stateMutability === "pure") ? contract[fn.name] : contract.connect(signer)[fn.name]}
         functionInfo={fn}
         provider={provider}
         gasPrice={gasPrice}
@@ -83,14 +83,7 @@ export default function Contract({ customContract, account, gasPrice, signer, pr
           <div>
             {name}
             <div style={{ float: "right" }}>
-              <Account
-                address={address}
-                localProvider={provider}
-                injectedProvider={provider}
-                mainnetProvider={provider}
-                price={price}
-                blockExplorer={blockExplorer}
-              />
+              <Address value={address} ensProvider={provider} blockExplorer={blockExplorer} />
               {account}
             </div>
           </div>

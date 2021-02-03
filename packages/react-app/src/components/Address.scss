@@ -2,7 +2,7 @@
   line-height: normal;
   vertical-align: middle;
 
-  .ant-badge > .identicon {
+  & > .identicon {
     border-radius: 8px;
   }
 }
@@ -10,15 +10,13 @@
 .address-detail {
   display: flex;
   flex-direction: column;
-}
-
-.address-detail > .text {
-  font-size: 16px;
-  line-height: normal;
-}
-
-.address-detail > .status {
-  font-size: 10px;
-  line-height: normal;
-  color: #30db9e;
+  & > .text {
+    font-size: 16px;
+    line-height: normal;
+  }
+  & > .status {
+    font-size: 10px;
+    line-height: normal;
+    color: #30db9e;
+  }
 }
