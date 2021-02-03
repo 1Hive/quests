@@ -2,19 +2,19 @@
 
 set -e
 
-if ! which docker 2>&1 > /dev/null; then
-    echo "Please install 'docker' first"
-    exit 1
+if ! which docker 2>&1 >/dev/null; then
+  echo "Please install 'docker' first"
+  exit 1
 fi
 
-if ! which docker-compose 2>&1 > /dev/null; then
-    echo "Please install 'docker-compose' first"
-    exit 1
+if ! which docker-compose 2>&1 >/dev/null; then
+  echo "Please install 'docker-compose' first"
+  exit 1
 fi
 
-if ! which jq 2>&1 > /dev/null; then
-    echo "Please install 'jq' first"
-    exit 1
+if ! which jq 2>&1 >/dev/null; then
+  echo "Please install 'jq' first"
+  exit 1
 fi
 
 # Create the graph-node container
@@ -34,9 +34,9 @@ echo "Host IP: $HOST_IP"
 # Inject the host IP into docker-compose.yml
 sed -i -e "s/host.docker.internal/$HOST_IP/g" docker-compose.yml
 
-function stop_graph_node {
-    # Ensure graph-node is stopped
-    docker-compose stop graph-node
+function stop_graph_node() {
+  # Ensure graph-node is stopped
+  docker-compose stop graph-node
 }
 
 trap stop_graph_node EXIT

@@ -54,12 +54,12 @@ export default function EtherInput(props) {
   }
 
   useEffect(
-    ()=>{
-      if(!currentValue){
+    () => {
+      if (!currentValue) {
         setDisplay("");
       }
     }
-  ,[ currentValue ])
+    , [currentValue])
 
   return (
     <Input

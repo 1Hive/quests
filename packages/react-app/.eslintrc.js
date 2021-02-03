@@ -15,7 +15,7 @@ module.exports = {
         "ts": "never",
         "tsx": "never"
       }
-   ],
+    ],
     "import/prefer-default-export": "off",
     "prefer-destructuring": "off",
     "prefer-template": "off",

@@ -5,7 +5,7 @@ const tryToDisplay = thing => {
     try {
       return thing.toNumber();
     } catch (e) {
-      return "Ξ"+formatUnits(thing, "ether");
+      return "Ξ" + formatUnits(thing, "ether");
     }
   }
   return JSON.stringify(thing);
