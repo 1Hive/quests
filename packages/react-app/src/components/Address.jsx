@@ -76,15 +76,17 @@ export default function Address(props) {
 
   return (
     <Space wrap>
-      {props.showStatus ?
-        <Badge status="success" title="Connected" offset={[0, 32]} size="default" dot>
-          <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
-        </Badge> :
+      {props.hideStatus ?
         <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        : <Badge status={props.connected ? "success" : "error"} title="Connected" offset={[0, 32]} size="default" dot>
+          <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        </Badge>
       }
       <div className="address-detail">
         <span className="text">{text}</span>
-        <If expression={props.showStatus}><span className="status">Connected</span></If>
+        {props.connected ?
+          <span className="status">Connected</span>
+          : <span className="status">Disconnected</span>}
       </div>
     </Space>
   );

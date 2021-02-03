@@ -3,7 +3,7 @@ import { Card } from "antd";
 import { useContractLoader, useContractExistsAtAddress } from "../../hooks";
 import DisplayVariable from "./DisplayVariable";
 import FunctionForm from "./FunctionForm";
-import Address from "../Address"
+import Account from "../Account";
 
 const noContractDisplay = (
   <div>
@@ -83,7 +83,14 @@ export default function Contract({ customContract, account, gasPrice, signer, pr
           <div>
             {name}
             <div style={{ float: "right" }}>
-              <Address value={address} ensProvider={provider} blockExplorer={blockExplorer} />
+              <Account
+                address={address}
+                localProvider={provider}
+                injectedProvider={provider}
+                mainnetProvider={provider}
+                price={price}
+                blockExplorer={blockExplorer}
+              />
               {account}
             </div>
           </div>
