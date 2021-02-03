@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import "antd/dist/antd.css";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import "./App.scss";
-import { Layout, Row, Col, Button } from "antd";
+import { Row, Col, Button, Layout } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
 import { Transactor } from "./helpers";
 import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useContractReader, useEventListener, useBalance } from "./hooks";
-import { AppHeader, Account, Contract, GodTool, GasGauge, Address, Faucet, Ramp } from "./components";
+import { AppHeader, Account, Faucet, Ramp, GasGauge, Contract } from "./components";
 import { formatEther } from "@ethersproject/units";
 import { Switch, Route } from "react-router-dom";
 import { Hints, ExampleUI, Subgraph } from "./views"
@@ -55,6 +55,8 @@ const localProviderUrl = "http://" + window.location.hostname + ":8545"; // for 
 const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
 if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
+
+
 
 export default function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
@@ -128,37 +130,25 @@ export default function App(props) {
     setRoute(window.location.pathname)
   }, [setRoute]);
 
-  const wrapperRef = React.createRef();
-  const showButtonRef = React.createRef();
-  const hideButtonRef = React.createRef();
-
-  const hideFaucet = () => {
-    wrapperRef.current.style.display = 'none';
-    hideButtonRef.current.style.display = 'none';
-    showButtonRef.current.style.display = 'block';
-  }
-
-  const showFaucet = () => {
-    wrapperRef.current.style.display = 'block';
-    hideButtonRef.current.style.display = 'block';
-    showButtonRef.current.style.display = 'none';
-  }
-
+  const renderAccount = () => (
+    <Account
+      address={address}
+      localProvider={localProvider}
+      userProvider={userProvider}
+      mainnetProvider={mainnetProvider}
+      price={price}
+      web3Modal={web3Modal}
+      loadWeb3Modal={loadWeb3Modal}
+      logoutOfWeb3Modal={logoutOfWeb3Modal}
+      blockExplorer={blockExplorer}
+    />
+  );
 
   return (
     <BrowserRouter>
       <Layout>
         {/* ✏️ Edit the header and change the title to your project name */}
-        <AppHeader route={route} setRoute={setRoute}
-          address={address}
-          localProvider={localProvider}
-          userProvider={userProvider}
-          mainnetProvider={mainnetProvider}
-          price={price}
-          web3Modal={web3Modal}
-          loadWeb3Modal={loadWeb3Modal}
-          logoutOfWeb3Modal={logoutOfWeb3Modal}
-          blockExplorer={blockExplorer} />
+        <AppHeader route={route} setRoute={setRoute} renderAccount={renderAccount} />
         <Content>
           <Switch>
             <Route exact path="/contract">
@@ -220,13 +210,9 @@ export default function App(props) {
           </Switch>
         </Content>
         <Footer style={{ textAlign: 'center' }}>Honey Quest @2021 Founded by <a href="https://1hive.org/">1Hive</a></Footer>
-      </Layout>
 
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Button id="hide-faucet-button" ref={hideButtonRef} onClick={() => hideFaucet()} type="link" icon={<DownCircleOutlined style={{ fontSize: '32px' }} />}></Button>
-        <Button id="show-faucet-button" ref={showButtonRef} onClick={() => showFaucet()} type="link" icon={<UpCircleOutlined style={{ fontSize: '32px' }} />}></Button>
-        <div ref={wrapperRef} className="wrapper">
+        {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
+        <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
           <Row align="middle" gutter={[4, 4]}>
             <Col span={8}>
               <Ramp price={price} address={address} />
@@ -265,10 +251,12 @@ export default function App(props) {
             </Col>
           </Row>
         </div>
-      </div>
+      </Layout>
     </BrowserRouter>
   );
 }
+
+
 /*
   Web3 modal helps us "connect" external wallets:
 */

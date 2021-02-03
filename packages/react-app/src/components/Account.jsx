@@ -1,11 +1,19 @@
 import "./Account.scss";
 import React from "react";
-import { Menu, Button, Dropdown } from "antd";
+import { Button, Dropdown, Space, Menu } from "antd";
 import Address from "./Address";
 import Balance from "./Balance";
 import Wallet from "./Wallet";
-import { EllipsisOutlined } from "@ant-design/icons";
+import { EllipsisOutlined } from '@ant-design/icons';
 
+
+const openProfileModal = () => {
+
+};
+
+const openSettingsModal = () => {
+
+};
 
 export default function Account({
   address,
@@ -17,16 +25,20 @@ export default function Account({
   web3Modal,
   loadWeb3Modal,
   logoutOfWeb3Modal,
-  blockExplorer,
+  blockExplorer
 }) {
 
-  const openProfileModal = () => {
+  const loginButton = (<Button
+    className="btn-login"
+    key="loginbutton"
+    shape="round"
+    size="large"
+    onClick={loadWeb3Modal}
+  /*type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time*/
 
-  };
-
-  const openSettingsModal = () => {
-
-  };
+  >
+    Connect
+  </Button>);
 
   const menu = (
     <Menu>
@@ -48,53 +60,31 @@ export default function Account({
       </Menu.Item>
     </Menu>
   );
-  const modalButtons = [];
-  if (web3Modal) {
-    if (web3Modal.cachedProvider) {
-      modalButtons.push(<Dropdown key="more" overlay={menu}>
-        <Button
-          style={{
-            border: 'none',
-            padding: 0,
-          }}
-        >
-          <EllipsisOutlined
-            style={{
-              fontSize: 20,
-              verticalAlign: 'top',
-            }}
-          />
-        </Button>
-      </Dropdown>)
-    } else {
-      modalButtons.push(
-        <Button
-          className="btn-login"
-          key="loginbutton"
-          shape="round"
-          size="large"
-          onClick={loadWeb3Modal}
-        >
-          Connect
-        </Button>,
-      );
-    }
-  }
 
-  const display = minimized || !web3Modal?.cachedProvider ? (
+  const display = minimized ? (
     ""
   ) : (
-      <span>
-        {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} connected={web3Modal?.cachedProvider} /> : "Connecting..."}
+      <Space>
+        {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} showStatus /> : "Connecting..."}
         <Balance address={address} provider={localProvider} dollarMultiplier={price} />
         <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
-      </span>
+        <Dropdown key="more" overlay={menu}>
+          <Button
+            style={{
+              border: 'none',
+              padding: 0,
+            }}
+          >
+            <EllipsisOutlined
+              style={{
+                fontSize: 20,
+                verticalAlign: 'top',
+              }}
+            />
+          </Button>
+        </Dropdown>
+      </Space>
     );
 
-  return (
-    <div>
-      {display}
-      {modalButtons}
-    </div>
-  );
+  return web3Modal?.cachedProvider ? display : loginButton;
 }
