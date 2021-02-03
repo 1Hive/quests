@@ -1,0 +1,12 @@
+.wrapper,
+.hide-button {
+  display: block;
+  &.ant-btn {
+    margin-bottom: 8px;
+  }
+}
+
+.show-button {
+  display: none;
+  margin-bottom: 8px;
+}
