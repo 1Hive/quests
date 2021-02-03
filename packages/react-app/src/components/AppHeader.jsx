@@ -1,12 +1,19 @@
 
 import "./AppHeader.scss";
 import React from "react";
-import { Menu, Layout } from "antd";
+import { Menu, Layout, Button, Dropdown } from "antd";
 import { Link } from "react-router-dom";
+import { Account } from "./";
 const { SubMenu } = Menu;
 const { Header } = Layout;
 
 export default class AppHeader extends React.Component {
+  constructor(props) {
+    super();
+    this.props = props;
+  }
+
+
   render() {
     return (
       <Header>
@@ -48,7 +55,17 @@ export default class AppHeader extends React.Component {
             </Menu.Item  >
           </SubMenu>
         </Menu>
-        {this.props.renderAccount()}
+        <Account
+          address={this.props.address}
+          localProvider={this.props.localProvider}
+          userProvider={this.props.userProvider}
+          mainnetProvider={this.props.mainnetProvider}
+          price={this.props.price}
+          web3Modal={this.props.web3Modal}
+          loadWeb3Modal={this.props.loadWeb3Modal}
+          logoutOfWeb3Modal={this.props.logoutOfWeb3Modal}
+          blockExplorer={this.props.blockExplorer}
+        />
       </Header >
     )
   }

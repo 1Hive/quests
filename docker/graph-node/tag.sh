@@ -3,14 +3,14 @@
 # This script is used by cloud build to push Docker images into Docker hub
 
 tag_and_push() {
-    tag=$1
-    docker tag gcr.io/$PROJECT_ID/graph-node:$SHORT_SHA \
-           graphprotocol/graph-node:$tag
-    docker push graphprotocol/graph-node:$tag
+  tag=$1
+  docker tag gcr.io/$PROJECT_ID/graph-node:$SHORT_SHA \
+  graphprotocol/graph-node:$tag
+  docker push graphprotocol/graph-node:$tag
 
-    docker tag gcr.io/$PROJECT_ID/graph-node-debug:$SHORT_SHA \
-           graphprotocol/graph-node-debug:$tag
-    docker push graphprotocol/graph-node-debug:$tag
+  docker tag gcr.io/$PROJECT_ID/graph-node-debug:$SHORT_SHA \
+  graphprotocol/graph-node-debug:$tag
+  docker push graphprotocol/graph-node-debug:$tag
 }
 
 echo "Logging into Docker Hub"

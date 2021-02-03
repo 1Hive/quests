@@ -30,9 +30,9 @@ function publishContract(contractName) {
       } else {
         graphConfig = '{}'
       }
-      } catch (e) {
-        console.log(e)
-      }
+    } catch (e) {
+      console.log(e)
+    }
 
     graphConfig = JSON.parse(graphConfig)
     graphConfig[contractName + "Address"] = address
@@ -49,8 +49,8 @@ function publishContract(contractName) {
       `module.exports = "${contract.bytecode}";`
     );
 
-    const folderPath = graphConfigPath.replace("/config.json","")
-    if (!fs.existsSync(folderPath)){
+    const folderPath = graphConfigPath.replace("/config.json", "")
+    if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath);
     }
     fs.writeFileSync(

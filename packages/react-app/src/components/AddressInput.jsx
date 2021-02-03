@@ -38,7 +38,7 @@ export default function AddressInput(props) {
     </div>
   );
 
-  const {ensProvider, onChange} = props;
+  const { ensProvider, onChange } = props;
   const updateAddress = useCallback(
     async newValue => {
       if (typeof newValue !== "undefined") {
@@ -50,7 +50,7 @@ export default function AddressInput(props) {
               address = possibleAddress;
             }
             // eslint-disable-next-line no-empty
-          } catch (e) {}
+          } catch (e) { }
         }
         setValue(address);
         if (typeof onChange === "function") {
@@ -97,8 +97,8 @@ export default function AddressInput(props) {
       />
     </div>
   ) : (
-    ""
-  );
+      ""
+    );
 
   return (
     <div>

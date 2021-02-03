@@ -30,3 +30,16 @@ body {
     }
   }
 }
+
+.wrapper,
+#hide-faucet-button {
+  display: block;
+  &.ant-btn {
+    margin-bottom: 8px;
+  }
+}
+
+#show-faucet-button {
+  display: none;
+  margin-bottom: 8px;
+}
