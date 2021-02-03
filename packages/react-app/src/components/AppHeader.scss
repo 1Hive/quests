@@ -13,13 +13,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.title > .logo {
-  width: 40px;
-  margin: 0 8px;
-  float: left;
-}
-.title > .logo > img {
-  width: 100%;
+  & > .logo {
+    width: 40px;
+    margin: 0 8px;
+    float: left;
+    & > img {
+      width: 100%;
+    }
+  }
 }

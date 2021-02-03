@@ -1,6 +1,6 @@
 import "./Account.scss";
 import React from "react";
-import { Button, Dropdown, Space, Menu, Divider } from "antd";
+import { Button, Dropdown, Space, Menu } from "antd";
 import Address from "./Address";
 import Balance from "./Balance";
 import Wallet from "./Wallet";
@@ -86,5 +86,5 @@ export default function Account({
       </Space>
     );
 
-  return web3Modal.cachedProvider ? loginButton : display;
+  return web3Modal?.cachedProvider ? loginButton : display;
 }
