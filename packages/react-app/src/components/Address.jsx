@@ -1,8 +1,7 @@
-
 import "./Address.scss";
 import React from "react";
 import Blockies from "react-blockies";
-import { Typography, Skeleton, Badge, Space } from "antd";
+import { Typography, Skeleton, Badge, Space, Tooltip } from "antd";
 import { useLookupAddress } from "../hooks";
 import { If } from "../components"
 
@@ -34,7 +33,7 @@ export default function Address(props) {
     );
   }
 
-  let displayAddress = props.value.substr(0, 6);
+  let displayAddress = `${props.value.substring(0, 6)}...${props.value.substring(props.value.length - 4, props.value.length)}`;
 
   if (ens && ens.indexOf("0x") < 0) {
     displayAddress = ens;
@@ -59,35 +58,41 @@ export default function Address(props) {
   if (props.onChange) {
     text = (
       <Text editable={{ onChange: props.onChange }} copyable={{ text: props.value }}>
-        <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-          {displayAddress}
-        </a>
+        <Tooltip title={props.value.toLowerCase()}>
+          <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
+            {displayAddress}
+          </a>
+        </Tooltip>
       </Text>
     );
   } else {
     text = (
       <Text copyable={{ text: props.value }}>
-        <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-          {displayAddress}
-        </a>
+        <Tooltip title={props.value.toLowerCase()}>
+          <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
+            {displayAddress}
+          </a>
+        </Tooltip>
       </Text>
     );
   }
   let fontSize = props.fontSize ?? 16;
   if (!props.showStatus)
     fontSize *= 1.5;
+
+
   return (
     <Space align="baseline">
       {props.showStatus ?
         <Badge status="success" title="Connected" offset={[0, 32]} size="default" dot>
-          <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+          <Blockies toolt seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
         </Badge>
         : <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
       }
       <div className="address-detail">
         <span className="text" style={{ fontSize }}>{text}</span>
         <If expression={props.showStatus}>
-          <span className="status">Connected</span>
+          <span className="status">Connected to xDai</span>
         </If>
       </div>
     </Space>

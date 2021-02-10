@@ -2,6 +2,7 @@
   "name": "@scaffold-eth/react-app",
   "version": "1.0.0",
   "homepage": ".",
+  "license": "SEE LICENSE IN </LICENSE>",
   "browserslist": {
     "production": [
       ">0.2%",

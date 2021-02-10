@@ -49,7 +49,7 @@ export default function Balance(props) {
     floatBalance = parseFloat(etherBalance);
   }
 
-  let displayBalance = floatBalance.toFixed(4);
+  let displayBalance = floatBalance.toFixed(4) + " ETH";
 
   if (props.dollarMultiplier && dollarMode) {
     displayBalance = "$" + (floatBalance * props.dollarMultiplier).toFixed(2);
