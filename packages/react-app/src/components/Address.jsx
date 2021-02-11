@@ -54,28 +54,17 @@ export default function Address(props) {
     );
   }
 
-  let text;
-  if (props.onChange) {
-    text = (
-      <Text editable={{ onChange: props.onChange }} copyable={{ text: props.value }}>
-        <Tooltip title={props.value.toLowerCase()}>
-          <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-            {displayAddress}
-          </a>
-        </Tooltip>
-      </Text>
-    );
-  } else {
-    text = (
-      <Text copyable={{ text: props.value }}>
-        <Tooltip title={props.value.toLowerCase()}>
-          <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-            {displayAddress}
-          </a>
-        </Tooltip>
-      </Text>
-    );
-  }
+  let innerAnchor = (<a style={{ color: "#222222" }} target={"_blank"} href={props.interactable ? etherscanLink : ''} rel="noopener noreferrer">
+    {displayAddress}
+  </a>);
+  let text = (
+    <Text editable={props.interactable && props.onChange ? { onChange: props.onChange } : false} copyable={props.interactable ? { text: props.value } : false}>
+      { props.interactable ?
+        (<Tooltip title={props.value.toLowerCase()}>{innerAnchor}</Tooltip>)
+        : innerAnchor
+      }
+    </Text>
+  );
   let fontSize = props.fontSize ?? 16;
   if (!props.showStatus)
     fontSize *= 1.5;
@@ -84,7 +73,7 @@ export default function Address(props) {
   return (
     <Space align="baseline">
       {props.showStatus ?
-        <Badge status="success" title="Connected" offset={[0, 32]} size="default" dot>
+        <Badge status="success" title="Connected" offset={[-2, 30]} size="default" >
           <Blockies toolt seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
         </Badge>
         : <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />

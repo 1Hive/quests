@@ -1,10 +1,16 @@
 .ant-badge.ant-badge-status {
   line-height: normal;
   vertical-align: middle;
-
-  & > .identicon {
-    border-radius: 8px;
+  & > .ant-badge-dot {
+    width: 10px;
+    height: 10px;
+    border: 2px solid white;
+    border-radius: 50%;
   }
+}
+
+.identicon {
+  border-radius: 5px;
 }
 
 .address-detail {

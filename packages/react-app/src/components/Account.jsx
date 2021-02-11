@@ -3,7 +3,7 @@ import { Button, Popover, Space, Typography } from "antd";
 import Address from "./Address";
 import Balance from "./Balance";
 import Wallet from "./Wallet";
-import { BellFilled, DownOutlined, IdcardOutlined, LoginOutlined, LogoutOutlined, BellOutlined, SettingFilled, SettingOutlined } from "@ant-design/icons";
+import { BellFilled, DownOutlined, ProfileFilled, LoginOutlined, LogoutOutlined, BellOutlined, SettingFilled, SettingOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 const style = {
@@ -15,9 +15,15 @@ const style = {
 
 export default class Account extends React.Component {
 
-  parseAddress() {
-    let addressShort = `${this.props.address.substring(0, 6)}...${this.props.address.substring(this.props.address.length - 4, this.props.address.length)}`;
-    return (<Text copyable={this.props.address}>{addressShort}</Text>)
+  // parseAddress() {
+  //   let addressShort = `${this.props.address.substring(0, 6)}...${this.props.address.substring(this.props.address.length - 4, this.props.address.length)}`;
+  //   return (<Text copyable={this.props.address}>{addressShort}</Text>)
+  // }
+
+  getAddressComponent(minimized, interactable, showStatus) {
+    return this.props.address ?
+      (<Address minimized={minimized} interactable={interactable} showStatus={showStatus} value={this.props.address} ensProvider={this.props.mainnetProvider} blockExplorer={this.props.blockExplorer} />)
+      : "Connecting...";
   }
 
   render() {
@@ -34,6 +40,7 @@ export default class Account extends React.Component {
 
     const popAccountContent = (
       <Space direction="vertical" style={{ width: 250 }}>
+        {this.getAddressComponent(false, true, false)}
         <Text>Network : xDai</Text>
         <div>
           <Wallet address={this.props.address} provider={this.props.userProvider} ensProvider={this.props.mainnetProvider} price={this.props.price} />
@@ -61,24 +68,26 @@ export default class Account extends React.Component {
 
     const display = this.props.minimized || !this.props.web3Modal?.cachedProvider ? loginButton : (
       <Space>
-        <div className="mr-8">
-          {this.props.address ? <Address value={this.props.address} ensProvider={this.props.mainnetProvider} blockExplorer={this.props.blockExplorer} showStatus={this.props.web3Modal?.cachedProvider} /> : "Connecting..."}
-          <Popover content={popAccountContent} title={(<><IdcardOutlined /> {this.parseAddress()}</>)} placement="bottomLeft" arrowPointAtCenter>
-            <Button type="link" className="p-0 mt-8">
+        <div>
+          <Popover content={popAccountContent} title={(<><ProfileFilled /> Profile</>)} trigger="click">
+            {this.getAddressComponent(false, false, true)}
+            <Button type="link" className="p-8">
               <DownOutlined />
             </Button>
           </Popover>
         </div>
-        <Popover content={popNotifContent} title={(<><SettingFilled /> Settings</>)} arrowPointAtCenter>
-          <Button type="link" >
-            <SettingOutlined />
-          </Button>
-        </Popover>
-        <Popover content={popSettingsContent} title={(<><BellFilled /> Notifications</>)} arrowPointAtCenter placement="bottomLeft" >
-          <Button type="link">
-            <BellOutlined />
-          </Button>
-        </Popover>
+        <div>
+          <Popover content={popNotifContent} title={(<><SettingFilled /> Settings</>)} arrowPointAtCenter trigger="click">
+            <Button type="link" className="p-8">
+              <SettingOutlined />
+            </Button>
+          </Popover>
+          <Popover content={popSettingsContent} title={(<><BellFilled /> Notifications</>)} arrowPointAtCenter placement="bottomLeft" trigger="click">
+            <Button type="link" className="p-8">
+              <BellOutlined />
+            </Button>
+          </Popover>
+        </div>
       </Space>
     );
 
