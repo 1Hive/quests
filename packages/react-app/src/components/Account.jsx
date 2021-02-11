@@ -39,9 +39,8 @@ export default class Account extends React.Component {
     </Button>);
 
     const popAccountContent = (
-      <Space direction="vertical" style={{ width: 250 }}>
-        {this.getAddressComponent(false, true, false)}
-        <Text>Network : xDai</Text>
+      <Space direction="vertical" style={{ width: 200 }}>
+        {this.getAddressComponent(false, true, true)}
         <div>
           <Wallet address={this.props.address} provider={this.props.userProvider} ensProvider={this.props.mainnetProvider} price={this.props.price} />
           <Balance address={this.props.address} provider={this.props.localProvider} dollarMultiplier={this.props.price} />
@@ -70,10 +69,12 @@ export default class Account extends React.Component {
       <Space>
         <div>
           <Popover content={popAccountContent} title={(<><ProfileFilled /> Profile</>)} trigger="click">
-            {this.getAddressComponent(false, false, true)}
-            <Button type="link" className="p-8">
-              <DownOutlined />
-            </Button>
+            <div style={{ cursor: "pointer" }}>
+              {this.getAddressComponent(false, false, true)}
+              <Button type="link" className="p-8">
+                <DownOutlined />
+              </Button>
+            </div>
           </Popover>
         </div>
         <div>

@@ -71,7 +71,7 @@ export default function Address(props) {
 
 
   return (
-    <Space align="baseline">
+    <Space>
       {props.showStatus ?
         <Badge status="success" title="Connected" offset={[-2, 30]} size="default" >
           <Blockies toolt seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
