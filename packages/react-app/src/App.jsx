@@ -121,6 +121,11 @@ export default function App(props) {
     if (web3Modal.cachedProvider) {
       loadWeb3Modal();
     }
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', (_chainId) => window.location.reload());
+    } else {
+      
+    }
   }, [loadWeb3Modal]);
 
   const [route, setRoute] = useState();
@@ -290,3 +295,4 @@ const logoutOfWeb3Modal = async () => {
     window.location.reload();
   }, 1);
 };
+

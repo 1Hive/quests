@@ -22,6 +22,13 @@ const { Text } = Typography;
 
 const blockExplorerLink = (address, blockExplorer) => `${blockExplorer || "https://etherscan.io/"}${"address/"}${address}`;
 
+const chainMap = {
+  '0x1': 'Mainnet',
+  '0x4': 'Rinkeby',
+  '0x64': 'xDai',
+  '0x539': 'Localhost',
+}
+
 export default function Address(props) {
   const ens = useLookupAddress(props.ensProvider, props.value);
 
@@ -33,7 +40,7 @@ export default function Address(props) {
     );
   }
 
-  let displayAddress = `${props.value.substring(0, 6)}...${props.value.substring(props.value.length - 4, props.value.length)}`;
+  let displayAddress = props.value.substr(0, 6);;
 
   if (ens && ens.indexOf("0x") < 0) {
     displayAddress = ens;
@@ -45,23 +52,21 @@ export default function Address(props) {
 
   const etherscanLink = blockExplorerLink(props.value, props.blockExplorer);
   if (props.minimized) {
-    return (
-      <span>
-        <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-          <Blockies seed={props.value.toLowerCase()} size={8} scale={2} />
-        </a>
-      </span>
-    );
+    const blockies = (<Blockies seed={props.value.toLowerCase()} size={8} scale={2} />);
+    return props.interactable ?
+      (<a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">{blockies}</a>)
+      : blockies;
   }
 
-  let innerAnchor = (<a style={{ color: "#222222" }} target={"_blank"} href={props.interactable ? etherscanLink : ''} rel="noopener noreferrer">
-    {displayAddress}
-  </a>);
   let text = (
     <Text editable={props.interactable && props.onChange ? { onChange: props.onChange } : false} copyable={props.interactable ? { text: props.value } : false}>
       { props.interactable ?
-        (<Tooltip title={props.value.toLowerCase()}>{innerAnchor}</Tooltip>)
-        : innerAnchor
+        (<Tooltip title={props.value.toLowerCase()}>
+          <a style={{ color: "#222222" }} target={"_blank"} href={props.interactable ? etherscanLink : '#'} rel="noopener noreferrer">
+            {displayAddress}
+          </a>
+        </Tooltip>)
+        : displayAddress
       }
     </Text>
   );
@@ -69,6 +74,7 @@ export default function Address(props) {
   if (!props.showStatus)
     fontSize *= 1.5;
 
+  const netwName = window.ethereum ? chainMap[window.ethereum.chainId] : undefined;
 
   return (
     <Space>
@@ -81,7 +87,7 @@ export default function Address(props) {
       <div className="address-detail">
         <span className="text" style={{ fontSize }}>{text}</span>
         <If expression={props.showStatus}>
-          <span className="status">Connected to xDai</span>
+          <span className="status">Connected {netwName ? `to ${netwName}` : ''}</span>
         </If>
       </div>
     </Space>

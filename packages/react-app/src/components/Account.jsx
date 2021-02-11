@@ -5,7 +5,6 @@ import Balance from "./Balance";
 import Wallet from "./Wallet";
 import { BellFilled, DownOutlined, ProfileFilled, LoginOutlined, LogoutOutlined, BellOutlined, SettingFilled, SettingOutlined } from "@ant-design/icons";
 
-const { Text } = Typography;
 const style = {
   btnLogin: {
     background: 'linear-gradient(268.53deg, #aaf5d4 0%, #7ce0d6 100%)',
@@ -22,7 +21,8 @@ export default class Account extends React.Component {
 
   getAddressComponent(minimized, interactable, showStatus) {
     return this.props.address ?
-      (<Address minimized={minimized} interactable={interactable} showStatus={showStatus} value={this.props.address} ensProvider={this.props.mainnetProvider} blockExplorer={this.props.blockExplorer} />)
+      (<Address size="short" minimized={minimized} interactable={interactable} showStatus={showStatus} localProvider={this.props.mainnetProvider}
+        value={this.props.address} ensProvider={this.props.mainnetProvider} blockExplorer={this.props.blockExplorer} />)
       : "Connecting...";
   }
 
@@ -65,30 +65,28 @@ export default class Account extends React.Component {
       </div >
     );
 
-    const display = this.props.minimized || !this.props.web3Modal?.cachedProvider ? loginButton : (
+    const display = !this.props.web3Modal?.cachedProvider ? loginButton : (
       <Space>
-        <div>
-          <Popover content={popAccountContent} title={(<><ProfileFilled /> Profile</>)} trigger="click">
-            <div style={{ cursor: "pointer" }}>
-              {this.getAddressComponent(false, false, true)}
-              <Button type="link" className="p-8">
-                <DownOutlined />
-              </Button>
-            </div>
-          </Popover>
-        </div>
         <div>
           <Popover content={popNotifContent} title={(<><SettingFilled /> Settings</>)} arrowPointAtCenter trigger="click">
             <Button type="link" className="p-8">
-              <SettingOutlined />
+              <SettingOutlined style={{ fontSize: 20 }} />
             </Button>
           </Popover>
           <Popover content={popSettingsContent} title={(<><BellFilled /> Notifications</>)} arrowPointAtCenter placement="bottomLeft" trigger="click">
             <Button type="link" className="p-8">
-              <BellOutlined />
+              <BellOutlined style={{ fontSize: 20 }} />
             </Button>
           </Popover>
         </div>
+        <Popover content={popAccountContent} title={(<><ProfileFilled /> Profile</>)} >
+          <div style={{ cursor: "pointer" }}>
+            {this.getAddressComponent(false, false, true)}
+            <Button type="link" className="p-8">
+              <DownOutlined />
+            </Button>
+          </div>
+        </Popover>
       </Space>
     );
 
