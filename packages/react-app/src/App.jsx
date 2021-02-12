@@ -13,6 +13,7 @@ import { formatEther } from "@ethersproject/units";
 import { Switch, Route } from "react-router-dom";
 import { Hints, ExampleUI, Subgraph } from "./views"
 import { BrowserRouter } from "react-router-dom";
+import Web3 from "web3";
 //import Hints from "./Hints";
 /*
     Welcome to 🏗 scaffold-eth !
@@ -114,6 +115,7 @@ export default function App(props) {
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
+    window.web3 = new Web3(provider);
     setInjectedProvider(new Web3Provider(provider));
   }, [setInjectedProvider]);
 
@@ -121,10 +123,10 @@ export default function App(props) {
     if (web3Modal.cachedProvider) {
       loadWeb3Modal();
     }
-    if (window.ethereum) {
-      window.ethereum.on('chainChanged', (_chainId) => window.location.reload());
+    if (global.web3) {
+      global.web3.currentProvider.on('chainChanged', (_chainId) => window.location.reload());
     } else {
-      
+
     }
   }, [loadWeb3Modal]);
 
@@ -295,4 +297,3 @@ const logoutOfWeb3Modal = async () => {
     window.location.reload();
   }, 1);
 };
-
