@@ -1,7 +1,7 @@
 
 import "./AppHeader.scss";
 import React from "react";
-import { Menu, Layout, Button, Dropdown } from "antd";
+import { Menu, Layout } from "antd";
 import { Link } from "react-router-dom";
 import { Account } from "./";
 const { SubMenu } = Menu;

@@ -1,6 +1,7 @@
 {
   "name": "@scaffold-eth/monorepo",
   "version": "1.0.0",
+  "license": "SEE LICENSE IN <LICENSE>",
   "keywords": [
     "ethereum",
     "react",

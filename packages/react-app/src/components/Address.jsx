@@ -1,8 +1,7 @@
-
 import "./Address.scss";
 import React from "react";
 import Blockies from "react-blockies";
-import { Typography, Skeleton, Badge, Space } from "antd";
+import { Typography, Skeleton, Badge, Space, Tooltip } from "antd";
 import { useLookupAddress } from "../hooks";
 import { If } from "../components"
 
@@ -23,6 +22,13 @@ const { Text } = Typography;
 
 const blockExplorerLink = (address, blockExplorer) => `${blockExplorer || "https://etherscan.io/"}${"address/"}${address}`;
 
+const chainMap = {
+  '0x1': 'Mainnet',
+  '0x4': 'Rinkeby',
+  '0x64': 'xDai',
+  '0x539': 'Localhost',
+}
+
 export default function Address(props) {
   const ens = useLookupAddress(props.ensProvider, props.value);
 
@@ -34,7 +40,7 @@ export default function Address(props) {
     );
   }
 
-  let displayAddress = props.value.substr(0, 6);
+  let displayAddress = props.value.substr(0, 6);;
 
   if (ens && ens.indexOf("0x") < 0) {
     displayAddress = ens;
@@ -46,48 +52,42 @@ export default function Address(props) {
 
   const etherscanLink = blockExplorerLink(props.value, props.blockExplorer);
   if (props.minimized) {
-    return (
-      <span>
-        <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-          <Blockies seed={props.value.toLowerCase()} size={8} scale={2} />
-        </a>
-      </span>
-    );
+    const blockies = (<Blockies seed={props.value.toLowerCase()} size={8} scale={2} />);
+    return props.interactable ?
+      (<a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">{blockies}</a>)
+      : blockies;
   }
 
-  let text;
-  if (props.onChange) {
-    text = (
-      <Text editable={{ onChange: props.onChange }} copyable={{ text: props.value }}>
-        <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-          {displayAddress}
-        </a>
-      </Text>
-    );
-  } else {
-    text = (
-      <Text copyable={{ text: props.value }}>
-        <a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-          {displayAddress}
-        </a>
-      </Text>
-    );
-  }
+  let text = (
+    <Text editable={props.interactable && props.onChange ? { onChange: props.onChange } : false} copyable={props.interactable ? { text: props.value } : false}>
+      { props.interactable ?
+        (<Tooltip title={props.value.toLowerCase()}>
+          <a style={{ color: "#222222" }} target={"_blank"} href={props.interactable ? etherscanLink : '#'} rel="noopener noreferrer">
+            {displayAddress}
+          </a>
+        </Tooltip>)
+        : displayAddress
+      }
+    </Text>
+  );
   let fontSize = props.fontSize ?? 16;
   if (!props.showStatus)
     fontSize *= 1.5;
+
+  const netwName = window.ethereum ? chainMap[window.ethereum.chainId] : undefined;
+
   return (
-    <Space align="baseline">
+    <Space>
       {props.showStatus ?
-        <Badge status="success" title="Connected" offset={[0, 32]} size="default" dot>
-          <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        <Badge status="success" title="Connected" offset={[-2, 30]} size="default" >
+          <Blockies toolt seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
         </Badge>
         : <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
       }
       <div className="address-detail">
         <span className="text" style={{ fontSize }}>{text}</span>
         <If expression={props.showStatus}>
-          <span className="status">Connected</span>
+          <span className="status">Connected {netwName ? `to ${netwName}` : ''}</span>
         </If>
       </div>
     </Space>
