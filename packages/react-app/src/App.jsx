@@ -7,11 +7,19 @@ import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
 import { Transactor } from "./helpers";
-import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useContractReader, useEventListener, useBalance } from "./hooks";
+import {
+  useExchangePrice,
+  useGasPrice,
+  useUserProvider,
+  useContractLoader,
+  useContractReader,
+  useEventListener,
+  useBalance,
+} from "./hooks";
 import { AppHeader, Contract, Ramp, GasGauge, Faucet } from "./components";
 import { formatEther } from "@ethersproject/units";
 import { Switch, Route } from "react-router-dom";
-import { Hints, ExampleUI, Subgraph } from "./views"
+import { Hints, ExampleUI, Subgraph } from "./views";
 import { BrowserRouter } from "react-router-dom";
 import Web3 from "web3";
 //import Hints from "./Hints";
@@ -38,18 +46,18 @@ import { DownCircleOutlined, UpCircleOutlined } from "@ant-design/icons";
 const { Content, Footer } = Layout;
 
 // 😬 Sorry for all the console logging 🤡
-const DEBUG = true
+const DEBUG = true;
 
 // 🔭 block explorer URL
-const blockExplorer = "https://etherscan.io/" // for xdai: "https://blockscout.com/poa/xdai/"
+const blockExplorer = "https://etherscan.io/"; // for xdai: "https://blockscout.com/poa/xdai/"
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 //const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
-const mainnetProvider = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
+const mainnetProvider = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID);
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_ID)
-console.log("window.location.hostname", window.location.hostname)
+console.log("window.location.hostname", window.location.hostname);
 // 🏠 Your local provider is usually pointed at your local blockchain
 const localProviderUrl = "http://" + window.location.hostname + ":8545"; // for xdai: https://dai.poa.network
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
@@ -72,23 +80,23 @@ export default function App(props) {
   const address = useUserAddress(userProvider);
 
   // The transactor wraps transactions and provides notificiations
-  const tx = Transactor(userProvider, gasPrice)
+  const tx = Transactor(userProvider, gasPrice);
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
-  if (DEBUG) console.log("💵 yourLocalBalance", yourLocalBalance ? formatEther(yourLocalBalance) : "...")
+  if (DEBUG) console.log("💵 yourLocalBalance", yourLocalBalance ? formatEther(yourLocalBalance) : "...");
 
   // just plug in different 🛰 providers to get your balance on different chains:
   const yourMainnetBalance = useBalance(mainnetProvider, address);
-  if (DEBUG) console.log("💵 yourMainnetBalance", yourMainnetBalance ? formatEther(yourMainnetBalance) : "...")
+  if (DEBUG) console.log("💵 yourMainnetBalance", yourMainnetBalance ? formatEther(yourMainnetBalance) : "...");
 
   // Load in your local 📝 contract and read a value from it:
-  const readContracts = useContractLoader(localProvider)
-  if (DEBUG) console.log("📝 readContracts", readContracts)
+  const readContracts = useContractLoader(localProvider);
+  if (DEBUG) console.log("📝 readContracts", readContracts);
 
   // If you want to make 🔐 write transactions to your contracts, use the userProvider:
-  const writeContracts = useContractLoader(userProvider)
-  if (DEBUG) console.log("🔐 writeContracts", writeContracts)
+  const writeContracts = useContractLoader(userProvider);
+  if (DEBUG) console.log("🔐 writeContracts", writeContracts);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -101,12 +109,12 @@ export default function App(props) {
   //
 
   // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose")
-  console.log("🤗 purpose:", purpose)
+  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+  console.log("🤗 purpose:", purpose);
 
   //📟 Listen for broadcast events
   const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
-  console.log("📟 SetPurpose events:", setPurposeEvents)
+  console.log("📟 SetPurpose events:", setPurposeEvents);
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -124,15 +132,14 @@ export default function App(props) {
       loadWeb3Modal();
     }
     if (global.web3) {
-      global.web3.currentProvider.on('chainChanged', (_chainId) => window.location.reload());
+      global.web3.currentProvider.on("chainChanged", _chainId => window.location.reload());
     } else {
-
     }
   }, [loadWeb3Modal]);
 
   const [route, setRoute] = useState();
   useEffect(() => {
-    setRoute(window.location.pathname)
+    setRoute(window.location.pathname);
   }, [setRoute]);
 
   const wrapperRef = React.createRef();
@@ -140,22 +147,23 @@ export default function App(props) {
   const hideButtonRef = React.createRef();
 
   const hideFaucet = () => {
-    wrapperRef.current.style.display = 'none';
-    hideButtonRef.current.style.display = 'none';
-    showButtonRef.current.style.display = 'block';
-  }
+    wrapperRef.current.style.display = "none";
+    hideButtonRef.current.style.display = "none";
+    showButtonRef.current.style.display = "block";
+  };
 
   const showFaucet = () => {
-    wrapperRef.current.style.display = 'block';
-    hideButtonRef.current.style.display = 'block';
-    showButtonRef.current.style.display = 'none';
-  }
+    wrapperRef.current.style.display = "block";
+    hideButtonRef.current.style.display = "block";
+    showButtonRef.current.style.display = "none";
+  };
 
   return (
     <BrowserRouter>
       <Layout>
-        {/* ✏️ Edit the header and change the title to your project name */}
-        <AppHeader route={route} setRoute={setRoute}
+        <AppHeader
+          route={route}
+          setRoute={setRoute}
           address={address}
           localProvider={localProvider}
           userProvider={userProvider}
@@ -164,7 +172,8 @@ export default function App(props) {
           web3Modal={web3Modal}
           loadWeb3Modal={loadWeb3Modal}
           logoutOfWeb3Modal={logoutOfWeb3Modal}
-          blockExplorer={blockExplorer} />
+          blockExplorer={blockExplorer}
+        />
         <Content>
           <Switch>
             <Route exact path="/contract">
@@ -181,7 +190,7 @@ export default function App(props) {
                 blockExplorer={blockExplorer}
               />
 
-              { /* Uncomment to display and interact with an external contract (DAI on mainnet):
+              {/* Uncomment to display and interact with an external contract (DAI on mainnet):
         <Contract
           name="DAI"
           customContract={mainnetDAIContract}
@@ -189,8 +198,7 @@ export default function App(props) {
           provider={mainnetProvider}
           address={address}
           blockExplorer={blockExplorer}
-        />*/}
-
+        /> */}
             </Route>
             <Route path="/hints">
               <Hints
@@ -225,13 +233,27 @@ export default function App(props) {
             </Route>
           </Switch>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>Honey Quest @2021 Founded by <a href="https://1hive.org/">1Hive</a></Footer>
+        <Footer style={{ textAlign: "center" }}>
+          Honey Quest @2021 Founded by <a href="https://1hive.org/">1Hive</a>
+        </Footer>
       </Layout>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 0, padding: 10 }}>
-        <Button id="hide-faucet-button" ref={hideButtonRef} onClick={() => hideFaucet()} type="link" icon={<DownCircleOutlined style={{ fontSize: '32px' }} />}></Button>
-        <Button id="show-faucet-button" ref={showButtonRef} onClick={() => showFaucet()} type="link" icon={<UpCircleOutlined style={{ fontSize: '32px' }} />}></Button>
+        <Button
+          id="hide-faucet-button"
+          ref={hideButtonRef}
+          onClick={() => hideFaucet()}
+          type="link"
+          icon={<DownCircleOutlined style={{ fontSize: "32px" }} />}
+        ></Button>
+        <Button
+          id="show-faucet-button"
+          ref={showButtonRef}
+          onClick={() => showFaucet()}
+          type="link"
+          icon={<UpCircleOutlined style={{ fontSize: "32px" }} />}
+        ></Button>
         <div ref={wrapperRef} className="wrapper">
           <Row align="middle" gutter={[4, 4]}>
             <Col span={8}>
@@ -251,28 +273,32 @@ export default function App(props) {
               >
                 <span style={{ marginRight: 8 }} role="img" aria-label="support">
                   💬
-              </span>
-              Support
-            </Button>
+                </span>
+                Support
+              </Button>
             </Col>
           </Row>
 
           <Row align="middle" gutter={[4, 4]}>
             <Col span={24}>
               {
-
                 /*  if the local provider has a signer, let's show the faucet:  */
-                localProvider && localProvider.connection && localProvider.connection.url && localProvider.connection.url.indexOf(window.location.hostname) >= 0 && !process.env.REACT_APP_PROVIDER && price > 1 ? (
+                localProvider &&
+                localProvider.connection &&
+                localProvider.connection.url &&
+                localProvider.connection.url.indexOf(window.location.hostname) >= 0 &&
+                !process.env.REACT_APP_PROVIDER &&
+                price > 1 ? (
                   <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
                 ) : (
-                    ""
-                  )
+                  ""
+                )
               }
             </Col>
           </Row>
         </div>
       </div>
-    </BrowserRouter >
+    </BrowserRouter>
   );
 }
 /*
