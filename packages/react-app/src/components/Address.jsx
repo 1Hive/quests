@@ -23,10 +23,10 @@ const { Text } = Typography;
 const blockExplorerLink = (address, blockExplorer) => `${blockExplorer || "https://etherscan.io/"}${"address/"}${address}`;
 
 const chainMap = {
-  '0x1': 'Mainnet',
-  '0x4': 'Rinkeby',
+  '0x1': 'mainnet',
+  '0x4': 'rinkeby',
   '0x64': 'xDai',
-  '0x539': 'Localhost',
+  '0x539': 'localhost',
 }
 
 export default function Address(props) {
@@ -74,7 +74,7 @@ export default function Address(props) {
   if (!props.showStatus)
     fontSize *= 1.5;
 
-  const netwName = window.ethereum ? chainMap[window.ethereum.chainId] : undefined;
+  const netwName = global.web3?.currentProvider ? chainMap[global.web3?.currentProvider.chainId] : undefined;
 
   return (
     <Space>
