@@ -1,7 +1,7 @@
-.ant-badge.ant-badge-status {
+.badgeStatus {
   line-height: normal;
   vertical-align: middle;
-  & > .ant-badge-dot {
+  & > .antBadgeDot {
     width: 10px;
     height: 10px;
     border: 2px solid white;
@@ -13,7 +13,7 @@
   border-radius: 5px;
 }
 
-.address-detail {
+.addressDetail {
   display: flex;
   flex-direction: column;
   & > .text {
@@ -29,4 +29,8 @@
     line-height: normal;
     color: #be1b1b;
   }
+}
+
+.etherscanLink {
+  color: "#222222";
 }

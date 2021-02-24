@@ -1,15 +1,11 @@
-
-
-.wrapper,
-#hide-faucet-button {
+.hideFaucet {
   display: block;
   &.ant-btn {
     margin-bottom: 8px;
   }
 }
 
-#show-faucet-button {
+.showFaucet {
   display: none;
   margin-bottom: 8px;
 }
-

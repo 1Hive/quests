@@ -1,5 +1,5 @@
 
-import "./AppHeader.scss";
+import styles from "./AppHeader.module.scss";
 import React from "react";
 import { Menu, Layout } from "antd";
 import { Link } from "react-router-dom";
@@ -13,12 +13,11 @@ export default class AppHeader extends React.Component {
     this.props = props;
   }
 
-
   render() {
     return (
-      <Header>
-        <div className="title">
-          <div className="logo" >
+      <Header className={styles.layoutHeader}>
+        <div className={styles.title}>
+          <div className={styles.logo} >
             <img src='logo.png'></img>
           </div>
           <span>Honey Quest</span>
