@@ -31,7 +31,7 @@ export default class AppHeader extends React.Component {
             <Link to="/quests">Your quests</Link>
           </Menu.Item>
           <Menu.Item>
-            <a href="https://app.honeyswap.org/#/swap" target="_blank" rel="noopener noreferrer">
+            <a href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9" target="_blank" rel="noopener noreferrer">
               Get Honey
               </a>
           </Menu.Item>
