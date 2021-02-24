@@ -1,3 +1,4 @@
+import styles from "./Balance.module.scss"
 import React, { useState } from "react";
 import { formatEther } from "@ethersproject/units";
 import { usePoller } from "eth-hooks";
@@ -57,12 +58,8 @@ export default function Balance(props) {
 
   return (
     <span
-      style={{
-        verticalAlign: "middle",
-        fontSize: props.size ? props.size : 24,
-        padding: 8,
-        cursor: "pointer",
-      }}
+      style={{ fontSize: props.size ? props.size : 24 }}
+      className={`${styles.balance} p-8`}
       onClick={() => {
         setDollarMode(!dollarMode);
       }}

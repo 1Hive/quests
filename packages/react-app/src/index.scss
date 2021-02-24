@@ -63,3 +63,23 @@ $space-prefixes: (
 }
 
 @include make-spaces();
+
+.center {
+  text-align: center !important;
+}
+
+.hide {
+  display: none !important;
+}
+
+.show {
+  display: block !important;
+}
+
+.show-inline {
+  display: inline-block !important;
+}
+
+.show-flex {
+  display: flex !important;
+}

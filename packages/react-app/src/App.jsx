@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "antd/dist/antd.css";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
-import "./App.scss";
 import { Layout, Row, Col, Button } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
@@ -16,12 +15,13 @@ import {
   useEventListener,
   useBalance,
 } from "./hooks";
-import { AppHeader, Contract, Ramp, GasGauge, Faucet } from "./components";
+import { AppHeader, Contract, Ramp, GasGauge, Faucet, If } from "./components";
 import { formatEther } from "@ethersproject/units";
 import { Switch, Route } from "react-router-dom";
 import { Hints, ExampleUI, Subgraph } from "./views";
 import { BrowserRouter } from "react-router-dom";
 import Web3 from "web3";
+import styles from "./App.module.scss"
 //import Hints from "./Hints";
 /*
     Welcome to 🏗 scaffold-eth !
@@ -41,12 +41,12 @@ import Web3 from "web3";
     You can also bring in contract artifacts in `constants.js`
     (and then use the `useExternalContractLoader()` hook!)
 */
-import { INFURA_ID } from "./constants";
+import { INFURA_ID, IS_DEV } from "./constants";
 import { DownCircleOutlined, UpCircleOutlined } from "@ant-design/icons";
 const { Content, Footer } = Layout;
 
 // 😬 Sorry for all the console logging 🤡
-const DEBUG = true;
+const DEBUG = IS_DEV;
 
 // 🔭 block explorer URL
 const blockExplorer = "https://etherscan.io/"; // for xdai: "https://blockscout.com/poa/xdai/"
@@ -239,65 +239,67 @@ export default function App(props) {
       </Layout>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 0, padding: 10 }}>
-        <Button
-          id="hide-faucet-button"
-          ref={hideButtonRef}
-          onClick={() => hideFaucet()}
-          type="link"
-          icon={<DownCircleOutlined style={{ fontSize: "32px" }} />}
-        ></Button>
-        <Button
-          id="show-faucet-button"
-          ref={showButtonRef}
-          onClick={() => showFaucet()}
-          type="link"
-          icon={<UpCircleOutlined style={{ fontSize: "32px" }} />}
-        ></Button>
-        <div ref={wrapperRef} className="wrapper">
-          <Row align="middle" gutter={[4, 4]}>
-            <Col span={8}>
-              <Ramp price={price} address={address} />
-            </Col>
+      <If expression={IS_DEV}>
+        <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 0, padding: 10 }}>
+          <Button
+            className={"mb-8 " + styles.hideFaucet}
+            ref={hideButtonRef}
+            onClick={() => hideFaucet()}
+            type="link"
+            icon={<DownCircleOutlined style={{ fontSize: "32px" }} />}
+          ></Button>
+          <Button
+            className={"mb-8 " + styles.showFaucet}
+            ref={showButtonRef}
+            onClick={() => showFaucet()}
+            type="link"
+            icon={<UpCircleOutlined style={{ fontSize: "32px" }} />}
+          ></Button>
+          <div ref={wrapperRef} className="wrapper">
+            <Row align="middle" gutter={[4, 4]}>
+              <Col span={8}>
+                <Ramp price={price} address={address} />
+              </Col>
 
-            <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-              <GasGauge gasPrice={gasPrice} />
-            </Col>
-            <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-              <Button
-                onClick={() => {
-                  window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-                }}
-                size="large"
-                shape="round"
-              >
-                <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                  💬
+              <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
+                <GasGauge gasPrice={gasPrice} />
+              </Col>
+              <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+                <Button
+                  onClick={() => {
+                    window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
+                  }}
+                  size="large"
+                  shape="round"
+                >
+                  <span style={{ marginRight: 8 }} role="img" aria-label="support">
+                    💬
                 </span>
                 Support
               </Button>
-            </Col>
-          </Row>
+              </Col>
+            </Row>
 
-          <Row align="middle" gutter={[4, 4]}>
-            <Col span={24}>
-              {
-                /*  if the local provider has a signer, let's show the faucet:  */
-                localProvider &&
-                localProvider.connection &&
-                localProvider.connection.url &&
-                localProvider.connection.url.indexOf(window.location.hostname) >= 0 &&
-                !process.env.REACT_APP_PROVIDER &&
-                price > 1 ? (
-                  <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-                ) : (
-                  ""
-                )
-              }
-            </Col>
-          </Row>
+            <Row align="middle" gutter={[4, 4]}>
+              <Col span={24}>
+                {
+                  /*  if the local provider has a signer, let's show the faucet:  */
+                  localProvider &&
+                    localProvider.connection &&
+                    localProvider.connection.url &&
+                    localProvider.connection.url.indexOf(window.location.hostname) >= 0 &&
+                    !process.env.REACT_APP_PROVIDER &&
+                    price > 1 ? (
+                      <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+                    ) : (
+                      ""
+                    )
+                }
+              </Col>
+            </Row>
+          </div>
         </div>
-      </div>
+      </If>
     </BrowserRouter>
   );
 }

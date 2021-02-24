@@ -1,4 +1,4 @@
-import "./Address.scss";
+import styles from "./Address.module.scss";
 import React from "react";
 import Blockies from "react-blockies";
 import { Typography, Skeleton, Badge, Space, Tooltip } from "antd";
@@ -55,7 +55,7 @@ export default function Address(props) {
   if (props.minimized) {
     const blockies = (<Blockies seed={props.value.toLowerCase()} size={8} scale={2} />);
     return props.interactable ?
-      (<a style={{ color: "#222222" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">{blockies}</a>)
+      (<a className={styles.etherscanLink} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">{blockies}</a>)
       : blockies;
   }
 
@@ -63,7 +63,7 @@ export default function Address(props) {
     <Text editable={props.interactable && props.onChange ? { onChange: props.onChange } : false} copyable={props.interactable ? { text: props.value } : false}>
       { props.interactable ?
         (<Tooltip title={props.value.toLowerCase()}>
-          <a style={{ color: "#222222" }} target={"_blank"} href={props.interactable ? etherscanLink : '#'} rel="noopener noreferrer">
+          <a className={styles.etherscanLink} target={"_blank"} href={props.interactable ? etherscanLink : '#'} rel="noopener noreferrer">
             {displayAddress}
           </a>
         </Tooltip>)
@@ -76,22 +76,22 @@ export default function Address(props) {
     fontSize *= 1.5;
 
   let netwName = global.web3?.currentProvider ? chainMap[global.web3?.currentProvider.chainId] : undefined;
-  let status = "status"
+  let status = styles.status;
   if (!EXPECTED_NETWORKS.includes(netwName)) {
     netwName += " (wrong network)";
-    status += " disconnected"
+    status += " " + styles.disconnected;
   }
 
   return (
     <Space>
       {props.showStatus ?
-        <Badge status="success" title="Connected" offset={[-2, 30]} size="default" >
-          <Blockies toolt seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        <Badge className={`${styles.badgeStatus} ${styles.antBadgeDot}`} status="success" title="Connected" offset={[-2, 30]} size="default" >
+          <Blockies className={styles.identicon} toolt seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
         </Badge>
-        : <Blockies seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+        : <Blockies className={styles.identicon} seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
       }
-      <div className="address-detail">
-        <span className="text" style={{ fontSize }}>{text}</span>
+      <div className={styles.addressDetail}>
+        <span className={styles.text} style={{ fontSize }}>{text}</span>
         <If expression={props.showStatus}>
           <span className={status}>Connected {netwName ? `to ${netwName}` : ''}</span>
         </If>
