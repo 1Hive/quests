@@ -4,7 +4,7 @@ import Blockies from "react-blockies";
 import { Typography, Skeleton, Badge, Space, Tooltip } from "antd";
 import { useLookupAddress } from "../hooks";
 import { If } from "../components"
-import { EXPECTED_NETWORK } from "../constants"
+import { EXPECTED_NETWORKS } from "../constants"
 
 /*
 
@@ -77,7 +77,7 @@ export default function Address(props) {
 
   let netwName = global.web3?.currentProvider ? chainMap[global.web3?.currentProvider.chainId] : undefined;
   let status = "status"
-  if (netwName !== EXPECTED_NETWORK) {
+  if (!EXPECTED_NETWORKS.includes(netwName)) {
     netwName += " (wrong network)";
     status += " disconnected"
   }
