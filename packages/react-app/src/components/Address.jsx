@@ -4,6 +4,7 @@ import Blockies from "react-blockies";
 import { Typography, Skeleton, Badge, Space, Tooltip } from "antd";
 import { useLookupAddress } from "../hooks";
 import { If } from "../components"
+import { EXPECTED_NETWORK } from "../constants"
 
 /*
 
@@ -74,7 +75,12 @@ export default function Address(props) {
   if (!props.showStatus)
     fontSize *= 1.5;
 
-  const netwName = global.web3?.currentProvider ? chainMap[global.web3?.currentProvider.chainId] : undefined;
+  let netwName = global.web3?.currentProvider ? chainMap[global.web3?.currentProvider.chainId] : undefined;
+  let status = "status"
+  if (netwName !== EXPECTED_NETWORK) {
+    netwName += " (wrong network)";
+    status += " disconnected"
+  }
 
   return (
     <Space>
@@ -87,7 +93,7 @@ export default function Address(props) {
       <div className="address-detail">
         <span className="text" style={{ fontSize }}>{text}</span>
         <If expression={props.showStatus}>
-          <span className="status">Connected {netwName ? `to ${netwName}` : ''}</span>
+          <span className={status}>Connected {netwName ? `to ${netwName}` : ''}</span>
         </If>
       </div>
     </Space>
