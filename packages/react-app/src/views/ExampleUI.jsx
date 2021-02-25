@@ -144,7 +144,7 @@ export default function ExampleUI({ purpose, setPurposeEvents, address, mainnetP
                   value={item[0]}
                   ensProvider={mainnetProvider}
                   fontSize={16}
-                /> =>
+                />
                 {item[1]}
               </List.Item>
             )
