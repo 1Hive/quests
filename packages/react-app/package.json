@@ -51,13 +51,13 @@
     "react-scripts": "^3.4.3",
     "sass": "^1.32.6",
     "sass-loader": "10.0.5",
-    "web3modal": "^1.9.1"
+    "web3modal": "^1.9.1",
+    "reqwest": "^2.0.5"
   },
   "devDependencies": {
     "@testing-library/dom": "^6.12.2",
     "@types/react": "^16.9.19",
     "chalk": "^4.1.0",
-    "eslint": "^7.5.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-babel": "^5.3.1",

@@ -5,6 +5,7 @@ import { Typography, Skeleton, Badge, Space, Tooltip } from "antd";
 import { useLookupAddress } from "../hooks";
 import { If } from "../components"
 import { EXPECTED_NETWORKS } from "../constants"
+import { append } from "../helpers";
 
 /*
 
@@ -85,7 +86,7 @@ export default function Address(props) {
   return (
     <Space>
       {props.showStatus ?
-        <Badge className={`${styles.badgeStatus} ${styles.antBadgeDot}`} status="success" title="Connected" offset={[-2, 30]} size="default" >
+        <Badge className={append(styles.badgeStatus, styles.antBadgeDot)} status="success" title="Connected" offset={[-2, 30]} size="default" >
           <Blockies className={styles.identicon} toolt seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
         </Badge>
         : <Blockies className={styles.identicon} seed={props.value.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />

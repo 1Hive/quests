@@ -17,13 +17,14 @@ body {
         #cbf3ef 100%
       ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
       filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc3ab', endColorstr='#cbf3ef',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-      main {
+      & > main {
         min-height: 100%;
-        padding-top: 65px;
-        width: 80%;
-        margin-bottom: -50px;
+        padding-top: 72px;
+        width: 100%;
+        // TOOO : Restore with footer
+        // margin-bottom: -50px;
       }
-      footer {
+      & > footer {
         height: 50px;
         background: none;
       }
@@ -82,4 +83,8 @@ $space-prefixes: (
 
 .show-flex {
   display: flex !important;
+}
+
+.block {
+  width: 100% !important;
 }
