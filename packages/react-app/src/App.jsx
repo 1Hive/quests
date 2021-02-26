@@ -5,7 +5,7 @@ import { Layout, Row, Col, Button } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
-import { Transactor } from "./helpers";
+import { append, Transactor } from "./helpers";
 import {
   useExchangePrice,
   useGasPrice,
@@ -18,7 +18,7 @@ import {
 import { AppHeader, Contract, Ramp, GasGauge, Faucet, If } from "./components";
 import { formatEther } from "@ethersproject/units";
 import { Switch, Route } from "react-router-dom";
-import { Hints, ExampleUI, Subgraph } from "./views";
+import { Hints, ExampleUI, Subgraph, QuestList } from "./views";
 import { BrowserRouter } from "react-router-dom";
 import Web3 from "web3";
 import styles from "./App.module.scss"
@@ -140,6 +140,7 @@ export default function App(props) {
   const [route, setRoute] = useState();
   useEffect(() => {
     setRoute(window.location.pathname);
+    if (localStorage.getItem("hideFaucet")) hideFaucet();
   }, [setRoute]);
 
   const wrapperRef = React.createRef();
@@ -150,12 +151,14 @@ export default function App(props) {
     wrapperRef.current.style.display = "none";
     hideButtonRef.current.style.display = "none";
     showButtonRef.current.style.display = "block";
+    localStorage.setItem("hideFaucet", true);
   };
 
   const showFaucet = () => {
     wrapperRef.current.style.display = "block";
     hideButtonRef.current.style.display = "block";
     showButtonRef.current.style.display = "none";
+    localStorage.setItem("hideFaucet", false);
   };
 
   return (
@@ -176,6 +179,14 @@ export default function App(props) {
         />
         <Content>
           <Switch>
+            <Route path="/quests">
+              <QuestList
+                address={address}
+                yourLocalBalance={yourLocalBalance}
+                mainnetProvider={mainnetProvider}
+                price={price}
+              />
+            </Route>
             <Route exact path="/contract">
               {/*
                   🎛 this scaffolding is full of commonly used components
@@ -233,23 +244,23 @@ export default function App(props) {
             </Route>
           </Switch>
         </Content>
-        <Footer style={{ textAlign: "center" }}>
+        {/* <Footer style={{ textAlign: "center" }}>
           Honey Quest @2021 Founded by <a href="https://1hive.org/">1Hive</a>
-        </Footer>
+        </Footer> */}
       </Layout>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <If expression={IS_DEV}>
-        <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 0, padding: 10 }}>
+        <div className="p-8" style={{ position: "fixed", textAlign: "left", left: 0, bottom: 0 }}>
           <Button
-            className={"mb-8 " + styles.hideFaucet}
+            className={append("mb-8", styles.hideFaucet)}
             ref={hideButtonRef}
             onClick={() => hideFaucet()}
             type="link"
             icon={<DownCircleOutlined style={{ fontSize: "32px" }} />}
           ></Button>
           <Button
-            className={"mb-8 " + styles.showFaucet}
+            className={append("mb-8", styles.showFaucet)}
             ref={showButtonRef}
             onClick={() => showFaucet()}
             type="link"
@@ -261,10 +272,10 @@ export default function App(props) {
                 <Ramp price={price} address={address} />
               </Col>
 
-              <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
+              <Col span={8} className="center" >
                 <GasGauge gasPrice={gasPrice} />
               </Col>
-              <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+              <Col span={8} className="center" >
                 <Button
                   onClick={() => {
                     window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
@@ -272,7 +283,7 @@ export default function App(props) {
                   size="large"
                   shape="round"
                 >
-                  <span style={{ marginRight: 8 }} role="img" aria-label="support">
+                  <span className="mr-8" role="img" aria-label="support">
                     💬
                 </span>
                 Support
