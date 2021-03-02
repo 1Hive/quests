@@ -65,7 +65,7 @@ contract Quest {
     
     function getReward() public view returns (uint){
         //Amount in ETHER
-        return address(this).balance;
+        return address(this).balance / ether;
     }
     
     function get_content() public view returns (string memory) {
