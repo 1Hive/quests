@@ -65,7 +65,7 @@ contract Quest {
     
     function getReward() public view returns (uint){
         //Amount in ETHER
-        return address(this).balance / 1000000000000000000;
+        return address(this).balance / ether;
     }
     
     function get_content() public view returns (string memory) {
@@ -84,7 +84,7 @@ contract Quest {
         }
     }
     
-    function destroy() private {
+    function destroy() private _ownerOnly{
         release ();
         selfdestruct(owner);
     }
