@@ -1,12 +1,12 @@
-import React from 'react'
-import { GU, Root, ScrollView, useViewport } from '@1hive/1hive-ui'
+import React from "react";
+import { GU, Root, ScrollView, useViewport } from "@1hive/1hive-ui";
 
-import Header from './Header/Header'
-import Layout from './Layout'
+import Header from "./Header/Header";
+import Layout from "./Layout";
 
 function MainView({ children }) {
-  const { below } = useViewport()
-  const compactMode = below('large')
+  const { below } = useViewport();
+  const compactMode = below("large");
 
   return (
     <div
@@ -36,12 +36,13 @@ function MainView({ children }) {
               min-height: 100vh;
               margin: 0;
               display: grid;
-              grid-template-rows: 1fr ${compactMode ? 'auto' : `${40 * GU}px`};
+              grid-template-rows: 1fr ${compactMode ? "auto" : `${40 * GU}px`};
             `}
           >
             <div
               css={`
                 margin-bottom: ${(compactMode ? 3 : 0) * GU}px;
+                padding: 32px;
               `}
             >
               <Layout paddingBottom={3 * GU}>{children}</Layout>
@@ -50,7 +51,7 @@ function MainView({ children }) {
         </ScrollView>
       </Root.Provider>
     </div>
-  )
+  );
 }
 
-export default MainView
+export default MainView;

@@ -1,9 +1,9 @@
-import React from 'react'
-import { Layout, useViewport } from '@1hive/1hive-ui'
-import { BREAKPOINTS } from '../styles/breakpoints'
+import React from "react";
+import { Layout, useViewport } from "@1hive/1hive-ui";
+import { BREAKPOINTS } from "../styles/breakpoints";
 
 function CustomLayout({ children, paddingBottom = 0 }) {
-  const { width: vw } = useViewport()
+  const { width: vw } = useViewport();
   return (
     <Layout
       breakpoints={BREAKPOINTS}
@@ -16,7 +16,7 @@ function CustomLayout({ children, paddingBottom = 0 }) {
     >
       {children}
     </Layout>
-  )
+  );
 }
 
-export default CustomLayout
+export default CustomLayout;
