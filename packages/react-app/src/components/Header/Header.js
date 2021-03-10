@@ -1,17 +1,15 @@
-import React from 'react'
-import { GU, Link, useTheme, useViewport } from '@1hive/1hive-ui'
-import AccountModule from '../Account/AccountModule'
-import Layout from '../Layout'
-import { useWallet } from '../../providers/Wallet'
-
-import logoSvg from '../../assets/logo.svg'
+import React from "react";
+import { GU, Link, useTheme, useViewport } from "@1hive/1hive-ui";
+import AccountModule from "../Account/AccountModule";
+import Layout from "../Layout";
+import { useWallet } from "../../providers/Wallet";
 
 function Header() {
-  const theme = useTheme()
-  const { below } = useViewport()
-  const layoutSmall = below('medium')
+  const theme = useTheme();
+  const { below } = useViewport();
+  const layoutSmall = below("medium");
 
-  const { account } = useWallet()
+  const { account } = useWallet();
 
   return (
     <header
@@ -37,21 +35,37 @@ function Header() {
               align-items: center;
             `}
           >
-            <Link href="#/parties" external={false}>
-              <img src={logoSvg} height="28" alt="" />
+            <Link
+              href="#/home"
+              external={false}
+              css={`
+                text-decoration: none;
+                color: ${theme.accent};
+              `}
+            >
+              <div className="flex-center">
+                <img src="logo.png" alt=""></img>
+                <span
+                  css={`
+                    display: inline-flex;
+                    align-items: center;
+                  `}
+                >
+                  Honey Quest
+                </span>
+              </div>
             </Link>
-            {!below('large') && (
+            {!below("large") && (
               <nav
                 css={`
                   display: flex;
                   align-items: center;
-
                   height: 100%;
                   margin-left: ${6.5 * GU}px;
                 `}
               >
                 <Link
-                  href="#/parties"
+                  href="#/home"
                   external={false}
                   css={`
                     text-decoration: none;
@@ -59,20 +73,43 @@ function Header() {
                     margin-right: ${3 * GU}px;
                   `}
                 >
-                  Parties
+                  Home
                 </Link>
                 {account && (
                   <Link
-                    href="#/mytokens"
+                    href="#/your-quests"
                     external={false}
                     css={`
                       text-decoration: none;
                       color: ${theme.contentSecondary};
+                      margin-right: ${3 * GU}px;
                     `}
                   >
-                    My tokens
+                    Your quests
                   </Link>
                 )}
+                <Link
+                  href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"
+                  external={true}
+                  css={`
+                    text-decoration: none;
+                    color: ${theme.contentSecondary};
+                    margin-right: ${3 * GU}px;
+                  `}
+                >
+                  Get Honey
+                </Link>
+                <Link
+                  href="https://github.com/felixbbertrand/honeyquests/wiki"
+                  external={true}
+                  css={`
+                    text-decoration: none;
+                    color: ${theme.contentSecondary};
+                    margin-right: ${3 * GU}px;
+                  `}
+                >
+                  FAQ
+                </Link>
               </nav>
             )}
           </div>
@@ -88,7 +125,7 @@ function Header() {
         </div>
       </Layout>
     </header>
-  )
+  );
 }
 
-export default Header
+export default Header;

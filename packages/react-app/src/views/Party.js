@@ -22,7 +22,7 @@ function Party({ match }) {
   const [party, loading] = useParty(partyId)
 
   const handleBack = useCallback(() => {
-    history.push('/parties')
+    history.push('/home')
   }, [history])
 
   if (!party && !loading) {
@@ -62,7 +62,6 @@ function Party({ match }) {
                 border-top: 0;
                 border-left: 0;
                 border-right: 0;
-
                 border-radius: 0;
               }
             `}

@@ -11,6 +11,7 @@ packages/hardhat/cache
 docker/**/data
 
 packages/subgraph/config/config.json
+packages/react-app/public/aragon-ui
 
 # dependencies
 /node_modules

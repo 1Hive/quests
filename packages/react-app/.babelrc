@@ -10,9 +10,7 @@
     ],
     "@babel/preset-react"
   ],
-  "plugins": [
-    ["styled-components", { "displayName": true }]
-  ],
+  "plugins": [["styled-components", { "displayName": true }]],
   "env": {
     "test": {
       "presets": [
