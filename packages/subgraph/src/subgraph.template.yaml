@@ -6,7 +6,7 @@ dataSources:
     name: YourContract
     network: localhost
     source:
-      address: '{{YourContractAddress}}'
+      address: "{{YourContractAddress}}"
       abi: YourContract
       startBlock: 1
     mapping:
