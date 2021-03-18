@@ -75,3 +75,11 @@ $space-prefixes: (
   display: flex !important;
   justify-content: center !important;
 }
+
+.fit-content {
+  min-width: fit-content !important;
+}
+
+.inline-flex {
+  display: inline-flex !important;
+}
