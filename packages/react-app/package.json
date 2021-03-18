@@ -27,7 +27,9 @@
     "token-amount": "^0.3.0",
     "urql": "1.8.2",
     "use-wallet": "^0.5.0",
-    "web3-utils": "^1.2.0"
+    "web3-utils": "^1.2.0",
+    "react-infinite-scroll-component": "^6.0.0",
+    "react-loading-skeleton": "^2.2.0"
   },
   "scripts": {
     "start": "cross-env HTTPS=true npm run sync-assets && react-app-rewired start",
