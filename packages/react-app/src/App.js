@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React from "react";
 import { HashRouter } from "react-router-dom";
 import { Main } from "@1hive/1hive-ui";
