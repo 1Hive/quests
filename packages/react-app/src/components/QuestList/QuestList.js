@@ -1,33 +1,31 @@
 import React from "react";
-
 import { CRYPTOS, QUEST_STATUS } from "../../constants";
 import {
   AddressField,
   Box,
-  Button,
   Card,
-  DataView,
   DateRangePicker,
   DropDown,
   Field,
-  IconSquarePlus,
-  IdentityBadge,
   SearchInput,
   Split,
   Tag,
   TextInput,
+  TokenBadge,
 } from "@1hive/1hive-ui";
+import InfiniteScroll from "react-infinite-scroll-component";
+import Skeleton from "react-loading-skeleton";
 
 const currencyOptions = CRYPTOS.map((c) => c.symb);
 const questStatusOptions = ["All"].concat(QUEST_STATUS.map((x) => x.name));
+const batchSize = 3;
 
 export default class QuestList extends React.Component {
   loadMoreButtonRef;
   state = {
-    initLoading: true,
-    loading: false,
     data: [],
-    list: [],
+    placeholders: [],
+    hasMore: true,
     filter: {
       search: "",
       status: "All",
@@ -39,19 +37,12 @@ export default class QuestList extends React.Component {
     },
   };
   componentDidMount() {
-    this.getData((res) => {
-      this.setState({
-        initLoading: false,
-        data: res.results,
-        list: res.results,
-      });
-    });
-
-    this.loadMoreButtonRef = React.createRef();
+    this.refresh();
   }
-  getData = (callback) => {
+  getData(callback) {
     setTimeout(() => {
       callback({
+        hasMore: this.state.data.length < 9,
         results: [
           {
             address: "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
@@ -89,92 +80,185 @@ export default class QuestList extends React.Component {
         ],
       });
     }, 1000);
-  };
-  onLoadMore = () => {
+  }
+  loadMore = () => {
     this.setState({
-      loading: true,
-      list: this.state.data.concat(
-        [...new Array(3)].map(() => ({ loading: true, tags: [] }))
-      ),
+      placeholders: [...new Array(batchSize)].map(() => ({
+        placeholder: true,
+      })),
     });
     this.getData((res) => {
-      const data = this.state.data.concat(res.results);
-      this.setState(
-        {
-          data,
-          list: data,
-          loading: false,
-        },
-        () => {
-          this.loadMoreButtonRef.scrollIntoView({ behavior: "smooth" });
-        }
-      );
-    }, 1000);
+      this.setState({
+        data: this.state.data.concat(res.results),
+        placeholder: this.state.placeholders.splice(0, batchSize),
+        hasMore: res.hasMore,
+      });
+    });
   };
 
-  setFilter(filter) {
-    console.log(filter);
+  refresh = () => {
+    this.setState({
+      data: [],
+      placeholders: [...new Array(batchSize)].map(() => ({
+        placeholder: true,
+      })),
+    });
+    this.getData((res) => {
+      this.setState({
+        data: res.results,
+        placeholder: this.state.placeholders.splice(0, batchSize),
+        hasMore: res.hasMore,
+      });
+    });
+  };
+
+  setFilter = (filter) => {
     this.setState({ filter: { ...this.state.filter, ...filter } });
-  }
+  };
 
   render() {
     return (
       <Split
         invert="vertical"
         primary={
-          <>
-            {this.state.data.map(
-              ({
-                address,
-                title,
-                description,
-                players,
-                maxPlayers,
-                bounty,
-                colAmount,
-                tags,
-              }) => {
-                return (
-                  <Card width="1000px" className="mb-32">
-                    <Split
-                      primary={
-                        <div className="m-16">
-                          <AddressField address={address} />
-                          <div className="block mt-16">{description}</div>
-                        </div>
-                      }
-                      secondary={
-                        <>
-                          <Field>
-                            Number of player : ${players}/${maxPlayers}
-                          </Field>
-                          <Field>Bounty : ${bounty} HNY</Field>
-                          <Field>Collateral amount : ${colAmount} HNY</Field>
-                          <Field>
-                            Tags :
-                            {tags.map((tag) => (
-                              <a key={tag}>
-                                <Tag>{tag}</Tag>
-                              </a>
-                            ))}
-                          </Field>
-                        </>
-                      }
-                    />
-                  </Card>
-                );
-              }
-            )}
-            <Button
-              ref={(el) => {
-                this.loadMoreButtonRef = el;
-              }}
-              className="m-16"
-              size="large"
-              icon={<IconSquarePlus></IconSquarePlus>}
-              onClick={this.onLoadMore}
-            />
-          </>
+          <InfiniteScroll
+            dataLength={this.state.data.length}
+            next={this.loadMore}
+            hasMore={this.state.hasMore}
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>No more quests</b>
+              </p>
+            }
+            refreshFunction={this.refresh}
+            pullDownToRefresh
+            pullDownToRefreshThreshold={50}
+            pullDownToRefreshContent={
+              <h3 style={{ textAlign: "center" }}>
+                &#8595; Pull down to refresh
+              </h3>
+            }
+            releaseToRefreshContent={
+              <h3 style={{ textAlign: "center" }}>
+                &#8593; Release to refresh
+              </h3>
+            }
+            scrollableTarget="scroll-view"
+            scrollThreshold="0px"
+          >
+            <div>
+              {this.state.data
+                .concat(this.state.placeholders)
+                .map(
+                  (
+                    {
+                      placeholder,
+                      address,
+                      title,
+                      description,
+                      players,
+                      maxPlayers,
+                      bounty,
+                      colAmount,
+                      tags,
+                    },
+                    index
+                  ) => {
+                    return (
+                      <Card
+                        width="100%"
+                        height="100%"
+                        className="mb-32"
+                        key={`[${index}]${address}`}
+                      >
+                        <Split
+                          primary={
+                            <div className="m-16">
+                              <div className="block mt-16">
+                                <Split
+                                  primary={placeholder ? <Skeleton /> : title}
+                                  secondary={
+                                    placeholder ? (
+                                      <Skeleton />
+                                    ) : (
+                                      <AddressField
+                                        address={address}
+                                        autofocus={false}
+                                      />
+                                    )
+                                  }
+                                />
+                              </div>
+                              <div className="block mt-16">
+                                {placeholder ? (
+                                  <Skeleton count={5} />
+                                ) : (
+                                  description
+                                )}
+                              </div>
+                            </div>
+                          }
+                          secondary={
+                            <div className="m-16">
+                              <Field label="Number of player">
+                                {placeholder ? (
+                                  <Skeleton />
+                                ) : (
+                                  <span>
+                                    {players} / {maxPlayers}
+                                  </span>
+                                )}
+                              </Field>
+                              <Field label="Bounty">
+                                {placeholder ? (
+                                  <Skeleton />
+                                ) : (
+                                  <>
+                                    <span className="m-8">{bounty}</span>
+                                    <TokenBadge
+                                      symbol="CRO"
+                                      address="0xa0b73e1ff0b80914ab6fe0444e65848c4c34450b"
+                                      networkType="main"
+                                    />
+                                  </>
+                                )}
+                              </Field>
+                              <Field label="Collateral amount">
+                                {placeholder ? (
+                                  <Skeleton />
+                                ) : (
+                                  <>
+                                    <span className="m-8">{colAmount}</span>
+                                    <TokenBadge
+                                      symbol="CRO"
+                                      address="0xa0b73e1ff0b80914ab6fe0444e65848c4c34450b"
+                                      networkType="main"
+                                    />
+                                  </>
+                                )}
+                              </Field>
+                              <Field label="Tags">
+                                {placeholder ? (
+                                  <Skeleton />
+                                ) : (
+                                  <>
+                                    {tags.map((tag) => (
+                                      <a key={tag}>
+                                        <Tag>{tag}</Tag>
+                                      </a>
+                                    ))}
+                                  </>
+                                )}
+                              </Field>
+                            </div>
+                          }
+                        />
+                      </Card>
+                    );
+                  }
+                )}
+            </div>
+          </InfiniteScroll>
         }
         secondary={
           <Box heading="Filters" className="fit-content">
@@ -210,22 +294,24 @@ export default class QuestList extends React.Component {
             </div>
             <div className="m-16">
               <Field label="Min bounty">
-                <TextInput
-                  value={this.state.filter.minBounty}
-                  onChange={(event) => {
-                    this.setFilter({ minBounty: event.target.value });
-                  }}
-                  type="number"
-                />
-                <DropDown
-                  items={currencyOptions}
-                  selected={currencyOptions.indexOf(
-                    this.state.filter.bountyCurrency
-                  )}
-                  onChange={(x) =>
-                    this.setFilter({ bountyCurrency: currencyOptions[x] })
-                  }
-                ></DropDown>
+                <div className="inline-flex">
+                  <TextInput
+                    value={this.state.filter.minBounty}
+                    onChange={(event) => {
+                      this.setFilter({ minBounty: event.target.value });
+                    }}
+                    type="number"
+                  />
+                  <DropDown
+                    items={currencyOptions}
+                    selected={currencyOptions.indexOf(
+                      this.state.filter.bountyCurrency
+                    )}
+                    onChange={(x) =>
+                      this.setFilter({ bountyCurrency: currencyOptions[x] })
+                    }
+                  ></DropDown>
+                </div>
               </Field>
             </div>
           </Box>
