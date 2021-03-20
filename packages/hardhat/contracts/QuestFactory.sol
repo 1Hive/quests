@@ -5,7 +5,7 @@ contract QuestFactory {
     event QuestCreated(address questAddress, string _content);
 
     function createQuest(string calldata _content) external {
-        // require verify aragon address
+        require(msg.sender == aragonGovernAddress, "Error: sender not govern");
         Quest quest = new Quest(_content);
         emit QuestCreated(address(quest), _content);
     }
@@ -20,6 +20,7 @@ contract Quest {
     }
 
     function claim(
+        require(msg.sender == aragonGovernAddress, "Error: sender not govern");
         address payable player,
         uint256 amount,
         string calldata file
