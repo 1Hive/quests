@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useCallback, useState } from "react";
+import { useHistory } from "react-router-dom";
 import {
   AddressField,
   BackButton,
@@ -9,24 +9,24 @@ import {
   Tabs,
   textStyle,
   useTheme,
-} from '@1hive/1hive-ui'
-import { useParty } from '../hooks/useParties'
-import { durationTime } from '../utils/date-utils'
-import { PCT_BASE } from '../constants'
+} from "@1hive/1hive-ui";
+import { useParty } from "../hooks/useParties";
+import { durationTime } from "../utils/date-utils";
+import { PCT_BASE } from "../constants";
 
 function Party({ match }) {
-  const [selectedTab, setSelectedTab] = useState(0)
-  const history = useHistory()
-  const { id: partyId } = match.params
+  const [selectedTab, setSelectedTab] = useState(0);
+  const history = useHistory();
+  const { id: partyId } = match.params;
 
-  const [party, loading] = useParty(partyId)
+  const [party, loading] = useParty(partyId);
 
   const handleBack = useCallback(() => {
-    history.push('/home')
-  }, [history])
+    history.push("/home");
+  }, [history]);
 
   if (!party && !loading) {
-    handleBack()
+    handleBack();
   }
 
   return (
@@ -50,7 +50,7 @@ function Party({ match }) {
         <Box padding={0}>
           <div
             css={`
-              ${textStyle('title2')};
+              ${textStyle("title2")};
               padding: ${3 * GU}px;
             `}
           >
@@ -67,7 +67,7 @@ function Party({ match }) {
             `}
           >
             <Tabs
-              items={['Details', 'Deposit tokens']}
+              items={["Details", "Deposit tokens"]}
               selected={selectedTab}
               onChange={setSelectedTab}
             />
@@ -80,7 +80,7 @@ function Party({ match }) {
         </Box>
       )}
     </div>
-  )
+  );
 }
 
 function Details({ party }) {
@@ -93,7 +93,7 @@ function Details({ party }) {
       <div>
         <h2
           css={`
-            ${textStyle('title4')}
+            ${textStyle("title4")}
           `}
         >
           Token info and assets
@@ -113,7 +113,7 @@ function Details({ party }) {
       <div>
         <h2
           css={`
-            ${textStyle('title4')}
+            ${textStyle("title4")}
           `}
         >
           Distribution details
@@ -137,7 +137,7 @@ function Details({ party }) {
         />
       </div>
     </div>
-  )
+  );
 }
 
 function DepositTokens({ party }) {
@@ -149,7 +149,7 @@ function DepositTokens({ party }) {
     >
       <div
         css={`
-          ${textStyle('title4')};
+          ${textStyle("title4")};
         `}
       >
         In order to activate this offer, you need to deposit tokens in this
@@ -161,11 +161,11 @@ function DepositTokens({ party }) {
         value={<AddressField address={party.id} />}
       />
     </div>
-  )
+  );
 }
 
 function LineSeparator() {
-  const theme = useTheme()
+  const theme = useTheme();
   return (
     <div
       css={`
@@ -173,11 +173,11 @@ function LineSeparator() {
         border-top: 1px solid ${theme.border};
       `}
     />
-  )
+  );
 }
 
 function Field({ value, label }) {
-  const theme = useTheme()
+  const theme = useTheme();
 
   return (
     <div
@@ -187,7 +187,7 @@ function Field({ value, label }) {
     >
       <label
         css={`
-          ${textStyle('label2')};
+          ${textStyle("label2")};
           color: ${theme.contentSecondary};
         `}
       >
@@ -201,6 +201,6 @@ function Field({ value, label }) {
         {value}
       </div>
     </div>
-  )
+  );
 }
-export default Party
+export default Party;

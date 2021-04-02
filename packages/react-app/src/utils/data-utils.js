@@ -1,4 +1,4 @@
-import { toMs } from './date-utils'
+import { toMs } from "./date-utils";
 
 export function transformPartyData(party) {
   return {
@@ -8,13 +8,13 @@ export function transformPartyData(party) {
     vestingPeriod: toMs(party.vestingPeriod),
     vestingDurationInPeriods: parseInt(party.vestingDurationInPeriods),
     vestingCliffInPeriods: parseInt(party.vestingCliffInPeriods),
-    totalAmountClaimed: BigInt(party.totalAmountClaimed || '0'),
+    totalAmountClaimed: BigInt(party.totalAmountClaimed || "0"),
     vestings: party.vestings.map(transformVestingData),
-  }
+  };
 }
 
 export function transformUserData(user) {
-  return { ...user, claims: user.claims.map(transformClaimData) }
+  return { ...user, claims: user.claims.map(transformClaimData) };
 }
 
 function transformVestingData(vesting) {
@@ -25,7 +25,7 @@ function transformVestingData(vesting) {
     periodsClaimed: parseInt(vesting.periodsClaimed),
     amountClaimed: BigInt(vesting.amountClaimed),
     claims: vesting.claims?.map(transformClaimData) || null,
-  }
+  };
 }
 
 function transformClaimData(claim) {
@@ -34,5 +34,5 @@ function transformClaimData(claim) {
     createdAt: toMs(claim.createdAt),
     amount: BigInt(claim.amount),
     vesting: claim.vesting ? transformVestingData(claim.vesting) : null,
-  }
+  };
 }

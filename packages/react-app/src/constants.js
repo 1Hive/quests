@@ -3,7 +3,7 @@ export const PCT_BASE = BigInt(1e18);
 // MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
 export const INFURA_ID = "460f40a260564ac4a4f4b3fffb032dad";
 
-//MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
+// MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
 export const ETHERSCAN_KEY = "PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8";
 
 // Env
@@ -35,24 +35,12 @@ export const CRYPTOS = [
 ];
 
 // Enums
-export const QUEST_STATUS = [
-  {
-    name: "Active",
-    val: "active",
-  },
-  {
-    name: "Completed",
-    val: "completed",
-  },
-  {
-    name: "Aborted",
-    val: "aborted",
-  },
-  {
-    name: "Draft",
-    val: "draft",
-  },
-];
+export const QUEST_STATUS = {
+  active: { id: "active", label: "Active" },
+  completed: { id: "completed", label: "Completed" },
+  aborted: { id: "aborted", label: "Aborted" },
+  draft: { id: "draft", label: "Draft" },
+};
 
 // EXTERNAL CONTRACTS
 
@@ -68,9 +56,24 @@ export const DAI_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "address", name: "src", type: "address" },
-      { indexed: true, internalType: "address", name: "guy", type: "address" },
-      { indexed: false, internalType: "uint256", name: "wad", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "src",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "guy",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "wad",
+        type: "uint256",
+      },
     ],
     name: "Approval",
     type: "event",
@@ -78,11 +81,36 @@ export const DAI_ABI = [
   {
     anonymous: true,
     inputs: [
-      { indexed: true, internalType: "bytes4", name: "sig", type: "bytes4" },
-      { indexed: true, internalType: "address", name: "usr", type: "address" },
-      { indexed: true, internalType: "bytes32", name: "arg1", type: "bytes32" },
-      { indexed: true, internalType: "bytes32", name: "arg2", type: "bytes32" },
-      { indexed: false, internalType: "bytes", name: "data", type: "bytes" },
+      {
+        indexed: true,
+        internalType: "bytes4",
+        name: "sig",
+        type: "bytes4",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "usr",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "arg1",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "arg2",
+        type: "bytes32",
+      },
+      {
+        indexed: false,
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
+      },
     ],
     name: "LogNote",
     type: "event",
@@ -90,9 +118,24 @@ export const DAI_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "address", name: "src", type: "address" },
-      { indexed: true, internalType: "address", name: "dst", type: "address" },
-      { indexed: false, internalType: "uint256", name: "wad", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "src",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "dst",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "wad",
+        type: "uint256",
+      },
     ],
     name: "Transfer",
     type: "event",

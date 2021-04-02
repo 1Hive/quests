@@ -1,4 +1,4 @@
-import { GU } from '@1hive/1hive-ui'
+import { GU } from "@1hive/1hive-ui";
 
 // These breakpoints values represent minimum screen sizes.
 export const BREAKPOINTS = {
@@ -7,4 +7,4 @@ export const BREAKPOINTS = {
   medium: 96 * GU,
   large: 160 * GU,
   max: 200 * GU,
-}
+};

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Box, DataView, GU } from "@1hive/1hive-ui";
-import { useWallet } from "../providers/Wallet";
 import { useHistory } from "react-router-dom";
+import { useWallet } from "../providers/Wallet";
 import useUser from "../hooks/useUser";
 
 function MyTokens() {
@@ -43,13 +43,11 @@ function MyTokens() {
           `}
           fields={["Token", "Claimed amount", "price", "Vested amount"]}
           entries={
-            user?.claims.map((claim) => {
-              return {
-                token: claim.vesting.party.token.name,
-                claimedAmount: claim.amount,
-                vestedAmount: claim.vesting.amount,
-              };
-            }) || []
+            user?.claims.map((claim) => ({
+              token: claim.vesting.party.token.name,
+              claimedAmount: claim.amount,
+              vestedAmount: claim.vesting.amount,
+            })) || []
           }
           renderEntry={({ token, claimedAmount, price, vestedAmount }) => [
             <span>{token}</span>,

@@ -1,16 +1,16 @@
 import {
   usePartySubscription,
   usePartiesSubscription,
-} from './useSubscriptions'
+} from "./useSubscriptions";
 
 export function useParties() {
-  const { parties, fetching } = usePartiesSubscription()
+  const { parties, fetching } = usePartiesSubscription();
 
-  return [parties, fetching]
+  return [parties, fetching];
 }
 
 export function useParty(id) {
-  const { party, fetching } = usePartySubscription(id)
+  const { party, fetching } = usePartySubscription(id);
 
-  return [party, fetching]
+  return [party, fetching];
 }

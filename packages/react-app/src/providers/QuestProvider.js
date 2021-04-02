@@ -1,12 +1,13 @@
 import moment from "moment";
+import { QUEST_STATUS } from "../constants";
 
 export function getMoreQuests(currentIndex, count, filter) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      let result = {
+      const result = {
         data: [
           {
-            status: "Active",
+            status: QUEST_STATUS.active,
             address: "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
             title: "Beat the poggers",
             description:
@@ -19,7 +20,7 @@ export function getMoreQuests(currentIndex, count, filter) {
             expiration: "06/24/2021",
           },
           {
-            status: "Active",
+            status: QUEST_STATUS.active,
             address: "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
             title: "Rescue me",
             description:
@@ -32,7 +33,7 @@ export function getMoreQuests(currentIndex, count, filter) {
             expiration: "06/24/2021",
           },
           {
-            status: "Draft",
+            status: QUEST_STATUS.draft,
             address: "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
             title: "Foldondord",
             description:
@@ -45,33 +46,36 @@ export function getMoreQuests(currentIndex, count, filter) {
             expiration: "06/24/2021",
           },
         ].filter((x) => {
-          console.log(filter);
-          if (
-            filter.status &&
-            filter.status !== "All" &&
-            x.status !== filter.status
-          )
+          // Status
+          if (filter.status && x.status.id !== filter.status) {
             return false;
+          }
+          // Tags
           if (
             filter.tags?.length &&
             !x.tags.filter((x) => filter.tags.includes(x)).length
-          )
+          ) {
             return false;
+          }
+          // Search
           if (
             filter.search &&
             !x.title.includes(filter.search) &&
             !x.description.includes(filter.search) &&
             !x.address.includes(filter.search)
-          )
+          ) {
             return false;
+          }
+          // MinBounty
           if (filter.minBounty && x.bounty < filter.minBounty) return false;
           if (
             (filter.expiration?.startDate &&
               moment(x.expiration).isBefore(filter.expiration.startDate)) ||
             (filter.expiration?.endDate &&
               moment(x.expiration).isAfter(filter.expiration.endDate))
-          )
+          ) {
             return false;
+          }
 
           return true;
         }),

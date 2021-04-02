@@ -1,12 +1,12 @@
-import React from 'react'
-import { GU, LoadingRing, useTheme } from '@1hive/1hive-ui'
-import PartyCard from '../components/PartyCard'
-import TopBar from '../components/TopBar'
-import useFilteredParties from '../hooks/useFilteredParties'
+import React from "react";
+import { GU, LoadingRing, useTheme } from "@1hive/1hive-ui";
+import PartyCard from "../components/Shared/PartyCard";
+import TopBar from "../components/Shared/TopBar";
+import useFilteredParties from "../hooks/useFilteredParties";
 
 function Parties() {
-  const { theme } = useTheme()
-  const { filteredParties, filters, loading } = useFilteredParties()
+  const { theme } = useTheme();
+  const { filteredParties, filters, loading } = useFilteredParties();
 
   return (
     <div
@@ -30,9 +30,9 @@ function Parties() {
                 row-gap: ${2 * GU}px;
               `}
             >
-              {filteredParties.map((party, index) => {
-                return <PartyCard key={index} party={party} />
-              })}
+              {filteredParties.map((party, index) => (
+                <PartyCard key={index} party={party} />
+              ))}
             </div>
           ) : (
             <div
@@ -47,7 +47,7 @@ function Parties() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default Parties
+export default Parties;
