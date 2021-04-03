@@ -1,74 +1,73 @@
-import React from "react";
-import PropTypes from "prop-types";
-import {
-  EthIdenticon,
-  GU,
-  RADIUS,
-  shortenAddress,
-  textStyle,
-  useTheme,
-} from "@1hive/1hive-ui";
-import connectionError from "./assets/connection-error.png";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { EthIdenticon, GU, RADIUS, shortenAddress, textStyle, useTheme } from '@1hive/1hive-ui';
 
-import { useWallet } from "../../../providers/Wallet";
-import HeaderModule from "../Header/HeaderModule";
+import styled from 'styled-components';
+import { useWallet } from '../../../providers/Wallet';
+import HeaderModule from '../Header/HeaderModule';
+
+// #region StyledComponents
+
+const AccountButtonBackground = styled.div`
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  background: ${({ background }) => background};
+  border: 2px solid ${({ borderColor }) => borderColor};
+  border-radius: 50%;
+`;
+
+const AccountButtonContainer = styled.div`
+  position: relative;
+`;
+
+const AccountButtonContent = styled.div`
+  margin-bottom: -5px;
+  ${textStyle('body2')}
+`;
+
+const AccountButtonContentWrapper = styled.div`
+  overflow: hidden;
+  max-width: ${16 * GU}px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const ConnectedLabel = styled.div`
+  font-size: 11px; /* doesn’t exist in aragonUI */
+  color: ${(props) => props.theme.positive};
+`;
+
+// #endregion
 
 function AccountButton({ onClick }) {
   const theme = useTheme();
   const wallet = useWallet();
-
   return (
     <HeaderModule
       icon={
-        <div css="position: relative">
+        <AccountButtonContainer>
           <EthIdenticon address={wallet.account} radius={RADIUS} />
-          <div
-            css={`
-              position: absolute;
-              bottom: -3px;
-              right: -3px;
-              width: 10px;
-              height: 10px;
-              background: ${theme.positive};
-              border: 2px solid ${theme.surface};
-              border-radius: 50%;
-            `}
-          />
-        </div>
+          <AccountButtonBackground background={theme.positive} borderColor={theme.surface} />
+        </AccountButtonContainer>
       }
       content={
         <>
-          <div
-            css={`
-              margin-bottom: -5px;
-              ${textStyle("body2")}
-            `}
-          >
-            <div
-              css={`
-                overflow: hidden;
-                max-width: ${16 * GU}px;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-              `}
-            >
+          <AccountButtonContent>
+            <AccountButtonContentWrapper>
               {shortenAddress(wallet.account)}
-            </div>
-          </div>
-          <div
-            css={`
-              font-size: 11px; /* doesn’t exist in aragonUI */
-              color: ${theme.positive};
-            `}
-          >
-            Connected
-          </div>
+            </AccountButtonContentWrapper>
+          </AccountButtonContent>
+          <ConnectedLabel theme={theme}>Connected</ConnectedLabel>
         </>
       }
       onClick={onClick}
     />
   );
 }
+
 AccountButton.propTypes = {
   onClick: PropTypes.func.isRequired,
 };

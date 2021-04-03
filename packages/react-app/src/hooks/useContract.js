@@ -1,10 +1,10 @@
-import { useMemo } from "react";
-import { Contract, AddressZero } from "ethers";
-import { getNetwork } from "../networks";
-import { useWallet } from "../providers/Wallet";
+import { useMemo } from 'react';
+import { Contract, AddressZero } from 'ethers';
+import { getNetwork } from '../networks';
+import { useWallet } from '../providers/Wallet';
 
-import factoryAbi from "../abis/PartyFactory.json";
-import merkleDistributorAbi from "../abis/MerkleDistributor.json";
+import factoryAbi from '../abis/PartyFactory.json';
+import merkleDistributorAbi from '../abis/MerkleDistributor.json';
 
 // account is not optional
 export function getSigner(ethersProvider, account) {
@@ -23,11 +23,7 @@ export function getContract(address, ABI, ethersProvider, account) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
   }
 
-  return new Contract(
-    address,
-    ABI,
-    getProviderOrSigner(ethersProvider, account)
-  );
+  return new Contract(address, ABI, getProviderOrSigner(ethersProvider, account));
 }
 
 // account is optional
@@ -42,10 +38,10 @@ function useContract(address, ABI, withSignerIfPossible = true) {
         address,
         ABI,
         ethers,
-        withSignerIfPossible && account ? account : undefined
+        withSignerIfPossible && account ? account : undefined,
       );
     } catch (error) {
-      console.error("Failed to get contract", error);
+      console.error('Failed to get contract', error);
       return null;
     }
   }, [address, ABI, ethers, withSignerIfPossible, account]);

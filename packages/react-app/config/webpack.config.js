@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 "use strict";
 
 const fs = require("fs");
@@ -150,8 +152,7 @@ module.exports = function (webpackEnv) {
       // the line below with these two lines if you prefer the stock client:
       // require.resolve('webpack-dev-server/client') + '?/',
       // require.resolve('webpack/hot/dev-server'),
-      isEnvDevelopment &&
-        require.resolve("react-dev-utils/webpackHotDevClient"),
+      isEnvDevelopment && require.resolve("react-dev-utils/webpackHotDevClient"),
       // Finally, this is your app's code:
       paths.appIndexJs,
       // We include the app code last so that if there is a runtime error during
@@ -185,8 +186,7 @@ module.exports = function (webpackEnv) {
               .relative(paths.appSrc, info.absoluteResourcePath)
               .replace(/\\/g, "/")
         : isEnvDevelopment &&
-          ((info) =>
-            path.resolve(info.absoluteResourcePath).replace(/\\/g, "/")),
+          ((info) => path.resolve(info.absoluteResourcePath).replace(/\\/g, "/")),
       // Prevents conflicts when multiple webpack runtimes (from different apps)
       // are used on the same page.
       jsonpFunction: `webpackJsonp${appPackageJson.name}`,
@@ -566,8 +566,7 @@ module.exports = function (webpackEnv) {
       // to restart the development server for webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
       // See https://github.com/facebook/create-react-app/issues/186
-      isEnvDevelopment &&
-        new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+      isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
       isEnvProduction &&
         new MiniCssExtractPlugin({
           // Options similar to the same options in webpackOptions.output

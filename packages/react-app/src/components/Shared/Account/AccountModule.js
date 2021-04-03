@@ -1,43 +1,54 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Button, GU, IconConnect, springs } from "@1hive/1hive-ui";
-import { Transition, animated } from "react-spring/renderprops";
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+/* eslint-disable consistent-return */
+/* eslint-disable no-shadow */
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
+import { Transition, animated } from 'react-spring/renderprops';
 
-import AccountButton from "./AccountButton";
-import HeaderPopover from "../Header/HeaderPopover";
-import ScreenConnected from "./ScreenConnected";
-import ScreenConnecting from "./ScreenConnecting";
-import ScreenError from "./ScreenError";
-import ScreenProviders from "./ScreenProviders";
-import { useWallet } from "../../../providers/Wallet";
+import styled from 'styled-components';
+import AccountButton from './AccountButton';
+import HeaderPopover from '../Header/HeaderPopover';
+import ScreenConnected from './ScreenConnected';
+import ScreenConnecting from './ScreenConnecting';
+import ScreenError from './ScreenError';
+import ScreenProviders from './ScreenProviders';
+import { useWallet } from '../../../providers/Wallet';
 
-import { getUseWalletProviders } from "../../../utils/web3-utils";
+import { getUseWalletProviders } from '../../../utils/web3-utils';
 
-const AnimatedDiv = animated.div;
+const AccountWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  outline: 0;
+`;
+
+const AnimatedDiv = styled(animated.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
 
 const SCREENS = [
   {
-    id: "providers",
+    id: 'providers',
     height:
       6 * GU + // header
       (12 + 1.5) * GU * Math.ceil(getUseWalletProviders().length / 2) + // buttons
       7 * GU, // footer
   },
   {
-    id: "connecting",
+    id: 'connecting',
     height: 38 * GU,
   },
   {
-    id: "connected",
+    id: 'connected',
     height: 28 * GU,
   },
   {
-    id: "error",
+    id: 'error',
     height: 50 * GU,
   },
 ];
@@ -69,7 +80,7 @@ function AccountModule({ compact }) {
         setActivationError(error);
       }
     },
-    [wallet]
+    [wallet],
   );
 
   // Don’t animate the slider until the popover has opened
@@ -108,10 +119,10 @@ function AccountModule({ compact }) {
 
   const { screenIndex, direction } = useMemo(() => {
     const screenId = (() => {
-      if (activationError) return "error";
-      if (activatingDelayed) return "connecting";
-      if (account) return "connected";
-      return "providers";
+      if (activationError) return 'error';
+      if (activatingDelayed) return 'connecting';
+      if (account) return 'connected';
+      return 'providers';
     })();
 
     const screenIndex = SCREENS.findIndex((screen) => screen.id === screenId);
@@ -125,17 +136,14 @@ function AccountModule({ compact }) {
   const screen = SCREENS[screenIndex];
   const screenId = screen.id;
 
-  const handlePopoverClose = useCallback(
-    (reject) => {
-      if (screenId === "connecting" || screenId === "error") {
-        // reject closing the popover
-        return false;
-      }
-      setOpened(false);
-      setActivationError(null);
-    },
-    [screenId]
-  );
+  const handlePopoverClose = useCallback(() => {
+    if (screenId === 'connecting' || screenId === 'error') {
+      // reject closing the popover
+      return false;
+    }
+    setOpened(false);
+    setActivationError(null);
+  }, [screenId]);
 
   // Prevents to lose the focus on the popover when a screen leaves while an
   // element inside is focused (e.g. when clicking on the “disconnect” button).
@@ -146,24 +154,15 @@ function AccountModule({ compact }) {
   }, [screenId]);
 
   return (
-    <div
-      ref={buttonRef}
-      tabIndex="0"
-      css={`
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-        outline: 0;
-      `}
-    >
-      {screen.id === "connected" ? (
+    <AccountWrapper ref={buttonRef} tabIndex="0">
+      {screen.id === 'connected' ? (
         <AccountButton onClick={toggle} />
       ) : (
         <Button
           icon={<IconConnect />}
           label="Enable account"
           onClick={toggle}
-          display={compact ? "icon" : "all"}
+          display={compact ? 'icon' : 'all'}
         />
       )}
 
@@ -187,7 +186,7 @@ function AccountModule({ compact }) {
               // activation fails before React updates the state of `activating`.
               // A future version of use-wallet might return an
               // `activationError` object instead, making this unnecessary.
-              activating: screen.id === "error" ? null : activatingDelayed,
+              activating: screen.id === 'error' ? null : activatingDelayed,
               wallet,
             }}
             keys={({ screen }) => screen.id + activatingDelayed}
@@ -195,47 +194,25 @@ function AccountModule({ compact }) {
               opacity: 0,
               transform: `translate3d(${3 * GU * direction}px, 0, 0)`,
             }}
-            enter={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
+            enter={{ opacity: 1, transform: 'translate3d(0, 0, 0)' }}
             leave={{
               opacity: 0,
               transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
             }}
           >
             {({ screen, activating, wallet }) => ({ opacity, transform }) => (
-              <AnimatedDiv
-                style={{ opacity, transform }}
-                css={`
-                  position: absolute;
-                  top: 0;
-                  left: 0;
-                  right: 0;
-                  bottom: 0;
-                `}
-              >
+              <AnimatedDiv style={{ opacity, transform }}>
                 {(() => {
-                  if (screen.id === "connecting") {
+                  if (screen.id === 'connecting') {
                     return (
-                      <ScreenConnecting
-                        providerId={activating}
-                        onCancel={handleCancelConnection}
-                      />
+                      <ScreenConnecting providerId={activating} onCancel={handleCancelConnection} />
                     );
                   }
-                  if (screen.id === "connected") {
-                    return (
-                      <ScreenConnected
-                        onClosePopover={toggle}
-                        wallet={wallet}
-                      />
-                    );
+                  if (screen.id === 'connected') {
+                    return <ScreenConnected onClosePopover={toggle} wallet={wallet} />;
                   }
-                  if (screen.id === "error") {
-                    return (
-                      <ScreenError
-                        error={activationError}
-                        onBack={clearError}
-                      />
-                    );
+                  if (screen.id === 'error') {
+                    return <ScreenError error={activationError} onBack={clearError} />;
                   }
                   return <ScreenProviders onActivate={activate} />;
                 })()}
@@ -244,7 +221,7 @@ function AccountModule({ compact }) {
           </Transition>
         </div>
       </HeaderPopover>
-    </div>
+    </AccountWrapper>
   );
 }
 

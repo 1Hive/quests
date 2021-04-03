@@ -1,9 +1,9 @@
-import React, { useMemo, useRef } from "react";
-import PropTypes from "prop-types";
-import { GU, Link, textStyle, useTheme } from "@1hive/1hive-ui";
-import { UnsupportedChainError } from "use-wallet";
-import { getNetworkName } from "../../../utils/web3-utils";
-import connectionError from "./assets/connection-error.png";
+import React, { useMemo, useRef } from 'react';
+import PropTypes from 'prop-types';
+import { Button, GU, IconRefresh, textStyle, useTheme } from '@1hive/1hive-ui';
+import { UnsupportedChainError } from 'use-wallet';
+import { getNetworkName } from '../../../utils/web3-utils';
+import connectionError from './assets/connection-error.png';
 
 function AccountModuleErrorScreen({ error, onBack }) {
   const theme = useTheme();
@@ -12,14 +12,11 @@ function AccountModuleErrorScreen({ error, onBack }) {
   const [title, secondary] = useMemo(() => {
     if (error instanceof UnsupportedChainError) {
       return [
-        "Wrong network",
+        'Wrong network',
         `Please select the ${getNetworkName()} network in your wallet and try again.`,
       ];
     }
-    return [
-      "Failed to enable your account",
-      "You can try another Ethereum wallet.",
-    ];
+    return ['Failed to enable your account', 'You can try another Ethereum wallet.'];
   }, [error]);
 
   return (
@@ -55,7 +52,7 @@ function AccountModuleErrorScreen({ error, onBack }) {
         <h1
           css={`
             padding-top: ${2 * GU}px;
-            ${textStyle("body1")};
+            ${textStyle('body1')};
             font-weight: 600;
           `}
         >
@@ -75,7 +72,7 @@ function AccountModuleErrorScreen({ error, onBack }) {
           flex-grow: 0;
         `}
       >
-        <Link onClick={onBack}>OK, try again</Link>
+        <Button onClick={onBack} icon={<IconRefresh />} label=" OK, try again" />
       </div>
     </section>
   );

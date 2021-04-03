@@ -1,17 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, GU } from "@1hive/1hive-ui";
-import Header from "../Header";
-import { useWizard } from "../../../../providers/Wizard";
-import TransactionStatus from "../../Transaction/TransactionStatus";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, GU } from '@1hive/1hive-ui';
+import Header from '../Header';
+import { useWizard } from '../../../../providers/Wizard';
+import TransactionStatus from '../../Transaction/TransactionStatus';
 import {
   TX_STATUS_SIGNED,
   TX_STATUS_PENDING,
   TX_STATUS_CONFIRMED,
   TX_STATUS_SIGNATURE_FAILED,
   TX_STATUS_FAILED,
-} from "../../Transaction/transaction-statuses";
-import { useFactoryContract } from "../../../../hooks/useContract";
-import { getNetwork } from "../../../../networks";
+} from '../../Transaction/transaction-statuses';
+import { useFactoryContract } from '../../../../hooks/useContract';
+import { getNetwork } from '../../../../networks';
 
 const EMPTY_STATE = {
   signed: false,
@@ -23,7 +23,7 @@ const EMPTY_STATE = {
 function StartParty({ title }) {
   const [attempt, setAttempt] = useState(0);
   const [progress, setProgress] = useState(EMPTY_STATE);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const { data, settings, onNext, onPartyAddressChange } = useWizard();
 
   const factory = useFactoryContract();
@@ -61,7 +61,7 @@ function StartParty({ title }) {
         settings.period,
         settings.duration,
         settings.cliff,
-        { gasLimit: 9500000 }
+        { gasLimit: 9500000 },
       );
       setProgress((progress) => ({
         ...progress,
@@ -81,7 +81,7 @@ function StartParty({ title }) {
 
         const { args } = recipt.logs
           .map((log) => factory.interface.parseLog(log))
-          .find(({ name }) => name === "NewParty");
+          .find(({ name }) => name === 'NewParty');
 
         onPartyAddressChange(args[0]);
         setProgress((progress) => ({ ...progress, confirmed: true }));
@@ -90,7 +90,7 @@ function StartParty({ title }) {
         setProgress((progress) => ({ ...progress, failed: true }));
       }
     },
-    [data, factory.interface, onNext, onPartyAddressChange]
+    [data, factory.interface, onNext, onPartyAddressChange],
   );
 
   useEffect(() => {
@@ -114,14 +114,7 @@ function StartParty({ title }) {
     };
 
     start();
-  }, [
-    error,
-    settings,
-    attempt,
-    ensureConfirmation,
-    signTx,
-    progress.confirmed,
-  ]);
+  }, [error, settings, attempt, ensureConfirmation, signTx, progress.confirmed]);
 
   return (
     <div>
@@ -140,8 +133,7 @@ function StartParty({ title }) {
             text-align: center;
           `}
         >
-          {(status === TX_STATUS_FAILED ||
-            status === TX_STATUS_SIGNATURE_FAILED) && (
+          {(status === TX_STATUS_FAILED || status === TX_STATUS_SIGNATURE_FAILED) && (
             <Button label="Retry" mode="strong" onClick={handleNextAttempt} />
           )}
         </div>

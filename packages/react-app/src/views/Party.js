@@ -1,5 +1,6 @@
-import React, { useCallback, useState } from "react";
-import { useHistory } from "react-router-dom";
+import PropTypes from 'prop-types';
+import React, { useCallback, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   AddressField,
   BackButton,
@@ -9,10 +10,11 @@ import {
   Tabs,
   textStyle,
   useTheme,
-} from "@1hive/1hive-ui";
-import { useParty } from "../hooks/useParties";
-import { durationTime } from "../utils/date-utils";
-import { PCT_BASE } from "../constants";
+} from '@1hive/1hive-ui';
+import styled from 'styled-components';
+import { useParty } from '../hooks/useParties';
+import { durationTime } from '../utils/date-utils';
+import { PCT_BASE } from '../constants';
 
 function Party({ match }) {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -22,7 +24,7 @@ function Party({ match }) {
   const [party, loading] = useParty(partyId);
 
   const handleBack = useCallback(() => {
-    history.push("/home");
+    history.push('/home');
   }, [history]);
 
   if (!party && !loading) {
@@ -50,7 +52,7 @@ function Party({ match }) {
         <Box padding={0}>
           <div
             css={`
-              ${textStyle("title2")};
+              ${textStyle('title2')};
               padding: ${3 * GU}px;
             `}
           >
@@ -67,21 +69,25 @@ function Party({ match }) {
             `}
           >
             <Tabs
-              items={["Details", "Deposit tokens"]}
+              items={['Details', 'Deposit tokens']}
               selected={selectedTab}
               onChange={setSelectedTab}
             />
-            {selectedTab === 0 ? (
-              <Details party={party} />
-            ) : (
-              <DepositTokens party={party} />
-            )}
+            {selectedTab === 0 ? <Details party={party} /> : <DepositTokens party={party} />}
           </div>
         </Box>
       )}
     </div>
   );
 }
+
+Party.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.number,
+    }),
+  }).isRequired,
+};
 
 function Details({ party }) {
   return (
@@ -93,7 +99,7 @@ function Details({ party }) {
       <div>
         <h2
           css={`
-            ${textStyle("title4")}
+            ${textStyle('title4')}
           `}
         >
           Token info and assets
@@ -113,7 +119,7 @@ function Details({ party }) {
       <div>
         <h2
           css={`
-            ${textStyle("title4")}
+            ${textStyle('title4')}
           `}
         >
           Distribution details
@@ -121,24 +127,30 @@ function Details({ party }) {
 
         <Field
           label="Vesting duration"
-          value={durationTime(
-            party.vestingPeriod * party.vestingDurationInPeriods
-          )}
+          value={durationTime(party.vestingPeriod * party.vestingDurationInPeriods)}
         />
         <Field
           label=" Vesting cliff"
-          value={durationTime(
-            party.vestingPeriod * party.vestingCliffInPeriods
-          )}
+          value={durationTime(party.vestingPeriod * party.vestingCliffInPeriods)}
         />
-        <Field
-          label="Up front amount"
-          value={`${(party.upfrontPct * BigInt(100)) / PCT_BASE}%`}
-        />
+        <Field label="Up front amount" value={`${(party.upfrontPct * BigInt(100)) / PCT_BASE}%`} />
       </div>
     </div>
   );
 }
+
+Details.propTypes = {
+  party: PropTypes.shape({
+    name: PropTypes.string,
+    token: PropTypes.shape({
+      id: PropTypes.number,
+    }),
+    upfrontPct: PropTypes.number,
+    vestingCliffInPeriods: PropTypes.number,
+    vestingDurationInPeriods: PropTypes.number,
+    vestingPeriod: PropTypes.number,
+  }).isRequired,
+};
 
 function DepositTokens({ party }) {
   return (
@@ -149,20 +161,22 @@ function DepositTokens({ party }) {
     >
       <div
         css={`
-          ${textStyle("title4")};
+          ${textStyle('title4')};
         `}
       >
-        In order to activate this offer, you need to deposit tokens in this
-        address:
+        In order to activate this offer, you need to deposit tokens in this address:
       </div>
 
-      <Field
-        label="Deposit address"
-        value={<AddressField address={party.id} />}
-      />
+      <Field label="Deposit address" value={<AddressField address={party.id} />} />
     </div>
   );
 }
+
+DepositTokens.propTypes = {
+  party: PropTypes.shape({
+    id: PropTypes.number,
+  }).isRequired,
+};
 
 function LineSeparator() {
   const theme = useTheme();
@@ -176,31 +190,32 @@ function LineSeparator() {
   );
 }
 
+const fieldContainer = styled.div`
+  margin-top: ${3 * GU}px;
+`;
+
+const fieldLabel = styled.label`
+  ${textStyle('label2')};
+  color: ${(props) => props.theme.contentSecondary};
+`;
+
+const fieldValueSpacer = styled.div`
+  margin-top: ${0.5 * GU}px;
+`;
+
 function Field({ value, label }) {
   const theme = useTheme();
 
   return (
-    <div
-      css={`
-        margin-top: ${3 * GU}px;
-      `}
-    >
-      <label
-        css={`
-          ${textStyle("label2")};
-          color: ${theme.contentSecondary};
-        `}
-      >
-        {label}
-      </label>
-      <div
-        css={`
-          margin-top: ${0.5 * GU}px;
-        `}
-      >
-        {value}
-      </div>
-    </div>
+    <fieldContainer>
+      <fieldLabel theme={theme}>{label}</fieldLabel>
+      <fieldValueSpacer>{value}</fieldValueSpacer>
+    </fieldContainer>
   );
 }
+
+Field.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+};
 export default Party;

@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useRef } from "react";
-import { Field, GU, Info, TextInput, Slider } from "@1hive/1hive-ui";
-import { isAddress } from "web3-utils";
-import Header from "../Header";
-import Navigation from "../Navigation";
-import { useWizard } from "../../../../providers/Wizard";
+import React, { useCallback, useMemo, useRef } from 'react';
+import { Field, GU, Info, TextInput, Slider } from '@1hive/1hive-ui';
+import { isAddress } from 'web3-utils';
+import Header from '../Header';
+import Navigation from '../Navigation';
+import { useWizard } from '../../../../providers/Wizard';
 
 function ConfigParty({ title }) {
   const {
@@ -25,10 +25,10 @@ function ConfigParty({ title }) {
   const errors = useMemo(() => {
     const errors = [];
     if (token && !isAddress(token)) {
-      errors.push("Token must be a valid address");
+      errors.push('Token must be a valid address');
     }
     if (duration !== 0 && cliff !== 0 && duration <= cliff) {
-      errors.push("Vesting duration should be greater than cliff");
+      errors.push('Vesting duration should be greater than cliff');
     }
 
     return errors;
@@ -50,12 +50,11 @@ function ConfigParty({ title }) {
       fileReader.current.onloadend = handleFileRead;
       fileReader.current.readAsText(event.target.files[0]);
     },
-    [handleFileRead]
+    [handleFileRead],
   );
 
   const emptyValues =
-    (!token || !duration || !data) &&
-    (!token || !(Math.round(100 * upfront) === 100));
+    (!token || !duration || !data) && (!token || !(Math.round(100 * upfront) === 100));
 
   return (
     <div>
@@ -73,12 +72,7 @@ function ConfigParty({ title }) {
               width: 100%;
             `}
           >
-            <TextInput
-              value={token}
-              onChange={onTokenChange}
-              wide
-              placeholder="0xcafe"
-            />
+            <TextInput value={token} onChange={onTokenChange} wide placeholder="0xcafe" />
           </Field>
           <div
             css={`
@@ -93,12 +87,7 @@ function ConfigParty({ title }) {
                 margin-right: ${1.5 * GU}px;
               `}
             >
-              <TextInput
-                value={duration}
-                onChange={onDurationChange}
-                wide
-                type="number"
-              />
+              <TextInput value={duration} onChange={onDurationChange} wide type="number" />
             </Field>
             Days
           </div>
@@ -141,12 +130,7 @@ function ConfigParty({ title }) {
               margin-right: ${1.5 * GU}px;
             `}
           >
-            <TextInput
-              onChange={handleJsonFileSelected}
-              wide
-              type="file"
-              required
-            />
+            <TextInput onChange={handleJsonFileSelected} wide type="file" required />
           </Field>
         </div>
       </div>

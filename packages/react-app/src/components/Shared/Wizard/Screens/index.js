@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { GU, springs } from "@1hive/1hive-ui";
-import { Transition, animated } from "react-spring/renderprops";
-import { WizardScreens } from "../config";
-import { useWizard } from "../../../providers/Wizard";
+import React, { useEffect, useState } from 'react';
+import { GU, springs } from '@1hive/1hive-ui';
+import { Transition, animated } from 'react-spring/renderprops';
+import { WizardScreens } from '../config';
+import { useWizard } from '../../../providers/Wizard';
 
 const AnimatedDiv = animated.div;
 
@@ -26,17 +26,17 @@ function Screens() {
       keys={({ step }) => step}
       from={{
         opacity: 0,
-        position: "absolute",
+        position: 'absolute',
         transform: `translate3d(${10 * direction}%, 0, 0)`,
       }}
       enter={{
         opacity: 1,
-        position: "static",
-        transform: "translate3d(0%, 0, 0)",
+        position: 'static',
+        transform: 'translate3d(0%, 0, 0)',
       }}
       leave={{
         opacity: 0,
-        position: "absolute",
+        position: 'absolute',
         transform: `translate3d(${-10 * direction}%, 0, 0)`,
       }}
       config={springs.smooth}

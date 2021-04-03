@@ -1,6 +1,6 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Button, IconArrowLeft, GU, useTheme } from "@1hive/1hive-ui";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Button, IconArrowLeft, GU, useTheme } from '@1hive/1hive-ui';
 
 function Navigation({
   backEnabled,
@@ -66,9 +66,9 @@ Navigation.propTypes = {
 
 Navigation.defaultProps = {
   backEnabled: true,
-  backLabel: "Back",
+  backLabel: 'Back',
   nextEnabled: true,
-  nextLabel: "Next",
+  nextLabel: 'Next',
   showBack: true,
   showNext: true,
 };

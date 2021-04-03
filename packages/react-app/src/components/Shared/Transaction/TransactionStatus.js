@@ -1,11 +1,11 @@
-import React, { useMemo } from "react";
-import { GU, IconCheck, IconCross, useTheme } from "@1hive/1hive-ui";
+import React, { useMemo } from 'react';
+import { GU, IconCheck, IconCross, useTheme } from '@1hive/1hive-ui';
 import {
   TX_STATUS_FAILED,
   TX_STATUS_SIGNATURE_FAILED,
   TX_STATUS_CONFIRMED,
   TX_STATUS_SIGNED,
-} from "./transaction-statuses";
+} from './transaction-statuses';
 
 function TransactionStatus({ status, error }) {
   const theme = useTheme();
@@ -17,8 +17,8 @@ function TransactionStatus({ status, error }) {
         labelColor: theme.negative,
         labelText:
           status === TX_STATUS_SIGNATURE_FAILED
-            ? "Signing transaction failed!"
-            : `Transaction failed${error ? ` with: ${error}` : ""}`,
+            ? 'Signing transaction failed!'
+            : `Transaction failed${error ? ` with: ${error}` : ''}`,
       };
     }
 
@@ -26,7 +26,7 @@ function TransactionStatus({ status, error }) {
       return {
         iconColor: theme.positive,
         labelColor: theme.positive,
-        labelText: "Transaction confirmed!",
+        labelText: 'Transaction confirmed!',
       };
     }
 
@@ -34,19 +34,17 @@ function TransactionStatus({ status, error }) {
       return {
         iconColor: theme.info,
         labelColor: theme.contentSecondary,
-        labelText: "Transaction being mined…",
+        labelText: 'Transaction being mined…',
       };
     }
 
     return {
       iconColor: theme.contentSecondary,
-      labelText: "Waiting for signature…",
+      labelText: 'Waiting for signature…',
     };
   }, [error, status, theme]);
 
-  const failed =
-    status === TX_STATUS_SIGNATURE_FAILED ||
-    status === TX_STATUS_SIGNATURE_FAILED;
+  const failed = status === TX_STATUS_SIGNATURE_FAILED || status === TX_STATUS_SIGNATURE_FAILED;
 
   return (
     <div

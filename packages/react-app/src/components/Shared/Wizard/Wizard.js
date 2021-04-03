@@ -1,7 +1,7 @@
-import React from "react";
-import { Modal } from "@1hive/1hive-ui";
-import { useWizard, WizardProvider } from "../../providers/Wizard";
-import Screens from "./Screens";
+import React from 'react';
+import { Modal } from '@1hive/1hive-ui';
+import { useWizard, WizardProvider } from '../../providers/Wizard';
+import Screens from './Screens';
 
 const noop = () => {};
 

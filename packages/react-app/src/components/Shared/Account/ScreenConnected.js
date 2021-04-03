@@ -1,4 +1,5 @@
-import React, { useCallback } from "react";
+import PropTypes from 'prop-types';
+import React, { useCallback } from 'react';
 import {
   Button,
   ButtonBase,
@@ -8,23 +9,20 @@ import {
   RADIUS,
   textStyle,
   useTheme,
-} from "@1hive/1hive-ui";
-import IdentityBadge from "../IdentityBadge";
-import { useCopyToClipboard } from "../../../hooks/useCopyToClipboard";
-import { getNetworkName } from "../../../utils/web3-utils";
-import { getProviderFromUseWalletId } from "../../../ethereum-providers";
+} from '@1hive/1hive-ui';
+import IdentityBadge from '../IdentityBadge';
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
+import { getNetworkName } from '../../../utils/web3-utils';
+import { getProviderFromUseWalletId } from '../../../ethereum-providers';
 
-function AccountScreenConnected({ onClosePopover, wallet }) {
+function AccountScreenConnected({ wallet }) {
   const theme = useTheme();
   const copy = useCopyToClipboard();
 
   const networkName = getNetworkName();
   const providerInfo = getProviderFromUseWalletId(wallet.activated);
 
-  const handleCopyAddress = useCallback(() => copy(wallet.account), [
-    copy,
-    wallet,
-  ]);
+  const handleCopyAddress = useCallback(() => copy(wallet.account), [copy, wallet]);
 
   const handleDeactivate = useCallback(() => wallet.deactivate(), [wallet]);
 
@@ -41,7 +39,7 @@ function AccountScreenConnected({ onClosePopover, wallet }) {
       >
         <h4
           css={`
-            ${textStyle("label2")};
+            ${textStyle('label2')};
             color: ${theme.contentSecondary};
             margin-bottom: ${2 * GU}px;
           `}
@@ -72,9 +70,7 @@ function AccountScreenConnected({ onClosePopover, wallet }) {
                 transform: translateY(-2px);
               `}
             />
-            <span>
-              {providerInfo.id === "unknown" ? "Wallet" : providerInfo.name}
-            </span>
+            <span>{providerInfo.id === 'unknown' ? 'Wallet' : providerInfo.name}</span>
           </div>
           <div
             css={`
@@ -97,12 +93,7 @@ function AccountScreenConnected({ onClosePopover, wallet }) {
                 }
               `}
             >
-              <IdentityBadge
-                entity={wallet.account}
-                compact
-                badgeOnly
-                css="cursor: pointer"
-              />
+              <IdentityBadge entity={wallet.account} compact badgeOnly css="cursor: pointer" />
               <IconCopy
                 css={`
                   color: ${theme.hint};
@@ -121,7 +112,7 @@ function AccountScreenConnected({ onClosePopover, wallet }) {
               display: flex;
               align-items: center;
               color: ${theme.positive};
-              ${textStyle("label2")};
+              ${textStyle('label2')};
             `}
           >
             <IconCheck size="small" />
@@ -142,11 +133,20 @@ function AccountScreenConnected({ onClosePopover, wallet }) {
         css={`
           margin-top: ${2 * GU}px;
         `}
+        mode="negative"
       >
         Disconnect wallet
       </Button>
     </div>
   );
 }
+
+AccountScreenConnected.propTypes = {
+  wallet: PropTypes.shape({
+    account: PropTypes.string,
+    activated: PropTypes.string,
+    deactivate: PropTypes.func,
+  }),
+};
 
 export default AccountScreenConnected;

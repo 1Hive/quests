@@ -1,5 +1,6 @@
-import React from "react";
-import { DropDown } from "@1hive/1hive-ui";
+import PropTypes from 'prop-types';
+import React from 'react';
+import { DropDown } from '@1hive/1hive-ui';
 
 function Filters({ filters }) {
   return (
@@ -12,5 +13,15 @@ function Filters({ filters }) {
     </div>
   );
 }
+
+Filters.propTypes = {
+  filters: PropTypes.shape({
+    host: PropTypes.shape({
+      filter: PropTypes.number,
+      items: PropTypes.array,
+      onChange: PropTypes.func,
+    }),
+  }),
+};
 
 export default Filters;

@@ -1,6 +1,4 @@
-import React from "react";
-import { CRYPTOS, QUEST_STATUS } from "../../../constants";
-
+import React from 'react';
 import {
   Box,
   Button,
@@ -13,14 +11,16 @@ import {
   TextInput,
   TokenBadge,
   _AutoComplete as AutoComplete,
-} from "@1hive/1hive-ui";
-import { debounce } from "../../../utils/class-util";
+} from '@1hive/1hive-ui';
+import { CRYPTOS, QUEST_STATUS } from '../../../constants';
 
-const currencyOptions = CRYPTOS.map((c) => c.symb);
+import { debounce } from '../../../utils/class-util';
+
+const currencyOptions = Object.values(CRYPTOS).map((c) => c.symb);
 const questStatusOptions = Object.values(QUEST_STATUS).map((x) => x.label);
-const tagSuggestion = ["FrontEnd", "Angular", "React", "CoolStuff"];
+const tagSuggestion = ['FrontEnd', 'Angular', 'React', 'CoolStuff'];
 const defaultFilter = {
-  search: "",
+  search: '',
   status: null,
   expiration: { start: null, end: null },
   tags: [],
@@ -30,34 +30,30 @@ const defaultFilter = {
 };
 
 export default class QuestListFilter extends React.Component {
-  state = defaultFilter;
-
   constructor(props) {
     super(props);
+    this.state = defaultFilter;
     this.tagRef = React.createRef();
   }
 
-  onTagDelete = (i) => {
+  onTagDelete(i) {
     const tags = this.state.tags.slice(0);
     tags.splice(i, 1);
     this.setFilter({ tags });
-  };
+  }
 
-  onTagAddition = (tag) => {
+  onTagAddition(tag) {
     if (!this.state.tags.includes(tag)) {
       const tags = this.state.tags.concat(tag);
       this.setFilter({ tags });
     }
-    this.tagRef.current.value = "";
-  };
+    this.tagRef.current.value = '';
+  }
 
-  setFilter = (filter, shouldDebounce) => {
-    let callback = () => this.props.onFilterChange(this.state);
-    this.setState(
-      { ...this.state, ...filter },
-      shouldDebounce ? debounce(callback, 500) : callback
-    );
-  };
+  setFilter(filter, shouldDebounce) {
+    const callback = () => this.props.onFilterChange(this.state);
+    this.setState({ ...filter }, shouldDebounce ? debounce(callback, 500) : callback);
+  }
 
   render() {
     return (
@@ -76,9 +72,7 @@ export default class QuestListFilter extends React.Component {
             <DropDown
               items={questStatusOptions}
               selected={Object.keys(QUEST_STATUS).indexOf(this.state.status)}
-              onChange={(i) =>
-                this.setFilter({ status: Object.keys(QUEST_STATUS)[i] })
-              }
+              onChange={(i) => this.setFilter({ status: Object.keys(QUEST_STATUS)[i] })}
               placeholder="All"
               wide
             />
@@ -105,9 +99,9 @@ export default class QuestListFilter extends React.Component {
                 type="number"
               />
               <TokenBadge
-                symbol="HNY"
-                address="0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9"
-                networkType="dai"
+                symbol={CRYPTOS.honey.symb}
+                address={CRYPTOS.honey.address}
+                networkType="private"
                 size="normal"
               />
               {/* <DropDown
@@ -126,9 +120,7 @@ export default class QuestListFilter extends React.Component {
               items={tagSuggestion.filter(
                 (name) =>
                   this.state.searchTags &&
-                  name
-                    .toLowerCase()
-                    .indexOf(this.state.searchTags.toLowerCase()) > -1
+                  name.toLowerCase().indexOf(this.state.searchTags.toLowerCase()) > -1,
               )}
               onChange={(val) => this.setState({ searchTags: val })}
               onSelect={this.onTagAddition}
@@ -137,7 +129,7 @@ export default class QuestListFilter extends React.Component {
             />
             {this.state.tags.map((x, i) => (
               <Tag
-                key={i}
+                key={x}
                 label={x}
                 icon={<IconClose />}
                 onClick={() => this.onTagDelete(i)}

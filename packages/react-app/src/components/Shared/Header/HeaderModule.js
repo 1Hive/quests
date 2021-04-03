@@ -1,27 +1,30 @@
-import React from "react";
-import {
-  ButtonBase,
-  GU,
-  IconDown,
-  useTheme,
-  useViewport,
-} from "@1hive/1hive-ui";
+import PropTypes from 'prop-types';
+import React from 'react';
+import { ButtonBase, GU, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import styled from 'styled-components';
+
+// #region StyledComponents
+
+const HeaderAccountButtonStyled = styled(ButtonBase)`
+  height: 100%;
+  padding: ${1 * GU}px;
+  background: ${({ background }) => background};
+  &:active {
+    background: ${({ backgroundActive }) => backgroundActive};
+  }
+`;
+
+// #endregion
 
 function HeaderModule({ content, hasPopover = true, icon, onClick }) {
   const { above } = useViewport();
   const theme = useTheme();
 
   return (
-    <ButtonBase
+    <HeaderAccountButtonStyled
       onClick={onClick}
-      css={`
-        height: 100%;
-        padding: ${1 * GU}px;
-        background: ${theme.surface};
-        &:active {
-          background: ${theme.surfacePressed};
-        }
-      `}
+      background={theme.surface}
+      backgroundActive={theme.surfacePressed}
     >
       <div
         css={`
@@ -33,7 +36,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }) {
       >
         <>
           {icon}
-          {above("medium") && (
+          {above('medium') && (
             <>
               <div
                 css={`
@@ -55,8 +58,15 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }) {
           )}
         </>
       </div>
-    </ButtonBase>
+    </HeaderAccountButtonStyled>
   );
 }
+
+HeaderModule.propTypes = {
+  content: PropTypes.node,
+  hasPopover: PropTypes.bool,
+  icon: PropTypes.node,
+  onClick: PropTypes.func,
+};
 
 export default HeaderModule;

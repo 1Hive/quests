@@ -1,10 +1,10 @@
 export function append(...str) {
-  return str.join(" ");
+  return str.join(' ');
 }
 
 export const debounce = (func, wait) => {
   let timeout;
-  return function (...args) {
+  return (...args) => {
     const context = this;
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => {

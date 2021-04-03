@@ -1,7 +1,7 @@
-import React from "react";
-import { AddressField, GU } from "@1hive/1hive-ui";
-import { useWizard } from "../../../../providers/Wizard";
-import Header from "../Header";
+import React from 'react';
+import { AddressField, GU } from '@1hive/1hive-ui';
+import { useWizard } from '../../../../providers/Wizard';
+import Header from '../Header';
 
 function CreatedParty({ title }) {
   const { partyAddress } = useWizard();

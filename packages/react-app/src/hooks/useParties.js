@@ -1,7 +1,4 @@
-import {
-  usePartySubscription,
-  usePartiesSubscription,
-} from "./useSubscriptions";
+import { usePartySubscription, usePartiesSubscription } from './useSubscriptions';
 
 export function useParties() {
   const { parties, fetching } = usePartiesSubscription();

@@ -1,20 +1,13 @@
-import { toMs } from "./date-utils";
+import { toMs } from './date-utils';
 
-export function transformPartyData(party) {
+function transformClaimData(claim) {
   return {
-    ...party,
-    createdAt: toMs(party.createdAt),
-    upfrontPct: BigInt(party.upfrontPct),
-    vestingPeriod: toMs(party.vestingPeriod),
-    vestingDurationInPeriods: parseInt(party.vestingDurationInPeriods),
-    vestingCliffInPeriods: parseInt(party.vestingCliffInPeriods),
-    totalAmountClaimed: BigInt(party.totalAmountClaimed || "0"),
-    vestings: party.vestings.map(transformVestingData),
+    ...claim,
+    createdAt: toMs(claim.createdAt),
+    amount: BigInt(claim.amount),
+    // eslint-disable-next-line no-use-before-define
+    vesting: claim.vesting ? transformVestingData(claim.vesting) : null,
   };
-}
-
-export function transformUserData(user) {
-  return { ...user, claims: user.claims.map(transformClaimData) };
 }
 
 function transformVestingData(vesting) {
@@ -22,17 +15,25 @@ function transformVestingData(vesting) {
     ...vesting,
     startTime: toMs(vesting.startTime),
     amount: BigInt(vesting.amount),
-    periodsClaimed: parseInt(vesting.periodsClaimed),
+    periodsClaimed: parseInt(vesting.periodsClaimed, 10),
     amountClaimed: BigInt(vesting.amountClaimed),
     claims: vesting.claims?.map(transformClaimData) || null,
   };
 }
 
-function transformClaimData(claim) {
+export function transformPartyData(party) {
   return {
-    ...claim,
-    createdAt: toMs(claim.createdAt),
-    amount: BigInt(claim.amount),
-    vesting: claim.vesting ? transformVestingData(claim.vesting) : null,
+    ...party,
+    createdAt: toMs(party.createdAt),
+    upfrontPct: BigInt(party.upfrontPct),
+    vestingPeriod: toMs(party.vestingPeriod),
+    vestingDurationInPeriods: parseInt(party.vestingDurationInPeriods, 10),
+    vestingCliffInPeriods: parseInt(party.vestingCliffInPeriods, 10),
+    totalAmountClaimed: BigInt(party.totalAmountClaimed || '0'),
+    vestings: party.vestings.map(transformVestingData),
   };
+}
+
+export function transformUserData(user) {
+  return { ...user, claims: user.claims.map(transformClaimData) };
 }

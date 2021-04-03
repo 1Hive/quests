@@ -1,10 +1,11 @@
-import React from "react";
-import { Split } from "@1hive/1hive-ui";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { getMoreQuests } from "../../../providers/QuestProvider";
-import { isMobile } from "react-device-detect";
-import QuestListFilter from "./QuestListFilter";
-import { Quest } from "../../Shared/Quest/Quest";
+import React from 'react';
+import { Split } from '@1hive/1hive-ui';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { isMobile } from 'react-device-detect';
+import { getMoreQuests } from '../../../providers/QuestProvider';
+import QuestListFilter from './QuestListFilter';
+import { Quest } from '../../Shared/Quest/Quest';
+
 const batchSize = 3;
 
 export default class QuestList extends React.Component {
@@ -12,7 +13,7 @@ export default class QuestList extends React.Component {
     super(props);
     this.state = {
       quests: [],
-      placeholderCount: 0,
+      placeholderCount: 3,
       hasMore: true,
       filter: {},
     };
@@ -22,39 +23,42 @@ export default class QuestList extends React.Component {
     this.refresh();
   }
 
-  loadMore = async () => {
-    this.setState({
-      placeholderCount: this.state.placeholderCount + batchSize,
-    });
-    let res = await getMoreQuests(
-      this.state.quests.length,
-      batchSize,
-      this.state.filter
+  async onFilterChange(filter) {
+    this.setState({ filter }, () => this.refresh());
+  }
+
+  async refresh() {
+    this.setState(
+      {
+        quests: [],
+        placeholderCount: batchSize,
+      },
+      () => {
+        getMoreQuests(0, batchSize, this.state.filter).then((res) =>
+          this.setState({
+            quests: res.data,
+            placeholderCount: 0,
+            hasMore: res.hasMore,
+          }),
+        );
+      },
     );
-    this.setState({
-      quests: this.state.quests.concat(res.data),
-      placeholderCount: this.state.placeholderCount - batchSize,
-      hasMore: res.hasMore,
-    });
-  };
+  }
 
-  refresh = async () => {
-    this.setState({
-      quests: [],
-      placeholderCount: batchSize,
-    });
-    let res = await getMoreQuests(0, batchSize, this.state.filter);
-    console.log(res);
-    this.setState({
-      quests: res.data,
-      placeholderCount: 0,
-      hasMore: res.hasMore,
-    });
-  };
-
-  onFilterChange = async (filter) => {
-    this.setState({ filter }, this.refresh);
-  };
+  async loadMore() {
+    this.setState(
+      (prevState) => ({ placeholderCount: prevState.placeholderCount + batchSize }),
+      () => {
+        getMoreQuests(this.state.quests.length, batchSize, this.state.filter).then((res) => {
+          this.setState((prevState) => ({
+            quests: prevState.quests.concat(res.data),
+            placeholderCount: prevState.placeholderCount - batchSize,
+            hasMore: res.hasMore,
+          }));
+        });
+      },
+    );
+  }
 
   render() {
     return (
@@ -63,22 +67,18 @@ export default class QuestList extends React.Component {
         primary={
           <InfiniteScroll
             dataLength={this.state.quests.length}
-            next={this.loadMore}
+            next={() => this.loadMore()}
             hasMore={this.state.hasMore}
             endMessage={
               <p className="center">
                 <b>No more quests found</b>
               </p>
             }
-            refreshFunction={this.refresh}
+            refreshFunction={() => this.refresh()}
             pullDownToRefresh={isMobile}
             pullDownToRefreshThreshold={50}
-            pullDownToRefreshContent={
-              <h3 className="center">&#8595; Pull down to refresh</h3>
-            }
-            releaseToRefreshContent={
-              <h3 className="center">&#8593; Release to refresh</h3>
-            }
+            pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
+            releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
             scrollableTarget="scroll-view"
             scrollThreshold="0px"
           >
@@ -87,7 +87,7 @@ export default class QuestList extends React.Component {
                 .concat(
                   [...new Array(this.state.placeholderCount)].map(() => ({
                     isLoading: true,
-                  }))
+                  })),
                 )
                 .map(
                   (
@@ -103,7 +103,7 @@ export default class QuestList extends React.Component {
                       colAmount,
                       tags,
                     },
-                    index
+                    index,
                   ) => (
                     <Quest
                       key={`[${index}]${address}`}
@@ -118,17 +118,13 @@ export default class QuestList extends React.Component {
                       bounty={bounty}
                       colAmount={colAmount}
                       tags={tags}
-                    ></Quest>
-                  )
+                    />
+                  ),
                 )}
             </div>
           </InfiniteScroll>
         }
-        secondary={
-          <QuestListFilter
-            onFilterChange={this.onFilterChange}
-          ></QuestListFilter>
-        }
+        secondary={<QuestListFilter onFilterChange={(filter) => this.onFilterChange(filter)} />}
       />
     );
   }

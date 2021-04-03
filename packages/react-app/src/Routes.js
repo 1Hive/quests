@@ -1,7 +1,7 @@
-import React from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
-import QuestList from "./components/Pages/QuestList/QuestList";
-import CreateQuest from "./components/Pages/CreateQuest/CreateQuests";
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import QuestList from './components/Pages/QuestList/QuestList';
+import CreateQuest from './components/Pages/CreateQuest/CreateQuests';
 
 export default function Routes() {
   return (

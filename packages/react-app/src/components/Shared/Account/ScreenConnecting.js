@@ -1,13 +1,10 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { keyframes } from "styled-components";
-import { GU, useTheme, textStyle, Link } from "@1hive/1hive-ui";
-import {
-  getProviderFromUseWalletId,
-  getProviderString,
-} from "../../../ethereum-providers";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { keyframes } from 'styled-components';
+import { GU, useTheme, textStyle, Button } from '@1hive/1hive-ui';
+import { getProviderFromUseWalletId, getProviderString } from '../../../ethereum-providers';
 
-import loadingRing from "./assets/loading-ring.svg";
+import loadingRing from './assets/loading-ring.svg';
 
 const spin = keyframes`
   from {
@@ -72,15 +69,14 @@ const AccountModuleConnectingScreen = React.memo(({ onCancel, providerId }) => {
               left: 0;
               right: 0;
               bottom: 0;
-              background: 50% 50% / auto ${5 * GU}px no-repeat
-                url(${provider.image});
+              background: 50% 50% / auto ${5 * GU}px no-repeat url(${provider.image});
             `}
           />
         </div>
         <h1
           css={`
             padding-top: ${2 * GU}px;
-            ${textStyle("body1")};
+            ${textStyle('body1')};
             font-weight: 600;
           `}
         >
@@ -92,8 +88,8 @@ const AccountModuleConnectingScreen = React.memo(({ onCancel, providerId }) => {
             color: ${theme.surfaceContentSecondary};
           `}
         >
-          Log into {getProviderString("your Ethereum provider", provider.id)}.
-          You may be temporarily redirected to a new screen.
+          Log into {getProviderString('your Ethereum provider', provider.id)}. You may be
+          temporarily redirected to a new screen.
         </p>
       </div>
       <div
@@ -101,7 +97,7 @@ const AccountModuleConnectingScreen = React.memo(({ onCancel, providerId }) => {
           flex-grow: 0;
         `}
       >
-        <Link onClick={onCancel}>Cancel</Link>
+        <Button mode="negative" onClick={onCancel} label="cancel" />
       </div>
     </section>
   );

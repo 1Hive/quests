@@ -1,7 +1,7 @@
-import React from "react";
-import { useTheme } from "@1hive/1hive-ui";
-import { WizardScreens } from "./config";
-import { useWizard } from "../../providers/Wizard";
+import React from 'react';
+import { useTheme } from '@1hive/1hive-ui';
+import { WizardScreens } from './config';
+import { useWizard } from '../../providers/Wizard';
 
 function Stepper() {
   const theme = useTheme();

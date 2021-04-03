@@ -1,22 +1,13 @@
-import React, { useCallback } from "react";
-import { Field, GU, TextInput } from "@1hive/1hive-ui";
-import Header from "../Header";
-import Navigation from "../Navigation";
-import BalanceTree from "../../../../utils/balance-tree";
-import { useWizard } from "../../../../providers/Wizard";
-import { PCT_BASE } from "../../../../constants";
+import React, { useCallback } from 'react';
+import { Field, GU, TextInput } from '@1hive/1hive-ui';
+import Header from '../Header';
+import Navigation from '../Navigation';
+import BalanceTree from '../../../../utils/balance-tree';
+import { useWizard } from '../../../../providers/Wizard';
+import { PCT_BASE } from '../../../../constants';
 
 function ConfirmParty({ title }) {
-  const {
-    onNext,
-    onBack,
-    token,
-    duration,
-    cliff,
-    upfront,
-    data,
-    onSettingsChange,
-  } = useWizard();
+  const { onNext, onBack, token, duration, cliff, upfront, data, onSettingsChange } = useWizard();
 
   const handleStartParty = useCallback(() => {
     const tree = new BalanceTree(data);
@@ -37,8 +28,7 @@ function ConfirmParty({ title }) {
       <Header title={title} />
       <div>
         <div>
-          Here you will review the details of your party and sent a transaction
-          to start it.
+          Here you will review the details of your party and sent a transaction to start it.
         </div>
         <div
           css={`
@@ -104,11 +94,7 @@ function ConfirmParty({ title }) {
           </Field>
         </div>
       </div>
-      <Navigation
-        nextLabel="Start Party!"
-        onNext={handleStartParty}
-        onBack={onBack}
-      />
+      <Navigation nextLabel="Start Party!" onNext={handleStartParty} onBack={onBack} />
     </div>
   );
 }

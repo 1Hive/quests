@@ -1,5 +1,5 @@
-import React from "react";
-import { GU, textStyle } from "@1hive/1hive-ui";
+import React from 'react';
+import { GU, textStyle } from '@1hive/1hive-ui';
 
 function Header({ title }) {
   return (
@@ -11,7 +11,7 @@ function Header({ title }) {
     >
       <h1
         css={`
-          ${textStyle("title2")}
+          ${textStyle('title2')}
         `}
       >
         {title}

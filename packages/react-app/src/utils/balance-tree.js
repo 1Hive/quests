@@ -1,13 +1,10 @@
-import MerkleTree from "./merkle-tree";
-import { utils } from "ethers";
+import { utils } from 'ethers';
+import MerkleTree from './merkle-tree';
 
 export default class BalanceTree {
-  tree;
   constructor(balances) {
     this.tree = new MerkleTree(
-      balances.map(({ account, amount }, index) => {
-        return BalanceTree.toNode(index, account, amount);
-      })
+      balances.map(({ account, amount }, index) => BalanceTree.toNode(index, account, amount)),
     );
   }
 
@@ -24,12 +21,9 @@ export default class BalanceTree {
   static toNode(index, account, amount) {
     return Buffer.from(
       utils
-        .solidityKeccak256(
-          ["uint256", "address", "uint256"],
-          [index, account, amount]
-        )
+        .solidityKeccak256(['uint256', 'address', 'uint256'], [index, account, amount])
         .substr(2),
-      "hex"
+      'hex',
     );
   }
 

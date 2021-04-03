@@ -1,15 +1,8 @@
-import React, { useCallback } from "react";
-import PropTypes from "prop-types";
-import {
-  ButtonBase,
-  GU,
-  Link,
-  RADIUS,
-  textStyle,
-  useTheme,
-} from "@1hive/1hive-ui";
-import { getProviderFromUseWalletId } from "../../../ethereum-providers";
-import { getUseWalletProviders } from "../../../utils/web3-utils";
+import React, { useCallback } from 'react';
+import PropTypes from 'prop-types';
+import { ButtonBase, GU, Link, RADIUS, textStyle, useTheme } from '@1hive/1hive-ui';
+import { getProviderFromUseWalletId } from '../../../ethereum-providers';
+import { getUseWalletProviders } from '../../../utils/web3-utils';
 
 const PROVIDERS_INFO = getUseWalletProviders().map((provider) => [
   provider.id,
@@ -25,7 +18,7 @@ function ScreenProviders({ onActivate }) {
         css={`
           padding-top: ${2 * GU}px;
           padding-left: ${2 * GU}px;
-          ${textStyle("label2")};
+          ${textStyle('label2')};
           color: ${theme.contentSecondary};
           margin-bottom: ${2 * GU}px;
         `}
@@ -49,12 +42,7 @@ function ScreenProviders({ onActivate }) {
           `}
         >
           {PROVIDERS_INFO.map(([id, provider]) => (
-            <ProviderButton
-              key={id}
-              id={id}
-              provider={provider}
-              onActivate={onActivate}
-            />
+            <ProviderButton key={id} id={id} provider={provider} onActivate={onActivate} />
           ))}
         </div>
         <div
@@ -64,10 +52,7 @@ function ScreenProviders({ onActivate }) {
             margin-top: ${2 * GU}px;
           `}
         >
-          <Link
-            href="https://ethereum.org/wallets/"
-            css="text-decoration: none"
-          >
+          <Link href="https://ethereum.org/wallets/" css="text-decoration: none">
             What is an Ethereum provider?
           </Link>
         </div>
@@ -111,7 +96,7 @@ function ProviderButton({ id, provider, onActivate }) {
       <div
         css={`
           margin-top: ${1 * GU}px;
-          ${textStyle("body1")};
+          ${textStyle('body1')};
         `}
       >
         {provider.name}

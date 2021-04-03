@@ -1,13 +1,13 @@
-import { useMemo } from "react";
-import { useQuery } from "urql";
-import { PartyFactory, Parties, Party, User } from "../queries";
-import { transformPartyData, transformUserData } from "../utils/data-utils";
+import { useMemo } from 'react';
+import { useQuery } from 'urql';
+import { PartyFactory, Parties, Party, User } from '../queries';
+import { transformPartyData, transformUserData } from '../utils/data-utils';
 
 function useQuerySub(query, variables = {}, options = {}) {
   return useQuery({
     query,
     variables,
-    requestPolicy: "cache-and-network",
+    requestPolicy: 'cache-and-network',
     pollInterval: 13 * 1000,
     ...options,
   });

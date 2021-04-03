@@ -1,26 +1,3 @@
-body {
-  background: #ffc3ab !important; /* Old browsers */
-  background: -moz-linear-gradient(
-    -45deg,
-    #ffc3ab 0%,
-    #fafae2 50%,
-    #cbf3ef 100%
-  ) !important; /* FF3.6-15 */
-  background: -webkit-linear-gradient(
-    -45deg,
-    #ffc3ab 0%,
-    #fafae2 50%,
-    #cbf3ef 100%
-  ) !important; /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(
-    135deg,
-    #ffc3ab 0%,
-    #fafae2 50%,
-    #cbf3ef 100%
-  ) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc3ab', endColorstr='#cbf3ef',GradientType=1 ) !important; /* IE6-9 fallback on horizontal gradient */
-}
-
 // Spacing helpers
 
 $space-values: (0, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72) !default;
@@ -42,7 +19,7 @@ $space-prefixes: (
   @each $attr-short, $attr-long in $space-prefixes {
     @each $value in $space-values {
       .#{$attr-short}-#{$value} {
-        #{$attr-long}: #{$value}#{"px"} !important;
+        #{$attr-long}: #{$value}#{'px'} !important;
       }
     }
   }

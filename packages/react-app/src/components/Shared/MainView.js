@@ -1,42 +1,67 @@
-import React from "react";
-import { GU, Root, ScrollView, useViewport } from "@1hive/1hive-ui";
+import PropTypes from 'prop-types';
+import React from 'react';
+import { GU, Root } from '@1hive/1hive-ui';
 
-import Header from "./Header/Header";
-import Layout from "./Layout";
+import styled from 'styled-components';
+import Header from './Header/Header';
+import Layout from './Layout';
 
-function MainView({ children }) {
-  const { below } = useViewport();
-  const compactMode = below("large");
+// #region StyledComponents
 
-  return (
-    <div
-      css={`
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
+const MainViewStyled = styled.div`
+  ${(props) =>
+    props.currentTheme === 'dark'
+      ? `
+      background: #1a3a6d;  /* fallback for old browsers */
+      background: -webkit-linear-gradient(-45deg, #1a3a6d, #373B44);  /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(135deg, #1a3a6d, #373B44); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+      `
+      : `
+      background: #ffc3ab !important; /* Old browsers */
+      background: #ffc3ab !important; /* Old browsers */
+      background: -moz-linear-gradient(    -45deg,    #ffc3ab 0%,    #fafae2 50%,    #cbf3ef 100%  ) !important; /* FF3.6-15 */
+      background: -webkit-linear-gradient(    -45deg,    #ffc3ab 0%,    #fafae2 50%,    #cbf3ef 100%  ) !important; /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(    135deg,    #ffc3ab 0%,    #fafae2 50%,    #cbf3ef 100%  ) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc3ab', endColorstr='#cbf3ef',GradientType=1 ) !important; /* IE6-9 fallback on horizontal gradient */
       `}
-    >
-      <div
-        css={`
-          flex-shrink: 0;
-        `}
-      >
-        <Header />
-      </div>
+
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+`;
+
+const HeaderWrapperStyled = styled.div`
+  flex-shrink: 0;
+`;
+
+const ScrollViewStyled = styled.div`
+  overflow: auto;
+  height: calc(100vh - 64px);
+  padding: ${3 * GU}px;
+`;
+
+// #endregion
+
+function MainView({ children, toggleTheme, currentTheme }) {
+  return (
+    <MainViewStyled currentTheme={currentTheme}>
+      <HeaderWrapperStyled>
+        <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
+      </HeaderWrapperStyled>
       <Root.Provider>
-        <div
-          id="scroll-view"
-          css={{
-            overflow: "auto",
-            height: "calc(100vh - 64px)",
-            padding: 3 * GU,
-          }}
-        >
+        <ScrollViewStyled id="scroll-view">
           <Layout paddingBottom={3 * GU}>{children}</Layout>
-        </div>
+        </ScrollViewStyled>
       </Root.Provider>
-    </div>
+    </MainViewStyled>
   );
 }
+
+MainView.propTypes = {
+  children: PropTypes.node,
+  currentTheme: PropTypes.string.isRequired,
+  toggleTheme: PropTypes.func,
+};
 
 export default MainView;
