@@ -3,40 +3,38 @@ pragma solidity >= 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract QuestGold is ERC20 {
-    constructor(uint256 initialSupply) ERC20("QuestGold", "QGLD") {
-        _mint(msg.sender, initialSupply);
-    }
-}
-
 contract QuestFactory {
     event QuestCreated(address questAddress, string _content);
 
-    function createQuest(string calldata _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, uint256 _nbToken) external {
-        Quest quest = new Quest(_content,_terminationDate,_aragonGovernAddress,_fallbackAddress, _nbToken);
+    function createQuest(string calldata _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, ERC20 _token) external {
+        Quest quest = new Quest(_content,_terminationDate,_aragonGovernAddress,_fallbackAddress, _token);
         emit QuestCreated(address(quest), _content);
     }
 }
 
 contract Quest {
-    string private userFiles;
+    string public userFiles;
     string public content;
-    address payable private aragonGovernAddress;
-    address payable private fallbackAddress;
+    address payable public aragonGovernAddress;
+    address payable public fallbackAddress;
     uint256 public terminationDate;
-    QuestGold private token;
+    ERC20 public token;
 
-    constructor(string memory _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, uint256 _nbToken) public {
+    constructor(string memory _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, ERC20 _token) public {
         content = _content;
         terminationDate = _terminationDate;
         aragonGovernAddress = _aragonGovernAddress;
         fallbackAddress = _fallbackAddress;
-        token = new QuestGold(_nbToken);
+        token = _token;
     }
 
     function returnFunds() external payable{
         require(terminationDate < block.timestamp, "Quest is not expired yet.");  
-        fallbackAddress.transfer(address(this).balance);
+        token.transfer(fallbackAddress, token.totalSupply());
+    }
+
+    function recoverNativeTokens() external payable {
+        token.transfer(fallbackAddress, token.totalSupply());
     }
 
     function claim(
@@ -47,11 +45,9 @@ contract Quest {
         require(bytes(file).length != 0, "You must join a file");  
 
         if(amount > 0){
-            require(token.transferFrom(address(this), player, amount) == true, "Could not send tokens to the buyer");
-            player.transfer(amount);
+            require(token.transfer(player, amount), "Could not send tokens to the buyer");
         }else if(amount == 0) {
-            require(token.transferFrom(address(this), player, token.totalSupply()) == true, "Could not send tokens to the buyer");
-            player.transfer(address(this).balance);
+            require(token.transfer(player, token.totalSupply()), "Could not send tokens to the buyer");
         }
 
         userFiles = file;
