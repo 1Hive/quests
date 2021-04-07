@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract QuestFactory {
     event QuestCreated(address questAddress, string _content);
 
-    function createQuest(string calldata _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, ERC20 _token) external {
+    function createQuest(string calldata _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, IERC20 _token) external {
         Quest quest = new Quest(_content,_terminationDate,_aragonGovernAddress,_fallbackAddress, _token);
         emit QuestCreated(address(quest), _content);
     }
@@ -18,14 +18,14 @@ contract Quest {
     address payable public aragonGovernAddress;
     address payable public fallbackAddress;
     uint256 public terminationDate;
-    ERC20 public token;
+    IERC20 public token;
 
-    constructor(string memory _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, ERC20 _token) public {
+    constructor(string memory _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, IERC20 _token) public {
         content = _content;
         terminationDate = _terminationDate;
         aragonGovernAddress = _aragonGovernAddress;
         fallbackAddress = _fallbackAddress;
-        token = _token;
+        token = IERC20(_token);
     }
 
     function returnFunds() external payable{
