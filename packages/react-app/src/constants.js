@@ -15,7 +15,7 @@ export const EXPECTED_NETWORKS = IS_DEV ? ['localhost'] : ['xDai'];
 export const defaultTheme = 'light';
 
 // Cryptos
-export const CRYPTOS = {
+export const TOKENS = {
   questgold: {
     name: 'Quest Gold',
     symb: 'QGLD',
@@ -49,6 +49,23 @@ export const QUEST_STATUS = {
   completed: { id: 'completed', label: 'Completed' },
   aborted: { id: 'aborted', label: 'Aborted' },
   draft: { id: 'draft', label: 'Draft' },
+};
+
+export const BREAKPOINTS = {
+  4: '4',
+  8: '8',
+  16: '16',
+  24: '24',
+  32: '32',
+  40: '40',
+  48: '48',
+  56: '56',
+  64: '64',
+  72: '72',
+};
+
+export const EVENTS = {
+  QUEST_SAVED: 'QuestSaved',
 };
 
 // EXTERNAL CONTRACTS

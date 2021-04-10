@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-import React from 'react';
 import {
   Box,
   Button,
@@ -11,15 +9,16 @@ import {
   SearchInput,
   Switch,
 } from '@1hive/1hive-ui';
+import PropTypes from 'prop-types';
+import React from 'react';
 import styled from 'styled-components';
-import { CRYPTOS, QUEST_STATUS } from '../../../constants';
-
+import { QUEST_STATUS, TOKENS } from '../../../constants';
 import { debounce } from '../../../utils/class-util';
-import { Spacer16 } from '../../Shared/Utils/Spacer';
-import Separator from '../../Shared/Utils/Splitter';
+import CreateQuestModal from '../../Modals/QuestModal';
 import AmountFieldInput from '../../Shared/FieldInput/AmountFieldInput';
 import TagFieldInput from '../../Shared/FieldInput/TagFieldInput';
-import CreateQuestModal from '../../Modals/QuestModal';
+import { Outset } from '../../Shared/Utils/spacer-util';
+import Separator from '../../Shared/Utils/splitter';
 
 // #region StyledComponent
 
@@ -37,7 +36,7 @@ const defaultFilter = {
   status: null,
   expiration: { start: null, end: null },
   tags: [],
-  bounty: { amount: 0, token: CRYPTOS.questgold },
+  bounty: { amount: 0, token: TOKENS.questgold },
   showFull: false,
 };
 
@@ -61,38 +60,32 @@ export default class QuestListFilter extends React.Component {
   render() {
     return (
       <BoxStyled heading="Filters">
-        <Spacer16>
-          <Field label="Search">
-            <SearchInput
-              id="filterSearch"
-              value={this.state.search}
-              onChange={(x) => this.setFilter({ search: x }, true)}
-              placeholder="keyword"
-              wide
-            />
-          </Field>
-        </Spacer16>
-        <Spacer16>
-          <Field label="filterStatus">
-            <DropDown
-              items={questStatusOptions}
-              selected={Object.keys(QUEST_STATUS).indexOf(this.state.status)}
-              onChange={(i) => this.setFilter({ status: Object.keys(QUEST_STATUS)[i] })}
-              placeholder="All"
-              wide
-            />
-          </Field>
-        </Spacer16>
-        <Spacer16>
-          <Field label="Expiration">
-            <DateRangePicker
-              startDate={this.state.expiration.start}
-              endDate={this.state.expiration.end}
-              onChange={(val) => this.setFilter({ expiration: val })}
-            />
-          </Field>
-        </Spacer16>
-        <Spacer16>
+        <Field label="Search">
+          <SearchInput
+            id="filterSearch"
+            value={this.state.search}
+            onChange={(x) => this.setFilter({ search: x }, true)}
+            placeholder="keyword"
+            wide
+          />
+        </Field>
+        <Field label="filterStatus">
+          <DropDown
+            items={questStatusOptions}
+            selected={Object.keys(QUEST_STATUS).indexOf(this.state.status)}
+            onChange={(i) => this.setFilter({ status: Object.keys(QUEST_STATUS)[i] })}
+            placeholder="All"
+            wide
+          />
+        </Field>
+        <Field label="Expiration">
+          <DateRangePicker
+            startDate={this.state.expiration.start}
+            endDate={this.state.expiration.end}
+            onChange={(val) => this.setFilter({ expiration: val })}
+          />
+        </Field>
+        <Outset gu16 vertical>
           <AmountFieldInput
             id="filterBounty"
             label="Min bounty"
@@ -100,42 +93,40 @@ export default class QuestListFilter extends React.Component {
             onChange={(x) => this.setFilter({ bounty: x }, true)}
             wide
           />
-        </Spacer16>
-        <Spacer16>
-          <TagFieldInput
-            id="filterTags"
-            label="Tags"
-            placeholder="Search"
-            value={this.state.tags}
-            onChange={(x) => this.setFilter({ tags: x })}
+        </Outset>
+        <TagFieldInput
+          id="filterTags"
+          label="Tags"
+          placeholder="Search"
+          value={this.state.tags}
+          onChange={(x) => this.setFilter({ tags: x })}
+        />
+        <Button
+          icon={<IconClose />}
+          label="clear"
+          wide
+          onClick={() => this.setFilter(defaultFilter)}
+        />
+        <Separator />
+        <Field label="Created quests">
+          <Switch
+            checked={this.state.createdQuests}
+            onChange={(x) => this.setFilter({ createdQuests: x })}
           />
-          <Button
-            icon={<IconClose />}
-            label="clear"
-            wide
-            onClick={() => this.setFilter(defaultFilter)}
+        </Field>
+        <Field label="Played quests">
+          <Switch
+            checked={this.state.playedQuests}
+            onChange={(x) => this.setFilter({ playedQuests: x })}
           />
-          <Separator />
-          <Field label="Created quests">
-            <Switch
-              checked={this.state.createdQuests}
-              onChange={(x) => this.setFilter({ createdQuests: x })}
-            />
-          </Field>
-          <Field label="Played quests">
-            <Switch
-              checked={this.state.playedQuests}
-              onChange={(x) => this.setFilter({ playedQuests: x })}
-            />
-          </Field>
-          <Field label="Founded quests">
-            <Switch
-              checked={this.state.foundedQuests}
-              onChange={(x) => this.setFilter({ foundedQuests: x })}
-            />
-          </Field>
-          <CreateQuestModal onClose={() => this.props.onFilterChange(this.state)} />
-        </Spacer16>
+        </Field>
+        <Field label="Founded quests">
+          <Switch
+            checked={this.state.foundedQuests}
+            onChange={(x) => this.setFilter({ foundedQuests: x })}
+          />
+        </Field>
+        <CreateQuestModal create />
       </BoxStyled>
     );
   }

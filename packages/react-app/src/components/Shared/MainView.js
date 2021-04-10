@@ -3,7 +3,7 @@ import React from 'react';
 import { GU, Root } from '@1hive/1hive-ui';
 
 import styled from 'styled-components';
-import Header from './Header/Header';
+import Header from './Header';
 import Layout from './Layout';
 
 // #region StyledComponents

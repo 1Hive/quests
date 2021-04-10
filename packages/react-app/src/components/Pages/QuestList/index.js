@@ -1,11 +1,13 @@
-import React from 'react';
 import { Split } from '@1hive/1hive-ui';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import React from 'react';
 import { isMobile } from 'react-device-detect';
-import { getMoreQuests } from '../../../providers/QuestProvider';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { EVENTS } from '../../../constants';
+import EventManager from '../../../providers/EventManager';
+import QuestProvider from '../../../providers/QuestProvider';
+import Quest from '../../Shared/Quest';
+import { Outset } from '../../Shared/Utils/spacer-util';
 import QuestListFilter from './QuestListFilter';
-import Quest from '../../Shared/Quest/Quest';
-import { Spacer16 } from '../../Shared/Utils/Spacer';
 
 const batchSize = 3;
 
@@ -22,6 +24,9 @@ export default class QuestList extends React.Component {
 
   componentDidMount() {
     this.refresh();
+    EventManager.addListener(EVENTS.QUEST_SAVED, () => {
+      this.refresh();
+    });
   }
 
   onFilterChange = async (filter) => {
@@ -35,12 +40,15 @@ export default class QuestList extends React.Component {
         placeholderCount: batchSize,
       },
       () => {
-        getMoreQuests(0, batchSize, this.state.filter).then((res) =>
-          this.setState({
-            quests: res.data,
-            placeholderCount: 0,
-            hasMore: res.hasMore,
-          }),
+        QuestProvider.getMoreQuests(0, batchSize, this.state.filter).then((res) =>
+          this.setState(
+            {
+              quests: res.data,
+              placeholderCount: 0,
+              hasMore: res.hasMore,
+            },
+            () => {},
+          ),
         );
       },
     );
@@ -50,13 +58,15 @@ export default class QuestList extends React.Component {
     this.setState(
       (prevState) => ({ placeholderCount: prevState.placeholderCount + batchSize }),
       () => {
-        getMoreQuests(this.state.quests.length, batchSize, this.state.filter).then((res) => {
-          this.setState((prevState) => ({
-            quests: prevState.quests.concat(res.data),
-            placeholderCount: prevState.placeholderCount - batchSize,
-            hasMore: res.hasMore,
-          }));
-        });
+        QuestProvider.getMoreQuests(this.state.quests.length, batchSize, this.state.filter).then(
+          (res) => {
+            this.setState((prevState) => ({
+              quests: prevState.quests.concat(res.data),
+              placeholderCount: prevState.placeholderCount - batchSize,
+              hasMore: res.hasMore,
+            }));
+          },
+        );
       },
     );
   };
@@ -93,15 +103,16 @@ export default class QuestList extends React.Component {
                     })),
                   )
                   .map((x, index) => (
-                    <Spacer16 key={`[${index}]${x.address}`}>
+                    <Outset gu16 key={`${index ?? ''}-${x.address ?? ''}`}>
                       <Quest
-                        data={x.data}
+                        meta={x.meta}
                         players={x.players}
                         address={x.address}
+                        funds={x.funds}
                         status={x.status}
                         isLoading={x.isLoading}
                       />
-                    </Spacer16>
+                    </Outset>
                   ))}
               </div>
             </InfiniteScroll>

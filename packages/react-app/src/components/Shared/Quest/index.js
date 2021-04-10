@@ -1,18 +1,21 @@
-import PropTypes from 'prop-types';
+/* eslint-disable react/no-children-prop */
 import { AddressField, Button, Card, Field, GU, Split } from '@1hive/1hive-ui';
+import { Form, Formik } from 'formik';
+import PropTypes from 'prop-types';
 import React, { useRef } from 'react';
+import { FaSave } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-import { FaDollarSign, FaPlay, FaSave } from 'react-icons/fa';
-import { Form, Formik } from 'formik';
-import { CRYPTOS, QUEST_STATUS } from '../../../constants';
-import { Spacer16, Spacer8V } from '../Utils/Spacer';
-import AmountFieldInput from '../FieldInput/AmountFieldInput';
-import TextFieldInput from '../FieldInput/TextFieldInput';
-import { saveQuest } from '../../../providers/QuestProvider';
+import { QUEST_STATUS, TOKENS } from '../../../constants';
+import QuestProvider from '../../../providers/QuestProvider';
 import { emptyFunc } from '../../../utils/class-util';
-import TagFieldInput from '../FieldInput/TagFieldInput';
+import FundModal from '../../Modals/FundModal';
+import PlayModal from '../../Modals/PlayModal';
+import AmountFieldInput from '../FieldInput/AmountFieldInput';
 import NumberFieldInput from '../FieldInput/NumberFieldInput';
+import TagFieldInput from '../FieldInput/TagFieldInput';
+import TextFieldInput from '../FieldInput/TextFieldInput';
+import { ChildSpacer, Outset } from '../Utils/spacer-util';
 
 // #region StyledComponents
 
@@ -41,51 +44,51 @@ const FormStyled = styled(Form)`
 
 // #endregion
 
-const defaultData = {
+const defaultMeta = {
   title: null,
   description: null,
   maxPlayers: -1,
-  bounty: { amount: 0, token: CRYPTOS.questgold },
-  collateral: { amount: 0, token: CRYPTOS.questgold },
+  bounty: { amount: 0, token: TOKENS.questgold },
+  collateral: { amount: 0, token: TOKENS.questgold },
   tags: [],
 };
 
 export default function Quest({
-  data = defaultData,
-  address,
+  meta = defaultMeta,
+  address = '',
   isEdit = false,
   status = QUEST_STATUS.draft,
   isLoading = false,
-  players = 0,
+  players = [],
+  funds = [],
   onSave = emptyFunc,
   css,
 }) {
-  const formRef = useRef(undefined);
+  const formRef = useRef(null);
   return (
-    <CardStyled style={css}>
+    <CardStyled style={css} id={address}>
       <Formik
         initialValues={{
-          title: data.title,
-          description: data.description,
-          maxPlayers: data.maxPlayers,
-          bounty: data.bounty,
-          collateral: data.collateral,
-          tags: data.tags,
+          title: meta.title,
+          description: meta.description,
+          maxPlayers: meta.maxPlayers,
+          bounty: meta.bounty,
+          collateral: meta.collateral,
+          tags: meta.tags,
         }}
-        onSubmit={async (values, { setSubmitting }) => {
-          setTimeout(() => {
+        onSubmit={(values, { setSubmitting }) => {
+          setTimeout(async () => {
             setSubmitting(false);
+            onSave(await QuestProvider.saveQuest(values));
           }, 400);
-          await saveQuest(values);
-          onSave(values);
         }}
       >
         {({ values, handleChange, handleSubmit }) => (
           <FormStyled onSubmit={handleSubmit} ref={formRef}>
             <Split
               primary={
-                <Spacer16>
-                  <Spacer8V className="block">
+                <Outset gu16>
+                  <Outset gu8 vertical className="block">
                     <Split
                       primary={
                         <TextFieldInput
@@ -109,8 +112,8 @@ export default function Quest({
                         ))
                       }
                     />
-                  </Spacer8V>
-                  <Spacer8V>
+                  </Outset>
+                  <Outset gu8 vertical>
                     <TextFieldInput
                       id="description"
                       label={isEdit ? 'Description' : ''}
@@ -123,15 +126,18 @@ export default function Quest({
                       multiline
                       css={{ height: '100px' }}
                     />
-                  </Spacer8V>
-                </Spacer16>
+                  </Outset>
+                </Outset>
               }
               secondary={
-                <Spacer16>
+                <Outset gu16>
                   {!isEdit && (
                     <>
                       <Field label="Status">{isLoading ? <Skeleton /> : status.label}</Field>
-                      <Field label="Number of players">{isLoading ? <Skeleton /> : players}</Field>
+                      <Field label="Founders">{isLoading ? <Skeleton /> : funds.length}</Field>
+                      <Field label="Number of players">
+                        {isLoading ? <Skeleton /> : players.length}
+                      </Field>
                     </>
                   )}
                   {(values.maxPlayers !== -1 || isEdit) && (
@@ -167,10 +173,9 @@ export default function Quest({
                     isEdit={isEdit}
                     isLoading={isLoading}
                     value={values.tags}
-                    onChange={(e) => console.log(e)}
                     formik={formRef}
                   />
-                </Spacer16>
+                </Outset>
               }
             />
             <QuestFooterStyled>
@@ -182,10 +187,12 @@ export default function Quest({
                   type="submit"
                 />
               ) : (
-                <>
-                  <QuestActionButtonStyled label="Play" icon={<FaPlay />} mode="strong" />
-                  <QuestActionButtonStyled label="Fund" icon={<FaDollarSign />} mode="strong" />
-                </>
+                <Outset gu8 vertical>
+                  <ChildSpacer>
+                    <PlayModal questAddress={address} />
+                    <FundModal questAddress={address} />
+                  </ChildSpacer>
+                </Outset>
               )}
             </QuestFooterStyled>
           </FormStyled>
@@ -198,7 +205,9 @@ export default function Quest({
 Quest.propTypes = {
   address: PropTypes.string,
   css: PropTypes.any,
-  data: PropTypes.shape({
+  isEdit: PropTypes.bool,
+  isLoading: PropTypes.bool,
+  meta: PropTypes.shape({
     bounty: PropTypes.shape({
       amount: PropTypes.number,
       token: PropTypes.shape({
@@ -220,12 +229,14 @@ Quest.propTypes = {
     tags: PropTypes.array,
     title: PropTypes.string,
   }),
-  isEdit: PropTypes.bool,
-  isLoading: PropTypes.bool,
   onSave: PropTypes.func,
-  players: PropTypes.number,
+  players: PropTypes.arrayOf(PropTypes.string),
   status: PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string,
+  }),
+  totalFunds: PropTypes.shape({
+    amount: PropTypes.number,
+    token: PropTypes.any,
   }),
 };

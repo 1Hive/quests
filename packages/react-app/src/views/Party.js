@@ -199,7 +199,7 @@ const fieldLabel = styled.label`
   color: ${(props) => props.theme.contentSecondary};
 `;
 
-const fieldValueSpacer = styled.div`
+const fieldValueOutset = styled.div`
   margin-top: ${0.5 * GU}px;
 `;
 
@@ -209,7 +209,7 @@ function Field({ value, label }) {
   return (
     <fieldContainer>
       <fieldLabel theme={theme}>{label}</fieldLabel>
-      <fieldValueSpacer>{value}</fieldValueSpacer>
+      <fieldValueOutset>{value}</fieldValueOutset>
     </fieldContainer>
   );
 }

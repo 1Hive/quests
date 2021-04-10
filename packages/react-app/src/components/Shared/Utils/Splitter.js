@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Spacer16V } from './Spacer';
+import { Outset } from './spacer-util';
 
 const SeparatorStyled = styled.div`
   border-top: 1px solid #efefef;
@@ -8,8 +8,8 @@ const SeparatorStyled = styled.div`
 
 export default function Separator() {
   return (
-    <Spacer16V>
+    <Outset gu16 vertical>
       <SeparatorStyled />
-    </Spacer16V>
+    </Outset>
   );
 }

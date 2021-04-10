@@ -1,24 +1,38 @@
-import { Button, IconPlus, Modal } from '@1hive/1hive-ui';
+import { Button, IconPlus } from '@1hive/1hive-ui';
 import React, { useState } from 'react';
-import Quest from '../Shared/Quest/Quest';
+import { emptyFunc } from '../../utils/class-util';
+import Quest from '../Shared/Quest';
+import ModalBase from './ModalBase';
 
-export default function CreateQuestModal({ onClose }) {
+export default function QuestModal({ onClose = emptyFunc, create }) {
   const [opened, setOpened] = useState(false);
-  const open = () => setOpened(true);
-  const close = (emit = false) => {
+  const onOpenButtonClick = () => {
+    setOpened(true);
+  };
+  const onModalClose = () => {
     setOpened(false);
-    if (emit) onClose();
+    onClose();
+  };
+  const onSaveClick = (address) => {
+    setOpened(false);
+    onClose(address);
   };
   return (
-    <>
-      <Button icon={<IconPlus />} label="Create quest" wide mode="strong" onClick={open} />
-      <Modal
-        visible={opened}
-        onClose={close}
-        width={(viewport) => Math.min(viewport.width - 48, 1200)}
-      >
-        <Quest isEdit onSave={() => close(true)} />
-      </Modal>
-    </>
+    <ModalBase
+      title={create ? 'Create quest' : 'Edit quest'}
+      openButton={
+        <Button
+          icon={<IconPlus />}
+          label={create ? 'Create quest' : 'Edit quest'}
+          wide
+          mode="strong"
+          onClick={onOpenButtonClick}
+        />
+      }
+      isOpen={opened}
+      onClose={onModalClose}
+    >
+      <Quest isEdit onSave={onSaveClick} />
+    </ModalBase>
   );
 }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';

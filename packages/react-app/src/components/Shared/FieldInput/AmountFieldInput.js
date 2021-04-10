@@ -1,14 +1,14 @@
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
-import { Field, TextInput, TokenBadge, DropDown, GU } from '@1hive/1hive-ui';
-import Skeleton from 'react-loading-skeleton';
-import styled from 'styled-components';
+import { DropDown, Field, GU, TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { toNumber } from 'lodash';
-import { CRYPTOS } from '../../../constants';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import styled from 'styled-components';
+import { TOKENS } from '../../../constants';
 import { emptyFunc } from '../../../utils/class-util';
 
-const currencyOptions = Object.values(CRYPTOS).map((c) => c.symb);
+const currencyOptions = Object.values(TOKENS).map((c) => c.symb);
 
 // #region StyledComponents
 
@@ -27,27 +27,27 @@ function AmountFieldInput({
   isLoading = false,
   label = '',
   placeHolder = '',
-  value = { amount: 0, token: CRYPTOS.questgold },
+  value = { amount: 0, token: TOKENS.questgold },
   onChange = emptyFunc,
   wide = false,
-  formik,
+  formik = null,
 }) {
   if (value?.amount === undefined) value.amount = 0;
-  if (value?.token === undefined) value.token = CRYPTOS.questgold;
+  if (value?.token === undefined) value.token = TOKENS.questgold;
   const [amount, setAmount] = useState(value.amount);
   const [token, setToken] = useState(value.token);
 
   const onAmountChange = (e) => {
     setAmount(e.target.value);
     value = { ...value, amount: toNumber(amount) };
-    formik.setFieldValue(id, value);
+    formik?.setFieldValue(id, value);
     onChange(value);
   };
 
   const onTokenChange = (index) => {
-    setToken(Object.values(CRYPTOS)[index]);
+    setToken(Object.values(TOKENS)[index]);
     value = { ...value, token };
-    formik.setFieldValue(id, value);
+    formik?.setFieldValue(id, value);
     onChange(value);
   };
 
@@ -68,10 +68,10 @@ function AmountFieldInput({
           selected={currencyOptions.indexOf(token.symb)}
           onChange={onTokenChange}
           renderLabel={({ selectedLabel }) => {
-            const crypto = Object.values(CRYPTOS).find((x) => x.symb === selectedLabel);
+            const crypto = Object.values(TOKENS).find((x) => x.symb === selectedLabel);
             return crypto ? `${crypto.symb} - ${crypto.name}` : selectedLabel;
           }}
-          wide
+          wide={wide}
         />
       </>
     );

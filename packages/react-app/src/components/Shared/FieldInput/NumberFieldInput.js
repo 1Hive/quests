@@ -1,6 +1,6 @@
+import { Field, TextInput } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Field, TextInput } from '@1hive/1hive-ui';
 import Skeleton from 'react-loading-skeleton';
 import { emptyFunc } from '../../../utils/class-util';
 

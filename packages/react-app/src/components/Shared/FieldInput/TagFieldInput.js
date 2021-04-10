@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types';
 import { Field, IconClose, Tag, _AutoComplete as AutoComplete } from '@1hive/1hive-ui';
-import React, { useRef, useState } from 'react';
-import Skeleton from 'react-loading-skeleton';
-import { FaHashtag } from 'react-icons/fa';
 import { connect } from 'formik';
+import PropTypes from 'prop-types';
+import React, { useRef, useState } from 'react';
+import { FaHashtag } from 'react-icons/fa';
+import Skeleton from 'react-loading-skeleton';
+import QuestProvider from '../../../providers/QuestProvider';
 import { emptyFunc } from '../../../utils/class-util';
-import { getTagSuggestions } from '../../../providers/QuestProvider';
-import { Spacer4 } from '../Utils/Spacer';
+import { Outset } from '../Utils/spacer-util';
 
 function TagFieldInput({
   id,
@@ -18,7 +18,7 @@ function TagFieldInput({
   onTagClick = emptyFunc,
   isEdit = false,
   isLoading = false,
-  formik,
+  formik = null,
 }) {
   const [tags, setTags] = useState(value ?? []);
   const [searchTerm, setSearchTerm] = useState(null);
@@ -28,7 +28,7 @@ function TagFieldInput({
     if (!tags.includes(tag)) {
       value = tags.concat(tag);
       setTags(value);
-      formik.setFieldValue(id, value);
+      formik?.setFieldValue(id, value);
       onChange(value);
     }
   };
@@ -37,11 +37,11 @@ function TagFieldInput({
     value = tags.slice(0);
     value.splice(i, 1);
     setTags(value);
-    formik.setFieldValue(id, value);
+    formik?.setFieldValue(id, value);
     onChange(value);
   };
 
-  tagSuggestions = tagSuggestions ?? getTagSuggestions();
+  tagSuggestions = tagSuggestions ?? QuestProvider.getTagSuggestions();
 
   return (
     <Field label={label} key={id}>
@@ -62,7 +62,7 @@ function TagFieldInput({
             />
           )}
           {tags.map((x, i) => (
-            <Spacer4 inline key={x}>
+            <Outset gu4 inline key={x}>
               <Tag
                 label={x}
                 icon={isEdit ? <IconClose /> : <FaHashtag />}
@@ -70,7 +70,7 @@ function TagFieldInput({
                 onClick={() => (isEdit ? deleteTag(i) : onTagClick(x))}
                 className="pointer"
               />
-            </Spacer4>
+            </Outset>
           ))}
         </>
       )}
