@@ -36,5 +36,6 @@ function getNetworkInternalName(chainId = getDefaultChain()) {
 }
 
 export function getNetwork(chainId = getDefaultChain()) {
+  console.log(chainId);
   return networks[getNetworkInternalName(chainId)];
 }

@@ -53,7 +53,9 @@ function Header({ toggleTheme, currentTheme }) {
             <AccountModule compact={layoutSmall} />
             <Button
               className="ml-8"
+              label={currentTheme === 'dark' ? 'Light' : 'Dark'}
               icon={currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
+              display="icon"
               onClick={toggleTheme}
             />
           </HeaderRightPanel>

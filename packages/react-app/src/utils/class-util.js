@@ -13,3 +13,6 @@ export const debounce = (func, wait) => {
     }, wait);
   };
 };
+
+// eslint-disable-next-line no-unused-vars
+export function emptyFunc(..._args) {}

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {
   Box,
@@ -5,70 +6,74 @@ import {
   DateRangePicker,
   DropDown,
   Field,
+  GU,
   IconClose,
   SearchInput,
-  Tag,
-  TextInput,
-  TokenBadge,
-  _AutoComplete as AutoComplete,
+  Switch,
 } from '@1hive/1hive-ui';
+import styled from 'styled-components';
 import { CRYPTOS, QUEST_STATUS } from '../../../constants';
 
 import { debounce } from '../../../utils/class-util';
+import { Spacer16 } from '../../Shared/Utils/Spacer';
+import Separator from '../../Shared/Utils/Splitter';
+import AmountFieldInput from '../../Shared/FieldInput/AmountFieldInput';
+import TagFieldInput from '../../Shared/FieldInput/TagFieldInput';
+import CreateQuestModal from '../../Modals/QuestModal';
 
-const currencyOptions = Object.values(CRYPTOS).map((c) => c.symb);
+// #region StyledComponent
+
+const BoxStyled = styled(Box)`
+  width: fit-content;
+  margin-bottom: ${2 * GU}px;
+`;
+
+// #endregion
+
 const questStatusOptions = Object.values(QUEST_STATUS).map((x) => x.label);
-const tagSuggestion = ['FrontEnd', 'Angular', 'React', 'CoolStuff'];
+
 const defaultFilter = {
   search: '',
   status: null,
   expiration: { start: null, end: null },
   tags: [],
-  minBounty: 0,
-  bountyCurrency: currencyOptions[0],
+  bounty: { amount: 0, token: CRYPTOS.questgold },
   showFull: false,
 };
 
 export default class QuestListFilter extends React.Component {
   constructor(props) {
     super(props);
-    this.state = defaultFilter;
+    this.state = {
+      ...defaultFilter,
+      createdQuests: false,
+      playedQuests: false,
+      foundedQuests: false,
+    };
     this.tagRef = React.createRef();
   }
 
-  onTagDelete(i) {
-    const tags = this.state.tags.slice(0);
-    tags.splice(i, 1);
-    this.setFilter({ tags });
-  }
-
-  onTagAddition(tag) {
-    if (!this.state.tags.includes(tag)) {
-      const tags = this.state.tags.concat(tag);
-      this.setFilter({ tags });
-    }
-    this.tagRef.current.value = '';
-  }
-
-  setFilter(filter, shouldDebounce) {
+  setFilter(filter, shouldDebounce = false) {
     const callback = () => this.props.onFilterChange(this.state);
     this.setState({ ...filter }, shouldDebounce ? debounce(callback, 500) : callback);
   }
 
   render() {
     return (
-      <Box heading="Filters" className="fit-content mb-16">
-        <div className="m-16">
+      <BoxStyled heading="Filters">
+        <Spacer16>
           <Field label="Search">
             <SearchInput
+              id="filterSearch"
               value={this.state.search}
               onChange={(x) => this.setFilter({ search: x }, true)}
+              placeholder="keyword"
               wide
             />
           </Field>
-        </div>
-        <div className="m-16">
-          <Field label="Status">
+        </Spacer16>
+        <Spacer16>
+          <Field label="filterStatus">
             <DropDown
               items={questStatusOptions}
               selected={Object.keys(QUEST_STATUS).indexOf(this.state.status)}
@@ -77,74 +82,65 @@ export default class QuestListFilter extends React.Component {
               wide
             />
           </Field>
-        </div>
-        <div className="m-16">
+        </Spacer16>
+        <Spacer16>
           <Field label="Expiration">
             <DateRangePicker
               startDate={this.state.expiration.start}
               endDate={this.state.expiration.end}
               onChange={(val) => this.setFilter({ expiration: val })}
-              wide
             />
           </Field>
-        </div>
-        <div className="m-16">
-          <Field label="Min bounty">
-            <div className="inline-flex" css={{ height: 40 }}>
-              <TextInput
-                value={this.state.minBounty}
-                onChange={(event) => {
-                  this.setFilter({ minBounty: event.target.value }, true);
-                }}
-                type="number"
-              />
-              <TokenBadge
-                symbol={CRYPTOS.honey.symb}
-                address={CRYPTOS.honey.address}
-                networkType="private"
-                size="normal"
-              />
-              {/* <DropDown
-                items={currencyOptions}
-                selected={currencyOptions.indexOf(this.state.bountyCurrency)}
-                onChange={(x) =>
-                  this.setFilter({ bountyCurrency: currencyOptions[x] })
-                }
-              ></DropDown> */}
-            </div>
-          </Field>
-        </div>
-        <div className="m-16">
-          <Field label="Tags">
-            <AutoComplete
-              items={tagSuggestion.filter(
-                (name) =>
-                  this.state.searchTags &&
-                  name.toLowerCase().indexOf(this.state.searchTags.toLowerCase()) > -1,
-              )}
-              onChange={(val) => this.setState({ searchTags: val })}
-              onSelect={this.onTagAddition}
-              ref={this.tagRef}
-              wide
-            />
-            {this.state.tags.map((x, i) => (
-              <Tag
-                key={x}
-                label={x}
-                icon={<IconClose />}
-                onClick={() => this.onTagDelete(i)}
-                className="pointer"
-              />
-            ))}
-          </Field>
+        </Spacer16>
+        <Spacer16>
+          <AmountFieldInput
+            id="filterBounty"
+            label="Min bounty"
+            value={this.state.bounty}
+            onChange={(x) => this.setFilter({ bounty: x }, true)}
+            wide
+          />
+        </Spacer16>
+        <Spacer16>
+          <TagFieldInput
+            id="filterTags"
+            label="Tags"
+            placeholder="Search"
+            value={this.state.tags}
+            onChange={(x) => this.setFilter({ tags: x })}
+          />
           <Button
             icon={<IconClose />}
             label="clear"
             wide
             onClick={() => this.setFilter(defaultFilter)}
           />
-        </div>
-      </Box>
+          <Separator />
+          <Field label="Created quests">
+            <Switch
+              checked={this.state.createdQuests}
+              onChange={(x) => this.setFilter({ createdQuests: x })}
+            />
+          </Field>
+          <Field label="Played quests">
+            <Switch
+              checked={this.state.playedQuests}
+              onChange={(x) => this.setFilter({ playedQuests: x })}
+            />
+          </Field>
+          <Field label="Founded quests">
+            <Switch
+              checked={this.state.foundedQuests}
+              onChange={(x) => this.setFilter({ foundedQuests: x })}
+            />
+          </Field>
+          <CreateQuestModal onClose={() => this.props.onFilterChange(this.state)} />
+        </Spacer16>
+      </BoxStyled>
     );
   }
 }
+
+QuestListFilter.propTypes = {
+  onFilterChange: PropTypes.func.isRequired,
+};

@@ -16,13 +16,18 @@ export const defaultTheme = 'light';
 
 // Cryptos
 export const CRYPTOS = {
+  questgold: {
+    name: 'Quest Gold',
+    symb: 'QGLD',
+    address: '0x3198e29D289A8586a7eEbFBE3506eb7064cF0936',
+  },
   honey: {
     name: 'Honey',
     symb: 'HNY',
     address: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
   },
   theter: {
-    name: 'TetherTether USD on xDai',
+    name: 'Tether',
     symb: 'USDT',
     address: '0x4ECaBa5870353805a9F068101A40E0f32ed605C6',
   },

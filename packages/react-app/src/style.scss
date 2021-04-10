@@ -29,6 +29,10 @@ $space-prefixes: (
 
 // ARAGON OVERRIDES
 
+span[class^='Switch_'] {
+  z-index: 0 !important;
+}
+
 // CLASS HELPERS
 
 .center {

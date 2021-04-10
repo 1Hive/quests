@@ -4,7 +4,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { isMobile } from 'react-device-detect';
 import { getMoreQuests } from '../../../providers/QuestProvider';
 import QuestListFilter from './QuestListFilter';
-import { Quest } from '../../Shared/Quest/Quest';
+import Quest from '../../Shared/Quest/Quest';
+import { Spacer16 } from '../../Shared/Utils/Spacer';
 
 const batchSize = 3;
 
@@ -23,11 +24,11 @@ export default class QuestList extends React.Component {
     this.refresh();
   }
 
-  async onFilterChange(filter) {
+  onFilterChange = async (filter) => {
     this.setState({ filter }, () => this.refresh());
-  }
+  };
 
-  async refresh() {
+  refresh = async () => {
     this.setState(
       {
         quests: [],
@@ -43,9 +44,9 @@ export default class QuestList extends React.Component {
         );
       },
     );
-  }
+  };
 
-  async loadMore() {
+  loadMore = async () => {
     this.setState(
       (prevState) => ({ placeholderCount: prevState.placeholderCount + batchSize }),
       () => {
@@ -58,74 +59,56 @@ export default class QuestList extends React.Component {
         });
       },
     );
-  }
+  };
 
   render() {
     return (
-      <Split
-        invert="vertical"
-        primary={
-          <InfiniteScroll
-            dataLength={this.state.quests.length}
-            next={() => this.loadMore()}
-            hasMore={this.state.hasMore}
-            endMessage={
-              <p className="center">
-                <b>No more quests found</b>
-              </p>
-            }
-            refreshFunction={() => this.refresh()}
-            pullDownToRefresh={isMobile}
-            pullDownToRefreshThreshold={50}
-            pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
-            releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
-            scrollableTarget="scroll-view"
-            scrollThreshold="0px"
-          >
-            <div>
-              {this.state.quests
-                .concat(
-                  [...new Array(this.state.placeholderCount)].map(() => ({
-                    isLoading: true,
-                  })),
-                )
-                .map(
-                  (
-                    {
-                      isLoading,
-                      status,
-                      address,
-                      title,
-                      description,
-                      players,
-                      maxPlayers,
-                      bounty,
-                      colAmount,
-                      tags,
-                    },
-                    index,
-                  ) => (
-                    <Quest
-                      key={`[${index}]${address}`}
-                      index={index}
-                      isLoading={isLoading}
-                      status={status}
-                      address={address}
-                      title={title}
-                      description={description}
-                      players={players}
-                      maxPlayers={maxPlayers}
-                      bounty={bounty}
-                      colAmount={colAmount}
-                      tags={tags}
-                    />
-                  ),
-                )}
-            </div>
-          </InfiniteScroll>
-        }
-        secondary={<QuestListFilter onFilterChange={(filter) => this.onFilterChange(filter)} />}
-      />
+      <>
+        <Split
+          invert="vertical"
+          primary={
+            <InfiniteScroll
+              loader={<></>}
+              dataLength={this.state.quests.length}
+              next={this.loadMore}
+              hasMore={this.state.hasMore}
+              endMessage={
+                <p className="center">
+                  <b>No more quests found</b>
+                </p>
+              }
+              refreshFunction={this.refresh}
+              pullDownToRefresh={isMobile}
+              pullDownToRefreshThreshold={50}
+              pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
+              releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
+              scrollableTarget="scroll-view"
+              scrollThreshold="0px"
+            >
+              <div>
+                {this.state.quests
+                  .concat(
+                    [...new Array(this.state.placeholderCount ?? 0)].map(() => ({
+                      isLoading: true,
+                    })),
+                  )
+                  .map((x, index) => (
+                    <Spacer16 key={`[${index}]${x.address}`}>
+                      <Quest
+                        data={x.data}
+                        players={x.players}
+                        address={x.address}
+                        status={x.status}
+                        isLoading={x.isLoading}
+                      />
+                    </Spacer16>
+                  ))}
+              </div>
+            </InfiniteScroll>
+          }
+          secondary={<QuestListFilter onFilterChange={this.onFilterChange} />}
+        />
+      </>
     );
   }
 }
