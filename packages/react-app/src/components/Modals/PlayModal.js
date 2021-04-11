@@ -39,7 +39,8 @@ export default function PlayModal({ questAddress, onClose = emptyFunc, disabled 
       }
       buttons={[
         <FlexStyled>
-          <Checkbox checked={licenseChecked} onChange={setLicenseChecked} />I accept the terms
+          <Checkbox id="license" checked={licenseChecked} onChange={setLicenseChecked} />
+          <label htmlFor="license">I accept the terms</label>
         </FlexStyled>,
         <Button
           icon={<GiBroadsword />}

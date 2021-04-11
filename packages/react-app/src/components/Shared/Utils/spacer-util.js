@@ -116,13 +116,14 @@ export function Inset({
 }
 
 export function ChildSpacer({ children, size = 8, vertical = false }) {
-  return React.Children.map(children, (child) => {
+  return React.Children.map(children, (child, i) => {
     let className = `p${vertical ? 't' : 'l'}-${size}`;
     className += ` p${vertical ? 'b' : 'r'}-${size}`;
     return (
       <div
         style={vertical ? { display: 'block' } : { display: 'inline-block' }}
         className={className}
+        key={i}
       >
         {child}
       </div>
