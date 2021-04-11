@@ -1,9 +1,9 @@
-import React, { useContext, useMemo } from 'react';
 import { providers as EthersProviders } from 'ethers';
-import { UseWalletProvider, useWallet } from 'use-wallet';
-import { getUseWalletConnectors } from '../utils/web3-utils';
-import { getNetwork } from '../networks';
+import React, { useContext, useMemo } from 'react';
+import { useWallet, UseWalletProvider } from 'use-wallet';
 import { getDefaultChain } from '../local-settings';
+import { getNetwork } from '../networks';
+import { getUseWalletConnectors } from '../utils/web3-utils';
 
 const WalletAugmentedContext = React.createContext();
 
@@ -14,6 +14,7 @@ function useWalletAugmented() {
 // Adds Ethers.js to the useWallet() object
 function WalletAugmented({ children }) {
   const wallet = useWallet();
+
   const { ethereum } = wallet;
 
   const ethers = useMemo(() => {

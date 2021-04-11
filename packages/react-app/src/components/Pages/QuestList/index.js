@@ -24,10 +24,16 @@ export default class QuestList extends React.Component {
 
   componentDidMount() {
     this.refresh();
-    EventManager.addListener(EVENTS.QUEST_SAVED, () => {
-      this.refresh();
-    });
+    EventManager.addListener(EVENTS.QUEST_SAVED, this.onQuestSaved);
   }
+
+  componentWillUnmount() {
+    EventManager.removeListener(EVENTS.QUEST_SAVED, this.onQuestSaved);
+  }
+
+  onQuestSaved = () => {
+    this.refresh();
+  };
 
   onFilterChange = async (filter) => {
     this.setState({ filter }, () => this.refresh());
@@ -108,6 +114,7 @@ export default class QuestList extends React.Component {
                         meta={x.meta}
                         players={x.players}
                         address={x.address}
+                        creator={x.creator}
                         funds={x.funds}
                         status={x.status}
                         isLoading={x.isLoading}

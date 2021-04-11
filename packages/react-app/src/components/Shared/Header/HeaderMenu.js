@@ -1,8 +1,7 @@
+import { GU, Link, useTheme } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { GU, Link, useTheme } from '@1hive/1hive-ui';
 import styled from 'styled-components';
-import { useWallet } from '../../../providers/Wallet';
 
 // #region StyledComponents
 
@@ -22,7 +21,6 @@ const HeaderNavItemStyled = styled(Link)`
 
 export default function HeaderMenu({ below }) {
   const theme = useTheme();
-  const { account } = useWallet();
 
   return (
     !below('large') && (
@@ -30,15 +28,6 @@ export default function HeaderMenu({ below }) {
         <HeaderNavItemStyled href="#/home" external={false} color={theme.contentSecondary}>
           Home
         </HeaderNavItemStyled>
-        {account && (
-          <HeaderNavItemStyled
-            href="#/create-quest"
-            external={false}
-            color={theme.contentSecondary}
-          >
-            Create quest
-          </HeaderNavItemStyled>
-        )}
         <HeaderNavItemStyled
           color={theme.contentSecondary}
           href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"

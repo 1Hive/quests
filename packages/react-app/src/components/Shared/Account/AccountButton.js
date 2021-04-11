@@ -1,14 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { EthIdenticon, GU, RADIUS, shortenAddress, textStyle, useTheme } from '@1hive/1hive-ui';
-
+import PropTypes from 'prop-types';
+import React from 'react';
 import styled from 'styled-components';
 import { useWallet } from '../../../providers/Wallet';
 import HeaderModule from '../Header/HeaderModule';
 
 // #region StyledComponents
 
-const AccountButtonBackground = styled.div`
+const AccountButtonBackgroundStyled = styled.div`
   position: absolute;
   bottom: -3px;
   right: -3px;
@@ -19,23 +18,23 @@ const AccountButtonBackground = styled.div`
   border-radius: 50%;
 `;
 
-const AccountButtonContainer = styled.div`
+const AccountButtonContainerStyled = styled.div`
   position: relative;
 `;
 
-const AccountButtonContent = styled.div`
+const AccountButtonContentStyled = styled.div`
   margin-bottom: -5px;
   ${textStyle('body2')}
 `;
 
-const AccountButtonContentWrapper = styled.div`
+const AccountButtonContentWrapperStyled = styled.div`
   overflow: hidden;
   max-width: ${16 * GU}px;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-const ConnectedLabel = styled.div`
+const ConnectedLabelStyled = styled.div`
   font-size: 11px; /* doesn’t exist in aragonUI */
   color: ${(props) => props.theme.positive};
 `;
@@ -48,19 +47,19 @@ function AccountButton({ onClick }) {
   return (
     <HeaderModule
       icon={
-        <AccountButtonContainer>
+        <AccountButtonContainerStyled>
           <EthIdenticon address={wallet.account} radius={RADIUS} />
-          <AccountButtonBackground background={theme.positive} borderColor={theme.surface} />
-        </AccountButtonContainer>
+          <AccountButtonBackgroundStyled background={theme.positive} borderColor={theme.surface} />
+        </AccountButtonContainerStyled>
       }
       content={
         <>
-          <AccountButtonContent>
-            <AccountButtonContentWrapper>
+          <AccountButtonContentStyled>
+            <AccountButtonContentWrapperStyled>
               {shortenAddress(wallet.account)}
-            </AccountButtonContentWrapper>
-          </AccountButtonContent>
-          <ConnectedLabel theme={theme}>Connected</ConnectedLabel>
+            </AccountButtonContentWrapperStyled>
+          </AccountButtonContentStyled>
+          <ConnectedLabelStyled theme={theme}>Connected</ConnectedLabelStyled>
         </>
       }
       onClick={onClick}

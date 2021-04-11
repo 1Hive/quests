@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-import React, { useCallback } from 'react';
 import {
   Button,
   ButtonBase,
@@ -10,10 +8,12 @@ import {
   textStyle,
   useTheme,
 } from '@1hive/1hive-ui';
-import IdentityBadge from '../IdentityBadge';
+import PropTypes from 'prop-types';
+import React, { useCallback } from 'react';
+import { getProviderFromUseWalletId } from '../../../ethereum-providers';
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
 import { getNetworkName } from '../../../utils/web3-utils';
-import { getProviderFromUseWalletId } from '../../../ethereum-providers';
+import IdentityBadge from '../IdentityBadge';
 
 function AccountScreenConnected({ wallet }) {
   const theme = useTheme();

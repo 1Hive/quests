@@ -2,10 +2,11 @@
 import { AddressField, Button, Card, Field, GU, Split } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
-import { FaSave } from 'react-icons/fa';
+import React, { useRef, useState } from 'react';
+import { FaEdit, FaSave } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
+import { useWallet } from 'use-wallet';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
 import QuestProvider from '../../../providers/QuestProvider';
 import { emptyFunc } from '../../../utils/class-util';
@@ -61,10 +62,14 @@ export default function Quest({
   isLoading = false,
   players = [],
   funds = [],
+  creator = undefined,
   onSave = emptyFunc,
   css,
 }) {
+  const wallet = useWallet();
   const formRef = useRef(null);
+  const [editMode, setEditMode] = useState(isEdit);
+  const alreadyPlayed = !!players.find((x) => x === wallet.account);
   return (
     <CardStyled style={css} id={address}>
       <Formik
@@ -79,7 +84,7 @@ export default function Quest({
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setSubmitting(false);
-            onSave(await QuestProvider.saveQuest(values));
+            onSave(await QuestProvider.saveQuest(wallet.account, values, address));
           }, 400);
         }}
       >
@@ -93,8 +98,8 @@ export default function Quest({
                       primary={
                         <TextFieldInput
                           id="title"
-                          label={isEdit ? 'Title' : ''}
-                          isEdit={isEdit}
+                          label={editMode ? 'Title' : ''}
+                          isEdit={editMode}
                           isLoading={isLoading}
                           placeHolder="Quest title"
                           value={values.title}
@@ -104,7 +109,7 @@ export default function Quest({
                         />
                       }
                       secondary={
-                        !isEdit &&
+                        !editMode &&
                         (isLoading ? (
                           <Skeleton />
                         ) : (
@@ -116,9 +121,9 @@ export default function Quest({
                   <Outset gu8 vertical>
                     <TextFieldInput
                       id="description"
-                      label={isEdit ? 'Description' : ''}
+                      label={editMode ? 'Description' : ''}
                       value={values.description}
-                      isEdit={isEdit}
+                      isEdit={editMode}
                       isLoading={isLoading}
                       placeHolder="Quest description"
                       onChange={handleChange}
@@ -140,11 +145,11 @@ export default function Quest({
                       </Field>
                     </>
                   )}
-                  {(values.maxPlayers !== -1 || isEdit) && (
+                  {(values.maxPlayers !== -1 || editMode) && (
                     <NumberFieldInput
                       id="maxPlayers"
                       onChange={handleChange}
-                      isEdit={isEdit}
+                      isEdit={editMode}
                       isLoading={isLoading}
                       label="Max players"
                       value={values.maxPlayers}
@@ -154,7 +159,7 @@ export default function Quest({
                   <AmountFieldInput
                     id="bounty"
                     label="Bounty"
-                    isEdit={isEdit}
+                    isEdit={editMode}
                     value={values.bounty}
                     isLoading={isLoading}
                     formik={formRef}
@@ -162,7 +167,7 @@ export default function Quest({
                   <AmountFieldInput
                     id="collateral"
                     label="Collateral amount"
-                    isEdit={isEdit}
+                    isEdit={editMode}
                     value={values.collateral}
                     isLoading={isLoading}
                     formik={formRef}
@@ -170,7 +175,7 @@ export default function Quest({
                   <TagFieldInput
                     id="tags"
                     label="Tags"
-                    isEdit={isEdit}
+                    isEdit={editMode}
                     isLoading={isLoading}
                     value={values.tags}
                     formik={formRef}
@@ -179,7 +184,7 @@ export default function Quest({
               }
             />
             <QuestFooterStyled>
-              {isEdit ? (
+              {editMode ? (
                 <QuestActionButtonStyled
                   label="Save"
                   icon={<FaSave />}
@@ -187,12 +192,17 @@ export default function Quest({
                   type="submit"
                 />
               ) : (
-                <Outset gu8 vertical>
-                  <ChildSpacer>
-                    <PlayModal questAddress={address} />
-                    <FundModal questAddress={address} />
-                  </ChildSpacer>
-                </Outset>
+                wallet.account && (
+                  <Outset gu8 vertical>
+                    <ChildSpacer>
+                      {creator === wallet.account && (
+                        <Button onClick={() => setEditMode(true)} label="Edit" icon={<FaEdit />} />
+                      )}
+                      <PlayModal questAddress={address} disabled={alreadyPlayed} />
+                      <FundModal questAddress={address} />
+                    </ChildSpacer>
+                  </Outset>
+                )
               )}
             </QuestFooterStyled>
           </FormStyled>
@@ -230,7 +240,8 @@ Quest.propTypes = {
     title: PropTypes.string,
   }),
   onSave: PropTypes.func,
-  players: PropTypes.arrayOf(PropTypes.string),
+  players: PropTypes.array,
+  funds: PropTypes.array,
   status: PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string,

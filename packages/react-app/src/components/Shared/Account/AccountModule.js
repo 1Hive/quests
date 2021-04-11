@@ -1,29 +1,27 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable consistent-return */
 /* eslint-disable no-shadow */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
-import { Transition, animated } from 'react-spring/renderprops';
-
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { animated, Transition } from 'react-spring/renderprops';
 import styled from 'styled-components';
-import AccountButton from './AccountButton';
+import { useWallet } from '../../../providers/Wallet';
+import { getUseWalletProviders } from '../../../utils/web3-utils';
 import HeaderPopover from '../Header/HeaderPopover';
+import AccountButton from './AccountButton';
 import ScreenConnected from './ScreenConnected';
 import ScreenConnecting from './ScreenConnecting';
 import ScreenError from './ScreenError';
 import ScreenProviders from './ScreenProviders';
-import { useWallet } from '../../../providers/Wallet';
 
-import { getUseWalletProviders } from '../../../utils/web3-utils';
-
-const AccountWrapper = styled.div`
+const AccountWrapperStyled = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
   outline: 0;
 `;
 
-const AnimatedDiv = styled(animated.div)`
+const AnimatedDivStyled = styled(animated.div)`
   position: absolute;
   top: 0;
   left: 0;
@@ -154,7 +152,7 @@ function AccountModule({ compact }) {
   }, [screenId]);
 
   return (
-    <AccountWrapper ref={buttonRef} tabIndex="0">
+    <AccountWrapperStyled ref={buttonRef} tabIndex="0">
       {screen.id === 'connected' ? (
         <AccountButton onClick={toggle} />
       ) : (
@@ -201,7 +199,7 @@ function AccountModule({ compact }) {
             }}
           >
             {({ screen, activating, wallet }) => ({ opacity, transform }) => (
-              <AnimatedDiv style={{ opacity, transform }}>
+              <AnimatedDivStyled style={{ opacity, transform }}>
                 {(() => {
                   if (screen.id === 'connecting') {
                     return (
@@ -216,12 +214,12 @@ function AccountModule({ compact }) {
                   }
                   return <ScreenProviders onActivate={activate} />;
                 })()}
-              </AnimatedDiv>
+              </AnimatedDivStyled>
             )}
           </Transition>
         </div>
       </HeaderPopover>
-    </AccountWrapper>
+    </AccountWrapperStyled>
   );
 }
 

@@ -1,13 +1,18 @@
-import { Button, Checkbox, Field, useToast } from '@1hive/1hive-ui';
+/* eslint-disable jsx-a11y/label-has-associated-control */
+import { Button, Checkbox, useToast } from '@1hive/1hive-ui';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
-import { useWallet } from 'use-wallet';
+import styled from 'styled-components';
 import QuestProvider from '../../providers/QuestProvider';
 import { emptyFunc } from '../../utils/class-util';
 import ModalBase from './ModalBase';
 
-export default function PlayModal({ questAddress, onClose = emptyFunc }) {
-  const { account } = useWallet();
+const FlexStyled = styled.div`
+  display: flex;
+`;
+
+export default function PlayModal({ questAddress, onClose = emptyFunc, disabled = false }) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
   const [licenseChecked, setLicenseChecked] = useState(false);
@@ -17,8 +22,8 @@ export default function PlayModal({ questAddress, onClose = emptyFunc }) {
   };
   const onPlayClick = () => {
     onModalClose();
-    QuestProvider.playQuest(account.address, questAddress);
-    toast('Successfully played');
+    QuestProvider.playQuest(questAddress);
+    toast('Successfully register as a player');
   };
   return (
     <ModalBase
@@ -29,11 +34,21 @@ export default function PlayModal({ questAddress, onClose = emptyFunc }) {
           onClick={() => setOpened(true)}
           label="Play"
           mode="positive"
+          disabled={disabled}
         />
       }
-      buttons={
-        <Button icon={<GiBroadsword />} onClick={onPlayClick} label="Play" mode="positive" />
-      }
+      buttons={[
+        <FlexStyled>
+          <Checkbox checked={licenseChecked} onChange={setLicenseChecked} />I accept the terms
+        </FlexStyled>,
+        <Button
+          icon={<GiBroadsword />}
+          onClick={onPlayClick}
+          label="Play"
+          mode="positive"
+          disabled={!licenseChecked}
+        />,
+      ]}
       onClose={onModalClose}
       isOpen={opened}
     >
@@ -102,9 +117,12 @@ export default function PlayModal({ questAddress, onClose = emptyFunc }) {
       venenatis venenatis efficitur. Fusce nec ligula quis turpis vestibulum vulputate a id augue.
       Nam commodo massa et ex aliquam consectetur. Maecenas elementum velit non purus ullamcorper
       scelerisque.
-      <Field>
-        <Checkbox checked={licenseChecked} onChange={setLicenseChecked} />I accept the terms
-      </Field>
     </ModalBase>
   );
 }
+
+PlayModal.propTypes = {
+  onClose: PropTypes.func,
+  questAddress: PropTypes.string,
+  disabled: PropTypes.bool,
+};

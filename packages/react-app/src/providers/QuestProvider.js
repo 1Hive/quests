@@ -1,70 +1,51 @@
+import { random } from 'lodash';
 import moment from 'moment';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import Web3 from 'web3';
 import { EVENTS, QUEST_STATUS, TOKENS } from '../constants';
+import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
 import EventManager from './EventManager';
 
 // #region Private
 
-const fakeDb = [
-  {
+const fakeDb = [];
+
+function loadStorage() {
+  const fakeDbJson = localStorage.getItem('fakeDb');
+  if (fakeDbJson !== null) {
+    const parsed = JSON.parse(fakeDbJson);
+    parsed.forEach((element) => {
+      fakeDb.push(element);
+    });
+  }
+}
+
+function updateStorage() {
+  localStorage.setItem('fakeDb', JSON.stringify(fakeDb));
+}
+
+function generateFakeQuest(index) {
+  fakeDb.push({
     status: QUEST_STATUS.active,
-    address: '0x4ECaBa5870353805a9F068101A40E0f32ed605C6',
+    address: createContractAccount().address,
     meta: {
-      title: 'Rescue me',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.',
-      maxPlayers: 1,
-      bounty: { amount: 1000, token: TOKENS.theter },
-      collateral: { amount: 230, token: TOKENS.qutheterestgold },
-      tags: ['Backend', 'Oracle', 'SQL', 'CoolStuf'],
-      expiration: '06/24/2021',
-    },
-    funds: [
-      {
-        founder: '0xe51A153E0b41518A2Ce8Dd3D7944Fa863463a514',
-        amount: { amount: 1, token: TOKENS.honey },
-      },
-    ],
-    players: [],
-  },
-  {
-    status: QUEST_STATUS.draft,
-    address: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
-    meta: {
-      title: 'Foldondord',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.',
-      maxPlayers: 2,
-      bounty: { amount: 230, token: TOKENS.questgold },
-      collateral: { amount: 50, token: TOKENS.questgold },
-      tags: ['React', 'CoolStuf'],
-      expiration: '06/24/2021',
-    },
-    funds: [],
-    players: [],
-  },
-  {
-    status: QUEST_STATUS.active,
-    address: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
-    meta: {
-      title: 'Beat the poggers',
+      title: `Quest #${index + 1}`,
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.',
-      maxPlayers: 10,
-      bounty: { amount: 10, token: TOKENS.honey },
-      collateral: { amount: 0, token: TOKENS.honey },
-      tags: ['FrontEnd', 'Angular', 'JS', 'CoolStuf'],
+      maxPlayers: random(5, 20),
+      bounty: { amount: random(100, 1000), token: TOKENS.questgold },
+      collateral: { amount: random(0, 10), token: TOKENS.questgold },
+      tags: ['FrontEnd', 'Angular', 'JS', 'CoolStuf', 'Chills']
+        .map((tag) => ({
+          tag,
+          rand: random() > 0,
+        }))
+        .filter((x) => x.rand)
+        .map((x) => x.tag),
       expiration: '06/24/2021',
     },
     funds: [],
     players: [],
-  },
-];
-
-function createContractAccount() {
-  const web3 = new Web3('http://localhost:8545');
-  return web3.eth.accounts.create();
+    creator: createContractAccount().address,
+  });
 }
 
 function retrieveQuest(address) {
@@ -77,52 +58,63 @@ function retrieveQuest(address) {
 
 // #region Public
 
-function getMoreQuests(currentIndex, count, filter) {
+async function getMoreQuests(currentIndex, count, filter) {
+  const currentAccount = await getCurrentAccount();
   return new Promise((resolve) => {
     setTimeout(() => {
       const result = {
-        data: fakeDb.filter((res) => {
+        data: fakeDb.filter((quest) => {
           // Status
-          if (filter.status && res.status.id !== filter.status) {
+          if (filter.status && quest.status.id !== filter.status) {
             return false;
           }
           // Tags
           if (
             filter.tags?.length &&
-            !res.meta.tags.filter((tag) => filter.tags.includes(tag)).length
+            !quest.meta.tags.filter((tag) => filter.tags.includes(tag)).length
           ) {
             return false;
           }
           // Search
           if (
             filter.search &&
-            !res.meta.title.includes(filter.search) &&
-            !res.meta.description.includes(filter.search) &&
-            !res.address.includes(filter.search)
+            !quest.meta.title.includes(filter.search) &&
+            !quest.meta.description.includes(filter.search) &&
+            !quest.address.includes(filter.search)
           ) {
             return false;
           }
           // MinBounty
-          if (filter.minBounty && res.meta.bounty < filter.minBounty) return false;
+          if (filter.minBounty && quest.meta.bounty < filter.minBounty) return false;
           if (
             (filter.expiration?.startDate &&
-              moment(res.meta.expiration).isBefore(filter.expiration.startDate)) ||
+              moment(quest.meta.expiration).isBefore(filter.expiration.startDate)) ||
             (filter.expiration?.endDate &&
-              moment(res.meta.expiration).isAfter(filter.expiration.endDate))
+              moment(quest.meta.expiration).isAfter(filter.expiration.endDate))
           ) {
             return false;
           }
 
+          // Followed quests
+          if (filter.createdQuests && quest.creator !== currentAccount) return false;
+          if (filter.playedQuests && !quest.players.find((x) => x.player === currentAccount))
+            return false;
+          if (filter.foundedQuests && !quest.funds.find((x) => x.founder === currentAccount))
+            return false;
+
           return true;
         }),
       };
-      result.hasMore = result.data.length === count && currentIndex < 9;
+      const fullResultLenght = result.data.length;
+      result.data = result.data.slice(currentIndex, currentIndex + count);
+      result.hasMore = result.data.length === count && currentIndex < fullResultLenght;
       resolve(result);
     }, 1000);
   });
 }
 
-function saveQuest(meta, address = undefined) {
+async function saveQuest(account, meta, address = undefined) {
+  const isNew = !address;
   const quest = address
     ? fakeDb.find((x) => x.address === address)
     : {
@@ -131,26 +123,35 @@ function saveQuest(meta, address = undefined) {
         funds: [],
         totalFunds: { amount: 0, token: TOKENS.theter },
         address: createContractAccount().address,
+        meta,
+        creator: account,
       };
-  fakeDb.push({
-    ...quest,
-    meta,
-  });
-  EventManager.dispatch(EVENTS.QUEST_SAVED, { isNew: !address, address, meta });
-  return Promise.resolve(quest.address);
+  if (isNew) {
+    fakeDb.unshift(quest);
+  } else {
+    quest.meta = meta;
+  }
+  EventManager.dispatch(EVENTS.QUEST_SAVED, { isNew, address, meta });
+  updateStorage();
+  return quest.address;
 }
 
-function fundQuest(founderAddress, questAddress, amount) {
-  return retrieveQuest(questAddress).funds.push({
-    founder: founderAddress,
+async function fundQuest(questAddress, amount, onCompleted) {
+  const currentAccount = await getCurrentAccount();
+  await sendTransaction(questAddress, amount, onCompleted);
+  retrieveQuest(questAddress).funds.push({
+    founder: currentAccount,
     amount,
   });
+  updateStorage();
 }
 
-function playQuest(playerAddress, questAddress) {
-  return retrieveQuest(questAddress).players.push({
-    player: playerAddress,
+async function playQuest(questAddress) {
+  const currentAccount = await getCurrentAccount();
+  retrieveQuest(questAddress).players.push({
+    player: currentAccount,
   });
+  updateStorage();
 }
 
 function getTagSuggestions() {
@@ -158,6 +159,14 @@ function getTagSuggestions() {
 }
 
 // #endregion
+
+loadStorage();
+if (!fakeDb.length) {
+  for (let index = 0; index < 10; index += 1) {
+    generateFakeQuest(index);
+  }
+  updateStorage();
+}
 
 export default {
   getMoreQuests,

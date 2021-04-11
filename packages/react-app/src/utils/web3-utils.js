@@ -1,7 +1,20 @@
+import Web3 from 'web3';
+import { toWei } from 'web3-utils';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
+
+function getWeb3() {
+  // @ts-ignore
+  const web3 = new Web3(window.ethereum);
+  // @ts-ignore
+  window.ethereum.enable().catch((error) => {
+    // User denied account access
+    console.error(error);
+  });
+  return web3;
+}
 
 export function getUseWalletProviders() {
   const providers = [{ id: 'injected' }];
@@ -51,6 +64,25 @@ export function getNetworkName(chainId = getDefaultChain()) {
   return 'unknown';
 }
 
+export function createContractAccount() {
+  return getWeb3().eth.accounts.create();
+}
+
+export async function getCurrentAccount() {
+  return new Promise((res) => {
+    getWeb3().eth.getAccounts((error, result) => {
+      if (error) {
+        console.error(error);
+      } else {
+        res(result.length ? result[0] : null);
+      }
+    });
+  });
+}
+
+export function isConnectedToProvider() {
+  return getCurrentAccount() !== null;
+}
 export const addressPattern = '(0x)?[0-9a-fA-F]{40}';
 const ETH_ADDRESS_SPLIT_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
 const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
@@ -75,5 +107,21 @@ export function addressesEqualNoSum(first, second) {
   return first === second;
 }
 
+export async function sendTransaction(to, amount, onCompleted) {
+  const from = await getCurrentAccount();
+  return new Promise((res, rej) =>
+    getWeb3()
+      .eth.sendTransaction({
+        from,
+        to,
+        value: toWei(amount.amount.toString(), 'ether'),
+        chain: getNetworkType(),
+      })
+      .on('transactionHash', res)
+      .on('receipt', onCompleted)
+      .catch(rej),
+  );
+}
+
 // Re-export some web3-utils functions
-export { isAddress, toUtf8, soliditySha3 } from 'web3-utils';
+export { isAddress, soliditySha3, toUtf8 } from 'web3-utils';

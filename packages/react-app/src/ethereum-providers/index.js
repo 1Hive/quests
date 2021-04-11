@@ -1,10 +1,10 @@
-import frame from './icons/Frame.png';
 import cipher from './icons/Cipher.png';
+import fortmatic from './icons/Fortmatic.svg';
+import frame from './icons/Frame.png';
 import metamask from './icons/Metamask.png';
+import portis from './icons/Portis.svg';
 import status from './icons/Status.png';
 import wallet from './icons/wallet.svg';
-import fortmatic from './icons/Fortmatic.svg';
-import portis from './icons/Portis.svg';
 
 // See the corresponding prop type, EthereumProviderType, in prop-types.js.
 const PROVIDERS = new Map(
