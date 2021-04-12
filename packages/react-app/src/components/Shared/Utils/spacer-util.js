@@ -123,7 +123,7 @@ export function ChildSpacer({ children, size = 8, vertical = false }) {
       <div
         style={vertical ? { display: 'block' } : { display: 'inline-block' }}
         className={className}
-        key={i}
+        key={`child-${i}`}
       >
         {child}
       </div>

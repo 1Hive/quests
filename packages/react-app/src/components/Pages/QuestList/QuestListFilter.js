@@ -18,7 +18,7 @@ import CreateQuestModal from '../../Modals/QuestModal';
 import AmountFieldInput from '../../Shared/FieldInput/AmountFieldInput';
 import TagFieldInput from '../../Shared/FieldInput/TagFieldInput';
 import { Outset } from '../../Shared/Utils/spacer-util';
-import Separator from '../../Shared/Utils/splitter';
+import Separator from '../../Shared/Utils/Separator';
 
 // #region StyledComponent
 
