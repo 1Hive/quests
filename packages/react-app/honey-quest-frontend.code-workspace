@@ -1,0 +1,12 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "eslint.workingDirectories": ["../.."],
+    "editor.formatOnSave": true,
+    "js/ts.implicitProjectConfig.checkJs": true
+  }
+}

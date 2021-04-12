@@ -1,6 +1,6 @@
-import React from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
-import QuestList from "./components/QuestList/QuestList";
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import QuestList from './components/Pages/QuestList';
 
 export default function Routes() {
   return (

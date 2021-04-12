@@ -1,14 +1,13 @@
-import React from "react";
+import React from 'react';
 import {
   createClient,
   Provider as UrqlProvider,
   cacheExchange,
   debugExchange,
   fetchExchange,
-} from "urql";
-import { getNetwork } from "../networks";
-
-import { devtoolsExchange } from "@urql/devtools";
+} from 'urql';
+import { devtoolsExchange } from '@urql/devtools';
+import { getNetwork } from '../networks';
 
 const SubgraphContext = React.createContext({ resetSubgraphClient: null });
 

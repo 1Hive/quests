@@ -1,44 +1,38 @@
-import MerkleTree from './merkle-tree'
-import { utils } from 'ethers'
+import { utils } from 'ethers';
+import MerkleTree from './merkle-tree';
 
 export default class BalanceTree {
-  tree
   constructor(balances) {
     this.tree = new MerkleTree(
-      balances.map(({ account, amount }, index) => {
-        return BalanceTree.toNode(index, account, amount)
-      })
-    )
+      balances.map(({ account, amount }, index) => BalanceTree.toNode(index, account, amount)),
+    );
   }
 
   static verifyProof(index, account, amount, proof, root) {
-    let pair = BalanceTree.toNode(index, account, amount)
+    let pair = BalanceTree.toNode(index, account, amount);
     for (const item of proof) {
-      pair = MerkleTree.combinedHash(pair, item)
+      pair = MerkleTree.combinedHash(pair, item);
     }
 
-    return pair.equals(root)
+    return pair.equals(root);
   }
 
   // keccak256(abi.encode(index, account, amount))
   static toNode(index, account, amount) {
     return Buffer.from(
       utils
-        .solidityKeccak256(
-          ['uint256', 'address', 'uint256'],
-          [index, account, amount]
-        )
+        .solidityKeccak256(['uint256', 'address', 'uint256'], [index, account, amount])
         .substr(2),
-      'hex'
-    )
+      'hex',
+    );
   }
 
   getHexRoot() {
-    return this.tree.getHexRoot()
+    return this.tree.getHexRoot();
   }
 
   // returns the hex bytes32 values of the proof
   getProof(index, account, amount) {
-    return this.tree.getHexProof(BalanceTree.toNode(index, account, amount))
+    return this.tree.getHexProof(BalanceTree.toNode(index, account, amount));
   }
 }

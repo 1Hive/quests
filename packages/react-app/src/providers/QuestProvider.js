@@ -1,83 +1,177 @@
-import moment from "moment";
+import { random } from 'lodash';
+import moment from 'moment';
+import { EVENTS, QUEST_STATUS, TOKENS } from '../constants';
+import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
+import EventManager from './EventManager';
 
-export function getMoreQuests(currentIndex, count, filter) {
-  return new Promise((resolve, reject) => {
+// #region Private
+
+const fakeDb = [];
+
+function loadStorage() {
+  const fakeDbJson = localStorage.getItem('fakeDb');
+  if (fakeDbJson !== null) {
+    const parsed = JSON.parse(fakeDbJson);
+    parsed.forEach((element) => {
+      fakeDb.push(element);
+    });
+  }
+}
+
+function updateStorage() {
+  localStorage.setItem('fakeDb', JSON.stringify(fakeDb));
+}
+
+function generateFakeQuest(index) {
+  fakeDb.push({
+    status: QUEST_STATUS.active,
+    address: createContractAccount().address,
+    meta: {
+      title: `Quest #${index + 1}`,
+      description:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.',
+      maxPlayers: random(5, 20),
+      bounty: { amount: random(100, 1000), token: TOKENS.questgold },
+      collateral: { amount: random(0, 10), token: TOKENS.questgold },
+      tags: ['FrontEnd', 'Angular', 'JS', 'CoolStuf', 'Chills']
+        .map((tag) => ({
+          tag,
+          rand: random() > 0,
+        }))
+        .filter((x) => x.rand)
+        .map((x) => x.tag),
+      expiration: '06/24/2021',
+    },
+    funds: [],
+    players: [],
+    creator: createContractAccount().address,
+  });
+}
+
+function retrieveQuest(address) {
+  const quest = fakeDb.find((x) => x.address === address);
+  if (!quest) throw Error(`[Quest funding] Quest was not found : ${address}`); // TODO : Implement error handler
+  return quest;
+}
+
+// #endregion
+
+// #region Public
+
+async function getMoreQuests(currentIndex, count, filter) {
+  const currentAccount = await getCurrentAccount();
+  return new Promise((resolve) => {
     setTimeout(() => {
-      let result = {
-        data: [
-          {
-            status: "Active",
-            address: "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-            title: "Beat the poggers",
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.",
-            players: 5,
-            maxPlayers: 10,
-            bounty: 0,
-            colAmount: 0,
-            tags: ["FrontEnd", "Angular", "JS", "CoolStuf"],
-            expiration: "06/24/2021",
-          },
-          {
-            status: "Active",
-            address: "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-            title: "Rescue me",
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.",
-            players: 0,
-            maxPlayers: 1,
-            bounty: 500,
-            colAmount: 25,
-            tags: ["Backend", "Oracle", "SQL", "CoolStuf"],
-            expiration: "06/24/2021",
-          },
-          {
-            status: "Draft",
-            address: "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-            title: "Foldondord",
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.",
-            players: 0,
-            maxPlayers: 2,
-            bounty: 230,
-            colAmount: 0,
-            tags: ["React", "CoolStuf"],
-            expiration: "06/24/2021",
-          },
-        ].filter((x) => {
-          console.log(filter);
-          if (
-            filter.status &&
-            filter.status !== "All" &&
-            x.status !== filter.status
-          )
+      const result = {
+        data: fakeDb.filter((quest) => {
+          // Status
+          if (filter.status && quest.status.id !== filter.status) {
             return false;
+          }
+          // Tags
           if (
             filter.tags?.length &&
-            !x.tags.filter((x) => filter.tags.includes(x)).length
-          )
+            !quest.meta.tags.filter((tag) => filter.tags.includes(tag)).length
+          ) {
             return false;
+          }
+          // Search
           if (
             filter.search &&
-            !x.title.includes(filter.search) &&
-            !x.description.includes(filter.search) &&
-            !x.address.includes(filter.search)
-          )
+            !quest.meta.title.includes(filter.search) &&
+            !quest.meta.description.includes(filter.search) &&
+            !quest.address.includes(filter.search)
+          ) {
             return false;
-          if (filter.minBounty && x.bounty < filter.minBounty) return false;
+          }
+          // MinBounty
+          if (filter.minBounty && quest.meta.bounty < filter.minBounty) return false;
           if (
             (filter.expiration?.startDate &&
-              moment(x.expiration).isBefore(filter.expiration.startDate)) ||
+              moment(quest.meta.expiration).isBefore(filter.expiration.startDate)) ||
             (filter.expiration?.endDate &&
-              moment(x.expiration).isAfter(filter.expiration.endDate))
-          )
+              moment(quest.meta.expiration).isAfter(filter.expiration.endDate))
+          ) {
+            return false;
+          }
+
+          // Followed quests
+          if (filter.createdQuests && quest.creator !== currentAccount) return false;
+          if (filter.playedQuests && !quest.players.find((x) => x.player === currentAccount))
+            return false;
+          if (filter.foundedQuests && !quest.funds.find((x) => x.founder === currentAccount))
             return false;
 
           return true;
         }),
       };
-      result.hasMore = result.data.length === count && currentIndex < 9;
+      const fullResultLenght = result.data.length;
+      result.data = result.data.slice(currentIndex, currentIndex + count);
+      result.hasMore = result.data.length === count && currentIndex < fullResultLenght;
       resolve(result);
     }, 1000);
   });
 }
+
+async function saveQuest(account, meta, address = undefined) {
+  const isNew = !address;
+  const quest = address
+    ? fakeDb.find((x) => x.address === address)
+    : {
+        players: [],
+        status: QUEST_STATUS.draft,
+        funds: [],
+        totalFunds: { amount: 0, token: TOKENS.theter },
+        address: createContractAccount().address,
+        meta,
+        creator: account,
+      };
+  if (isNew) {
+    fakeDb.unshift(quest);
+  } else {
+    quest.meta = meta;
+  }
+  EventManager.dispatch(EVENTS.QUEST_SAVED, { isNew, address, meta });
+  updateStorage();
+  return quest.address;
+}
+
+async function fundQuest(questAddress, amount, onCompleted) {
+  const currentAccount = await getCurrentAccount();
+  await sendTransaction(questAddress, amount, onCompleted);
+  retrieveQuest(questAddress).funds.push({
+    founder: currentAccount,
+    amount,
+  });
+  updateStorage();
+}
+
+async function playQuest(questAddress) {
+  const currentAccount = await getCurrentAccount();
+  retrieveQuest(questAddress).players.push({
+    player: currentAccount,
+  });
+  updateStorage();
+}
+
+function getTagSuggestions() {
+  return [...new Set([].concat(...fakeDb.map((x) => x.meta.tags)))];
+}
+
+// #endregion
+
+loadStorage();
+if (!fakeDb.length) {
+  for (let index = 0; index < 10; index += 1) {
+    generateFakeQuest(index);
+  }
+  updateStorage();
+}
+
+export default {
+  getMoreQuests,
+  saveQuest,
+  fundQuest,
+  playQuest,
+  getTagSuggestions,
+};

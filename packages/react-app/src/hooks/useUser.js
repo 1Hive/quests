@@ -1,7 +1,7 @@
-import { useUserSubscription } from './useSubscriptions'
+import { useUserSubscription } from './useSubscriptions';
 
 export default function useUser(account) {
-  const { user, fetching } = useUserSubscription(account)
+  const { user, fetching } = useUserSubscription(account);
 
-  return [user, fetching]
+  return [user, fetching];
 }

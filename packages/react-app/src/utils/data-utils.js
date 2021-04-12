@@ -1,38 +1,24 @@
-import { toMs } from './date-utils'
+import { TOKENS } from '../constants';
 
-export function transformPartyData(party) {
-  return {
-    ...party,
-    createdAt: toMs(party.createdAt),
-    upfrontPct: BigInt(party.upfrontPct),
-    vestingPeriod: toMs(party.vestingPeriod),
-    vestingDurationInPeriods: parseInt(party.vestingDurationInPeriods),
-    vestingCliffInPeriods: parseInt(party.vestingCliffInPeriods),
-    totalAmountClaimed: BigInt(party.totalAmountClaimed || '0'),
-    vestings: party.vestings.map(transformVestingData),
-  }
+export async function convertTo(from, toToken) {
+  const res = await fetch(
+    `https://coingecko.p.rapidapi.com/simple/price?ids=${[
+      from.token.symb,
+      toToken.symb,
+    ]}&vs_currencies=usd`,
+    {
+      method: 'GET',
+    },
+  );
+
+  console.log(res);
+  return { amount: res, token: toToken };
 }
 
-export function transformUserData(user) {
-  return { ...user, claims: user.claims.map(transformClaimData) }
-}
-
-function transformVestingData(vesting) {
-  return {
-    ...vesting,
-    startTime: toMs(vesting.startTime),
-    amount: BigInt(vesting.amount),
-    periodsClaimed: parseInt(vesting.periodsClaimed),
-    amountClaimed: BigInt(vesting.amountClaimed),
-    claims: vesting.claims?.map(transformClaimData) || null,
-  }
-}
-
-function transformClaimData(claim) {
-  return {
-    ...claim,
-    createdAt: toMs(claim.createdAt),
-    amount: BigInt(claim.amount),
-    vesting: claim.vesting ? transformVestingData(claim.vesting) : null,
-  }
+export async function computeTotalFunds(funds) {
+  if (!funds?.length) return { amount: 0, token: TOKENS.theter };
+  console.log(funds);
+  const tetherFunds = await Promise.all(funds.map((x) => convertTo(x.amount, TOKENS.theter)));
+  const amount = tetherFunds.reduce((total, x) => total + x.amount);
+  return { amount, token: TOKENS.theter };
 }

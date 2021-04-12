@@ -1,10 +1,10 @@
-import frame from './icons/Frame.png'
-import cipher from './icons/Cipher.png'
-import metamask from './icons/Metamask.png'
-import status from './icons/Status.png'
-import wallet from './icons/wallet.svg'
-import fortmatic from './icons/Fortmatic.svg'
-import portis from './icons/Portis.svg'
+import cipher from './icons/Cipher.png';
+import fortmatic from './icons/Fortmatic.svg';
+import frame from './icons/Frame.png';
+import metamask from './icons/Metamask.png';
+import portis from './icons/Portis.svg';
+import status from './icons/Status.png';
+import wallet from './icons/wallet.svg';
 
 // See the corresponding prop type, EthereumProviderType, in prop-types.js.
 const PROVIDERS = new Map(
@@ -72,43 +72,36 @@ const PROVIDERS = new Map(
         'your Ethereum provider': 'your provider',
       },
     },
-  ].map((provider) => [provider.id, provider])
-)
+  ].map((provider) => [provider.id, provider]),
+);
 
 // Get a providers object for a given ID.
 function getProvider(providerId) {
-  return PROVIDERS.get(providerId)
+  return PROVIDERS.get(providerId);
 }
 
 // Get a string that depends on the current Ethereum provider.
 // The default string is used as an identifier (à la gettext).
 function getProviderString(string, providerId = 'unknown') {
-  const provider = getProvider(providerId)
-  return (provider && provider.strings[string]) || string
+  const provider = getProvider(providerId);
+  return (provider && provider.strings[string]) || string;
 }
 
 // Get an identifier for the provider, if it can be detected.
 function identifyProvider(provider) {
   if (provider && provider.isMetaMask) {
-    return 'metamask'
+    return 'metamask';
   }
-  return 'unknown'
+  return 'unknown';
 }
 
 // Get a provider from its useWallet() identifier.
 function getProviderFromUseWalletId(id) {
   if (id === 'injected') {
-    return (
-      getProvider(identifyProvider(window.ethereum)) || getProvider('unknown')
-    )
+    return getProvider(identifyProvider(window.ethereum)) || getProvider('unknown');
   }
-  return getProvider(id) || getProvider('unknown')
+  return getProvider(id) || getProvider('unknown');
 }
 
-export {
-  getProvider,
-  identifyProvider,
-  getProviderString,
-  getProviderFromUseWalletId,
-}
-export default PROVIDERS
+export { getProvider, identifyProvider, getProviderString, getProviderFromUseWalletId };
+export default PROVIDERS;

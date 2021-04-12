@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 
 export const PartyFactory = gql`
   query PartyFactory($id: ID!) {
@@ -8,7 +8,7 @@ export const PartyFactory = gql`
       count
     }
   }
-`
+`;
 
 export const Parties = gql`
   query Parties {
@@ -49,7 +49,7 @@ export const Parties = gql`
       }
     }
   }
-`
+`;
 
 export const Party = gql`
   query Party($id: ID!) {
@@ -90,7 +90,7 @@ export const Party = gql`
       }
     }
   }
-`
+`;
 
 export const User = gql`
   query User($id: ID!) {
@@ -124,4 +124,4 @@ export const User = gql`
       }
     }
   }
-`
+`;

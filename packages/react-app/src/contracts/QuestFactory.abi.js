@@ -1,79 +1,49 @@
 module.exports = [
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "questAddress",
-        "type": "address"
+        indexed: false,
+        internalType: 'address',
+        name: 'questAddress',
+        type: 'address',
       },
       {
-        "indexed": false,
-        "internalType": "string",
-        "name": "_content",
-        "type": "string"
-      }
+        indexed: false,
+        internalType: 'string',
+        name: '_content',
+        type: 'string',
+      },
     ],
-    "name": "QuestCreated",
-    "type": "event"
+    name: 'QuestCreated',
+    type: 'event',
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "string",
-        "name": "_content",
-        "type": "string"
-      }
+        internalType: 'string',
+        name: '_content',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: '_terminationDate',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address payable',
+        name: '_aragonGovernAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address payable',
+        name: '_fallbackAddress',
+        type: 'address',
+      },
     ],
-    "name": "createQuest",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'createQuest',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
-  {
-    "inputs": [
-      {
-        "internalType": "contract Quest",
-        "name": "quest",
-        "type": "address"
-      }
-    ],
-    "name": "disable",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getQuests",
-    "outputs": [
-      {
-        "internalType": "contract Quest[]",
-        "name": "_quests",
-        "type": "address[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "quests",
-    "outputs": [
-      {
-        "internalType": "contract Quest",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
 ];
