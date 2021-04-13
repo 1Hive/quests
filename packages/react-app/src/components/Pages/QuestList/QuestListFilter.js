@@ -17,8 +17,8 @@ import { debounce } from '../../../utils/class-util';
 import CreateQuestModal from '../../Modals/QuestModal';
 import AmountFieldInput from '../../Shared/FieldInput/AmountFieldInput';
 import TagFieldInput from '../../Shared/FieldInput/TagFieldInput';
-import { Outset } from '../../Shared/Utils/spacer-util';
 import Separator from '../../Shared/Utils/Separator';
+import { Outset } from '../../Shared/Utils/spacer-util';
 
 // #region StyledComponent
 
@@ -98,6 +98,7 @@ export default class QuestListFilter extends React.Component {
             <TagFieldInput
               id="filterTags"
               label="Tags"
+              isEdit
               placeholder="Search"
               value={this.state.tags}
               onChange={(x) => this.setFilter({ tags: x })}
