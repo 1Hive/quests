@@ -1,9 +1,7 @@
 import { GU, Root } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { useWallet } from '../../providers/Wallet';
-import { isConnectedToProvider as isConnected } from '../../utils/web3-utils';
 import Header from './Header';
 import Layout from './Layout';
 
@@ -45,10 +43,10 @@ const ScrollViewStyled = styled.div`
 // #endregion
 
 function MainView({ children, toggleTheme, currentTheme }) {
-  const wallet = useWallet();
-  useEffect(() => {
-    if (isConnected() && !wallet.account) wallet.activate(); // Auto connect to metamask
-  }, []); // Run only once
+  // const wallet = useWallet();
+  // useEffect(() => {
+  //   if (isConnected() && !wallet.account) wallet.activate(); // Auto connect to metamask
+  // }, []); // Run only once
   return (
     <MainViewStyled currentTheme={currentTheme}>
       <HeaderWrapperStyled>
