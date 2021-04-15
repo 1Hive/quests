@@ -9,7 +9,7 @@ function getWeb3() {
   // @ts-ignore
   const web3 = new Web3(window.ethereum);
   // @ts-ignore
-  window.ethereum.enable().catch((error) => {
+  window.ethereum?.enable().catch((error) => {
     // User denied account access
     console.error(error);
   });
