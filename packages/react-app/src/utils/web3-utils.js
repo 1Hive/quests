@@ -1,7 +1,9 @@
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
+import { IS_DEV } from '../constants';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
+import { wrapError } from './errors-util';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
 
@@ -65,24 +67,29 @@ export function getNetworkName(chainId = getDefaultChain()) {
 }
 
 export function createContractAccount() {
-  return getWeb3().eth.accounts.create();
+  return getWeb3()?.eth.accounts.create();
 }
 
 export async function getCurrentAccount() {
   return new Promise((res) => {
-    getWeb3().eth.getAccounts((error, result) => {
+    getWeb3()?.eth.getAccounts((error, result) => {
       if (error) {
-        console.error(error);
-      } else {
-        res(result.length ? result[0] : null);
+        if (IS_DEV) console.error(error);
+        res(undefined);
       }
+      res(result.length ? result[0] : undefined);
     });
   });
 }
 
-export function isConnectedToProvider() {
-  return getCurrentAccount() !== null;
+export async function isConnected() {
+  try {
+    return !!(await getCurrentAccount());
+  } catch (error) {
+    return false;
+  }
 }
+
 export const addressPattern = '(0x)?[0-9a-fA-F]{40}';
 const ETH_ADDRESS_SPLIT_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
 const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
@@ -109,6 +116,10 @@ export function addressesEqualNoSum(first, second) {
 
 export async function sendTransaction(to, amount, onCompleted) {
   const from = await getCurrentAccount();
+  if (!from)
+    return Promise.reject(
+      wrapError('User account not connected when trying to send a transaction!', { to, amount }),
+    );
   return new Promise((res, rej) =>
     getWeb3()
       .eth.sendTransaction({

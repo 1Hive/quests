@@ -1,6 +1,7 @@
 import { random } from 'lodash';
 import moment from 'moment';
 import { EVENTS, QUEST_STATUS, TOKENS } from '../constants';
+import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
 import EventManager from './EventManager';
 
@@ -60,6 +61,12 @@ function retrieveQuest(address) {
 
 async function getMoreQuests(currentIndex, count, filter) {
   const currentAccount = await getCurrentAccount();
+  if (!currentAccount && (filter.foundedQuests || filter.playedQuests || filter.createdQuests)) {
+    throw wrapError(
+      'Trying to filter on current account when this account is not enabled nor connected',
+      { filter },
+    );
+  }
   return new Promise((resolve) => {
     setTimeout(() => {
       const result = {
@@ -138,6 +145,11 @@ async function saveQuest(account, meta, address = undefined) {
 
 async function fundQuest(questAddress, amount, onCompleted) {
   const currentAccount = await getCurrentAccount();
+  if (!currentAccount)
+    throw wrapError('User account not connected when trying to found a quest!', {
+      questAddress,
+      amount,
+    });
   await sendTransaction(questAddress, amount, onCompleted);
   retrieveQuest(questAddress).funds.push({
     founder: currentAccount,
@@ -148,6 +160,10 @@ async function fundQuest(questAddress, amount, onCompleted) {
 
 async function playQuest(questAddress) {
   const currentAccount = await getCurrentAccount();
+  if (!currentAccount)
+    throw wrapError('User account not connected when trying to play a quest!', {
+      questAddress,
+    });
   retrieveQuest(questAddress).players.push({
     player: currentAccount,
   });

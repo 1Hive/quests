@@ -14,6 +14,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
 import { debounce } from '../../../utils/class-util';
+import { isConnected } from '../../../utils/web3-utils';
 import CreateQuestModal from '../../Modals/QuestModal';
 import AmountFieldInput from '../../Shared/FieldInput/AmountFieldInput';
 import TagFieldInput from '../../Shared/FieldInput/TagFieldInput';
@@ -49,8 +50,13 @@ export default class QuestListFilter extends React.Component {
       createdQuests: false,
       playedQuests: false,
       foundedQuests: false,
+      isConnected: false,
     };
     this.tagRef = React.createRef();
+  }
+
+  async componentDidMount() {
+    this.setState({ isConnected: await isConnected() });
   }
 
   setFilter(filter, shouldDebounce = false) {
@@ -109,26 +115,30 @@ export default class QuestListFilter extends React.Component {
               wide
               onClick={() => this.setFilter(defaultFilter)}
             />
-            <Separator />
-            <Field label="Created quests">
-              <Switch
-                checked={this.state.createdQuests}
-                onChange={(x) => this.setFilter({ createdQuests: x })}
-              />
-            </Field>
-            <Field label="Played quests">
-              <Switch
-                checked={this.state.playedQuests}
-                onChange={(x) => this.setFilter({ playedQuests: x })}
-              />
-            </Field>
-            <Field label="Founded quests">
-              <Switch
-                checked={this.state.foundedQuests}
-                onChange={(x) => this.setFilter({ foundedQuests: x })}
-              />
-            </Field>
-            <CreateQuestModal create />
+            {this.state.isConnected && (
+              <>
+                <Separator />
+                <Field label="Created quests">
+                  <Switch
+                    checked={this.state.createdQuests}
+                    onChange={(x) => this.setFilter({ createdQuests: x })}
+                  />
+                </Field>
+                <Field label="Played quests">
+                  <Switch
+                    checked={this.state.playedQuests}
+                    onChange={(x) => this.setFilter({ playedQuests: x })}
+                  />
+                </Field>
+                <Field label="Founded quests">
+                  <Switch
+                    checked={this.state.foundedQuests}
+                    onChange={(x) => this.setFilter({ foundedQuests: x })}
+                  />
+                </Field>
+                <CreateQuestModal create />
+              </>
+            )}
           </Outset>
         </BoxStyled>
       </Outset>
