@@ -139,7 +139,7 @@ export default function Quest({
                   {!isEdit && (
                     <>
                       <Field label="Status">{isLoading ? <Skeleton /> : status.label}</Field>
-                      <Field label="Founders">{isLoading ? <Skeleton /> : funds.length}</Field>
+                      <Field label="Patrons">{isLoading ? <Skeleton /> : funds.length}</Field>
                       <Field label="Number of players">
                         {isLoading ? <Skeleton /> : players.length}
                       </Field>
