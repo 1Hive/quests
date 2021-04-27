@@ -50,7 +50,7 @@ const defaultMeta = {
   description: null,
   maxPlayers: -1,
   bounty: { amount: 0, token: TOKENS.questgold },
-  collateral: { amount: 0, token: TOKENS.questgold },
+  collateral: 0,
   tags: [],
 };
 
@@ -164,13 +164,14 @@ export default function Quest({
                     isLoading={isLoading}
                     formik={formRef}
                   />
-                  <AmountFieldInput
+                  <NumberFieldInput
                     id="collateral"
-                    label="Collateral amount"
+                    label="Collateral"
+                    onChange={handleChange}
                     isEdit={editMode}
                     value={values.collateral}
                     isLoading={isLoading}
-                    formik={formRef}
+                    suffix="%"
                   />
                   <TagFieldInput
                     id="tags"
@@ -226,14 +227,7 @@ Quest.propTypes = {
         symb: PropTypes.string,
       }),
     }),
-    collateral: PropTypes.shape({
-      amount: PropTypes.number,
-      token: PropTypes.shape({
-        address: PropTypes.string,
-        name: PropTypes.string,
-        symb: PropTypes.string,
-      }),
-    }),
+    collateral: PropTypes.number,
     description: PropTypes.string,
     maxPlayers: PropTypes.number,
     tags: PropTypes.array,
