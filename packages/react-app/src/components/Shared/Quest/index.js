@@ -47,8 +47,8 @@ const FormStyled = styled(Form)`
 const defaultMeta = {
   title: null,
   description: null,
-  bounty: { amount: 0, token: TOKENS.questgold },
-  collateral: { amount: 0, token: TOKENS.questgold },
+  bounty: { amount: 0, token: TOKENS.honey },
+  collateral: 0,
   tags: [],
 };
 
@@ -136,7 +136,7 @@ export default function Quest({
                   {!isEdit && (
                     <>
                       <Field label="Status">{isLoading ? <Skeleton /> : status.label}</Field>
-                      <Field label="Founders">{isLoading ? <Skeleton /> : funds.length}</Field>
+                      <Field label="Patrons">{isLoading ? <Skeleton /> : funds.length}</Field>
                       <Field label="Players">{isLoading ? <Skeleton /> : players.length}</Field>
                     </>
                   )}
@@ -148,13 +148,14 @@ export default function Quest({
                     isLoading={isLoading}
                     formik={formRef}
                   />
-                  <AmountFieldInput
+                  <NumberFieldInput
                     id="collateral"
-                    label="Collateral amount"
+                    label="Collateral"
+                    onChange={handleChange}
                     isEdit={editMode}
                     value={values.collateral}
                     isLoading={isLoading}
-                    formik={formRef}
+                    suffix="%"
                   />
                   <TagFieldInput
                     id="tags"
@@ -210,14 +211,7 @@ Quest.propTypes = {
         symb: PropTypes.string,
       }),
     }),
-    collateral: PropTypes.shape({
-      amount: PropTypes.number,
-      token: PropTypes.shape({
-        address: PropTypes.string,
-        name: PropTypes.string,
-        symb: PropTypes.string,
-      }),
-    }),
+    collateral: PropTypes.number,
     description: PropTypes.string,
     tags: PropTypes.array,
     title: PropTypes.string,

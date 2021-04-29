@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 export const PCT_BASE = BigInt(1e18);
 
-export const APP_TITLE = 'Honey Quest';
+export const APP_TITLE = 'Quest';
 
 // MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
 export const INFURA_ID = '460f40a260564ac4a4f4b3fffb032dad';
@@ -16,11 +16,6 @@ export const defaultTheme = 'light';
 
 // Cryptos
 export const TOKENS = {
-  questgold: {
-    name: 'Quest Gold',
-    symb: 'QGLD',
-    address: '0x3198e29D289A8586a7eEbFBE3506eb7064cF0936',
-  },
   honey: {
     name: 'Honey',
     symb: 'HNY',
