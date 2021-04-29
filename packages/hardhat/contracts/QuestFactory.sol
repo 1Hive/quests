@@ -5,9 +5,14 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract QuestFactory {
     event QuestCreated(address questAddress, string _content);
+    address payable public aragonGovernAddress;
 
-    function createQuest(string calldata _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, IERC20 _token) external {
-        Quest quest = new Quest(_content,_terminationDate,_aragonGovernAddress,_fallbackAddress, _token);
+    constructor(address payable _aragonGovernAddress){
+        aragonGovernAddress = _aragonGovernAddress;
+    }
+
+    function createQuest(string calldata _content,uint256 _terminationDate, address payable _fallbackAddress) external {
+        Quest quest = new Quest(_content,_terminationDate,aragonGovernAddress,_fallbackAddress);
         emit QuestCreated(address(quest), _content);
     }
 }
@@ -20,12 +25,11 @@ contract Quest {
     uint256 public terminationDate;
     IERC20 public token;
 
-    constructor(string memory _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress, IERC20 _token) public {
+    constructor(string memory _content,uint256 _terminationDate,address payable _aragonGovernAddress, address payable _fallbackAddress) public {
         content = _content;
         terminationDate = _terminationDate;
         aragonGovernAddress = _aragonGovernAddress;
         fallbackAddress = _fallbackAddress;
-        token = IERC20(_token);
     }
 
     function returnFunds() external payable{
@@ -47,7 +51,7 @@ contract Quest {
         if(amount > 0){
             require(token.transfer(player, amount), "Could not send tokens to the buyer");
         }else if(amount == 0) {
-            require(token.transfer(player, token.totalSupply()), "Could not send tokens to the buyer");
+            require(token.transfer(player, token.balanceOf(address(this))), "Could not send tokens to the buyer");
         }
 
         userFiles = file;
