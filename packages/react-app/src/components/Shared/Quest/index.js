@@ -13,7 +13,6 @@ import { emptyFunc } from '../../../utils/class-util';
 import FundModal from '../../Modals/FundModal';
 import PlayModal from '../../Modals/PlayModal';
 import AmountFieldInput from '../FieldInput/AmountFieldInput';
-import NumberFieldInput from '../FieldInput/NumberFieldInput';
 import TagFieldInput from '../FieldInput/TagFieldInput';
 import TextFieldInput from '../FieldInput/TextFieldInput';
 import { ChildSpacer, Outset } from '../Utils/spacer-util';
@@ -48,7 +47,6 @@ const FormStyled = styled(Form)`
 const defaultMeta = {
   title: null,
   description: null,
-  maxPlayers: -1,
   bounty: { amount: 0, token: TOKENS.honey },
   collateral: 0,
   tags: [],
@@ -76,7 +74,6 @@ export default function Quest({
         initialValues={{
           title: meta.title,
           description: meta.description,
-          maxPlayers: meta.maxPlayers,
           bounty: meta.bounty,
           collateral: meta.collateral,
           tags: meta.tags,
@@ -140,21 +137,8 @@ export default function Quest({
                     <>
                       <Field label="Status">{isLoading ? <Skeleton /> : status.label}</Field>
                       <Field label="Patrons">{isLoading ? <Skeleton /> : funds.length}</Field>
-                      <Field label="Number of players">
-                        {isLoading ? <Skeleton /> : players.length}
-                      </Field>
+                      <Field label="Players">{isLoading ? <Skeleton /> : players.length}</Field>
                     </>
-                  )}
-                  {(values.maxPlayers !== -1 || editMode) && (
-                    <NumberFieldInput
-                      id="maxPlayers"
-                      onChange={handleChange}
-                      isEdit={editMode}
-                      isLoading={isLoading}
-                      label="Max players"
-                      value={values.maxPlayers}
-                      wide
-                    />
                   )}
                   <AmountFieldInput
                     id="bounty"
@@ -229,7 +213,6 @@ Quest.propTypes = {
     }),
     collateral: PropTypes.number,
     description: PropTypes.string,
-    maxPlayers: PropTypes.number,
     tags: PropTypes.array,
     title: PropTypes.string,
   }),
