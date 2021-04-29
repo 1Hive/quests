@@ -24,7 +24,7 @@ contract Quest {
         address player,
         uint256 amount
     }
-    
+
     Claim[] public claims;
     string public userFiles;
     string public content;
@@ -50,7 +50,7 @@ contract Quest {
     }
 
     function claim(
-        string calldata file,
+        bytes file,
         address player,
         uint256 amount) external {
         require(msg.sender == aragonGovernAddress, "Error: sender not govern");    
