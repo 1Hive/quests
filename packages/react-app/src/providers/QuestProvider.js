@@ -106,7 +106,7 @@ async function getMoreQuests(currentIndex, count, filter) {
           if (filter.createdQuests && quest.creator !== currentAccount) return false;
           if (filter.playedQuests && !quest.players.find((x) => x.player === currentAccount))
             return false;
-          if (filter.foundedQuests && !quest.funds.find((x) => x.founder === currentAccount))
+          if (filter.foundedQuests && !quest.funds.find((x) => x.patron === currentAccount))
             return false;
 
           return true;
@@ -152,7 +152,7 @@ async function fundQuest(questAddress, amount, onCompleted) {
     });
   await sendTransaction(questAddress, amount, onCompleted);
   retrieveQuest(questAddress).funds.push({
-    founder: currentAccount,
+    patron: currentAccount,
     amount,
   });
   updateStorage();
