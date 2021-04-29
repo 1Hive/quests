@@ -49,7 +49,7 @@ const defaultMeta = {
   title: null,
   description: null,
   maxPlayers: -1,
-  bounty: { amount: 0, token: TOKENS.questgold },
+  bounty: { amount: 0, token: TOKENS.honey },
   collateral: 0,
   tags: [],
 };

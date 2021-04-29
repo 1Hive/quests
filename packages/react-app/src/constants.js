@@ -16,11 +16,6 @@ export const defaultTheme = 'light';
 
 // Cryptos
 export const TOKENS = {
-  questgold: {
-    name: 'Quest Gold',
-    symb: 'QGLD',
-    address: '0x3198e29D289A8586a7eEbFBE3506eb7064cF0936',
-  },
   honey: {
     name: 'Honey',
     symb: 'HNY',
