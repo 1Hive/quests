@@ -17,7 +17,8 @@ contract QuestFactory {
     }
 }
 
-contract Quest {    
+contract Quest { 
+    event QuestClaimed(bytes file,address player,uint256 amount); 
 
     struct Claim {
         bytes file,
@@ -62,7 +63,9 @@ contract Quest {
             require(token.transfer(player, token.balanceOf(address(this))), "Could not send tokens to the buyer");
         }
 
-        claims.push(Claim(file, player, amount))
+        claims.push(Claim(file, player, amount));
+
+        emit QuestClaimed(file, player, amount);
         //Send to the aragon quest stack
     }
 }
