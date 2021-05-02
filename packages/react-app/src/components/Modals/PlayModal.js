@@ -38,11 +38,12 @@ export default function PlayModal({ questAddress, onClose = emptyFunc, disabled 
         />
       }
       buttons={[
-        <FlexStyled>
+        <FlexStyled key="acceptLicense">
           <Checkbox id="license" checked={licenseChecked} onChange={setLicenseChecked} />
           <label htmlFor="license">I accept the terms</label>
         </FlexStyled>,
         <Button
+          key="confirmButton"
           icon={<GiBroadsword />}
           onClick={onPlayClick}
           label="Play"
