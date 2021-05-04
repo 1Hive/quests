@@ -13,6 +13,7 @@ import { emptyFunc } from '../../../utils/class-util';
 import FundModal from '../../Modals/FundModal';
 import PlayModal from '../../Modals/PlayModal';
 import AmountFieldInput from '../FieldInput/AmountFieldInput';
+import NumberFieldInput from '../FieldInput/NumberFieldInput';
 import TagFieldInput from '../FieldInput/TagFieldInput';
 import TextFieldInput from '../FieldInput/TextFieldInput';
 import { ChildSpacer, Outset } from '../Utils/spacer-util';

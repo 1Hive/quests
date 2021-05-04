@@ -17,6 +17,7 @@
     "react-app:test": "yarn workspace @scaffold-eth/react-app test",
     "start-all": "npm-run-all --parallel start chain deploy",
     "build": "yarn workspace @scaffold-eth/react-app build --max-old-space-size=12288",
+    "lint": "yarn workspace @scaffold-eth/react-app lint",
     "chain": "yarn workspace @scaffold-eth/hardhat chain",
     "fork": "yarn workspace @scaffold-eth/hardhat fork",
     "node": "yarn workspace @scaffold-eth/hardhat chain",
