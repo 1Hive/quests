@@ -1,10 +1,10 @@
+import { AddressZero, Contract } from 'ethers';
+import log from 'loglevel';
 import { useMemo } from 'react';
-import { Contract, AddressZero } from 'ethers';
+import merkleDistributorAbi from '../abis/MerkleDistributor.json';
+import factoryAbi from '../abis/PartyFactory.json';
 import { getNetwork } from '../networks';
 import { useWallet } from '../providers/Wallet';
-
-import factoryAbi from '../abis/PartyFactory.json';
-import merkleDistributorAbi from '../abis/MerkleDistributor.json';
 
 // account is not optional
 export function getSigner(ethersProvider, account) {
@@ -41,7 +41,7 @@ function useContract(address, ABI, withSignerIfPossible = true) {
         withSignerIfPossible && account ? account : undefined,
       );
     } catch (error) {
-      console.error('Failed to get contract', error);
+      log.error('Failed to get contract', error);
       return null;
     }
   }, [address, ABI, ethers, withSignerIfPossible, account]);
