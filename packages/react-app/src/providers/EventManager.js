@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-empty */
 
-import log from "loglevel";
+import log from 'loglevel';
 
 /**
  * EventManager - simplifies events
