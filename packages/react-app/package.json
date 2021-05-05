@@ -1,6 +1,6 @@
 {
   "proxy": "https://cors-anywhere.herokuapp.com/",
-  "name": "1hive-quests",
+  "name": "@scaffold-eth/react-app",
   "version": "0.1.0",
   "license": "MIT",
   "homepage": ".",
