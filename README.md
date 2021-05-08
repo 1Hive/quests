@@ -12,7 +12,7 @@ Deployed app : https://honeyquests-felixbbertrand.vercel.app/
 
 ## Setup & Launch
 
-1. Clone 
+1. Clone
 
    > git clone https://github.com/1Hive/quests.git
 
@@ -51,10 +51,9 @@ Deployed app : https://honeyquests-felixbbertrand.vercel.app/
 
 ### Connect
 
-#### Metamask : 
+#### Metamask :
 
 1. Select xDai chain
 2. Click Enable Button account
 3. Click on Metamask button
-4. You can now 
-
+4. You can now

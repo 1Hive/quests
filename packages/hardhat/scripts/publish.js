@@ -3,7 +3,7 @@ const chalk = require("chalk");
 const bre = require("hardhat");
 
 const publishDir = "../react-app/src/contracts";
-const graphDir = "../subgraph"
+const graphDir = "../subgraph";
 
 function publishContract(contractName) {
   console.log(
@@ -14,28 +14,28 @@ function publishContract(contractName) {
   );
   try {
     let contract = fs
-      .readFileSync(`${bre.config.paths.artifacts}/contracts/${contractName}.sol/${contractName}.json`)
+      .readFileSync(
+        `${bre.config.paths.artifacts}/contracts/${contractName}.sol/${contractName}.json`
+      )
       .toString();
     const address = fs
       .readFileSync(`${bre.config.paths.artifacts}/${contractName}.address`)
       .toString();
     contract = JSON.parse(contract);
-    let graphConfigPath = `${graphDir}/config/config.json`
-    let graphConfig
+    let graphConfigPath = `${graphDir}/config/config.json`;
+    let graphConfig;
     try {
       if (fs.existsSync(graphConfigPath)) {
-        graphConfig = fs
-          .readFileSync(graphConfigPath)
-          .toString();
+        graphConfig = fs.readFileSync(graphConfigPath).toString();
       } else {
-        graphConfig = '{}'
+        graphConfig = "{}";
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
 
-    graphConfig = JSON.parse(graphConfig)
-    graphConfig[contractName + "Address"] = address
+    graphConfig = JSON.parse(graphConfig);
+    graphConfig[contractName + "Address"] = address;
     fs.writeFileSync(
       `${publishDir}/${contractName}.address.js`,
       `module.exports = "${address}";`
@@ -49,20 +49,15 @@ function publishContract(contractName) {
       `module.exports = "${contract.bytecode}";`
     );
 
-    const folderPath = graphConfigPath.replace("/config.json", "")
+    const folderPath = graphConfigPath.replace("/config.json", "");
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath);
     }
-    fs.writeFileSync(
-      graphConfigPath,
-      JSON.stringify(graphConfig, null, 2)
-    );
+    fs.writeFileSync(graphConfigPath, JSON.stringify(graphConfig, null, 2));
     fs.writeFileSync(
       `${graphDir}/abis/${contractName}.json`,
       JSON.stringify(contract.abi, null, 2)
     );
-
-
 
     return true;
   } catch (e) {
