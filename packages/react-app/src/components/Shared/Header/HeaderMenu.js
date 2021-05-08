@@ -36,7 +36,7 @@ export default function HeaderMenu({ below }) {
           Get Honey
         </HeaderNavItemStyled>
         <HeaderNavItemStyled
-          href="https://github.com/felixbbertrand/honeyquests/wiki"
+          href="https://github.com/1Hive/quests/wiki"
           external
           color={theme.contentSecondary}
         >

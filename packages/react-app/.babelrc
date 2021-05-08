@@ -10,7 +10,10 @@
     ],
     "@babel/preset-react"
   ],
-  "plugins": [["styled-components", { "displayName": true }]],
+  "plugins": [
+    ["styled-components", { "displayName": true }],
+    "@babel/plugin-transform-react-jsx-source"
+  ],
   "env": {
     "test": {
       "presets": [

@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import { TOKENS } from '../constants';
 
 export async function convertTo(from, toToken) {
@@ -11,13 +12,13 @@ export async function convertTo(from, toToken) {
     },
   );
 
-  console.log(res);
+  log.log(res);
   return { amount: res, token: toToken };
 }
 
 export async function computeTotalFunds(funds) {
   if (!funds?.length) return { amount: 0, token: TOKENS.theter };
-  console.log(funds);
+  log.log(funds);
   const tetherFunds = await Promise.all(funds.map((x) => convertTo(x.amount, TOKENS.theter)));
   const amount = tetherFunds.reduce((total, x) => total + x.amount);
   return { amount, token: TOKENS.theter };
