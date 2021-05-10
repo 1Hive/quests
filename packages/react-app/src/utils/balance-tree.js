@@ -10,6 +10,7 @@ export default class BalanceTree {
 
   static verifyProof(index, account, amount, proof, root) {
     let pair = BalanceTree.toNode(index, account, amount);
+    // eslint-disable-next-line no-restricted-syntax
     for (const item of proof) {
       pair = MerkleTree.combinedHash(pair, item);
     }

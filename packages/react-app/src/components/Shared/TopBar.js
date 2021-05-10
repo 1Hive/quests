@@ -9,7 +9,7 @@ import Wizard from './Wizard/Wizard';
 
 const ContainerStyled = styled.div`
   display: flex;
-  algin-items: center;
+  align-items: center;
   justify-content: space-between;
   padding: ${1.5 * GU}px;
 `;
