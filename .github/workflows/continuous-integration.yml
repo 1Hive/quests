@@ -6,7 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Install Dependencies
+      - name: Lint
+        run: yarn lint
+      - name: Install
         run: yarn
       - name: Build
         run: yarn build
