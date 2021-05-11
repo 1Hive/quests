@@ -8,7 +8,7 @@ Kanban board : https://trello.com/b/34bFf1ZM/honey-quests-kanban
 
 Discord : https://discord.gg/NpW2WWEX (Quest Swarm channel)
 
-Deployed app : https://honeyquests-felixbbertrand.vercel.app/
+Deployed app : https://quests-d1u7l8p9l-1hive.vercel.app/
 
 ## Setup & Launch
 
