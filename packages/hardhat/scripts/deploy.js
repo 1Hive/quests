@@ -9,7 +9,7 @@ const main = async () => {
   console.log("\n\n 📡 Deploying...\n");
 
   const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 16 vvvv
-  const questFactoryContract = await deploy("QuestFactory");
+  const questFactoryContract = await deploy("QuestFactory", ["0x34aA3F359A9D614239015126635CE7732c18fDF3"]); //todo modify address
 
   // const exampleToken = await deploy("ExampleToken")
   // const examplePriceOracle = await deploy("ExamplePriceOracle")
