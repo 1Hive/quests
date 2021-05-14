@@ -2,5 +2,5 @@
   "editor.tabSize": 2,
   "eslint.validate": ["javascript"],
   "editor.formatOnSave": true,
-  "files.eol": "\r\n"
+  "files.eol": "\n"
 }
