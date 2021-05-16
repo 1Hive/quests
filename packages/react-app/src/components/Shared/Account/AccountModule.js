@@ -202,29 +202,24 @@ function AccountModule({ compact }) {
               transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
             }}
           >
-            {({ screen, activating, wallet }) =>
-              ({ opacity, transform }) =>
-                (
-                  <AnimatedDivStyled style={{ opacity, transform }}>
-                    {(() => {
-                      if (screen.id === 'connecting') {
-                        return (
-                          <ScreenConnecting
-                            providerId={activating}
-                            onCancel={handleCancelConnection}
-                          />
-                        );
-                      }
-                      if (screen.id === 'connected') {
-                        return <ScreenConnected onClosePopover={toggle} wallet={wallet} />;
-                      }
-                      if (screen.id === 'error') {
-                        return <ScreenError error={activationError} onBack={clearError} />;
-                      }
-                      return <ScreenProviders onActivate={activate} />;
-                    })()}
-                  </AnimatedDivStyled>
-                )}
+            {({ screen, activating, wallet }) => ({ opacity, transform }) => (
+              <AnimatedDivStyled style={{ opacity, transform }}>
+                {(() => {
+                  if (screen.id === 'connecting') {
+                    return (
+                      <ScreenConnecting providerId={activating} onCancel={handleCancelConnection} />
+                    );
+                  }
+                  if (screen.id === 'connected') {
+                    return <ScreenConnected onClosePopover={toggle} wallet={wallet} />;
+                  }
+                  if (screen.id === 'error') {
+                    return <ScreenError error={activationError} onBack={clearError} />;
+                  }
+                  return <ScreenProviders onActivate={activate} />;
+                })()}
+              </AnimatedDivStyled>
+            )}
           </Transition>
         </div>
       </HeaderPopover>

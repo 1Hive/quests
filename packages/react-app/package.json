@@ -79,6 +79,7 @@
     "@sentry/webpack-plugin": "^1.15.1",
     "babel-eslint": "^10.1.0",
     "babel-plugin-styled-components": "^1.10.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "cross-env": "^7.0.2",
     "customize-cra": "^1.0.0",
     "eslint-config-airbnb": "^18.2.1",
