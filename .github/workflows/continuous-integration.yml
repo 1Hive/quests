@@ -1,8 +1,8 @@
 name: Continuous Integration
 on: [pull_request]
 jobs:
-  lint and build:
-    name: LintAndBuild
+  LintAndBuild:
+    name: Lint and build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
