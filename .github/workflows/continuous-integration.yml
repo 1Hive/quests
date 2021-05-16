@@ -2,11 +2,13 @@ name: Continuous Integration
 on: [pull_request]
 jobs:
   buildAndTest:
-    name: Build and Test
+    name: Lint and Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Install
         run: yarn
+      - name: Lint
+        run: yarn lint
       - name: Build
         run: yarn build
