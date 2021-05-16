@@ -26,3 +26,5 @@ jobs:
           prettier: true
           auto_fix: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          git_name: autolinter
+          git_email: autolinter@1hivequest.com
