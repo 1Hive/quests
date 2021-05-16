@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
-        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
       - name: Set up Node.js
         uses: actions/setup-node@v1
@@ -27,6 +25,3 @@ jobs:
           eslint: true
           prettier: true
           auto_fix: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          git_name: autolinter
-          git_email: corantin.noll@gmail.com
