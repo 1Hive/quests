@@ -15,6 +15,7 @@
     "react-app:eject": "yarn workspace @scaffold-eth/react-app eject",
     "react-app:start": "yarn workspace @scaffold-eth/react-app start",
     "react-app:test": "yarn workspace @scaffold-eth/react-app test",
+    "format": "yarn workspace @scaffold-eth/react-app format",
     "start-all": "npm-run-all --parallel start chain deploy",
     "build": "yarn workspace @scaffold-eth/react-app build --max-old-space-size=12288",
     "lint": "yarn workspace @scaffold-eth/react-app lint",
@@ -62,9 +63,5 @@
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5"
-  },
-  "dependencies": {
-    "@ethersproject/solidity": "^5.0.9",
-    "@openzeppelin/contracts": "^4.0.0"
   }
 }

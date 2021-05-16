@@ -31,9 +31,10 @@ function useFilteredParties() {
       host: {
         items: ['All', 'You', 'Others'],
         filter: creatorFilter,
-        onChange: useCallback((index) => setCreatorFilter(index || NULL_FILTER_STATE), [
-          setCreatorFilter,
-        ]),
+        onChange: useCallback(
+          (index) => setCreatorFilter(index || NULL_FILTER_STATE),
+          [setCreatorFilter],
+        ),
       },
     },
     loading,
