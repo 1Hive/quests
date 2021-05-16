@@ -8,11 +8,5 @@ jobs:
       - uses: actions/checkout@v1
       - name: Install
         run: yarn
-      - name: Linting
-        uses: wearerequired/lint-action@v1.9.0
-        with:
-          eslint: true
-          prettier: true
-          auto_fix: true
       - name: Build
         run: yarn build
