@@ -25,4 +25,6 @@ jobs:
           eslint: true
           prettier: true
           auto_fix: true
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git_name: autolinter
+          commit_message: Auto lint fix
