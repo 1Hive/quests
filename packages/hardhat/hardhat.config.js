@@ -32,7 +32,7 @@ function mnemonic() {
 }
 
 module.exports = {
-  defaultNetwork,
+  defaultNetwork: "rinkeby",
 
   // don't forget to set your provider like:
   // REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
@@ -150,21 +150,64 @@ task("fundedwallet", "Create a wallet (pk) link and fund it with deployer?")
     //SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
     // IF NOT SEND USING LOCAL HARDHAT NODE:
     if (localDeployerMnemonic) {
-      let deployerWallet = new ethers.Wallet.fromMnemonic(localDeployerMnemonic)
-      deployerWallet = deployerWallet.connect(ethers.provider)
-      console.log("💵 Sending " + amount + " ETH to " + randomWallet.address + " using deployer account");
-      let sendresult = await deployerWallet.sendTransaction(tx)
-      console.log("\n" + url + "/pk#" + privateKey + "\n")
-      return
+      let deployerWallet = new ethers.Wallet.fromMnemonic(
+        localDeployerMnemonic
+      );
+      deployerWallet = deployerWallet.connect(ethers.provider);
+      console.log(
+        "💵 Sending " +
+        amount +
+        " ETH to " +
+        randomWallet.address +
+        " using deployer account"
+      );
+      let sendresult = await deployerWallet.sendTransaction(tx);
+      console.log("\n" + url + "/pk#" + privateKey + "\n");
+      return;
     } else {
-      console.log("💵 Sending " + amount + " ETH to " + randomWallet.address + " using local node");
-      console.log("\n" + url + "/pk#" + privateKey + "\n")
+      console.log(
+        "💵 Sending " +
+        amount +
+        " ETH to " +
+        randomWallet.address +
+        " using local node"
+      );
+      console.log("\n" + url + "/pk#" + privateKey + "\n");
       return send(ethers.provider.getSigner(), tx);
     }
 
   });
 
-
+task(
+  "generate",
+  "Create a mnemonic for builder deploys",
+  async (_, { ethers }) => {
+    const bip39 = require("bip39");
+    const hdkey = require("ethereumjs-wallet/hdkey");
+    const mnemonic = bip39.generateMnemonic();
+    if (DEBUG) console.log("mnemonic", mnemonic);
+    const seed = await bip39.mnemonicToSeed(mnemonic);
+    if (DEBUG) console.log("seed", seed);
+    const hdwallet = hdkey.fromMasterSeed(seed);
+    const wallet_hdpath = "m/44'/60'/0'/0/";
+    const account_index = 0;
+    let fullPath = wallet_hdpath + account_index;
+    if (DEBUG) console.log("fullPath", fullPath);
+    const wallet = hdwallet.derivePath(fullPath).getWallet();
+    const privateKey = "0x" + wallet._privKey.toString("hex");
+    if (DEBUG) console.log("privateKey", privateKey);
+    var EthUtil = require("ethereumjs-util");
+    const address =
+      "0x" + EthUtil.privateToAddress(wallet._privKey).toString("hex");
+    console.log(
+      "🔐 Account Generated as " +
+      address +
+      " and set as mnemonic in packages/hardhat"
+    );
+    console.log(
+      "💬 Use 'yarn run account' to get more information about the deployment account."
+    );
+  });
 task("generate", "Create a mnemonic for builder deploys", async (_, { ethers }) => {
   const bip39 = require("bip39")
   const hdkey = require('ethereumjs-wallet/hdkey');
@@ -234,9 +277,18 @@ task("mine", "Looks for a deployer account that will give leading zeros")
 
     }
 
-    console.log("⛏  Account Mined as " + address + " and set as mnemonic in packages/hardhat")
-    console.log("📜 This will create the first contract: " + chalk.magenta("0x" + contract_address));
-    console.log("💬 Use 'yarn run account' to get more information about the deployment account.")
+    console.log(
+      "⛏  Account Mined as " +
+      address +
+      " and set as mnemonic in packages/hardhat"
+    );
+    console.log(
+      "📜 This will create the first contract: " +
+      chalk.magenta("0x" + contract_address)
+    );
+    console.log(
+      "💬 Use 'yarn run account' to get more information about the deployment account."
+    );
 
     fs.writeFileSync("./" + address + "_produces" + contract_address + ".txt", mnemonic.toString())
     fs.writeFileSync("./mnemonic.txt", mnemonic.toString())
