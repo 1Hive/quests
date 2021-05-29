@@ -21,9 +21,9 @@ contract Quest {
     event QuestClaimed(bytes file,address player,uint256 amount); 
 
     struct Claim {
-        bytes file,
-        address player,
-        uint256 amount
+        bytes file;
+        address player;
+        uint256 amount;
     }
 
     Claim[] public claims;
@@ -34,7 +34,7 @@ contract Quest {
     uint256 public terminationDate;
     IERC20 public token;
 
-    constructor(string memory _content,uint256 _terminationDate,address _aragonGovernAddress, address _fallbackAddress) public {
+    constructor(string memory _content,uint256 _terminationDate,address _aragonGovernAddress, address _fallbackAddress) {
         content = _content;
         terminationDate = _terminationDate;
         aragonGovernAddress = _aragonGovernAddress;
@@ -51,7 +51,7 @@ contract Quest {
     }
 
     function claim(
-        bytes file,
+        bytes memory file,
         address player,
         uint256 amount) external {
         require(msg.sender == aragonGovernAddress, "Error: sender not govern");    
