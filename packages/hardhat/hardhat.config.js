@@ -1,6 +1,9 @@
+/* eslint-disable */
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-web3");
+require("@nomiclabs/hardhat-etherscan");
+require("dotenv").config();
 
 const fs = require("fs");
 const chalk = require("chalk");
@@ -102,13 +105,16 @@ module.exports = {
     },
   },
   solidity: {
-    version: "0.6.7",
+    version: "0.7.0",
     settings: {
       optimizer: {
         enabled: true,
         runs: 200,
       },
     },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API,
   },
 };
 

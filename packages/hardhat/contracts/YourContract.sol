@@ -1,4 +1,5 @@
-pragma solidity >=0.6.0 <0.8.0;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0;
 
 import "hardhat/console.sol";
 
@@ -7,9 +8,9 @@ import "hardhat/console.sol";
 contract YourContract {
     event SetPurpose(address sender, string purpose);
 
-    string public purpose = "🛠 Programming Unstoppable Money";
+    string public purpose = "Programming Unstoppable Money";
 
-    constructor() public {
+    constructor() {
         // what should we do on deploy?
     }
 

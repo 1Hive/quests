@@ -1,15 +1,20 @@
 /* eslint no-use-before-define: "warn" */
-const { ethers } = require("hardhat");
+const { ethers, run } = require("hardhat");
 
 const main = async () => {
+  await run("compile");
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Token = await ethers.getContractFactory("QuestFactory");
-  const token = await Token.deploy();
+  const QuestFactory = await ethers.getContractFactory("QuestFactory");
+  const questFactory = await (await QuestFactory.deploy()).deployed();
 
-  console.log("Token address:", token.address);
+  console.log("QuestFactory address:", questFactory.address);
+
+  await run("verify:verify", {
+    address: questFactory.address,
+  });
 };
 
 main()
