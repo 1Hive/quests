@@ -21,7 +21,6 @@ export default function QuestList() {
     setQuests([]);
     setIsLoading(true);
     QuestProvider.getMoreQuests(0, batchSize, filter).then((res) => {
-      console.log('Hello');
       setIsLoading(false);
       setQuests(res.data);
       setHasMore(res.hasMore);
