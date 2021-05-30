@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const WizardContext = React.createContext();
+const WizardContext = React.createContext(null);
 
 function WizardProvider({ children }) {
   const [step, setStep] = useState(0);
@@ -13,9 +13,9 @@ function WizardProvider({ children }) {
   const [data, setData] = useState(null);
   const [partyAddress, setPartyAddress] = useState('');
 
-  const onNext = useCallback(() => setStep((step) => step + 1), []);
+  const onNext = useCallback(() => setStep((_step) => _step + 1), []);
 
-  const onBack = useCallback(() => setStep((step) => Math.max(0, step - 1)), []);
+  const onBack = useCallback(() => setStep((_step) => Math.max(0, _step - 1)), []);
 
   const onTokenChange = useCallback((event) => setToken(event.target.value), []);
 
@@ -25,9 +25,9 @@ function WizardProvider({ children }) {
 
   const onUpfrontChange = useCallback((value) => setUpfront(Math.round(value * 100) / 100), []);
 
-  const onSettingsChange = useCallback((settings) => setSettings(settings), []);
+  const onSettingsChange = useCallback((_settings) => setSettings(_settings), []);
 
-  const onDataChange = useCallback((data) => setData(data), []);
+  const onDataChange = useCallback((_data) => setData(_data), []);
   const onPartyAddressChange = useCallback((address) => setPartyAddress(address), []);
 
   const resetData = useCallback(() => {

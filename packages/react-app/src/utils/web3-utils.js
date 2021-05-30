@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import { IS_DEV } from '../constants';
@@ -13,7 +14,7 @@ function getWeb3() {
   // @ts-ignore
   window.ethereum?.enable().catch((error) => {
     // User denied account access
-    console.error(error);
+    log.error(error);
   });
   return web3;
 }
@@ -56,12 +57,12 @@ export function getUseWalletConnectors() {
 }
 
 export function getNetworkName(chainId = getDefaultChain()) {
-  chainId = String(chainId);
+  const chainIdStr = String(chainId);
 
-  if (chainId === '1') return 'Mainnet';
-  if (chainId === '3') return 'Ropsten';
-  if (chainId === '4') return 'Rinkeby';
-  if (chainId === '100') return 'xDai';
+  if (chainIdStr === '1') return 'Mainnet';
+  if (chainIdStr === '3') return 'Ropsten';
+  if (chainIdStr === '4') return 'Rinkeby';
+  if (chainIdStr === '100') return 'xDai';
 
   return 'unknown';
 }
@@ -74,7 +75,7 @@ export async function getCurrentAccount() {
   return new Promise((res) => {
     getWeb3()?.eth.getAccounts((error, result) => {
       if (error) {
-        if (IS_DEV) console.error(error);
+        if (IS_DEV) log.error(error);
         res(undefined);
       }
       res(result.length ? result[0] : undefined);

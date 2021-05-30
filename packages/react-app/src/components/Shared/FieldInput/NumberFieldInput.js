@@ -16,6 +16,7 @@ export default function NumberFieldInput({
   max,
   min,
   isRequired = false,
+  suffix = '',
 }) {
   let content;
   if (isEdit)
@@ -31,7 +32,7 @@ export default function NumberFieldInput({
         isRequired={isRequired}
       />
     );
-  else content = value;
+  else content = value + suffix;
   return (
     <Field label={label} key={id}>
       {isLoading ? <Skeleton /> : content}
@@ -51,4 +52,5 @@ NumberFieldInput.propTypes = {
   placeHolder: PropTypes.string,
   value: PropTypes.number,
   wide: PropTypes.bool,
+  suffix: PropTypes.string,
 };

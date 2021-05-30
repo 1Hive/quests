@@ -27,13 +27,13 @@ function AmountFieldInput({
   isLoading = false,
   label = '',
   placeHolder = '',
-  value = { amount: 0, token: TOKENS.questgold },
+  value = { amount: 0, token: TOKENS.honey },
   onChange = emptyFunc,
   wide = false,
   formik = null,
 }) {
   if (value?.amount === undefined) value.amount = 0;
-  if (value?.token === undefined) value.token = TOKENS.questgold;
+  if (value?.token === undefined) value.token = TOKENS.honey;
   const [amount, setAmount] = useState(value.amount);
   const [token, setToken] = useState(value.token);
 

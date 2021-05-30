@@ -31,10 +31,9 @@ function generateFakeQuest(index) {
       title: `Quest #${index + 1}`,
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.',
-      maxPlayers: random(5, 20),
-      bounty: { amount: random(100, 1000), token: TOKENS.questgold },
-      collateral: { amount: random(0, 10), token: TOKENS.questgold },
-      tags: ['FrontEnd', 'Angular', 'JS', 'CoolStuf', 'Chills']
+      bounty: { amount: random(100, 1000), token: TOKENS.honey },
+      collateral: random(0, 10),
+      tags: ['FrontEnd', 'Angular', 'JS', 'CoolStuf', 'Chills', 'Spinash', 'Foo']
         .map((tag) => ({
           tag,
           rand: random() > 0,
@@ -106,7 +105,7 @@ async function getMoreQuests(currentIndex, count, filter) {
           if (filter.createdQuests && quest.creator !== currentAccount) return false;
           if (filter.playedQuests && !quest.players.find((x) => x.player === currentAccount))
             return false;
-          if (filter.foundedQuests && !quest.funds.find((x) => x.founder === currentAccount))
+          if (filter.foundedQuests && !quest.funds.find((x) => x.patron === currentAccount))
             return false;
 
           return true;
@@ -152,7 +151,7 @@ async function fundQuest(questAddress, amount, onCompleted) {
     });
   await sendTransaction(questAddress, amount, onCompleted);
   retrieveQuest(questAddress).funds.push({
-    founder: currentAccount,
+    patron: currentAccount,
     amount,
   });
   updateStorage();
