@@ -5,7 +5,7 @@ import { getDefaultChain } from '../local-settings';
 import { getNetwork } from '../networks';
 import { getUseWalletConnectors } from '../utils/web3-utils';
 
-const WalletAugmentedContext = React.createContext();
+const WalletAugmentedContext = React.createContext(null);
 
 function useWalletAugmented() {
   return useContext(WalletAugmentedContext);

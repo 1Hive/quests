@@ -1,9 +1,8 @@
 import { random } from 'lodash';
 import moment from 'moment';
-import { EVENTS, QUEST_STATUS, TOKENS } from '../constants';
+import { QUEST_STATUS, TOKENS } from '../constants';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
-import EventManager from './EventManager';
 
 // #region Private
 
@@ -137,7 +136,6 @@ async function saveQuest(account, meta, address = undefined) {
   } else {
     quest.meta = meta;
   }
-  EventManager.dispatch(EVENTS.QUEST_SAVED, { isNew, address, meta });
   updateStorage();
   return quest.address;
 }

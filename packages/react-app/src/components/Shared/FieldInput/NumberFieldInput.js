@@ -1,8 +1,8 @@
 import { Field, TextInput } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { emptyFunc } from '../../../utils/class-util';
 
 export default function NumberFieldInput({
   id,
@@ -11,7 +11,7 @@ export default function NumberFieldInput({
   label = '',
   placeHolder = '',
   value = 0,
-  onChange = emptyFunc,
+  onChange = noop,
   wide = false,
   max,
   min,
