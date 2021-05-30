@@ -1,18 +1,18 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { Button, Checkbox, useToast } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
-import QuestProvider from '../../providers/QuestProvider';
-import { emptyFunc } from '../../utils/class-util';
+import QuestProvider from '../../Services/QuestService';
 import ModalBase from './ModalBase';
 
 const FlexStyled = styled.div`
   display: flex;
 `;
 
-export default function PlayModal({ questAddress, onClose = emptyFunc, disabled = false }) {
+export default function PlayModal({ questAddress, onClose = noop, disabled = false }) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
   const [licenseChecked, setLicenseChecked] = useState(false);

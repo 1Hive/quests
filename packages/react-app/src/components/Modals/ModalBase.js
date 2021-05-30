@@ -1,8 +1,8 @@
 import { GU, Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-import { emptyFunc } from '../../utils/class-util';
 import { ChildSpacer, Outset } from '../Shared/Utils/spacer-util';
 
 const ModalFooterStyled = styled.div`
@@ -30,7 +30,7 @@ export default function ModalBase({
   title = undefined,
   openButton,
   buttons = undefined,
-  onClose = emptyFunc,
+  onClose = noop,
   isOpen = false,
   css = undefined,
 }) {

@@ -1,13 +1,13 @@
 import { Button, useToast } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
-import QuestProvider from '../../providers/QuestProvider';
-import { emptyFunc } from '../../utils/class-util';
+import QuestProvider from '../../Services/QuestService';
 import AmountFieldInput from '../Shared/FieldInput/AmountFieldInput';
 import ModalBase from './ModalBase';
 
-export default function FundModal({ questAddress, onClose = emptyFunc }) {
+export default function FundModal({ questAddress, onClose = noop }) {
   const [fundAmount, setFundAmount] = useState(undefined);
   const [opened, setOpened] = useState(false);
   const toast = useToast();

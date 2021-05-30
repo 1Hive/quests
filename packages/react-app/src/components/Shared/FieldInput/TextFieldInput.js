@@ -1,8 +1,8 @@
 import { Field, TextInput } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { emptyFunc } from '../../../utils/class-util';
 
 export default function TextFieldInput({
   id,
@@ -12,26 +12,31 @@ export default function TextFieldInput({
   placeHolder = '',
   value = '',
   fontSize = '',
-  onChange = emptyFunc,
+  onChange = noop,
   wide = false,
   multiline = false,
   css = undefined,
 }) {
-  let content;
-  if (isEdit)
-    content = (
-      <TextInput
-        id={id}
-        value={value ?? ''}
-        wide={wide}
-        onChange={onChange}
-        placeHolder={placeHolder}
-        multiline={multiline}
-        style={css}
-      />
+  if (isLoading)
+    return (
+      <Field label={label} key={id}>
+        <Skeleton />
+      </Field>
     );
-  else content = <span style={{ fontSize }}>{value}</span>;
-  const loadableContent = isLoading ? <Skeleton /> : content;
+
+  const loadableContent = isEdit ? (
+    <TextInput
+      id={id}
+      value={value ?? ''}
+      wide={wide}
+      onChange={onChange}
+      placeHolder={placeHolder}
+      multiline={multiline}
+      style={css}
+    />
+  ) : (
+    <span style={{ fontSize }}>{value}</span>
+  );
   return label ? (
     <Field label={label} key={id}>
       {loadableContent}

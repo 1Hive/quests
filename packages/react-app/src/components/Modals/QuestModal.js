@@ -1,11 +1,11 @@
 import { Button, IconPlus } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
+import { noop } from 'lodash-es';
 import React, { useState } from 'react';
-import { emptyFunc } from '../../utils/class-util';
 import Quest from '../Shared/Quest';
 import ModalBase from './ModalBase';
 
-export default function QuestModal({ onClose = emptyFunc, create = false }) {
+export default function QuestModal({ onClose = noop, create = false }) {
   const [opened, setOpened] = useState(false);
   const onOpenButtonClick = () => {
     setOpened(true);

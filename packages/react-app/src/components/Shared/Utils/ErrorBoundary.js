@@ -1,4 +1,3 @@
-import { useToast } from '@1hive/1hive-ui';
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 import React from 'react';
@@ -11,11 +10,6 @@ Sentry.init({
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
   tracesSampleRate: 0,
-  beforeSend: (event) => {
-    const toast = useToast();
-    toast('Oops, Something went wrong !');
-    return event;
-  },
 });
 
 Sentry.configureScope((scope) => {
@@ -41,9 +35,9 @@ export default class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
-      const toast = useToast();
-      toast('Oops, Something went wrong !');
+      // // You can render any custom fallback UI
+      // const toast = useToast();
+      // toast('Oops, Something went wrong !');
     }
 
     return this.props.children;
