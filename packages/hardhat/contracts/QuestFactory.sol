@@ -44,16 +44,12 @@ contract Quest {
     uint256 public terminationDate;
     IERC20 public token;
 
-<<<<<<< HEAD
-    constructor(string memory _content,uint256 _terminationDate,address _aragonGovernAddress, address _fallbackAddress) {
-=======
     constructor(
         string memory _content,
         uint256 _terminationDate,
         address _aragonGovernAddress,
         address _fallbackAddress
-    ) public {
->>>>>>> 7a6b354a4a0715278445e5077106c84f813aed16
+    ) {
         content = _content;
         terminationDate = _terminationDate;
         aragonGovernAddress = _aragonGovernAddress;
