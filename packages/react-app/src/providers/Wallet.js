@@ -18,11 +18,12 @@ function WalletAugmented({ children }) {
   const { ethereum } = wallet;
 
   const ethers = useMemo(() => {
+    const network = getNetwork();
     if (!ethereum) {
-      return new EthersProviders.JsonRpcProvider(getNetwork()?.defaultEthNode);
+      return new EthersProviders.JsonRpcProvider(undefined, network.chainId);
     }
 
-    const ensRegistry = getNetwork()?.ensRegistry;
+    const ensRegistry = network?.ensRegistry;
     return new EthersProviders.Web3Provider(ethereum, {
       name: '',
       chainId: getDefaultChain(),
