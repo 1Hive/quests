@@ -24,11 +24,14 @@ const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpack
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 
 const postcssNormalize = require('postcss-normalize');
-const getClientEnvironment = require('./env');
-const modules = require('./modules');
+
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+
 const paths = require('./paths');
+const modules = require('./modules');
 
 const appPackageJson = require(paths.appPackageJson);
+const getClientEnvironment = require('./env');
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -623,6 +626,17 @@ module.exports = function (webpackEnv) {
           // The formatter is invoked directly in WebpackDevServerUtils during development
           formatter: isEnvProduction ? typescriptFormatter : undefined,
         }),
+      new SentryWebpackPlugin({
+        // sentry-cli configuration
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        org: 'example-org',
+        project: 'example-project',
+        release: process.env.SENTRY_RELEASE,
+
+        // webpack specific configuration
+        include: '.',
+        ignore: ['node_modules', 'webpack.config.js'],
+      }),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell webpack to provide empty mocks for them so importing them works.

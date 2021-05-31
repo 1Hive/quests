@@ -48,9 +48,8 @@ const FormStyled = styled(Form)`
 const defaultMeta = {
   title: null,
   description: null,
-  maxPlayers: -1,
-  bounty: { amount: 0, token: TOKENS.questgold },
-  collateral: { amount: 0, token: TOKENS.questgold },
+  bounty: { amount: 0, token: TOKENS.honey },
+  collateral: 0,
   tags: [],
 };
 
@@ -76,7 +75,6 @@ export default function Quest({
         initialValues={{
           title: meta.title,
           description: meta.description,
-          maxPlayers: meta.maxPlayers,
           bounty: meta.bounty,
           collateral: meta.collateral,
           tags: meta.tags,
@@ -139,22 +137,9 @@ export default function Quest({
                   {!isEdit && (
                     <>
                       <Field label="Status">{isLoading ? <Skeleton /> : status.label}</Field>
-                      <Field label="Founders">{isLoading ? <Skeleton /> : funds.length}</Field>
-                      <Field label="Number of players">
-                        {isLoading ? <Skeleton /> : players.length}
-                      </Field>
+                      <Field label="Patrons">{isLoading ? <Skeleton /> : funds.length}</Field>
+                      <Field label="Players">{isLoading ? <Skeleton /> : players.length}</Field>
                     </>
-                  )}
-                  {(values.maxPlayers !== -1 || editMode) && (
-                    <NumberFieldInput
-                      id="maxPlayers"
-                      onChange={handleChange}
-                      isEdit={editMode}
-                      isLoading={isLoading}
-                      label="Max players"
-                      value={values.maxPlayers}
-                      wide
-                    />
                   )}
                   <AmountFieldInput
                     id="bounty"
@@ -164,13 +149,14 @@ export default function Quest({
                     isLoading={isLoading}
                     formik={formRef}
                   />
-                  <AmountFieldInput
+                  <NumberFieldInput
                     id="collateral"
-                    label="Collateral amount"
+                    label="Collateral"
+                    onChange={handleChange}
                     isEdit={editMode}
                     value={values.collateral}
                     isLoading={isLoading}
-                    formik={formRef}
+                    suffix="%"
                   />
                   <TagFieldInput
                     id="tags"
@@ -226,16 +212,8 @@ Quest.propTypes = {
         symb: PropTypes.string,
       }),
     }),
-    collateral: PropTypes.shape({
-      amount: PropTypes.number,
-      token: PropTypes.shape({
-        address: PropTypes.string,
-        name: PropTypes.string,
-        symb: PropTypes.string,
-      }),
-    }),
+    collateral: PropTypes.number,
     description: PropTypes.string,
-    maxPlayers: PropTypes.number,
     tags: PropTypes.array,
     title: PropTypes.string,
   }),

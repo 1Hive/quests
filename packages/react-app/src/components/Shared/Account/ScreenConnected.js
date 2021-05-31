@@ -7,6 +7,7 @@ import {
   RADIUS,
   textStyle,
   useTheme,
+  // @ts-ignore
 } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
@@ -28,16 +29,19 @@ function AccountScreenConnected({ wallet }) {
 
   return (
     <div
+      // @ts-ignore
       css={`
         padding: ${2 * GU}px;
       `}
     >
       <div
+        // @ts-ignore
         css={`
           padding-top: ${2 * GU}px;
         `}
       >
         <h4
+          // @ts-ignore
           css={`
             ${textStyle('label2')};
             color: ${theme.contentSecondary};
@@ -47,6 +51,7 @@ function AccountScreenConnected({ wallet }) {
           Active Wallet
         </h4>
         <div
+          // @ts-ignore
           css={`
             display: flex;
             align-items: center;
@@ -54,6 +59,7 @@ function AccountScreenConnected({ wallet }) {
           `}
         >
           <div
+            // @ts-ignore
             css={`
               display: flex;
               align-items: center;
@@ -63,6 +69,7 @@ function AccountScreenConnected({ wallet }) {
             <img
               src={providerInfo.image}
               alt=""
+              // @ts-ignore
               css={`
                 width: ${2.5 * GU}px;
                 height: ${2.5 * GU}px;
@@ -73,6 +80,7 @@ function AccountScreenConnected({ wallet }) {
             <span>{providerInfo.id === 'unknown' ? 'Wallet' : providerInfo.name}</span>
           </div>
           <div
+            // @ts-ignore
             css={`
               display: flex;
               align-items: center;
@@ -93,8 +101,15 @@ function AccountScreenConnected({ wallet }) {
                 }
               `}
             >
-              <IdentityBadge entity={wallet.account} compact badgeOnly css="cursor: pointer" />
+              <IdentityBadge
+                // @ts-ignore
+                entity={wallet.account}
+                compact
+                badgeOnly
+                css="cursor: pointer"
+              />
               <IconCopy
+                // @ts-ignore
                 css={`
                   color: ${theme.hint};
                 `}
@@ -103,11 +118,13 @@ function AccountScreenConnected({ wallet }) {
           </div>
         </div>
         <div
+          // @ts-ignore
           css={`
             padding: ${2 * GU}px 0;
           `}
         >
           <div
+            // @ts-ignore
             css={`
               display: flex;
               align-items: center;
@@ -117,6 +134,7 @@ function AccountScreenConnected({ wallet }) {
           >
             <IconCheck size="small" />
             <span
+              // @ts-ignore
               css={`
                 margin-left: ${0.5 * GU}px;
               `}

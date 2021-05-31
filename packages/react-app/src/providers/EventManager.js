@@ -1,6 +1,9 @@
 /* eslint-disable func-names */
 /* eslint-disable no-console */
 /* eslint-disable no-empty */
+
+import log from 'loglevel';
+
 /**
  * EventManager - simplifies events
  * Src : https://dmnsgn.medium.com/singleton-pattern-in-es6-d2d021d150ae
@@ -60,7 +63,7 @@ class EventManager {
     this.cache[event.type] = event;
     try {
       if (!quiet)
-        console.log(`dispatch ${event.type}(${event.detail ? JSON.stringify(event.detail) : ''})`); // TODO : Implement Logger
+        log.log(`dispatch ${event.type}(${event.detail ? JSON.stringify(event.detail) : ''})`); // TODO : Implement Logger
     } catch (ex) {}
   }
 }

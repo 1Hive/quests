@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-/* eslint-disable consistent-return */
 /* eslint-disable no-shadow */
+// @ts-nocheck
 import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
 import styled from 'styled-components';
@@ -84,13 +85,15 @@ function AccountModule({ compact }) {
   // Don’t animate the slider until the popover has opened
   useEffect(() => {
     if (!opened) {
-      return;
+      return noop;
     }
     setAnimate(false);
     const timer = setTimeout(() => {
       setAnimate(true);
     }, 0);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [opened]);
 
   // Always show the “connecting…” screen, even if there are no delay
@@ -101,7 +104,7 @@ function AccountModule({ compact }) {
 
     if (activating) {
       setActivatingDelayed(activating);
-      return;
+      return noop;
     }
 
     const timer = setTimeout(() => {
@@ -141,12 +144,13 @@ function AccountModule({ compact }) {
     }
     setOpened(false);
     setActivationError(null);
+    return true;
   }, [screenId]);
 
   // Prevents to lose the focus on the popover when a screen leaves while an
   // element inside is focused (e.g. when clicking on the “disconnect” button).
   useEffect(() => {
-    if (popoverFocusElement.current) {
+    if (popoverFocusElement?.current) {
       popoverFocusElement.current.focus();
     }
   }, [screenId]);
@@ -198,24 +202,29 @@ function AccountModule({ compact }) {
               transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
             }}
           >
-            {({ screen, activating, wallet }) => ({ opacity, transform }) => (
-              <AnimatedDivStyled style={{ opacity, transform }}>
-                {(() => {
-                  if (screen.id === 'connecting') {
-                    return (
-                      <ScreenConnecting providerId={activating} onCancel={handleCancelConnection} />
-                    );
-                  }
-                  if (screen.id === 'connected') {
-                    return <ScreenConnected onClosePopover={toggle} wallet={wallet} />;
-                  }
-                  if (screen.id === 'error') {
-                    return <ScreenError error={activationError} onBack={clearError} />;
-                  }
-                  return <ScreenProviders onActivate={activate} />;
-                })()}
-              </AnimatedDivStyled>
-            )}
+            {({ screen, activating, wallet }) =>
+              ({ opacity, transform }) =>
+                (
+                  <AnimatedDivStyled style={{ opacity, transform }}>
+                    {(() => {
+                      if (screen.id === 'connecting') {
+                        return (
+                          <ScreenConnecting
+                            providerId={activating}
+                            onCancel={handleCancelConnection}
+                          />
+                        );
+                      }
+                      if (screen.id === 'connected') {
+                        return <ScreenConnected onClosePopover={toggle} wallet={wallet} />;
+                      }
+                      if (screen.id === 'error') {
+                        return <ScreenError error={activationError} onBack={clearError} />;
+                      }
+                      return <ScreenProviders onActivate={activate} />;
+                    })()}
+                  </AnimatedDivStyled>
+                )}
           </Transition>
         </div>
       </HeaderPopover>

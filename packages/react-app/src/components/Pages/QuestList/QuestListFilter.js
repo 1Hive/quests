@@ -38,7 +38,7 @@ const defaultFilter = {
   status: null,
   expiration: { start: null, end: null },
   tags: [],
-  bounty: { amount: 0, token: TOKENS.questgold },
+  bounty: { amount: 0, token: TOKENS.honey },
   showFull: false,
 };
 

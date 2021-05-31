@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >= 0.7.0;
+pragma solidity >=0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -11,14 +11,24 @@ contract QuestFactory {
         aragonGovernAddress = address(0x123);
     }
 
-    function createQuest(string calldata _content,uint256 _terminationDate, address _fallbackAddress) external {
-        Quest quest = new Quest(_content,_terminationDate,aragonGovernAddress,_fallbackAddress);
+    function createQuest(
+        string calldata _content,
+        uint256 _terminationDate,
+        address _fallbackAddress
+    ) external {
+        Quest quest =
+            new Quest(
+                _content,
+                _terminationDate,
+                aragonGovernAddress,
+                _fallbackAddress
+            );
         emit QuestCreated(address(quest), _content);
     }
 }
 
-contract Quest { 
-    event QuestClaimed(bytes file,address player,uint256 amount); 
+contract Quest {
+    event QuestClaimed(bytes file, address player, uint256 amount);
 
     struct Claim {
         bytes file;
@@ -34,15 +44,24 @@ contract Quest {
     uint256 public terminationDate;
     IERC20 public token;
 
+<<<<<<< HEAD
     constructor(string memory _content,uint256 _terminationDate,address _aragonGovernAddress, address _fallbackAddress) {
+=======
+    constructor(
+        string memory _content,
+        uint256 _terminationDate,
+        address _aragonGovernAddress,
+        address _fallbackAddress
+    ) public {
+>>>>>>> 7a6b354a4a0715278445e5077106c84f813aed16
         content = _content;
         terminationDate = _terminationDate;
         aragonGovernAddress = _aragonGovernAddress;
         fallbackAddress = _fallbackAddress;
     }
 
-    function returnFunds() external{
-        require(terminationDate < block.timestamp, "Quest is not expired yet.");  
+    function returnFunds() external {
+        require(terminationDate < block.timestamp, "Quest is not expired yet.");
         token.transfer(fallbackAddress, token.totalSupply());
     }
 
@@ -53,14 +72,21 @@ contract Quest {
     function claim(
         bytes memory file,
         address player,
-        uint256 amount) external {
-        require(msg.sender == aragonGovernAddress, "Error: sender not govern");    
-        require(bytes(file).length != 0, "You must join a file");  
+        uint256 amount
+    ) external {
+        require(msg.sender == aragonGovernAddress, "Error: sender not govern");
+        require(bytes(file).length != 0, "You must join a file");
 
-        if(amount > 0){
-            require(token.transfer(player, amount), "Could not send tokens to the buyer");
-        }else if(amount == 0) {
-            require(token.transfer(player, token.balanceOf(address(this))), "Could not send tokens to the buyer");
+        if (amount > 0) {
+            require(
+                token.transfer(player, amount),
+                "Could not send tokens to the buyer"
+            );
+        } else if (amount == 0) {
+            require(
+                token.transfer(player, token.balanceOf(address(this))),
+                "Could not send tokens to the buyer"
+            );
         }
 
         claims.push(Claim(file, player, amount));

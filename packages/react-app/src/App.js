@@ -1,9 +1,9 @@
-/* eslint-disable no-undef */
 import { Main } from '@1hive/1hive-ui';
 import React, { useState } from 'react';
 import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
 import MainView from './components/Shared/MainView';
+import ErrorBoundary from './components/Shared/Utils/ErrorBoundary';
 import { defaultTheme } from './constants';
 import { WalletProvider } from './providers/Wallet';
 import Routes from './Routes';
@@ -18,15 +18,17 @@ function App() {
   };
 
   return (
-    <WalletProvider>
-      <Main assetsUrl="/aragon-ui/" layout={false} scrollView={false} theme={currentTheme}>
-        <HashRouter>
-          <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
-            <Routes />
-          </MainView>
-        </HashRouter>
-      </Main>
-    </WalletProvider>
+    <ErrorBoundary>
+      <WalletProvider>
+        <Main assetsUrl="/aragon-ui/" layout={false} scrollView={false} theme={currentTheme}>
+          <HashRouter>
+            <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
+              <Routes />
+            </MainView>
+          </HashRouter>
+        </Main>
+      </WalletProvider>
+    </ErrorBoundary>
   );
 }
 export default process.env.NODE_ENV === 'development' ? hot(App) : App;
