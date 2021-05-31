@@ -11,6 +11,7 @@
   ],
   "private": true,
   "scripts": {
+    "lint": "yarn workspace @1hivequests/react-app lint",
     "react-app:build": "yarn workspace @1hivequests/react-app build --max-old-space-size=12288",
     "react-app:eject": "yarn workspace @1hivequests/react-app eject",
     "react-app:start": "yarn workspace @1hivequests/react-app start",
