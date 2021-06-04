@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.0;
 
 import "hardhat/console.sol";
@@ -9,7 +10,7 @@ contract YourContract {
 
     string public purpose = "Programming Unstoppable Money";
 
-    constructor() public {
+    constructor() {
         // what should we do on deploy?
     }
 

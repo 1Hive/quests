@@ -49,7 +49,7 @@ contract Quest {
         uint256 _terminationDate,
         address _aragonGovernAddress,
         address _fallbackAddress
-    ) public {
+    ) {
         content = _content;
         terminationDate = _terminationDate;
         aragonGovernAddress = _aragonGovernAddress;
