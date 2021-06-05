@@ -59,8 +59,15 @@ export const BREAKPOINTS = {
   72: '72',
 };
 
-export const EVENTS = {
-  QUEST_SAVED: 'QuestSaved',
+// Default values
+
+export const defaultFilter = {
+  search: '',
+  status: null,
+  expiration: { start: null, end: null },
+  tags: [],
+  bounty: { amount: 0, token: TOKENS.honey },
+  showFull: false,
 };
 
 // EXTERNAL CONTRACTS

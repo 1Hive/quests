@@ -1,12 +1,12 @@
 import { DropDown, Field, GU, TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { toNumber } from 'lodash';
+import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { TOKENS } from '../../../constants';
-import { emptyFunc } from '../../../utils/class-util';
 
 const currencyOptions = Object.values(TOKENS).map((c) => c.symb);
 
@@ -28,7 +28,7 @@ function AmountFieldInput({
   label = '',
   placeHolder = '',
   value = { amount: 0, token: TOKENS.honey },
-  onChange = emptyFunc,
+  onChange = noop,
   wide = false,
   formik = null,
 }) {

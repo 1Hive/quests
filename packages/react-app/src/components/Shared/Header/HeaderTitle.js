@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useTheme, textStyle, Link } from '@1hive/1hive-ui';
+import { useTheme, textStyle, Link, GU } from '@1hive/1hive-ui';
 import styled from 'styled-components';
 import { APP_TITLE } from '../../../constants';
 import logo from './assets/logo.svg';
@@ -15,6 +15,7 @@ const TitleLinkWrapperStyled = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
+  margin-left: ${5 * GU}px;
 `;
 
 const TitleTextStyled = styled.span`

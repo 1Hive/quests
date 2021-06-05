@@ -1,6 +1,7 @@
 /* eslint-disable react/no-children-prop */
 import { AddressField, Button, Card, Field, GU, Split } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
+import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
 import { FaEdit, FaSave } from 'react-icons/fa';
@@ -8,8 +9,7 @@ import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
-import QuestProvider from '../../../providers/QuestProvider';
-import { emptyFunc } from '../../../utils/class-util';
+import QuestProvider from '../../../Services/QuestService';
 import FundModal from '../../Modals/FundModal';
 import PlayModal from '../../Modals/PlayModal';
 import AmountFieldInput from '../FieldInput/AmountFieldInput';
@@ -62,8 +62,9 @@ export default function Quest({
   players = [],
   funds = [],
   creator = undefined,
-  onSave = emptyFunc,
+  onSave = noop,
   css,
+  onFilterChange = noop,
 }) {
   const wallet = useWallet();
   const formRef = useRef(null);
@@ -165,6 +166,7 @@ export default function Quest({
                     isLoading={isLoading}
                     value={values.tags}
                     formik={formRef}
+                    onTagClick={(tag) => onFilterChange({ tags: [tag] })}
                   />
                 </Outset>
               }
