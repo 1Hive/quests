@@ -1,15 +1,12 @@
-type Purpose @entity {
+type Quest @entity {
   id: ID!
-  sender: Sender!
-  purpose: String!
-  createdAt: BigInt!
-  transactionHash: String!
+  file: Bytes!
+  player: Bytes!
+  amount: BigInt!
 }
 
-type Sender @entity {
+type QuestFactory @entity {
   id: ID!
-  address: Bytes!
-  purposes: [Purpose!] @derivedFrom(field: "sender")
-  createdAt: BigInt!
-  purposeCount: BigInt!
+  questAddress: Bytes!
+  questMetadata: String!
 }

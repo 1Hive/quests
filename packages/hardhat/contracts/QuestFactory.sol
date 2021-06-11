@@ -7,8 +7,8 @@ contract QuestFactory {
     event QuestCreated(address questAddress, string _content);
     address public aragonGovernAddress;
 
-    constructor() {
-        aragonGovernAddress = address(0x123);
+    constructor(address _aragonGovernAddress) {
+        aragonGovernAddress = _aragonGovernAddress;
     }
 
     function createQuest(
