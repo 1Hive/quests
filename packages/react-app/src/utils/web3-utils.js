@@ -12,10 +12,12 @@ function getWeb3() {
   // @ts-ignore
   const web3 = new Web3(window.ethereum);
   // @ts-ignore
-  window.ethereum?.enable().catch((error) => {
-    // User denied account access
-    log.error(error);
-  });
+  if (!window.ethereum.isConnected()) {
+    window.ethereum?.enable().catch((error) => {
+      // User denied account access
+      log.error(error);
+    });
+  }
   return web3;
 }
 
@@ -85,7 +87,7 @@ export async function getCurrentAccount() {
 
 export async function isConnected() {
   try {
-    return !!(await getCurrentAccount());
+    return window?.ethereum?.isConnected() ?? false;
   } catch (error) {
     return false;
   }
