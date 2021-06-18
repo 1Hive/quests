@@ -1,5 +1,16 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_aragonGovernAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -19,6 +30,19 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "aragonGovernAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -31,12 +55,7 @@
         "type": "uint256"
       },
       {
-        "internalType": "address payable",
-        "name": "_aragonGovernAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address payable",
+        "internalType": "address",
         "name": "_fallbackAddress",
         "type": "address"
       }

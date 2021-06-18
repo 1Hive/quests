@@ -3,12 +3,12 @@ schema:
   file: ./src/schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: YourContract
-    network: localhost
+    name: QuestFactory
+    network: {{network}}
     source:
-      address: "{{YourContractAddress}}"
-      abi: YourContract
-      startBlock: 1
+      address: "{{contractAddress}}"
+      abi: QuestFactory
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -17,9 +17,9 @@ dataSources:
         - Purpose
         - Sender
       abis:
-        - name: YourContract
-          file: ./abis/YourContract.json
+        - name: QuestFactory
+          file: ./abis/QuestFactory.json
       eventHandlers:
-        - event: SetPurpose(address,string)
-          handler: handleSetPurpose
+        - event: QuestCreated(address,string)
+          handler: handleQuestCreate
       file: ./src/mapping.ts
