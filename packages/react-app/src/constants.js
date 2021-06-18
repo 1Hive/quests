@@ -70,6 +70,10 @@ export const defaultFilter = {
   showFull: false,
 };
 
+// SUBGRAPH
+
+export const SUBGRAPH_URI = 'https://api.thegraph.com/subgraphs/name/sunguru98/quests';
+
 // EXTERNAL CONTRACTS
 
 export const DAI_ADDRESS = '0x6b175474e89094c44da98b954eedeac495271d0f';
