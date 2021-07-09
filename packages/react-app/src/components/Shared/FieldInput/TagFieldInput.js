@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
-import QuestProvider from '../../../Services/QuestService';
+import QuestProvider from '../../../services/QuestService';
 import { Outset } from '../Utils/spacer-util';
 
 function TagFieldInput({
