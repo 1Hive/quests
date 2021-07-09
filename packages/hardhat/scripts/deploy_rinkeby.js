@@ -19,6 +19,8 @@ const main = async () => {
   await run("verify:verify", {
     address: questFactory.address,
   });
+
+  return questFactory;
 };
 
 main()
