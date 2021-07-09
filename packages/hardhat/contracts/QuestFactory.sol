@@ -6,7 +6,7 @@ import "./Quest.sol";
 
 
 contract QuestFactory {
-  
+
     address public aragonGovernAddress;
 
     event QuestCreated(address questAddress, bytes _requirements);
@@ -20,7 +20,9 @@ contract QuestFactory {
         IERC20 _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress
-    ) external {
+    ) 
+        external 
+    {
         Quest quest = new Quest(_requirements, _rewardToken, _expireTime, aragonGovernAddress, _fundsRecoveryAddress);
         emit QuestCreated(address(quest), _requirements);
     }
