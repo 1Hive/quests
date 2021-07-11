@@ -9,7 +9,7 @@ import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
-import QuestProvider from '../../../Services/QuestService';
+import QuestProvider from '../../../services/QuestService';
 import FundModal from '../../Modals/FundModal';
 import PlayModal from '../../Modals/PlayModal';
 import AmountFieldInput from '../FieldInput/AmountFieldInput';
