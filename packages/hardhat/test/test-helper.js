@@ -30,7 +30,7 @@ async function deployQuest(
 }
 
 async function deployFakeToken(initialBalance) {
-  const FakeRewardToken = await ethers.getContractFactory("FakeRewardToken");
+  const FakeRewardToken = await ethers.getContractFactory("RewardTokenMock");
   const fakeRewardToken = await FakeRewardToken.deploy(initialBalance);
   await fakeRewardToken.deployed();
   return fakeRewardToken;
