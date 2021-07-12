@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useFilterContext } from '../../../providers/FilterContext';
-import QuestProvider from '../../../Services/QuestService';
+import QuestProvider from '../../../services/QuestService';
 import Quest from '../../Shared/Quest';
 import { Outset } from '../../Shared/Utils/spacer-util';
 import QuestListFilter from './QuestListFilter';
@@ -69,7 +69,7 @@ export default function QuestList() {
           pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
           releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
           scrollableTarget="scroll-view"
-          scrollThreshold="0px"
+          scrollThreshold="50px"
         >
           <div>
             {quests.map((x) => (
