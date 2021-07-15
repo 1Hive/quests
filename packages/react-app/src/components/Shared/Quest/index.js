@@ -12,9 +12,9 @@ import { QUEST_STATUS, TOKENS } from '../../../constants';
 import QuestProvider from '../../../services/QuestService';
 import FundModal from '../../Modals/FundModal';
 import PlayModal from '../../Modals/PlayModal';
-import AmountFieldInput from '../FieldInput/AmountFieldInput';
+import { AmountFieldInputFormik } from '../FieldInput/AmountFieldInput';
 import NumberFieldInput from '../FieldInput/NumberFieldInput';
-import TagFieldInput from '../FieldInput/TagFieldInput';
+import { TagFieldInputFormik } from '../FieldInput/TagFieldInput';
 import TextFieldInput from '../FieldInput/TextFieldInput';
 import { ChildSpacer, Outset } from '../Utils/spacer-util';
 
@@ -142,7 +142,7 @@ export default function Quest({
                       <Field label="Players">{isLoading ? <Skeleton /> : players.length}</Field>
                     </>
                   )}
-                  <AmountFieldInput
+                  <AmountFieldInputFormik
                     id="bounty"
                     label="Bounty"
                     isEdit={editMode}
@@ -159,7 +159,7 @@ export default function Quest({
                     isLoading={isLoading}
                     suffix="%"
                   />
-                  <TagFieldInput
+                  <TagFieldInputFormik
                     id="tags"
                     label="Tags"
                     isEdit={editMode}

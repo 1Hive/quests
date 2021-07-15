@@ -113,4 +113,7 @@ AmountFieldInput.propTypes = {
 };
 
 // @ts-ignore
-export default connect(AmountFieldInput);
+const AmountFieldInputFormik = connect(AmountFieldInput);
+
+export default AmountFieldInput;
+export { AmountFieldInputFormik };
