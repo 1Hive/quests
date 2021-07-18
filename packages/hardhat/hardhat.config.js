@@ -4,6 +4,7 @@ require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-etherscan");
 require("dotenv").config();
+require("solidity-coverage");
 
 const fs = require("fs");
 const chalk = require("chalk");
