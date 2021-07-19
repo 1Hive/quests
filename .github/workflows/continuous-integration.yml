@@ -44,7 +44,7 @@ jobs:
       run: yarn compile
 
     - name: Run coverage
-      run: yarn test-coverage
+      run: yarn coverage
 
     - name: Upload report
       run: bash <(curl -s https://codecov.io/bash)
