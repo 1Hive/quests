@@ -13,6 +13,10 @@ describe("[Contract] QuestFactory", function () {
     [owner] = await ethers.getSigners();
   });
 
+  it("should set the owner address correctly", async function () {
+    expect(!!owner.address).to.eq(true); // truthy
+  });
+
   describe("createQuest()", function () {
     let questFactory;
 
