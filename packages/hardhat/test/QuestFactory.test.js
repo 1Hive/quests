@@ -1,30 +1,30 @@
 const { ethers } = require("hardhat");
-const { use, expect } = require("chai");
-const { solidity } = require("ethereum-waffle");
-const { deployFakeToken, deployQuestFactory } = require("./test-helper");
-
-use(solidity);
+const { expect } = require("chai");
+const {
+  deployFakeToken,
+  deployQuestFactory,
+  hashToBytes,
+} = require("./test-helper");
 
 describe("[Contract] QuestFactory", function () {
-  let ownerAddress;
+  let owner;
 
   before(async function () {
-    const [owner] = await ethers.getSigners();
-    ownerAddress = owner.address;
+    [owner] = await ethers.getSigners();
   });
 
   describe("createQuest()", function () {
     let questFactory;
 
     beforeEach(async function () {
-      questFactory = await deployQuestFactory(ownerAddress);
+      questFactory = await deployQuestFactory(owner.address);
     });
 
     it("should emit QuestCreated", async function () {
       // Arrange
-      const requirements = 0x0;
+      const requirements = hashToBytes("requirement1");
       const fakeToken = await deployFakeToken(0);
-      const expireTime = 0;
+      const expireTime = 0; // Unix Epoch 0
 
       // Act
       // Assert
@@ -33,7 +33,7 @@ describe("[Contract] QuestFactory", function () {
           requirements,
           fakeToken.address,
           expireTime,
-          ownerAddress
+          owner.address
         )
       ).to.emit(questFactory, "QuestCreated");
     });

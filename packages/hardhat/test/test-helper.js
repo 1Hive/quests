@@ -1,8 +1,12 @@
 const { ethers } = require("hardhat");
 
-const FAKE_ADDRESS = "0x0000000000000000000000000000000000000000";
+const FAKE_GOVERN_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-async function deployQuestFactory(governAddress = FAKE_ADDRESS) {
+function hashToBytes(input) {
+  return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(input));
+}
+
+async function deployQuestFactory(governAddress = FAKE_GOVERN_ADDRESS) {
   const QuestFactory = await ethers.getContractFactory("QuestFactory");
   const questFactory = await QuestFactory.deploy(governAddress);
   await questFactory.deployed();
@@ -18,7 +22,7 @@ async function deployQuest(
 ) {
   const Quest = await ethers.getContractFactory("Quest");
   const quest = await Quest.deploy(
-    requirements,
+    hashToBytes(requirements),
     rewardToken.address,
     expireTime,
     aragonGovernAddress,
@@ -36,9 +40,15 @@ async function deployFakeToken(initialBalance) {
   return fakeRewardToken;
 }
 
+function getNowAsUnixEpoch() {
+  return Math.round(new Date().getTime() / 1000) + 1000;
+}
+
 module.exports = {
-  FAKE_ADDRESS,
+  FAKE_GOVERN_ADDRESS,
   deployQuestFactory,
   deployQuest,
   deployFakeToken,
+  hashToBytes,
+  getNowAsUnixEpoch,
 };

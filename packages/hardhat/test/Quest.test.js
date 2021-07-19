@@ -1,34 +1,42 @@
 const { ethers } = require("hardhat");
-const { fail } = require("assert");
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
-const { deployFakeToken, deployQuest } = require("./test-helper");
-
-const FAKE_ADDRESS = "0x0000000000000000000000000000000000000000";
+const {
+  deployFakeToken,
+  deployQuest,
+  hashToBytes: hash,
+  getNowAsUnixEpoch,
+} = require("./test-helper");
 
 use(solidity);
 
 describe("[Contract] Quest", function () {
-  let ownerAddress;
-  let playerAddress;
+  const epoch0 = 0; // Set expireTime to Unix Epoch 0
 
-  before(async function () {
-    const [owner, player] = await ethers.getSigners();
-    ownerAddress = owner.address;
-    playerAddress = player.address;
+  let govern;
+  let player;
+  let founder;
+
+  beforeEach(async function () {
+    [govern, player, founder] = await ethers.getSigners();
   });
 
   describe("recoverUnclaimedFunds()", function () {
-    it("should empty the quest funds", async function () {
+    let rewardToken;
+    const questFunds = 1000;
+
+    beforeEach(async () => {
+      rewardToken = await deployFakeToken(questFunds);
+    });
+
+    it("should empty the quest funds and founder recover his funds", async function () {
       // Arrange
-      const questFund = 1000;
-      const rewardToken = await deployFakeToken(questFund);
       const quest = await deployQuest(
-        0x0,
+        "requirement1",
         rewardToken,
-        1, // Set expireTime to Unix Epoch 0
-        FAKE_ADDRESS,
-        ownerAddress
+        epoch0,
+        govern.address,
+        founder.address
       );
 
       // Act
@@ -36,117 +44,182 @@ describe("[Contract] Quest", function () {
 
       // Assert
       expect(await rewardToken.balanceOf(quest.address)).to.eq(0);
-      expect(await rewardToken.balanceOf(ownerAddress)).to.eq(questFund);
+      expect(await rewardToken.balanceOf(founder.address)).to.eq(questFunds);
     });
 
-    it("should throw if not expire", async function () {
+    it("should revert if not expire", async function () {
       // Arrange
-      const questFund = 1000;
-      const rewardToken = await deployFakeToken(questFund);
       const quest = await deployQuest(
-        0x0,
+        "requirement1",
         rewardToken,
-        Math.round(new Date().getTime() / 1000) + 1000, // now in unich epoch
-        FAKE_ADDRESS,
-        ownerAddress
+        getNowAsUnixEpoch(),
+        govern.address,
+        founder.address
       );
 
-      try {
-        // Act
-        await quest.recoverUnclaimedFunds();
-        // Assert
-        fail("AssertionError : Should throw because quest is not yet expired");
-      } catch (err) {
-        expect(err.message).to.contains("ERROR: Not expired");
-      }
+      // Act
+      const act = () => quest.recoverUnclaimedFunds();
+
+      // Assert
+      await expect(act()).to.be.revertedWith("ERROR: Not expired");
     });
   });
 
   describe("recoverNativeTokens()", function () {
-    it("should set the balance", async function () {
+    let rewardToken;
+    const questFund = 1000;
+
+    beforeEach(async () => {
+      rewardToken = await deployFakeToken(questFund);
+    });
+
+    xit("should empty quest funds and restore funds to founder", async function () {
       // Arrange
-      const questFund = 1000;
-      const rewardToken = await deployFakeToken(questFund);
       const quest = await deployQuest(
-        0x0,
+        "requirement1",
         rewardToken,
-        0,
-        ownerAddress,
-        ownerAddress
+        epoch0,
+        govern.address,
+        founder.address
       );
 
       // Act
       await quest.recoverNativeTokens();
 
       // Assert
-      expect(await rewardToken.balanceOf(ownerAddress)).to.eq(0);
+      expect(await rewardToken.balanceOf(quest.address)).to.eq(0);
+      expect(await rewardToken.balanceOf(founder.address)).to.eq(questFund);
     });
   });
 
   describe("claim()", function () {
-    it("should transfer amount to player", async function () {
-      // Arrange
-      const questFund = 1000;
-      const claimAmount = 500;
-      const rewardToken = await deployFakeToken(questFund);
-      const quest = await deployQuest(
-        0x0,
-        rewardToken,
-        0,
-        ownerAddress,
-        ownerAddress
-      );
+    describe("questFund is 1000", function () {
+      let rewardToken;
+      const questFunds = 1000;
 
-      // Act
-      await quest.claim(0x0, playerAddress, claimAmount);
+      beforeEach(async () => {
+        rewardToken = await deployFakeToken(questFunds);
+      });
 
-      // Assert
-      expect(await rewardToken.balanceOf(playerAddress)).to.eq(claimAmount);
-      expect(await rewardToken.balanceOf(quest.address)).to.eq(
-        questFund - claimAmount
-      );
+      it("should transfer amount to player", async function () {
+        // Arrange
+        const claimAmount = 500;
+        const quest = await deployQuest(
+          "requirement1",
+          rewardToken,
+          epoch0,
+          govern.address,
+          founder.address
+        );
+
+        // Act
+        await quest.claim(hash("evidence1"), player.address, claimAmount);
+
+        // Assert
+        expect(await rewardToken.balanceOf(player.address)).to.eq(claimAmount);
+        expect(await rewardToken.balanceOf(quest.address)).to.eq(
+          questFunds - claimAmount
+        );
+      });
+
+      it("should transfer rest of available funds to player when claimAmount is 0", async function () {
+        // Arrange
+        const claimAmount = 0; // Claim all remaining
+        const quest = await deployQuest(
+          "requirement1",
+          rewardToken,
+          epoch0,
+          govern.address,
+          founder.address
+        );
+
+        // Act
+        await quest.claim(hash("evidence1"), player.address, claimAmount);
+
+        // Assert
+        expect(await rewardToken.balanceOf(player.address)).to.eq(questFunds);
+        expect(await rewardToken.balanceOf(quest.address)).to.eq(0);
+      });
+
+      it("should emit a ClaimEvent with correct args", async function () {
+        // Arrange
+        const claimAmount = 500; // Claim all remaining
+        const evidence = hash("evidence1");
+        const quest = await deployQuest(
+          "requirement1",
+          rewardToken,
+          epoch0,
+          govern.address,
+          founder.address
+        );
+
+        // Act
+        const act = () => quest.claim(evidence, player.address, claimAmount);
+
+        // Assert
+        await expect(act())
+          .to.emit(quest, "QuestClaimed")
+          .withArgs(evidence, player.address, claimAmount);
+      });
+
+      it("should revert if the claim is greater than the quest funds", async function () {
+        // Arrange
+        const claimAmount = questFunds + 1;
+        const evidence = hash("evidence1");
+        const quest = await deployQuest(
+          "requirement1",
+          rewardToken,
+          epoch0,
+          govern.address,
+          founder.address
+        );
+
+        // Act
+        const act = () => quest.claim(evidence, player.address, claimAmount);
+
+        // Assert
+        await expect(act()).to.be.revertedWith(
+          "ERC20: transfer amount exceeds balance"
+        );
+      });
+
+      it("should revert if the there is no provided evidence", async function () {
+        // Arrange
+        const claimAmount = questFunds + 1;
+        const evidence = [];
+        const quest = await deployQuest(
+          "requirement1",
+          rewardToken,
+          epoch0,
+          govern.address,
+          founder.address
+        );
+
+        // Act
+        const act = () => quest.claim(evidence, player.address, claimAmount);
+
+        // Assert
+        await expect(act()).to.be.revertedWith("ERROR: No evidence");
+      });
     });
-    it("should transfer rest of available funds to player when claimAmount is 0", async function () {
-      // Arrange
-      const questFund = 1000;
-      const claimAmount = 0;
-      const rewardToken = await deployFakeToken(questFund);
-      const quest = await deployQuest(
-        0x0,
-        rewardToken,
-        0,
-        ownerAddress,
-        ownerAddress
-      );
 
-      // Act
-      await quest.claim(0x0, playerAddress, claimAmount);
-
-      // Assert
-      expect(await rewardToken.balanceOf(playerAddress)).to.eq(questFund);
-      expect(await rewardToken.balanceOf(quest.address)).to.eq(0);
-    });
-    it("should throw if caller is not govern", async function () {
+    it("should revert if caller is not govern", async function () {
       // Arrange
       const rewardToken = await deployFakeToken(0);
       const quest = await deployQuest(
-        0x0,
+        "requirement1",
         rewardToken,
-        0,
-        FAKE_ADDRESS, // Faking the govern address is not the current
-        ownerAddress
+        epoch0,
+        govern.address,
+        founder.address
       );
 
       // Act
+      const act = () =>
+        quest.connect(player).claim(hash("evidence1"), player.address, 0); // player claims by himself (should throw)
+
       // Assert
-      try {
-        await quest.claim(0x0, playerAddress, 0);
-        fail(
-          "AssertionError : Expect claim() throw exception when not called from govern address."
-        );
-      } catch (error) {
-        expect(error.message).to.contains("ERROR: Sender not govern");
-      }
+      await expect(act()).to.be.revertedWith("ERROR: Sender not govern");
     });
   });
 });
