@@ -94,4 +94,7 @@ TagFieldInput.propTypes = {
   }),
 };
 
-export default connect(TagFieldInput);
+const TagFieldInputFormik = connect(TagFieldInput);
+
+export default TagFieldInput;
+export { TagFieldInputFormik };
