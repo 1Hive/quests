@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
-import QuestProvider from '../../Services/QuestService';
+import QuestProvider from '../../services/QuestService';
 import AmountFieldInput from '../Shared/FieldInput/AmountFieldInput';
 import ModalBase from './ModalBase';
 
