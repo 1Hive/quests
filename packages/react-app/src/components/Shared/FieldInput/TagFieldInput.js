@@ -29,6 +29,8 @@ function TagFieldInput({
     if (!value.includes(tag)) {
       value = value.concat(tag);
       formik?.setFieldValue(id, value);
+      autoCompleteRef.current.value = null;
+      setSearchTerm(null);
       onChange(value);
     }
   };
