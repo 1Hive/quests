@@ -1,7 +1,8 @@
+// @ts-ignore
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
 const {
-  deployFakeToken,
+  deployTokenMock,
   deployQuestFactory,
   hashToBytes,
 } = require("./test-helper");
@@ -27,7 +28,7 @@ describe("[Contract] QuestFactory", function () {
     it("should emit QuestCreated", async function () {
       // Arrange
       const requirements = hashToBytes("requirement1");
-      const fakeToken = await deployFakeToken(0);
+      const fakeToken = await deployTokenMock(0);
       const expireTime = 0; // Unix Epoch 0
 
       // Act

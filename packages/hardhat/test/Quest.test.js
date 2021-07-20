@@ -1,10 +1,11 @@
+// @ts-ignore
 const { ethers } = require("hardhat");
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
 const {
-  deployFakeToken,
+  deployTokenMock,
   deployQuest,
-  hashToBytes: hash,
+  hashToBytes,
   getNowAsUnixEpoch,
 } = require("./test-helper");
 
@@ -26,7 +27,7 @@ describe("[Contract] Quest", function () {
     const questFunds = 1000;
 
     beforeEach(async () => {
-      rewardToken = await deployFakeToken(questFunds);
+      rewardToken = await deployTokenMock(questFunds);
     });
 
     it("should empty the quest funds and founder recover his funds", async function () {
@@ -65,30 +66,41 @@ describe("[Contract] Quest", function () {
     });
   });
 
-  describe("recoverNativeTokens()", function () {
-    let rewardToken;
+  xdescribe("recoverNativeTokens()", function () {
+    let token;
     const questFund = 1000;
 
     beforeEach(async () => {
-      rewardToken = await deployFakeToken(questFund);
+      token = await deployTokenMock(questFund, "ETHER", "ETH");
     });
 
-    xit("should empty quest funds and restore funds to founder", async function () {
+    it("should empty quest native tokens and restore it to founder", async function () {
       // Arrange
       const quest = await deployQuest(
         "requirement1",
-        rewardToken,
+        token,
         epoch0,
         govern.address,
         founder.address
       );
+      const funds = ethers.utils.parseEther("1.0");
+      const prov = ethers.getDefaultProvider();
+      console.log(
+        await prov.getBalance(founder.address),
+        "prov.getBalance(quest.address)"
+      );
+      await founder.sendTransaction({
+        to: "contract address",
+        value: funds,
+      });
+      expect(await prov.getBalance(quest.address)).to.eq(funds);
 
       // Act
-      await quest.recoverNativeTokens();
+      quest.recoverNativeTokens();
 
       // Assert
-      expect(await rewardToken.balanceOf(quest.address)).to.eq(0);
-      expect(await rewardToken.balanceOf(founder.address)).to.eq(questFund);
+      expect(await token.balanceOf(quest.address)).to.eq(0);
+      expect(await token.balanceOf(founder.address)).to.eq(funds);
     });
   });
 
@@ -98,7 +110,7 @@ describe("[Contract] Quest", function () {
       const questFunds = 1000;
 
       beforeEach(async () => {
-        rewardToken = await deployFakeToken(questFunds);
+        rewardToken = await deployTokenMock(questFunds);
       });
 
       it("should transfer amount to player", async function () {
@@ -113,7 +125,11 @@ describe("[Contract] Quest", function () {
         );
 
         // Act
-        await quest.claim(hash("evidence1"), player.address, claimAmount);
+        await quest.claim(
+          hashToBytes("evidence1"),
+          player.address,
+          claimAmount
+        );
 
         // Assert
         expect(await rewardToken.balanceOf(player.address)).to.eq(claimAmount);
@@ -134,7 +150,11 @@ describe("[Contract] Quest", function () {
         );
 
         // Act
-        await quest.claim(hash("evidence1"), player.address, claimAmount);
+        await quest.claim(
+          hashToBytes("evidence1"),
+          player.address,
+          claimAmount
+        );
 
         // Assert
         expect(await rewardToken.balanceOf(player.address)).to.eq(questFunds);
@@ -144,7 +164,7 @@ describe("[Contract] Quest", function () {
       it("should emit a ClaimEvent with correct args", async function () {
         // Arrange
         const claimAmount = 500; // Claim all remaining
-        const evidence = hash("evidence1");
+        const evidence = hashToBytes("evidence1");
         const quest = await deployQuest(
           "requirement1",
           rewardToken,
@@ -165,7 +185,7 @@ describe("[Contract] Quest", function () {
       it("should revert if the claim is greater than the quest funds", async function () {
         // Arrange
         const claimAmount = questFunds + 1;
-        const evidence = hash("evidence1");
+        const evidence = hashToBytes("evidence1");
         const quest = await deployQuest(
           "requirement1",
           rewardToken,
@@ -205,7 +225,7 @@ describe("[Contract] Quest", function () {
 
     it("should revert if caller is not govern", async function () {
       // Arrange
-      const rewardToken = await deployFakeToken(0);
+      const rewardToken = await deployTokenMock(0);
       const quest = await deployQuest(
         "requirement1",
         rewardToken,
@@ -216,7 +236,9 @@ describe("[Contract] Quest", function () {
 
       // Act
       const act = () =>
-        quest.connect(player).claim(hash("evidence1"), player.address, 0); // player claims by himself (should throw)
+        quest
+          .connect(player)
+          .claim(hashToBytes("evidence1"), player.address, 0); // player claims by himself (should throw)
 
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: Sender not govern");

@@ -33,9 +33,17 @@ async function deployQuest(
   return quest;
 }
 
-async function deployFakeToken(initialBalance) {
-  const FakeRewardToken = await ethers.getContractFactory("RewardTokenMock");
-  const fakeRewardToken = await FakeRewardToken.deploy(initialBalance);
+async function deployTokenMock(
+  initialBalance,
+  name = "RewardTokenMock",
+  symbol = "RTM"
+) {
+  const FakeRewardToken = await ethers.getContractFactory("TokenMock");
+  const fakeRewardToken = await FakeRewardToken.deploy(
+    initialBalance,
+    name,
+    symbol
+  );
   await fakeRewardToken.deployed();
   return fakeRewardToken;
 }
@@ -48,7 +56,7 @@ module.exports = {
   FAKE_GOVERN_ADDRESS,
   deployQuestFactory,
   deployQuest,
-  deployFakeToken,
+  deployTokenMock,
   hashToBytes,
   getNowAsUnixEpoch,
 };
