@@ -21,7 +21,7 @@
     "chain": "yarn workspace @1hivequests/hardhat chain",
     "fork": "yarn workspace @1hivequests/hardhat fork",
     "node": "yarn workspace @1hivequests/hardhat chain",
-    "test": "yarn workspace @1hivequests/hardhat test",
+    "test": "yarn workspace @1hivequests/hardhat test-coverage",
     "start": "yarn workspace @1hivequests/react-app start",
     "start:local": "yarn workspace @1hivequests/react-app start:local",
     "compile": "yarn workspace @1hivequests/hardhat compile",
