@@ -90,7 +90,7 @@ describe("[Contract] Quest", function () {
         "prov.getBalance(quest.address)"
       );
       await founder.sendTransaction({
-        to: "contract address",
+        to: quest.address,
         value: funds,
       });
       expect(await prov.getBalance(quest.address)).to.eq(funds);
