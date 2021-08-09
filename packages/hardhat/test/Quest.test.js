@@ -66,44 +66,6 @@ describe("[Contract] Quest", function () {
     });
   });
 
-  xdescribe("recoverNativeTokens()", function () {
-    let token;
-    const questFund = 1000;
-
-    beforeEach(async () => {
-      token = await deployTokenMock(questFund, "ETHER", "ETH");
-    });
-
-    it("should empty quest native tokens and restore it to founder", async function () {
-      // Arrange
-      const quest = await deployQuest(
-        "requirement1",
-        token,
-        epoch0,
-        govern.address,
-        founder.address
-      );
-      const funds = ethers.utils.parseEther("1.0");
-      const prov = ethers.getDefaultProvider();
-      console.log(
-        await prov.getBalance(founder.address),
-        "prov.getBalance(quest.address)"
-      );
-      await founder.sendTransaction({
-        to: quest.address,
-        value: funds,
-      });
-      expect(await prov.getBalance(quest.address)).to.eq(funds);
-
-      // Act
-      quest.recoverNativeTokens();
-
-      // Assert
-      expect(await token.balanceOf(quest.address)).to.eq(0);
-      expect(await token.balanceOf(founder.address)).to.eq(funds);
-    });
-  });
-
   describe("claim()", function () {
     describe("questFund is 1000", function () {
       let rewardToken;

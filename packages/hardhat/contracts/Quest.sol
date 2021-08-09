@@ -42,10 +42,6 @@ contract Quest {
         rewardToken.safeTransfer(fundsRecoveryAddress, rewardToken.balanceOf(address(this)));
     }
 
-    function recoverNativeTokens() external {
-        fundsRecoveryAddress.transfer(address(this).balance);
-    }
-
     function claim(bytes memory _evidence, address _player, uint256 _amount) external {
         require(msg.sender == aragonGovernAddress, "ERROR: Sender not govern");
         require(_evidence.length != 0, "ERROR: No evidence");
