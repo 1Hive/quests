@@ -3,9 +3,27 @@ const { ethers } = require("hardhat");
 const { expect } = require("chai");
 const {
   deployTokenMock,
-  deployQuestFactory,
   hashToBytes,
+  deployQuestFactory,
 } = require("./test-helper");
+
+// const setupTest = deployments.createFixture(
+//   // eslint-disable-next-line no-shadow
+//   async ({ deployments, getNamedAccounts, ethers }, options) => {
+//     await deployments.fixture();
+//     const { owner } = await getNamedAccounts();
+//     const QuestFactoryContract = await ethers.getContract(
+//       "QuestFactory",
+//       owner
+//     );
+//     return {
+//       owner: {
+//         address: owner,
+//         QuestFactoryContract,
+//       },
+//     };
+//   }
+// );
 
 describe("[Contract] QuestFactory", function () {
   let owner;

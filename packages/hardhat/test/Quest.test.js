@@ -1,5 +1,5 @@
 // @ts-ignore
-const { ethers } = require("hardhat");
+const { ethers, deployments } = require("hardhat");
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
 const {
@@ -27,7 +27,8 @@ describe("[Contract] Quest", function () {
     const questFunds = 1000;
 
     beforeEach(async () => {
-      rewardToken = await deployTokenMock(questFunds);
+        rewardToken = await deployTokenMock(questFunds);
+        
     });
 
     it("should empty the quest funds and founder recover his funds", async function () {
