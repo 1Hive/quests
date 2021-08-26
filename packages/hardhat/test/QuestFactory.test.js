@@ -1,29 +1,7 @@
 // @ts-ignore
-const { ethers } = require("hardhat");
+const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
-const {
-  deployTokenMock,
-  hashToBytes,
-  deployQuestFactory,
-} = require("./test-helper");
-
-// const setupTest = deployments.createFixture(
-//   // eslint-disable-next-line no-shadow
-//   async ({ deployments, getNamedAccounts, ethers }, options) => {
-//     await deployments.fixture();
-//     const { owner } = await getNamedAccounts();
-//     const QuestFactoryContract = await ethers.getContract(
-//       "QuestFactory",
-//       owner
-//     );
-//     return {
-//       owner: {
-//         address: owner,
-//         QuestFactoryContract,
-//       },
-//     };
-//   }
-// );
+const { hashToBytes } = require("./test-helper");
 
 describe("[Contract] QuestFactory", function () {
   let owner;
@@ -37,28 +15,29 @@ describe("[Contract] QuestFactory", function () {
   });
 
   describe("createQuest()", function () {
-    let questFactory;
+    let questFactoryContract;
 
     beforeEach(async function () {
-      questFactory = await deployQuestFactory(owner.address);
+      await deployments.fixture(["TokenMock", "QuestFactory"]);
+      questFactoryContract = await ethers.getContract("QuestFactory");
     });
 
     it("should emit QuestCreated", async function () {
       // Arrange
+      const tokenContract = await deployments.get("TokenMock");
       const requirements = hashToBytes("requirement1");
-      const fakeToken = await deployTokenMock(0);
       const expireTime = 0; // Unix Epoch 0
 
       // Act
       // Assert
       expect(
-        await questFactory.createQuest(
+        await questFactoryContract.createQuest(
           requirements,
-          fakeToken.address,
+          tokenContract.address,
           expireTime,
           owner.address
         )
-      ).to.emit(questFactory, "QuestCreated");
+      ).to.emit(questFactoryContract, "QuestCreated");
     });
   });
 });

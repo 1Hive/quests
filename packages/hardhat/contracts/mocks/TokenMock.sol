@@ -4,13 +4,11 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 // Example class - a mock class using delivering from ERC20
 contract TokenMock is ERC20 {
-    uint256 initialBalance;
 
-    constructor(uint256 _initialBalance,  string memory _name, string memory _symbol) ERC20(_name, _symbol) payable {
-        initialBalance = _initialBalance;
+    constructor() ERC20("TokenMock", "TKM") payable {
     }
 
-    function mint(address owner) external {
+    function mint(address owner, uint256 initialBalance) external {
         _mint(owner, initialBalance);
     }
 }

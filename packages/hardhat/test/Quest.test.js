@@ -3,7 +3,6 @@ const { ethers, deployments } = require("hardhat");
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
 const {
-  deployTokenMock,
   deployQuest,
   hashToBytes,
   getNowAsUnixEpoch,
@@ -27,8 +26,8 @@ describe("[Contract] Quest", function () {
     const questFunds = 1000;
 
     beforeEach(async () => {
-        rewardToken = await deployTokenMock(questFunds);
-        
+      await deployments.fixture(["TokenMock"]);
+      rewardToken = await ethers.getContract("TokenMock");
     });
 
     it("should empty the quest funds and founder recover his funds", async function () {
@@ -38,7 +37,8 @@ describe("[Contract] Quest", function () {
         rewardToken,
         epoch0,
         govern.address,
-        founder.address
+        founder.address,
+        questFunds
       );
 
       // Act
@@ -56,7 +56,8 @@ describe("[Contract] Quest", function () {
         rewardToken,
         getNowAsUnixEpoch(),
         govern.address,
-        founder.address
+        founder.address,
+        questFunds
       );
 
       // Act
@@ -73,7 +74,8 @@ describe("[Contract] Quest", function () {
       const questFunds = 1000;
 
       beforeEach(async () => {
-        rewardToken = await deployTokenMock(questFunds);
+        await deployments.fixture(["TokenMock"]);
+        rewardToken = await ethers.getContract("TokenMock");
       });
 
       it("should transfer amount to player", async function () {
@@ -84,7 +86,8 @@ describe("[Contract] Quest", function () {
           rewardToken,
           epoch0,
           govern.address,
-          founder.address
+          founder.address,
+          questFunds
         );
 
         // Act
@@ -109,7 +112,8 @@ describe("[Contract] Quest", function () {
           rewardToken,
           epoch0,
           govern.address,
-          founder.address
+          founder.address,
+          questFunds
         );
 
         // Act
@@ -133,7 +137,8 @@ describe("[Contract] Quest", function () {
           rewardToken,
           epoch0,
           govern.address,
-          founder.address
+          founder.address,
+          questFunds
         );
 
         // Act
@@ -154,7 +159,8 @@ describe("[Contract] Quest", function () {
           rewardToken,
           epoch0,
           govern.address,
-          founder.address
+          founder.address,
+          questFunds
         );
 
         // Act
@@ -175,7 +181,8 @@ describe("[Contract] Quest", function () {
           rewardToken,
           epoch0,
           govern.address,
-          founder.address
+          founder.address,
+          questFunds
         );
 
         // Act
@@ -188,13 +195,14 @@ describe("[Contract] Quest", function () {
 
     it("should revert if caller is not govern", async function () {
       // Arrange
-      const rewardToken = await deployTokenMock(0);
+      const rewardToken = await ethers.getContract("TokenMock");
       const quest = await deployQuest(
         "requirement1",
         rewardToken,
         epoch0,
         govern.address,
-        founder.address
+        founder.address,
+        0
       );
 
       // Act

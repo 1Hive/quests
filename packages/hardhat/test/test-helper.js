@@ -1,16 +1,7 @@
 const { ethers } = require("hardhat");
 
-const FAKE_GOVERN_ADDRESS = "0x0000000000000000000000000000000000000000";
-
 function hashToBytes(input) {
   return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(input));
-}
-
-async function deployQuestFactory(governAddress = FAKE_GOVERN_ADDRESS) {
-  const QuestFactory = await ethers.getContractFactory("QuestFactory");
-  const questFactory = await QuestFactory.deploy(governAddress);
-  await questFactory.deployed();
-  return questFactory;
 }
 
 async function deployQuest(
@@ -18,7 +9,8 @@ async function deployQuest(
   rewardToken,
   expireTime,
   aragonGovernAddress,
-  fundsRecoveryAddress
+  fundsRecoveryAddress,
+  initialBalance
 ) {
   const Quest = await ethers.getContractFactory("Quest");
   const quest = await Quest.deploy(
@@ -29,23 +21,8 @@ async function deployQuest(
     fundsRecoveryAddress
   );
   await quest.deployed();
-  await rewardToken.mint(quest.address);
+  await rewardToken.mint(quest.address, initialBalance);
   return quest;
-}
-
-async function deployTokenMock(
-  initialBalance,
-  name = "RewardTokenMock",
-  symbol = "RTM"
-) {
-  const FakeRewardToken = await ethers.getContractFactory("TokenMock");
-  const fakeRewardToken = await FakeRewardToken.deploy(
-    initialBalance,
-    name,
-    symbol
-  );
-  await fakeRewardToken.deployed();
-  return fakeRewardToken;
 }
 
 function getNowAsUnixEpoch() {
@@ -53,10 +30,7 @@ function getNowAsUnixEpoch() {
 }
 
 module.exports = {
-  FAKE_GOVERN_ADDRESS,
-  deployQuestFactory,
   deployQuest,
-  deployTokenMock,
   hashToBytes,
   getNowAsUnixEpoch,
 };
