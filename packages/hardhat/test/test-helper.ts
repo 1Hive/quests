@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat");
+import { ethers } from "hardhat";
 
 function hashToBytes(input) {
   return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(input));

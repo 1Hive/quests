@@ -4,9 +4,9 @@
 
 ## Links
 
-Kanban board : https://trello.com/b/34bFf1ZM/honey-quests-kanban
+Kanban board : https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board
 
-Discord : https://discord.gg/NpW2WWEX (Quest Swarm channel)
+Discord : 1Hive (Quest Swarm channel)
 
 Deployed app : https://quests-d1u7l8p9l-1hive.vercel.app/
 
@@ -34,7 +34,7 @@ Deployed app : https://quests-d1u7l8p9l-1hive.vercel.app/
    >
    > [new terminal]
    >
-   > yarn deploy
+   > yarn deploy:local
 
 ## Doc
 
@@ -51,9 +51,10 @@ Deployed app : https://quests-d1u7l8p9l-1hive.vercel.app/
 
 ### Connect
 
-#### Metamask :
-
 1. Select xDai chain
 2. Click Enable Button account
 3. Click on Metamask button
-4. You can now
+4. You can now :
+   1. Create a quest
+   2. Fund a quest
+   3. Play a quest

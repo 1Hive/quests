@@ -1,7 +1,6 @@
 // @ts-ignore
-const { ethers, deployments } = require("hardhat");
-const { expect } = require("chai");
-const { hashToBytes } = require("./test-helper");
+import { ethers, deployments } from "hardhat";
+import { expect } from "chai";
 
 describe("[Contract] QuestFactory", function () {
   let owner;
