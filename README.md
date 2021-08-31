@@ -1,60 +1,53 @@
-# 🌟 Quests
+## 🌟 Quests
 
-[![Continuous Integration](README.assets/badge.svg)](https://github.com/1Hive/quests/actions/workflows/continuous-integration.yml)
+[![Continuous Integration](https://github.com/1Hive/quests/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/1Hive/quests/actions/workflows/continuous-integration.yml)
 
-## Links
-
-Kanban board : https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board
-
-Discord : 1Hive (Quest Swarm channel)
-
-Deployed app : https://quests-d1u7l8p9l-1hive.vercel.app/
+Quests is a bounty board for 1Hive swarms.
 
 ## Setup & Launch
 
-1. Clone
+Clone the repository
 
-   > git clone https://github.com/1Hive/quests.git
+```sh
+git clone git@github.com:1hive/quests
+```
 
-2. Install
+Install the dependencies
 
-   > yarn install
+```sh
+yarn
+```
 
-3. a. Launch with **Rinkeby** test network
+Start the project
 
-   > yarn start
+```sh
+# Rinkeby testnet
+yarn start
+# Local chain
+yarn start:local &; yarn chain &; yarn deploy &
+```
 
-   b. Launch with local chain
+### Docs
 
-   > yarn start:local
-   >
-   > [new terminal]
-   >
-   > yarn chain
-   >
-   > [new terminal]
-   >
-   > yarn deploy:local
-
-## Doc
-
-### Anonymous features
+#### Anonymous features
 
 - Browse quests
 - Filter Quests
 
-### Account connected features
+#### Account connected features
 
 - Play quest
 - Create quest
 - Fund quest
 
-### Connect
+#### Connect
 
 1. Select xDai chain
 2. Click Enable Button account
 3. Click on Metamask button
-4. You can now :
-   1. Create a quest
-   2. Fund a quest
-   3. Play a quest
+
+### Additional Resources
+
+- [Kanban board](https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board)
+- Discord : 1Hive (Quest Swarm channel)
+- [Deployed app](https://quests-d1u7l8p9l-1hive.vercel.app/)
