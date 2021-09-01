@@ -78,7 +78,7 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: {
-        // gasPrice: mainnetGwei * 1000000000,
+        // gasPrice: mainnetGwei * 1000000000, TODO : Consider uncoment if using mainnet
         mnemonic: mnemonic(),
       },
     },
@@ -212,26 +212,13 @@ const config: HardhatUserConfig = {
     },
   },
   solidity: {
-    compilers: [
-      {
-        version: "0.8.4",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
+    version: "0.8.0",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
       },
-      {
-        version: "0.6.7",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
-      },
-    ],
+    },
   },
   ovm: {
     solcVersion: "0.7.6",
@@ -570,3 +557,5 @@ task("send", "Send ETH")
 
     return send(fromSigner, txRequest);
   });
+
+module.exports = config;

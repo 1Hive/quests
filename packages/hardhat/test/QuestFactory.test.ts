@@ -1,6 +1,10 @@
 // @ts-ignore
 import { ethers, deployments } from "hardhat";
-import { expect } from "chai";
+import { use, expect } from "chai";
+import { solidity } from "ethereum-waffle";
+import { hashToBytes } from "./test-helper";
+
+use(solidity);
 
 describe("[Contract] QuestFactory", function () {
   let owner;

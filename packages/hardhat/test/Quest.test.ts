@@ -1,12 +1,8 @@
 // @ts-ignore
-const { ethers, deployments } = require("hardhat");
-const { use, expect } = require("chai");
-const { solidity } = require("ethereum-waffle");
-const {
-  deployQuest,
-  hashToBytes,
-  getNowAsUnixEpoch,
-} = require("./test-helper");
+import { ethers, deployments } from "hardhat";
+import { use, expect } from "chai";
+import { solidity } from "ethereum-waffle";
+import { deployQuest, hashToBytes, getNowAsUnixEpoch } from "./test-helper";
 
 use(solidity);
 

@@ -1,17 +1,17 @@
 import { ethers } from "hardhat";
 
-function hashToBytes(input) {
+const hashToBytes = (input) => {
   return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(input));
-}
+};
 
-async function deployQuest(
+const deployQuest = async (
   requirements,
   rewardToken,
   expireTime,
   aragonGovernAddress,
   fundsRecoveryAddress,
   initialBalance
-) {
+) => {
   const Quest = await ethers.getContractFactory("Quest");
   const quest = await Quest.deploy(
     hashToBytes(requirements),
@@ -23,14 +23,10 @@ async function deployQuest(
   await quest.deployed();
   await rewardToken.mint(quest.address, initialBalance);
   return quest;
-}
-
-function getNowAsUnixEpoch() {
-  return Math.round(new Date().getTime() / 1000) + 1000;
-}
-
-module.exports = {
-  deployQuest,
-  hashToBytes,
-  getNowAsUnixEpoch,
 };
+
+const getNowAsUnixEpoch = () => {
+  return Math.round(new Date().getTime() / 1000) + 1000;
+};
+
+export { deployQuest, hashToBytes, getNowAsUnixEpoch };
