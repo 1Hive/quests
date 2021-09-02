@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { noop } from 'lodash-es';
 import React, { useState } from 'react';
 import Quest from '../Shared/Quest';
-import ModalBase from './ModalBase';
+import ModalBase from './ModalBase';;
 
 export default function QuestModal({ onClose = noop, create = false }) {
   const [opened, setOpened] = useState(false);
@@ -20,6 +20,7 @@ export default function QuestModal({ onClose = noop, create = false }) {
     setOpened(false);
     onClose(address);
   };
+
 
   return (
     <ModalBase

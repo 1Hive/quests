@@ -12,7 +12,7 @@ import { QUEST_STATUS, TOKENS } from '../../../constants';
 import QuestFactoryAbi from '../../../contracts/QuestFactory.abi';
 import QuestFactoryAddress from '../../../contracts/QuestFactory.address';
 import { useContract } from '../../../hooks/useContract';
-import QuestProvider from '../../../Services/QuestService';
+import QuestProvider from '../../../services/QuestService';
 import FundModal from '../../Modals/FundModal';
 import PlayModal from '../../Modals/PlayModal';
 import { AmountFieldInputFormik } from '../FieldInput/AmountFieldInput';

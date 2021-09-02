@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useFilterContext } from '../../../providers/FilterContext';
-import QuestProvider from '../../../Services/QuestService';
+import QuestProvider from '../../../services/QuestService';
 import Quest from '../../Shared/Quest';
 import { Outset } from '../../Shared/Utils/spacer-util';
 import QuestListFilter from './QuestListFilter';
