@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
-import QuestProvider from '../../services/QuestService';
+import QuestProvider from '../../Services/QuestService';
 import ModalBase from './ModalBase';
 
 const FlexStyled = styled.div`
