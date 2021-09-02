@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from 'urql';
-import { PartyFactory, Parties, Party, User } from '../queries';
+import { Parties, Party, PartyFactory, User } from '../queries';
 import { transformPartyData, transformUserData } from '../utils/data-utils';
 
 function useQuerySub(query, variables = {}, options = {}) {

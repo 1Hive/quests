@@ -1,6 +1,3 @@
-import PropTypes from 'prop-types';
-import React, { useCallback, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import {
   AddressField,
   BackButton,
@@ -11,10 +8,13 @@ import {
   textStyle,
   useTheme,
 } from '@1hive/1hive-ui';
+import PropTypes from 'prop-types';
+import React, { useCallback, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import { PCT_BASE } from '../constants';
 import { useParty } from '../hooks/useParties';
 import { durationTime } from '../utils/date-utils';
-import { PCT_BASE } from '../constants';
 
 function Party({ match }) {
   const [selectedTab, setSelectedTab] = useState(0);

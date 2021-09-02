@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import { Bar, Button, GU } from '@1hive/1hive-ui';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import Filters from './Filters';
 import { useWallet } from '../../providers/Wallet';
-import Wizard from './Wizard/Wizard';
+import Filters from './Filters';
+import Wizard from './wizard/Wizard';
 
 // #region StyledComponents
 

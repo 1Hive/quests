@@ -10,13 +10,13 @@ import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
 import QuestProvider from '../../../services/QuestService';
-import FundModal from '../../Modals/FundModal';
-import PlayModal from '../../Modals/PlayModal';
-import AmountFieldInput from '../FieldInput/AmountFieldInput';
-import NumberFieldInput from '../FieldInput/NumberFieldInput';
-import TagFieldInput from '../FieldInput/TagFieldInput';
-import TextFieldInput from '../FieldInput/TextFieldInput';
-import { ChildSpacer, Outset } from '../Utils/spacer-util';
+import FundModal from '../../modals/FundModal';
+import PlayModal from '../../modals/PlayModal';
+import AmountFieldInput from '../field-input/AmountFieldInput';
+import NumberFieldInput from '../field-input/NumberFieldInput';
+import TagFieldInput from '../field-input/TagFieldInput';
+import TextFieldInput from '../field-input/TextFieldInput';
+import { ChildSpacer, Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
 

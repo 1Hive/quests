@@ -1,7 +1,6 @@
+import { IdentityBadge as Badge } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { IdentityBadge as Badge } from '@1hive/1hive-ui';
-
 import { getNetworkType } from '../../utils/web3-utils';
 
 const IdentityBadge = React.memo(({ entity, ...props }) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import QuestList from './components/Pages/QuestList';
+import QuestList from './components/pages/quest-list';
 import FilterContextProvider from './providers/FilterContext';
 
 export default function Routes() {

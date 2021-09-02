@@ -1,7 +1,7 @@
-import React from 'react';
 import { GU, LoadingRing, useTheme } from '@1hive/1hive-ui';
-import PartyCard from '../components/Shared/PartyCard';
-import TopBar from '../components/Shared/TopBar';
+import React from 'react';
+import PartyCard from '../components/shared/PartyCard';
+import TopBar from '../components/shared/TopBar';
 import useFilteredParties from '../hooks/useFilteredParties';
 
 function Parties() {
