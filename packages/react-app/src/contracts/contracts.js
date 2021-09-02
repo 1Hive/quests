@@ -1,1 +1,1 @@
-module.exports = ['QuestFactory', 'YourContract'];
+module.exports = ['QuestFactory'];
