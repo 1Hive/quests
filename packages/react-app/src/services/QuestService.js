@@ -1,6 +1,6 @@
 import { random } from 'lodash';
 import { request } from 'graphql-request';
-import { QUEST_STATUS, SUBGRAPH_URI, TOKENS } from '../constants';
+import { ONE_WEEK_IN_MILLSECONDS, QUEST_STATUS, SUBGRAPH_URI, TOKENS } from '../constants';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
 import { QuestFactory } from '../queries';
@@ -90,26 +90,17 @@ async function getMoreQuests(currentIndex, count, filter) {
   return result;
 }
 
-async function saveQuest(account, meta, address = undefined) {
-  const isNew = !address;
-  const quest = address
-    ? fakeDb.find((x) => x.address === address)
-    : {
-        players: [],
-        status: QUEST_STATUS.draft,
-        funds: [],
-        totalFunds: { amount: 0, token: TOKENS.theter },
-        address: createContractAccount().address,
-        meta,
-        creator: account,
-      };
-  if (isNew) {
-    fakeDb.unshift(quest);
-  } else {
-    quest.meta = meta;
+async function saveQuest(questFactoryContract, account, meta) {
+  if (questFactoryContract) {
+    const ONE_WEEK = Math.round(Date.now(Date.now() + ONE_WEEK_IN_MILLSECONDS) / 1000);
+    const tx = await questFactoryContract.createQuest(JSON.stringify(meta), ONE_WEEK, account);
+    console.log('TX HASH', tx.hash);
+    const receipt = await tx.wait();
+    const questDeployedAddress = receipt?.events[0]?.args[0];
+    return questDeployedAddress;
   }
-  updateStorage();
-  return quest.address;
+
+  return null;
 }
 
 async function fundQuest(questAddress, amount, onCompleted) {

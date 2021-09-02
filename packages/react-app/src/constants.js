@@ -14,6 +14,9 @@ export const IS_DEV = process.env?.NODE_ENV === 'development';
 export const EXPECTED_NETWORKS = IS_DEV ? ['localhost'] : ['xDai'];
 export const defaultTheme = 'light';
 
+export const ONE_WEEK_IN_MILLSECONDS = 1000 * 60 * 60 * 24 * 7;
+export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
+
 // Cryptos
 export const TOKENS = {
   honey: {

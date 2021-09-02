@@ -9,6 +9,9 @@ import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
+import QuestFactoryAbi from '../../../contracts/QuestFactory.abi';
+import QuestFactoryAddress from '../../../contracts/QuestFactory.address';
+import { useContract } from '../../../hooks/useContract';
 import QuestProvider from '../../../Services/QuestService';
 import FundModal from '../../Modals/FundModal';
 import PlayModal from '../../Modals/PlayModal';
@@ -67,6 +70,7 @@ export default function Quest({
   onFilterChange = noop,
 }) {
   const wallet = useWallet();
+  const questFactoryContract = useContract(QuestFactoryAddress, QuestFactoryAbi);
   const formRef = useRef(null);
   const [editMode, setEditMode] = useState(isEdit);
   const alreadyPlayed = !!players.find((x) => x === wallet.account);
@@ -83,7 +87,9 @@ export default function Quest({
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setSubmitting(false);
-            onSave(await QuestProvider.saveQuest(wallet.account, values, address));
+            onSave(
+              await QuestProvider.saveQuest(questFactoryContract, wallet.account, values, address),
+            );
           }, 400);
         }}
       >
