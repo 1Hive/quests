@@ -25,6 +25,7 @@
     "start": "yarn workspace @1hivequests/react-app start",
     "start:local": "yarn workspace @1hivequests/react-app start:local",
     "compile": "yarn workspace @1hivequests/hardhat compile",
+    "coverage": "yarn workspace @1hivequests/hardhat test-coverage",
     "deploy": "yarn workspace @1hivequests/hardhat deploy",
     "watch": "yarn workspace @1hivequests/hardhat watch",
     "accounts": "yarn workspace @1hivequests/hardhat accounts",

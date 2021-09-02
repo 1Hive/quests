@@ -29,6 +29,8 @@ function TagFieldInput({
     if (!value.includes(tag)) {
       value = value.concat(tag);
       formik?.setFieldValue(id, value);
+      autoCompleteRef.current.value = null;
+      setSearchTerm(null);
       onChange(value);
     }
   };
@@ -92,4 +94,7 @@ TagFieldInput.propTypes = {
   }),
 };
 
-export default connect(TagFieldInput);
+const TagFieldInputFormik = connect(TagFieldInput);
+
+export default TagFieldInput;
+export { TagFieldInputFormik };

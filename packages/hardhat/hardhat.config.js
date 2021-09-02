@@ -1,6 +1,7 @@
-/* eslint-disable */
-require("@nomiclabs/hardhat-waffle");
+require("hardhat-deploy");
+require("solidity-coverage");
 require("@nomiclabs/hardhat-ethers");
+require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-etherscan");
 require("dotenv").config();
@@ -115,6 +116,18 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API,
+  },
+  namedAccounts: {
+    deployer: {
+      default: 0,
+      100: 0,
+      rinkeby: "0x84b9514E013710b9dD0811c9Fe46b837a4A0d8E0",
+    },
+    govern: {
+      default: 1,
+      100: "TODO : Add XDai Govern Address",
+      rinkeby: "0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E",
+    },
   },
 };
 
