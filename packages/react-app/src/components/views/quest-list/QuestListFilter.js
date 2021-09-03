@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import { defaultFilter, QUEST_STATUS } from '../../../constants';
 import { useFilterContext } from '../../../providers/FilterContext';
 import { isConnected } from '../../../utils/web3-utils';
-import CreateQuestModal from '../../modals2/QuestModal';
+import CreateQuestModal from '../../modals/QuestModal';
 import AmountFieldInput from '../../shared/field-input/AmountFieldInput';
 import TagFieldInput from '../../shared/field-input/TagFieldInput';
 import Separator from '../../shared/utils/Separator';
