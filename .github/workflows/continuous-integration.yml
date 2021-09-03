@@ -6,12 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Case Sensitivity Checker
+        uses: credfeto/action-case-checker@v1.1
       - name: Install
         run: yarn
       - name: Lint
         run: yarn lint
       - name: Build
         run: yarn build
+
   coverage:
     runs-on: ubuntu-latest
     steps:
