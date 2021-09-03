@@ -89,6 +89,7 @@ export async function isConnected() {
   try {
     return window?.ethereum?.isConnected() ?? false;
   } catch (error) {
+    console.error(error);
     return false;
   }
 }

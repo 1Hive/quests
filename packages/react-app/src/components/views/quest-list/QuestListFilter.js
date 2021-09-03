@@ -9,11 +9,11 @@ import {
   SearchInput,
   Switch,
 } from '@1hive/1hive-ui';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { defaultFilter, QUEST_STATUS } from '../../../constants';
 import { useFilterContext } from '../../../providers/FilterContext';
-import { isConnected } from '../../../utils/web3-utils';
+import { useWallet } from '../../../providers/Wallet';
 import CreateQuestModal from '../../modals/QuestModal';
 import AmountFieldInput from '../../shared/field-input/AmountFieldInput';
 import TagFieldInput from '../../shared/field-input/TagFieldInput';
@@ -34,14 +34,10 @@ const questStatusOptions = Object.values(QUEST_STATUS).map((x) => x.label);
 
 export default function QuestListFilter() {
   const { filter, setFilter } = useFilterContext();
-  const [connected, setConnected] = useState(false);
+  const { account } = useWallet();
   const [createdQuests, setCreatedQuests] = useState(false);
   const [playedQuests, setPlayedQuests] = useState(false);
   const [foundedQuests, setFoundedQuests] = useState(false);
-
-  useEffect(() => {
-    isConnected().then((x) => setConnected(x));
-  }, []);
 
   return (
     <Outset gu16>
@@ -93,7 +89,7 @@ export default function QuestListFilter() {
             wide
             onClick={() => setFilter(defaultFilter)}
           />
-          {connected && (
+          {account && (
             <>
               <Separator />
               <Field label="Created quests">
