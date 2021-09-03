@@ -15,7 +15,7 @@ const networks = {
     type: 'rinkeby',
     defaultEthNode: 'https://rinkeby.eth.aragon.network/',
     subgraph: 'https://thegraph.com/legacy-explorer/subgraph/sunguru98/quests',
-    factory: '0x50f36Ded366cA239Dd3a00dABD04Ddc3739E2244', // TODO : Change each time there is a new deployement
+    questFactory: '0x50f36Ded366cA239Dd3a00dABD04Ddc3739E2244', // TODO : Change each time there is a new deployement
     govern: '0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E',
   },
   xdai: {
@@ -23,7 +23,7 @@ const networks = {
     name: 'xDai',
     type: 'xdai',
     defaultEthNode: 'https://xdai.poanetwork.dev/',
-    factory: '', // TODO : When questFactory will be on xDai
+    questFactory: '', // TODO : When questFactory will be on xDai
     govern: '', // TODO : When govern will be on xDai
   },
   local: {

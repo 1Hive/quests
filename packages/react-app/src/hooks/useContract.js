@@ -2,7 +2,7 @@ import { Contract } from 'ethers';
 import log from 'loglevel';
 import { useMemo } from 'react';
 import { ADDRESS_ZERO } from '../constants';
-import ContractArtifacts from '../contracts/hardhat_contracts.json';
+import questFactoryAbi from '../contracts/QuestFactory.abi';
 import { getNetwork } from '../networks';
 import { useWallet } from '../providers/Wallet';
 
@@ -49,6 +49,5 @@ function useContract(address, ABI, withSignerIfPossible = true) {
 
 export function useFactoryContract() {
   const { factory } = getNetwork(4); // Rinkeby chaind id = 4
-  const questFactory = ContractArtifacts.contracts.QuestFactory;
-  return useContract(factory, questFactory.abi);
+  return useContract(factory, questFactoryAbi);
 }
