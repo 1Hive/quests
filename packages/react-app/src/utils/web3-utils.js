@@ -85,15 +85,6 @@ export async function getCurrentAccount() {
   });
 }
 
-export async function isConnected() {
-  try {
-    return window?.ethereum?.isConnected() ?? false;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-}
-
 export const addressPattern = '(0x)?[0-9a-fA-F]{40}';
 const ETH_ADDRESS_SPLIT_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
 const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
