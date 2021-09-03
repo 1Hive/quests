@@ -93,8 +93,8 @@ async function getMoreQuests(currentIndex, count, filter) {
 async function saveQuest(questFactoryContract, account, meta, address = null) {
   if (address) throw Error('Saveing existinng quest is nott yet implemented');
   if (questFactoryContract) {
-    const withinAWeek = Math.round(Date.now() + ONE_WEEK_IN_MILLSECONDS / 1000);
-    const tx = await questFactoryContract.createQuest(JSON.stringify(meta), withinAWeek, account);
+    const inAWeek = Math.round(Date.now() + ONE_WEEK_IN_MILLSECONDS / 1000);
+    const tx = await questFactoryContract.createQuest(JSON.stringify(meta), inAWeek, account);
     console.info('TX HASH', tx.hash);
     const receipt = await tx.wait();
     const questDeployedAddress = receipt?.events[0]?.args[0];
