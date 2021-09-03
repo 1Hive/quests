@@ -48,7 +48,7 @@ function useContract(address, ABI, withSignerIfPossible = true) {
 }
 
 export function useFactoryContract() {
-  const { factory } = getNetwork();
+  const { factory } = getNetwork(4); // Rinkeby chaind id = 4
   const questFactory = ContractArtifacts.contracts.QuestFactory;
   return useContract(factory, questFactory.abi);
 }
