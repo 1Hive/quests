@@ -9,12 +9,13 @@ import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
+import { useFactoryContract } from '../../../hooks/useContract';
 import QuestProvider from '../../../services/QuestService';
 import FundModal from '../../modals/FundModal';
 import PlayModal from '../../modals/PlayModal';
-import AmountFieldInput from '../field-input/AmountFieldInput';
+import { AmountFieldInputFormik } from '../field-input/AmountFieldInput';
 import NumberFieldInput from '../field-input/NumberFieldInput';
-import TagFieldInput from '../field-input/TagFieldInput';
+import { TagFieldInputFormik } from '../field-input/TagFieldInput';
 import TextFieldInput from '../field-input/TextFieldInput';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 
@@ -67,6 +68,7 @@ export default function Quest({
   onFilterChange = noop,
 }) {
   const wallet = useWallet();
+  const questFactoryContract = useFactoryContract();
   const formRef = useRef(null);
   const [editMode, setEditMode] = useState(isEdit);
   const alreadyPlayed = !!players.find((x) => x === wallet.account);
@@ -83,7 +85,9 @@ export default function Quest({
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setSubmitting(false);
-            onSave(await QuestProvider.saveQuest(wallet.account, values, address));
+            onSave(
+              await QuestProvider.saveQuest(questFactoryContract, wallet.account, values, address),
+            );
           }, 400);
         }}
       >
@@ -142,7 +146,7 @@ export default function Quest({
                       <Field label="Players">{isLoading ? <Skeleton /> : players.length}</Field>
                     </>
                   )}
-                  <AmountFieldInput
+                  <AmountFieldInputFormik
                     id="bounty"
                     label="Bounty"
                     isEdit={editMode}
@@ -159,7 +163,7 @@ export default function Quest({
                     isLoading={isLoading}
                     suffix="%"
                   />
-                  <TagFieldInput
+                  <TagFieldInputFormik
                     id="tags"
                     label="Tags"
                     isEdit={editMode}

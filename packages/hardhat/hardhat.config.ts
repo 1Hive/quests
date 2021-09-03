@@ -234,8 +234,8 @@ const config: HardhatUserConfig = {
     },
     govern: {
       default: 1,
-      100: "TODO : Add XDai Govern Address",
-      rinkeby: "0xc03710063b0e4435f997A0B1bbdf2680A2f07E13", // Governn address on rinkeby
+      100: 0, // TODO : Add XDai Govern Address
+      rinkeby: "0xc03710063b0e4435f997A0B1bbdf2680A2f07E13", // Govern address on rinkeby
       xdai: "", // TODO : Add address when Govern will be deployed on xDai chain
     },
   },

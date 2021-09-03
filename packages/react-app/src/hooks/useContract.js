@@ -1,8 +1,8 @@
-import { AddressZero, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import log from 'loglevel';
 import { useMemo } from 'react';
-import merkleDistributorAbi from '../abis/MerkleDistributor.json';
-import factoryAbi from '../abis/PartyFactory.json';
+import { ADDRESS_ZERO } from '../constants';
+import QuestFactoryAbi from '../contracts/QuestFactory.abi';
 import { getNetwork } from '../networks';
 import { useWallet } from '../providers/Wallet';
 
@@ -19,7 +19,7 @@ export function getProviderOrSigner(ethersProvider, account) {
 
 // account is optional
 export function getContract(address, ABI, ethersProvider, account) {
-  if (!address === AddressZero) {
+  if (!address || address === ADDRESS_ZERO) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
   }
 
@@ -49,9 +49,5 @@ function useContract(address, ABI, withSignerIfPossible = true) {
 
 export function useFactoryContract() {
   const { factory } = getNetwork();
-  return useContract(factory, factoryAbi);
-}
-
-export function useMerkleDistributorContract(merkleDistributorAddress) {
-  return useContract(merkleDistributorAddress, merkleDistributorAbi);
+  return useContract(factory, QuestFactoryAbi);
 }

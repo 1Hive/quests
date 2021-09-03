@@ -10,14 +10,17 @@ export default function QuestModal({ onClose = noop, create = false }) {
   const onOpenButtonClick = () => {
     setOpened(true);
   };
+
   const onModalClose = () => {
     setOpened(false);
     onClose();
   };
+
   const onSaveClick = (address) => {
     setOpened(false);
     onClose(address);
   };
+
   return (
     <ModalBase
       title={create ? 'Create quest' : 'Edit quest'}

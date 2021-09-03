@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { getNetworkType } from '../../utils/web3-utils';
 
+// @ts-ignore
 const IdentityBadge = React.memo(({ entity, ...props }) => {
   const networkType = getNetworkType();
 
@@ -16,6 +17,7 @@ const IdentityBadge = React.memo(({ entity, ...props }) => {
   );
 });
 
+// @ts-ignore
 IdentityBadge.propTypes = {
   entity: PropTypes.string,
 };
