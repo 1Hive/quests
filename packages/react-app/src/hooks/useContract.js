@@ -2,7 +2,7 @@ import { Contract } from 'ethers';
 import log from 'loglevel';
 import { useMemo } from 'react';
 import { ADDRESS_ZERO } from '../constants';
-import QuestFactoryAbi from '../contracts/QuestFactory.abi';
+import ContractArtifacts from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
 import { useWallet } from '../providers/Wallet';
 
@@ -49,5 +49,6 @@ function useContract(address, ABI, withSignerIfPossible = true) {
 
 export function useFactoryContract() {
   const { factory } = getNetwork();
-  return useContract(factory, QuestFactoryAbi);
+  const questFactory = ContractArtifacts.contracts.QuestFactory;
+  return useContract(factory, questFactory.abi);
 }

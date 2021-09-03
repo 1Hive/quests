@@ -1,6 +1,6 @@
-import fs from "fs";
-import chalk from "chalk";
-import hre from "hardhat";
+const fs = require("fs");
+const chalk = require("chalk");
+const hre = require("hardhat");
 
 const publishDir = "../react-app/src/contracts";
 const graphDir = "../subgraph";
@@ -65,6 +65,7 @@ function publishContract(contractName) {
 
     return true;
   } catch (e) {
+    console.error(e);
     if (e.toString().indexOf("no such file or directory") >= 0) {
       console.log(
         chalk.yellow(
@@ -78,6 +79,7 @@ function publishContract(contractName) {
       return false;
     }
   }
+  return false;
 }
 
 async function main() {

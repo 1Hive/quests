@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 const KNOWN_FORMATS = {
   onlyDate: 'DD/MM/YYYY',
@@ -26,4 +26,5 @@ function durationTime(ms) {
 
 const toMs = (seconds) => parseInt(seconds, 10) * 1000;
 
+export const ONE_WEEK_IN_MILLSECONDS = 1000 * 60 * 60 * 24 * 7;
 export { dayjs, dateFormat, durationTime, toMs };

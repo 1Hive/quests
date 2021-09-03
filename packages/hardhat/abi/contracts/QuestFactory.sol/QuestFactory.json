@@ -1,0 +1,5 @@
+[
+  "event QuestCreated(address questAddress, bytes _requirements)",
+  "function aragonGovernAddress() view returns (address)",
+  "function createQuest(bytes _requirements, address _rewardToken, uint256 _expireTime, address _fundsRecoveryAddress)"
+]

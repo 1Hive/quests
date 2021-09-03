@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-const s3FolderUpload = require("s3-folder-upload");
-const fs = require("fs");
+const s3FolderUpload = require('s3-folder-upload');
+const fs = require('fs');
 
-const directoryName = "build";
+const directoryName = 'build';
 
-const BUCKETNAME = "testbucket.xyz"; // <<---- SET YOUR BUCKET NAME AND CREATE aws.json ** see below vvvvvvvvvv
+const BUCKETNAME = 'testbucket.xyz'; // <<---- SET YOUR BUCKET NAME AND CREATE aws.json ** see below vvvvvvvvvv
 
 /*
  const invalidation = {
@@ -14,13 +14,13 @@ const BUCKETNAME = "testbucket.xyz"; // <<---- SET YOUR BUCKET NAME AND CREATE a
  */
 
 if (!BUCKETNAME) {
-  console.log("☢️   Enter a bucket name in packages/react-app/scripts/s3.js ");
+  console.log('☢️   Enter a bucket name in packages/react-app/scripts/s3.js ');
   process.exit(1);
 }
 
 let credentials = {};
 try {
-  credentials = JSON.parse(fs.readFileSync("aws.json"));
+  credentials = JSON.parse(fs.readFileSync('aws.json'));
 } catch (e) {
   console.log(e);
   console.log(
@@ -42,17 +42,17 @@ const options = {
 /// //////////
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const AWS = require("aws-sdk");
+const AWS = require('aws-sdk');
 // Load credentials and set Region from JSON file
-AWS.config.loadFromPath("./aws.json");
+AWS.config.loadFromPath('./aws.json');
 
 // Create S3 service object
-s3 = new AWS.S3({ apiVersion: "2006-03-01" });
+s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 // Create params JSON for S3.createBucket
 const bucketParams = {
   Bucket: BUCKETNAME,
-  ACL: "public-read",
+  ACL: 'public-read',
 };
 
 // Create params JSON for S3.setBucketWebsite
@@ -60,28 +60,28 @@ const staticHostParams = {
   Bucket: BUCKETNAME,
   WebsiteConfiguration: {
     ErrorDocument: {
-      Key: "index.html",
+      Key: 'index.html',
     },
     IndexDocument: {
-      Suffix: "index.html",
+      Suffix: 'index.html',
     },
   },
 };
 
 // Call S3 to create the bucket
-s3.createBucket(bucketParams, function (err, data) {
+s3.createBucket(bucketParams, (err, data) => {
   if (err) {
-    console.log("Error", err);
+    console.log('Error', err);
   } else {
-    console.log("Bucket URL is ", data.Location);
+    console.log('Bucket URL is ', data.Location);
     // Set the new policy on the newly created bucket
-    s3.putBucketWebsite(staticHostParams, function (err, data) {
+    s3.putBucketWebsite(staticHostParams, (err, data) => {
       if (err) {
         // Display error message
-        console.log("Error", err);
+        console.log('Error', err);
       } else {
         // Update the displayed policy for the selected bucket
-        console.log("Success... UPLOADING!", data);
+        console.log('Success... UPLOADING!', data);
 
         ///
         /// After the bucket is created, we upload to it:

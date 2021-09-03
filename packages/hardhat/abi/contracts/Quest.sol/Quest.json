@@ -1,0 +1,11 @@
+[
+  "event QuestClaimed(bytes evidence, address player, uint256 amount)",
+  "function aragonGovernAddress() view returns (address)",
+  "function claim(bytes _evidence, address _player, uint256 _amount)",
+  "function claims(uint256) view returns (bytes evidence, address player, uint256 amount)",
+  "function expireTime() view returns (uint256)",
+  "function fundsRecoveryAddress() view returns (address)",
+  "function recoverUnclaimedFunds()",
+  "function requirements() view returns (bytes)",
+  "function rewardToken() view returns (address)"
+]
