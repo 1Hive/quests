@@ -16,6 +16,7 @@ jobs:
         run: yarn build
 
   coverage:
+    name: Contract coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
