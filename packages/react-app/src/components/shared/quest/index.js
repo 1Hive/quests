@@ -9,14 +9,15 @@ import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { QUEST_STATUS, TOKENS } from '../../../constants';
+import { useFactoryContract } from '../../../hooks/useContract';
 import QuestProvider from '../../../services/QuestService';
-import FundModal from '../../Modals/FundModal';
-import PlayModal from '../../Modals/PlayModal';
-import { AmountFieldInputFormik } from '../FieldInput/AmountFieldInput';
-import NumberFieldInput from '../FieldInput/NumberFieldInput';
-import { TagFieldInputFormik } from '../FieldInput/TagFieldInput';
-import TextFieldInput from '../FieldInput/TextFieldInput';
-import { ChildSpacer, Outset } from '../Utils/spacer-util';
+import FundModal from '../../modals/FundModal';
+import PlayModal from '../../modals/PlayModal';
+import { AmountFieldInputFormik } from '../field-input/AmountFieldInput';
+import NumberFieldInput from '../field-input/NumberFieldInput';
+import { TagFieldInputFormik } from '../field-input/TagFieldInput';
+import TextFieldInput from '../field-input/TextFieldInput';
+import { ChildSpacer, Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
 
@@ -67,6 +68,7 @@ export default function Quest({
   onFilterChange = noop,
 }) {
   const wallet = useWallet();
+  const questFactoryContract = useFactoryContract();
   const formRef = useRef(null);
   const [editMode, setEditMode] = useState(isEdit);
   const alreadyPlayed = !!players.find((x) => x === wallet.account);
@@ -83,7 +85,9 @@ export default function Quest({
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setSubmitting(false);
-            onSave(await QuestProvider.saveQuest(wallet.account, values, address));
+            onSave(
+              await QuestProvider.saveQuest(questFactoryContract, wallet.account, values, address),
+            );
           }, 400);
         }}
       >

@@ -1,6 +1,7 @@
+import { request } from 'graphql-request';
 import { random } from 'lodash';
-import moment from 'moment';
-import { QUEST_STATUS, TOKENS } from '../constants';
+import { ONE_WEEK_IN_MILLSECONDS, QUEST_STATUS, SUBGRAPH_URI, TOKENS } from '../constants';
+import { QuestFactory } from '../queries';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
 
@@ -53,6 +54,16 @@ function retrieveQuest(address) {
   return quest;
 }
 
+function mapQuests(quests) {
+  return quests.map((x) => {
+    const metatdata = JSON.parse(x.questMetadata);
+    return {
+      address: x.questAddress,
+      meta: metatdata,
+    };
+  });
+}
+
 // #endregion
 
 // #region Public
@@ -65,79 +76,33 @@ async function getMoreQuests(currentIndex, count, filter) {
       { filter },
     );
   }
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const result = {
-        data: fakeDb.filter((quest) => {
-          // Status
-          if (filter.status && quest.status.id !== filter.status) {
-            return false;
-          }
-          // Tags
-          if (
-            filter.tags?.length &&
-            !quest.meta.tags.filter((tag) => filter.tags.includes(tag)).length
-          ) {
-            return false;
-          }
-          // Search
-          if (
-            filter.search &&
-            !quest.meta.title.includes(filter.search) &&
-            !quest.meta.description.includes(filter.search) &&
-            !quest.address.includes(filter.search)
-          ) {
-            return false;
-          }
-          // MinBounty
-          if (filter.minBounty && quest.meta.bounty < filter.minBounty) return false;
-          if (
-            (filter.expiration?.startDate &&
-              moment(quest.meta.expiration).isBefore(filter.expiration.startDate)) ||
-            (filter.expiration?.endDate &&
-              moment(quest.meta.expiration).isAfter(filter.expiration.endDate))
-          ) {
-            return false;
-          }
 
-          // Followed quests
-          if (filter.createdQuests && quest.creator !== currentAccount) return false;
-          if (filter.playedQuests && !quest.players.find((x) => x.player === currentAccount))
-            return false;
-          if (filter.foundedQuests && !quest.funds.find((x) => x.patron === currentAccount))
-            return false;
-
-          return true;
-        }),
-      };
-      const fullResultLenght = result.data.length;
-      result.data = result.data.slice(currentIndex, currentIndex + count);
-      result.hasMore = result.data.length === count && currentIndex < fullResultLenght;
-      resolve(result);
-    }, 1000);
+  const queryResult = await request(SUBGRAPH_URI, QuestFactory, {
+    skip: currentIndex,
+    first: count,
   });
+
+  const result = {
+    data: mapQuests(queryResult.questFactories),
+  };
+  result.hasMore = result.data.length === count;
+
+  return result;
 }
 
-async function saveQuest(account, meta, address = undefined) {
-  const isNew = !address;
-  const quest = address
-    ? fakeDb.find((x) => x.address === address)
-    : {
-        players: [],
-        status: QUEST_STATUS.draft,
-        funds: [],
-        totalFunds: { amount: 0, token: TOKENS.theter },
-        address: createContractAccount().address,
-        meta,
-        creator: account,
-      };
-  if (isNew) {
-    fakeDb.unshift(quest);
-  } else {
-    quest.meta = meta;
+async function saveQuest(questFactoryContract, account, meta, address = null) {
+  if (address) throw Error('Saveing existinng quest is nott yet implemented');
+  if (questFactoryContract) {
+    const inAWeek = Math.round(Date.now() + ONE_WEEK_IN_MILLSECONDS / 1000);
+    const tx = await questFactoryContract.createQuest(JSON.stringify(meta), inAWeek, account);
+    // eslint-disable-next-line no-console
+    console.info('TX HASH', tx.hash);
+    const receipt = await tx.wait();
+    const questDeployedAddress = receipt?.events[0]?.args[0];
+    return questDeployedAddress;
   }
-  updateStorage();
-  return quest.address;
+
+  return null;
 }
 
 async function fundQuest(questAddress, amount, onCompleted) {

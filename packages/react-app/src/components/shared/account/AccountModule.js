@@ -2,13 +2,13 @@
 /* eslint-disable no-shadow */
 // @ts-nocheck
 import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
 import styled from 'styled-components';
-import { noop } from 'lodash-es';
 import { useWallet } from '../../../providers/Wallet';
 import { getUseWalletProviders } from '../../../utils/web3-utils';
-import HeaderPopover from '../Header/HeaderPopover';
+import HeaderPopover from '../header/HeaderPopover';
 import AccountButton from './AccountButton';
 import ScreenConnected from './ScreenConnected';
 import ScreenConnecting from './ScreenConnecting';

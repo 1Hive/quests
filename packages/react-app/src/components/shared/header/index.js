@@ -4,7 +4,7 @@ import React from 'react';
 import { Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import styled from 'styled-components';
-import AccountModule from '../Account/AccountModule';
+import AccountModule from '../account/AccountModule';
 import Layout from '../Layout';
 import HeaderTitle from './HeaderTitle';
 import HeaderMenu from './HeaderMenu';

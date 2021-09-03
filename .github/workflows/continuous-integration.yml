@@ -6,13 +6,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Case Sensitivity Checker
+        uses: credfeto/action-case-checker@v1.1
       - name: Install
         run: yarn
       - name: Lint
         run: yarn lint
       - name: Build
         run: yarn build
+
   coverage:
+    name: Contract coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -20,7 +24,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 14.17.0
 
       - name: Cache yarn modules
         uses: actions/cache@v2

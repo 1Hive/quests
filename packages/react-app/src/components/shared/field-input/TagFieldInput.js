@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 import QuestProvider from '../../../services/QuestService';
-import { Outset } from '../Utils/spacer-util';
+import { Outset } from '../utils/spacer-util';
 
 function TagFieldInput({
   id,

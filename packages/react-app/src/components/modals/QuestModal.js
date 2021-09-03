@@ -1,8 +1,8 @@
 import { Button, IconPlus } from '@1hive/1hive-ui';
-import PropTypes from 'prop-types';
 import { noop } from 'lodash-es';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import Quest from '../Shared/Quest';
+import Quest from '../shared/quest';
 import ModalBase from './ModalBase';
 
 export default function QuestModal({ onClose = noop, create = false }) {
@@ -10,14 +10,17 @@ export default function QuestModal({ onClose = noop, create = false }) {
   const onOpenButtonClick = () => {
     setOpened(true);
   };
+
   const onModalClose = () => {
     setOpened(false);
     onClose();
   };
+
   const onSaveClick = (address) => {
     setOpened(false);
     onClose(address);
   };
+
   return (
     <ModalBase
       title={create ? 'Create quest' : 'Edit quest'}
