@@ -125,7 +125,7 @@ module.exports = {
     },
     govern: {
       default: 1,
-      100: "TODO : Add XDai Govern Address",
+      100: 0, // TODO : Add XDai Govern Address
       rinkeby: "0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E",
     },
   },

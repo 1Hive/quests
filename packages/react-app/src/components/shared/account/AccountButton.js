@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 import { useWallet } from '../../../providers/Wallet';
-import HeaderModule from '../Header/HeaderModule';
+import HeaderModule from '../header/HeaderModule';
 
 // #region StyledComponents
 

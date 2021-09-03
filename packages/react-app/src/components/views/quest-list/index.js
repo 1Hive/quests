@@ -5,8 +5,8 @@ import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useFilterContext } from '../../../providers/FilterContext';
 import QuestProvider from '../../../services/QuestService';
-import Quest from '../../Shared/Quest';
-import { Outset } from '../../Shared/Utils/spacer-util';
+import Quest from '../../shared/quest';
+import { Outset } from '../../shared/utils/spacer-util';
 import QuestListFilter from './QuestListFilter';
 
 const batchSize = 3;

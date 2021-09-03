@@ -1,4 +1,0 @@
-[
-  "function startParty(address,bytes32,uint64,uint8,uint16,uint16) public returns (address)",
-  "event NewParty(address)"
-]

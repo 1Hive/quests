@@ -1,5 +1,5 @@
-import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3-utils';
 import { getDefaultChain } from './local-settings';
+import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3-utils';
 
 const networks = {
   mainnet: {
@@ -14,20 +14,24 @@ const networks = {
     name: 'Rinkeby',
     type: 'rinkeby',
     defaultEthNode: 'https://rinkeby.eth.aragon.network/',
-    subgraph: 'https://api.thegraph.com/subgraphs/name/1hive/vesting-party-rinkeby', // TODO : Change to honey
-    factory: '0x4D85D70E1036bc05342b25e6a3aD520790Ec6680',
+    subgraph: 'https://thegraph.com/legacy-explorer/subgraph/sunguru98/quests',
+    factory: '0x50f36Ded366cA239Dd3a00dABD04Ddc3739E2244', // TODO : Change each time there is a new deployement
+    govern: '0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E',
   },
   xdai: {
     chainId: 100,
     name: 'xDai',
     type: 'xdai',
     defaultEthNode: 'https://xdai.poanetwork.dev/',
+    factory: '', // TODO : When questFactory will be on xDai
+    govern: '', // TODO : When govern will be on xDai
   },
   local: {
     chainId: 1337,
     name: 'Local',
     type: 'private',
     defaultEthNode: 'http://0.0.0.0:8545/',
+    govern: 0,
   },
 };
 
