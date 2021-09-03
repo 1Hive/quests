@@ -2,10 +2,7 @@ import { GU, Root } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-<<<<<<< Updated upstream
 import Header from './header';
-=======
->>>>>>> Stashed changes
 import Layout from './Layout';
 
 // #region StyledComponents

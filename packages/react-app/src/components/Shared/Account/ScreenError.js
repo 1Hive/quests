@@ -1,6 +1,6 @@
-import React, { useMemo, useRef } from 'react';
-import PropTypes from 'prop-types';
 import { Button, GU, IconRefresh, textStyle, useTheme } from '@1hive/1hive-ui';
+import PropTypes from 'prop-types';
+import React, { useMemo, useRef } from 'react';
 import { UnsupportedChainError } from 'use-wallet';
 import { getNetworkName } from '../../../utils/web3-utils';
 import connectionError from './assets/connection-error.png';

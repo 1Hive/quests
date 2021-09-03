@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import QuestProvider from '../../services/QuestService';
-import AmountFieldInput from '../Shared/FieldInput/AmountFieldInput';
+import AmountFieldInput from '../shared/field-input/AmountFieldInput';
 import ModalBase from './ModalBase';
 
 export default function FundModal({ questAddress, onClose = noop }) {

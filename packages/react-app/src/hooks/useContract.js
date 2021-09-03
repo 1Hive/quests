@@ -20,7 +20,7 @@ export function getProviderOrSigner(ethersProvider, account) {
 
 // account is optional
 export function getContract(address, ABI, ethersProvider, account) {
-  if (!address === ADDRESS_ZERO) {
+  if (!address || address === ADDRESS_ZERO) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
   }
 

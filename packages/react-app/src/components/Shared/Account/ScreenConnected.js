@@ -7,7 +7,6 @@ import {
   RADIUS,
   textStyle,
   useTheme,
-  // @ts-ignore
 } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
