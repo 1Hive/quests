@@ -39,7 +39,7 @@ jobs:
             packages/*/cache
             packages/*/artifacts
             ~/.cache/hardhat-nodejs/
-          key: contracts-v${{ secrets.CONTRACTS_CACHE_VERSION }}-${{ hashFiles('packages/*/contracts/**/*.sol') }}
+          key: ${{ runner.os }}-contracts-v${{ secrets.CONTRACTS_CACHE_VERSION }}-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
