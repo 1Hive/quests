@@ -46,9 +46,9 @@
     "graph-prepare": "mustache packages/subgraph/config/config.json packages/subgraph/src/subgraph.template.yaml > packages/subgraph/subgraph.yaml",
     "graph-codegen": "yarn workspace @1hive/quests-subgraph graph codegen",
     "graph-build": "yarn workspace @1hive/quests-subgraph graph build",
-    "graph-create-local": "yarn workspace @1hive1hive/quests/subgraph graph create --node http://localhost:8020/ scaffold-eth/your-contract",
-    "graph-remove-local": "yarn workspace @1hive1hive/quests/subgraph graph remove --node http://localhost:8020/ scaffold-eth/your-contract",
-    "graph-deploy-local": "yarn workspace @1hive1hive/quests/subgraph graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scaffold-eth/your-contract",
+    "graph-create-local": "yarn workspace @1hive/quests/subgraph graph create --node http://localhost:8020/ scaffold-eth/your-contract",
+    "graph-remove-local": "yarn workspace @1hive/quests/subgraph graph remove --node http://localhost:8020/ scaffold-eth/your-contract",
+    "graph-deploy-local": "yarn workspace @1hive/quests/subgraph graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scaffold-eth/your-contract",
     "graph-ship-local": "yarn graph-prepare && yarn graph-codegen && yarn graph-deploy-local",
     "deploy-and-graph": "yarn deploy && yarn graph-ship-local"
   },

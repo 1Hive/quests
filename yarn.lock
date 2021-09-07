@@ -4067,9 +4067,9 @@ acorn-walk@^7.1.1:
   integrity sha512-OPdCF6GsMIP+Az+aWfAAOEt2/+iVDKE7oy6lJ098aoe59oAmK76qV6Gw60SbZ8jHuG2wH058GF4pLFbYamYrVA==
 
 acorn-walk@^8.1.1:
-  version "8.1.1"
-  resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.1.1.tgz#3ddab7f84e4a7e2313f6c414c5b7dac85f4e3ebc"
-  integrity sha512-FbJdceMlPHEAWJOILDk1fXD8lnTlEIWFkqtfk+MvmL5q/qlHfN7GEHcsFZWt/Tea9jRNPWUZG4G976nqAAmU9w==
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.2.0.tgz#741210f2e2426454508853a2f44d0ab83b7f69c1"
+  integrity sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==
 
 acorn@^6.0.1, acorn@^6.0.4, acorn@^6.4.1:
   version "6.4.2"
@@ -10508,11 +10508,6 @@ hard-rejection@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/hard-rejection/-/hard-rejection-2.1.0.tgz#1c6eda5c1685c63942766d79bb40ae773cecd883"
   integrity sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==
-
-hardhat-abi-exporter@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/hardhat-abi-exporter/-/hardhat-abi-exporter-2.3.0.tgz#f7aeb56f2ceef1ccdb75a5b8d81dc80cbbfeefc4"
-  integrity sha512-9EVhogHgFWsi4Bc46tv+WirOR+auGBZrv9V5/qAHBjOqYiZPbNXoFUo/yQhOAsF8Bz4Q9p4jHpdeQXnYt7g6Yw==
 
 hardhat-deploy@^0.9.0:
   version "0.9.0"
