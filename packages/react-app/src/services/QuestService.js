@@ -92,16 +92,9 @@ async function getMoreQuests(currentIndex, count, filter) {
 }
 
 async function saveQuest(questFactoryContract, account, meta, address = null) {
-  console.log({
-    questFactoryContract,
-    account,
-    meta,
-    address,
-  });
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
     const inAWeek = Math.round(Date.now() + ONE_WEEK_IN_MILLSECONDS / 1000);
-
     const tx = await questFactoryContract.createQuest(JSON.stringify(meta), inAWeek, account);
     // eslint-disable-next-line no-console
     console.info('TX HASH', tx.hash);
