@@ -1,7 +1,8 @@
 import { request } from 'graphql-request';
 import { random } from 'lodash';
-import { ONE_WEEK_IN_MILLSECONDS, QUEST_STATUS, SUBGRAPH_URI, TOKENS } from '../constants';
+import { QUEST_STATUS, SUBGRAPH_URI, TOKENS } from '../constants';
 import { QuestFactory } from '../queries';
+import { ONE_WEEK_IN_MILLSECONDS } from '../utils/date-utils';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
 
@@ -91,7 +92,7 @@ async function getMoreQuests(currentIndex, count, filter) {
 }
 
 async function saveQuest(questFactoryContract, account, meta, address = null) {
-  if (address) throw Error('Saveing existinng quest is nott yet implemented');
+  if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
     const inAWeek = Math.round(Date.now() + ONE_WEEK_IN_MILLSECONDS / 1000);
     const tx = await questFactoryContract.createQuest(JSON.stringify(meta), inAWeek, account);

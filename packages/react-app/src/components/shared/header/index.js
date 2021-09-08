@@ -1,13 +1,13 @@
 // @ts-nocheck
+import { Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import styled from 'styled-components';
 import AccountModule from '../account/AccountModule';
 import Layout from '../Layout';
-import HeaderTitle from './HeaderTitle';
 import HeaderMenu from './HeaderMenu';
+import HeaderTitle from './HeaderTitle';
 
 // #region StyledComponents
 const HeaderWraper = styled.header`

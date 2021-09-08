@@ -11,6 +11,7 @@ const run = () => {
 };
 
 console.log("🔬 Watching Contracts...");
+// @ts-ignore
 watch("./contracts", { recursive: true }, function (evt, name) {
   console.log("%s changed.", name);
   run();

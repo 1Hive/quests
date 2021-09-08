@@ -1,28 +1,28 @@
 const fs = require("fs");
 const chalk = require("chalk");
-const bre = require("hardhat");
+const hre = require("hardhat");
 
 const publishDir = "../react-app/src/contracts";
 const graphDir = "../subgraph";
 
 function publishContract(contractName) {
   console.log(
-    "Publishing",
+    " 💽 Publishing",
     chalk.cyan(contractName),
     "to",
-    chalk.yellow(publishDir)
+    chalk.gray(publishDir)
   );
   try {
-    let contract = fs
+    const contractArtifact = fs
       .readFileSync(
-        `${bre.config.paths.artifacts}/contracts/${contractName}.sol/${contractName}.json`
+        `${hre.config.paths.artifacts}/contracts/${contractName}.sol/${contractName}.json`
       )
       .toString();
     const address = fs
-      .readFileSync(`${bre.config.paths.artifacts}/${contractName}.address`)
+      .readFileSync(`${hre.config.paths.artifacts}/${contractName}.address`)
       .toString();
-    contract = JSON.parse(contract);
-    let graphConfigPath = `${graphDir}/config/config.json`;
+    const contract = JSON.parse(contractArtifact);
+    const graphConfigPath = `${graphDir}/config/config.json`;
     let graphConfig;
     try {
       if (fs.existsSync(graphConfigPath)) {
@@ -59,11 +59,27 @@ function publishContract(contractName) {
       JSON.stringify(contract.abi, null, 2)
     );
 
+    console.log(
+      " 📠 Published " + chalk.green(contractName) + " to the frontend."
+    );
+
     return true;
   } catch (e) {
-    console.log(e);
-    return false;
+    console.error(e);
+    if (e.toString().indexOf("no such file or directory") >= 0) {
+      console.log(
+        chalk.yellow(
+          " ⚠️  Can't publish " +
+            contractName +
+            " yet (make sure it getting deployed)."
+        )
+      );
+    } else {
+      console.log(e);
+      return false;
+    }
   }
+  return false;
 }
 
 async function main() {
@@ -71,7 +87,7 @@ async function main() {
     fs.mkdirSync(publishDir);
   }
   const finalContractList = [];
-  fs.readdirSync(bre.config.paths.sources).forEach((file) => {
+  fs.readdirSync(hre.config.paths.sources).forEach((file) => {
     if (file.indexOf(".sol") >= 0) {
       const contractName = file.replace(".sol", "");
       // Add contract to list if publishing is successful

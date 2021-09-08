@@ -2,8 +2,8 @@ import { Contract } from 'ethers';
 import log from 'loglevel';
 import { useMemo } from 'react';
 import { ADDRESS_ZERO } from '../constants';
-import QuestFactoryAbi from '../contracts/QuestFactory.abi';
-import { getNetwork } from '../networks';
+import questFactoryAbi from '../contracts/QuestFactory.abi';
+import questFactoryAddress from '../contracts/QuestFactory.address';
 import { useWallet } from '../providers/Wallet';
 
 // account is not optional
@@ -48,6 +48,5 @@ function useContract(address, ABI, withSignerIfPossible = true) {
 }
 
 export function useFactoryContract() {
-  const { factory } = getNetwork();
-  return useContract(factory, QuestFactoryAbi);
+  return useContract(questFactoryAddress, questFactoryAbi);
 }

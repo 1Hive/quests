@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "**/node_modules"
-          key: yarn-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-yarn-v${{ secrets.YARN_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}
 
       - name: Cache contracts
         uses: actions/cache@v2
@@ -39,7 +39,7 @@ jobs:
             packages/*/cache
             packages/*/artifacts
             ~/.cache/hardhat-nodejs/
-          key: contracts-${{ hashFiles('packages/*/contracts/**/*.sol') }}
+          key: ${{ runner.os }}-contracts-v${{ secrets.CONTRACTS_CACHE_VERSION }}-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
