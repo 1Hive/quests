@@ -72,5 +72,7 @@ export const defaultFilter = {
 };
 
 // SUBGRAPH
-
 export const SUBGRAPH_URI = 'https://api.thegraph.com/subgraphs/name/sunguru98/quests';
+
+// Handle retro compatibility correctly
+export const QUEST_VERSION = '2.0';

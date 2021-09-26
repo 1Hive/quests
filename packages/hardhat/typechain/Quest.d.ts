@@ -28,7 +28,7 @@ interface QuestInterface extends ethers.utils.Interface {
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
     "recoverUnclaimedFunds()": FunctionFragment;
-    "requirements()": FunctionFragment;
+    "requirementsIpfsHash()": FunctionFragment;
     "rewardToken()": FunctionFragment;
   };
 
@@ -57,7 +57,7 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "requirements",
+    functionFragment: "requirementsIpfsHash",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -81,7 +81,7 @@ interface QuestInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "requirements",
+    functionFragment: "requirementsIpfsHash",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -164,9 +164,9 @@ export class Quest extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    requirements(overrides?: CallOverrides): Promise<[string]>;
+    requirementsIpfsHash(overrides?: CallOverrides): Promise<[string]>;
 
-    "requirements()"(overrides?: CallOverrides): Promise<[string]>;
+    "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<[string]>;
 
     rewardToken(overrides?: CallOverrides): Promise<[string]>;
 
@@ -227,9 +227,9 @@ export class Quest extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  requirements(overrides?: CallOverrides): Promise<string>;
+  requirementsIpfsHash(overrides?: CallOverrides): Promise<string>;
 
-  "requirements()"(overrides?: CallOverrides): Promise<string>;
+  "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<string>;
 
   rewardToken(overrides?: CallOverrides): Promise<string>;
 
@@ -288,9 +288,9 @@ export class Quest extends Contract {
 
     "recoverUnclaimedFunds()"(overrides?: CallOverrides): Promise<void>;
 
-    requirements(overrides?: CallOverrides): Promise<string>;
+    requirementsIpfsHash(overrides?: CallOverrides): Promise<string>;
 
-    "requirements()"(overrides?: CallOverrides): Promise<string>;
+    "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<string>;
 
     rewardToken(overrides?: CallOverrides): Promise<string>;
 
@@ -339,9 +339,9 @@ export class Quest extends Contract {
 
     "recoverUnclaimedFunds()"(overrides?: Overrides): Promise<BigNumber>;
 
-    requirements(overrides?: CallOverrides): Promise<BigNumber>;
+    requirementsIpfsHash(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "requirements()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     rewardToken(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -399,9 +399,13 @@ export class Quest extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    requirements(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    requirementsIpfsHash(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    "requirements()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "requirementsIpfsHash()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     rewardToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -20,6 +20,6 @@ dataSources:
         - name: QuestFactory
           file: ./abis/QuestFactory.json
       eventHandlers:
-        - event: QuestCreated(address,string)
+        - event: QuestCreated(address,string,address,uint256,string)
           handler: handleQuestCreate
       file: ./src/mapping.ts

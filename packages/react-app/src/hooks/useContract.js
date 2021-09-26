@@ -2,9 +2,10 @@ import { Contract } from 'ethers';
 import log from 'loglevel';
 import { useMemo } from 'react';
 import { ADDRESS_ZERO } from '../constants';
-import questFactoryAbi from '../contracts/QuestFactory.abi';
-import questFactoryAddress from '../contracts/QuestFactory.address';
+import contractsJson from '../contracts/hardhat_contracts.json';
 import { useWallet } from '../providers/Wallet';
+
+let contracts;
 
 // account is not optional
 export function getSigner(ethersProvider, account) {
@@ -28,15 +29,17 @@ export function getContract(address, ABI, ethersProvider, account) {
 
 // account is optional
 // returns null on errors
-function useContract(address, ABI, withSignerIfPossible = true) {
+function useContract(contractName, withSignerIfPossible = true) {
   const { account, ethers } = useWallet();
+  if (!contracts) contracts = contractsJson[ethers.network.chainId].rinkeby.contracts;
+  const askedContract = contracts[contractName];
 
   return useMemo(() => {
-    if (!address || !ABI || !ethers) return null;
+    if (!askedContract.address || !askedContract.abi || !ethers) return null;
     try {
       return getContract(
-        address,
-        ABI,
+        askedContract.address,
+        askedContract.abi,
         ethers,
         withSignerIfPossible && account ? account : undefined,
       );
@@ -44,9 +47,9 @@ function useContract(address, ABI, withSignerIfPossible = true) {
       log.error('Failed to get contract', error);
       return null;
     }
-  }, [address, ABI, ethers, withSignerIfPossible, account]);
+  }, [askedContract.address, askedContract.abi, ethers, withSignerIfPossible, account]);
 }
 
 export function useFactoryContract() {
-  return useContract(questFactoryAddress, questFactoryAbi);
+  return useContract('QuestFactory');
 }

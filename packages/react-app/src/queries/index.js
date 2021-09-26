@@ -5,7 +5,10 @@ export const QuestFactory = gql`
     questFactories(first: $first, skip: $skip) {
       id
       questAddress
-      questMetadata
+      questMetadataHash
+      questRewardTokenAddress
+      questExpireTime
+      questVersion
     }
   }
 `;

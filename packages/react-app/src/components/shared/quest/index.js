@@ -81,12 +81,13 @@ export default function Quest({
           bounty: meta.bounty,
           collateral: meta.collateral,
           tags: meta.tags,
+          fallbackAddress: wallet.account,
         }}
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setSubmitting(false);
             onSave(
-              await QuestProvider.saveQuest(questFactoryContract, wallet.account, values, address),
+              await QuestProvider.saveQuest(questFactoryContract, values.fallbackAddress, values),
             );
           }, 400);
         }}
@@ -134,6 +135,16 @@ export default function Quest({
                       multiline
                       css={{ height: '100px' }}
                     />
+                    {editMode && (
+                      <AddressField
+                        id="fallbackAddress"
+                        label="Funds fallback address"
+                        value={values.fallbackAddress}
+                        isLoading={isLoading}
+                        placeHolder="Funds fallback address"
+                        onChange={handleChange}
+                      />
+                    )}
                   </Outset>
                 </Outset>
               }

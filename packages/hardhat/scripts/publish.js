@@ -19,7 +19,7 @@ function publishContract(contractName) {
       )
       .toString();
     const address = fs
-      .readFileSync(`${hre.config.paths.artifacts}/${contractName}.address`)
+      .readFileSync(`${hre.config.paths.artifacts}/${contractName}`)
       .toString();
     const contract = JSON.parse(contractArtifact);
     const graphConfigPath = `${graphDir}/config/config.json`;

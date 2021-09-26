@@ -2,7 +2,6 @@
 import { ethers, deployments } from "hardhat";
 import { use, expect } from "chai";
 import { solidity } from "ethereum-waffle";
-import { hashToBytes } from "./test-helper";
 
 use(solidity);
 
@@ -28,17 +27,18 @@ describe("[Contract] QuestFactory", function () {
     it("should emit QuestCreated", async function () {
       // Arrange
       const tokenContract = await deployments.get("TokenMock");
-      const requirements = hashToBytes("requirement1");
+      const requirementsIpfsHash = "fakeRequirementIpfsHash";
       const expireTime = 0; // Unix Epoch 0
 
       // Act
       // Assert
       expect(
         await questFactoryContract.createQuest(
-          requirements,
+          requirementsIpfsHash,
           tokenContract.address,
           expireTime,
-          owner.address
+          owner.address,
+          "1.0"
         )
       ).to.emit(questFactoryContract, "QuestCreated");
     });

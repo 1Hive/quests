@@ -22,7 +22,25 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "_content",
+        "name": "requirementsIpfsHash",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "rewardTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "expireTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "version",
         "type": "string"
       }
     ],
@@ -46,18 +64,28 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "_content",
+        "name": "_requirementsIpfsHash",
         "type": "string"
       },
       {
+        "internalType": "contract IERC20",
+        "name": "_rewardToken",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_terminationDate",
+        "name": "_expireTime",
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "_fallbackAddress",
+        "internalType": "address payable",
+        "name": "_fundsRecoveryAddress",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_version",
+        "type": "string"
       }
     ],
     "name": "createQuest",

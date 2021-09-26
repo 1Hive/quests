@@ -8,5 +8,8 @@ type Quest @entity {
 type QuestFactory @entity {
   id: ID!
   questAddress: Bytes!
-  questMetadata: String!
+  questMetadataHash: String!
+  questRewardTokenAddress: Bytes!
+  questExpireTime: BigInt!
+  questVersion: String!
 }
