@@ -1,11 +1,4 @@
-type Quest @entity {
-  id: ID!
-  file: Bytes!
-  player: Bytes!
-  amount: BigInt!
-}
-
-type QuestFactory @entity {
+type QuestEntity @entity {
   id: ID!
   questAddress: Bytes!
   questMetadataHash: String!

@@ -50,13 +50,7 @@
   {
     "inputs": [],
     "name": "aragonGovernAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -72,21 +66,13 @@
         "name": "_rewardToken",
         "type": "address"
       },
-      {
-        "internalType": "uint256",
-        "name": "_expireTime",
-        "type": "uint256"
-      },
+      { "internalType": "uint256", "name": "_expireTime", "type": "uint256" },
       {
         "internalType": "address payable",
         "name": "_fundsRecoveryAddress",
         "type": "address"
       },
-      {
-        "internalType": "string",
-        "name": "_version",
-        "type": "string"
-      }
+      { "internalType": "string", "name": "_version", "type": "string" }
     ],
     "name": "createQuest",
     "outputs": [],

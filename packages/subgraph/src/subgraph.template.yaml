@@ -11,15 +11,14 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Purpose
-        - Sender
+        - QuestCreated
       abis:
         - name: QuestFactory
           file: ./abis/QuestFactory.json
       eventHandlers:
         - event: QuestCreated(address,string,address,uint256,string)
-          handler: handleQuestCreate
+          handler: handleQuestCreated
       file: ./src/mapping.ts
