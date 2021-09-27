@@ -51,7 +51,8 @@ export const pushObjectToIpfs = async (obj) => {
 export const getObjectFromIpfs = async (objHash) => {
   // eslint-disable-next-line no-restricted-syntax
   for await (const value of ipfs.get(objHash)) {
-    return new TextDecoder().decode(value); // Only one result
+    const decoded = new TextDecoder('utf-8').decode(value); // Only one result
+    return decoded.substring(decoded.indexOf('{'), decoded.lastIndexOf('}') + 1).trim();
   }
   return null; // No result
 };

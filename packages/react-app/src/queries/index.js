@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
-export const QuestFactory = gql`
-  query questFactories($first: Int, $skip: Int) {
-    questFactories(first: $first, skip: $skip) {
+export const QuestEntity = gql`
+  query questEntities($first: Int, $skip: Int) {
+    questEntities(first: $first, skip: $skip) {
       id
       questAddress
       questMetadataHash

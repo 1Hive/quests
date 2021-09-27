@@ -136,13 +136,15 @@ export default function Quest({
                       css={{ height: '100px' }}
                     />
                     {editMode && (
-                      <AddressField
+                      <TextFieldInput
                         id="fallbackAddress"
                         label="Funds fallback address"
                         value={values.fallbackAddress}
                         isLoading={isLoading}
+                        isEdit
                         placeHolder="Funds fallback address"
                         onChange={handleChange}
+                        wide
                       />
                     )}
                   </Outset>
