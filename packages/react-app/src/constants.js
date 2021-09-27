@@ -2,12 +2,6 @@ export const PCT_BASE = BigInt(1e18);
 
 export const APP_TITLE = 'Quest';
 
-// MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
-export const INFURA_ID = '460f40a260564ac4a4f4b3fffb032dad';
-
-// MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
-export const ETHERSCAN_KEY = 'PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8';
-
 // Env
 export const IS_DEV = process.env?.NODE_ENV === 'development';
 export const EXPECTED_NETWORKS = IS_DEV ? ['localhost'] : ['xDai'];
@@ -64,8 +58,7 @@ export const BREAKPOINTS = {
 
 export const defaultFilter = {
   search: '',
-  status: null,
-  expiration: { start: null, end: null },
+  expire: { start: null, end: null },
   tags: [],
   bounty: { amount: 0, token: TOKENS.honey },
   showFull: false,
@@ -75,5 +68,5 @@ export const defaultFilter = {
 export const SUBGRAPH_URI = 'https://api.thegraph.com/subgraphs/name/corantin/quests';
 
 // Handle retro compatibility correctly
-export const QUEST_VERSION = '2.0';
-export const MIN_QUEST_VERSION = 2.0;
+export const QUEST_VERSION = '2.3';
+export const MIN_QUEST_VERSION = '2.3';

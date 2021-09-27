@@ -1,15 +1,50 @@
-import {
-  ipfs,
-  nodeMayAllowPublish,
-  publishHashToIPNS,
-  pushDirectoryToIPFS,
-} from '../src/services/IpfsService';
+const ipfsAPI = require('ipfs-http-client');
 
+const { globSource } = ipfsAPI;
 const { clearLine } = require('readline');
 const chalk = require('chalk');
 
 const ipfsGateway = 'https://ipfs.io/ipfs/';
 const ipnsGateway = 'https://ipfs.io/ipns/';
+
+const addOptions = {
+  pin: true,
+};
+
+const infura = {
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+};
+
+const ipfs = ipfsAPI.create(infura);
+
+const pushDirectoryToIPFS = async (path) => {
+  try {
+    // @ts-ignore
+    const response = await ipfs.add(globSource(path, { recursive: true }), addOptions);
+    return response;
+  } catch (e) {
+    return {};
+  }
+};
+
+const publishHashToIPNS = async (ipfsHash) => {
+  try {
+    const response = await ipfs.name.publish(`/ipfs/${ipfsHash}`);
+    return response;
+  } catch (e) {
+    return {};
+  }
+};
+
+const nodeMayAllowPublish = (ipfsClient) => {
+  // You must have your own IPFS node in order to publish an IPNS name
+  // This contains a blacklist of known nodes which do not allow users to publish IPNS names.
+  const nonPublishingNodes = ['ipfs.infura.io'];
+  const { host } = ipfsClient.getEndpointConfig();
+  return !nonPublishingNodes.some((nodeUrl) => host.includes(nodeUrl));
+};
 
 const deployWebApp = async () => {
   console.log('🛰  Sending to IPFS...');

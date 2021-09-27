@@ -3,7 +3,6 @@ import { random } from 'lodash';
 import { log } from 'loglevel';
 import { MIN_QUEST_VERSION, QUEST_STATUS, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
 import { QuestEntity } from '../queries';
-import { ONE_WEEK_IN_MILLSECONDS } from '../utils/date-utils';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
 import { getObjectFromIpfs, pushObjectToIpfs } from './IpfsService';
@@ -43,7 +42,7 @@ function generateFakeQuest(index) {
         }))
         .filter((x) => x.rand)
         .map((x) => x.tag),
-      expiration: '06/24/2021',
+      expire: '06/24/2021',
     },
     funds: [],
     players: [],
@@ -59,21 +58,18 @@ function retrieveQuest(address) {
 
 function mapQuests(quests) {
   return Promise.all(
-    quests
-      .filter((x) => parseFloat(x.questVersion) >= MIN_QUEST_VERSION)
-      .map(async (x) => {
-        const metadataJson = await getObjectFromIpfs(x.questMetadataHash);
-        console.log(metadataJson);
-        if (metadataJson == null)
-          throw Error(`Quest metadata was not found with Hash: ${x.questMetadataHash}`);
-        const metatdata = JSON.parse(metadataJson);
-        return {
-          address: x.questAddress,
-          meta: metatdata,
-          rewardTokenAddress: x.questRewardTokenAddress,
-          expireTime: x.questExpireTime,
-        };
-      }),
+    quests.map(async (x) => {
+      const metadataJson = await getObjectFromIpfs(x.questMetadataHash);
+      if (metadataJson == null)
+        throw Error(`Quest metadata was not found with Hash: ${x.questMetadataHash}`);
+      const metatdata = JSON.parse(metadataJson);
+      return {
+        address: x.questAddress,
+        meta: metatdata,
+        rewardTokenAddress: x.questRewardTokenAddress,
+        expireTime: x.questExpireTime * 1000, // Sec to Ms
+      };
+    }),
   );
 }
 
@@ -93,6 +89,7 @@ async function getMoreQuests(currentIndex, count, filter) {
   const queryResult = await request(SUBGRAPH_URI, QuestEntity, {
     skip: currentIndex,
     first: count,
+    minVersion: MIN_QUEST_VERSION,
   });
 
   const result = {
@@ -106,12 +103,11 @@ async function getMoreQuests(currentIndex, count, filter) {
 async function saveQuest(questFactoryContract, fallbackAddress, meta, address = null) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
-    const inAWeek = Math.round(Date.now() + ONE_WEEK_IN_MILLSECONDS / 1000);
     const ipfsHash = await pushObjectToIpfs({ ...meta, version: QUEST_VERSION });
     const tx = await questFactoryContract.createQuest(
       ipfsHash.toString(),
       TOKENS.honey.address,
-      inAWeek,
+      Math.round(meta.expireTime / 1000), // Ms to Sec
       fallbackAddress,
       QUEST_VERSION,
     );

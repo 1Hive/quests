@@ -26,5 +26,7 @@ function durationTime(ms) {
 
 const toMs = (seconds) => parseInt(seconds, 10) * 1000;
 
-export const ONE_WEEK_IN_MILLSECONDS = 1000 * 60 * 60 * 24 * 7;
+export const ONE_WEEK_IN_MS = 1000 * 60 * 60 * 24 * 7;
+export const IN_A_WEEK_IN_MS = Date.now() + ONE_WEEK_IN_MS;
+
 export { dayjs, dateFormat, durationTime, toMs };

@@ -78,6 +78,7 @@ export default function QuestList() {
                   meta={x.meta}
                   players={x.players}
                   address={x.address}
+                  expireTime={x.expireTime}
                   creator={x.creator}
                   funds={x.funds}
                   status={x.status}
