@@ -38,7 +38,9 @@
     "@tenderly/hardhat-tenderly": "1.0.10",
     "@typechain/ethers-v5": "^5.0.0",
     "chalk": "^4.1.0",
+    "cross-var": "^1.1.0",
     "dotenv": "^10.0.0",
+    "dotenv-cli": "^4.0.0",
     "ethereum-waffle": "^3.4.0",
     "hardhat": "^2.6.2",
     "hardhat-deploy": "^0.9.0",
@@ -51,7 +53,7 @@
   },
   "scripts": {
     "chain": "hardhat node --hostname 0.0.0.0 --network hardhat --no-deploy",
-    "fork": "hardhat node --no-deploy --network hardhat --fork https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad",
+    "fork": "dotenv -- cross-var hardhat node --no-deploy --network hardhat --fork https://mainnet.infura.io/v3/%INFURA_ID%",
     "test": "hardhat test --network hardhat",
     "test-coverage": "hardhat coverage --network localhost --testfiles \"test/*.test.ts\" --solcoverjs ./test/coverage.solcover.ts",
     "compile": "hardhat compile",
@@ -59,13 +61,13 @@
     "deploy:xdai": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json --network xdai",
     "deploy:local": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json",
     "console": "hardhat console",
-    "postdeploy": "hardhat run scripts/publish.ts",
+    "postdeploy": "hardhat run scripts/publish.js",
     "watch": "node scripts/watch.js",
     "accounts": "hardhat accounts",
     "balance": "hardhat balance",
     "send": "hardhat send",
     "generate": "hardhat generate",
     "account": "hardhat account",
-    "etherscan-verify": "hardhat etherscan-verify --api-key PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8"
+    "etherscan-verify": "dotenv -- cross-var hardhat etherscan-verify --network rinkeby --api-key %ETHERSCAN_API_KEY%"
   }
 }

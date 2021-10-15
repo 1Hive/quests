@@ -1,12 +1,8 @@
-type Quest @entity {
-  id: ID!
-  file: Bytes!
-  player: Bytes!
-  amount: BigInt!
-}
-
-type QuestFactory @entity {
+type QuestEntity @entity {
   id: ID!
   questAddress: Bytes!
-  questMetadata: String!
+  questMetadataHash: String!
+  questRewardTokenAddress: Bytes!
+  questExpireTime: BigInt!
+  questVersion: String!
 }

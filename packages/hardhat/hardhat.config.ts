@@ -224,19 +224,18 @@ const config: HardhatUserConfig = {
     solcVersion: "0.7.6",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API,
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   namedAccounts: {
     deployer: {
       default: 0,
-      100: 0,
-      rinkeby: "0x84b9514E013710b9dD0811c9Fe46b837a4A0d8E0", // Static address for test purposes
+      100: process.env.DEPLOYER_ADDRESS,
+      rinkeby: process.env.DEPLOYER_ADDRESS, // Static address for test purposes
     },
     govern: {
       default: 1,
-      100: 0, // TODO : Add XDai Govern Address
+      xdai: 0, // TODO : Add XDai Govern Address
       rinkeby: "0xc03710063b0e4435f997A0B1bbdf2680A2f07E13", // Govern address on rinkeby
-      xdai: "", // TODO : Add address when Govern will be deployed on xDai chain
     },
   },
 };

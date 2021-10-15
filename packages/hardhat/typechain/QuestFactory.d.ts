@@ -23,7 +23,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestFactoryInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
-    "createQuest(bytes,address,uint256,address)": FunctionFragment;
+    "createQuest(string,address,uint256,address,string)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -32,7 +32,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createQuest",
-    values: [BytesLike, string, BigNumberish, string]
+    values: [string, string, BigNumberish, string, string]
   ): string;
 
   decodeFunctionResult(
@@ -45,7 +45,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "QuestCreated(address,bytes)": EventFragment;
+    "QuestCreated(address,string,address,uint256,string)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "QuestCreated"): EventFragment;
@@ -70,18 +70,20 @@ export class QuestFactory extends Contract {
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
     createQuest(
-      _requirements: BytesLike,
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createQuest(bytes,address,uint256,address)"(
-      _requirements: BytesLike,
+    "createQuest(string,address,uint256,address,string)"(
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
@@ -91,18 +93,20 @@ export class QuestFactory extends Contract {
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
   createQuest(
-    _requirements: BytesLike,
+    _requirementsIpfsHash: string,
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
+    _version: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createQuest(bytes,address,uint256,address)"(
-    _requirements: BytesLike,
+  "createQuest(string,address,uint256,address,string)"(
+    _requirementsIpfsHash: string,
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
+    _version: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -112,24 +116,32 @@ export class QuestFactory extends Contract {
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
     createQuest(
-      _requirements: BytesLike,
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "createQuest(bytes,address,uint256,address)"(
-      _requirements: BytesLike,
+    "createQuest(string,address,uint256,address,string)"(
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
   filters: {
-    QuestCreated(questAddress: null, _requirements: null): EventFilter;
+    QuestCreated(
+      questAddress: null,
+      requirementsIpfsHash: null,
+      rewardTokenAddress: null,
+      expireTime: null,
+      version: null
+    ): EventFilter;
   };
 
   estimateGas: {
@@ -138,18 +150,20 @@ export class QuestFactory extends Contract {
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     createQuest(
-      _requirements: BytesLike,
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createQuest(bytes,address,uint256,address)"(
-      _requirements: BytesLike,
+    "createQuest(string,address,uint256,address,string)"(
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
   };
@@ -164,18 +178,20 @@ export class QuestFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     createQuest(
-      _requirements: BytesLike,
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createQuest(bytes,address,uint256,address)"(
-      _requirements: BytesLike,
+    "createQuest(string,address,uint256,address,string)"(
+      _requirementsIpfsHash: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _version: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };

@@ -1,14 +1,8 @@
 const ipfsAPI = require('ipfs-http-client');
-const chalk = require('chalk');
-const { clearLine } = require('readline');
 
 const { globSource } = ipfsAPI;
-
-const infura = { host: 'ipfs.infura.io', port: '5001', protocol: 'https' };
-// run your own ipfs daemon: https://docs.ipfs.io/how-to/command-line-quick-start/#install-ipfs
-// const localhost = { host: "localhost", port: "5001", protocol: "http" };
-
-const ipfs = ipfsAPI(infura);
+const { clearLine } = require('readline');
+const chalk = require('chalk');
 
 const ipfsGateway = 'https://ipfs.io/ipfs/';
 const ipnsGateway = 'https://ipfs.io/ipns/';
@@ -17,8 +11,17 @@ const addOptions = {
   pin: true,
 };
 
+const infura = {
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+};
+
+const ipfs = ipfsAPI.create(infura);
+
 const pushDirectoryToIPFS = async (path) => {
   try {
+    // @ts-ignore
     const response = await ipfs.add(globSource(path, { recursive: true }), addOptions);
     return response;
   } catch (e) {
@@ -43,7 +46,7 @@ const nodeMayAllowPublish = (ipfsClient) => {
   return !nonPublishingNodes.some((nodeUrl) => host.includes(nodeUrl));
 };
 
-const deploy = async () => {
+const deployWebApp = async () => {
   console.log('🛰  Sending to IPFS...');
   const { cid } = await pushDirectoryToIPFS('./build');
   if (!cid) {
@@ -86,4 +89,4 @@ const deploy = async () => {
   return true;
 };
 
-deploy();
+deployWebApp();

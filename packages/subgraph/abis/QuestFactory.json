@@ -22,7 +22,25 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "_content",
+        "name": "requirementsIpfsHash",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "rewardTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "expireTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "version",
         "type": "string"
       }
     ],
@@ -32,13 +50,7 @@
   {
     "inputs": [],
     "name": "aragonGovernAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -46,19 +58,21 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "_content",
+        "name": "_requirementsIpfsHash",
         "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "_terminationDate",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_fallbackAddress",
+        "internalType": "contract IERC20",
+        "name": "_rewardToken",
         "type": "address"
-      }
+      },
+      { "internalType": "uint256", "name": "_expireTime", "type": "uint256" },
+      {
+        "internalType": "address payable",
+        "name": "_fundsRecoveryAddress",
+        "type": "address"
+      },
+      { "internalType": "string", "name": "_version", "type": "string" }
     ],
     "name": "createQuest",
     "outputs": [],

@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   DateRangePicker,
-  DropDown,
   Field,
   GU,
   IconClose,
@@ -11,7 +10,7 @@ import {
 } from '@1hive/1hive-ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { defaultFilter, QUEST_STATUS } from '../../../constants';
+import { defaultFilter } from '../../../constants';
 import { useFilterContext } from '../../../providers/FilterContext';
 import { useWallet } from '../../../providers/Wallet';
 import CreateQuestModal from '../../modals/QuestModal';
@@ -30,14 +29,16 @@ const BoxStyled = styled(Box)`
 
 // #endregion
 
-const questStatusOptions = Object.values(QUEST_STATUS).map((x) => x.label);
-
 export default function QuestListFilter() {
   const { filter, setFilter } = useFilterContext();
   const { account } = useWallet();
   const [createdQuests, setCreatedQuests] = useState(false);
   const [playedQuests, setPlayedQuests] = useState(false);
   const [foundedQuests, setFoundedQuests] = useState(false);
+
+  const handleClose = (address) => {
+    if (address) setFilter(filter); // Force a refresh
+  };
 
   return (
     <Outset gu16>
@@ -52,20 +53,11 @@ export default function QuestListFilter() {
               wide
             />
           </Field>
-          <Field label="filterStatus">
-            <DropDown
-              items={questStatusOptions}
-              selected={Object.keys(QUEST_STATUS).indexOf(filter.status)}
-              onChange={(i) => setFilter({ status: Object.keys(QUEST_STATUS)[i] })}
-              placeholder="All"
-              wide
-            />
-          </Field>
-          <Field label="Expiration">
+          <Field label="Expire time">
             <DateRangePicker
-              startDate={filter.expiration?.start}
-              endDate={filter.expiration?.end}
-              onChange={(val) => setFilter({ expiration: val })}
+              startDate={filter.expire?.start}
+              endDate={filter.expire?.end}
+              onChange={(val) => setFilter({ expire: val })}
             />
           </Field>
           <AmountFieldInput
@@ -101,7 +93,7 @@ export default function QuestListFilter() {
               <Field label="Founded quests">
                 <Switch checked={foundedQuests} onChange={setFoundedQuests} />
               </Field>
-              <CreateQuestModal create />
+              <CreateQuestModal create onClose={handleClose} />
             </>
           )}
         </Outset>
