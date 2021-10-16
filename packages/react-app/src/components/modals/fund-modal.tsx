@@ -3,7 +3,7 @@ import { noop } from 'lodash';
 import { useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { TokenAmount } from 'src/models/amount';
-import QuestProvider from '../../services/QuestService';
+import * as QuestService from '../../services/QuestService';
 import AmountFieldInput from '../shared/field-input/amount-field-input';
 import ModalBase from './modal-base';
 
@@ -22,7 +22,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   };
   const onFundClick = () => {
     if (fundAmount)
-      QuestProvider.fundQuest(questAddress, fundAmount, () => toast('Transaction completed')).then(
+      QuestService.fundQuest(questAddress, fundAmount, () => toast('Transaction completed')).then(
         () => {
           onModalClose();
           toast('Transaction sent');

@@ -9,7 +9,7 @@ import { useFactoryContract } from 'src/hooks/useContract';
 import { TokenAmount } from 'src/models/amount';
 import { Fund as Fundation } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
-import QuestService from 'src/services/QuestService';
+import * as QuestService from 'src/services/QuestService';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date-utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';

@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import React, { useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
-import QuestProvider from '../../../services/QuestService';
+import * as QuestService from '../../../services/QuestService';
 import { Outset } from '../utils/spacer-util';
 
 type Props = {
@@ -35,7 +35,7 @@ function TagFieldInput({
   const [searchTerm, setSearchTerm] = useState<string>();
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
-  tagSuggestions = tagSuggestions ?? QuestProvider.getTagSuggestions();
+  tagSuggestions = tagSuggestions ?? QuestService.getTagSuggestions();
 
   const onTagAddition = (tag: string) => {
     if (!value.includes(tag)) {

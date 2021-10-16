@@ -4,7 +4,6 @@ import { log } from 'loglevel';
 import { TokenAmount } from 'src/models/amount';
 import { Fund } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
-import { QuestsResult } from 'src/models/quests-result';
 import { MIN_QUEST_VERSION, QUEST_STATUS, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
 import { QuestEntity } from '../queries/index';
 import { wrapError } from '../utils/errors-util';
@@ -81,26 +80,40 @@ function mapQuests(quests: any[]) {
       const metadataJson = await getObjectFromIpfs(x.questMetadataHash);
       if (metadataJson == null)
         throw Error(`Quest metadata was not found with Hash: ${x.questMetadataHash}`);
-      const metatdata = JSON.parse(metadataJson);
+      const meta = JSON.parse(metadataJson);
+
       return {
+        title: meta.title,
+        description: meta.description,
+        bounty: meta.bounty,
+        collateralPercentage: meta.collateral,
+        tags: meta.tags,
+
         address: x.questAddress,
-        meta: metatdata,
         rewardTokenAddress: x.questRewardTokenAddress,
         expireTimeMs: x.questExpireTime * 1000, // Sec to Ms
-      } as Partial<QuestData>;
+      };
     }),
   );
+}
+
+loadStorage();
+if (!fakeDb.length) {
+  for (let index = 0; index < 10; index += 1) {
+    generateFakeQuest(index);
+  }
+  updateStorage();
 }
 
 // #endregion
 
 // #region Public
 
-async function getMoreQuests(
+export async function getMoreQuests(
   currentIndex: number,
   count: number,
   filter: { foundedQuests: boolean; playedQuests: boolean; createdQuests: boolean },
-): Promise<QuestsResult> {
+): Promise<QuestData[]> {
   const currentAccount = await getCurrentAccount();
   if (!currentAccount && (filter.foundedQuests || filter.playedQuests || filter.createdQuests)) {
     throw wrapError(
@@ -115,15 +128,10 @@ async function getMoreQuests(
     minVersion: MIN_QUEST_VERSION,
   });
 
-  const result = {
-    data: await mapQuests(queryResult.questEntities),
-  } as QuestsResult;
-  result.hasMore = result.data.length === count;
-
-  return result;
+  return mapQuests(queryResult.questEntities);
 }
 
-async function saveQuest(
+export async function saveQuest(
   questFactoryContract: any,
   fallbackAddress: string,
   meta: Partial<QuestData>,
@@ -148,7 +156,11 @@ async function saveQuest(
   return null;
 }
 
-async function fundQuest(questAddress: string, amount: TokenAmount, onCompleted: Function = noop) {
+export async function fundQuest(
+  questAddress: string,
+  amount: TokenAmount,
+  onCompleted: Function = noop,
+) {
   const currentAccount = await getCurrentAccount();
   if (!currentAccount)
     throw wrapError('User account not connected when trying to found a quest!', {
@@ -163,7 +175,7 @@ async function fundQuest(questAddress: string, amount: TokenAmount, onCompleted:
   updateStorage();
 }
 
-async function playQuest(questAddress: string) {
+export async function playQuest(questAddress: string) {
   const currentAccount = await getCurrentAccount();
   if (!currentAccount)
     throw wrapError('User account not connected when trying to play a quest!', {
@@ -173,24 +185,8 @@ async function playQuest(questAddress: string) {
   updateStorage();
 }
 
-function getTagSuggestions() {
+export function getTagSuggestions() {
   return fakeDb.map((x) => x.meta.tags).flat();
 }
 
 // #endregion
-
-loadStorage();
-if (!fakeDb.length) {
-  for (let index = 0; index < 10; index += 1) {
-    generateFakeQuest(index);
-  }
-  updateStorage();
-}
-
-export default {
-  getMoreQuests,
-  saveQuest,
-  fundQuest,
-  playQuest,
-  getTagSuggestions,
-};

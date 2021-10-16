@@ -6,7 +6,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
 import { QuestData } from 'src/models/quest-data';
 import { useFilterContext } from '../../providers/filter-context';
-import QuestProvider from '../../services/QuestService';
+import * as QuestService from '../../services/QuestService';
 import QuestListFilter from './quest-list-filter';
 import { Outset } from './utils/spacer-util';
 
@@ -22,19 +22,19 @@ export default function QuestList() {
   const refresh = () => {
     setQuests([]);
     setIsLoading(true);
-    QuestProvider.getMoreQuests(0, batchSize, filter).then((res) => {
+    QuestService.getMoreQuests(0, batchSize, filter).then((res) => {
       setIsLoading(false);
-      setQuests(res.data);
-      setHasMore(res.hasMore);
+      setQuests(res);
+      setHasMore(res.length >= batchSize);
     });
   };
 
   const loadMore = () => {
     setIsLoading(true);
-    QuestProvider.getMoreQuests(quests.length, batchSize, filter).then((res) => {
+    QuestService.getMoreQuests(quests.length, batchSize, filter).then((res) => {
       setIsLoading(false);
-      setQuests(quests.concat(res.data));
-      setHasMore(res.hasMore);
+      setQuests(quests.concat(res));
+      setHasMore(res.length >= batchSize);
     });
   };
 
@@ -76,15 +76,8 @@ export default function QuestList() {
           <div>
             {quests.map((x) => (
               <Outset gu16 key={x.address}>
-                <Quest
-                  players={x.players}
-                  address={x.address}
-                  expireTimeMs={x.expireTimeMs}
-                  creatorAddress={x.creatorAddress}
-                  funds={x.funds}
-                  isLoading={x.isLoading}
-                  onFilterChange={setFilter}
-                />
+                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                <Quest {...x} onFilterChange={setFilter} />
               </Outset>
             ))}
             {isLoading && skeletonQuests}

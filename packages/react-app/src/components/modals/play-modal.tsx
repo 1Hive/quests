@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useState } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
-import QuestProvider from '../../services/QuestService';
+import * as QuestService from '../../services/QuestService';
 import ModalBase from './modal-base';
 
 const FlexStyled = styled.div`
@@ -27,7 +27,7 @@ export default function PlayModal({ questAddress, onClose = noop, disabled = fal
   };
   const onPlayClick = () => {
     onModalClose();
-    QuestProvider.playQuest(questAddress);
+    QuestService.playQuest(questAddress);
     toast('Successfully register as a player');
   };
   return (
