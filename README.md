@@ -1,8 +1,7 @@
 ## 🌟 Quests
 
 [![Continuous Integration](https://github.com/1Hive/quests/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/1Hive/quests/actions/workflows/continuous-integration.yml)
-
-[![codecov](https://codecov.io/gh/1hive/quests/branch/master/graph/badge.svg)](https://codecov.io/gh/1hive/quests)
+[![codecov](https://codecov.io/gh/1hive/quests/branch/main/graph/badge.svg?token=IDwI3r7ExZ)](https://codecov.io/gh/1hive/quests)
 
 Quests is a bounty board for 1Hive swarms.
 
