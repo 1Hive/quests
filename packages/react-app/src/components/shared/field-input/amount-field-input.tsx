@@ -1,7 +1,6 @@
 import { DropDown, Field, GU, TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
-import { toNumber } from 'lodash';
-import { noop } from 'lodash-es';
+import { noop, toNumber } from 'lodash-es';
 import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { TokenAmount } from 'src/models/amount';

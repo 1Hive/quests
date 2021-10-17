@@ -1,5 +1,5 @@
 import { request } from 'graphql-request';
-import { noop, random } from 'lodash';
+import { noop, random } from 'lodash-es';
 import { log } from 'loglevel';
 import { TokenAmount } from 'src/models/amount';
 import { Fund } from 'src/models/fund';

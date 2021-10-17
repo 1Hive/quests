@@ -1,5 +1,5 @@
 import { Button, useToast } from '@1hive/1hive-ui';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 import { useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { TokenAmount } from 'src/models/amount';

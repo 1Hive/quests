@@ -1,4 +1,4 @@
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 import log from 'loglevel';
 import { TokenAmount } from 'src/models/amount';
 import Web3 from 'web3';

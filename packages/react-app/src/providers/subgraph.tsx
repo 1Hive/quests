@@ -1,5 +1,5 @@
 import { devtoolsExchange } from '@urql/devtools';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 import React from 'react';
 import {
   cacheExchange,
