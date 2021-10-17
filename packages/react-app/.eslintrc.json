@@ -5,6 +5,7 @@
     "browser": true,
     "node": true
   },
+  "ignorePatterns": "*.svg,*.png",
   "extends": ["plugin:react/recommended", "airbnb", "prettier"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

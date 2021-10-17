@@ -11,6 +11,7 @@ const run = () => {
 };
 
 console.log('🔬 Watching Themes...');
+// @ts-ignore
 watch('./src/themes', { recursive: true }, (evt, name) => {
   console.log('%s changed.', name);
   run();

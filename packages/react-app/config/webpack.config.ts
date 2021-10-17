@@ -416,6 +416,7 @@ module.exports = function (webpackEnv) {
             {
               test: cssRegex,
               exclude: cssModuleRegex,
+              // @ts-ignore
               use: getStyleLoaders({
                 importLoaders: 1,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
@@ -430,6 +431,7 @@ module.exports = function (webpackEnv) {
             // using the extension .module.css
             {
               test: cssModuleRegex,
+              // @ts-ignore
               use: getStyleLoaders({
                 importLoaders: 1,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
@@ -635,7 +637,7 @@ module.exports = function (webpackEnv) {
 
         // webpack specific configuration
         include: '.',
-        ignore: ['node_modules', 'webpack.config.js'],
+        ignore: ['node_modules', 'webpack.config.ts'],
       }),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.

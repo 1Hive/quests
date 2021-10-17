@@ -1,5 +1,4 @@
 // Spacing helpers
-
 $space-values: (0, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72) !default;
 
 $space-prefixes: (
@@ -16,7 +15,7 @@ $space-prefixes: (
 ) !default;
 
 @mixin make-spaces() {
-  @each $attr-short, $attr-long in $space-prefixes {
+  @each $attr-short, $attr-long in $space-prefixeFs {
     @each $value in $space-values {
       .#{$attr-short}-#{$value} {
         #{$attr-long}: #{$value}#{'px'} !important;
