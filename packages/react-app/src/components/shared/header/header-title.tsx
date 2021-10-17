@@ -1,5 +1,5 @@
 import { GU, Link, textStyle, useTheme } from '@1hive/1hive-ui';
-import { noop } from '@babel/types';
+import { noop } from 'lodash';
 import styled from 'styled-components';
 import { APP_TITLE } from '../../../constants';
 import logo from './assets/logo.svg';
