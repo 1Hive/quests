@@ -5,42 +5,38 @@
     "browser": true,
     "node": true
   },
-  "parser": "babel-eslint",
-  "extends": ["airbnb", "prettier"],
-  "globals": {
-    "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
-  },
+  "extends": ["plugin:react/recommended", "airbnb", "prettier"],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
-      "jsx": true,
-      "modules": true
+      "jsx": true
     },
-    "ecmaVersion": 2020,
+    "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier"],
+  "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "react/jsx-filename-extension": [
-      1,
+    "radix": 0,
+    "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
       {
-        "extensions": [".js", ".jsx"]
+        "ts": "never",
+        "tsx": "never"
       }
     ],
-    "react/forbid-prop-types": [
-      0,
-      {
-        "forbid": ["any"]
-      }
-    ],
-    "react/prop-types": 0,
-    "import/prefer-default-export": "off",
-    "react/destructuring-assignment": "off",
-    "no-param-reassign": "off",
     "react/require-default-props": "off",
-    "react/no-array-index-key": "off",
-    "no-debugger": "warn",
-    "radix": 0
+    "import/prefer-default-export": "off",
+    "no-use-before-define": "off",
+    "no-param-reassign": "off",
+    "no-unused-expressions": "off",
+    "react/react-in-jsx-scope": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
   }
 }

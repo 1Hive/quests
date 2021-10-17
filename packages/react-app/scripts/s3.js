@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+// @ts-ignore
 const s3FolderUpload = require('s3-folder-upload');
 const fs = require('fs');
 
@@ -20,6 +20,7 @@ if (!BUCKETNAME) {
 
 let credentials = {};
 try {
+  // @ts-ignore
   credentials = JSON.parse(fs.readFileSync('aws.json'));
 } catch (e) {
   console.log(e);
@@ -37,9 +38,9 @@ const options = {
   useIAMRoleCredentials: false,
 };
 
-/// //////////
-/// ////////// First, let's automatically create the bucket if it doesn't exist...
-/// //////////
+//////////
+////////// First, let's automatically create the bucket if it doesn't exist...
+//////////
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const AWS = require('aws-sdk');
@@ -47,6 +48,7 @@ const AWS = require('aws-sdk');
 AWS.config.loadFromPath('./aws.json');
 
 // Create S3 service object
+// @ts-ignore
 s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 // Create params JSON for S3.createBucket
@@ -69,12 +71,14 @@ const staticHostParams = {
 };
 
 // Call S3 to create the bucket
+// @ts-ignore
 s3.createBucket(bucketParams, (err, data) => {
   if (err) {
     console.log('Error', err);
   } else {
     console.log('Bucket URL is ', data.Location);
     // Set the new policy on the newly created bucket
+    // @ts-ignore
     s3.putBucketWebsite(staticHostParams, (err, data) => {
       if (err) {
         // Display error message
