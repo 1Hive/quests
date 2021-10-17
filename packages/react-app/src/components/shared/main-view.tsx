@@ -44,7 +44,7 @@ const ScrollViewStyled = styled.div`
 type Props = {
   children: React.ReactNode;
   toggleTheme: Function;
-  currentTheme: string;
+  currentTheme: any;
 };
 
 function MainView({ children, toggleTheme, currentTheme }: Props) {
