@@ -15,7 +15,7 @@ $space-prefixes: (
 ) !default;
 
 @mixin make-spaces() {
-  @each $attr-short, $attr-long in $space-prefixeFs {
+  @each $attr-short, $attr-long in $space-prefixes {
     @each $value in $space-values {
       .#{$attr-short}-#{$value} {
         #{$attr-long}: #{$value}#{'px'} !important;
