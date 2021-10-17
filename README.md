@@ -43,7 +43,7 @@ yarn start:local &; yarn chain &; yarn deploy &
 
 #### Connect
 
-1. Select xDai chain
+1. Select xDai chain if realease or Rinkeby chain if debug 
 2. Click Enable Button account
 3. Click on Metamask button
 
