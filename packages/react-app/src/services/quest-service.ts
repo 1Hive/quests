@@ -5,8 +5,9 @@ import { Filter } from 'src/models/filter';
 import { Fund } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
+import { QuestEntity } from 'src/queries/quest-entity';
 import { MIN_QUEST_VERSION, QUEST_STATUS, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
-import { QuestEntity } from '../queries/index';
+import { QuestSearch } from '../queries/quest-search';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
 
@@ -116,15 +117,30 @@ export async function getMoreQuests(
       { filter },
     );
   }
+  console.log('filterr', filter);
 
-  const queryResult = await request(SUBGRAPH_URI, QuestEntity, {
-    skip: currentIndex,
-    first: count,
-    search: filter.search,
-    minVersion: MIN_QUEST_VERSION,
-  });
+  let queryResult;
+  if (filter.search) {
+    queryResult = (
+      await request(SUBGRAPH_URI, QuestSearch, {
+        skip: currentIndex,
+        first: count,
+        search: filter.search,
+        minVersion: MIN_QUEST_VERSION,
+      })
+    ).questSearch;
+  } else {
+    queryResult = (
+      await request(SUBGRAPH_URI, QuestEntity, {
+        skip: currentIndex,
+        first: count,
+        minVersion: MIN_QUEST_VERSION,
+        tags: filter.tags,
+      })
+    ).questEntities;
+  }
 
-  return mapQuests(queryResult.questSearch);
+  return mapQuests(queryResult);
 }
 
 export async function saveQuest(

@@ -202,7 +202,7 @@ export default function Quest({
                     isLoading={loading}
                     suffix="%"
                   />
-                  {!!values.tags?.length && (
+                  {(!!values.tags?.length || editMode) && (
                     <TagFieldInputFormik
                       id="tags"
                       label="Tags"
