@@ -9,7 +9,7 @@ contract QuestFactory {
 
     event QuestCreated(
         address questAddress,
-        string requirementsIpfsHash,
+        string questMetadataJson,
         address rewardTokenAddress,
         uint256 expireTime,
         string version
@@ -20,14 +20,14 @@ contract QuestFactory {
     }
 
     function createQuest(
-        string memory _requirementsIpfsHash,
+        string memory _questMetadataJson,
         IERC20 _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress,
         string memory _version
     ) external {
         Quest quest = new Quest(
-            _requirementsIpfsHash,
+            _questMetadataJson,
             _rewardToken,
             _expireTime,
             aragonGovernAddress,
@@ -35,7 +35,7 @@ contract QuestFactory {
         );
         emit QuestCreated(
             address(quest),
-            _requirementsIpfsHash,
+            _questMetadataJson,
             address(_rewardToken),
             _expireTime,
             _version

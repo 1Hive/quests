@@ -27,8 +27,8 @@ interface QuestInterface extends ethers.utils.Interface {
     "claims(uint256)": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
+    "questMetadataJson()": FunctionFragment;
     "recoverUnclaimedFunds()": FunctionFragment;
-    "requirementsIpfsHash()": FunctionFragment;
     "rewardToken()": FunctionFragment;
   };
 
@@ -53,11 +53,11 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "recoverUnclaimedFunds",
+    functionFragment: "questMetadataJson",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "requirementsIpfsHash",
+    functionFragment: "recoverUnclaimedFunds",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -77,11 +77,11 @@ interface QuestInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "recoverUnclaimedFunds",
+    functionFragment: "questMetadataJson",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "requirementsIpfsHash",
+    functionFragment: "recoverUnclaimedFunds",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -158,15 +158,15 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
+    questMetadataJson(overrides?: CallOverrides): Promise<[string]>;
+
+    "questMetadataJson()"(overrides?: CallOverrides): Promise<[string]>;
+
     recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
 
     "recoverUnclaimedFunds()"(
       overrides?: Overrides
     ): Promise<ContractTransaction>;
-
-    requirementsIpfsHash(overrides?: CallOverrides): Promise<[string]>;
-
-    "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<[string]>;
 
     rewardToken(overrides?: CallOverrides): Promise<[string]>;
 
@@ -221,15 +221,15 @@ export class Quest extends Contract {
 
   "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
+  questMetadataJson(overrides?: CallOverrides): Promise<string>;
+
+  "questMetadataJson()"(overrides?: CallOverrides): Promise<string>;
+
   recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
 
   "recoverUnclaimedFunds()"(
     overrides?: Overrides
   ): Promise<ContractTransaction>;
-
-  requirementsIpfsHash(overrides?: CallOverrides): Promise<string>;
-
-  "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<string>;
 
   rewardToken(overrides?: CallOverrides): Promise<string>;
 
@@ -284,13 +284,13 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
+    questMetadataJson(overrides?: CallOverrides): Promise<string>;
+
+    "questMetadataJson()"(overrides?: CallOverrides): Promise<string>;
+
     recoverUnclaimedFunds(overrides?: CallOverrides): Promise<void>;
 
     "recoverUnclaimedFunds()"(overrides?: CallOverrides): Promise<void>;
-
-    requirementsIpfsHash(overrides?: CallOverrides): Promise<string>;
-
-    "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<string>;
 
     rewardToken(overrides?: CallOverrides): Promise<string>;
 
@@ -335,13 +335,13 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    questMetadataJson(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "questMetadataJson()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     recoverUnclaimedFunds(overrides?: Overrides): Promise<BigNumber>;
 
     "recoverUnclaimedFunds()"(overrides?: Overrides): Promise<BigNumber>;
-
-    requirementsIpfsHash(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "requirementsIpfsHash()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     rewardToken(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -393,18 +393,16 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    questMetadataJson(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "questMetadataJson()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     recoverUnclaimedFunds(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "recoverUnclaimedFunds()"(
       overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    requirementsIpfsHash(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "requirementsIpfsHash()"(
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     rewardToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
