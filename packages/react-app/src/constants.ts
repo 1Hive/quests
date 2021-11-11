@@ -67,7 +67,7 @@ export const defaultFilter = {
 };
 
 // SUBGRAPH
-export const SUBGRAPH_URI = 'https://api.thegraph.com/subgraphs/name/corantin/quests';
+export const SUBGRAPH_URI = 'https://api.studio.thegraph.com/query/10030/1hive-quests/0.0.1';
 
 // Handle retro compatibility correctly
 export const QUEST_VERSION = '2.4';

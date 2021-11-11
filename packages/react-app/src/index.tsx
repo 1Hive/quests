@@ -1,4 +1,3 @@
-// @ts-ignore
 import ReactDOM from 'react-dom';
 import App from './app';
 import { SubgraphProvider } from './providers/subgraph-context';

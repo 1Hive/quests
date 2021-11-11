@@ -9,7 +9,6 @@ import { MIN_QUEST_VERSION, QUEST_STATUS, QUEST_VERSION, SUBGRAPH_URI, TOKENS } 
 import { QuestEntity } from '../queries/index';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
-import { pushObjectToIpfs } from './ipfs-service';
 
 // #region Private
 
@@ -110,8 +109,6 @@ export async function getMoreQuests(
   count: number,
   filter: Filter,
 ): Promise<QuestData[]> {
-  console.log('filter', filter);
-
   const currentAccount = await getCurrentAccount();
   if (!currentAccount && (filter.foundedQuests || filter.playedQuests || filter.createdQuests)) {
     throw wrapError(
@@ -123,10 +120,11 @@ export async function getMoreQuests(
   const queryResult = await request(SUBGRAPH_URI, QuestEntity, {
     skip: currentIndex,
     first: count,
+    search: filter.search,
     minVersion: MIN_QUEST_VERSION,
   });
 
-  return mapQuests(queryResult.questEntities);
+  return mapQuests(queryResult.questSearch);
 }
 
 export async function saveQuest(
@@ -137,9 +135,8 @@ export async function saveQuest(
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
-    const ipfsHash = await pushObjectToIpfs({ ...meta });
     const tx = await questFactoryContract.createQuest(
-      ipfsHash.toString(),
+      JSON.stringify(meta),
       TOKENS.honey.address,
       Math.round(meta.expireTimeMs! / 1000), // Ms to Sec
       fallbackAddress,

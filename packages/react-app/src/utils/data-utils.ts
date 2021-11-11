@@ -1,7 +1,7 @@
 import log from 'loglevel';
-import { TokenAmount } from 'src/models/token-amount';
 import { Fund } from 'src/models/fund';
 import { Token } from 'src/models/token';
+import { TokenAmount } from 'src/models/token-amount';
 import { TOKENS } from '../constants';
 
 export async function convertTo(from: TokenAmount, toToken: Token) {
