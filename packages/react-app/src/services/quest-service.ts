@@ -1,14 +1,15 @@
 import { request } from 'graphql-request';
 import { noop, random } from 'lodash-es';
 import { log } from 'loglevel';
-import { TokenAmount } from 'src/models/amount';
+import { Filter } from 'src/models/filter';
 import { Fund } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
+import { TokenAmount } from 'src/models/token-amount';
 import { MIN_QUEST_VERSION, QUEST_STATUS, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
 import { QuestEntity } from '../queries/index';
 import { wrapError } from '../utils/errors-util';
 import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
-import { getObjectFromIpfs, pushObjectToIpfs } from './IpfsService';
+import { pushObjectToIpfs } from './ipfs-service';
 
 // #region Private
 
@@ -74,26 +75,21 @@ function retrieveQuest(address: string) {
   return quest;
 }
 
-function mapQuests(quests: any[]) {
+function mapQuests(quests: any[]): Promise<QuestData[]> {
   return Promise.all(
-    quests.map(async (x) => {
-      const metadataJson = await getObjectFromIpfs(x.questMetadataHash);
-      if (metadataJson == null)
-        throw Error(`Quest metadata was not found with Hash: ${x.questMetadataHash}`);
-      const meta = JSON.parse(metadataJson);
-
-      return {
-        title: meta.title,
-        description: meta.description,
-        bounty: meta.bounty,
-        collateralPercentage: meta.collateral,
-        tags: meta.tags,
-
-        address: x.questAddress,
-        rewardTokenAddress: x.questRewardTokenAddress,
-        expireTimeMs: x.questExpireTime * 1000, // Sec to Ms
-      };
-    }),
+    quests.map(
+      async (questEntity) =>
+        ({
+          address: questEntity.questAddress,
+          title: questEntity.questMetaTitle,
+          description: questEntity.questMetaDescription,
+          rewardTokenAddress: questEntity.questRewardTokenAddress,
+          bounty: { amount: 0, token: TOKENS.honey }, // Fetch amount of honey for this quest or questRewardTokenAddress
+          collateralPercentage: questEntity.questMetaCollateralPercentage,
+          tags: questEntity.questMetaTags,
+          expireTimeMs: questEntity.questExpireTimeSec * 1000, // Sec to Ms
+        } as QuestData),
+    ),
   );
 }
 
@@ -112,8 +108,10 @@ if (!fakeDb.length) {
 export async function getMoreQuests(
   currentIndex: number,
   count: number,
-  filter: { foundedQuests: boolean; playedQuests: boolean; createdQuests: boolean },
+  filter: Filter,
 ): Promise<QuestData[]> {
+  console.log('filter', filter);
+
   const currentAccount = await getCurrentAccount();
   if (!currentAccount && (filter.foundedQuests || filter.playedQuests || filter.createdQuests)) {
     throw wrapError(
@@ -139,7 +137,7 @@ export async function saveQuest(
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
-    const ipfsHash = await pushObjectToIpfs({ ...meta, version: QUEST_VERSION });
+    const ipfsHash = await pushObjectToIpfs({ ...meta });
     const tx = await questFactoryContract.createQuest(
       ipfsHash.toString(),
       TOKENS.honey.address,

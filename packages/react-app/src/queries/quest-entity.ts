@@ -5,10 +5,14 @@ export const QuestEntity = gql`
     questEntities(first: $first, skip: $skip, where: { questVersion_gte: $minVersion }) {
       id
       questAddress
-      questMetadataHash
       questRewardTokenAddress
-      questExpireTime
+      questExpireTimeSec
       questVersion
+      questMetaIpfsHash
+      questMetaTitle
+      questMetaDescription
+      questMetaCollateralPercentage
+      questMetaTags
     }
   }
 `;

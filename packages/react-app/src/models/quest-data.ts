@@ -1,4 +1,4 @@
-import { TokenAmount } from './amount';
+import { TokenAmount } from './token-amount';
 import { Fund } from './fund';
 import { Status } from './status';
 

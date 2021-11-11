@@ -70,5 +70,5 @@ export const defaultFilter = {
 export const SUBGRAPH_URI = 'https://api.thegraph.com/subgraphs/name/corantin/quests';
 
 // Handle retro compatibility correctly
-export const QUEST_VERSION = '2.3';
-export const MIN_QUEST_VERSION = '2.3';
+export const QUEST_VERSION = '2.4';
+export const MIN_QUEST_VERSION = '2.4';

@@ -1,5 +1,5 @@
 import log from 'loglevel';
-import { TokenAmount } from 'src/models/amount';
+import { TokenAmount } from 'src/models/token-amount';
 import { Fund } from 'src/models/fund';
 import { Token } from 'src/models/token';
 import { TOKENS } from '../constants';

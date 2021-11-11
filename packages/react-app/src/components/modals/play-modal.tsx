@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useState } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
-import * as QuestService from '../../services/QuestService';
+import * as QuestService from '../../services/quest-service';
 import ModalBase from './modal-base';
 
 const FlexStyled = styled.div`

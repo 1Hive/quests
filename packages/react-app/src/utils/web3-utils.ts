@@ -1,6 +1,6 @@
 import { noop } from 'lodash-es';
 import log from 'loglevel';
-import { TokenAmount } from 'src/models/amount';
+import { TokenAmount } from 'src/models/token-amount';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import { IS_DEV } from '../constants';

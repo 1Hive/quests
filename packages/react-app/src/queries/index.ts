@@ -1,3 +1,3 @@
-import { QuestEntity } from './QuestEntity';
+import { QuestEntity } from './quest-entity';
 
 export { QuestEntity };

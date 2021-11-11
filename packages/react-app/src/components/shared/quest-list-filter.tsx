@@ -12,7 +12,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { defaultFilter } from '../../constants';
 import { useFilterContext } from '../../providers/filter-context';
-import { useWallet } from '../../providers/wallet';
+import { useWallet } from '../../providers/wallet-context';
 import CreateQuestModal from '../modals/quest-modal';
 import AmountFieldInput from './field-input/amount-field-input';
 import TagFieldInput from './field-input/tag-field-input';

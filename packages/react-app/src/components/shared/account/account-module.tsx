@@ -5,7 +5,7 @@ import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
 import styled from 'styled-components';
-import { useWallet } from '../../../providers/wallet';
+import { useWallet } from '../../../providers/wallet-context';
 import { getUseWalletProviders } from '../../../utils/web3-utils';
 import HeaderPopover from '../header/header-popover';
 import AccountButton from './account-button';

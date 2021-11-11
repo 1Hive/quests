@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import React, { useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
-import * as QuestService from '../../../services/QuestService';
+import * as QuestService from '../../../services/quest-service';
 import { Outset } from '../utils/spacer-util';
 
 type Props = {

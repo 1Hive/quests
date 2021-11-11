@@ -1,8 +1,0 @@
-type QuestEntity @entity {
-  id: ID!
-  questAddress: Bytes!
-  questMetadataHash: String!
-  questRewardTokenAddress: Bytes!
-  questExpireTime: BigInt!
-  questVersion: String!
-}
