@@ -48,7 +48,6 @@ export async function getMoreQuests(
       { filter },
     );
   }
-  console.log('filterr', filter);
 
   let queryResult;
   if (filter.search) {
