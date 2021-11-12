@@ -49,7 +49,7 @@ export default function QuestListFilter() {
             <SearchInput
               id="filterSearch"
               value={filter.search}
-              onChange={(x: string) => setFilter({ search: x })}
+              onChange={(x: string) => setFilter({ ...filter, search: x })}
               placeholder="keyword"
               wide
             />
@@ -58,14 +58,14 @@ export default function QuestListFilter() {
             <DateRangePicker
               startDate={filter.expire?.start}
               endDate={filter.expire?.end}
-              onChange={(val: any) => setFilter({ expire: val })}
+              onChange={(val: any) => setFilter({ ...filter, expire: val })}
             />
           </Field>
           <AmountFieldInput
             id="filterBounty"
             label="Min bounty"
             value={filter.bounty}
-            onChange={(x: any) => setFilter({ bounty: x }, true)}
+            onChange={(x: any) => setFilter({ ...filter, bounty: x }, true)}
             wide
           />
           <TagFieldInput
@@ -74,7 +74,7 @@ export default function QuestListFilter() {
             isEdit
             placeholder="Search"
             value={filter.tags}
-            onChange={(x: string[]) => setFilter({ tags: x })}
+            onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
           />
           <Button
             icon={<IconClose />}

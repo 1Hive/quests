@@ -18,7 +18,7 @@ export default function QuestList() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   // @ts-ignore
-  const { filter, setFilter } = useFilterContext();
+  const { filter } = useFilterContext();
 
   const refresh = (_filter?: Filter) => {
     if (!isLoading) {
@@ -84,7 +84,7 @@ export default function QuestList() {
             {quests.map((x) => (
               <Outset gu16 key={x.address}>
                 {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                <Quest {...x} onFilterChange={setFilter} />
+                <Quest {...x} />
               </Outset>
             ))}
             {isLoading && skeletonQuests}

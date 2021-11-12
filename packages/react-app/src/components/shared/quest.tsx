@@ -1,6 +1,7 @@
 import { AddressField, Button, Card, Field, GU, LoadingRing, Split } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
+import { log } from 'loglevel';
 import { useRef, useState } from 'react';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
@@ -63,7 +64,6 @@ type Props = {
   players?: string[];
   funds?: Fundation[];
   creatorAddress?: string;
-  onFilterChange?: Function;
   expireTimeMs?: number;
 };
 
@@ -82,7 +82,6 @@ export default function Quest({
   funds = [],
   onSave = noop,
   css,
-  onFilterChange = noop,
 }: Props) {
   const wallet = useWallet();
   const questFactoryContract = useFactoryContract();
@@ -90,6 +89,8 @@ export default function Quest({
   const [editMode, setEditMode] = useState(isEdit);
   const [loading, setLoading] = useState(isLoading);
   const alreadyPlayed = !!players.find((x) => x === wallet.account);
+  // @ts-ignore
+  //   const { filter, setFilter } = useFilterContext();
   return (
     <CardStyled style={css} id={address}>
       <Formik
@@ -210,7 +211,7 @@ export default function Quest({
                       isLoading={loading}
                       value={values.tags}
                       formik={formRef}
-                      onTagClick={(tag: string) => onFilterChange({ tags: [tag] })}
+                      onTagClick={(x: String[]) => log('Tag clicked : ', x)}
                     />
                   )}
                   <DateFieldInput
