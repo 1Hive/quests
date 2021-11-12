@@ -35,7 +35,12 @@ function TagFieldInput({
   const [searchTerm, setSearchTerm] = useState<string>();
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
-  tagSuggestions = tagSuggestions ?? QuestService.getTagSuggestions();
+  tagSuggestions = (tagSuggestions ?? []).concat(QuestService.getTagSuggestions());
+  tagSuggestions = tagSuggestions.filter(
+    (name) => searchTerm && name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1,
+  );
+
+  if (!tagSuggestions.length && searchTerm) tagSuggestions.push(searchTerm);
 
   const onTagAddition = (tag: string) => {
     if (!value.includes(tag)) {
@@ -62,11 +67,7 @@ function TagFieldInput({
         <>
           {isEdit && (
             <AutoComplete
-              items={
-                tagSuggestions?.filter(
-                  (name) => searchTerm && name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1,
-                ) ?? []
-              }
+              items={tagSuggestions}
               onChange={setSearchTerm}
               onSelect={onTagAddition}
               ref={autoCompleteRef}

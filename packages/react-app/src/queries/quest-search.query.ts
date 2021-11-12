@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
 
-export const QuestSearch = gql`
+export const QuestSearchQuery = gql`
   query questSearch($first: Int, $skip: Int, $search: String) {
     questSearch(first: $first, skip: $skip, text: $search) {
       id

@@ -1,79 +1,18 @@
 import { request } from 'graphql-request';
-import { noop, random } from 'lodash-es';
+import { noop } from 'lodash-es';
 import { log } from 'loglevel';
 import { Filter } from 'src/models/filter';
-import { Fund } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
-import { QuestEntity } from 'src/queries/quest-entity';
-import { MIN_QUEST_VERSION, QUEST_STATUS, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
-import { QuestSearch } from '../queries/quest-search';
+import { QuestEntityQuery } from 'src/queries/quest-entity.query';
+import { GQL_MAX_INT, MIN_QUEST_VERSION, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
+import { QuestSearchQuery } from '../queries/quest-search.query';
 import { wrapError } from '../utils/errors-util';
-import { createContractAccount, getCurrentAccount, sendTransaction } from '../utils/web3-utils';
+import { getCurrentAccount, sendTransaction } from '../utils/web3-utils';
+
+let questList: QuestData[] = [];
 
 // #region Private
-
-type fakeDbRow = {
-  status: { id: string; label: string };
-  address: string;
-  meta: {
-    title: string;
-    description: string;
-    bounty: { amount: number; token: { name: string; symb: string; address: string } };
-    collateral: number;
-    tags: string[];
-    expire: string;
-  };
-  funds: Fund[];
-  players: string[];
-  creator: string;
-};
-const fakeDb: fakeDbRow[] = [];
-
-function loadStorage() {
-  const fakeDbJson = localStorage.getItem('fakeDb');
-  if (fakeDbJson !== null) {
-    const parsed = JSON.parse(fakeDbJson);
-    parsed.forEach((element: fakeDbRow) => {
-      fakeDb.push(element);
-    });
-  }
-}
-
-function updateStorage() {
-  localStorage.setItem('fakeDb', JSON.stringify(fakeDb));
-}
-
-function generateFakeQuest(index: number) {
-  fakeDb.push({
-    status: QUEST_STATUS.active,
-    address: createContractAccount().address,
-    meta: {
-      title: `Quest #${index + 1}`,
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus purus, faucibus et pretium nec, lacinia ultrices urna. Phasellus vitae consequat augue. Suspendisse in est est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam fringilla ullamcorper massa, luctus condimentum est tempus sit amet. Curabitur turpis lacus, varius vel justo sed, ultricies ornare purus. Aliquam lacinia enim sed nisi pharetra egestas. Donec dapibus semper nisi.',
-      bounty: { amount: random(100, 1000), token: TOKENS.honey },
-      collateral: random(0, 10),
-      tags: ['FrontEnd', 'Angular', 'JS', 'CoolStuf', 'Chills', 'Spinash', 'Foo']
-        .map((tag) => ({
-          tag,
-          rand: random() > 0,
-        }))
-        .filter((x) => x.rand)
-        .map((x) => x.tag),
-      expire: '06/24/2021',
-    },
-    funds: [],
-    players: [],
-    creator: createContractAccount().address,
-  });
-}
-
-function retrieveQuest(address: string) {
-  const quest = fakeDb.find((x) => x.address === address);
-  if (!quest) throw Error(`[Quest funding] Quest was not found : ${address}`); // TODO : Implement error handler
-  return quest;
-}
 
 function mapQuests(quests: any[]): Promise<QuestData[]> {
   return Promise.all(
@@ -91,14 +30,6 @@ function mapQuests(quests: any[]): Promise<QuestData[]> {
         } as QuestData),
     ),
   );
-}
-
-loadStorage();
-if (!fakeDb.length) {
-  for (let index = 0; index < 10; index += 1) {
-    generateFakeQuest(index);
-  }
-  updateStorage();
 }
 
 // #endregion
@@ -122,7 +53,7 @@ export async function getMoreQuests(
   let queryResult;
   if (filter.search) {
     queryResult = (
-      await request(SUBGRAPH_URI, QuestSearch, {
+      await request(SUBGRAPH_URI, QuestSearchQuery, {
         skip: currentIndex,
         first: count,
         search: filter.search,
@@ -131,16 +62,25 @@ export async function getMoreQuests(
     ).questSearch;
   } else {
     queryResult = (
-      await request(SUBGRAPH_URI, QuestEntity, {
+      await request(SUBGRAPH_URI, QuestEntityQuery, {
         skip: currentIndex,
         first: count,
         minVersion: MIN_QUEST_VERSION,
         tags: filter.tags,
+        expireTimeLower: filter.expire?.start
+          ? Math.round(filter.expire.start.getTime() / 1000) // MS to Sec
+          : 0,
+        expireTimeUpper: filter.expire?.end
+          ? Math.round(filter.expire.end.getTime() / 1000) // MS to Sec
+          : GQL_MAX_INT, // January 18, 2038 10:14:07 PM  // TODO : Change to a later time when supported by grapql-request
       })
     ).questEntities;
   }
 
-  return mapQuests(queryResult);
+  return mapQuests(queryResult).then((questResult) => {
+    questList = questList.concat(questResult);
+    return questResult;
+  });
 }
 
 export async function saveQuest(
@@ -179,11 +119,6 @@ export async function fundQuest(
       amount,
     });
   await sendTransaction(questAddress, amount, onCompleted);
-  retrieveQuest(questAddress).funds.push({
-    patron: currentAccount,
-    amount,
-  });
-  updateStorage();
 }
 
 export async function playQuest(questAddress: string) {
@@ -192,12 +127,10 @@ export async function playQuest(questAddress: string) {
     throw wrapError('User account not connected when trying to play a quest!', {
       questAddress,
     });
-  retrieveQuest(questAddress).players.push(currentAccount);
-  updateStorage();
 }
 
 export function getTagSuggestions() {
-  return fakeDb.map((x) => x.meta.tags).flat();
+  return questList.map((x) => x.tags).flat();
 }
 
 // #endregion
