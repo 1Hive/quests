@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "QuestFactory": {
-          "address": "0xD5fF48D41866a89490AE964F2000dcB6c0ca1Acd",
+          "address": "0xf4C05eE81f6e0E22cE7fdBfF0249542f080cdfb8",
           "abi": [
             {
               "inputs": [
@@ -30,7 +30,7 @@
                 {
                   "indexed": false,
                   "internalType": "string",
-                  "name": "requirementsIpfsHash",
+                  "name": "questMetadataJson",
                   "type": "string"
                 },
                 {
@@ -72,7 +72,7 @@
               "inputs": [
                 {
                   "internalType": "string",
-                  "name": "_requirementsIpfsHash",
+                  "name": "_questMetadataJson",
                   "type": "string"
                 },
                 {
@@ -435,7 +435,7 @@
                 {
                   "indexed": false,
                   "internalType": "string",
-                  "name": "requirementsIpfsHash",
+                  "name": "questMetadataJson",
                   "type": "string"
                 },
                 {
@@ -477,7 +477,7 @@
               "inputs": [
                 {
                   "internalType": "string",
-                  "name": "_requirementsIpfsHash",
+                  "name": "_questMetadataJson",
                   "type": "string"
                 },
                 {

@@ -1,7 +1,6 @@
-// @ts-ignore
 import ReactDOM from 'react-dom';
 import App from './app';
-import { SubgraphProvider } from './providers/subgraph';
+import { SubgraphProvider } from './providers/subgraph.context';
 import './style.scss';
 
 ReactDOM.render(

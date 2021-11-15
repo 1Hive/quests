@@ -1,12 +1,13 @@
 import { Split } from '@1hive/1hive-ui';
 import { debounce } from 'lodash-es';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
 import { QuestData } from 'src/models/quest-data';
-import { useFilterContext } from '../../providers/filter-context';
-import * as QuestService from '../../services/QuestService';
+import { Filter } from '../../models/filter';
+import { useFilterContext } from '../../providers/filter.context';
+import * as QuestService from '../../services/quest.service';
 import QuestListFilter from './quest-list-filter';
 import { Outset } from './utils/spacer-util';
 
@@ -17,16 +18,18 @@ export default function QuestList() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   // @ts-ignore
-  const { filter, setFilter } = useFilterContext();
+  const { filter } = useFilterContext();
 
-  const refresh = () => {
-    setQuests([]);
-    setIsLoading(true);
-    QuestService.getMoreQuests(0, batchSize, filter).then((res) => {
-      setIsLoading(false);
-      setQuests(res);
-      setHasMore(res.length >= batchSize);
-    });
+  const refresh = (_filter?: Filter) => {
+    if (!isLoading) {
+      setQuests([]);
+      setIsLoading(true);
+      QuestService.getMoreQuests(0, batchSize, _filter ?? filter).then((res) => {
+        setIsLoading(false);
+        setQuests(res);
+        setHasMore(res.length >= batchSize);
+      });
+    }
   };
 
   const loadMore = () => {
@@ -47,8 +50,12 @@ export default function QuestList() {
     );
   }
 
+  const debounceFilter = useCallback(
+    debounce((nextFilter) => refresh(nextFilter), 500),
+    [], // will be created only once initially
+  );
   useEffect(() => {
-    debounce(refresh, 200)();
+    debounceFilter(filter);
   }, [filter]);
 
   return (
@@ -77,7 +84,7 @@ export default function QuestList() {
             {quests.map((x) => (
               <Outset gu16 key={x.address}>
                 {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                <Quest {...x} onFilterChange={setFilter} />
+                <Quest {...x} />
               </Outset>
             ))}
             {isLoading && skeletonQuests}

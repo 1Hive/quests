@@ -1,7 +1,7 @@
 import { ButtonBase, GU, Link, RADIUS, textStyle, useTheme } from '@1hive/1hive-ui';
 import { useCallback } from 'react';
 import { getProviderFromUseWalletId } from '../../../ethereum-providers';
-import { getUseWalletProviders } from '../../../utils/web3-utils';
+import { getUseWalletProviders } from '../../../utils/web3.utils';
 
 const PROVIDERS_INFO = getUseWalletProviders().map((provider) => [
   provider.id,

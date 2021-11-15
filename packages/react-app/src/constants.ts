@@ -1,3 +1,4 @@
+import { Filter } from './models/filter';
 import { Token } from './models/token';
 
 export const PCT_BASE = BigInt(1e18);
@@ -60,15 +61,19 @@ export const BREAKPOINTS = {
 
 export const defaultFilter = {
   search: '',
-  expire: { start: null, end: null },
+  expire: { start: undefined, end: undefined },
   tags: [],
   bounty: { amount: 0, token: TOKENS.honey },
   showFull: false,
-};
+  foundedQuests: false,
+  createdQuests: false,
+  playedQuests: false,
+} as Filter;
 
 // SUBGRAPH
-export const SUBGRAPH_URI = 'https://api.thegraph.com/subgraphs/name/corantin/quests';
+export const SUBGRAPH_URI = 'https://api.studio.thegraph.com/query/10030/1hive-quests/0.0.1';
 
 // Handle retro compatibility correctly
-export const QUEST_VERSION = '2.3';
-export const MIN_QUEST_VERSION = '2.3';
+export const QUEST_VERSION = '2.4';
+export const MIN_QUEST_VERSION = '2.4';
+export const GQL_MAX_INT = 2 ** 31 - 1;

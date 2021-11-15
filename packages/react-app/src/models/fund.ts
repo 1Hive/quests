@@ -1,4 +1,4 @@
-import { TokenAmount } from './amount';
+import { TokenAmount } from './token-amount';
 
 export type Fund = {
   patron: string;

@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import { CSSProperties } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-import { dateFormat } from '../../../utils/date-utils';
+import { dateFormat } from '../../../utils/date.utils';
 
 const InputStyled = styled.input`
   background-color: ${({ background }: any) => background};

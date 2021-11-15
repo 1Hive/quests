@@ -3,7 +3,7 @@ import { connect } from 'formik';
 import { noop, toNumber } from 'lodash-es';
 import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { TokenAmount } from 'src/models/amount';
+import { TokenAmount } from 'src/models/token-amount';
 import styled from 'styled-components';
 import { TOKENS } from '../../../constants';
 

@@ -1,6 +1,6 @@
-import { TokenAmount } from './amount';
 import { Fund } from './fund';
 import { Status } from './status';
+import { TokenAmount } from './token-amount';
 
 export type QuestData = {
   // Meta

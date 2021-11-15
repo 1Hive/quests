@@ -13,7 +13,7 @@ contract Quest {
         uint256 amount;
     }
 
-    string public requirementsIpfsHash;
+    string public questMetadataJson;
     IERC20 public rewardToken;
     uint256 public expireTime;
     address public aragonGovernAddress;
@@ -23,13 +23,13 @@ contract Quest {
     event QuestClaimed(bytes evidence, address player, uint256 amount);
 
     constructor(
-        string memory _requirementsIpfsHash,
+        string memory _questMetadataJson,
         IERC20 _rewardToken,
         uint256 _expireTime,
         address _aragonGovernAddress,
         address payable _fundsRecoveryAddress
     ) {
-        requirementsIpfsHash = _requirementsIpfsHash;
+        questMetadataJson = _questMetadataJson;
         rewardToken = _rewardToken;
         expireTime = _expireTime;
         aragonGovernAddress = _aragonGovernAddress;

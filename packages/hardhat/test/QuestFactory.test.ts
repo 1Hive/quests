@@ -27,7 +27,7 @@ describe("[Contract] QuestFactory", function () {
     it("should emit QuestCreated", async function () {
       // Arrange
       const tokenContract = await deployments.get("TokenMock");
-      const requirementsIpfsHash = "fakeRequirementIpfsHash";
+      const requirementsIpfsHash = "fakeMetaJSON";
       const expireTime = 0; // Unix Epoch 0
 
       // Act

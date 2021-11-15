@@ -70,7 +70,7 @@ export class QuestFactory extends Contract {
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
     createQuest(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
@@ -79,7 +79,7 @@ export class QuestFactory extends Contract {
     ): Promise<ContractTransaction>;
 
     "createQuest(string,address,uint256,address,string)"(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
@@ -93,7 +93,7 @@ export class QuestFactory extends Contract {
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
   createQuest(
-    _requirementsIpfsHash: string,
+    _questMetadataJson: string,
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
@@ -102,7 +102,7 @@ export class QuestFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   "createQuest(string,address,uint256,address,string)"(
-    _requirementsIpfsHash: string,
+    _questMetadataJson: string,
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
@@ -116,7 +116,7 @@ export class QuestFactory extends Contract {
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
     createQuest(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
@@ -125,7 +125,7 @@ export class QuestFactory extends Contract {
     ): Promise<void>;
 
     "createQuest(string,address,uint256,address,string)"(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
@@ -137,7 +137,7 @@ export class QuestFactory extends Contract {
   filters: {
     QuestCreated(
       questAddress: null,
-      requirementsIpfsHash: null,
+      questMetadataJson: null,
       rewardTokenAddress: null,
       expireTime: null,
       version: null
@@ -150,7 +150,7 @@ export class QuestFactory extends Contract {
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     createQuest(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
@@ -159,7 +159,7 @@ export class QuestFactory extends Contract {
     ): Promise<BigNumber>;
 
     "createQuest(string,address,uint256,address,string)"(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
@@ -178,7 +178,7 @@ export class QuestFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     createQuest(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
@@ -187,7 +187,7 @@ export class QuestFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "createQuest(string,address,uint256,address,string)"(
-      _requirementsIpfsHash: string,
+      _questMetadataJson: string,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,

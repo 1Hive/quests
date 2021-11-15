@@ -5,12 +5,12 @@ import { useRef, useState } from 'react';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 import { TOKENS } from 'src/constants';
-import { useFactoryContract } from 'src/hooks/useContract';
-import { TokenAmount } from 'src/models/amount';
+import { useFactoryContract } from 'src/hooks/use-contract.hook';
 import { Fund as Fundation } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
-import * as QuestService from 'src/services/QuestService';
-import { IN_A_WEEK_IN_MS } from 'src/utils/date-utils';
+import { TokenAmount } from 'src/models/token-amount';
+import * as QuestService from 'src/services/quest.service';
+import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import FundModal from '../modals/fund-modal';
@@ -63,7 +63,6 @@ type Props = {
   players?: string[];
   funds?: Fundation[];
   creatorAddress?: string;
-  onFilterChange?: Function;
   expireTimeMs?: number;
 };
 
@@ -82,7 +81,6 @@ export default function Quest({
   funds = [],
   onSave = noop,
   css,
-  onFilterChange = noop,
 }: Props) {
   const wallet = useWallet();
   const questFactoryContract = useFactoryContract();
@@ -202,7 +200,7 @@ export default function Quest({
                     isLoading={loading}
                     suffix="%"
                   />
-                  {!!values.tags?.length && (
+                  {(!!values.tags?.length || editMode) && (
                     <TagFieldInputFormik
                       id="tags"
                       label="Tags"
@@ -210,7 +208,7 @@ export default function Quest({
                       isLoading={loading}
                       value={values.tags}
                       formik={formRef}
-                      onTagClick={(tag: string) => onFilterChange({ tags: [tag] })}
+                      // onTagClick={(x: String[]) => log('Tag clicked : ', x)} // TODO : Restore filter by tag on tag click
                     />
                   )}
                   <DateFieldInput

@@ -3,7 +3,7 @@ import log from 'loglevel';
 import { useMemo } from 'react';
 import { ADDRESS_ZERO } from '../constants';
 import contractsJson from '../contracts/hardhat_contracts.json';
-import { useWallet } from '../providers/wallet';
+import { useWallet } from '../providers/wallet.context';
 
 let contracts: any;
 
