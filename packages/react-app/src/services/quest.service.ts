@@ -7,8 +7,8 @@ import { TokenAmount } from 'src/models/token-amount';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
 import { GQL_MAX_INT, MIN_QUEST_VERSION, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
 import { QuestSearchQuery } from '../queries/quest-search.query';
-import { wrapError } from '../utils/errors-util';
-import { getCurrentAccount, sendTransaction } from '../utils/web3-utils';
+import { wrapError } from '../utils/errors.util';
+import { getCurrentAccount, sendTransaction } from '../utils/web3.utils';
 
 let questList: QuestData[] = [];
 

@@ -1,17 +1,16 @@
 import { AddressField, Button, Card, Field, GU, LoadingRing, Split } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
-import { log } from 'loglevel';
 import { useRef, useState } from 'react';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 import { TOKENS } from 'src/constants';
-import { useFactoryContract } from 'src/hooks/useContract';
+import { useFactoryContract } from 'src/hooks/use-contract.hook';
 import { Fund as Fundation } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
-import * as QuestService from 'src/services/quest-service';
-import { IN_A_WEEK_IN_MS } from 'src/utils/date-utils';
+import * as QuestService from 'src/services/quest.service';
+import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import FundModal from '../modals/fund-modal';
@@ -89,8 +88,6 @@ export default function Quest({
   const [editMode, setEditMode] = useState(isEdit);
   const [loading, setLoading] = useState(isLoading);
   const alreadyPlayed = !!players.find((x) => x === wallet.account);
-  // @ts-ignore
-  //   const { filter, setFilter } = useFilterContext();
   return (
     <CardStyled style={css} id={address}>
       <Formik
@@ -211,7 +208,7 @@ export default function Quest({
                       isLoading={loading}
                       value={values.tags}
                       formik={formRef}
-                      onTagClick={(x: String[]) => log('Tag clicked : ', x)}
+                      // onTagClick={(x: String[]) => log('Tag clicked : ', x)} // TODO : Restore filter by tag on tag click
                     />
                   )}
                   <DateFieldInput

@@ -6,8 +6,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
 import { QuestData } from 'src/models/quest-data';
 import { Filter } from '../../models/filter';
-import { useFilterContext } from '../../providers/filter-context';
-import * as QuestService from '../../services/quest-service';
+import { useFilterContext } from '../../providers/filter.context';
+import * as QuestService from '../../services/quest.service';
 import QuestListFilter from './quest-list-filter';
 import { Outset } from './utils/spacer-util';
 

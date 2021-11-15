@@ -1,5 +1,5 @@
 {
-  "name": "1hive-quests",
+  "name": "@1hive/quests-subgraph",
   "license": "UNLICENSED",
   "version": "0.1.0",
   "scripts": {

@@ -3,7 +3,7 @@ import React, { useContext, useMemo } from 'react';
 import { useWallet, UseWalletProvider } from 'use-wallet';
 import { getDefaultChain } from '../local-settings';
 import { getNetwork } from '../networks';
-import { getUseWalletConnectors } from '../utils/web3-utils';
+import { getUseWalletConnectors } from '../utils/web3.utils';
 
 const WalletAugmentedContext = React.createContext<any>(undefined);
 

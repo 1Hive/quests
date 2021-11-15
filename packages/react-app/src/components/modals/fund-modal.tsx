@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import { useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { TokenAmount } from 'src/models/token-amount';
-import * as QuestService from '../../services/quest-service';
+import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../shared/field-input/amount-field-input';
 import ModalBase from './modal-base';
 

@@ -1,7 +1,7 @@
 import { Button, GU, IconRefresh, textStyle, useTheme } from '@1hive/1hive-ui';
 import { useMemo, useRef } from 'react';
 import { UnsupportedChainError } from 'use-wallet';
-import { getNetworkName } from '../../../utils/web3-utils';
+import { getNetworkName } from '../../../utils/web3.utils';
 import connectionError from './assets/connection-error.png';
 
 type Props = {
