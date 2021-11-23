@@ -16,8 +16,8 @@ export const QuestEntityQuery = gql`
       where: {
         questVersion_gte: $minVersion
         questMetaTags_contains: $tags
-        questExpireTimeSec_gte: 1636606800
-        questExpireTimeSec_lte: 1637384400
+        questExpireTimeSec_gte: $expireTimeLower
+        questExpireTimeSec_lte: $expireTimeUpper
       }
     ) {
       id
