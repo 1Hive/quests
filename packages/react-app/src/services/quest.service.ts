@@ -78,6 +78,7 @@ export async function getMoreQuests(
 
   return mapQuests(queryResult).then((questResult) => {
     questList = questList.concat(questResult);
+    console.log(count);
     return questResult;
   });
 }
