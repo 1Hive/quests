@@ -6,8 +6,6 @@ import {
   GU,
   LoadingRing,
   Split,
-  Toast,
-  ToastHub,
   useToast,
 } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
@@ -159,11 +157,6 @@ export default function Quest({
                           <Skeleton />
                         ) : (
                           <>
-                            <ToastHub>
-                              <Toast timeout="Infinity">
-                                {(t: any) => <Button onClick={() => t('Error')}>Click me</Button>}
-                              </Toast>
-                            </ToastHub>
                             ,
                             <AddressField id="address" address={address} autofocus={false} />
                           </>
