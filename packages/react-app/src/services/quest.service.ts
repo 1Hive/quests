@@ -88,6 +88,7 @@ export async function saveQuest(
   meta: Partial<QuestData>,
   address?: string,
 ) {
+  console.log(meta);
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
     const tx = await questFactoryContract.createQuest(
