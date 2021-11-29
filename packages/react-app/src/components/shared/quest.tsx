@@ -157,7 +157,6 @@ export default function Quest({
                           <Skeleton />
                         ) : (
                           <>
-                            ,
                             <AddressField id="address" address={address} autofocus={false} />
                           </>
                         ))
