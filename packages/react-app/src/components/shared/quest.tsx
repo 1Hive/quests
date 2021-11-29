@@ -1,4 +1,13 @@
-import { AddressField, Button, Card, Field, GU, LoadingRing, Split } from '@1hive/1hive-ui';
+import {
+  AddressField,
+  Button,
+  Card,
+  Field,
+  GU,
+  LoadingRing,
+  Split,
+  useToast,
+} from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
@@ -87,6 +96,7 @@ export default function Quest({
   const formRef = useRef(null);
   const [editMode, setEditMode] = useState(isEdit);
   const [loading, setLoading] = useState(isLoading);
+  const toast = useToast();
   const alreadyPlayed = !!players.find((x) => x === wallet.account);
   return (
     <CardStyled style={css} id={address}>
@@ -105,13 +115,17 @@ export default function Quest({
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setLoading(true);
-            onSave(
-              await QuestService.saveQuest(
+            try {
+              const saveResponse = await QuestService.saveQuest(
                 questFactoryContract,
                 values.fallbackAddress ?? wallet.account,
                 values,
-              ),
-            );
+              );
+              onSave(saveResponse);
+            } catch (e: any) {
+              toast(e.message);
+            }
+
             setSubmitting(false);
             setLoading(false);
           }, 400);
@@ -142,7 +156,9 @@ export default function Quest({
                         (loading ? (
                           <Skeleton />
                         ) : (
-                          <AddressField id="address" address={address} autofocus={false} />
+                          <>
+                            <AddressField id="address" address={address} autofocus={false} />
+                          </>
                         ))
                       }
                     />
