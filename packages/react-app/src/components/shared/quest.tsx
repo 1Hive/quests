@@ -23,7 +23,7 @@ import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import FundModal from '../modals/fund-modal';
-import PlayModal from '../modals/play-modal';
+import ClaimModale from '../modals/claim-modal';
 import { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import NumberFieldInput from './field-input/number-field-input';
@@ -254,7 +254,7 @@ export default function Quest({
                       {creatorAddress === wallet.account && (
                         <Button onClick={() => setEditMode(true)} label="Edit" icon={<FaEdit />} />
                       )}
-                      <PlayModal questAddress={address} disabled={alreadyPlayed} />
+                      <ClaimModale questAddress={address} disabled={alreadyPlayed} />
                       <FundModal questAddress={address} />
                     </ChildSpacer>
                   </Outset>

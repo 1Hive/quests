@@ -120,10 +120,9 @@ export async function fundQuest(
   await sendTransaction(questAddress, amount, onCompleted);
 }
 
-export async function playQuest(questAddress: string) {
-  const currentAccount = await getCurrentAccount();
-  if (!currentAccount)
-    throw wrapError('User account not connected when trying to play a quest!', {
+export async function claimQuest(questAddress: string, address: string) {
+  if (!address)
+    throw wrapError('Address is not defined', {
       questAddress,
     });
 }
