@@ -116,10 +116,11 @@ export default function Quest({
           setTimeout(async () => {
             setLoading(true);
             try {
+              const timeValue = new Date(values.expireTimeMs ?? 0).getTime();
               const saveResponse = await QuestService.saveQuest(
                 questFactoryContract,
                 values.fallbackAddress ?? wallet.account,
-                values,
+                { ...values, expireTimeMs: timeValue },
               );
               onSave(saveResponse);
             } catch (e: any) {
@@ -208,7 +209,7 @@ export default function Quest({
                     formik={formRef}
                   />
                   <NumberFieldInput
-                    id="collateral"
+                    id="collateralPercentage"
                     label="Collateral"
                     onChange={handleChange}
                     isEdit={editMode}
@@ -228,7 +229,7 @@ export default function Quest({
                     />
                   )}
                   <DateFieldInput
-                    id="expireDate"
+                    id="expireTimeMs"
                     label="Expire time"
                     isEdit={editMode}
                     isLoading={loading}

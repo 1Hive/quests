@@ -52,7 +52,7 @@ export default function DateFieldInput({
     <InputStyled
       id={id}
       type="date"
-      value={valFormat}
+      defaultValue={valFormat}
       onChange={handleChange}
       style={css}
       // @ts-ignore
