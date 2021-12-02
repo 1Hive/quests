@@ -11,6 +11,7 @@ import { TOKENS } from '../../../constants';
 
 const LineStyled = styled.div`
   display: flex;
+  align-items: center;
 `;
 const AmountStyled = styled.div`
   margin-top: 2px;
@@ -53,40 +54,33 @@ function AmountFieldInput({
     onChange(value);
   };
 
-  let content;
-
-  if (isEdit)
-    content = isLoading ? (
-      <Skeleton />
-    ) : (
-      <>
-        <TextInput
-          id={id}
-          wide={wide}
-          onChange={onAmountChange}
-          placeHolder={placeHolder}
-          type="number"
-          value={amount}
-        />
-        <TokenBadge
-          symbol={TOKENS.honey.symb}
-          address={TOKENS.honey.address}
-          networkType="private"
-        />
-      </>
-    );
-  else
-    content = isLoading ? (
-      <Skeleton />
-    ) : (
-      <LineStyled>
-        <AmountStyled>{value.amount}</AmountStyled>
-        <TokenBadge symbol={value.token.symb} address={value.token.address} networkType="private" />
-      </LineStyled>
-    );
   return (
     <Field label={label} key={id}>
-      {content}
+      {isLoading ? (
+        <Skeleton />
+      ) : (
+        <LineStyled>
+          <AmountStyled>
+            {isEdit ? (
+              <TextInput
+                id={id}
+                wide={wide}
+                onChange={onAmountChange}
+                placeHolder={placeHolder}
+                type="number"
+                value={amount}
+              />
+            ) : (
+              value.amount
+            )}
+          </AmountStyled>
+          <TokenBadge
+            symbol={TOKENS.honey.symb}
+            address={TOKENS.honey.address}
+            networkType="private"
+          />
+        </LineStyled>
+      )}
     </Field>
   );
 }
