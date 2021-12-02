@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { BREAKPOINTS } from '../../styles/breakpoints';
 
 const LayoutStyled = styled(Layout)`
-  ${({ width }: any) => width < BREAKPOINTS.large && 'width: auto;'}
+  width: 100%;
   min-width: auto;
 `;
 

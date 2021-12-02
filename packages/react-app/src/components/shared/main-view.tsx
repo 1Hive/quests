@@ -1,8 +1,10 @@
 import { GU, Root } from '@1hive/1hive-ui';
 import React from 'react';
 import styled from 'styled-components';
+import FilterContextProvider from '../../providers/filter.context';
 import Header from './header';
 import Layout from './layout';
+import QuestListFilter from './quest-list-filter';
 
 // #region StyledComponents
 
@@ -24,8 +26,6 @@ const MainViewStyled = styled.div`
       filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc3ab', endColorstr='#cbf3ef',GradientType=1 ) !important; /* IE6-9 fallback on horizontal gradient */
       `}
 
-  display: flex;
-  flex-direction: column;
   height: 100vh;
 `;
 
@@ -34,10 +34,25 @@ const HeaderWrapperStyled = styled.div`
 `;
 
 const ScrollViewStyled = styled.div`
-  overflow: auto;
+  overflow-x: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   height: calc(100vh - 64px);
   padding: ${3 * GU}px;
 `;
+
+const WrapperStyled = styled.div`
+  display: flex;
+`;
+const MainBlockStyled = styled.div`
+  width: 75%;
+`;
+const SideBlockStyled = styled.div``;
 
 // #endregion
 
@@ -58,9 +73,18 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
         <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
       </HeaderWrapperStyled>
       <Root.Provider>
-        <ScrollViewStyled id="scroll-view">
-          <Layout paddingBottom={3 * GU}>{children}</Layout>
-        </ScrollViewStyled>
+        <FilterContextProvider>
+          <WrapperStyled>
+            <MainBlockStyled>
+              <ScrollViewStyled id="scroll-view">
+                <Layout paddingBottom={3 * GU}>{children}</Layout>
+              </ScrollViewStyled>
+            </MainBlockStyled>
+            <SideBlockStyled>
+              <QuestListFilter />
+            </SideBlockStyled>
+          </WrapperStyled>
+        </FilterContextProvider>
       </Root.Provider>
     </MainViewStyled>
   );
