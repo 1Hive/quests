@@ -27,7 +27,8 @@ interface QuestInterface extends ethers.utils.Interface {
     "claims(uint256)": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
-    "questMetadataJson()": FunctionFragment;
+    "questDetailsRef()": FunctionFragment;
+    "questTitle()": FunctionFragment;
     "recoverUnclaimedFunds()": FunctionFragment;
     "rewardToken()": FunctionFragment;
   };
@@ -53,7 +54,11 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "questMetadataJson",
+    functionFragment: "questDetailsRef",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "questTitle",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -77,9 +82,10 @@ interface QuestInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "questMetadataJson",
+    functionFragment: "questDetailsRef",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "questTitle", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "recoverUnclaimedFunds",
     data: BytesLike
@@ -158,9 +164,13 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
-    questMetadataJson(overrides?: CallOverrides): Promise<[string]>;
+    questDetailsRef(overrides?: CallOverrides): Promise<[string]>;
 
-    "questMetadataJson()"(overrides?: CallOverrides): Promise<[string]>;
+    "questDetailsRef()"(overrides?: CallOverrides): Promise<[string]>;
+
+    questTitle(overrides?: CallOverrides): Promise<[string]>;
+
+    "questTitle()"(overrides?: CallOverrides): Promise<[string]>;
 
     recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -221,9 +231,13 @@ export class Quest extends Contract {
 
   "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  questMetadataJson(overrides?: CallOverrides): Promise<string>;
+  questDetailsRef(overrides?: CallOverrides): Promise<string>;
 
-  "questMetadataJson()"(overrides?: CallOverrides): Promise<string>;
+  "questDetailsRef()"(overrides?: CallOverrides): Promise<string>;
+
+  questTitle(overrides?: CallOverrides): Promise<string>;
+
+  "questTitle()"(overrides?: CallOverrides): Promise<string>;
 
   recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -284,9 +298,13 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
-    questMetadataJson(overrides?: CallOverrides): Promise<string>;
+    questDetailsRef(overrides?: CallOverrides): Promise<string>;
 
-    "questMetadataJson()"(overrides?: CallOverrides): Promise<string>;
+    "questDetailsRef()"(overrides?: CallOverrides): Promise<string>;
+
+    questTitle(overrides?: CallOverrides): Promise<string>;
+
+    "questTitle()"(overrides?: CallOverrides): Promise<string>;
 
     recoverUnclaimedFunds(overrides?: CallOverrides): Promise<void>;
 
@@ -335,9 +353,13 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    questMetadataJson(overrides?: CallOverrides): Promise<BigNumber>;
+    questDetailsRef(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "questMetadataJson()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "questDetailsRef()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    questTitle(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "questTitle()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     recoverUnclaimedFunds(overrides?: Overrides): Promise<BigNumber>;
 
@@ -393,11 +415,15 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    questMetadataJson(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    questDetailsRef(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "questMetadataJson()"(
+    "questDetailsRef()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    questTitle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "questTitle()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     recoverUnclaimedFunds(overrides?: Overrides): Promise<PopulatedTransaction>;
 
