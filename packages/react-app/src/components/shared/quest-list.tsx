@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
+import { QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
 import { Filter } from '../../models/filter';
 import { useFilterContext } from '../../providers/filter.context';
@@ -84,7 +85,7 @@ export default function QuestList() {
             {quests.map((x) => (
               <Outset gu16 key={x.address}>
                 {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                <Quest {...x} />
+                <Quest questMode={QUEST_MODE.READ} {...x} />
               </Outset>
             ))}
             {isLoading && skeletonQuests}

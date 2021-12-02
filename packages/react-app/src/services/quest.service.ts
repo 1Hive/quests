@@ -24,8 +24,6 @@ function mapQuests(quests: any[]): Promise<QuestData[]> {
           description: questEntity.questMetaDescription,
           rewardTokenAddress: questEntity.questRewardTokenAddress,
           bounty: { amount: 0, token: TOKENS.honey }, // Fetch amount of honey for this quest or questRewardTokenAddress
-          collateralPercentage: questEntity.questMetaCollateralPercentage,
-          tags: questEntity.questMetaTags,
           expireTimeMs: questEntity.questExpireTimeSec * 1000, // Sec to Ms
         } as QuestData),
     ),
@@ -126,9 +124,8 @@ export async function claimQuest(questAddress: string, address: string) {
       questAddress,
     });
 }
-
 export function getTagSuggestions() {
-  return questList.map((x) => x.tags).flat();
+  return []; // TODO : Restore after MVP questList.map((x) => x.tags).flat();
 }
 
 // #endregion

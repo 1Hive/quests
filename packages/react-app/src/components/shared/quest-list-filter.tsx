@@ -1,21 +1,10 @@
-import {
-  Box,
-  Button,
-  DateRangePicker,
-  Field,
-  GU,
-  IconClose,
-  SearchInput,
-  Switch,
-} from '@1hive/1hive-ui';
-import { useState } from 'react';
+import { Box, Button, DateRangePicker, Field, GU, IconClose, SearchInput } from '@1hive/1hive-ui';
 import styled from 'styled-components';
-import { defaultFilter } from '../../constants';
+import { defaultFilter, QUEST_MODE } from '../../constants';
 import { useFilterContext } from '../../providers/filter.context';
 import { useWallet } from '../../providers/wallet.context';
-import CreateQuestModal from '../modals/quest-modal';
+import QuestModal from '../modals/quest-modal';
 import AmountFieldInput from './field-input/amount-field-input';
-import TagFieldInput from './field-input/tag-field-input';
 import Separator from './utils/separator';
 import { Outset } from './utils/spacer-util';
 
@@ -33,9 +22,6 @@ export default function QuestListFilter() {
   // @ts-ignore
   const { filter, setFilter } = useFilterContext();
   const { account } = useWallet();
-  const [createdQuests, setCreatedQuests] = useState(false);
-  const [playedQuests, setPlayedQuests] = useState(false);
-  const [foundedQuests, setFoundedQuests] = useState(false);
 
   const handleClose = (address: string) => {
     if (address) setFilter(filter); // Force a refresh
@@ -63,19 +49,19 @@ export default function QuestListFilter() {
           </Field>
           <AmountFieldInput
             id="filterBounty"
-            label="Min bounty"
+            label="Min available bounty"
             value={filter.bounty}
             onChange={(x: any) => setFilter({ ...filter, bounty: x }, true)}
             wide
           />
-          <TagFieldInput
+          {/* <TagFieldInput
             id="filterTags"
             label="Tags"
             isEdit
             placeholder="Search"
             value={filter.tags}
             onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
-          />
+          /> TODO : Restore after MVP */}
           <Button
             icon={<IconClose />}
             label="clear"
@@ -85,7 +71,7 @@ export default function QuestListFilter() {
           {account && (
             <>
               <Separator />
-              <Field label="Created quests">
+              {/* <Field label="Created quests">
                 <Switch checked={createdQuests} onChange={setCreatedQuests} />
               </Field>
               <Field label="Played quests">
@@ -93,8 +79,8 @@ export default function QuestListFilter() {
               </Field>
               <Field label="Founded quests">
                 <Switch checked={foundedQuests} onChange={setFoundedQuests} />
-              </Field>
-              <CreateQuestModal create onClose={handleClose} />
+              </Field>TODO : Restore after MVP or when doing #67 : https://github.com/1Hive/quests/issues/67 */}
+              <QuestModal questMode={QUEST_MODE.CREATE} onClose={handleClose} />
             </>
           )}
         </Outset>

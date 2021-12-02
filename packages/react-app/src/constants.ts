@@ -44,6 +44,12 @@ export const QUEST_STATUS = {
   draft: { id: 'draft', label: 'Draft' },
 };
 
+export const QUEST_MODE = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  READ: 'READ',
+};
+
 export const BREAKPOINTS = {
   4: '4',
   8: '8',
@@ -74,6 +80,6 @@ export const defaultFilter = {
 export const SUBGRAPH_URI = 'https://api.studio.thegraph.com/query/10030/1hive-quests/0.0.1';
 
 // Handle retro compatibility correctly
-export const QUEST_VERSION = '2.4';
-export const MIN_QUEST_VERSION = '2.4';
+export const QUEST_VERSION = '2.5';
+export const MIN_QUEST_VERSION = '2.5';
 export const GQL_MAX_INT = 2 ** 31 - 1;
