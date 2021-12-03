@@ -1,10 +1,10 @@
-import { GU, Root } from '@1hive/1hive-ui';
+import { Root } from '@1hive/1hive-ui';
 import React from 'react';
 import styled from 'styled-components';
 import FilterContextProvider from '../../providers/filter.context';
 import Header from './header';
-import Layout from './layout';
 import QuestListFilter from './quest-list-filter';
+import MainScrollWithSidebarLayout from './side-content-layout';
 
 // #region StyledComponents
 
@@ -25,34 +25,12 @@ const MainViewStyled = styled.div`
       background: linear-gradient(    135deg,    #ffc3ab 0%,    #fafae2 50%,    #cbf3ef 100%  ) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
       filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc3ab', endColorstr='#cbf3ef',GradientType=1 ) !important; /* IE6-9 fallback on horizontal gradient */
       `}
-
   height: 100vh;
 `;
 
 const HeaderWrapperStyled = styled.div`
   flex-shrink: 0;
 `;
-
-const ScrollViewStyled = styled.div`
-  overflow-x: auto;
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  height: calc(100vh - 64px);
-  padding: ${3 * GU}px;
-`;
-
-const WrapperStyled = styled.div`
-  display: flex;
-`;
-const MainBlockStyled = styled.div`
-  width: 75%;
-`;
-const SideBlockStyled = styled.div``;
 
 // #endregion
 
@@ -74,16 +52,7 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
       </HeaderWrapperStyled>
       <Root.Provider>
         <FilterContextProvider>
-          <WrapperStyled>
-            <MainBlockStyled>
-              <ScrollViewStyled id="scroll-view">
-                <Layout paddingBottom={3 * GU}>{children}</Layout>
-              </ScrollViewStyled>
-            </MainBlockStyled>
-            <SideBlockStyled>
-              <QuestListFilter />
-            </SideBlockStyled>
-          </WrapperStyled>
+          <MainScrollWithSidebarLayout main={children} side={<QuestListFilter />} />
         </FilterContextProvider>
       </Root.Provider>
     </MainViewStyled>
