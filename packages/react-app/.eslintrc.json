@@ -16,7 +16,12 @@
   },
   "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
-    "prettier/prettier": "error",
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
     "radix": 0,
     "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
     "import/extensions": [
@@ -32,7 +37,8 @@
     "no-use-before-define": "off",
     "no-param-reassign": "off",
     "no-unused-expressions": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "class-methods-use-this": "off"
   },
   "settings": {
     "import/resolver": {

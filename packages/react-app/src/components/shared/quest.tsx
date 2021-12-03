@@ -224,7 +224,7 @@ export default function Quest({
                       isLoading={loading}
                       value={values.tags}
                       formik={formRef}
-                      // onTagClick={(x: String[]) => log('Tag clicked : ', x)} // TODO : Restore filter by tag on tag click
+                      // onTagClick={(x: String[]) => Logger.debug('Tag clicked : ', x)} // TODO : Restore filter by tag on tag click
                     />
                   )} TODO : No tags for MVP */}
                   <DateFieldInput

@@ -6,9 +6,9 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
 import { QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
+import * as QuestService from 'src/services/quest.service';
 import { Filter } from '../../models/filter';
 import { useFilterContext } from '../../providers/filter.context';
-import * as QuestService from '../../services/quest.service';
 import QuestListFilter from './quest-list-filter';
 import { Outset } from './utils/spacer-util';
 
@@ -57,6 +57,7 @@ export default function QuestList() {
   );
   useEffect(() => {
     debounceFilter(filter);
+    return () => debounceFilter.cancel();
   }, [filter]);
 
   return (

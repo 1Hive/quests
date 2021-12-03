@@ -1,6 +1,5 @@
 import { request } from 'graphql-request';
 import { noop } from 'lodash-es';
-import { log } from 'loglevel';
 import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
@@ -8,6 +7,7 @@ import { QuestEntityQuery } from 'src/queries/quest-entity.query';
 import { GQL_MAX_INT, MIN_QUEST_VERSION, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
 import { QuestSearchQuery } from '../queries/quest-search.query';
 import { wrapError } from '../utils/errors.util';
+import { Logger } from '../utils/logger';
 import { getCurrentAccount, sendTransaction } from '../utils/web3.utils';
 
 let questList: QuestData[] = [];
@@ -23,7 +23,8 @@ function mapQuests(quests: any[]): Promise<QuestData[]> {
           title: questEntity.questMetaTitle,
           description: questEntity.questMetaDescription,
           rewardTokenAddress: questEntity.questRewardTokenAddress,
-          bounty: { amount: 0, token: TOKENS.honey }, // Fetch amount of honey for this quest or questRewardTokenAddress
+          claimDeposit: { amount: 0, token: TOKENS.honey }, // TODO : Fetch govern
+          bounty: { amount: 0, token: TOKENS.honey }, // TODO : check balance in questRewardTokenAddress of questAddress
           expireTimeMs: questEntity.questExpireTimeSec * 1000, // Sec to Ms
         } as QuestData),
     ),
@@ -89,13 +90,14 @@ export async function saveQuest(
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
     const tx = await questFactoryContract.createQuest(
+      meta.title,
       JSON.stringify(meta),
       TOKENS.honey.address,
       Math.round(meta.expireTimeMs! / 1000), // Ms to Sec
       fallbackAddress,
       QUEST_VERSION,
     );
-    log('TX HASH', tx.hash);
+    Logger.info('TX HASH', tx.hash);
     const receipt = await tx.wait();
     const questDeployedAddress = receipt?.events[0]?.args[0];
     return questDeployedAddress;
@@ -124,6 +126,7 @@ export async function claimQuest(questAddress: string, address: string) {
       questAddress,
     });
 }
+
 export function getTagSuggestions() {
   return []; // TODO : Restore after MVP questList.map((x) => x.tags).flat();
 }
