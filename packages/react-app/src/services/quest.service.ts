@@ -1,3 +1,4 @@
+import { Contract } from 'ethers';
 import { request } from 'graphql-request';
 import { noop } from 'lodash-es';
 import { Filter } from 'src/models/filter';
@@ -5,6 +6,7 @@ import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
 import { GQL_MAX_INT, MIN_QUEST_VERSION, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
+import ERC20Abi from '../contracts/ERC20.json';
 import { QuestSearchQuery } from '../queries/quest-search.query';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
@@ -130,5 +132,15 @@ export async function claimQuest(questAddress: string, address: string) {
 export function getTagSuggestions() {
   return []; // TODO : Restore after MVP questList.map((x) => x.tags).flat();
 }
+
+// TODO
+export async function fetchAvailableBounty(quest: QuestData, account: any) {
+  const contract = new Contract(quest.rewardTokenAddress, ERC20Abi, account);
+  const balance = await contract.balanceOf(quest.address);
+  return balance.toString();
+}
+
+// TODO
+export function fetchClaimingPlayers(quest: QuestData) {}
 
 // #endregion

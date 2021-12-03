@@ -1,5 +1,4 @@
 import { noop } from 'lodash-es';
-import log from 'loglevel';
 import { TokenAmount } from 'src/models/token-amount';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
@@ -7,6 +6,7 @@ import { IS_DEV } from '../constants';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { wrapError } from './errors.util';
+import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
 
@@ -17,7 +17,7 @@ function getWeb3() {
   if (!ethers.isConnected()) {
     ethers.enable().catch((error: Error) => {
       // User denied account access
-      log.error(error);
+      Logger.error(error);
     });
   }
   return web3;
@@ -79,7 +79,7 @@ export async function getCurrentAccount(): Promise<string | undefined> {
   return new Promise((res) => {
     getWeb3()?.eth.getAccounts((error: Error, result: any[]) => {
       if (error) {
-        if (IS_DEV) log.error(error);
+        if (IS_DEV) Logger.error(error);
         res(undefined);
       }
       res(result.length ? result[0] : undefined);

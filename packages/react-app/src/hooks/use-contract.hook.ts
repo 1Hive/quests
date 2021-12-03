@@ -1,6 +1,6 @@
 import { Contract, ContractInterface } from 'ethers';
-import log from 'loglevel';
 import { useMemo } from 'react';
+import { Logger } from 'src/utils/logger';
 import { ADDRESS_ZERO } from '../constants';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { useWallet } from '../providers/wallet.context';
@@ -49,7 +49,7 @@ function useContract(contractName: string, withSignerIfPossible = true) {
         withSignerIfPossible && account ? account : undefined,
       );
     } catch (error) {
-      log.error('Failed to get contract', error);
+      Logger.error('Failed to get contract', error);
       return null;
     }
   }, [askedContract.address, askedContract.abi, ethers, withSignerIfPossible, account]);

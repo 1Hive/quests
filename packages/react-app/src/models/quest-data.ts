@@ -7,7 +7,7 @@ export type QuestData = {
   bounty: TokenAmount;
   claimDeposit: TokenAmount;
   expireTimeMs: number;
-  rewardTokenAddress?: string;
+  rewardTokenAddress: string;
   fallbackAddress?: string;
   isLoading?: boolean;
 };

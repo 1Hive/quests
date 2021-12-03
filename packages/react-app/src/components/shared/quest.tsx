@@ -195,7 +195,9 @@ export default function Quest({
                   {!isEdit && (
                     <>
                       {/* <Field label="Patrons">{loading ? <Skeleton /> : funds.length}</Field> TODO : Restore after MVP */}
-                      <Field label="Players">{loading ? <Skeleton /> : players.length}</Field>
+                      <Field label="Claiming players">
+                        {loading ? <Skeleton /> : players.length}
+                      </Field>
                     </>
                   )}
                   <AmountFieldInputFormik
