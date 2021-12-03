@@ -13,7 +13,7 @@ import { Outset } from './utils/spacer-util';
 const BoxStyled = styled(Box)`
   width: 100%;
   min-width: fit-content;
-  margin-bottom: ${2 * GU}px;
+  margin: ${5 * GU}px 0;
 `;
 
 // #endregion
@@ -28,33 +28,32 @@ export default function QuestListFilter() {
   };
 
   return (
-    <Outset gu16>
-      <BoxStyled heading="Filters">
-        <Outset gu8>
-          <Field label="Search">
-            <SearchInput
-              id="filterSearch"
-              value={filter.search}
-              onChange={(x: string) => setFilter({ ...filter, search: x })}
-              placeholder="keyword"
-              wide
-            />
-          </Field>
-          <Field label="Expire time">
-            <DateRangePicker
-              startDate={filter.expire?.start}
-              endDate={filter.expire?.end}
-              onChange={(val: any) => setFilter({ ...filter, expire: val })}
-            />
-          </Field>
-          <AmountFieldInput
-            id="filterBounty"
-            label="Min available bounty"
-            value={filter.bounty}
-            onChange={(x: any) => setFilter({ ...filter, bounty: x }, true)}
+    <BoxStyled heading="Filters">
+      <Outset gu8>
+        <Field label="Search">
+          <SearchInput
+            id="filterSearch"
+            value={filter.search}
+            onChange={(x: string) => setFilter({ ...filter, search: x })}
+            placeholder="keyword"
             wide
           />
-          {/* <TagFieldInput
+        </Field>
+        <Field label="Expire time">
+          <DateRangePicker
+            startDate={filter.expire?.start}
+            endDate={filter.expire?.end}
+            onChange={(val: any) => setFilter({ ...filter, expire: val })}
+          />
+        </Field>
+        <AmountFieldInput
+          id="filterBounty"
+          label="Min available bounty"
+          value={filter.bounty}
+          onChange={(x: any) => setFilter({ ...filter, bounty: x }, true)}
+          wide
+        />
+        {/* <TagFieldInput
             id="filterTags"
             label="Tags"
             isEdit
@@ -62,16 +61,11 @@ export default function QuestListFilter() {
             value={filter.tags}
             onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
           /> TODO : Restore after MVP */}
-          <Button
-            icon={<IconClose />}
-            label="clear"
-            wide
-            onClick={() => setFilter(defaultFilter)}
-          />
-          {account && (
-            <>
-              <Separator />
-              {/* <Field label="Created quests">
+        <Button icon={<IconClose />} label="clear" wide onClick={() => setFilter(defaultFilter)} />
+        {account && (
+          <>
+            <Separator />
+            {/* <Field label="Created quests">
                 <Switch checked={createdQuests} onChange={setCreatedQuests} />
               </Field>
               <Field label="Played quests">
@@ -80,11 +74,10 @@ export default function QuestListFilter() {
               <Field label="Founded quests">
                 <Switch checked={foundedQuests} onChange={setFoundedQuests} />
               </Field>TODO : Restore after MVP or when doing #67 : https://github.com/1Hive/quests/issues/67 */}
-              <QuestModal questMode={QUEST_MODE.CREATE} onClose={handleClose} />
-            </>
-          )}
-        </Outset>
-      </BoxStyled>
-    </Outset>
+            <QuestModal questMode={QUEST_MODE.CREATE} onClose={handleClose} />
+          </>
+        )}
+      </Outset>
+    </BoxStyled>
   );
 }
