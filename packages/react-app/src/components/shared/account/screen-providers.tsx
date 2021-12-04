@@ -79,7 +79,11 @@ function ProviderButton({ id, provider, onActivate }: ProviderButtonProps) {
   const theme = useTheme();
 
   const handleClick = useCallback(() => {
-    onActivate(id);
+    if (provider.id === 'unknown') {
+      onActivate(window.open(provider.link));
+    } else {
+      onActivate(id);
+    }
   }, [onActivate, id]);
 
   return (
