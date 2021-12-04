@@ -1,4 +1,3 @@
-import { Split } from '@1hive/1hive-ui';
 import { debounce } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -8,7 +7,6 @@ import { QuestData } from 'src/models/quest-data';
 import { Filter } from '../../models/filter';
 import { useFilterContext } from '../../providers/filter.context';
 import * as QuestService from '../../services/quest.service';
-import QuestListFilter from './quest-list-filter';
 import { Outset } from './utils/spacer-util';
 
 const batchSize = 3;
@@ -59,39 +57,33 @@ export default function QuestList() {
   }, [filter]);
 
   return (
-    <Split
-      invert="vertical"
-      primary={
-        <InfiniteScroll
-          loader={<></>}
-          dataLength={quests.length}
-          next={loadMore}
-          hasMore={hasMore}
-          endMessage={
-            <p className="center">
-              <b>No more quests found</b>
-            </p>
-          }
-          refreshFunction={refresh}
-          pullDownToRefresh={isMobile}
-          pullDownToRefreshThreshold={50}
-          pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
-          releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
-          scrollableTarget="scroll-view"
-          scrollThreshold="50px"
-        >
-          <div>
-            {quests.map((x) => (
-              <Outset gu16 key={x.address}>
-                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                <Quest {...x} />
-              </Outset>
-            ))}
-            {isLoading && skeletonQuests}
-          </div>
-        </InfiniteScroll>
+    <InfiniteScroll
+      loader={<></>}
+      dataLength={quests.length}
+      next={loadMore}
+      hasMore={hasMore}
+      endMessage={
+        <p className="center">
+          <b>No more quests found</b>
+        </p>
       }
-      secondary={<QuestListFilter />}
-    />
+      refreshFunction={refresh}
+      pullDownToRefresh={isMobile}
+      pullDownToRefreshThreshold={50}
+      pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
+      releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
+      scrollableTarget="scroll-view"
+      scrollThreshold="50px"
+    >
+      <div>
+        {quests.map((x) => (
+          <Outset gu16 key={x.address}>
+            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+            <Quest {...x} />
+          </Outset>
+        ))}
+        {isLoading && skeletonQuests}
+      </div>
+    </InfiniteScroll>
   );
 }
