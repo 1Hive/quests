@@ -22,8 +22,7 @@ import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
-import FundModal from '../modals/fund-modal';
-import PlayModal from '../modals/play-modal';
+import QuestModal from '../modals/quest-modal';
 import { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import NumberFieldInput from './field-input/number-field-input';
@@ -73,17 +72,19 @@ type Props = {
   funds?: Fundation[];
   creatorAddress?: string;
   expireTimeMs?: number;
+  isDetailedView?: boolean;
 };
 
 export default function Quest({
   title,
   description,
   bounty = { amount: 0, token: TOKENS.honey },
-  collateralPercentage = 0,
+  collateralPercentage = 9,
   tags = [],
   address = '',
   expireTimeMs = IN_A_WEEK_IN_MS,
   isEdit = false,
+  isDetailedView = false,
   isLoading = false,
   creatorAddress = '',
   players = [],
@@ -97,7 +98,7 @@ export default function Quest({
   const [editMode, setEditMode] = useState(isEdit);
   const [loading, setLoading] = useState(isLoading);
   const toast = useToast();
-  const alreadyPlayed = !!players.find((x) => x === wallet.account);
+
   return (
     <CardStyled style={css} id={address}>
       <Formik
@@ -254,8 +255,22 @@ export default function Quest({
                       {creatorAddress === wallet.account && (
                         <Button onClick={() => setEditMode(true)} label="Edit" icon={<FaEdit />} />
                       )}
-                      <PlayModal questAddress={address} disabled={alreadyPlayed} />
-                      <FundModal questAddress={address} />
+                      {!isDetailedView && (
+                        <QuestModal
+                          data={{
+                            title,
+                            description,
+                            bounty,
+                            collateralPercentage,
+                            tags,
+                            address,
+                            expireTimeMs,
+                          }}
+                          isDetailedView
+                          onClose={noop}
+                          create={false}
+                        />
+                      )}
                     </ChildSpacer>
                   </Outset>
                 )
