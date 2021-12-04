@@ -1,20 +1,24 @@
+import { Contract } from "@ethersproject/contracts";
 import { ethers } from "hardhat";
+import { Address } from "hardhat-deploy/dist/types";
 
 const hashToBytes = (input) => {
   return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(input));
 };
 
 const deployQuest = async (
-  requirements,
-  rewardToken,
-  expireTime,
-  aragonGovernAddress,
-  fundsRecoveryAddress,
-  initialBalance
+  title: string,
+  detailIpfsHash: string,
+  rewardToken: Contract,
+  expireTime: number,
+  aragonGovernAddress: Address,
+  fundsRecoveryAddress: Address,
+  initialBalance: number
 ) => {
   const Quest = await ethers.getContractFactory("Quest");
   const quest = await Quest.deploy(
-    hashToBytes(requirements),
+    title,
+    detailIpfsHash,
     rewardToken.address,
     expireTime,
     aragonGovernAddress,

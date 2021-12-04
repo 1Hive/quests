@@ -4,7 +4,6 @@ import React from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import styled from 'styled-components';
 import AccountModule from '../account/account-module';
-import Layout from '../layout';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
 
@@ -32,6 +31,7 @@ const HeaderLayoutContentFlex = styled.div`
 const HeaderRightPanel = styled.div`
   display: flex;
   align-items: center;
+  margin-right: ${6 * GU}px;
 `;
 // #endregion
 
@@ -47,25 +47,23 @@ function Header({ toggleTheme, currentTheme }: Props) {
 
   return (
     <HeaderWraper background={theme.surface}>
-      <Layout paddingBottom={0}>
-        <HeaderLayoutContent>
-          <HeaderLayoutContentFlex>
-            <HeaderTitle href="#/home" external={false} />
-            <HeaderMenu below={below} />
-          </HeaderLayoutContentFlex>
+      <HeaderLayoutContent>
+        <HeaderLayoutContentFlex>
+          <HeaderTitle href="#/home" external={false} />
+          <HeaderMenu below={below} />
+        </HeaderLayoutContentFlex>
 
-          <HeaderRightPanel>
-            <AccountModule compact={layoutSmall} />
-            <Button
-              className="ml-8"
-              label={currentTheme === 'dark' ? 'Light' : 'Dark'}
-              icon={currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
-              display="icon"
-              onClick={toggleTheme}
-            />
-          </HeaderRightPanel>
-        </HeaderLayoutContent>
-      </Layout>
+        <HeaderRightPanel>
+          <AccountModule compact={layoutSmall} />
+          <Button
+            className="ml-8"
+            label={currentTheme === 'dark' ? 'Light' : 'Dark'}
+            icon={currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
+            display="icon"
+            onClick={toggleTheme}
+          />
+        </HeaderRightPanel>
+      </HeaderLayoutContent>
     </HeaderWraper>
   );
 }

@@ -29,7 +29,8 @@ describe("[Contract] Quest", function () {
     it("should empty the quest funds and founder recover his funds", async function () {
       // Arrange
       const quest = await deployQuest(
-        "fakeMetaJSON",
+        "fakeTitle",
+        "fakeDetailsIpfsHash",
         rewardToken,
         epoch0,
         govern.address,
@@ -48,6 +49,7 @@ describe("[Contract] Quest", function () {
     it("should revert if not expire", async function () {
       // Arrange
       const quest = await deployQuest(
+        "fakeTitle",
         "fakeMetaJSON",
         rewardToken,
         getNowAsUnixEpoch(),
@@ -78,6 +80,7 @@ describe("[Contract] Quest", function () {
         // Arrange
         const claimAmount = 500;
         const quest = await deployQuest(
+          "fakeTitle",
           "fakeMetaJSON",
           rewardToken,
           epoch0,
@@ -104,6 +107,7 @@ describe("[Contract] Quest", function () {
         // Arrange
         const claimAmount = 0; // Claim all remaining
         const quest = await deployQuest(
+          "fakeTitle",
           "fakeMetaJSON",
           rewardToken,
           epoch0,
@@ -129,6 +133,7 @@ describe("[Contract] Quest", function () {
         const claimAmount = 500; // Claim all remaining
         const evidence = hashToBytes("evidence1");
         const quest = await deployQuest(
+          "fakeTitle",
           "fakeMetaJSON",
           rewardToken,
           epoch0,
@@ -151,6 +156,7 @@ describe("[Contract] Quest", function () {
         const claimAmount = questFunds + 1;
         const evidence = hashToBytes("evidence1");
         const quest = await deployQuest(
+          "fakeTitle",
           "fakeMetaJSON",
           rewardToken,
           epoch0,
@@ -173,6 +179,7 @@ describe("[Contract] Quest", function () {
         const claimAmount = questFunds + 1;
         const evidence = [];
         const quest = await deployQuest(
+          "fakeTitle",
           "fakeMetaJSON",
           rewardToken,
           epoch0,
@@ -193,6 +200,7 @@ describe("[Contract] Quest", function () {
       // Arrange
       const rewardToken = await ethers.getContract("TokenMock");
       const quest = await deployQuest(
+        "fakeTitle",
         "fakeMetaJSON",
         rewardToken,
         epoch0,
