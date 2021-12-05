@@ -72,6 +72,7 @@ type Props = {
   funds?: Fundation[];
   creatorAddress?: string;
   expireTimeMs?: number;
+  rewardTokenAddress?: string;
   isDetailedView?: boolean;
 };
 
@@ -79,14 +80,15 @@ export default function Quest({
   title,
   description,
   bounty = { amount: 0, token: TOKENS.honey },
-  collateralPercentage = 9,
+  collateralPercentage = 0,
   tags = [],
-  address = '',
   expireTimeMs = IN_A_WEEK_IN_MS,
+  address = undefined,
+  creatorAddress = undefined,
+  rewardTokenAddress = undefined,
   isEdit = false,
   isDetailedView = false,
   isLoading = false,
-  creatorAddress = '',
   players = [],
   funds = [],
   onSave = noop,
@@ -265,6 +267,9 @@ export default function Quest({
                             tags,
                             address,
                             expireTimeMs,
+                            creatorAddress,
+                            players,
+                            rewardTokenAddress,
                           }}
                           isDetailedView
                           onClose={noop}
