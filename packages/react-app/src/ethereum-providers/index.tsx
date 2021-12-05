@@ -67,7 +67,13 @@ const PROVIDERS = new Map(
       name: 'Install MetaMask',
       type: 'Desktop',
       image: metamask,
-      link: 'https://metamask.io/',
+      link: {
+        chrome:
+          'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en',
+        firefox: 'https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/',
+        edge: 'https://microsoftedge.microsoft.com/addons/detail/metamask/ejbalbakoplchlghecdalmeeeajnimhm?hl=en-US',
+        default: 'https://metamask.io/download.html',
+      },
       strings: {
         'your Ethereum provider': 'your provider',
       },

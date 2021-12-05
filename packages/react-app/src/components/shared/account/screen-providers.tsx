@@ -79,8 +79,23 @@ function ProviderButton({ id, provider, onActivate }: ProviderButtonProps) {
   const theme = useTheme();
 
   const handleClick = useCallback(() => {
+    const chrome = navigator.userAgent.search('Chrome');
+    const firefox = navigator.userAgent.search('Firefox');
+    const edge8 = navigator.userAgent.search('MSIE 8.0');
+    const edge9 = navigator.userAgent.search('MSIE 9.0');
+
     if (provider.id === 'unknown') {
-      onActivate(window.open(provider.link));
+      if (chrome > -1) {
+        onActivate(window.open(provider.link.chrome));
+      } else if (firefox > -1) {
+        onActivate(window.open(provider.link.firefox));
+      } else if (edge8 > -1) {
+        onActivate(window.open(provider.link.edge));
+      } else if (edge9 > -1) {
+        onActivate(window.open(provider.link.edge));
+      } else {
+        onActivate(window.open(provider.link.default));
+      }
     } else {
       onActivate(id);
     }
