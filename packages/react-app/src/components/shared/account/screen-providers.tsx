@@ -89,9 +89,7 @@ function ProviderButton({ id, provider, onActivate }: ProviderButtonProps) {
         onActivate(window.open(provider.link.chrome));
       } else if (firefox > -1) {
         onActivate(window.open(provider.link.firefox));
-      } else if (edge8 > -1) {
-        onActivate(window.open(provider.link.edge));
-      } else if (edge9 > -1) {
+      } else if (edge8 > -1 || edge9 > -1) {
         onActivate(window.open(provider.link.edge));
       } else {
         onActivate(window.open(provider.link.default));
