@@ -6,12 +6,11 @@ export type QuestData = {
   // Meta
   title?: string;
   description?: string;
-  address: string;
   bounty: TokenAmount;
   collateralPercentage: number;
   expireTimeMs: number;
   tags: string[];
-
+  address?: string;
   creatorAddress?: string;
   rewardTokenAddress?: string;
   fallbackAddress?: string;
