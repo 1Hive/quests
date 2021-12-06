@@ -1,19 +1,9 @@
-import {
-  Box,
-  Button,
-  DateRangePicker,
-  Field,
-  GU,
-  IconClose,
-  SearchInput,
-  Switch,
-} from '@1hive/1hive-ui';
-import { useState } from 'react';
+import { Box, Button, DateRangePicker, Field, GU, IconClose, SearchInput } from '@1hive/1hive-ui';
 import styled from 'styled-components';
 import { defaultFilter } from '../../constants';
 import { useFilterContext } from '../../providers/filter.context';
 import { useWallet } from '../../providers/wallet.context';
-import CreateQuestModal from '../modals/quest-modal';
+import QuestModal from '../modals/quest-modal';
 import AmountFieldInput from './field-input/amount-field-input';
 import TagFieldInput from './field-input/tag-field-input';
 import Separator from './utils/separator';
@@ -33,9 +23,9 @@ export default function QuestListFilter() {
   // @ts-ignore
   const { filter, setFilter } = useFilterContext();
   const { account } = useWallet();
-  const [createdQuests, setCreatedQuests] = useState(false);
-  const [playedQuests, setPlayedQuests] = useState(false);
-  const [foundedQuests, setFoundedQuests] = useState(false);
+  // const [createdQuests, setCreatedQuests] = useState(false);
+  // const [playedQuests, setPlayedQuests] = useState(false);
+  // const [foundedQuests, setFoundedQuests] = useState(false);
 
   const handleClose = (address: string) => {
     if (address) setFilter(filter); // Force a refresh
@@ -79,7 +69,7 @@ export default function QuestListFilter() {
         {account && (
           <>
             <Separator />
-            <Field label="Created quests">
+            {/* <Field label="Created quests">
               <Switch checked={createdQuests} onChange={setCreatedQuests} />
             </Field>
             <Field label="Played quests">
@@ -87,8 +77,8 @@ export default function QuestListFilter() {
             </Field>
             <Field label="Founded quests">
               <Switch checked={foundedQuests} onChange={setFoundedQuests} />
-            </Field>
-            <CreateQuestModal create onClose={handleClose} />
+            </Field> */}
+            <QuestModal create onClose={handleClose} />
           </>
         )}
       </Outset>

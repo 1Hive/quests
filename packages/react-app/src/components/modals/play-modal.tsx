@@ -12,7 +12,7 @@ const FlexStyled = styled.div`
 `;
 
 type Props = {
-  questAddress: string;
+  questAddress?: string;
   onClose?: Function;
   disabled?: boolean;
 };
@@ -27,7 +27,9 @@ export default function PlayModal({ questAddress, onClose = noop, disabled = fal
   };
   const onPlayClick = () => {
     onModalClose();
-    QuestService.playQuest(questAddress);
+    if (questAddress) {
+      QuestService.playQuest(questAddress);
+    }
     toast('Successfully register as a player');
   };
   return (
