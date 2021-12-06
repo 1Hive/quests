@@ -46,10 +46,10 @@ const FormStyled = styled(Form)`
 
 type Props = {
   data?: QuestData;
-  css?: any;
   questMode?: string;
   isLoading?: boolean;
   onSave?: Function;
+  css?: any;
 };
 
 export default function Quest({

@@ -36,6 +36,11 @@ export const TOKENS = {
   } as Token,
 };
 
+export const DEFAULT_AMOUNT = {
+  amount: 0,
+  token: TOKENS.honey,
+};
+
 // Enums
 export const QUEST_STATUS = {
   active: { id: 'active', label: 'Active' },
@@ -47,7 +52,8 @@ export const QUEST_STATUS = {
 export const QUEST_MODE = {
   CREATE: 'CREATE',
   UPDATE: 'UPDATE',
-  READ: 'READ',
+  READ_SUMMARY: 'SUMMARY',
+  READ_DETAIL: 'DETAIL',
 };
 
 export const BREAKPOINTS = {
@@ -69,7 +75,7 @@ export const defaultFilter = {
   search: '',
   expire: { start: undefined, end: undefined },
   tags: [],
-  bounty: { amount: 0, token: TOKENS.honey },
+  bounty: DEFAULT_AMOUNT,
   showFull: false,
   foundedQuests: false,
   createdQuests: false,

@@ -5,7 +5,14 @@ import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
-import { GQL_MAX_INT, MIN_QUEST_VERSION, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
+import {
+  DEFAULT_AMOUNT,
+  GQL_MAX_INT,
+  MIN_QUEST_VERSION,
+  QUEST_VERSION,
+  SUBGRAPH_URI,
+  TOKENS,
+} from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { QuestSearchQuery } from '../queries/quest-search.query';
 import { wrapError } from '../utils/errors.util';
@@ -133,14 +140,21 @@ export function getTagSuggestions() {
   return []; // TODO : Restore after MVP questList.map((x) => x.tags).flat();
 }
 
-// TODO
+// TODO : To verify
 export async function fetchAvailableBounty(quest: QuestData, account: any) {
+  if (!quest?.rewardTokenAddress) return DEFAULT_AMOUNT;
   const contract = new Contract(quest.rewardTokenAddress, ERC20Abi, account);
   const balance = await contract.balanceOf(quest.address);
-  return balance.toString();
+  return {
+    amount: balance.toString(),
+    token: TOKENS.honey,
+  } as TokenAmount;
 }
 
 // TODO
-export function fetchClaimingPlayers(quest: QuestData) {}
+export function fetchClaimingPlayers(quest: QuestData) {
+  console.log(quest);
+  return [];
+}
 
 // #endregion

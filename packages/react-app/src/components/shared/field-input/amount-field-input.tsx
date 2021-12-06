@@ -3,9 +3,9 @@ import { connect } from 'formik';
 import { noop, toNumber } from 'lodash-es';
 import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { DEFAULT_AMOUNT, TOKENS } from 'src/constants';
 import { TokenAmount } from 'src/models/token-amount';
 import styled from 'styled-components';
-import { TOKENS } from '../../../constants';
 
 // #region StyledComponents
 
@@ -38,7 +38,7 @@ function AmountFieldInput({
   isLoading = false,
   label = '',
   placeHolder = '',
-  value = { amount: 0, token: TOKENS.honey },
+  value = DEFAULT_AMOUNT,
   onChange = noop,
   wide = false,
   formik,

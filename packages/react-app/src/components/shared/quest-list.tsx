@@ -78,10 +78,9 @@ export default function QuestList() {
       scrollThreshold="50px"
     >
       <div>
-        {quests.map((x) => (
+        {quests.map((x: QuestData) => (
           <Outset gu16 key={x.address}>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            <Quest questMode={QUEST_MODE.READ} {...x} />
+            <Quest questMode={QUEST_MODE.READ_SUMMARY} data={x} />
           </Outset>
         ))}
         {isLoading && skeletonQuests}
