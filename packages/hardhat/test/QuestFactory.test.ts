@@ -39,8 +39,7 @@ describe("[Contract] QuestFactory", function () {
           detailIPFS,
           tokenContract.address,
           expireTime,
-          owner.address,
-          "1.0"
+          owner.address
         )
       ).to.emit(questFactoryContract, "QuestCreated");
     });
