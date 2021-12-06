@@ -1,4 +1,4 @@
-require("dotenv").config();
+import { config as dotenvConfig } from "dotenv";
 import "solidity-coverage";
 import "hardhat-deploy";
 import { utils } from "ethers";
@@ -12,6 +12,8 @@ import "@nomiclabs/hardhat-etherscan";
 import "hardhat-typechain";
 import { task, HardhatUserConfig } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
+import { resolve } from "path";
+dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
