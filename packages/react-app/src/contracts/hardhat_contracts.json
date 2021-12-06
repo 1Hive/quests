@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "QuestFactory": {
-          "address": "0x1a98911e0b4d12Ef8FDE90a9EfCf16EAF23DCce0",
+          "address": "0xF34097Cc1e7523f531f725657DD19A55575FF403",
           "abi": [
             {
               "inputs": [
@@ -50,12 +50,6 @@
                   "internalType": "uint256",
                   "name": "expireTime",
                   "type": "uint256"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "string",
-                  "name": "version",
-                  "type": "string"
                 }
               ],
               "name": "QuestCreated",
@@ -100,11 +94,6 @@
                   "internalType": "address payable",
                   "name": "_fundsRecoveryAddress",
                   "type": "address"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_version",
-                  "type": "string"
                 }
               ],
               "name": "createQuest",
