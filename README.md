@@ -51,4 +51,4 @@ yarn start:local &; yarn chain &; yarn deploy &
 
 - [Kanban board](https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board)
 - Discord : 1Hive (Quest Swarm channel)
-- [Deployed app](https://quests-d1u7l8p9l-1hive.vercel.app/)
+- [Deployed app](https://quests.vercel.app/)
