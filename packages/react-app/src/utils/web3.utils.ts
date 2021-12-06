@@ -12,14 +12,23 @@ const DEFAULT_LOCAL_CHAIN = 'private';
 
 function getWeb3() {
   // @ts-ignore
-  const ethers = window.ethereum;
-  const web3 = new Web3(ethers);
-  if (!ethers.isConnected()) {
-    ethers.enable().catch((error: Error) => {
-      // User denied account access
-      Logger.error(error);
-    });
+  let ethers: any = null;
+  let web3: any = null;
+
+  // @ts-ignore
+  if (window.ethereum) {
+    // @ts-ignore
+    ethers = window.ethereum;
+    web3 = new Web3(ethers);
+
+    if (!ethers.isConnected()) {
+      ethers.enable().catch((error: Error) => {
+        // User denied account access
+        Logger.error(error);
+      });
+    }
   }
+
   return web3;
 }
 

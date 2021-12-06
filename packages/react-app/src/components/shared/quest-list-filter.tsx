@@ -22,6 +22,9 @@ export default function QuestListFilter() {
   // @ts-ignore
   const { filter, setFilter } = useFilterContext();
   const { account } = useWallet();
+  // const [createdQuests, setCreatedQuests] = useState(false);
+  // const [playedQuests, setPlayedQuests] = useState(false);
+  // const [foundedQuests, setFoundedQuests] = useState(false);
 
   const handleClose = (address: string) => {
     if (address) setFilter(filter); // Force a refresh

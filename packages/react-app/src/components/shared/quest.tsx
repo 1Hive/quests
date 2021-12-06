@@ -1,28 +1,17 @@
-import {
-  AddressField,
-  Button,
-  Card,
-  Field,
-  GU,
-  LoadingRing,
-  Split,
-  useToast,
-} from '@1hive/1hive-ui';
+import { AddressField, Button, Card, GU, LoadingRing, Split, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
-import { FaEdit, FaSave } from 'react-icons/fa';
+import { FaSave } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
-import { QUEST_MODE, TOKENS } from 'src/constants';
+import { DEFAULT_AMOUNT, QUEST_MODE } from 'src/constants';
 import { useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
-import { TokenAmount } from 'src/models/token-amount';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
-import ClaimModale from '../modals/claim-modal';
-import FundModal from '../modals/fund-modal';
+import QuestModal from '../modals/quest-modal';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import TextFieldInput from './field-input/text-field-input';
@@ -56,33 +45,27 @@ const FormStyled = styled(Form)`
 // #endregion
 
 type Props = {
-  title?: string;
-  description?: string;
-  bounty?: TokenAmount;
-  claimDeposit?: TokenAmount;
-  tags?: string[];
-  address?: string;
+  data?: QuestData;
   css?: any;
   questMode?: string;
   isLoading?: boolean;
   onSave?: Function;
-  players?: string[];
-  creatorAddress?: string;
-  expireTimeMs?: number;
 };
 
 export default function Quest({
-  title,
-  description,
-  bounty = { amount: 0, token: TOKENS.honey },
-  claimDeposit,
-  tags = [],
-  address = '',
-  expireTimeMs = IN_A_WEEK_IN_MS,
-  questMode = QUEST_MODE.CREATE,
+  data = {
+    title: '',
+    description: '',
+    expireTimeMs: IN_A_WEEK_IN_MS,
+    fallbackAddress: undefined,
+    bounty: DEFAULT_AMOUNT,
+    address: undefined,
+    rewardTokenAddress: undefined,
+    claimDeposit: DEFAULT_AMOUNT,
+    creatorAddress: undefined,
+  },
   isLoading = false,
-  creatorAddress = '',
-  players = [],
+  questMode = QUEST_MODE.CREATE,
   onSave = noop,
   css,
 }: Props) {
@@ -90,26 +73,18 @@ export default function Quest({
   const questFactoryContract = useFactoryContract();
   const formRef = useRef(null);
   const [loading, setLoading] = useState(isLoading);
-  const [isEdit, setIsEdit] = useState(questMode !== QUEST_MODE.READ);
+  const [isEdit, setIsEdit] = useState(false);
   const toast = useToast();
-  const alreadyPlayed = !!players.find((x) => x === wallet.account);
 
-  useEffect(() => setIsEdit(questMode !== QUEST_MODE.READ), [questMode]);
+  useEffect(
+    () => setIsEdit(questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE),
+    [questMode],
+  );
 
   return (
-    <CardStyled style={css} id={address}>
+    <CardStyled style={css} id={data.address}>
       <Formik
-        initialValues={
-          {
-            title,
-            description,
-            bounty,
-            claimDeposit,
-            tags,
-            fallbackAddress: wallet.account,
-            expireTimeMs,
-          } as Partial<QuestData>
-        }
+        initialValues={data}
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setLoading(true);
@@ -156,7 +131,7 @@ export default function Quest({
                           <Skeleton />
                         ) : (
                           <>
-                            <AddressField id="address" address={address} autofocus={false} />
+                            <AddressField id="address" address={data.address} autofocus={false} />
                           </>
                         ))
                       }
@@ -192,18 +167,10 @@ export default function Quest({
               }
               secondary={
                 <Outset gu16>
-                  {!isEdit && (
-                    <>
-                      {/* <Field label="Patrons">{loading ? <Skeleton /> : funds.length}</Field> TODO : Restore after MVP */}
-                      <Field label="Claiming players">
-                        {loading ? <Skeleton /> : players.length}
-                      </Field>
-                    </>
-                  )}
                   <AmountFieldInputFormik
                     id="bounty"
                     label={questMode === QUEST_MODE.CREATE ? 'Initial bounty' : 'Available bounty'}
-                    isEdit={questMode === QUEST_MODE.CREATE}
+                    isEdit={isEdit}
                     value={values.bounty}
                     isLoading={loading}
                     formik={formRef}
@@ -252,11 +219,9 @@ export default function Quest({
                 wallet.account && (
                   <Outset gu8 vertical>
                     <ChildSpacer>
-                      {creatorAddress === wallet.account && (
-                        <Button onClick={() => setIsEdit(true)} label="Edit" icon={<FaEdit />} />
+                      {questMode !== QUEST_MODE.READ_DETAIL && (
+                        <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
                       )}
-                      <ClaimModale questAddress={address} disabled={alreadyPlayed} />
-                      <FundModal questAddress={address} />
                     </ChildSpacer>
                   </Outset>
                 )

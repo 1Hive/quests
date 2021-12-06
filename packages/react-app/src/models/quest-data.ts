@@ -1,13 +1,16 @@
 import { TokenAmount } from './token-amount';
 
 export type QuestData = {
+  // User defined
   title?: string;
   description?: string;
-  address: string;
-  bounty: TokenAmount;
-  claimDeposit: TokenAmount;
   expireTimeMs: number;
-  rewardTokenAddress: string;
   fallbackAddress?: string;
-  isLoading?: boolean;
+  bounty?: TokenAmount;
+
+  // Computed
+  address?: string;
+  rewardTokenAddress?: string;
+  claimDeposit?: TokenAmount;
+  creatorAddress?: string;
 };

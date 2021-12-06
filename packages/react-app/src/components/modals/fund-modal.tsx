@@ -9,7 +9,7 @@ import ModalBase from './modal-base';
 
 type Props = {
   onClose?: Function;
-  questAddress: string;
+  questAddress?: string;
 };
 
 export default function FundModal({ questAddress, onClose = noop }: Props) {
@@ -21,7 +21,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
     onClose();
   };
   const onFundClick = () => {
-    if (fundAmount)
+    if (fundAmount && questAddress)
       QuestService.fundQuest(questAddress, fundAmount, () => toast('Transaction completed')).then(
         () => {
           onModalClose();
