@@ -7,7 +7,7 @@ import "./Quest.sol";
 contract QuestFactory {
     address public aragonGovernAddress;
 
-    event QuestCreated(address questAddress, string questTitle, string questDetailsRef, address rewardTokenAddress, uint256 expireTime);
+    event QuestCreated(address questAddress, string questTitle, bytes questDetailsRef, address rewardTokenAddress, uint256 expireTime);
 
     constructor(address _aragonGovernAddress) {
         aragonGovernAddress = _aragonGovernAddress;
@@ -15,7 +15,7 @@ contract QuestFactory {
 
     function createQuest(
         string memory _questTitle,
-        string memory _questDetailsRef,
+        bytes memory _questDetailsRef,
         IERC20 _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress

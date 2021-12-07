@@ -14,7 +14,7 @@ contract Quest {
     }
 
     string public questTitle;
-    string public questDetailsRef;
+    bytes public questDetailsRef;
     IERC20 public rewardToken;
     uint256 public expireTime;
     address public aragonGovernAddress;
@@ -25,7 +25,7 @@ contract Quest {
 
     constructor(
         string memory _questTitle,
-        string memory _questDetailsRef,
+        bytes memory _questDetailsRef,
         IERC20 _rewardToken,
         uint256 _expireTime,
         address _aragonGovernAddress,
