@@ -82,8 +82,6 @@ export async function saveQuest(
   meta: Partial<QuestData>,
   address?: string,
 ) {
-  console.log('meta', meta);
-
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
     const ipfsHash = await pushObjectToIpfs({ description: meta.description ?? '' });

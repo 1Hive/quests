@@ -1930,10 +1930,10 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.2.tgz#30aa825f11d438671d585bd44e7fd564535fc210"
   integrity sha512-82cpyJyKRoQoRi+14ibCeGPu0CwypgtBAdBhq1WfvagpCZNKqwXbKwXllYSMG91DhmG4jt9gN8eP6lGOtozuaw==
 
-"@graphprotocol/graph-cli@^0.25.1":
-  version "0.25.1"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.25.1.tgz#32a6c078f1cc3458a3f43c4205c2ae6f5c35725f"
-  integrity sha512-FPdxWDITWeI0u3VgfbaeaaWGDuaVY6QsAAinZSyPuLVBQSuMYdtzfhtRPRw5T2IL5Eb1j29Ir8Ty2vgY2lJ0rw==
+"@graphprotocol/graph-cli@^0.23.2":
+  version "0.23.2"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.23.2.tgz#cfb3787bd1b571b28fed05a748116579f01cda19"
+  integrity sha512-1JDyCwaAIeKsEPYPlsJ7IiAB5BhQ+v2fvmDIJTcLfRIYmTKsoETdjrw9qUGJtjICVXIGuL9DeNVhQgKgTMCQZQ==
   dependencies:
     assemblyscript "0.19.10"
     binary-install-raw "0.0.13"
@@ -1959,10 +1959,10 @@
     which "2.0.2"
     yaml "^1.5.1"
 
-"@graphprotocol/graph-ts@^0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.24.1.tgz#50961b52b5383f9c5cf5e6e23fa039f24e729ddf"
-  integrity sha512-2vU4m5ZPQIqMlMce/z5vmOtGHRlRmcRhMfemS3NIwxCSxSBGVnX2zb7QBTzzdQKGwsAZdbz6V0okkOtvohELfQ==
+"@graphprotocol/graph-ts@^0.23.1":
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.23.1.tgz#76e595d26ec5672f3778b1d3830e4640a57aec1b"
+  integrity sha512-pipofvN1LlwLOXrS7IWy8hSBFZzVyVHdLXDpQskl9nKqdbb3chelj4JoVEzCl7klvomDpP84ngLpW17fBh5vww==
   dependencies:
     assemblyscript "0.19.10"
 
