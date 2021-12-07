@@ -1,0 +1,9 @@
+type QuestEntity @entity {
+  id: ID!
+  questAddress: String!
+  questTitle: String!
+  questDescription: String
+  questExpireTimeSec: BigInt
+  questDetailsRef: String!
+  questRewardTokenAddress: Bytes!
+}

@@ -9,6 +9,8 @@ import ClaimModale from './claim-modal';
 import FundModal from './fund-modal';
 import ModalBase from './modal-base';
 
+// #region StyledComponents
+
 const ButtonWrapperStyled = styled.div`
   margin: ${1 * GU}px;
   margin-bottom: 0;
@@ -22,6 +24,8 @@ type Props = {
   onClose: Function;
   questMode: string;
 };
+
+// #endregion
 
 export default function QuestModal({
   data = undefined,
@@ -69,6 +73,7 @@ export default function QuestModal({
         <Button icon={<IconPlus />} label={title} wide mode="strong" onClick={onOpenButtonClick} />
       }
       buttons={
+        questMode === QUEST_MODE.READ_DETAIL &&
         data?.address && (
           <ButtonWrapperStyled>
             <FundModal questAddress={data.address} />

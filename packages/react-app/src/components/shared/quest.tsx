@@ -8,13 +8,14 @@ import { DEFAULT_AMOUNT, QUEST_MODE } from 'src/constants';
 import { useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
 import * as QuestService from 'src/services/quest.service';
-import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import QuestModal from '../modals/quest-modal';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import TextFieldInput from './field-input/text-field-input';
+import IdentityBadge from './identity-badge';
 import { ChildSpacer, Outset } from './utils/spacer-util';
 
 // #region StyledComponents
@@ -31,15 +32,14 @@ const QuestFooterStyled = styled.div`
   padding: ${1 * GU}px;
 `;
 
-const QuestActionButtonStyled = styled(Button)`
-  margin: ${1 * GU}px;
-`;
-
 const FormStyled = styled(Form)`
   width: 100%;
   #description {
     height: 200px;
   }
+`;
+const QuestActionButtonStyled = styled(Button)`
+  margin: ${1 * GU}px;
 `;
 
 // #endregion
@@ -56,22 +56,19 @@ export default function Quest({
   data = {
     title: '',
     description: '',
-    expireTimeMs: IN_A_WEEK_IN_MS,
-    fallbackAddress: undefined,
+    expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
     bounty: DEFAULT_AMOUNT,
-    address: undefined,
-    rewardTokenAddress: undefined,
+    address: '',
     claimDeposit: DEFAULT_AMOUNT,
-    creatorAddress: undefined,
   },
   isLoading = false,
-  questMode = QUEST_MODE.CREATE,
+  questMode = QUEST_MODE.READ_SUMMARY,
   onSave = noop,
   css,
 }: Props) {
   const wallet = useWallet();
   const questFactoryContract = useFactoryContract();
-  const formRef = useRef(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
   const toast = useToast();
@@ -84,16 +81,17 @@ export default function Quest({
   return (
     <CardStyled style={css} id={data.address}>
       <Formik
-        initialValues={data}
+        initialValues={{ fallbackAddress: wallet.account, ...data }}
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setLoading(true);
             try {
-              const timeValue = new Date(values.expireTimeMs ?? 0).getTime();
+              // Set noon to prevent rounidng form changing date
+              const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
               const saveResponse = await QuestService.saveQuest(
                 questFactoryContract,
-                values.fallbackAddress ?? wallet.account,
-                { ...values, expireTimeMs: timeValue },
+                values.fallbackAddress!,
+                { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
               );
               onSave(saveResponse);
             } catch (e: any) {
@@ -151,16 +149,19 @@ export default function Quest({
                       css={{ height: '100px' }}
                     />
                     {isEdit && (
-                      <TextFieldInput
-                        id="fallbackAddress"
-                        label="Funds fallback address"
-                        value={values.fallbackAddress}
-                        isLoading={loading}
-                        isEdit
-                        placeHolder="Funds fallback address"
-                        onChange={handleChange}
-                        wide
-                      />
+                      <>
+                        <TextFieldInput
+                          id="fallbackAddress"
+                          label="Funds fallback address"
+                          value={values.fallbackAddress}
+                          isLoading={loading}
+                          isEdit
+                          placeHolder="Funds fallback address"
+                          onChange={handleChange}
+                          wide
+                        />
+                        <IdentityBadge entity={values.fallbackAddress} badgeOnly />
+                      </>
                     )}
                   </Outset>
                 </Outset>
@@ -216,12 +217,11 @@ export default function Quest({
                   type="submit"
                 />
               ) : (
-                wallet.account && (
+                wallet.account &&
+                questMode !== QUEST_MODE.READ_DETAIL && (
                   <Outset gu8 vertical>
                     <ChildSpacer>
-                      {questMode !== QUEST_MODE.READ_DETAIL && (
-                        <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
-                      )}
+                      <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
                     </ChildSpacer>
                   </Outset>
                 )

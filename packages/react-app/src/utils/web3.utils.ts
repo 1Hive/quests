@@ -15,10 +15,9 @@ function getWeb3() {
   let ethers: any = null;
   let web3: any = null;
 
-  // @ts-ignore
-  if (window.ethereum) {
-    // @ts-ignore
-    ethers = window.ethereum;
+  const w = window as any;
+  if (w.ethereum) {
+    ethers = w.ethereum;
     web3 = new Web3(ethers);
 
     if (!ethers.isConnected()) {
@@ -29,7 +28,11 @@ function getWeb3() {
     }
   }
 
-  return web3;
+  return { web3, ethers };
+}
+
+export function isConnected() {
+  return (window as any).ethereum;
 }
 
 export function getUseWalletProviders() {
@@ -81,12 +84,12 @@ export function getNetworkName(chainId = getDefaultChain()) {
 }
 
 export function createContractAccount() {
-  return getWeb3()?.eth.accounts.create();
+  return getWeb3()?.web3.eth.accounts.create();
 }
 
 export async function getCurrentAccount(): Promise<string | undefined> {
   return new Promise((res) => {
-    getWeb3()?.eth.getAccounts((error: Error, result: any[]) => {
+    getWeb3()?.web3.eth.getAccounts((error: Error, result: any[]) => {
       if (error) {
         if (IS_DEV) Logger.error(error);
         res(undefined);
@@ -133,7 +136,7 @@ export async function sendTransaction(
     );
   return new Promise((res, rej) =>
     getWeb3()
-      .eth.sendTransaction({
+      ?.web3.eth.sendTransaction({
         from,
         to,
         value: toWei(amount.amount.toString(), 'ether'),
@@ -143,6 +146,11 @@ export async function sendTransaction(
       .on('receipt', onCompleted)
       .catch(rej),
   );
+}
+
+export function checkConnection() {
+  // Check if User is already connected by retrieving the accounts
+  getWeb3()?.ethers.request({ method: 'eth_requestAccounts' });
 }
 
 // Re-export some web3-utils functions

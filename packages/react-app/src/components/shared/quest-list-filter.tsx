@@ -24,7 +24,7 @@ export default function QuestListFilter() {
   const { account } = useWallet();
   // const [createdQuests, setCreatedQuests] = useState(false);
   // const [playedQuests, setPlayedQuests] = useState(false);
-  // const [foundedQuests, setFoundedQuests] = useState(false);
+  // const [fundedQuests, setFoundedQuests] = useState(false);
 
   const handleClose = (address: string) => {
     if (address) setFilter(filter); // Force a refresh
@@ -68,15 +68,6 @@ export default function QuestListFilter() {
         {account && (
           <>
             <Separator />
-            {/* <Field label="Created quests">
-                <Switch checked={createdQuests} onChange={setCreatedQuests} />
-              </Field>
-              <Field label="Played quests">
-                <Switch checked={playedQuests} onChange={setPlayedQuests} />
-              </Field>
-              <Field label="Founded quests">
-                <Switch checked={foundedQuests} onChange={setFoundedQuests} />
-              </Field>TODO : Restore after MVP or when doing #67 : https://github.com/1Hive/quests/issues/67 */}
             <QuestModal questMode={QUEST_MODE.CREATE} onClose={handleClose} />
           </>
         )}

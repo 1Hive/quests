@@ -74,16 +74,8 @@ export const BREAKPOINTS = {
 export const defaultFilter = {
   search: '',
   expire: { start: undefined, end: undefined },
-  tags: [],
   bounty: DEFAULT_AMOUNT,
-  showFull: false,
-  foundedQuests: false,
-  createdQuests: false,
-  playedQuests: false,
 } as Filter;
-
-// SUBGRAPH
-export const SUBGRAPH_URI = 'https://api.studio.thegraph.com/query/10030/1hive-quests/0.0.1';
 
 // Handle retro compatibility correctly
 export const QUEST_VERSION = '2.5';

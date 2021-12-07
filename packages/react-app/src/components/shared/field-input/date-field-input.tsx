@@ -43,8 +43,7 @@ export default function DateFieldInput({
   const handleChange = (e: any) => {
     e.preventDefault();
     if (e.currentTarget) {
-      const timeValue = new Date(e.currentTarget.value).getTime();
-      onChange({ ...e, value: timeValue });
+      onChange(e);
     }
   };
 
