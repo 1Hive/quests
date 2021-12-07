@@ -1,16 +1,9 @@
 const ipfsAPI = require('ipfs-http-client');
 
-const projectId = '1ybJNw3SNodb56QTsPl6hKpzKdb';
-const projectSecret = 'a0ec06faf24ca9368f87a1c4260d69d7';
-const auth = `Basic ${Buffer.from(`${projectId}:${projectSecret}`).toString('base64')}`;
-
 const infura = {
   host: 'ipfs.infura.io',
   port: 5001,
   protocol: 'https',
-  headers: {
-    authorization: auth,
-  },
 };
 
 const ipfs = ipfsAPI.create(infura);
