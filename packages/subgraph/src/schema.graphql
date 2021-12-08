@@ -21,6 +21,6 @@ type QuestEntity @entity {
   questTitle: String!
   questDescription: String
   questExpireTimeSec: BigInt
-  questDetailsRef: String!
+  questDetailsRef: Bytes!
   questRewardTokenAddress: Bytes!
 }

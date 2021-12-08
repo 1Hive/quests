@@ -15,7 +15,7 @@ export function handleQuestCreated(event: QuestCreated): void {
     questEntity.questDescription = "";
   } else {
     // Fetching quest description with IPFS
-    let questDataBytes = ipfs.cat(event.params.questDetailsRef);
+    let questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
     if (!questDataBytes) {
       // Continue with IPFS link as the description
       questEntity.questDescription = `A problem occured when trying to fetch description from IPFS but it is available here :
