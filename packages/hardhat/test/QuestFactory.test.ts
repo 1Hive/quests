@@ -28,7 +28,7 @@ describe("[Contract] QuestFactory", function () {
       // Arrange
       const tokenContract = await deployments.get("TokenMock");
       const title = "title";
-      const detailIPFS = "detailIPFS";
+      const detailIPFS = "0x";
       const expireTime = 0; // Unix Epoch 0
 
       // Act

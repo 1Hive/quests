@@ -218,7 +218,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 20000,
       },
     },
   },
@@ -237,7 +237,7 @@ const config: HardhatUserConfig = {
     govern: {
       default: 1,
       xdai: 0, // TODO : Add XDai Govern Address
-      rinkeby: "0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697", // Govern address on rinkeby
+      rinkeby: "0x0f37760f7bF292A3E1578583bDb8db9835E37229", // Govern address on rinkeby
     },
   },
 };

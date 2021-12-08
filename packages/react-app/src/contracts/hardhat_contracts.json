@@ -4,8 +4,211 @@
       "name": "rinkeby",
       "chainId": "4",
       "contracts": {
+        "Quest": {
+          "address": "0xf20aeAD3583f35b5eA76b3fC59A652E525cCa83b",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "_questTitle",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_questDetailsRef",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_rewardToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_expireTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_aragonGovernAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address payable",
+                  "name": "_fundsRecoveryAddress",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "bytes",
+                  "name": "evidence",
+                  "type": "bytes"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "player",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "QuestClaimed",
+              "type": "event"
+            },
+            {
+              "inputs": [],
+              "name": "aragonGovernAddress",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "_evidence",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_player",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "claim",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "name": "claims",
+              "outputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "evidence",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "address",
+                  "name": "player",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "expireTime",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "fundsRecoveryAddress",
+              "outputs": [
+                {
+                  "internalType": "address payable",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "questDetailsRef",
+              "outputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "",
+                  "type": "bytes"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "questTitle",
+              "outputs": [
+                {
+                  "internalType": "string",
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "recoverUnclaimedFunds",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "rewardToken",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]
+        },
         "QuestFactory": {
-          "address": "0xF34097Cc1e7523f531f725657DD19A55575FF403",
+          "address": "0x398890291cBf8d10AfBb426b1F790C93aB772203",
           "abi": [
             {
               "inputs": [
@@ -35,9 +238,9 @@
                 },
                 {
                   "indexed": false,
-                  "internalType": "string",
+                  "internalType": "bytes",
                   "name": "questDetailsRef",
-                  "type": "string"
+                  "type": "bytes"
                 },
                 {
                   "indexed": false,
@@ -76,9 +279,9 @@
                   "type": "string"
                 },
                 {
-                  "internalType": "string",
+                  "internalType": "bytes",
                   "name": "_questDetailsRef",
-                  "type": "string"
+                  "type": "bytes"
                 },
                 {
                   "internalType": "contract IERC20",
@@ -104,7 +307,7 @@
           ]
         },
         "TokenMock": {
-          "address": "0xc71f1340162357850c07A5502f2a7D88EE772996",
+          "address": "0xc981b1afCEd779a669643EAd47FeFb10873658b8",
           "abi": [
             {
               "inputs": [],

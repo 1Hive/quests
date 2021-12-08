@@ -30,7 +30,7 @@ describe("[Contract] Quest", function () {
       // Arrange
       const quest = await deployQuest(
         "fakeTitle",
-        "fakeDetailsIpfsHash",
+        "0x",
         rewardToken,
         epoch0,
         govern.address,
@@ -50,7 +50,7 @@ describe("[Contract] Quest", function () {
       // Arrange
       const quest = await deployQuest(
         "fakeTitle",
-        "fakeMetaJSON",
+        "0x",
         rewardToken,
         getNowAsUnixEpoch(),
         govern.address,
@@ -81,7 +81,7 @@ describe("[Contract] Quest", function () {
         const claimAmount = 500;
         const quest = await deployQuest(
           "fakeTitle",
-          "fakeMetaJSON",
+          "0x",
           rewardToken,
           epoch0,
           govern.address,
@@ -108,7 +108,7 @@ describe("[Contract] Quest", function () {
         const claimAmount = 0; // Claim all remaining
         const quest = await deployQuest(
           "fakeTitle",
-          "fakeMetaJSON",
+          "0x",
           rewardToken,
           epoch0,
           govern.address,
@@ -134,7 +134,7 @@ describe("[Contract] Quest", function () {
         const evidence = hashToBytes("evidence1");
         const quest = await deployQuest(
           "fakeTitle",
-          "fakeMetaJSON",
+          "0x",
           rewardToken,
           epoch0,
           govern.address,
@@ -157,7 +157,7 @@ describe("[Contract] Quest", function () {
         const evidence = hashToBytes("evidence1");
         const quest = await deployQuest(
           "fakeTitle",
-          "fakeMetaJSON",
+          "0x",
           rewardToken,
           epoch0,
           govern.address,
@@ -180,7 +180,7 @@ describe("[Contract] Quest", function () {
         const evidence = [];
         const quest = await deployQuest(
           "fakeTitle",
-          "fakeMetaJSON",
+          "0x",
           rewardToken,
           epoch0,
           govern.address,
@@ -201,7 +201,7 @@ describe("[Contract] Quest", function () {
       const rewardToken = await ethers.getContract("TokenMock");
       const quest = await deployQuest(
         "fakeTitle",
-        "fakeMetaJSON",
+        "0x",
         rewardToken,
         epoch0,
         govern.address,
