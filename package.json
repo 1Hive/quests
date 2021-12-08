@@ -68,6 +68,7 @@
   },
   "dependencies": {
     "ansi-html": "0.0.7",
+    "aws-sdk": "2.814.0",
     "axios": "0.21.2",
     "elliptic": "6.5.4",
     "glob-parent": "5.1.2",
