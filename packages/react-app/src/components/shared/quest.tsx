@@ -1,8 +1,7 @@
-import { AddressField, Button, Card, GU, LoadingRing, Split, useToast } from '@1hive/1hive-ui';
+import { AddressField, Card, GU, Split, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
-import { FaSave } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 import { DEFAULT_AMOUNT, QUEST_MODE } from 'src/constants';
 import { useFactoryContract } from 'src/hooks/use-contract.hook';
@@ -38,9 +37,6 @@ const FormStyled = styled(Form)`
     height: 200px;
   }
 `;
-const QuestActionButtonStyled = styled(Button)`
-  margin: ${1 * GU}px;
-`;
 
 // #endregion
 
@@ -58,7 +54,6 @@ export default function Quest({
     description: '',
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
     bounty: DEFAULT_AMOUNT,
-    address: '',
     claimDeposit: DEFAULT_AMOUNT,
   },
   isLoading = false,
@@ -104,7 +99,11 @@ export default function Quest({
         }}
       >
         {({ values, handleChange, handleSubmit }) => (
-          <FormStyled onSubmit={handleSubmit} ref={formRef}>
+          <FormStyled
+            onSubmit={handleSubmit}
+            ref={formRef}
+            id={`quest-form-${data.address ?? 'new'}`}
+          >
             <Split
               primary={
                 <Outset gu16>
@@ -160,7 +159,7 @@ export default function Quest({
                           onChange={handleChange}
                           wide
                         />
-                        <IdentityBadge entity={values.fallbackAddress} badgeOnly />
+                        {!loading && <IdentityBadge entity={values.fallbackAddress} badgeOnly />}
                       </>
                     )}
                   </Outset>
@@ -208,25 +207,17 @@ export default function Quest({
                 </Outset>
               }
             />
-            <QuestFooterStyled>
-              {isEdit ? (
-                <QuestActionButtonStyled
-                  label="Save"
-                  icon={loading ? <LoadingRing /> : <FaSave />}
-                  mode="positive"
-                  type="submit"
-                />
-              ) : (
-                wallet.account &&
-                questMode !== QUEST_MODE.READ_DETAIL && (
+            {!loading && (
+              <QuestFooterStyled>
+                {!isEdit && wallet.account && questMode !== QUEST_MODE.READ_DETAIL && (
                   <Outset gu8 vertical>
                     <ChildSpacer>
                       <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
                     </ChildSpacer>
                   </Outset>
-                )
-              )}
-            </QuestFooterStyled>
+                )}
+              </QuestFooterStyled>
+            )}
           </FormStyled>
         )}
       </Formik>

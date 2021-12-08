@@ -31,8 +31,16 @@ function getWeb3() {
   return { web3, ethers };
 }
 
-export function isConnected() {
-  return (window as any).ethereum;
+export async function isConnected() {
+  return new Promise((res) =>
+    getWeb3().web3.eth.getAccounts((err: Error, accounts: any[]) => {
+      if (accounts.length !== 0) res(true);
+      else {
+        if (err != null) Logger.error(`An error occurred: ${err}`);
+        res(false);
+      }
+    }),
+  );
 }
 
 export function getUseWalletProviders() {

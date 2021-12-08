@@ -9,7 +9,7 @@ export type QuestData = {
   bounty?: TokenAmount;
 
   // Computed
-  address: string;
+  address?: string;
   rewardTokenAddress?: string;
   claimDeposit?: TokenAmount;
   creatorAddress?: string;

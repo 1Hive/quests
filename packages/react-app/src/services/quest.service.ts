@@ -82,15 +82,15 @@ export async function getMoreQuests(
 export async function saveQuest(
   questFactoryContract: any,
   fallbackAddress: string,
-  meta: Partial<QuestData>,
+  data: Partial<QuestData>,
   address?: string,
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
-    const ipfsHash = await pushObjectToIpfs({ description: meta.description ?? '' });
-    const questExpireTimeUtcSec = Math.round(meta.expireTimeMs! / 1000); // Ms to UTC timestamp
+    const ipfsHash = await pushObjectToIpfs({ description: data.description ?? '' });
+    const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
-      meta.title,
+      data.title,
       ipfsHash.toString(), // Push description to IPFS and push hash to quest contract
       TOKENS.honey.address,
       questExpireTimeUtcSec,

@@ -45,7 +45,9 @@ type Props = {
 function MainView({ children, toggleTheme, currentTheme }: Props) {
   const wallet = useWallet();
   useEffect(() => {
-    if (isConnected() && !wallet.account) wallet.activate(); // Auto connect to wallet
+    if (!wallet.account) {
+      isConnected().then(() => wallet.activate());
+    }
   }, []);
 
   return (
