@@ -1,3 +1,20 @@
+type _Schema_
+  @fulltext(
+    name: "QuestSearch"
+    language: en
+    algorithm: rank
+    include: [
+      {
+        entity: "QuestEntity"
+        fields: [
+          { name: "questAddress" }
+          { name: "questTitle" }
+          { name: "questDescription" }
+        ]
+      }
+    ]
+  )
+
 type QuestEntity @entity {
   id: ID!
   questAddress: String!

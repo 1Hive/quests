@@ -9,7 +9,6 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questTitle = event.params.questTitle;
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
-
   questEntity.questDetailsRef = event.params.questDetailsRef;
 
   if (!event.params.questDetailsRef) {

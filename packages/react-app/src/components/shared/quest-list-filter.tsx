@@ -4,7 +4,6 @@ import { defaultFilter, QUEST_MODE } from '../../constants';
 import { useFilterContext } from '../../providers/filter.context';
 import { useWallet } from '../../providers/wallet.context';
 import QuestModal from '../modals/quest-modal';
-import AmountFieldInput from './field-input/amount-field-input';
 import Separator from './utils/separator';
 import { Outset } from './utils/spacer-util';
 
@@ -49,13 +48,17 @@ export default function QuestListFilter() {
             onChange={(val: any) => setFilter({ ...filter, expire: val })}
           />
         </Field>
-        <AmountFieldInput
+        {
+          // TODO : We don't have this information available in subgraph
+          /* <AmountFieldInput
           id="filterBounty"
           label="Min available bounty"
           value={filter.bounty}
           onChange={(x: any) => setFilter({ ...filter, bounty: x }, true)}
           wide
-        />
+        /> */
+        }
+
         {/* <TagFieldInput
             id="filterTags"
             label="Tags"

@@ -6,9 +6,9 @@ import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
 import { getNetwork } from 'src/networks';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
-import { DEFAULT_AMOUNT, GQL_MAX_INT, IS_DEV, TOKENS } from '../constants';
+import { QuestSearchQuery } from 'src/queries/quest-search.query';
+import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
-import { DebugQuery } from '../queries/debug.query';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
 import { getCurrentAccount, sendTransaction } from '../utils/web3.utils';
@@ -50,31 +50,34 @@ export async function getMoreQuests(
   filter: Filter,
 ): Promise<QuestData[]> {
   const network = getNetwork(4); // TODO : Change when no more rinkeby
-
-  const queryResult = (
-    await request(network.subgraph, QuestEntityQuery, {
-      skip: currentIndex,
-      first: count,
-      expireTimeLower: filter.expire?.start
-        ? Math.round(filter.expire.start.getTime() / 1000) // MS to Sec
-        : 0,
-      expireTimeUpper: filter.expire?.end
-        ? Math.round(filter.expire.end.getTime() / 1000) // MS to Sec
-        : GQL_MAX_INT, // January 18, 2038 10:14:07 PM  // TODO : Change to a later time when supported by grapql-request
-    })
-  ).questEntities;
+  let queryResult;
+  if (filter.search) {
+    queryResult = (
+      await request(network.subgraph, QuestSearchQuery, {
+        skip: currentIndex,
+        first: count,
+        text: filter.search,
+      })
+    ).QuestSearch;
+  } else {
+    queryResult = (
+      await request(network.subgraph, QuestEntityQuery, {
+        skip: currentIndex,
+        first: count,
+        expireTimeLower: filter.expire?.start
+          ? Math.round(filter.expire.start.getTime() / 1000) // MS to Sec
+          : 0,
+        expireTimeUpper: filter.expire?.end
+          ? Math.round(filter.expire.end.getTime() / 1000) // MS to Sec
+          : GQL_MAX_INT, // January 18, 2038 10:14:07 PM  // TODO : Change to a later time when supported by grapql-request
+      })
+    ).questEntities;
+  }
 
   const newQuests = mapQuests(queryResult);
   questList = questList.concat(newQuests);
   return newQuests;
 }
-
-function debugSubgraph() {
-  const network = getNetwork(4);
-  return request(network.subgraph, DebugQuery);
-}
-
-if (IS_DEV) (window as any).debugSubgraph = debugSubgraph;
 
 export async function saveQuest(
   questFactoryContract: any,
