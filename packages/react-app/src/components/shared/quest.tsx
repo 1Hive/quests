@@ -207,15 +207,13 @@ export default function Quest({
                 </Outset>
               }
             />
-            {!loading && (
+            {!loading && !isEdit && wallet.account && questMode !== QUEST_MODE.READ_DETAIL && (
               <QuestFooterStyled>
-                {!isEdit && wallet.account && questMode !== QUEST_MODE.READ_DETAIL && (
-                  <Outset gu8 vertical>
-                    <ChildSpacer>
-                      <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
-                    </ChildSpacer>
-                  </Outset>
-                )}
+                <Outset gu8 vertical>
+                  <ChildSpacer>
+                    <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
+                  </ChildSpacer>
+                </Outset>
               </QuestFooterStyled>
             )}
           </FormStyled>
