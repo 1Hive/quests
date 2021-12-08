@@ -68,6 +68,7 @@
   },
   "dependencies": {
     "ansi-html": "0.0.7",
+    "axios": "0.21.2",
     "elliptic": "6.5.4",
     "immer": "9.0.7",
     "trim-newlines": "3.0.1"
