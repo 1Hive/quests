@@ -1,7 +1,9 @@
 import { Root } from '@1hive/1hive-ui';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useWallet } from 'src/providers/wallet.context';
 import styled from 'styled-components';
 import FilterContextProvider from '../../providers/filter.context';
+import { isConnected } from '../../utils/web3.utils';
 import Header from './header';
 import QuestListFilter from './quest-list-filter';
 import MainScrollWithSidebarLayout from './side-content-layout';
@@ -41,10 +43,15 @@ type Props = {
 };
 
 function MainView({ children, toggleTheme, currentTheme }: Props) {
-  // const wallet = useWallet();
-  // useEffect(() => {
-  //   if (isConnected() && !wallet.account) wallet.activate(); // Auto connect to metamask
-  // }, []); // Run only once
+  const wallet = useWallet();
+  useEffect(() => {
+    if (!wallet.account) {
+      isConnected().then((connected) => {
+        if (connected) wallet.activate();
+      });
+    }
+  }, []);
+
   return (
     <MainViewStyled currentTheme={currentTheme}>
       <HeaderWrapperStyled>

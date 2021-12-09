@@ -51,7 +51,7 @@
     "typechain": "^4.0.0"
   },
   "scripts": {
-    "chain": "hardhat node --hostname 0.0.0.0 --network hardhat --no-deploy",
+    "chain": "hardhat node --hostname 0.0.0.0 --network hardhat --no-deploy --show-accounts",
     "fork": "dotenv -- cross-var hardhat node --no-deploy --network hardhat --fork https://mainnet.infura.io/v3/%INFURA_ID%",
     "test": "hardhat test --network hardhat",
     "test-coverage": "hardhat coverage --network localhost --testfiles \"test/*.test.ts\" --solcoverjs ./test/coverage.solcover.ts",

@@ -1,35 +1,43 @@
+import { Contract } from 'ethers';
 import { request } from 'graphql-request';
 import { noop } from 'lodash-es';
-import { log } from 'loglevel';
 import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
+import { getNetwork } from 'src/networks';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
-import { GQL_MAX_INT, MIN_QUEST_VERSION, QUEST_VERSION, SUBGRAPH_URI, TOKENS } from '../constants';
-import { QuestSearchQuery } from '../queries/quest-search.query';
+import { QuestSearchQuery } from 'src/queries/quest-search.query';
+import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
+import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
-import { getCurrentAccount, sendTransaction } from '../utils/web3.utils';
+import { Logger } from '../utils/logger';
+import { getCurrentAccount, sendTransaction, toHex } from '../utils/web3.utils';
+import { pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
 
 // #region Private
 
-function mapQuests(quests: any[]): Promise<QuestData[]> {
-  return Promise.all(
-    quests.map(
-      async (questEntity) =>
-        ({
+function mapQuests(quests: any[]): QuestData[] {
+  return quests
+    .map((questEntity) => {
+      try {
+        return {
           address: questEntity.questAddress,
-          title: questEntity.questMetaTitle,
-          description: questEntity.questMetaDescription,
+          title: questEntity.questTitle,
+          description: questEntity.questDescription,
+          detailsRefIpfs: questEntity.questDetailsRef.toString(),
           rewardTokenAddress: questEntity.questRewardTokenAddress,
-          bounty: { amount: 0, token: TOKENS.honey }, // Fetch amount of honey for this quest or questRewardTokenAddress
-          collateralPercentage: questEntity.questMetaCollateralPercentage,
-          tags: questEntity.questMetaTags,
-          expireTimeMs: questEntity.questExpireTimeSec * 1000, // Sec to Ms
-        } as QuestData),
-    ),
-  );
+          claimDeposit: { amount: 0, token: TOKENS.honey },
+          bounty: { amount: 0, token: TOKENS.honey },
+          expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
+        } as QuestData;
+      } catch (error) {
+        Logger.error('Failed to map quest : ', questEntity);
+        return undefined;
+      }
+    })
+    .filter((x) => !!x) as QuestData[];
 }
 
 // #endregion
@@ -41,31 +49,21 @@ export async function getMoreQuests(
   count: number,
   filter: Filter,
 ): Promise<QuestData[]> {
-  const currentAccount = await getCurrentAccount();
-  if (!currentAccount && (filter.foundedQuests || filter.playedQuests || filter.createdQuests)) {
-    throw wrapError(
-      'Trying to filter on current account when this account is not enabled nor connected',
-      { filter },
-    );
-  }
-
+  const network = getNetwork();
   let queryResult;
   if (filter.search) {
     queryResult = (
-      await request(SUBGRAPH_URI, QuestSearchQuery, {
+      await request(network.subgraph, QuestSearchQuery, {
         skip: currentIndex,
         first: count,
-        search: filter.search,
-        minVersion: MIN_QUEST_VERSION,
+        text: filter.search,
       })
     ).questSearch;
   } else {
     queryResult = (
-      await request(SUBGRAPH_URI, QuestEntityQuery, {
+      await request(network.subgraph, QuestEntityQuery, {
         skip: currentIndex,
         first: count,
-        minVersion: MIN_QUEST_VERSION,
-        tags: filter.tags,
         expireTimeLower: filter.expire?.start
           ? Math.round(filter.expire.start.getTime() / 1000) // MS to Sec
           : 0,
@@ -76,28 +74,29 @@ export async function getMoreQuests(
     ).questEntities;
   }
 
-  return mapQuests(queryResult).then((questResult) => {
-    questList = questList.concat(questResult);
-    return questResult;
-  });
+  const newQuests = mapQuests(queryResult);
+  questList = questList.concat(newQuests);
+  return newQuests;
 }
 
 export async function saveQuest(
   questFactoryContract: any,
   fallbackAddress: string,
-  meta: Partial<QuestData>,
+  data: Partial<QuestData>,
   address?: string,
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
+    const ipfsHash = await pushObjectToIpfs({ description: data.description ?? '' });
+    const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
-      JSON.stringify(meta),
+      data.title,
+      toHex(ipfsHash.toString()), // Push description to IPFS and push hash to quest contract
       TOKENS.honey.address,
-      Math.round(meta.expireTimeMs! / 1000), // Ms to Sec
+      questExpireTimeUtcSec,
       fallbackAddress,
-      QUEST_VERSION,
     );
-    log('TX HASH', tx.hash);
+    Logger.info('TX HASH', tx.hash);
     const receipt = await tx.wait();
     const questDeployedAddress = receipt?.events[0]?.args[0];
     return questDeployedAddress;
@@ -120,16 +119,32 @@ export async function fundQuest(
   await sendTransaction(questAddress, amount, onCompleted);
 }
 
-export async function playQuest(questAddress: string) {
-  const currentAccount = await getCurrentAccount();
-  if (!currentAccount)
-    throw wrapError('User account not connected when trying to play a quest!', {
+export async function claimQuest(questAddress: string, address: string) {
+  if (!address)
+    throw wrapError('Address is not defined', {
       questAddress,
     });
 }
 
 export function getTagSuggestions() {
-  return questList.map((x) => x.tags).flat();
+  return []; // TODO : Restore after MVP questList.map((x) => x.tags).flat();
+}
+
+// TODO : To verify
+export async function fetchAvailableBounty(quest: QuestData, account: any) {
+  if (!quest?.rewardTokenAddress) return DEFAULT_AMOUNT;
+  const contract = new Contract(quest.rewardTokenAddress, ERC20Abi, account);
+  const balance = await contract.balanceOf(quest.address);
+  return {
+    amount: balance.toString(),
+    token: TOKENS.honey,
+  } as TokenAmount;
+}
+
+// TODO
+export function fetchClaimingPlayers(quest: QuestData) {
+  Logger.debug(quest);
+  return [];
 }
 
 // #endregion

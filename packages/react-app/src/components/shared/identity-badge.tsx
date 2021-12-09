@@ -4,15 +4,15 @@ import { getNetworkType } from '../../utils/web3.utils';
 
 type Props = {
   entity: string;
-  compact: boolean;
+  compact?: boolean;
   children?: React.ReactNode;
   badgeOnly?: boolean;
   connectedAccount?: boolean;
-  label: string;
-  labelStyle: string;
-  popoverTitle: React.ReactNode;
-  popoverAction: any;
-  shorten: boolean;
+  label?: string;
+  labelStyle?: string;
+  popoverTitle?: React.ReactNode;
+  popoverAction?: any;
+  shorten?: boolean;
 };
 
 const IdentityBadge = React.memo(({ entity, ...props }: Props) => {

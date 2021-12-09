@@ -1,5 +1,4 @@
 import { noop } from 'lodash-es';
-import log from 'loglevel';
 import { TokenAmount } from 'src/models/token-amount';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
@@ -7,6 +6,7 @@ import { IS_DEV } from '../constants';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { wrapError } from './errors.util';
+import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
 
@@ -15,21 +15,34 @@ function getWeb3() {
   let ethers: any = null;
   let web3: any = null;
 
-  // @ts-ignore
-  if (window.ethereum) {
-    // @ts-ignore
-    ethers = window.ethereum;
+  const w = window as any;
+  if (w.ethereum) {
+    ethers = w.ethereum;
     web3 = new Web3(ethers);
 
     if (!ethers.isConnected()) {
       ethers.enable().catch((error: Error) => {
         // User denied account access
-        log.error(error);
+        Logger.error(error);
       });
     }
   }
 
-  return web3;
+  return { web3, ethers };
+}
+
+export async function isConnected() {
+  return new Promise((res) => {
+    if (!getWeb3().web3?.eth) res(false);
+    else
+      getWeb3().web3.eth.getAccounts((err: Error, accounts: any[]) => {
+        if (accounts.length !== 0) res(true);
+        else {
+          if (err != null) Logger.error(`An error occurred: ${err}`);
+          res(false);
+        }
+      });
+  });
 }
 
 export function getUseWalletProviders() {
@@ -81,14 +94,14 @@ export function getNetworkName(chainId = getDefaultChain()) {
 }
 
 export function createContractAccount() {
-  return getWeb3()?.eth.accounts.create();
+  return getWeb3()?.web3.eth.accounts.create();
 }
 
 export async function getCurrentAccount(): Promise<string | undefined> {
   return new Promise((res) => {
-    getWeb3()?.eth.getAccounts((error: Error, result: any[]) => {
+    getWeb3()?.web3.eth.getAccounts((error: Error, result: any[]) => {
       if (error) {
-        if (IS_DEV) log.error(error);
+        if (IS_DEV) Logger.error(error);
         res(undefined);
       }
       res(result.length ? result[0] : undefined);
@@ -133,7 +146,7 @@ export async function sendTransaction(
     );
   return new Promise((res, rej) =>
     getWeb3()
-      .eth.sendTransaction({
+      ?.web3.eth.sendTransaction({
         from,
         to,
         value: toWei(amount.amount.toString(), 'ether'),
@@ -145,5 +158,10 @@ export async function sendTransaction(
   );
 }
 
+export function checkConnection() {
+  // Check if User is already connected by retrieving the accounts
+  getWeb3()?.ethers.request({ method: 'eth_requestAccounts' });
+}
+
 // Re-export some web3-utils functions
-export { isAddress, soliditySha3, toUtf8 } from 'web3-utils';
+export { isAddress, soliditySha3, toHex, toUtf8 } from 'web3-utils';

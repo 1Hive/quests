@@ -1,36 +1,44 @@
 import { QuestCreated } from "../generated/QuestFactory/QuestFactory";
 import { QuestEntity } from "../generated/schema";
-import { json } from "@graphprotocol/graph-ts";
+import { ipfs, json } from "@graphprotocol/graph-ts";
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
 
   questEntity.questAddress = event.params.questAddress.toHexString();
+  questEntity.questTitle = event.params.questTitle;
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
-  questEntity.questVersion = event.params.version;
+  questEntity.questDetailsRef = event.params.questDetailsRef;
 
-  let metadata = json.fromString(event.params.questMetadataJson).toObject();
+  if (!event.params.questDetailsRef) {
+    questEntity.questDescription = "";
+  } else {
+    // Fetching quest description with IPFS
+    let questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
+    if (!questDataBytes) {
+      // Continue with IPFS link as the description
+      questEntity.questDescription = `A problem occured when trying to fetch description from IPFS but it is available here :
+      https://ipfs.io/ipfs/${event.params.questDetailsRef.toString()}`;
+    } else {
+      let ipfsObj = json.fromBytes(questDataBytes).toObject();
+      let description = ipfsObj.get("description");
+      questEntity.questDescription = description ? description.toString() : "";
+    }
+  }
 
-  // Extract data from IPFS
-  let title = metadata.get("title");
-  questEntity.questMetaTitle = title ? title.toString() : "";
+  //   let collateral = metadata.get("collateral");
+  //   questEntity.questMetaCollateralPercentage = collateral
+  //     ? collateral.toBigInt()
+  //     : null;
 
-  let description = metadata.get("description");
-  questEntity.questMetaDescription = description ? description.toString() : "";
-
-  let collateral = metadata.get("collateral");
-  questEntity.questMetaCollateralPercentage = collateral
-    ? collateral.toBigInt()
-    : null;
-
-  let tags = metadata.get("tags");
-  questEntity.questMetaTags = tags
-    ? tags
-        .toArray()
-        .filter((x) => !x.isNull())
-        .map<string>((x) => x.toString())
-    : [];
+  //   let tags = metadata.get("tags");
+  //   questEntity.questMetaTags = tags
+  //     ? tags
+  //         .toArray()
+  //         .filter((x) => !x.isNull())
+  //         .map<string>((x) => x.toString())
+  //     : [];
 
   questEntity.save();
 

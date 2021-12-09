@@ -3,10 +3,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
+import { QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
+import * as QuestService from 'src/services/quest.service';
 import { Filter } from '../../models/filter';
 import { useFilterContext } from '../../providers/filter.context';
-import * as QuestService from '../../services/quest.service';
 import { Outset } from './utils/spacer-util';
 
 const batchSize = 3;
@@ -54,6 +55,7 @@ export default function QuestList() {
   );
   useEffect(() => {
     debounceFilter(filter);
+    return () => debounceFilter.cancel();
   }, [filter]);
 
   return (
@@ -76,10 +78,9 @@ export default function QuestList() {
       scrollThreshold="50px"
     >
       <div>
-        {quests.map((x) => (
+        {quests.map((x: QuestData) => (
           <Outset gu16 key={x.address}>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            <Quest {...x} />
+            <Quest questMode={QUEST_MODE.READ_SUMMARY} data={x} />
           </Outset>
         ))}
         {isLoading && skeletonQuests}

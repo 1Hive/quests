@@ -1,8 +1,9 @@
 import { Contract, ContractInterface } from 'ethers';
-import log from 'loglevel';
 import { useMemo } from 'react';
+import { Logger } from 'src/utils/logger';
 import { ADDRESS_ZERO } from '../constants';
 import contractsJson from '../contracts/hardhat_contracts.json';
+import { getNetwork } from '../networks';
 import { useWallet } from '../providers/wallet.context';
 
 let contracts: any;
@@ -36,7 +37,8 @@ export function getContract(
 // returns null on errors
 function useContract(contractName: string, withSignerIfPossible = true) {
   const { account, ethers } = useWallet();
-  if (!contracts) contracts = contractsJson[ethers.network.chainId].rinkeby.contracts;
+  const network = getNetwork();
+  if (!contracts) contracts = contractsJson[network.chainId][network.name.toLowerCase()].contracts;
   const askedContract = contracts[contractName];
 
   return useMemo(() => {
@@ -49,7 +51,7 @@ function useContract(contractName: string, withSignerIfPossible = true) {
         withSignerIfPossible && account ? account : undefined,
       );
     } catch (error) {
-      log.error('Failed to get contract', error);
+      Logger.error('Failed to get contract', error);
       return null;
     }
   }, [askedContract.address, askedContract.abi, ethers, withSignerIfPossible, account]);

@@ -8,8 +8,8 @@ type _Schema_
         entity: "QuestEntity"
         fields: [
           { name: "questAddress" }
-          { name: "questMetaTitle" }
-          { name: "questMetaDescription" }
+          { name: "questTitle" }
+          { name: "questDescription" }
         ]
       }
     ]
@@ -18,12 +18,9 @@ type _Schema_
 type QuestEntity @entity {
   id: ID!
   questAddress: String!
-  questRewardTokenAddress: Bytes!
-  questVersion: String!
+  questTitle: String!
+  questDescription: String
   questExpireTimeSec: BigInt
-  questMetaIpfsHash: String!
-  questMetaTitle: String!
-  questMetaDescription: String
-  questMetaCollateralPercentage: BigInt
-  questMetaTags: [String!]
+  questDetailsRef: Bytes!
+  questRewardTokenAddress: Bytes!
 }

@@ -37,7 +37,8 @@
     "no-use-before-define": "off",
     "no-param-reassign": "off",
     "no-unused-expressions": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "class-methods-use-this": "off"
   },
   "settings": {
     "import/resolver": {

@@ -21,7 +21,6 @@ const ModalStyled = styled(Modal)`
 const ScrollViewStyled = styled(ScrollView)`
   overflow: auto;
   max-height: calc(60vh) !important;
-  padding: ${3 * GU}px;
 `;
 
 type Props = {

@@ -4,7 +4,7 @@ const DEFAULT_CHAIN_ID = 4;
 const ENV_VARS = {
   CHAIN_ID() {
     let chainId = NaN;
-    if (process.env.REACT_APP_CHAIN_IDs) chainId = parseInt(process.env.REACT_APP_CHAIN_ID!, 10);
+    if (process.env.REACT_APP_CHAIN_ID) chainId = +process.env.REACT_APP_CHAIN_ID;
     return Number.isNaN(chainId) ? DEFAULT_CHAIN_ID : chainId;
   },
 };

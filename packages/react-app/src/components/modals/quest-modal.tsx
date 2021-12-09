@@ -1,12 +1,16 @@
 import { Button, GU, IconPlus } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { FaSave } from 'react-icons/fa';
+import { QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
 import styled from 'styled-components';
 import Quest from '../shared/quest';
+import ClaimModal from './claim-modal';
 import FundModal from './fund-modal';
 import ModalBase from './modal-base';
-import PlayModal from './play-modal';
+
+// #region StyledComponents
 
 const ButtonWrapperStyled = styled.div`
   margin: ${1 * GU}px;
@@ -16,20 +20,25 @@ const ButtonWrapperStyled = styled.div`
   justify-content: space-between;
 `;
 
+const QuestActionButtonStyled = styled(Button)`
+  margin: ${1 * GU}px;
+`;
+
+// #endregion
+
 type Props = {
   data?: QuestData;
   onClose: Function;
-  create: boolean;
-  isDetailedView?: boolean;
+  questMode: string;
 };
 
 export default function QuestModal({
   data = undefined,
   onClose = noop,
-  create = false,
-  isDetailedView = false,
+  questMode = QUEST_MODE.READ_SUMMARY,
 }: Props) {
   const [opened, setOpened] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState('');
   const onOpenButtonClick = () => {
     setOpened(true);
   };
@@ -43,44 +52,56 @@ export default function QuestModal({
     setOpened(false);
     onClose(address);
   };
+  useEffect(() => {
+    switch (questMode) {
+      case QUEST_MODE.CREATE:
+        setButtonLabel('Create quest');
+        break;
+
+      case QUEST_MODE.UPDATE:
+        setButtonLabel('Update quest');
+        break;
+
+      case QUEST_MODE.READ_DETAIL:
+        setButtonLabel('Details');
+        break;
+
+      default:
+        break;
+    }
+  }, [questMode]);
 
   return (
     <ModalBase
-      title={create ? 'Create quest' : 'Details'}
       openButton={
         <Button
           icon={<IconPlus />}
-          label={isDetailedView ? 'Details' : 'Create quest'}
+          label={buttonLabel}
           wide
           mode="strong"
           onClick={onOpenButtonClick}
         />
       }
       buttons={
-        data && (
+        questMode === QUEST_MODE.READ_DETAIL ? (
           <ButtonWrapperStyled>
-            <FundModal questAddress={data.address} />
-            <PlayModal questAddress={data.address} />
+            <FundModal questAddress={data!.address!} />
+            <ClaimModal questAddress={data!.address!} />
           </ButtonWrapperStyled>
+        ) : (
+          <QuestActionButtonStyled
+            label="Save"
+            icon={<FaSave />}
+            mode="positive"
+            type="submit"
+            form="quest-form-new"
+          />
         )
       }
       isOpen={opened}
       onClose={onModalClose}
     >
-      {isDetailedView && data ? (
-        <Quest
-          isDetailedView
-          title={data.title}
-          description={data.description}
-          bounty={data.bounty}
-          collateralPercentage={data.collateralPercentage}
-          tags={data.tags}
-          address={data.address}
-          expireTimeMs={data.expireTimeMs}
-        />
-      ) : (
-        <Quest isEdit onSave={onSaveClick} />
-      )}
+      <Quest questMode={questMode} data={data} onSave={onSaveClick} />
     </ModalBase>
   );
 }

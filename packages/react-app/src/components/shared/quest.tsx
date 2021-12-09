@@ -1,33 +1,21 @@
-import {
-  AddressField,
-  Button,
-  Card,
-  Field,
-  GU,
-  LoadingRing,
-  Split,
-  useToast,
-} from '@1hive/1hive-ui';
+import { AddressField, Card, GU, Split, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
-import { useRef, useState } from 'react';
-import { FaEdit, FaSave } from 'react-icons/fa';
+import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { TOKENS } from 'src/constants';
+import { DEFAULT_AMOUNT, QUEST_MODE } from 'src/constants';
 import { useFactoryContract } from 'src/hooks/use-contract.hook';
-import { Fund as Fundation } from 'src/models/fund';
 import { QuestData } from 'src/models/quest-data';
-import { TokenAmount } from 'src/models/token-amount';
 import * as QuestService from 'src/services/quest.service';
-import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
+import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import QuestModal from '../modals/quest-modal';
-import { AmountFieldInputFormik } from './field-input/amount-field-input';
+import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
-import NumberFieldInput from './field-input/number-field-input';
-import { TagFieldInputFormik } from './field-input/tag-field-input';
 import TextFieldInput from './field-input/text-field-input';
+import IdentityBadge from './identity-badge';
 import { ChildSpacer, Outset } from './utils/spacer-util';
 
 // #region StyledComponents
@@ -44,10 +32,6 @@ const QuestFooterStyled = styled.div`
   padding: ${1 * GU}px;
 `;
 
-const QuestActionButtonStyled = styled(Button)`
-  margin: ${1 * GU}px;
-`;
-
 const FormStyled = styled(Form)`
   width: 100%;
   #description {
@@ -58,76 +42,61 @@ const FormStyled = styled(Form)`
 // #endregion
 
 type Props = {
-  title?: string;
-  description?: string;
-  bounty?: TokenAmount;
-  collateralPercentage?: number;
-  tags?: string[];
-  address?: string;
-  css?: any;
-  isEdit?: boolean;
+  data?: QuestData;
+  questMode?: string;
   isLoading?: boolean;
   onSave?: Function;
-  players?: string[];
-  funds?: Fundation[];
-  creatorAddress?: string;
-  expireTimeMs?: number;
-  rewardTokenAddress?: string;
-  isDetailedView?: boolean;
+  css?: any;
 };
 
 export default function Quest({
-  title,
-  description,
-  bounty = { amount: 0, token: TOKENS.honey },
-  collateralPercentage = 0,
-  tags = [],
-  expireTimeMs = IN_A_WEEK_IN_MS,
-  address = undefined,
-  creatorAddress = undefined,
-  rewardTokenAddress = undefined,
-  isEdit = false,
-  isDetailedView = false,
+  data = {
+    title: '',
+    description: '',
+    expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
+    bounty: DEFAULT_AMOUNT,
+    claimDeposit: DEFAULT_AMOUNT,
+  },
   isLoading = false,
-  players = [],
-  funds = [],
+  questMode = QUEST_MODE.READ_SUMMARY,
   onSave = noop,
   css,
 }: Props) {
   const wallet = useWallet();
   const questFactoryContract = useFactoryContract();
-  const formRef = useRef(null);
-  const [editMode, setEditMode] = useState(isEdit);
+  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
+  const [isEdit, setIsEdit] = useState(false);
   const toast = useToast();
 
+  useEffect(
+    () => setIsEdit(questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE),
+    [questMode],
+  );
+
   return (
-    <CardStyled style={css} id={address}>
+    <CardStyled style={css} id={data.address}>
       <Formik
-        initialValues={
-          {
-            title,
-            description,
-            bounty,
-            collateralPercentage,
-            tags,
-            fallbackAddress: wallet.account,
-            expireTimeMs,
-          } as Partial<QuestData>
-        }
+        initialValues={{ fallbackAddress: wallet.account, ...data }}
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setLoading(true);
             try {
-              const timeValue = new Date(values.expireTimeMs ?? 0).getTime();
+              // Set noon to prevent rounding form changing date
+              const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
               const saveResponse = await QuestService.saveQuest(
                 questFactoryContract,
-                values.fallbackAddress ?? wallet.account,
-                { ...values, expireTimeMs: timeValue },
+                values.fallbackAddress!,
+                { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
               );
               onSave(saveResponse);
             } catch (e: any) {
-              toast(e.message);
+              Logger.error(e);
+              toast(
+                e.message.includes('\n') || e.message.length > 50
+                  ? 'Oops. Something went wrong.'
+                  : e.message,
+              );
             }
 
             setSubmitting(false);
@@ -136,7 +105,11 @@ export default function Quest({
         }}
       >
         {({ values, handleChange, handleSubmit }) => (
-          <FormStyled onSubmit={handleSubmit} ref={formRef}>
+          <FormStyled
+            onSubmit={handleSubmit}
+            ref={formRef}
+            id={`quest-form-${data.address ?? 'new'}`}
+          >
             <Split
               primary={
                 <Outset gu16>
@@ -145,8 +118,8 @@ export default function Quest({
                       primary={
                         <TextFieldInput
                           id="title"
-                          label={editMode ? 'Title' : ''}
-                          isEdit={editMode}
+                          label={isEdit ? 'Title' : undefined}
+                          isEdit={isEdit}
                           isLoading={loading}
                           placeHolder="Quest title"
                           value={values.title}
@@ -156,12 +129,13 @@ export default function Quest({
                         />
                       }
                       secondary={
-                        !editMode &&
+                        !isEdit &&
+                        data.address &&
                         (loading ? (
                           <Skeleton />
                         ) : (
                           <>
-                            <AddressField id="address" address={address} autofocus={false} />
+                            <AddressField id="address" address={data.address} autofocus={false} />
                           </>
                         ))
                       }
@@ -170,9 +144,9 @@ export default function Quest({
                   <Outset gu8 vertical>
                     <TextFieldInput
                       id="description"
-                      label={editMode ? 'Description' : ''}
+                      label={isEdit ? 'Description' : undefined}
                       value={values.description}
-                      isEdit={editMode}
+                      isEdit={isEdit}
                       isLoading={loading}
                       placeHolder="Quest description"
                       onChange={handleChange}
@@ -180,47 +154,45 @@ export default function Quest({
                       multiline
                       css={{ height: '100px' }}
                     />
-                    {editMode && (
-                      <TextFieldInput
-                        id="fallbackAddress"
-                        label="Funds fallback address"
-                        value={values.fallbackAddress}
-                        isLoading={loading}
-                        isEdit
-                        placeHolder="Funds fallback address"
-                        onChange={handleChange}
-                        wide
-                      />
+                    {isEdit && (
+                      <>
+                        <TextFieldInput
+                          id="fallbackAddress"
+                          label="Funds fallback address"
+                          value={values.fallbackAddress}
+                          isLoading={loading}
+                          isEdit
+                          placeHolder="Funds fallback address"
+                          onChange={handleChange}
+                          wide
+                        />
+                        {!loading && <IdentityBadge entity={values.fallbackAddress} badgeOnly />}
+                      </>
                     )}
                   </Outset>
                 </Outset>
               }
               secondary={
                 <Outset gu16>
-                  {!isEdit && (
-                    <>
-                      <Field label="Patrons">{loading ? <Skeleton /> : funds.length}</Field>
-                      <Field label="Players">{loading ? <Skeleton /> : players.length}</Field>
-                    </>
-                  )}
                   <AmountFieldInputFormik
                     id="bounty"
-                    label="Bounty"
-                    isEdit={editMode}
+                    label={questMode === QUEST_MODE.CREATE ? 'Initial bounty' : 'Available bounty'}
+                    isEdit={isEdit}
                     value={values.bounty}
                     isLoading={loading}
                     formik={formRef}
                   />
-                  <NumberFieldInput
-                    id="collateralPercentage"
-                    label="Collateral"
-                    onChange={handleChange}
-                    isEdit={editMode}
-                    value={values.collateralPercentage}
-                    isLoading={loading}
-                    suffix="%"
-                  />
-                  {(!!values.tags?.length || editMode) && (
+                  {!isEdit && (
+                    <AmountFieldInput
+                      id="claimDeposit"
+                      label="Claim deposit"
+                      onChange={handleChange}
+                      isEdit={false}
+                      value={values.claimDeposit}
+                      isLoading={loading}
+                    />
+                  )}
+                  {/* {(!!values.tags?.length || editMode) && (
                     <TagFieldInputFormik
                       id="tags"
                       label="Tags"
@@ -228,13 +200,13 @@ export default function Quest({
                       isLoading={loading}
                       value={values.tags}
                       formik={formRef}
-                      // onTagClick={(x: String[]) => log('Tag clicked : ', x)} // TODO : Restore filter by tag on tag click
+                      // onTagClick={(x: String[]) => Logger.debug('Tag clicked : ', x)} // TODO : Restore filter by tag on tag click
                     />
-                  )}
+                  )} TODO : No tags for MVP */}
                   <DateFieldInput
                     id="expireTimeMs"
                     label="Expire time"
-                    isEdit={editMode}
+                    isEdit={isEdit}
                     isLoading={loading}
                     value={values.expireTimeMs}
                     onChange={handleChange}
@@ -242,45 +214,15 @@ export default function Quest({
                 </Outset>
               }
             />
-            <QuestFooterStyled>
-              {editMode ? (
-                <QuestActionButtonStyled
-                  label="Save"
-                  icon={loading ? <LoadingRing /> : <FaSave />}
-                  mode="positive"
-                  type="submit"
-                />
-              ) : (
-                wallet.account && (
-                  <Outset gu8 vertical>
-                    <ChildSpacer>
-                      {creatorAddress === wallet.account && (
-                        <Button onClick={() => setEditMode(true)} label="Edit" icon={<FaEdit />} />
-                      )}
-                      {!isDetailedView && (
-                        <QuestModal
-                          data={{
-                            title,
-                            description,
-                            bounty,
-                            collateralPercentage,
-                            tags,
-                            address,
-                            expireTimeMs,
-                            creatorAddress,
-                            players,
-                            rewardTokenAddress,
-                          }}
-                          isDetailedView
-                          onClose={noop}
-                          create={false}
-                        />
-                      )}
-                    </ChildSpacer>
-                  </Outset>
-                )
-              )}
-            </QuestFooterStyled>
+            {!loading && !isEdit && wallet.account && questMode !== QUEST_MODE.READ_DETAIL && (
+              <QuestFooterStyled>
+                <Outset gu8 vertical>
+                  <ChildSpacer>
+                    <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
+                  </ChildSpacer>
+                </Outset>
+              </QuestFooterStyled>
+            )}
           </FormStyled>
         )}
       </Formik>

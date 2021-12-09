@@ -7,7 +7,7 @@ export const APP_TITLE = 'Quest';
 
 // Env
 export const IS_DEV = process.env?.NODE_ENV === 'development';
-export const EXPECTED_NETWORKS = IS_DEV ? ['localhost'] : ['xDai'];
+export const EXPECTED_NETWORKS = IS_DEV ? ['localhost', 'rinkeby'] : ['xDai'];
 export const defaultTheme = 'light';
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
@@ -36,12 +36,24 @@ export const TOKENS = {
   } as Token,
 };
 
+export const DEFAULT_AMOUNT = {
+  amount: 0,
+  token: TOKENS.honey,
+};
+
 // Enums
 export const QUEST_STATUS = {
   active: { id: 'active', label: 'Active' },
   completed: { id: 'completed', label: 'Completed' },
   aborted: { id: 'aborted', label: 'Aborted' },
   draft: { id: 'draft', label: 'Draft' },
+};
+
+export const QUEST_MODE = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  READ_SUMMARY: 'SUMMARY',
+  READ_DETAIL: 'DETAIL',
 };
 
 export const BREAKPOINTS = {
@@ -62,18 +74,8 @@ export const BREAKPOINTS = {
 export const defaultFilter = {
   search: '',
   expire: { start: undefined, end: undefined },
-  tags: [],
-  bounty: { amount: 0, token: TOKENS.honey },
-  showFull: false,
-  foundedQuests: false,
-  createdQuests: false,
-  playedQuests: false,
+  bounty: DEFAULT_AMOUNT,
 } as Filter;
 
-// SUBGRAPH
-export const SUBGRAPH_URI = 'https://api.studio.thegraph.com/query/10030/1hive-quests/0.0.1';
-
 // Handle retro compatibility correctly
-export const QUEST_VERSION = '2.4';
-export const MIN_QUEST_VERSION = '2.4';
 export const GQL_MAX_INT = 2 ** 31 - 1;

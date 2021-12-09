@@ -1,8 +1,8 @@
-import log from 'loglevel';
 import { Fund } from 'src/models/fund';
 import { Token } from 'src/models/token';
 import { TokenAmount } from 'src/models/token-amount';
 import { TOKENS } from '../constants';
+import { Logger } from './logger';
 
 export async function convertTo(from: TokenAmount, toToken: Token) {
   const res = await fetch(
@@ -15,13 +15,13 @@ export async function convertTo(from: TokenAmount, toToken: Token) {
     },
   );
 
-  log.log(res);
+  Logger.debug(res);
   return { amount: res, token: toToken };
 }
 
 export async function computeTotalFunds(funds: Fund[]) {
   if (!funds?.length) return { amount: 0, token: TOKENS.theter };
-  log.log(funds);
+  Logger.debug(funds);
   const tetherFunds = await Promise.all(funds.map((x) => convertTo(x.amount, TOKENS.theter)));
   // @ts-ignore
   const amount = tetherFunds.reduce((total, x) => total + x.amount);

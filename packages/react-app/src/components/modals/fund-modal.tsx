@@ -9,7 +9,7 @@ import ModalBase from './modal-base';
 
 type Props = {
   onClose?: Function;
-  questAddress?: string;
+  questAddress: string;
 };
 
 export default function FundModal({ questAddress, onClose = noop }: Props) {

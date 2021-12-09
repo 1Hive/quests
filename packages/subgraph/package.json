@@ -3,15 +3,19 @@
   "license": "UNLICENSED",
   "version": "0.1.0",
   "scripts": {
+    "prepare:rinkeby": "node ./sync-with-last-deploy.js rinkeby && mustache config/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
+    "prepare:local": "node ./sync-with-last-deploy.js localhost && mustache config/localhost.json src/subgraph.template.yaml > subgraph.yaml",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --studio 1hive-quests",
-    "create-local": "graph create --node http://localhost:8020/ 1hive-quests",
-    "remove-local": "graph remove --node http://localhost:8020/ 1hive-quests",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 1hive-quests"
+    "create-local": "graph create --node http://0.0.0.0:8020/ corantin/quests-subgraph",
+    "remove-local": "graph remove --node http://0.0.0.0:8020/ corantin/quests-subgraph",
+    "deploy:rinkeby": "graph deploy corantin/quests-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy:local": "graph deploy corantin/quests-subgraph --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.23.0",
-    "@graphprotocol/graph-ts": "0.23.1"
+    "@graphprotocol/graph-cli": "^0.23.2",
+    "@graphprotocol/graph-ts": "^0.23.1",
+    "js-yaml": "^4.1.0",
+    "mustache": "^4.2.0"
   }
 }

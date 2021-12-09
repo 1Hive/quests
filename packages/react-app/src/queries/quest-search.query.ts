@@ -1,18 +1,15 @@
-import { gql } from 'graphql-request';
+import gql from 'graphql-tag';
 
 export const QuestSearchQuery = gql`
-  query questSearch($first: Int, $skip: Int, $search: String) {
-    questSearch(first: $first, skip: $skip, text: $search) {
+  query questSearch($first: Int, $skip: Int, $text: String) {
+    questSearch(first: $first, skip: $skip, text: $text) {
       id
       questAddress
-      questRewardTokenAddress
+      questTitle
+      questDescription
       questExpireTimeSec
-      questVersion
-      questMetaIpfsHash
-      questMetaTitle
-      questMetaDescription
-      questMetaCollateralPercentage
-      questMetaTags
+      questDetailsRef
+      questRewardTokenAddress
     }
   }
 `;
