@@ -58,7 +58,7 @@ export async function getMoreQuests(
         first: count,
         text: filter.search,
       })
-    ).QuestSearch;
+    ).questSearch;
   } else {
     queryResult = (
       await request(network.subgraph, QuestEntityQuery, {

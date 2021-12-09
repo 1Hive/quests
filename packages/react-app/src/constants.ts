@@ -78,6 +78,4 @@ export const defaultFilter = {
 } as Filter;
 
 // Handle retro compatibility correctly
-export const QUEST_VERSION = '2.5';
-export const MIN_QUEST_VERSION = '2.5';
 export const GQL_MAX_INT = 2 ** 31 - 1;

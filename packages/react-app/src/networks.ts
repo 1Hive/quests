@@ -25,7 +25,7 @@ const networks = {
     name: 'xDai',
     type: 'xdai',
     defaultEthNode: 'https://xdai.poanetwork.dev/',
-    // questFactory: HardhatDeployement[100].xdai.contracts.QuestFactory.address,
+    questFactory: HardhatDeployement[100].xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai
   },
   local: {
