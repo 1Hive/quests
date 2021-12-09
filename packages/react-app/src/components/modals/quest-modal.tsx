@@ -6,7 +6,7 @@ import { QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
 import styled from 'styled-components';
 import Quest from '../shared/quest';
-import ClaimModale from './claim-modal';
+import ClaimModal from './claim-modal';
 import FundModal from './fund-modal';
 import ModalBase from './modal-base';
 
@@ -86,7 +86,7 @@ export default function QuestModal({
         questMode === QUEST_MODE.READ_DETAIL ? (
           <ButtonWrapperStyled>
             <FundModal questAddress={data!.address!} />
-            <ClaimModale questAddress={data!.address!} />
+            <ClaimModal questAddress={data!.address!} />
           </ButtonWrapperStyled>
         ) : (
           <QuestActionButtonStyled

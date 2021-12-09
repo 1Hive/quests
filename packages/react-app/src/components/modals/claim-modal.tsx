@@ -18,7 +18,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export default function ClaimModale({ questAddress, onClose = noop, disabled = false }: Props) {
+export default function ClaimModal({ questAddress, onClose = noop, disabled = false }: Props) {
   const toast = useToast();
   const wallet = useWallet();
   const [opened, setOpened] = useState(false);
