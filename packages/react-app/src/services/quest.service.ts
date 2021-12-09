@@ -91,7 +91,7 @@ export async function saveQuest(
     const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
       data.title,
-      ipfsHash.toString(), // Push description to IPFS and push hash to quest contract
+      ipfsHash.bytes, // Push description to IPFS and push hash to quest contract
       TOKENS.honey.address,
       questExpireTimeUtcSec,
       fallbackAddress,

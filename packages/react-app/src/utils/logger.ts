@@ -3,33 +3,33 @@
 
 // eslint-disable-next-line no-shadow
 export enum LogLevels {
-  NONE = 0,
-  DEBUG = 1,
-  INFO = 2,
-  WARN = 3,
-  ERROR = 4,
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3,
+  NONE = 4,
 }
 
 let logLevel: LogLevels = process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG;
 
 function debug(message: any, ...params: any[]) {
   if (process.env.NODE_ENV === 'production' && logLevel < LogLevels.DEBUG) return;
-  console.debug(message, params);
+  params.length ? console.debug(message, params) : console.debug(message);
 }
 
 function info(message: any, ...params: any[]) {
-  if (logLevel < LogLevels.INFO) return;
-  console.info(message, params);
+  if (logLevel > LogLevels.INFO) return;
+  params.length ? console.info(message, params) : console.info(message);
 }
 
 function warn(message: any, ...params: any[]) {
-  if (logLevel < LogLevels.WARN) return;
-  console.warn(message, params);
+  if (logLevel > LogLevels.WARN) return;
+  params.length ? console.warn(message, params) : console.warn(message);
 }
 
 function error(message: any, ...params: any[]) {
-  if (logLevel < LogLevels.ERROR) return;
-  console.error(message, params);
+  if (logLevel > LogLevels.ERROR) return;
+  params.length ? console.error(message, params) : console.error(message);
 }
 
 function setLogLevel(level: LogLevels) {

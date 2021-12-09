@@ -25,14 +25,14 @@ const networks = {
     name: 'xDai',
     type: 'xdai',
     defaultEthNode: 'https://xdai.poanetwork.dev/',
-    questFactory: HardhatDeployement[100].xdai.contracts.QuestFactory.address,
+    questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai
   },
   local: {
     chainId: 1337,
     name: 'Localhost',
     type: 'private',
-    subgraph: 'http://127.0.0.1:8020/subgraphs/name/corantin/quests-subgraph',
+    subgraph: 'http://localhost:8000/subgraphs/name/corantin/quests-subgraph',
     defaultEthNode: 'http://0.0.0.0:8545/',
     questFactory: HardhatDeployement[1337].localhost.contracts.QuestFactory.address,
     govern: 0,

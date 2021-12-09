@@ -8,6 +8,7 @@ import { useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
+import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import QuestModal from '../modals/quest-modal';
@@ -90,7 +91,12 @@ export default function Quest({
               );
               onSave(saveResponse);
             } catch (e: any) {
-              toast(e.message);
+              Logger.error(e);
+              toast(
+                e.message.includes('\n') || e.message.length > 50
+                  ? 'Oops. Something went wrong.'
+                  : e.message,
+              );
             }
 
             setSubmitting(false);
@@ -124,6 +130,7 @@ export default function Quest({
                       }
                       secondary={
                         !isEdit &&
+                        data.address &&
                         (loading ? (
                           <Skeleton />
                         ) : (
