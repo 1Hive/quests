@@ -1,20 +1,6 @@
 import { QuestCreated } from "../generated/QuestFactory/QuestFactory";
 import { QuestEntity } from "../generated/schema";
-import { Entity, ipfs, json, JSONValue, Value } from "@graphprotocol/graph-ts";
-
-export function handleIpfsResult(value: JSONValue, questEntityId: Value): void {
-  let questEntity = new QuestEntity(questEntityId.toString());
-  //   if (value.isNull()) {
-  //     // Continue with IPFS link as the description
-  //     questEntity.questDescription = `A problem occured when trying to fetch description from IPFS but it is available here :
-  //       https://ipfs.io/ipfs/${event.params.questDetailsRef}`;
-  //   }
-
-  let detailsObj = value.toObject();
-  let description = detailsObj.get("description");
-  questEntity.questDescription = description ? description.toString() : "";
-  questEntity.save();
-}
+import { ipfs, json } from "@graphprotocol/graph-ts";
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
@@ -24,17 +10,21 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
   questEntity.questDetailsRef = event.params.questDetailsRef;
-  questEntity.questDescription = "";
-  questEntity.save();
 
-  if (event.params.questDetailsRef) {
+  if (!event.params.questDetailsRef) {
+    questEntity.questDescription = "";
+  } else {
     // Fetching quest description with IPFS
-    ipfs.map(
-      event.params.questDetailsRef.toString(),
-      "handleIpfsResult",
-      Value.fromString(questEntity.id),
-      ["json"]
-    );
+    let questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
+    if (!questDataBytes) {
+      // Continue with IPFS link as the description
+      questEntity.questDescription = `A problem occured when trying to fetch description from IPFS but it is available here :
+      https://ipfs.io/ipfs/${event.params.questDetailsRef}`;
+    } else {
+      let ipfsObj = json.fromBytes(questDataBytes).toObject();
+      let description = ipfsObj.get("description");
+      questEntity.questDescription = description ? description.toString() : "";
+    }
   }
 
   //   let collateral = metadata.get("collateral");
@@ -49,6 +39,8 @@ export function handleQuestCreated(event: QuestCreated): void {
   //         .filter((x) => !x.isNull())
   //         .map<string>((x) => x.toString())
   //     : [];
+
+  questEntity.save();
 
   // Note: If a handler doesn't require existing field values, it is faster
   // _not_ to load the entity from the store. Instead, create it fresh with
