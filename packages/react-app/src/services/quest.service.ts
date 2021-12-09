@@ -11,7 +11,7 @@ import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
-import { getCurrentAccount, sendTransaction } from '../utils/web3.utils';
+import { getCurrentAccount, sendTransaction, toHex } from '../utils/web3.utils';
 import { pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
@@ -26,7 +26,7 @@ function mapQuests(quests: any[]): QuestData[] {
           address: questEntity.questAddress,
           title: questEntity.questTitle,
           description: questEntity.questDescription,
-          detailsRefIpfs: questEntity.questDetailsRef,
+          detailsRefIpfs: questEntity.questDetailsRef.toString(),
           rewardTokenAddress: questEntity.questRewardTokenAddress,
           claimDeposit: { amount: 0, token: TOKENS.honey },
           bounty: { amount: 0, token: TOKENS.honey },
@@ -91,7 +91,7 @@ export async function saveQuest(
     const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
       data.title,
-      ipfsHash.bytes, // Push description to IPFS and push hash to quest contract
+      toHex(ipfsHash.toString()), // Push description to IPFS and push hash to quest contract
       TOKENS.honey.address,
       questExpireTimeUtcSec,
       fallbackAddress,

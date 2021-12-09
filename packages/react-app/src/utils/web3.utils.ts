@@ -164,4 +164,4 @@ export function checkConnection() {
 }
 
 // Re-export some web3-utils functions
-export { isAddress, soliditySha3, toUtf8 } from 'web3-utils';
+export { isAddress, soliditySha3, toHex, toUtf8 } from 'web3-utils';
