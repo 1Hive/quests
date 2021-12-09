@@ -1,6 +1,6 @@
 type _Schema_
   @fulltext(
-    name: "QuestSearch"
+    name: "questSearch"
     language: en
     algorithm: rank
     include: [
