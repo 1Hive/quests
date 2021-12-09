@@ -12,5 +12,6 @@ export type QuestData = {
   address?: string;
   rewardTokenAddress?: string;
   claimDeposit?: TokenAmount;
+  detailsRefIpfs?: string;
   creatorAddress?: string;
 };

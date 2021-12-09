@@ -46,7 +46,9 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   const wallet = useWallet();
   useEffect(() => {
     if (!wallet.account) {
-      isConnected().then(() => wallet.activate());
+      isConnected().then((connected) => {
+        if (connected) wallet.activate();
+      });
     }
   }, []);
 

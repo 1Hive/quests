@@ -30,10 +30,11 @@ const networks = {
   },
   local: {
     chainId: 1337,
-    name: 'Local',
+    name: 'Localhost',
     type: 'private',
+    subgraph: 'http://127.0.0.1:8020/subgraphs/name/corantin/quests-subgraph',
     defaultEthNode: 'http://0.0.0.0:8545/',
-    // questFactory: HardhatDeployement[1337].localhost.contracts.QuestFactory.address,
+    questFactory: HardhatDeployement[1337].localhost.contracts.QuestFactory.address,
     govern: 0,
   },
 };

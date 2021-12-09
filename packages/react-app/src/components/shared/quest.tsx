@@ -81,7 +81,7 @@ export default function Quest({
           setTimeout(async () => {
             setLoading(true);
             try {
-              // Set noon to prevent rounidng form changing date
+              // Set noon to prevent rounding form changing date
               const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
               const saveResponse = await QuestService.saveQuest(
                 questFactoryContract,
@@ -112,7 +112,7 @@ export default function Quest({
                       primary={
                         <TextFieldInput
                           id="title"
-                          label={isEdit ? 'Title' : ''}
+                          label={isEdit ? 'Title' : undefined}
                           isEdit={isEdit}
                           isLoading={loading}
                           placeHolder="Quest title"
@@ -137,7 +137,7 @@ export default function Quest({
                   <Outset gu8 vertical>
                     <TextFieldInput
                       id="description"
-                      label={isEdit ? 'Description' : ''}
+                      label={isEdit ? 'Description' : undefined}
                       value={values.description}
                       isEdit={isEdit}
                       isLoading={loading}
@@ -175,7 +175,7 @@ export default function Quest({
                     isLoading={loading}
                     formik={formRef}
                   />
-                  {questMode !== QUEST_MODE.CREATE && (
+                  {!isEdit && (
                     <AmountFieldInput
                       id="claimDeposit"
                       label="Claim deposit"

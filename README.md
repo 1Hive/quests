@@ -24,8 +24,10 @@ Start the project
 ```sh
 # Rinkeby testnet
 yarn start
-# Local chain
-yarn start:local &; yarn chain &; yarn deploy &
+# Local chain (three different terminals)
+> yarn start:local 
+> yarn chain 
+> yarn deploy:local
 ```
 
 ### Docs

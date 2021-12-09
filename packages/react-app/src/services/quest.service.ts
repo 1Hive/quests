@@ -49,7 +49,7 @@ export async function getMoreQuests(
   count: number,
   filter: Filter,
 ): Promise<QuestData[]> {
-  const network = getNetwork(4); // TODO : Change when no more rinkeby
+  const network = getNetwork();
   let queryResult;
   if (filter.search) {
     queryResult = (

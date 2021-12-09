@@ -7,7 +7,7 @@ packages/hardhat/*.txt
 **/node_modules
 packages/hardhat/artifacts
 packages/hardhat/cache
-
+packages/**/data
 docker/**/data
 
 packages/subgraph/config/config.json

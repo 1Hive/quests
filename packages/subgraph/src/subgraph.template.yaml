@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: QuestFactory
-    network: {{ network }}
+    network: {{network}}
     source:
       address: "{{contractAddress}}"
       abi: QuestFactory
-      startBlock: {{ startBlock }}
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

@@ -32,15 +32,17 @@ function getWeb3() {
 }
 
 export async function isConnected() {
-  return new Promise((res) =>
-    getWeb3().web3.eth.getAccounts((err: Error, accounts: any[]) => {
-      if (accounts.length !== 0) res(true);
-      else {
-        if (err != null) Logger.error(`An error occurred: ${err}`);
-        res(false);
-      }
-    }),
-  );
+  return new Promise((res) => {
+    if (!getWeb3().web3?.eth) res(false);
+    else
+      getWeb3().web3.eth.getAccounts((err: Error, accounts: any[]) => {
+        if (accounts.length !== 0) res(true);
+        else {
+          if (err != null) Logger.error(`An error occurred: ${err}`);
+          res(false);
+        }
+      });
+  });
 }
 
 export function getUseWalletProviders() {
