@@ -1,7 +1,9 @@
 import { TokenAmount } from './token-amount';
 
 export type Filter = {
-  search: string;
+  address: string;
+  title: string;
+  description: string;
   expire: { start?: Date; end?: Date };
   bounty: TokenAmount;
 };

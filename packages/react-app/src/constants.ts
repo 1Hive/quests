@@ -72,7 +72,9 @@ export const BREAKPOINTS = {
 // Default values
 
 export const defaultFilter = {
-  search: '',
+  address: '',
+  title: '',
+  description: '',
   expire: { start: undefined, end: undefined },
   bounty: DEFAULT_AMOUNT,
 } as Filter;

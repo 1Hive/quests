@@ -28,8 +28,7 @@ export function handleQuestCreated(event: QuestCreated): void {
       questEntity.questDescription = description ? description.toString() : "";
     } else {
       // Continue with IPFS link as the description
-      questEntity.questDescription = `A problem occured when trying to fetch description from IPFS but it is available here :
-      https://ipfs.io/ipfs/${event.params.questDetailsRef.toString()}`;
+      questEntity.questDescription = null;
     }
   }
 

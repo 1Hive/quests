@@ -29,12 +29,27 @@ export default function QuestListFilter() {
   return (
     <BoxStyled heading="Filters">
       <Outset gu8>
-        <Field label="Search">
+        <Field label="Address">
           <SearchInput
-            id="filterSearch"
-            value={filter.search}
-            onChange={(x: string) => setFilter({ ...filter, search: x })}
-            placeholder="keyword"
+            id="filterAddress"
+            value={filter.address}
+            onChange={(x: string) => setFilter({ ...filter, address: x })}
+            wide
+          />
+        </Field>
+        <Field label="Title">
+          <SearchInput
+            id="filterTitle"
+            value={filter.title}
+            onChange={(x: string) => setFilter({ ...filter, title: x })}
+            wide
+          />
+        </Field>
+        <Field label="Description">
+          <SearchInput
+            id="filterDescription"
+            value={filter.description}
+            onChange={(x: string) => setFilter({ ...filter, description: x })}
             wide
           />
         </Field>
