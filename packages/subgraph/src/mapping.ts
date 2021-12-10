@@ -1,6 +1,6 @@
 import { QuestCreated } from "../generated/QuestFactory/QuestFactory";
 import { QuestEntity } from "../generated/schema";
-import { ipfs, json } from "@graphprotocol/graph-ts";
+import { Bytes, ipfs, json } from "@graphprotocol/graph-ts";
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
@@ -15,15 +15,20 @@ export function handleQuestCreated(event: QuestCreated): void {
     questEntity.questDescription = "";
   } else {
     // Fetching quest description with IPFS
-    let questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
-    if (!questDataBytes) {
-      // Continue with IPFS link as the description
-      questEntity.questDescription = `A problem occured when trying to fetch description from IPFS but it is available here :
-      https://ipfs.io/ipfs/${event.params.questDetailsRef.toString()}`;
-    } else {
+    let questDataBytes: Bytes | null = null;
+    let tryCount = 0;
+    while (!questDataBytes || tryCount === 4) {
+      questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
+      tryCount = tryCount + 1;
+    }
+    if (questDataBytes) {
       let ipfsObj = json.fromBytes(questDataBytes).toObject();
       let description = ipfsObj.get("description");
       questEntity.questDescription = description ? description.toString() : "";
+    } else {
+      // Continue with IPFS link as the description
+      questEntity.questDescription = `A problem occured when trying to fetch description from IPFS but it is available here :
+      https://ipfs.io/ipfs/${event.params.questDetailsRef.toString()}`;
     }
   }
 

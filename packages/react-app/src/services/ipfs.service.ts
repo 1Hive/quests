@@ -8,9 +8,9 @@ const infura = {
 
 const ipfs = ipfsAPI.create(infura);
 
-export const pushObjectToIpfs = async (obj: Object) => {
+export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
   const response = await ipfs.add(JSON.stringify(obj));
-  return response.cid;
+  return response.cid.toString();
 };
 
 export const getObjectFromIpfs = async (objHash: string) => {

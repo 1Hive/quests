@@ -89,6 +89,7 @@ export default function Quest({
                 values.fallbackAddress!,
                 { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
               );
+              toast('New Quest is being proceed and will appear in the list in a few time ...');
               onSave(saveResponse);
             } catch (e: any) {
               Logger.error(e);

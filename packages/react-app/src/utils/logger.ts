@@ -10,10 +10,10 @@ export enum LogLevels {
   NONE = 4,
 }
 
-let logLevel: LogLevels = process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG;
+let logLevel: LogLevels;
 
 function debug(message: any, ...params: any[]) {
-  if (process.env.NODE_ENV === 'production' && logLevel < LogLevels.DEBUG) return;
+  if (process.env.NODE_ENV === 'production' || logLevel < LogLevels.DEBUG) return;
   params.length ? console.debug(message, params) : console.debug(message);
 }
 
@@ -34,7 +34,10 @@ function error(message: any, ...params: any[]) {
 
 function setLogLevel(level: LogLevels) {
   logLevel = level;
+  console.debug(`Log level set to ${Object.keys[logLevel]}`);
 }
+
+setLogLevel(process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG);
 
 export const Logger = {
   debug,

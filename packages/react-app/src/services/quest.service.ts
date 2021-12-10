@@ -12,7 +12,7 @@ import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
 import { getCurrentAccount, sendTransaction, toHex } from '../utils/web3.utils';
-import { pushObjectToIpfs } from './ipfs.service';
+import { getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
 
@@ -87,11 +87,16 @@ export async function saveQuest(
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
-    const ipfsHash = await pushObjectToIpfs({ description: data.description ?? '' });
+    const ipfsObj = { description: data.description ?? '' };
+    const ipfsHash = await pushObjectToIpfs(ipfsObj);
     const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
+    Logger.debug(`Pinging ${ipfsHash}...`);
+    const pingResult = await getObjectFromIpfs(ipfsHash); // ping IPFS before pushing it so subgraph will not timeout
+    if (pingResult) Logger.debug('Ping successfull : ', pingResult);
+    else Logger.error('Error when pinging : ', ipfsHash);
     const tx = await questFactoryContract.createQuest(
       data.title,
-      toHex(ipfsHash.toString()), // Push description to IPFS and push hash to quest contract
+      toHex(ipfsHash), // Push description to IPFS and push hash to quest contract
       TOKENS.honey.address,
       questExpireTimeUtcSec,
       fallbackAddress,
