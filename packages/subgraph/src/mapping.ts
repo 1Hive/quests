@@ -17,7 +17,8 @@ export function handleQuestCreated(event: QuestCreated): void {
     // Fetching quest description with IPFS
     let questDataBytes: Bytes | null = null;
     let tryCount = 0;
-    while (!questDataBytes || tryCount === 4) {
+    while (!questDataBytes && tryCount < 3) {
+      // 3 tries in total (180 sec for each try)
       questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
       tryCount = tryCount + 1;
     }
