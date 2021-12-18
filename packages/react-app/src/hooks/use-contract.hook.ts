@@ -1,7 +1,10 @@
 import { Contract, ContractInterface } from 'ethers';
 import { useMemo } from 'react';
+import { Token } from 'src/models/token';
 import { Logger } from 'src/utils/logger';
 import { ADDRESS_ZERO } from '../constants';
+import ERC20Abi from '../contracts/ERC20.json';
+import GovernQueueAbi from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
 import { useWallet } from '../providers/wallet.context';
@@ -33,19 +36,29 @@ export function getContract(
   return new Contract(address, ABI, getProviderOrSigner(ethersProvider, account));
 }
 
+function getContractsJson(network: any) {
+  return {
+    ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
+    GovernQueue: GovernQueueAbi,
+    ERC20: ERC20Abi,
+  };
+}
+
 // account is optional
 // returns null on errors
-function useContract(contractName: string, withSignerIfPossible = true) {
+function useContract(contractName: string, addressOverride?: string, withSignerIfPossible = true) {
   const { account, ethers } = useWallet();
   const network = getNetwork();
-  if (!contracts) contracts = contractsJson[network.chainId][network.name.toLowerCase()].contracts;
+  if (!contracts) contracts = getContractsJson(network);
   const askedContract = contracts[contractName];
 
   return useMemo(() => {
-    if (!askedContract.address || !askedContract.abi || !ethers) return null;
+    const contractAddress = addressOverride ?? askedContract.address;
+    if (!contractAddress) Logger.warn('Address was not defined for contract ', contractName);
+    if (!contractAddress || !askedContract.abi || !ethers) return null;
     try {
       return getContract(
-        askedContract.address,
+        contractAddress,
         askedContract.abi,
         ethers,
         withSignerIfPossible && account ? account : undefined,
@@ -59,4 +72,12 @@ function useContract(contractName: string, withSignerIfPossible = true) {
 
 export function useFactoryContract() {
   return useContract('QuestFactory');
+}
+
+export function useGovernQueueContract() {
+  return useContract('GovernQueue');
+}
+
+export function useERC20Contract(token: Token) {
+  return useContract('ERC20', token.address);
 }
