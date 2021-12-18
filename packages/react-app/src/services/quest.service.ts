@@ -5,7 +5,7 @@ import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
 import { getNetwork } from 'src/networks';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
-import { toAscii } from 'web3-utils';
+import { toAscii, toBN } from 'web3-utils';
 import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
@@ -115,7 +115,8 @@ export async function fundQuest(
     });
   // (questAddress, from, amount)
   // tester avec contractERC20.balanceOf(questAddress)
-  contractERC20.transfer(questAddress, walletAddress, amount);
+  console.log('amount', amount);
+  return contractERC20.transfer(questAddress, toBN(amount.amount));
 }
 
 export async function claimQuest(questAddress: string, address: string) {
