@@ -13,6 +13,7 @@ type Props = {
   value?: string;
   wide?: boolean;
   multiline?: boolean;
+  autoLinks?: boolean;
   fontSize?: string;
   css?: React.CSSProperties;
 };
@@ -27,6 +28,7 @@ export default function TextFieldInput({
   onChange = noop,
   wide = false,
   multiline = false,
+  autoLinks = false,
   css,
 }: Props) {
   if (isLoading)
@@ -47,7 +49,19 @@ export default function TextFieldInput({
       style={css}
     />
   ) : (
-    <span style={{ fontSize }}>{value}</span>
+    <span style={{ fontSize }}>
+      {autoLinks
+        ? value.split(' ').map((x) =>
+            x.startsWith('http') ? (
+              <a target="_blank" href={x} rel="noreferrer" key={x}>
+                {x}
+              </a>
+            ) : (
+              `${x} `
+            ),
+          )
+        : value}
+    </span>
   );
   return label ? (
     <Field label={label} key={id}>

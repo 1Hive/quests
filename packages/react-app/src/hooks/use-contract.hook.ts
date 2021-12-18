@@ -54,8 +54,9 @@ function useContract(contractName: string, addressOverride?: string, withSignerI
 
   return useMemo(() => {
     const contractAddress = addressOverride ?? askedContract.address;
+    const abi = askedContract.abi ?? askedContract;
     if (!contractAddress) Logger.warn('Address was not defined for contract ', contractName);
-    if (!contractAddress || !askedContract.abi || !ethers) return null;
+    if (!contractAddress || !abi || !ethers) return null;
     try {
       return getContract(
         contractAddress,

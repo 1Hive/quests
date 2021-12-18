@@ -11,14 +11,14 @@ import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
 import { toHex } from '../utils/web3.utils';
-import { pushObjectToIpfs } from './ipfs.service';
+import { getIpfsBaseUri, pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
 
 // #region Private
 
-function mapQuests(quests: any[]): Promise<QuestData[]> {
-  return Promise.all(
+async function mapQuests(quests: any[]): Promise<QuestData[]> {
+  const x = await Promise.all(
     quests.map(async (questEntity) => {
       try {
         const quest = {
@@ -31,6 +31,7 @@ function mapQuests(quests: any[]): Promise<QuestData[]> {
           bounty: { amount: 0, token: TOKENS.honey },
           expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
         } as QuestData;
+        if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
 
         return quest;
       } catch (error) {
@@ -38,7 +39,8 @@ function mapQuests(quests: any[]): Promise<QuestData[]> {
         return undefined;
       }
     }),
-  ).then((x) => x.filter((quest) => !!quest) as QuestData[]); // Filter out undefined quests (skiped)
+  );
+  return x.filter((quest) => !!quest) as QuestData[]; // Filter out undefined quests (skiped)
 }
 // #endregion
 
@@ -79,8 +81,9 @@ export async function saveQuest(
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
-    const ipfsObj = { description: data.description ?? '' };
-    const ipfsHash = await pushObjectToIpfs(ipfsObj);
+    const ipfsHash = await pushObjectToIpfs(data.description ?? '');
+    console.log({ ipfsHash });
+
     const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
       data.title,
