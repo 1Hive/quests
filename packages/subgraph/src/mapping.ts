@@ -23,12 +23,11 @@ export function handleQuestCreated(event: QuestCreated): void {
       tryCount = tryCount + 1;
     }
     if (questDataBytes) {
-      let ipfsObj = json.fromBytes(questDataBytes).toObject();
-      let description = ipfsObj.get("description");
+      let description = questDataBytes.toString();
       questEntity.questDescription = description ? description.toString() : "";
     } else {
-      // Continue with IPFS link as the description
-      questEntity.questDescription = null;
+      // Continue with empty description
+      questEntity.questDescription = "";
     }
   }
 

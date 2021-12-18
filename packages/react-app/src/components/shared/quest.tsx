@@ -11,6 +11,7 @@ import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
+import * as Yup from 'yup';
 import QuestModal from '../modals/quest-modal';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
@@ -78,6 +79,11 @@ export default function Quest({
     <CardStyled style={css} id={data.address}>
       <Formik
         initialValues={{ fallbackAddress: wallet.account, ...data }}
+        validateOnBlur
+        validationSchema={Yup.object().shape({
+          description: Yup.string().required(),
+          title: Yup.string().required(),
+        })}
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(async () => {
             setLoading(true);
@@ -89,7 +95,7 @@ export default function Quest({
                 values.fallbackAddress!,
                 { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
               );
-              toast('New Quest is being proceed and will appear in the list in a few time ...');
+              toast('Quest is being proceed and will appear in the list in a few minutes ...');
               onSave(saveResponse);
             } catch (e: any) {
               Logger.error(e);
@@ -153,6 +159,7 @@ export default function Quest({
                       onChange={handleChange}
                       wide
                       multiline
+                      autoLinks
                       css={{ height: '100px' }}
                     />
                     {isEdit && (
