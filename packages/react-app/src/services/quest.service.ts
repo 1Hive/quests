@@ -1,6 +1,5 @@
 import { Contract } from 'ethers';
 import { request } from 'graphql-request';
-import { noop } from 'lodash-es';
 import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
@@ -11,7 +10,7 @@ import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
-import { getCurrentAccount, sendTransaction, toHex } from '../utils/web3.utils';
+import { toHex } from '../utils/web3.utils';
 import { pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
@@ -100,17 +99,20 @@ export async function saveQuest(
 }
 
 export async function fundQuest(
+  walletAddress: string,
   questAddress: string,
   amount: TokenAmount,
-  onCompleted: Function = noop,
+  contractERC20: any,
 ) {
-  const currentAccount = await getCurrentAccount();
-  if (!currentAccount)
-    throw wrapError('User account not connected when trying to found a quest!', {
+  if (!walletAddress)
+    throw wrapError('Cannot find walletAddress', {
       questAddress,
       amount,
+      walletAddress,
     });
-  await sendTransaction(questAddress, amount, onCompleted);
+  // (questAddress, from, amount)
+  // tester avec contractERC20.balanceOf(questAddress)
+  contractERC20.transfer(questAddress, walletAddress, amount);
 }
 
 export async function claimQuest(questAddress: string, address: string) {

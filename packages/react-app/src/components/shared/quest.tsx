@@ -11,6 +11,7 @@ import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
+import FundModal from '../modals/fund-modal';
 import QuestModal from '../modals/quest-modal';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
@@ -220,6 +221,7 @@ export default function Quest({
                 <Outset gu8 vertical>
                   <ChildSpacer>
                     <QuestModal data={data} questMode={QUEST_MODE.READ_DETAIL} onClose={noop} />
+                    <FundModal questAddress={data!.address!} onClose={noop} />
                   </ChildSpacer>
                 </Outset>
               </QuestFooterStyled>
