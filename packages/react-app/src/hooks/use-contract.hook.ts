@@ -51,16 +51,16 @@ function useContract(contractName: string, addressOverride?: string, withSignerI
   const network = getNetwork();
   if (!contracts) contracts = getContractsJson(network);
   const askedContract = contracts[contractName];
+  const contractAddress = addressOverride ?? askedContract.address;
+  const contractAbi = askedContract.abi ?? askedContract;
 
   return useMemo(() => {
-    const contractAddress = addressOverride ?? askedContract.address;
-    const abi = askedContract.abi ?? askedContract;
     if (!contractAddress) Logger.warn('Address was not defined for contract ', contractName);
-    if (!contractAddress || !abi || !ethers) return null;
+    if (!contractAddress || !contractAbi || !ethers) return null;
     try {
       return getContract(
         contractAddress,
-        askedContract.abi,
+        contractAbi,
         ethers,
         withSignerIfPossible && account ? account : undefined,
       );
@@ -68,7 +68,7 @@ function useContract(contractName: string, addressOverride?: string, withSignerI
       Logger.error('Failed to get contract', error);
       return null;
     }
-  }, [askedContract.address, askedContract.abi, ethers, withSignerIfPossible, account]);
+  }, [contractAddress, contractAbi, ethers, withSignerIfPossible, account]);
 }
 
 export function useFactoryContract() {
