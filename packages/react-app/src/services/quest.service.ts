@@ -5,12 +5,12 @@ import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
 import { getNetwork } from 'src/networks';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
-import { toAscii, toBN } from 'web3-utils';
-import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
+import { toAscii } from 'web3-utils';
+import { DEFAULT_AMOUNT, DEFAULT_TOKEN, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
-import { toHex } from '../utils/web3.utils';
+import { parseAmount, toHex } from '../utils/web3.utils';
 import { getIpfsBaseUri, pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
@@ -27,8 +27,8 @@ async function mapQuests(quests: any[]): Promise<QuestData[]> {
           description: questEntity.questDescription ?? undefined,
           detailsRefIpfs: toAscii(questEntity.questDetailsRef),
           rewardTokenAddress: questEntity.questRewardTokenAddress,
-          claimDeposit: { amount: 0, token: TOKENS.honey },
-          bounty: { amount: 0, token: TOKENS.honey },
+          claimDeposit: DEFAULT_AMOUNT,
+          bounty: DEFAULT_AMOUNT,
           expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
         } as QuestData;
         if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
@@ -101,22 +101,8 @@ export async function saveQuest(
   return null;
 }
 
-export async function fundQuest(
-  walletAddress: string,
-  questAddress: string,
-  amount: TokenAmount,
-  contractERC20: any,
-) {
-  if (!walletAddress)
-    throw wrapError('Cannot find walletAddress', {
-      questAddress,
-      amount,
-      walletAddress,
-    });
-  // (questAddress, from, amount)
-  // tester avec contractERC20.balanceOf(questAddress)
-  console.log('amount', amount);
-  return contractERC20.transfer(questAddress, toBN(amount.amount));
+export async function fundQuest(questAddress: string, amount: TokenAmount, contractERC20: any) {
+  await contractERC20.transfer(questAddress, parseAmount(amount));
 }
 
 export async function claimQuest(questAddress: string, address: string) {
@@ -137,7 +123,7 @@ export async function fetchAvailableBounty(quest: QuestData, account: any) {
   const balance = await contract.balanceOf(quest.address);
   return {
     amount: balance.toString(),
-    token: TOKENS.honey,
+    token: DEFAULT_TOKEN,
   } as TokenAmount;
 }
 

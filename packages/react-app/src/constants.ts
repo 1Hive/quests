@@ -17,28 +17,34 @@ export const TOKENS = {
   honey: {
     name: 'Honey',
     symb: 'HNY',
-    address: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
+    address: '0x5e352ed38066417d70817399dc6d9d9236b5f203',
+    decimals: 18,
   } as Token,
   theter: {
     name: 'Tether',
     symb: 'USDT',
-    address: '0x4ECaBa5870353805a9F068101A40E0f32ed605C6',
+    address: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
+    decimals: 18,
   } as Token,
   wxdai: {
     name: 'Wrapped XDAI',
     symb: 'WXDAI',
     address: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
+    decimals: 18,
   } as Token,
   wether: {
     name: 'Wrapped Ethereum',
     symb: 'WETH',
     address: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
+    decimals: 18,
   } as Token,
 };
 
+export const DEFAULT_TOKEN = TOKENS.theter;
+
 export const DEFAULT_AMOUNT = {
   amount: 0,
-  token: TOKENS.honey,
+  token: DEFAULT_TOKEN,
 };
 
 // Enums
