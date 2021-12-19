@@ -5,6 +5,7 @@ import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
 import { getNetwork } from 'src/networks';
+import { QuestEntitiesQuery } from 'src/queries/quest-entities.query';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
 import { toAscii } from 'web3-utils';
 import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
@@ -17,29 +18,25 @@ import { pushObjectToIpfs } from './ipfs.service';
 let questList: QuestData[] = [];
 
 // #region Private
-
-function mapQuests(quests: any[]): Promise<QuestData[]> {
-  return Promise.all(
-    quests.map(async (questEntity) => {
-      try {
-        const quest = {
-          address: questEntity.questAddress,
-          title: questEntity.questTitle,
-          description: questEntity.questDescription ?? undefined,
-          detailsRefIpfs: toAscii(questEntity.questDetailsRef),
-          rewardTokenAddress: questEntity.questRewardTokenAddress,
-          claimDeposit: { amount: 0, token: TOKENS.honey },
-          bounty: { amount: 0, token: TOKENS.honey },
-          expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
-        } as QuestData;
-
-        return quest;
-      } catch (error) {
-        Logger.error('Failed to map quest : ', questEntity);
-        return undefined;
-      }
-    }),
-  ).then((x) => x.filter((quest) => !!quest) as QuestData[]); // Filter out undefined quests (skiped)
+function mapQuest(questEntity: any) {
+  try {
+    return {
+      address: questEntity.questAddress,
+      title: questEntity.questTitle,
+      description: questEntity.questDescription ?? undefined,
+      detailsRefIpfs: toAscii(questEntity.questDetailsRef),
+      rewardTokenAddress: questEntity.questRewardTokenAddress,
+      claimDeposit: { amount: 0, token: TOKENS.honey },
+      bounty: { amount: 0, token: TOKENS.honey },
+      expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
+    } as QuestData;
+  } catch (error) {
+    Logger.error('Failed to map quest : ', questEntity);
+    return undefined;
+  }
+}
+function mapQuestList(quests: any[]): QuestData[] {
+  return quests.map(mapQuest).filter((quest) => !!quest) as QuestData[]; // Filter out undefined quests (skiped)
 }
 // #endregion
 
@@ -52,7 +49,7 @@ export async function getMoreQuests(
 ): Promise<QuestData[]> {
   const network = getNetwork();
   const queryResult = (
-    await request(network.subgraph, QuestEntityQuery, {
+    await request(network.subgraph, QuestEntitiesQuery, {
       skip: currentIndex,
       first: count,
       expireTimeLower: filter.expire?.start
@@ -67,9 +64,19 @@ export async function getMoreQuests(
     })
   ).questEntities;
 
-  const newQuests = await mapQuests(queryResult);
+  const newQuests = mapQuestList(queryResult);
   questList = questList.concat(newQuests);
   return newQuests;
+}
+export async function getQuest(address: string) {
+  const network = getNetwork();
+  const queryResult = (
+    await request(network.subgraph, QuestEntityQuery, {
+      ID: address,
+    })
+  ).questEntity;
+  const newQuest = mapQuest(queryResult);
+  return newQuest;
 }
 
 export async function saveQuest(

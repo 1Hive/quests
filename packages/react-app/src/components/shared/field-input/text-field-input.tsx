@@ -8,6 +8,7 @@ type Props = {
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
+  maxLength?: number;
   onChange?: Function;
   placeHolder?: string;
   value?: string;
@@ -21,6 +22,9 @@ export default function TextFieldInput({
   isEdit = false,
   isLoading = false,
   label = '',
+
+  // eslint-disable-next-line no-unused-vars
+  maxLength = undefined,
   placeHolder = '',
   value = '',
   fontSize = '',
@@ -35,7 +39,12 @@ export default function TextFieldInput({
         <Skeleton />
       </Field>
     );
-
+  const readOnlyContent = maxLength ? (
+    <span>{value.substring(0, maxLength)}...</span>
+  ) : (
+    // <span>{value}</span>
+    <span style={{ fontSize }}>{value}</span>
+  );
   const loadableContent = isEdit ? (
     <TextInput
       id={id}
@@ -47,7 +56,7 @@ export default function TextFieldInput({
       style={css}
     />
   ) : (
-    <span style={{ fontSize }}>{value}</span>
+    readOnlyContent
   );
   return label ? (
     <Field label={label} key={id}>
