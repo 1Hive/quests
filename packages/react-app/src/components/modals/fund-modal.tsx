@@ -42,7 +42,6 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
             QuestService.fundQuest(questAddress, values.fundAmount, contractERC20).then(() => {
               onModalClose();
               toast('Transaction sent');
-              console.log('clicked fund quest 2222');
             });
           setSubmitting(false);
           setLoading(false);
