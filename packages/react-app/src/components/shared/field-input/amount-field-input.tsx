@@ -3,7 +3,7 @@ import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { DEFAULT_AMOUNT, TOKENS } from 'src/constants';
+import { DEFAULT_AMOUNT } from 'src/constants';
 import { TokenAmount } from 'src/models/token-amount';
 import styled from 'styled-components';
 
@@ -43,8 +43,6 @@ function AmountFieldInput({
   wide = false,
   formik,
 }: Props) {
-  if (value?.amount === undefined) value.amount = 0;
-  if (value?.token === undefined) value.token = TOKENS.honey;
   const [amount, setAmount] = useState(value.amount);
 
   const onAmountChange = (e: any) => {
@@ -76,8 +74,8 @@ function AmountFieldInput({
             )}
           </AmountStyled>
           <TokenBadge
-            symbol={TOKENS.honey.symb}
-            address={TOKENS.honey.address}
+            symbol={value.token.symb}
+            address={value.token.address}
             networkType="private"
           />
         </LineStyled>

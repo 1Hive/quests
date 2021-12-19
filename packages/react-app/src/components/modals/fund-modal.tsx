@@ -4,6 +4,7 @@ import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { DEFAULT_AMOUNT } from 'src/constants';
+import { useERC20Contract } from 'src/hooks/use-contract.hook';
 import styled from 'styled-components';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
@@ -23,6 +24,8 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const toast = useToast();
+  // TODO : take token from fundAmount
+  const contractERC20 = useERC20Contract(DEFAULT_AMOUNT.token);
   const onModalClose = () => {
     setOpened(false);
     onClose();
@@ -36,9 +39,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
           onModalClose();
           setLoading(true);
           if (values.fundAmount && questAddress)
-            QuestService.fundQuest(questAddress, values.fundAmount, () =>
-              toast('Transaction completed'),
-            ).then(() => {
+            QuestService.fundQuest(questAddress, values.fundAmount, contractERC20).then(() => {
               onModalClose();
               toast('Transaction sent');
             });
