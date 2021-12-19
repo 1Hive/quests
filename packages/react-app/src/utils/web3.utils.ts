@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { noop } from 'lodash-es';
 import { TokenAmount } from 'src/models/token-amount';
 import Web3 from 'web3';
@@ -12,23 +13,23 @@ const DEFAULT_LOCAL_CHAIN = 'private';
 
 function getWeb3() {
   // @ts-ignore
-  let ethers: any = null;
+  let ethereum: any = null;
   let web3: any = null;
 
   const w = window as any;
   if (w.ethereum) {
-    ethers = w.ethereum;
-    web3 = new Web3(ethers);
+    ethereum = w.ethereum;
+    web3 = new Web3(ethereum);
 
-    if (!ethers.isConnected()) {
-      ethers.enable().catch((error: Error) => {
+    if (!ethereum.isConnected()) {
+      ethereum.enable().catch((error: Error) => {
         // User denied account access
         Logger.error(error);
       });
     }
   }
 
-  return { web3, ethers };
+  return { web3, ethereum };
 }
 
 export async function isConnected() {
@@ -160,8 +161,12 @@ export async function sendTransaction(
 
 export function checkConnection() {
   // Check if User is already connected by retrieving the accounts
-  getWeb3()?.ethers.request({ method: 'eth_requestAccounts' });
+  getWeb3()?.ethereum.request({ method: 'eth_requestAccounts' });
 }
 
 // Re-export some web3-utils functions
-export { isAddress, soliditySha3, toHex, toUtf8 } from 'web3-utils';
+export { isAddress, soliditySha3, toBN, toHex, toUtf8 } from 'web3-utils';
+
+export function parseAmount(amount: TokenAmount) {
+  return ethers.utils.parseUnits(amount.amount.toString(), amount.token.decimals);
+}

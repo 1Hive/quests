@@ -1,20 +1,7 @@
-[
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "_owner",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "name": "balance",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "type": "function"
-  }
-]
+[ "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)",
+  
+  "function transfer(address to, uint amount) returns (bool)",
+  
+  "event Transfer(address indexed from, address indexed to, uint amount)"]

@@ -14,6 +14,7 @@ type Props = {
   value?: string;
   wide?: boolean;
   multiline?: boolean;
+  autoLinks?: boolean;
   fontSize?: string;
   css?: React.CSSProperties;
 };
@@ -31,6 +32,7 @@ export default function TextFieldInput({
   onChange = noop,
   wide = false,
   multiline = false,
+  autoLinks = false,
   css,
 }: Props) {
   if (isLoading)
@@ -39,11 +41,24 @@ export default function TextFieldInput({
         <Skeleton />
       </Field>
     );
-  const readOnlyContent = maxLength ? (
-    <span>{value.substring(0, maxLength)}...</span>
-  ) : (
-    // <span>{value}</span>
-    <span style={{ fontSize }}>{value}</span>
+  const readOnlyContent = (
+    <span style={{ fontSize }}>
+      {autoLinks
+        ? value
+            .substring(0, maxLength)
+            .split(' ')
+            .map((x) =>
+              x.startsWith('http') ? (
+                <a target="_blank" href={x} rel="noreferrer" key={x}>
+                  {x}
+                </a>
+              ) : (
+                `${x} `
+              ),
+            )
+        : value.substring(0, maxLength)}
+      {maxLength && value.length > maxLength && '...'}
+    </span>
   );
   const loadableContent = isEdit ? (
     <TextInput

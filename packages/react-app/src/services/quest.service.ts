@@ -1,6 +1,5 @@
 import { Contract } from 'ethers';
 import { request } from 'graphql-request';
-import { noop } from 'lodash-es';
 import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
@@ -8,36 +7,40 @@ import { getNetwork } from 'src/networks';
 import { QuestEntitiesQuery } from 'src/queries/quest-entities.query';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
 import { toAscii } from 'web3-utils';
-import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
+import { DEFAULT_AMOUNT, DEFAULT_TOKEN, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
-import { getCurrentAccount, sendTransaction, toHex } from '../utils/web3.utils';
-import { pushObjectToIpfs } from './ipfs.service';
+import { parseAmount, toHex } from '../utils/web3.utils';
+import { getIpfsBaseUri, pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
 
 // #region Private
 function mapQuest(questEntity: any) {
   try {
-    return {
+    const quest = {
       address: questEntity.questAddress,
       title: questEntity.questTitle,
-      description: questEntity.questDescription ?? undefined,
+      description: undefined,
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardTokenAddress: questEntity.questRewardTokenAddress,
-      claimDeposit: { amount: 0, token: TOKENS.honey },
-      bounty: { amount: 0, token: TOKENS.honey },
+      claimDeposit: DEFAULT_AMOUNT,
+      bounty: DEFAULT_AMOUNT,
       expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
     } as QuestData;
+    if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
+    return quest;
   } catch (error) {
     Logger.error('Failed to map quest : ', questEntity);
     return undefined;
   }
 }
+
 function mapQuestList(quests: any[]): QuestData[] {
   return quests.map(mapQuest).filter((quest) => !!quest) as QuestData[]; // Filter out undefined quests (skiped)
 }
+
 // #endregion
 
 // #region Public
@@ -87,8 +90,8 @@ export async function saveQuest(
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
-    const ipfsObj = { description: data.description ?? '' };
-    const ipfsHash = await pushObjectToIpfs(ipfsObj);
+    const ipfsHash = await pushObjectToIpfs(data.description ?? '');
+
     const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
       data.title,
@@ -106,18 +109,8 @@ export async function saveQuest(
   return null;
 }
 
-export async function fundQuest(
-  questAddress: string,
-  amount: TokenAmount,
-  onCompleted: Function = noop,
-) {
-  const currentAccount = await getCurrentAccount();
-  if (!currentAccount)
-    throw wrapError('User account not connected when trying to found a quest!', {
-      questAddress,
-      amount,
-    });
-  await sendTransaction(questAddress, amount, onCompleted);
+export async function fundQuest(questAddress: string, amount: TokenAmount, contractERC20: any) {
+  await contractERC20.transfer(questAddress, parseAmount(amount));
 }
 
 export async function claimQuest(questAddress: string, address: string) {
@@ -138,7 +131,7 @@ export async function fetchAvailableBounty(quest: QuestData, account: any) {
   const balance = await contract.balanceOf(quest.address);
   return {
     amount: balance.toString(),
-    token: TOKENS.honey,
+    token: DEFAULT_TOKEN,
   } as TokenAmount;
 }
 
