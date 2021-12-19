@@ -82,7 +82,6 @@ export async function saveQuest(
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
     const ipfsHash = await pushObjectToIpfs(data.description ?? '');
-    console.log({ ipfsHash });
 
     const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
