@@ -22,6 +22,7 @@ export const QuestEntitiesQuery = gql`
       }
       orderBy: questExpireTimeSec
       orderDirection: asc
+      subgraphError: allow
     ) {
       id
       questAddress
