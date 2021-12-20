@@ -1,19 +1,24 @@
 import { AddressField, Button, Card, GU, IconPlus, Split, useToast } from '@1hive/1hive-ui';
+import { BigNumber } from 'ethers';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { DEFAULT_AMOUNT, QUEST_MODE } from 'src/constants';
-import { useFactoryContract } from 'src/hooks/use-contract.hook';
+import { useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
+import { TokenAmount } from 'src/models/token-amount';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
+import { fromBigNumber } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import * as Yup from 'yup';
-import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
+import ClaimModal from '../modals/claim-modal';
+import FundModal from '../modals/fund-modal';
+import { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import IdentityBadge from './identity-badge';
@@ -37,6 +42,10 @@ const QuestFooterStyled = styled.div`
 `;
 
 const FormStyled = styled(Form)`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: 100%;
   #description {
     height: 200px;
@@ -58,8 +67,6 @@ export default function Quest({
     title: '',
     description: '',
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
-    bounty: DEFAULT_AMOUNT,
-    claimDeposit: DEFAULT_AMOUNT,
   },
   isLoading = false,
   questMode = QUEST_MODE.READ_DETAIL,
@@ -71,17 +78,35 @@ export default function Quest({
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
+  const [bounty, setBounty] = useState<TokenAmount>();
+  const [claimDeposit, setClaimDeposit] = useState(DEFAULT_AMOUNT);
   const toast = useToast();
+  const erc20Contract = useERC20Contract(DEFAULT_AMOUNT.token);
 
-  useEffect(
-    () => setIsEdit(questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE),
-    [questMode],
-  );
-  // const onCardClick = () => <Redirect to="/detail/" />;
+  useEffect(() => {
+    // setBounty({
+    //   token: DEFAULT_AMOUNT.token,
+    //   amount: fromBigNumber(BigNumber.from('0x0107ad8f556c6c0000'), DEFAULT_AMOUNT.token.decimals),
+    // });
+    erc20Contract
+      ?.balanceOf(data.address)
+      .then((x: BigNumber) => {
+        setBounty({
+          token: DEFAULT_AMOUNT.token,
+          amount: fromBigNumber(x, DEFAULT_AMOUNT.token.decimals),
+        });
+      })
+      .catch(Logger.error);
+  }, [erc20Contract]);
+
+  useEffect(() => {
+    setIsEdit(questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE);
+  }, [questMode]);
+
   return (
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.READ_SUMMARY} id={data.address}>
       <Formik
-        initialValues={{ fallbackAddress: wallet.account, ...data }}
+        initialValues={{ fallbackAddress: wallet.account, claimDeposit, ...data }}
         validateOnBlur
         validationSchema={Yup.object().shape({
           description: Yup.string().required(),
@@ -163,7 +188,7 @@ export default function Quest({
                       onChange={handleChange}
                       wide
                       multiline
-                      autoLinks={questMode === QUEST_MODE.READ_DETAIL}
+                      autoLinks
                       css={{ height: '100px' }}
                     />
                     {isEdit && (
@@ -190,11 +215,11 @@ export default function Quest({
                     id="bounty"
                     label={questMode === QUEST_MODE.CREATE ? 'Initial bounty' : 'Available bounty'}
                     isEdit={isEdit}
-                    value={values.bounty}
-                    isLoading={loading}
+                    value={bounty}
+                    isLoading={loading || !bounty}
                     formik={formRef}
                   />
-                  {!isEdit && (
+                  {/* {!isEdit && (
                     <AmountFieldInput
                       id="claimDeposit"
                       label="Claim deposit"
@@ -203,7 +228,7 @@ export default function Quest({
                       value={values.claimDeposit}
                       isLoading={loading}
                     />
-                  )}
+                  )} */}
                   {/* {(!!values.tags?.length || editMode) && (
                     <TagFieldInputFormik
                       id="tags"
@@ -226,14 +251,22 @@ export default function Quest({
                 </Outset>
               }
             />
-            {!loading && !isEdit && wallet.account && questMode !== QUEST_MODE.READ_DETAIL && (
+            {!loading && !isEdit && (
               <QuestFooterStyled>
                 <Outset gu8 vertical>
-                  <ChildSpacer>
-                    <LinkStyled to={`/detail?id=${data.address}`}>
-                      <Button icon={<IconPlus />} label="Details" wide mode="strong" />
-                    </LinkStyled>
-                  </ChildSpacer>
+                  {questMode !== QUEST_MODE.READ_DETAIL && (
+                    <ChildSpacer>
+                      <LinkStyled to={`/detail?id=${data.address}`}>
+                        <Button icon={<IconPlus />} label="Details" wide mode="strong" />
+                      </LinkStyled>
+                    </ChildSpacer>
+                  )}
+                  {questMode !== QUEST_MODE.READ_SUMMARY && wallet.account && (
+                    <ChildSpacer>
+                      <FundModal questAddress={data.address!} />
+                      <ClaimModal questAddress={data.address!} />
+                    </ChildSpacer>
+                  )}
                 </Outset>
               </QuestFooterStyled>
             )}

@@ -6,19 +6,9 @@ import { QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
 import styled from 'styled-components';
 import Quest from '../shared/quest';
-import ClaimModal from './claim-modal';
-import FundModal from './fund-modal';
 import ModalBase from './modal-base';
 
 // #region StyledComponents
-
-const ButtonWrapperStyled = styled.div`
-  margin: ${1 * GU}px;
-  margin-bottom: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-`;
 
 const QuestActionButtonStyled = styled(Button)`
   margin: ${1 * GU}px;
@@ -28,7 +18,7 @@ const QuestActionButtonStyled = styled(Button)`
 
 type Props = {
   data?: QuestData;
-  onClose: Function;
+  onClose?: Function;
   questMode: string;
 };
 
@@ -83,12 +73,7 @@ export default function QuestModal({
         />
       }
       buttons={
-        questMode === QUEST_MODE.READ_DETAIL ? (
-          <ButtonWrapperStyled>
-            <FundModal questAddress={data!.address!} />
-            <ClaimModal questAddress={data!.address!} />
-          </ButtonWrapperStyled>
-        ) : (
+        (questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE) && (
           <QuestActionButtonStyled
             label="Save"
             icon={<FaSave />}

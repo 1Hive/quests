@@ -26,26 +26,28 @@ export default function HeaderMenu({ below }: Props) {
 
   return (
     !below('large') && (
-      <HeaderNavStyled>
-        {/* Removed because counter intuitive */}
-        {/* <HeaderNavItemStyled href="#/home" external={false} color={theme.contentSecondary}>
+      <>
+        <HeaderNavStyled>
+          {/* Removed because counter intuitive */}
+          {/* <HeaderNavItemStyled href="#/home" external={false} color={theme.contentSecondary}>
           Home
         </HeaderNavItemStyled> */}
-        <HeaderNavItemStyled
-          color={theme.contentSecondary}
-          href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"
-          external
-        >
-          Get Honey
-        </HeaderNavItemStyled>
-        <HeaderNavItemStyled
-          href="https://github.com/1Hive/quests/wiki"
-          external
-          color={theme.contentSecondary}
-        >
-          FAQ
-        </HeaderNavItemStyled>
-      </HeaderNavStyled>
+          <HeaderNavItemStyled
+            color={theme.contentSecondary}
+            href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"
+            external
+          >
+            Get Honey
+          </HeaderNavItemStyled>
+          <HeaderNavItemStyled
+            href="https://github.com/1Hive/quests/wiki"
+            external
+            color={theme.contentSecondary}
+          >
+            FAQ
+          </HeaderNavItemStyled>
+        </HeaderNavStyled>
+      </>
     )
   );
 }

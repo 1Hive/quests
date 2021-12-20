@@ -39,15 +39,6 @@ export const TOKENS = {
     decimals: 18,
   } as Token,
 };
-
-export const DEFAULT_TOKEN = TOKENS.theter;
-
-export const DEFAULT_AMOUNT = {
-  amount: 0,
-  token: DEFAULT_TOKEN,
-};
-
-// Enums
 export const QUEST_STATUS = {
   active: { id: 'active', label: 'Active' },
   completed: { id: 'completed', label: 'Completed' },
@@ -55,6 +46,7 @@ export const QUEST_STATUS = {
   draft: { id: 'draft', label: 'Draft' },
 };
 
+// Enums
 export const QUEST_MODE = {
   CREATE: 'CREATE',
   UPDATE: 'UPDATE',
@@ -75,9 +67,23 @@ export const BREAKPOINTS = {
   72: '72',
 };
 
+export const PAGES = {
+  List: 'List',
+  Detail: 'Detail',
+};
+
 // Default values
 
-export const defaultFilter = {
+export const DEFAULT_TOKEN = TOKENS.theter;
+
+export const DEFAULT_AMOUNT = {
+  amount: 0,
+  token: DEFAULT_TOKEN,
+};
+
+export const DEFAULT_PAGE = PAGES.List;
+
+export const DEFAULT_FILTER = {
   address: '',
   title: '',
   description: '',
@@ -85,5 +91,4 @@ export const defaultFilter = {
   bounty: DEFAULT_AMOUNT,
 } as Filter;
 
-// Handle retro compatibility correctly
 export const GQL_MAX_INT = 2 ** 31 - 1;

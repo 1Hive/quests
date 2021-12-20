@@ -1,7 +1,10 @@
 // @ts-nocheck
-import { Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
+import { BackButton, Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
 import React from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
+import { useHistory } from 'react-router-dom';
+import { PAGES } from 'src/constants';
+import { usePageContext } from 'src/providers/page.context';
 import styled from 'styled-components';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
@@ -33,6 +36,16 @@ const HeaderRightPanel = styled.div`
   align-items: center;
   margin-right: ${6 * GU}px;
 `;
+
+const BackButtonStyled = styled(BackButton)`
+  padding-right: 16px;
+  border-radius: 0;
+`;
+
+const BackButtonSpacerStyled = styled.span`
+  width: 69px;
+`;
+
 // #endregion
 
 type Props = {
@@ -42,6 +55,9 @@ type Props = {
 
 function Header({ toggleTheme, currentTheme }: Props) {
   const theme = useTheme();
+
+  const history = useHistory();
+  const { page } = usePageContext();
   const { below } = useViewport();
   const layoutSmall = below('medium');
 
@@ -49,6 +65,11 @@ function Header({ toggleTheme, currentTheme }: Props) {
     <HeaderWraper background={theme.surface}>
       <HeaderLayoutContent>
         <HeaderLayoutContentFlex>
+          {page !== PAGES.List ? (
+            <BackButtonStyled onClick={() => history.push('home')} label="" />
+          ) : (
+            <BackButtonSpacerStyled />
+          )}
           <HeaderTitle href="#/home" external={false} />
           <HeaderMenu below={below} />
         </HeaderLayoutContentFlex>

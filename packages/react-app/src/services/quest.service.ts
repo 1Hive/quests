@@ -11,7 +11,7 @@ import { DEFAULT_AMOUNT, DEFAULT_TOKEN, GQL_MAX_INT, TOKENS } from '../constants
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
-import { parseAmount, toHex } from '../utils/web3.utils';
+import { toBigNumber, toHex } from '../utils/web3.utils';
 import { getIpfsBaseUri, pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
@@ -22,11 +22,9 @@ function mapQuest(questEntity: any) {
     const quest = {
       address: questEntity.questAddress,
       title: questEntity.questTitle,
-      description: undefined,
+      description: questEntity.questDescription || undefined, // if '' -> undefined
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardTokenAddress: questEntity.questRewardTokenAddress,
-      claimDeposit: DEFAULT_AMOUNT,
-      bounty: DEFAULT_AMOUNT,
       expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
     } as QuestData;
     if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
@@ -109,8 +107,8 @@ export async function saveQuest(
   return null;
 }
 
-export async function fundQuest(questAddress: string, amount: TokenAmount, contractERC20: any) {
-  await contractERC20.transfer(questAddress, parseAmount(amount));
+export function fundQuest(questAddress: string, amount: TokenAmount, contractERC20: any) {
+  return contractERC20.transfer(questAddress, toBigNumber(amount));
 }
 
 export async function claimQuest(questAddress: string, address: string) {

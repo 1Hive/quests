@@ -3,8 +3,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
-import { QUEST_MODE } from 'src/constants';
+import { PAGES, QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
+import { usePageContext } from 'src/providers/page.context';
 import * as QuestService from 'src/services/quest.service';
 import { Filter } from '../../models/filter';
 import { useFilterContext } from '../../providers/filter.context';
@@ -16,8 +17,10 @@ export default function QuestList() {
   const [quests, setQuests] = useState<QuestData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  // @ts-ignore
   const { filter } = useFilterContext();
+
+  const { setPage } = usePageContext();
+  useEffect(() => setPage(PAGES.List), [setPage]);
 
   const refresh = (_filter?: Filter) => {
     if (!isLoading) {

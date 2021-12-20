@@ -1,12 +1,13 @@
 import { Root } from '@1hive/1hive-ui';
 import React, { useEffect } from 'react';
+import { PageContextProvider } from 'src/providers/page.context';
 import { useWallet } from 'src/providers/wallet.context';
+import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import FilterContextProvider from '../../providers/filter.context';
-import { isConnected } from '../../utils/web3.utils';
+import { FilterContextProvider } from '../../providers/filter.context';
 import Header from './header';
-import QuestListFilter from './quest-list-filter';
 import MainScrollWithSidebarLayout from './side-content-layout';
+import Sidebar from './sidebar';
 
 // #region StyledComponents
 
@@ -53,16 +54,18 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   }, []);
 
   return (
-    <MainViewStyled currentTheme={currentTheme}>
-      <HeaderWrapperStyled>
-        <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
-      </HeaderWrapperStyled>
-      <Root.Provider>
-        <FilterContextProvider>
-          <MainScrollWithSidebarLayout main={children} side={<QuestListFilter />} />
-        </FilterContextProvider>
-      </Root.Provider>
-    </MainViewStyled>
+    <PageContextProvider>
+      <MainViewStyled currentTheme={currentTheme}>
+        <HeaderWrapperStyled>
+          <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
+        </HeaderWrapperStyled>
+        <Root.Provider>
+          <FilterContextProvider>
+            <MainScrollWithSidebarLayout main={children} side={<Sidebar />} />
+          </FilterContextProvider>
+        </Root.Provider>
+      </MainViewStyled>
+    </PageContextProvider>
   );
 }
 

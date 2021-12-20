@@ -1,7 +1,7 @@
 import { Field, GU, TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { TokenAmount } from 'src/models/token-amount';
@@ -44,6 +44,9 @@ function AmountFieldInput({
   formik,
 }: Props) {
   const [amount, setAmount] = useState(value.amount);
+  useEffect(() => {
+    setAmount(value.amount);
+  }, [value.amount]);
 
   const onAmountChange = (e: any) => {
     const newValue = +e.target.value;
@@ -70,7 +73,7 @@ function AmountFieldInput({
                 value={amount}
               />
             ) : (
-              value.amount
+              amount
             )}
           </AmountStyled>
           <TokenBadge
