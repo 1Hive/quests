@@ -16,5 +16,15 @@ export default function DetailedView() {
     setPage(PAGES.Detail);
     if (id) getQuest(id).then(setQuest);
   }, [id]);
-  return <>{quest ? <Quest data={quest} questMode={QUEST_MODE.READ_DETAIL} /> : <>LOADING</>}</>;
+  return (
+    <>
+      {quest ? (
+        <Quest data={quest} questMode={QUEST_MODE.READ_DETAIL} />
+      ) : (
+        <>
+          <Quest isLoading />
+        </>
+      )}
+    </>
+  );
 }

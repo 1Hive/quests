@@ -81,27 +81,27 @@ export default function Quest({
   const [bounty, setBounty] = useState<TokenAmount>();
   const [claimDeposit, setClaimDeposit] = useState(DEFAULT_AMOUNT);
   const toast = useToast();
-  const erc20Contract = useERC20Contract(DEFAULT_AMOUNT.token);
-
-  useEffect(() => {
-    // setBounty({
-    //   token: DEFAULT_AMOUNT.token,
-    //   amount: fromBigNumber(BigNumber.from('0x0107ad8f556c6c0000'), DEFAULT_AMOUNT.token.decimals),
-    // });
-    erc20Contract
-      ?.balanceOf(data.address)
-      .then((x: BigNumber) => {
-        setBounty({
-          token: DEFAULT_AMOUNT.token,
-          amount: fromBigNumber(x, DEFAULT_AMOUNT.token.decimals),
-        });
-      })
-      .catch(Logger.error);
-  }, [erc20Contract]);
+  let erc20Contract: any;
 
   useEffect(() => {
     setIsEdit(questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE);
   }, [questMode]);
+
+  if (data) {
+    erc20Contract = useERC20Contract(DEFAULT_AMOUNT.token);
+
+    useEffect(() => {
+      erc20Contract
+        ?.balanceOf(data.address)
+        .then((x: BigNumber) => {
+          setBounty({
+            token: DEFAULT_AMOUNT.token,
+            amount: fromBigNumber(x, DEFAULT_AMOUNT.token.decimals),
+          });
+        })
+        .catch(Logger.error);
+    }, [erc20Contract]);
+  }
 
   return (
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.READ_SUMMARY} id={data.address}>
