@@ -50,7 +50,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
             if (values.fundAmount && questAddress) {
               try {
                 setLoading(true);
-                await QuestService.fundQuest(questAddress, values.fundAmount, contractERC20);
+                await QuestService.fundQuest(contractERC20, questAddress, values.fundAmount);
                 onModalClose();
                 toast('Transaction sent');
               } catch (e: any) {

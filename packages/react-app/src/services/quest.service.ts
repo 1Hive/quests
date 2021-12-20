@@ -82,6 +82,7 @@ export async function getQuest(address: string) {
 
 export async function saveQuest(
   questFactoryContract: any,
+  erc20Contract: any,
   fallbackAddress: string,
   data: Partial<QuestData>,
   address?: string,
@@ -101,13 +102,14 @@ export async function saveQuest(
     Logger.info('TX HASH', tx.hash);
     const receipt = await tx.wait();
     const questDeployedAddress = receipt?.events[0]?.args[0];
+    if (data.bounty) await fundQuest(erc20Contract, questDeployedAddress, data.bounty);
     return questDeployedAddress;
   }
 
   return null;
 }
 
-export function fundQuest(questAddress: string, amount: TokenAmount, contractERC20: any) {
+export function fundQuest(contractERC20: any, questAddress: string, amount: TokenAmount) {
   return contractERC20.transfer(questAddress, toBigNumber(amount));
 }
 

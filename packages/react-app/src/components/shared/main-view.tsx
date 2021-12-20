@@ -2,6 +2,7 @@ import { Root } from '@1hive/1hive-ui';
 import React, { useEffect } from 'react';
 import { PageContextProvider } from 'src/providers/page.context';
 import { useWallet } from 'src/providers/wallet.context';
+import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { FilterContextProvider } from '../../providers/filter.context';
@@ -47,9 +48,11 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   const wallet = useWallet();
   useEffect(() => {
     if (!wallet.account) {
-      isConnected().then((connected) => {
-        if (connected) wallet.activate();
-      });
+      isConnected()
+        .then((connected) => {
+          if (connected) wallet.activate().catch(Logger.error);
+        })
+        .catch(Logger.error);
     }
   }, []);
 

@@ -39,12 +39,17 @@ export const TOKENS = {
     decimals: 18,
   } as Token,
 };
+
+// Constants
+
 export const QUEST_STATUS = {
   active: { id: 'active', label: 'Active' },
   completed: { id: 'completed', label: 'Completed' },
   aborted: { id: 'aborted', label: 'Aborted' },
   draft: { id: 'draft', label: 'Draft' },
 };
+
+export const QUEST_SUMMARY_MAX_CHARACTERS = 600;
 
 // Enums
 export const QUEST_MODE = {

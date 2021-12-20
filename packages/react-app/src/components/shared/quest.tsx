@@ -5,7 +5,12 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { DEFAULT_AMOUNT, DEFAULT_TOKEN, QUEST_MODE } from 'src/constants';
+import {
+  DEFAULT_AMOUNT,
+  DEFAULT_TOKEN,
+  QUEST_MODE,
+  QUEST_SUMMARY_MAX_CHARACTERS,
+} from 'src/constants';
 import { useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
@@ -30,9 +35,9 @@ const LinkStyled = styled(Link)`
 `;
 const CardStyled = styled(Card)`
   justify-content: flex-start;
-  width: 100% !important;
-  height: 100% !important;
-  border: none !important;
+  width: 100%;
+  height: fit-content;
+  border: none;
 `;
 
 const QuestFooterStyled = styled.div`
@@ -125,10 +130,11 @@ export default function Quest({
               const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
               const saveResponse = await QuestService.saveQuest(
                 questFactoryContract,
+                erc20Contract,
                 values.fallbackAddress!,
                 { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
               );
-              toast('Quest is being proceed and will appear in the list in a few minutes ...');
+              toast('Quest created successfully');
               onSave(saveResponse);
             } catch (e: any) {
               Logger.error(e);
@@ -185,7 +191,11 @@ export default function Quest({
                     <TextFieldInput
                       id="description"
                       label={isEdit ? 'Description' : undefined}
-                      maxLength={questMode === QUEST_MODE.READ_SUMMARY ? 300 : undefined}
+                      maxLength={
+                        questMode === QUEST_MODE.READ_SUMMARY
+                          ? QUEST_SUMMARY_MAX_CHARACTERS
+                          : undefined
+                      }
                       value={values.description}
                       isEdit={isEdit}
                       isLoading={loading}
@@ -194,7 +204,7 @@ export default function Quest({
                       wide
                       multiline
                       autoLinks
-                      css={{ height: '100px' }}
+                      css={{ height: '100px', whiteSpace: 'pre-wrap' }}
                     />
                     {isEdit && (
                       <>
@@ -221,7 +231,7 @@ export default function Quest({
                     label={questMode === QUEST_MODE.CREATE ? 'Initial bounty' : 'Available bounty'}
                     isEdit={isEdit}
                     value={bounty}
-                    isLoading={loading || !bounty}
+                    isLoading={loading || (!isEdit && !bounty)}
                     formik={formRef}
                   />
                   {!isEdit && (
@@ -229,7 +239,7 @@ export default function Quest({
                       id="claimDeposit"
                       label="Claim deposit"
                       isEdit={false}
-                      value={claimDeposit}
+                      value={claimDeposit || (!isEdit && !claimDeposit)}
                       isLoading={loading}
                     />
                   )}

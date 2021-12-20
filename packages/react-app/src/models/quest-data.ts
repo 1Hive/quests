@@ -1,3 +1,5 @@
+import { TokenAmount } from './token-amount';
+
 export type QuestData = {
   // User defined
   title?: string;
@@ -7,6 +9,7 @@ export type QuestData = {
 
   // Computed
   address?: string;
+  bounty?: TokenAmount;
   rewardTokenAddress?: string;
   detailsRefIpfs?: string;
   creatorAddress?: string;

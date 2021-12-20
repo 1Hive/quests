@@ -39,7 +39,8 @@
     "no-unused-expressions": "off",
     "react/react-in-jsx-scope": "off",
     "class-methods-use-this": "off",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "react/no-unused-prop-types": "warn"
   },
   "settings": {
     "import/resolver": {
