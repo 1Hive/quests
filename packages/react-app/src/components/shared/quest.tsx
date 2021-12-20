@@ -5,7 +5,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { DEFAULT_AMOUNT, QUEST_MODE } from 'src/constants';
+import { DEFAULT_AMOUNT, DEFAULT_TOKEN, QUEST_MODE } from 'src/constants';
 import { useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
@@ -18,7 +18,7 @@ import { useWallet } from 'use-wallet';
 import * as Yup from 'yup';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
-import { AmountFieldInputFormik } from './field-input/amount-field-input';
+import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import IdentityBadge from './identity-badge';
@@ -88,15 +88,20 @@ export default function Quest({
   }, [questMode]);
 
   if (data) {
-    erc20Contract = useERC20Contract(DEFAULT_AMOUNT.token);
+    erc20Contract = useERC20Contract(DEFAULT_TOKEN);
 
     useEffect(() => {
       erc20Contract
         ?.balanceOf(data.address)
         .then((x: BigNumber) => {
           setBounty({
-            token: DEFAULT_AMOUNT.token,
-            amount: fromBigNumber(x, DEFAULT_AMOUNT.token.decimals),
+            token: DEFAULT_TOKEN,
+            amount: fromBigNumber(x, DEFAULT_TOKEN.decimals),
+          });
+          // Faking claim fetch
+          setClaimDeposit({
+            amount: 2,
+            token: DEFAULT_TOKEN,
           });
         })
         .catch(Logger.error);
@@ -219,16 +224,15 @@ export default function Quest({
                     isLoading={loading || !bounty}
                     formik={formRef}
                   />
-                  {/* {!isEdit && (
+                  {!isEdit && (
                     <AmountFieldInput
                       id="claimDeposit"
                       label="Claim deposit"
-                      onChange={handleChange}
                       isEdit={false}
-                      value={values.claimDeposit}
+                      value={claimDeposit}
                       isLoading={loading}
                     />
-                  )} */}
+                  )}
                   {/* {(!!values.tags?.length || editMode) && (
                     <TagFieldInputFormik
                       id="tags"
