@@ -31,7 +31,7 @@ export default function TextFieldInput({
   isEdit = false,
   isLoading = false,
   label = '',
-
+  fontSize,
   // eslint-disable-next-line no-unused-vars
   maxLength = undefined,
   placeHolder = '',
@@ -65,10 +65,10 @@ export default function TextFieldInput({
       onChange={onChange}
       placeHolder={placeHolder}
       multiline={multiline}
-      style={css}
+      style={{ ...css, fontSize }}
     />
   ) : (
-    <TextContainerStyled>{readOnlyContent}</TextContainerStyled>
+    <TextContainerStyled style={{ ...css, fontSize }}>{readOnlyContent}</TextContainerStyled>
   );
   return label ? (
     <Field label={label} key={id}>
