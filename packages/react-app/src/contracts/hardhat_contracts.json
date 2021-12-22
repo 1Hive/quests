@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "Quest": {
-          "address": "0xf20aeAD3583f35b5eA76b3fC59A652E525cCa83b",
+          "address": "0xEA6015008c7926E84C76b70344EbD31a48A6fd2c",
           "abi": [
             {
               "inputs": [
@@ -208,7 +208,7 @@
           ]
         },
         "QuestFactory": {
-          "address": "0x398890291cBf8d10AfBb426b1F790C93aB772203",
+          "address": "0xCacDFC978Bda030Ce5064700f9cdE36288Da99eD",
           "abi": [
             {
               "inputs": [
@@ -300,14 +300,20 @@
                 }
               ],
               "name": "createQuest",
-              "outputs": [],
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
               "stateMutability": "nonpayable",
               "type": "function"
             }
           ]
         },
         "TokenMock": {
-          "address": "0xc981b1afCEd779a669643EAd47FeFb10873658b8",
+          "address": "0xE124e8945875686A90d03a2e81bce913756EF24E",
           "abi": [
             {
               "inputs": [],

@@ -2,12 +2,21 @@ import { Field, TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+import parse from 'html-react-parser';
+import styled from 'styled-components';
+
+// #region Styled
+const TextContainerStyled = styled.div`
+  white-space: pre-wrap;
+`;
+// #endregion
 
 type Props = {
   id: string;
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
+  maxLength?: number;
   onChange?: Function;
   placeHolder?: string;
   value?: string;
@@ -22,9 +31,10 @@ export default function TextFieldInput({
   isEdit = false,
   isLoading = false,
   label = '',
+  fontSize,
+  maxLength,
   placeHolder = '',
   value = '',
-  fontSize = '',
   onChange = noop,
   wide = false,
   multiline = false,
@@ -37,7 +47,15 @@ export default function TextFieldInput({
         <Skeleton />
       </Field>
     );
-
+  const content = value.substring(0, maxLength);
+  const readOnlyContent = (
+    <>
+      {autoLinks
+        ? parse(content.replace(/(https?:\/\/)([^ ]+)/g, '<a target="_blank" href="$&">$2</a>'))
+        : content}
+      {maxLength && value.length > maxLength && '...'}
+    </>
+  );
   const loadableContent = isEdit ? (
     <TextInput
       id={id}
@@ -46,22 +64,10 @@ export default function TextFieldInput({
       onChange={onChange}
       placeHolder={placeHolder}
       multiline={multiline}
-      style={css}
+      style={{ ...css, fontSize }}
     />
   ) : (
-    <span style={{ fontSize }}>
-      {autoLinks
-        ? value.split(' ').map((x) =>
-            x.startsWith('http') ? (
-              <a target="_blank" href={x} rel="noreferrer" key={x}>
-                {x}
-              </a>
-            ) : (
-              `${x} `
-            ),
-          )
-        : value}
-    </span>
+    <TextContainerStyled style={{ ...css, fontSize }}>{readOnlyContent}</TextContainerStyled>
   );
   return label ? (
     <Field label={label} key={id}>

@@ -14,12 +14,16 @@ let logLevel: LogLevels;
 
 function debug(message: any, ...params: any[]) {
   if (process.env.NODE_ENV === 'production' || logLevel < LogLevels.DEBUG) return;
-  params.length ? console.debug(message, params) : console.debug(message);
+  params.length
+    ? console.debug(message, { params, stacktrace: Error().stack })
+    : console.debug(message, Error().stack);
 }
 
 function info(message: any, ...params: any[]) {
   if (logLevel > LogLevels.INFO) return;
-  params.length ? console.info(message, params) : console.info(message);
+  params.length
+    ? console.info(message, { params, stacktrace: Error().stack })
+    : console.info(message);
 }
 
 function warn(message: any, ...params: any[]) {

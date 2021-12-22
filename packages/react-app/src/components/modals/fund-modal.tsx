@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
+import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
@@ -32,46 +33,44 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   };
 
   return (
-    <Formik
-      initialValues={{ fundAmount: DEFAULT_AMOUNT }}
-      onSubmit={(values, { setSubmitting }) => {
-        setTimeout(async () => {
-          onModalClose();
-          setLoading(true);
-          if (values.fundAmount && questAddress)
-            QuestService.fundQuest(questAddress, values.fundAmount, contractERC20).then(() => {
-              onModalClose();
-              toast('Transaction sent');
-            });
-          setSubmitting(false);
-          setLoading(false);
-        }, 400);
-      }}
+    <ModalBase
+      title="Fund"
+      openButton={
+        <Button icon={<GiTwoCoins />} onClick={() => setOpened(true)} label="Fund" mode="strong" />
+      }
+      buttons={
+        <Button icon={<GiTwoCoins />} type="submit" form="form-fund" label="Fund" mode="strong" />
+      }
+      isOpen={opened}
     >
-      {({ values, handleSubmit }) => (
-        <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
-          <ModalBase
-            title="Fund"
-            openButton={
-              <Button
-                icon={<GiTwoCoins />}
-                onClick={() => setOpened(true)}
-                label="Fund"
-                mode="strong"
-              />
+      <Formik
+        initialValues={{ fundAmount: DEFAULT_AMOUNT }}
+        onSubmit={(values, { setSubmitting }) => {
+          setTimeout(async () => {
+            if (values.fundAmount && questAddress) {
+              try {
+                setLoading(true);
+                toast('Quest funding ...');
+                await QuestService.fundQuest(contractERC20, questAddress, values.fundAmount);
+                onModalClose();
+                toast('Quest funded');
+              } catch (e: any) {
+                Logger.error(e);
+                toast(
+                  e.message.includes('\n') || e.message.length > 50
+                    ? 'Oops. Something went wrong.'
+                    : e.message,
+                );
+              } finally {
+                setSubmitting(false);
+                setLoading(false);
+              }
             }
-            buttons={
-              <Button
-                icon={<GiTwoCoins />}
-                type="submit"
-                form="form-fund"
-                label="Fund"
-                mode="strong"
-              />
-            }
-            onClose={onModalClose}
-            isOpen={opened}
-          >
+          }, 400);
+        }}
+      >
+        {({ values, handleSubmit }) => (
+          <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <AmountFieldInputFormik
               id="fundAmount"
               isEdit
@@ -79,9 +78,9 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
               isLoading={loading}
               value={values.fundAmount}
             />
-          </ModalBase>
-        </FormStyled>
-      )}
-    </Formik>
+          </FormStyled>
+        )}
+      </Formik>
+    </ModalBase>
   );
 }

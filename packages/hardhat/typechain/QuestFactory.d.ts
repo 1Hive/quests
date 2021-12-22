@@ -122,7 +122,7 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<string>;
 
     "createQuest(string,bytes,address,uint256,address)"(
       _questTitle: string,
@@ -131,7 +131,7 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<string>;
   };
 
   filters: {

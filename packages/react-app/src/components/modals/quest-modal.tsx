@@ -6,19 +6,9 @@ import { QUEST_MODE } from 'src/constants';
 import { QuestData } from 'src/models/quest-data';
 import styled from 'styled-components';
 import Quest from '../shared/quest';
-import ClaimModal from './claim-modal';
-import FundModal from './fund-modal';
 import ModalBase from './modal-base';
 
 // #region StyledComponents
-
-const ButtonWrapperStyled = styled.div`
-  margin: ${1 * GU}px;
-  margin-bottom: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-`;
 
 const QuestActionButtonStyled = styled(Button)`
   margin: ${1 * GU}px;
@@ -28,14 +18,14 @@ const QuestActionButtonStyled = styled(Button)`
 
 type Props = {
   data?: QuestData;
-  onClose: Function;
+  onClose?: Function;
   questMode: string;
 };
 
 export default function QuestModal({
   data = undefined,
   onClose = noop,
-  questMode = QUEST_MODE.READ_SUMMARY,
+  questMode = QUEST_MODE.ReadSummary,
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
@@ -54,15 +44,15 @@ export default function QuestModal({
   };
   useEffect(() => {
     switch (questMode) {
-      case QUEST_MODE.CREATE:
+      case QUEST_MODE.Create:
         setButtonLabel('Create quest');
         break;
 
-      case QUEST_MODE.UPDATE:
+      case QUEST_MODE.Update:
         setButtonLabel('Update quest');
         break;
 
-      case QUEST_MODE.READ_DETAIL:
+      case QUEST_MODE.ReadDetail:
         setButtonLabel('Details');
         break;
 
@@ -83,12 +73,7 @@ export default function QuestModal({
         />
       }
       buttons={
-        questMode === QUEST_MODE.READ_DETAIL ? (
-          <ButtonWrapperStyled>
-            <FundModal questAddress={data!.address!} />
-            <ClaimModal questAddress={data!.address!} />
-          </ButtonWrapperStyled>
-        ) : (
+        (questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update) && (
           <QuestActionButtonStyled
             label="Save"
             icon={<FaSave />}

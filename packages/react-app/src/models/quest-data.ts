@@ -6,12 +6,11 @@ export type QuestData = {
   description?: string;
   expireTimeMs: number;
   fallbackAddress?: string;
-  bounty?: TokenAmount;
 
   // Computed
   address?: string;
+  bounty?: TokenAmount;
   rewardTokenAddress?: string;
-  claimDeposit?: TokenAmount;
   detailsRefIpfs?: string;
   creatorAddress?: string;
 };

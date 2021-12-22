@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { noop } from 'lodash-es';
 import { TokenAmount } from 'src/models/token-amount';
 import Web3 from 'web3';
@@ -134,12 +134,7 @@ export function addressesEqualNoSum(first: string, second: string) {
   return first === second;
 }
 
-export async function sendTransaction(
-  to: string,
-  amount: TokenAmount,
-  // eslint-disable-next-line no-unused-vars
-  onCompleted: any,
-) {
+export async function sendTransaction(to: string, amount: TokenAmount, onCompleted: any) {
   const from = await getCurrentAccount();
   if (!from)
     return Promise.reject(
@@ -164,9 +159,13 @@ export function checkConnection() {
   getWeb3()?.ethereum.request({ method: 'eth_requestAccounts' });
 }
 
-// Re-export some web3-utils functions
-export { isAddress, soliditySha3, toBN, toHex, toUtf8 } from 'web3-utils';
-
-export function parseAmount(amount: TokenAmount) {
+export function toBigNumber(amount: TokenAmount) {
   return ethers.utils.parseUnits(amount.amount.toString(), amount.token.decimals);
 }
+
+export function fromBigNumber(bigNumber: BigNumber, decimals: number) {
+  return bigNumber.div(BigNumber.from(10).pow(decimals)).toNumber();
+}
+
+// Re-export some web3-utils functions
+export { isAddress, soliditySha3, toBN, toHex, toUtf8, toChecksumAddress } from 'web3-utils';

@@ -26,14 +26,18 @@ export function getProviderOrSigner(ethersProvider: any, account: any) {
 export function getContract(
   address: string,
   ABI: ContractInterface,
-  ethersProvider: any,
-  account: any,
+  ethersProvider?: any,
+  account?: any,
 ) {
   if (!address || address === ADDRESS_ZERO) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
   }
 
-  return new Contract(address, ABI, getProviderOrSigner(ethersProvider, account));
+  return new Contract(
+    address,
+    ABI,
+    ethersProvider && account ? getProviderOrSigner(ethersProvider, account) : undefined,
+  );
 }
 
 function getContractsJson(network: any) {
@@ -48,27 +52,29 @@ function getContractsJson(network: any) {
 // returns null on errors
 function useContract(contractName: string, addressOverride?: string, withSignerIfPossible = true) {
   const { account, ethers } = useWallet();
-  const network = getNetwork();
-  if (!contracts) contracts = getContractsJson(network);
-  const askedContract = contracts[contractName];
-  const contractAddress = addressOverride ?? askedContract.address;
-  const contractAbi = askedContract.abi ?? askedContract;
 
   return useMemo(() => {
+    const network = getNetwork();
+    contracts = getContractsJson(network);
+    const askedContract = contracts[contractName];
+    const contractAddress = addressOverride ?? askedContract.address;
+    const contractAbi = askedContract.abi ?? askedContract;
     if (!contractAddress) Logger.warn('Address was not defined for contract ', contractName);
     if (!contractAddress || !contractAbi || !ethers) return null;
     try {
-      return getContract(
+      const contract = getContract(
         contractAddress,
         contractAbi,
         ethers,
         withSignerIfPossible && account ? account : undefined,
       );
+
+      return contract;
     } catch (error) {
       Logger.error('Failed to get contract', error);
       return null;
     }
-  }, [contractAddress, contractAbi, ethers, withSignerIfPossible, account]);
+  }, [ethers, withSignerIfPossible, account]);
 }
 
 export function useFactoryContract() {

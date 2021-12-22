@@ -4,44 +4,41 @@ import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
 import { getNetwork } from 'src/networks';
+import { QuestEntitiesQuery } from 'src/queries/quest-entities.query';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
-import { toAscii } from 'web3-utils';
+import { toAscii, toChecksumAddress } from 'web3-utils';
 import { DEFAULT_AMOUNT, DEFAULT_TOKEN, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
-import { parseAmount, toHex } from '../utils/web3.utils';
+import { toBigNumber, toHex } from '../utils/web3.utils';
 import { getIpfsBaseUri, pushObjectToIpfs } from './ipfs.service';
 
 let questList: QuestData[] = [];
 
 // #region Private
-
-async function mapQuests(quests: any[]): Promise<QuestData[]> {
-  const x = await Promise.all(
-    quests.map(async (questEntity) => {
-      try {
-        const quest = {
-          address: questEntity.questAddress,
-          title: questEntity.questTitle,
-          description: questEntity.questDescription ?? undefined,
-          detailsRefIpfs: toAscii(questEntity.questDetailsRef),
-          rewardTokenAddress: questEntity.questRewardTokenAddress,
-          claimDeposit: DEFAULT_AMOUNT,
-          bounty: DEFAULT_AMOUNT,
-          expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
-        } as QuestData;
-        if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
-
-        return quest;
-      } catch (error) {
-        Logger.error('Failed to map quest : ', questEntity);
-        return undefined;
-      }
-    }),
-  );
-  return x.filter((quest) => !!quest) as QuestData[]; // Filter out undefined quests (skiped)
+function mapQuest(questEntity: any) {
+  try {
+    const quest = {
+      address: toChecksumAddress(questEntity.questAddress),
+      title: questEntity.questTitle,
+      description: questEntity.questDescription || undefined, // if '' -> undefined
+      detailsRefIpfs: toAscii(questEntity.questDetailsRef),
+      rewardTokenAddress: questEntity.questRewardTokenAddress,
+      expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
+    } as QuestData;
+    if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
+    return quest;
+  } catch (error) {
+    Logger.error('Failed to map quest : ', questEntity);
+    return undefined;
+  }
 }
+
+function mapQuestList(quests: any[]): QuestData[] {
+  return quests.map(mapQuest).filter((quest) => !!quest) as QuestData[]; // Filter out undefined quests (skiped)
+}
+
 // #endregion
 
 // #region Public
@@ -53,7 +50,7 @@ export async function getMoreQuests(
 ): Promise<QuestData[]> {
   const network = getNetwork();
   const queryResult = (
-    await request(network.subgraph, QuestEntityQuery, {
+    await request(network.subgraph, QuestEntitiesQuery, {
       skip: currentIndex,
       first: count,
       expireTimeLower: filter.expire?.start
@@ -62,15 +59,25 @@ export async function getMoreQuests(
       expireTimeUpper: filter.expire?.end
         ? Math.round(filter.expire.end.getTime() / 1000) // MS to Sec
         : GQL_MAX_INT, // January 18, 2038 10:14:07 PM  // TODO : Change to a later time when supported by grapql-request
-      address: filter.address,
+      address: filter.address.toLowerCase(), // Quest address was not stored with mixed-case
       title: filter.title,
       description: filter.description,
     })
   ).questEntities;
 
-  const newQuests = await mapQuests(queryResult);
+  const newQuests = mapQuestList(queryResult);
   questList = questList.concat(newQuests);
   return newQuests;
+}
+export async function getQuest(address: string) {
+  const network = getNetwork();
+  const queryResult = (
+    await request(network.subgraph, QuestEntityQuery, {
+      ID: address.toLowerCase(), // Subgraph address are stored lowercase
+    })
+  ).questEntity;
+  const newQuest = mapQuest(queryResult);
+  return newQuest;
 }
 
 export async function saveQuest(
@@ -87,21 +94,22 @@ export async function saveQuest(
     const tx = await questFactoryContract.createQuest(
       data.title,
       toHex(ipfsHash), // Push description to IPFS and push hash to quest contract
-      TOKENS.honey.address,
+      TOKENS.Honey.address,
       questExpireTimeUtcSec,
       fallbackAddress,
     );
     Logger.info('TX HASH', tx.hash);
     const receipt = await tx.wait();
     const questDeployedAddress = receipt?.events[0]?.args[0];
+
     return questDeployedAddress;
   }
 
   return null;
 }
 
-export async function fundQuest(questAddress: string, amount: TokenAmount, contractERC20: any) {
-  await contractERC20.transfer(questAddress, parseAmount(amount));
+export function fundQuest(contractERC20: any, questAddress: string, amount: TokenAmount) {
+  return contractERC20.transfer(questAddress, toBigNumber(amount));
 }
 
 export async function claimQuest(questAddress: string, address: string) {

@@ -7,7 +7,13 @@ import "./Quest.sol";
 contract QuestFactory {
     address public aragonGovernAddress;
 
-    event QuestCreated(address questAddress, string questTitle, bytes questDetailsRef, address rewardTokenAddress, uint256 expireTime);
+    event QuestCreated(
+        address questAddress,
+        string questTitle,
+        bytes questDetailsRef,
+        address rewardTokenAddress,
+        uint256 expireTime
+    );
 
     constructor(address _aragonGovernAddress) {
         aragonGovernAddress = _aragonGovernAddress;
@@ -19,8 +25,22 @@ contract QuestFactory {
         IERC20 _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress
-    ) external {
-        Quest quest = new Quest(_questTitle, _questDetailsRef, _rewardToken, _expireTime, aragonGovernAddress, _fundsRecoveryAddress);
-        emit QuestCreated(address(quest), _questTitle, _questDetailsRef, address(_rewardToken), _expireTime);
+    ) external returns (address) {
+        Quest quest = new Quest(
+            _questTitle,
+            _questDetailsRef,
+            _rewardToken,
+            _expireTime,
+            aragonGovernAddress,
+            _fundsRecoveryAddress
+        );
+        emit QuestCreated(
+            address(quest),
+            _questTitle,
+            _questDetailsRef,
+            address(_rewardToken),
+            _expireTime
+        );
+        return address(quest);
     }
 }

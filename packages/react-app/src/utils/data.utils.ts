@@ -20,10 +20,10 @@ export async function convertTo(from: TokenAmount, toToken: Token) {
 }
 
 export async function computeTotalFunds(funds: Fund[]) {
-  if (!funds?.length) return { amount: 0, token: TOKENS.theter };
+  if (!funds?.length) return { amount: 0, token: TOKENS.Theter };
   Logger.debug(funds);
-  const tetherFunds = await Promise.all(funds.map((x) => convertTo(x.amount, TOKENS.theter)));
+  const tetherFunds = await Promise.all(funds.map((x) => convertTo(x.amount, TOKENS.Theter)));
   // @ts-ignore
   const amount = tetherFunds.reduce((total, x) => total + x.amount);
-  return { amount, token: TOKENS.theter };
+  return { amount, token: TOKENS.Theter };
 }
