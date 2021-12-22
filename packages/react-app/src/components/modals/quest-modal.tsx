@@ -25,7 +25,7 @@ type Props = {
 export default function QuestModal({
   data = undefined,
   onClose = noop,
-  questMode = QUEST_MODE.READ_SUMMARY,
+  questMode = QUEST_MODE.ReadSummary,
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
@@ -44,15 +44,15 @@ export default function QuestModal({
   };
   useEffect(() => {
     switch (questMode) {
-      case QUEST_MODE.CREATE:
+      case QUEST_MODE.Create:
         setButtonLabel('Create quest');
         break;
 
-      case QUEST_MODE.UPDATE:
+      case QUEST_MODE.Update:
         setButtonLabel('Update quest');
         break;
 
-      case QUEST_MODE.READ_DETAIL:
+      case QUEST_MODE.ReadDetail:
         setButtonLabel('Details');
         break;
 
@@ -73,7 +73,7 @@ export default function QuestModal({
         />
       }
       buttons={
-        (questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE) && (
+        (questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update) && (
           <QuestActionButtonStyled
             label="Save"
             icon={<FaSave />}

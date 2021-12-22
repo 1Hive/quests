@@ -66,11 +66,11 @@ function Header({ toggleTheme, currentTheme }: Props) {
       <HeaderLayoutContent>
         <HeaderLayoutContentFlex>
           {page !== PAGES.List ? (
-            <BackButtonStyled onClick={() => history.push('home')} label="" />
+            <BackButtonStyled onClick={() => history.push(PAGES.List)} label="" />
           ) : (
             <BackButtonSpacerStyled />
           )}
-          <HeaderTitle href="#/home" external={false} />
+          <HeaderTitle external={false} />
           <HeaderMenu below={below} />
         </HeaderLayoutContentFlex>
 

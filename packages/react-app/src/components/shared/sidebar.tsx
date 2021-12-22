@@ -1,4 +1,7 @@
 import { Box, GU } from '@1hive/1hive-ui';
+import { useHistory } from 'react-router-dom';
+import { Filter as FilterModel } from 'src/models/filter';
+import { useFilterContext } from 'src/providers/filter.context';
 import { usePageContext } from 'src/providers/page.context';
 import styled from 'styled-components';
 import { PAGES, QUEST_MODE } from '../../constants';
@@ -21,6 +24,16 @@ const BoxStyled = styled(Box)`
 export default function Sidebar() {
   const { account } = useWallet();
   const { page } = usePageContext();
+  const { filter, setFilter } = useFilterContext();
+  const history = useHistory();
+
+  const onCreateQuestClosed = (questAddress: string) => {
+    if (questAddress)
+      setTimeout(() => {
+        if (page === PAGES.List) setFilter({ ...filter, address: questAddress } as FilterModel);
+        else if (page === PAGES.Detail) history.push(`/${PAGES.Detail}?id=${questAddress}`);
+      }, 2000);
+  };
 
   return (
     (account || page === PAGES.List) && (
@@ -28,7 +41,12 @@ export default function Sidebar() {
         <Outset gu8>
           {page === PAGES.List && <Filter />}
           {page === PAGES.List && account && <Separator />}
-          {account && <QuestModal questMode={QUEST_MODE.CREATE} />}
+          {account && (
+            <QuestModal
+              questMode={QUEST_MODE.Create}
+              onClose={(x: string) => onCreateQuestClosed(x)}
+            />
+          )}
         </Outset>
       </BoxStyled>
     )

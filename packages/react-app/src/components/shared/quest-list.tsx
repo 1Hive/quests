@@ -83,7 +83,7 @@ export default function QuestList() {
       <div>
         {quests.map((x: QuestData) => (
           <Outset gu16 key={x.address}>
-            <Quest questMode={QUEST_MODE.READ_SUMMARY} data={x} />
+            <Quest questMode={QUEST_MODE.ReadSummary} data={x} />
           </Outset>
         ))}
         {isLoading && skeletonQuests}

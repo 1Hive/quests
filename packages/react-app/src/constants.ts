@@ -14,28 +14,16 @@ export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
 // Cryptos
 export const TOKENS = {
-  honey: {
+  Honey: {
     name: 'Honey',
-    symb: 'HNY',
-    address: '0x5e352ed38066417d70817399dc6d9d9236b5f203',
+    symb: 'HNYT',
+    address: '0x3050e20fabe19f8576865811c9f28e85b96fa4f9',
     decimals: 18,
   } as Token,
-  theter: {
+  Theter: {
     name: 'Tether',
     symb: 'USDT',
     address: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
-    decimals: 18,
-  } as Token,
-  wxdai: {
-    name: 'Wrapped XDAI',
-    symb: 'WXDAI',
-    address: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
-    decimals: 18,
-  } as Token,
-  wether: {
-    name: 'Wrapped Ethereum',
-    symb: 'WETH',
-    address: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
     decimals: 18,
   } as Token,
 };
@@ -43,20 +31,20 @@ export const TOKENS = {
 // Constants
 
 export const QUEST_STATUS = {
-  active: { id: 'active', label: 'Active' },
-  completed: { id: 'completed', label: 'Completed' },
-  aborted: { id: 'aborted', label: 'Aborted' },
-  draft: { id: 'draft', label: 'Draft' },
+  Active: { id: 'active', label: 'Active' },
+  Completed: { id: 'completed', label: 'Completed' },
+  Aborted: { id: 'aborted', label: 'Aborted' },
+  Draft: { id: 'draft', label: 'Draft' },
 };
 
 export const QUEST_SUMMARY_MAX_CHARACTERS = 600;
 
 // Enums
 export const QUEST_MODE = {
-  CREATE: 'CREATE',
-  UPDATE: 'UPDATE',
-  READ_SUMMARY: 'SUMMARY',
-  READ_DETAIL: 'DETAIL',
+  Create: 'CREATE',
+  Update: 'UPDATE',
+  ReadSummary: 'SUMMARY',
+  ReadDetail: 'DETAIL',
 };
 
 export const BREAKPOINTS = {
@@ -73,13 +61,13 @@ export const BREAKPOINTS = {
 };
 
 export const PAGES = {
-  List: 'List',
-  Detail: 'Detail',
+  List: 'list',
+  Detail: 'detail',
 };
 
 // Default values
 
-export const DEFAULT_TOKEN = TOKENS.theter;
+export const DEFAULT_TOKEN = TOKENS.Honey;
 
 export const DEFAULT_AMOUNT = {
   amount: 0,

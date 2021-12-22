@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import {
   DEFAULT_AMOUNT,
   DEFAULT_TOKEN,
+  PAGES,
   QUEST_MODE,
   QUEST_SUMMARY_MAX_CHARACTERS,
 } from 'src/constants';
@@ -74,7 +75,7 @@ export default function Quest({
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
   },
   isLoading = false,
-  questMode = QUEST_MODE.READ_DETAIL,
+  questMode = QUEST_MODE.ReadDetail,
   onSave = noop,
   css,
 }: Props) {
@@ -88,33 +89,37 @@ export default function Quest({
   const toast = useToast();
   let erc20Contract: any;
 
+  const refreshBounty = () =>
+    erc20Contract
+      ?.balanceOf(data.address)
+      .then((x: BigNumber) => {
+        setBounty({
+          token: DEFAULT_TOKEN,
+          amount: fromBigNumber(x, DEFAULT_TOKEN.decimals),
+        });
+      })
+      .catch(Logger.error);
+
   useEffect(() => {
-    setIsEdit(questMode === QUEST_MODE.CREATE || questMode === QUEST_MODE.UPDATE);
+    setIsEdit(questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update);
   }, [questMode]);
 
   if (data) {
     erc20Contract = useERC20Contract(DEFAULT_TOKEN);
 
     useEffect(() => {
-      erc20Contract
-        ?.balanceOf(data.address)
-        .then((x: BigNumber) => {
-          setBounty({
-            token: DEFAULT_TOKEN,
-            amount: fromBigNumber(x, DEFAULT_TOKEN.decimals),
-          });
-          // Faking claim fetch
-          setClaimDeposit({
-            amount: 2,
-            token: DEFAULT_TOKEN,
-          });
-        })
-        .catch(Logger.error);
+      refreshBounty()?.then(() =>
+        setClaimDeposit({
+          // TODO : Fetch from Govern subgraph
+          amount: 2,
+          token: DEFAULT_TOKEN,
+        }),
+      );
     }, [erc20Contract]);
   }
 
   return (
-    <CardStyled style={css} isSummary={questMode === QUEST_MODE.READ_SUMMARY} id={data.address}>
+    <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
       <Formik
         initialValues={{ fallbackAddress: wallet.account, claimDeposit, ...data }}
         validateOnBlur
@@ -128,14 +133,18 @@ export default function Quest({
             try {
               // Set noon to prevent rounding form changing date
               const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
-              const saveResponse = await QuestService.saveQuest(
+              toast('Quest creating ...');
+              const createdQuestAddress = await QuestService.saveQuest(
                 questFactoryContract,
-                erc20Contract,
                 values.fallbackAddress!,
                 { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
               );
+              if (values.bounty?.amount) {
+                toast('Quest funding ...');
+                await QuestService.fundQuest(erc20Contract, createdQuestAddress, values.bounty);
+              }
               toast('Quest created successfully');
-              onSave(saveResponse);
+              onSave(createdQuestAddress);
             } catch (e: any) {
               Logger.error(e);
               toast(
@@ -192,7 +201,7 @@ export default function Quest({
                       id="description"
                       label={isEdit ? 'Description' : undefined}
                       maxLength={
-                        questMode === QUEST_MODE.READ_SUMMARY
+                        questMode === QUEST_MODE.ReadSummary
                           ? QUEST_SUMMARY_MAX_CHARACTERS
                           : undefined
                       }
@@ -228,7 +237,7 @@ export default function Quest({
                 <Outset gu16>
                   <AmountFieldInputFormik
                     id="bounty"
-                    label={questMode === QUEST_MODE.CREATE ? 'Initial bounty' : 'Available bounty'}
+                    label={questMode === QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
                     isEdit={isEdit}
                     value={bounty}
                     isLoading={loading || (!isEdit && !bounty)}
@@ -268,14 +277,14 @@ export default function Quest({
             {!loading && !isEdit && (
               <QuestFooterStyled>
                 <Outset gu8 vertical>
-                  {questMode !== QUEST_MODE.READ_DETAIL && (
+                  {questMode !== QUEST_MODE.ReadDetail && (
                     <ChildSpacer>
-                      <LinkStyled to={`/detail?id=${data.address}`}>
+                      <LinkStyled to={`/${PAGES.Detail}?id=${data.address}`}>
                         <Button icon={<IconPlus />} label="Details" wide mode="strong" />
                       </LinkStyled>
                     </ChildSpacer>
                   )}
-                  {questMode !== QUEST_MODE.READ_SUMMARY && wallet.account && (
+                  {questMode !== QUEST_MODE.ReadSummary && wallet.account && (
                     <ChildSpacer>
                       <FundModal questAddress={data.address!} />
                       <ClaimModal questAddress={data.address!} />

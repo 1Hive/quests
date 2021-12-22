@@ -173,4 +173,4 @@ export function fromBigNumber(bigNumber: BigNumber, decimals: number) {
 }
 
 // Re-export some web3-utils functions
-export { isAddress, soliditySha3, toBN, toHex, toUtf8 } from 'web3-utils';
+export { isAddress, soliditySha3, toBN, toHex, toUtf8, toChecksumAddress } from 'web3-utils';

@@ -1,13 +1,15 @@
-import { GU, Link, textStyle, useTheme } from '@1hive/1hive-ui';
+import { GU, textStyle, useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { APP_TITLE } from '../../../constants';
+import { APP_TITLE, PAGES } from '../../../constants';
 import logo from './assets/logo.svg';
 
 // #region StyledComponents
 
 const TitleLinkStyled = styled(Link)`
   height: 100%;
+  text-decoration: none;
 `;
 
 const TitleLinkWrapperStyled = styled.div`
@@ -28,16 +30,14 @@ const TitleTextStyled = styled.span`
 // #endregion
 
 type Props = {
-  external?: boolean;
-  href?: string;
   onClick?: Function;
 };
 
-export default function HeaderTitle({ onClick = noop, href, external = false }: Props) {
+export default function HeaderTitle({ onClick = noop }: Props) {
   const theme = useTheme();
 
   return (
-    <TitleLinkStyled onClick={onClick} href={href} external={external} color={theme.accent}>
+    <TitleLinkStyled onClick={onClick} to={PAGES.List} color={theme.accent}>
       <TitleLinkWrapperStyled>
         <img src={logo} alt="" />
         <TitleTextStyled color={theme.accent}>{APP_TITLE}</TitleTextStyled>

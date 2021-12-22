@@ -14,7 +14,9 @@ let logLevel: LogLevels;
 
 function debug(message: any, ...params: any[]) {
   if (process.env.NODE_ENV === 'production' || logLevel < LogLevels.DEBUG) return;
-  params.length ? console.debug(message, params) : console.debug(message);
+  params.length
+    ? console.debug(message, { params, stacktrace: Error().stack })
+    : console.debug(message);
 }
 
 function info(message: any, ...params: any[]) {

@@ -6,7 +6,7 @@ import { TokenAmount } from 'src/models/token-amount';
 import { getNetwork } from 'src/networks';
 import { QuestEntitiesQuery } from 'src/queries/quest-entities.query';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
-import { toAscii } from 'web3-utils';
+import { toAscii, toChecksumAddress } from 'web3-utils';
 import { DEFAULT_AMOUNT, DEFAULT_TOKEN, GQL_MAX_INT, TOKENS } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
 import { wrapError } from '../utils/errors.util';
@@ -20,7 +20,7 @@ let questList: QuestData[] = [];
 function mapQuest(questEntity: any) {
   try {
     const quest = {
-      address: questEntity.questAddress,
+      address: toChecksumAddress(questEntity.questAddress),
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
@@ -59,7 +59,7 @@ export async function getMoreQuests(
       expireTimeUpper: filter.expire?.end
         ? Math.round(filter.expire.end.getTime() / 1000) // MS to Sec
         : GQL_MAX_INT, // January 18, 2038 10:14:07 PM  // TODO : Change to a later time when supported by grapql-request
-      address: filter.address,
+      address: filter.address.toLowerCase(), // Quest address was not stored with mixed-case
       title: filter.title,
       description: filter.description,
     })
@@ -73,7 +73,7 @@ export async function getQuest(address: string) {
   const network = getNetwork();
   const queryResult = (
     await request(network.subgraph, QuestEntityQuery, {
-      ID: address,
+      ID: address.toLowerCase(), // Subgraph address are stored lowercase
     })
   ).questEntity;
   const newQuest = mapQuest(queryResult);
@@ -82,7 +82,6 @@ export async function getQuest(address: string) {
 
 export async function saveQuest(
   questFactoryContract: any,
-  erc20Contract: any,
   fallbackAddress: string,
   data: Partial<QuestData>,
   address?: string,
@@ -95,14 +94,14 @@ export async function saveQuest(
     const tx = await questFactoryContract.createQuest(
       data.title,
       toHex(ipfsHash), // Push description to IPFS and push hash to quest contract
-      TOKENS.honey.address,
+      TOKENS.Honey.address,
       questExpireTimeUtcSec,
       fallbackAddress,
     );
     Logger.info('TX HASH', tx.hash);
     const receipt = await tx.wait();
     const questDeployedAddress = receipt?.events[0]?.args[0];
-    if (data.bounty) await fundQuest(erc20Contract, questDeployedAddress, data.bounty);
+
     return questDeployedAddress;
   }
 
