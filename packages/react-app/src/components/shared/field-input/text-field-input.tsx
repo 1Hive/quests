@@ -32,8 +32,7 @@ export default function TextFieldInput({
   isLoading = false,
   label = '',
   fontSize,
-  // eslint-disable-next-line no-unused-vars
-  maxLength = undefined,
+  maxLength,
   placeHolder = '',
   value = '',
   onChange = noop,

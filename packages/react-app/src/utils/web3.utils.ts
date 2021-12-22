@@ -134,12 +134,7 @@ export function addressesEqualNoSum(first: string, second: string) {
   return first === second;
 }
 
-export async function sendTransaction(
-  to: string,
-  amount: TokenAmount,
-  // eslint-disable-next-line no-unused-vars
-  onCompleted: any,
-) {
+export async function sendTransaction(to: string, amount: TokenAmount, onCompleted: any) {
   const from = await getCurrentAccount();
   if (!from)
     return Promise.reject(

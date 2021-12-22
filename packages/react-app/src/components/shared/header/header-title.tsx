@@ -16,7 +16,7 @@ const TitleLinkWrapperStyled = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
-  margin-left: ${1 * GU}px;
+  margin-left: ${GU}px;
 `;
 
 const TitleTextStyled = styled.span`
