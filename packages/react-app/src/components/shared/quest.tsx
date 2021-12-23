@@ -1,29 +1,23 @@
 import { AddressField, Button, Card, GU, IconPlus, Split, useToast } from '@1hive/1hive-ui';
-import { BigNumber } from 'ethers';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import {
-  DEFAULT_AMOUNT,
-  DEFAULT_TOKEN,
-  PAGES,
-  QUEST_MODE,
-  QUEST_SUMMARY_MAX_CHARACTERS,
-} from 'src/constants';
-import { useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
+import { PAGES, QUEST_MODE, QUEST_SUMMARY_MAX_CHARACTERS } from 'src/constants';
+import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
+import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
-import { fromBigNumber } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import * as Yup from 'yup';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
+import { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import IdentityBadge from './identity-badge';
@@ -79,49 +73,34 @@ export default function Quest({
   css,
 }: Props) {
   const wallet = useWallet();
-  const questFactoryContract = useFactoryContract();
+  const { defaultToken } = getNetwork();
+  const erc20Contract = useERC20Contract(data.rewardToken ?? defaultToken);
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [bounty, setBounty] = useState<TokenAmount>();
-  const [claimDeposit, setClaimDeposit] = useState(DEFAULT_AMOUNT);
+  const [bounty, setBounty] = useState<TokenAmount | null>();
   const toast = useToast();
-  let erc20Contract: any;
-
-  const refreshBounty = () =>
-    erc20Contract
-      ?.balanceOf(data.address)
-      .then((x: BigNumber) => {
-        setBounty({
-          token: DEFAULT_TOKEN,
-          amount: fromBigNumber(x, DEFAULT_TOKEN.decimals),
-        });
-      })
-      .catch(Logger.error);
+  const questFactoryContract = useFactoryContract();
 
   useEffect(() => {
     setIsEdit(questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update);
   }, [questMode]);
 
-  if (data) {
-    erc20Contract = useERC20Contract(DEFAULT_TOKEN);
-
-    useEffect(() => {
-      refreshBounty()?.then(() =>
-        setClaimDeposit({
-          // TODO : Fetch from Govern subgraph
-          amount: 2,
-          token: DEFAULT_TOKEN,
-        }),
-      );
-    }, [erc20Contract]);
-  }
+  useEffect(() => {
+    if (data.address)
+      getBalanceOf(defaultToken, data.address)
+        .then((x: TokenAmount | null) => {
+          setBounty(x);
+        })
+        .catch((err: Error) => {
+          Logger.error(err);
+        });
+  }, [data.address]);
 
   return (
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
       <Formik
-        initialValues={{ fallbackAddress: wallet.account, claimDeposit, ...data }}
+        initialValues={{ fallbackAddress: wallet.account, ...data }}
         validateOnBlur
         validationSchema={Yup.object().shape({
           description: Yup.string().required(),
@@ -134,6 +113,11 @@ export default function Quest({
               // Set noon to prevent rounding form changing date
               const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
               toast('Quest creating ...');
+              if (!questFactoryContract) {
+                Logger.error(
+                  'QuestFactory contract was not loaded correctly (maybe account is disabled)',
+                );
+              }
               const createdQuestAddress = await QuestService.saveQuest(
                 questFactoryContract,
                 values.fallbackAddress!,
@@ -235,14 +219,18 @@ export default function Quest({
               }
               secondary={
                 <Outset gu16>
-                  {/* <AmountFieldInputFormik
-                    id="bounty"
-                    label={questMode === QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
-                    isEdit={isEdit}
-                    value={bounty}
-                    isLoading={loading || (!isEdit && !bounty)}
-                    formik={formRef}
-                  /> */}
+                  {bounty !== null && (
+                    <AmountFieldInputFormik
+                      id="bounty"
+                      label={
+                        questMode === QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'
+                      }
+                      isEdit={isEdit}
+                      value={bounty}
+                      isLoading={loading || (!isEdit && bounty === undefined)}
+                      formik={formRef}
+                    />
+                  )}
                   {/* {!isEdit && (
                     <AmountFieldInput
                       id="claimDeposit"

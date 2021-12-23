@@ -17,7 +17,7 @@ export const TOKENS = {
   Honey: {
     name: 'Honey',
     symb: 'HNYT',
-    address: '0x3050e20fabe19f8576865811c9f28e85b96fa4f9',
+    address: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
     decimals: 18,
   } as Token,
   Theter: {
@@ -67,11 +67,9 @@ export const PAGES = {
 
 // Default values
 
-export const DEFAULT_TOKEN = TOKENS.Honey;
-
 export const DEFAULT_AMOUNT = {
   amount: 0,
-  token: DEFAULT_TOKEN,
+  token: undefined,
 };
 
 export const DEFAULT_PAGE = PAGES.List;

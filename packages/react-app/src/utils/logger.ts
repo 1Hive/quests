@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 
+import { noop } from 'lodash';
+
 // eslint-disable-next-line no-shadow
 export enum LogLevels {
   DEBUG = 0,
@@ -10,38 +12,19 @@ export enum LogLevels {
   NONE = 4,
 }
 
-let logLevel: LogLevels;
+let logLevel: LogLevels = process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG;
+console.log('logLevel', logLevel);
 
-function debug(message: any, ...params: any[]) {
-  if (process.env.NODE_ENV === 'production' || logLevel < LogLevels.DEBUG) return;
-  params.length
-    ? console.debug(message, { params, stacktrace: Error().stack })
-    : console.debug(message, Error().stack);
-}
-
-function info(message: any, ...params: any[]) {
-  if (logLevel > LogLevels.INFO) return;
-  params.length
-    ? console.info(message, { params, stacktrace: Error().stack })
-    : console.info(message);
-}
-
-function warn(message: any, ...params: any[]) {
-  if (logLevel > LogLevels.WARN) return;
-  params.length ? console.warn(message, params) : console.warn(message);
-}
-
-function error(message: any, ...params: any[]) {
-  if (logLevel > LogLevels.ERROR) return;
-  params.length ? console.error(message, params) : console.error(message);
-}
+const debug =
+  process.env.NODE_ENV !== 'production' && logLevel < LogLevels.DEBUG ? console.debug : noop;
+const info = logLevel < LogLevels.INFO ? console.info : noop;
+const warn = logLevel < LogLevels.WARN ? console.warn : noop;
+const error = logLevel < LogLevels.ERROR ? console.error : noop;
 
 function setLogLevel(level: LogLevels) {
   logLevel = level;
   console.debug(`Log level set to ${Object.keys[logLevel]}`);
 }
-
-setLogLevel(process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG);
 
 export const Logger = {
   debug,

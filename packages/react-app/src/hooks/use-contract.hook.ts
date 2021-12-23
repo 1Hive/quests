@@ -2,9 +2,10 @@ import { Contract, ContractInterface } from 'ethers';
 import { useMemo } from 'react';
 import { Token } from 'src/models/token';
 import { Logger } from 'src/utils/logger';
+import { fromBigNumber, getDefaultProvider } from 'src/utils/web3.utils';
 import { ADDRESS_ZERO } from '../constants';
-import ERC20Abi from '../contracts/ERC20.json';
-import GovernQueueAbi from '../contracts/GovernQueue.json';
+import ERC20 from '../contracts/ERC20.json';
+import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
 import { useWallet } from '../providers/wallet.context';
@@ -18,7 +19,7 @@ export function getSigner(ethersProvider: any, account: any) {
 }
 
 // account is optional
-export function getProviderOrSigner(ethersProvider: any, account: any) {
+export function getProviderOrSigner(ethersProvider: any, account?: any) {
   return account ? getSigner(ethersProvider, account) : ethersProvider;
 }
 
@@ -26,55 +27,61 @@ export function getProviderOrSigner(ethersProvider: any, account: any) {
 export function getContract(
   address: string,
   ABI: ContractInterface,
-  ethersProvider?: any,
+  ethersProvider: any,
   account?: any,
 ) {
   if (!address || address === ADDRESS_ZERO) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
   }
 
-  return new Contract(
-    address,
-    ABI,
-    ethersProvider && account ? getProviderOrSigner(ethersProvider, account) : undefined,
-  );
+  return new Contract(address, ABI, getProviderOrSigner(ethersProvider, account));
 }
 
-function getContractsJson(network: any) {
+function getContractsJson(network?: any) {
+  network = network ?? getNetwork();
   return {
     ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
-    GovernQueue: GovernQueueAbi,
-    ERC20: ERC20Abi,
+    GovernQueue,
+    ERC20,
   };
 }
 
 // account is optional
 // returns null on errors
 function useContract(contractName: string, addressOverride?: string, withSignerIfPossible = true) {
-  const { account, ethers } = useWallet();
+  let account: any;
+  if (withSignerIfPossible) account = useWallet().account;
+  const network = getNetwork();
+  if (!contracts) contracts = getContractsJson(network);
+  const askedContract = contracts[contractName];
+  const contractAddress = addressOverride ?? askedContract.address;
+  const contractAbi = askedContract.abi ?? askedContract;
+  const provider = getDefaultProvider();
 
-  return useMemo(() => {
-    const network = getNetwork();
-    contracts = getContractsJson(network);
-    const askedContract = contracts[contractName];
-    const contractAddress = addressOverride ?? askedContract.address;
-    const contractAbi = askedContract.abi ?? askedContract;
+  const handleGetContract = () => {
     if (!contractAddress) Logger.warn('Address was not defined for contract ', contractName);
-    if (!contractAddress || !contractAbi || !ethers) return null;
+    if (!contractAddress || !contractAbi || !provider) return null;
     try {
-      const contract = getContract(
+      return getContract(
         contractAddress,
         contractAbi,
-        withSignerIfPossible && ethers ? ethers : undefined,
+        provider,
         withSignerIfPossible && account ? account : undefined,
       );
-
-      return contract;
     } catch (error) {
       Logger.error('Failed to get contract', error);
       return null;
     }
-  }, [ethers, withSignerIfPossible, account]);
+  };
+
+  if (!withSignerIfPossible) {
+    return handleGetContract();
+  }
+
+  return useMemo(
+    () => handleGetContract(),
+    [contractAddress, contractAbi, provider, withSignerIfPossible, account],
+  );
 }
 
 export function useFactoryContract() {
@@ -85,6 +92,16 @@ export function useGovernQueueContract() {
   return useContract('GovernQueue');
 }
 
-export function useERC20Contract(token: Token) {
-  return useContract('ERC20', token.address, false);
+export function useERC20Contract(token: Token, withSignerIfPossible = true) {
+  return useContract('ERC20', token.address, withSignerIfPossible);
+}
+
+export async function getBalanceOf(token: Token, address: string) {
+  const contract = useERC20Contract(token, false);
+  if (!contract) return null;
+  const balance = await contract.balanceOf(address);
+  return {
+    token,
+    amount: fromBigNumber(balance, token.decimals),
+  };
 }

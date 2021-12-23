@@ -1,6 +1,8 @@
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, ethers, ethers as ethersUtil } from 'ethers';
 import { noop } from 'lodash-es';
+import { getProvider } from 'src/ethereum-providers';
 import { TokenAmount } from 'src/models/token-amount';
+import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import { IS_DEV } from '../constants';
@@ -11,8 +13,7 @@ import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
 
-function getWeb3() {
-  // @ts-ignore
+export function getWeb3(): Web3 {
   let ethereum: any = null;
   let web3: any = null;
 
@@ -29,14 +30,14 @@ function getWeb3() {
     }
   }
 
-  return { web3, ethereum };
+  return web3;
 }
 
 export async function isConnected() {
   return new Promise((res) => {
-    if (!getWeb3().web3?.eth) res(false);
+    if (!getWeb3()?.eth) res(false);
     else
-      getWeb3().web3.eth.getAccounts((err: Error, accounts: any[]) => {
+      getWeb3().eth.getAccounts((err: Error, accounts: any[]) => {
         if (accounts.length !== 0) res(true);
         else {
           if (err != null) Logger.error(`An error occurred: ${err}`);
@@ -95,12 +96,12 @@ export function getNetworkName(chainId = getDefaultChain()) {
 }
 
 export function createContractAccount() {
-  return getWeb3()?.web3.eth.accounts.create();
+  return getWeb3()?.eth.accounts.create();
 }
 
 export async function getCurrentAccount(): Promise<string | undefined> {
   return new Promise((res) => {
-    getWeb3()?.web3.eth.getAccounts((error: Error, result: any[]) => {
+    getWeb3()?.eth.getAccounts((error: Error, result: any[]) => {
       if (error) {
         if (IS_DEV) Logger.error(error);
         res(undefined);
@@ -116,12 +117,6 @@ const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
 
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-// Detect Ethereum addresses in a string and transform each part.
-//
-// `callback` is called on every part with two params:
-//   - The string of the current part.
-//   - A boolean indicating if it is an address.
-//
 export function transformAddresses(str: string, callback: Function = noop) {
   return str
     .split(ETH_ADDRESS_SPLIT_REGEX)
@@ -142,7 +137,7 @@ export async function sendTransaction(to: string, amount: TokenAmount, onComplet
     );
   return new Promise((res, rej) =>
     getWeb3()
-      ?.web3.eth.sendTransaction({
+      ?.eth.sendTransaction({
         from,
         to,
         value: toWei(amount.amount.toString(), 'ether'),
@@ -154,17 +149,26 @@ export async function sendTransaction(to: string, amount: TokenAmount, onComplet
   );
 }
 
-export function checkConnection() {
-  // Check if User is already connected by retrieving the accounts
-  getWeb3()?.ethereum.request({ method: 'eth_requestAccounts' });
-}
-
 export function toBigNumber(amount: TokenAmount) {
-  return ethers.utils.parseUnits(amount.amount.toString(), amount.token.decimals);
+  const { defaultToken } = getNetwork();
+  if (!amount.token) {
+    amount.token = amount.token ?? defaultToken;
+  }
+  return ethers.utils.parseUnits(amount.amount.toString(), amount.token!.decimals);
 }
 
 export function fromBigNumber(bigNumber: BigNumber, decimals: number) {
   return bigNumber.div(BigNumber.from(10).pow(decimals)).toNumber();
+}
+
+export function getDefaultProvider() {
+  const ethOrWeb = (window as any).ethereum ?? (window as any).web3;
+  if (!ethOrWeb)
+    Logger.error(
+      "Can't load provider, no provider connected ... (Try to install metamask)",
+      getProvider('unknown')?.link?.default,
+    );
+  return ethOrWeb && new ethersUtil.providers.Web3Provider(ethOrWeb);
 }
 
 // Re-export some web3-utils functions
