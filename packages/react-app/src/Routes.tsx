@@ -1,5 +1,5 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
-import DetailedView from './components/shared/detailed-view';
+import QuestDetail from './components/shared/quest-detail';
 import QuestList from './components/shared/quest-list';
 import { PAGES } from './constants';
 
@@ -9,7 +9,7 @@ export default function Routes() {
       <Redirect exact from="/" to="/home" />
       <Redirect exact from={`/${PAGES.List}`} to="/home" />
       <Route path="/home" component={QuestList} />
-      <Route path={`/${PAGES.Detail}`} component={DetailedView} />
+      <Route path={`/${PAGES.Detail}`} component={QuestDetail} />
     </Switch>
   );
 }
