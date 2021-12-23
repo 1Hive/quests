@@ -14,7 +14,6 @@ import { Logger } from './logger';
 const DEFAULT_LOCAL_CHAIN = 'private';
 
 export function getWeb3(): Web3 {
-  // @ts-ignore
   let ethereum: any = null;
   let web3: any = null;
 
@@ -118,12 +117,6 @@ const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
 
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-// Detect Ethereum addresses in a string and transform each part.
-//
-// `callback` is called on every part with two params:
-//   - The string of the current part.
-//   - A boolean indicating if it is an address.
-//
 export function transformAddresses(str: string, callback: Function = noop) {
   return str
     .split(ETH_ADDRESS_SPLIT_REGEX)

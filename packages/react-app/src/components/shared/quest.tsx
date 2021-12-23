@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { DEFAULT_AMOUNT, PAGES, QUEST_MODE, QUEST_SUMMARY_MAX_CHARACTERS } from 'src/constants';
+import { PAGES, QUEST_MODE, QUEST_SUMMARY_MAX_CHARACTERS } from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestData } from 'src/models/quest-data';
 import { TokenAmount } from 'src/models/token-amount';
@@ -79,7 +79,6 @@ export default function Quest({
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmount | null>();
-  const [claimDeposit, setClaimDeposit] = useState(DEFAULT_AMOUNT);
   const toast = useToast();
   const questFactoryContract = useFactoryContract();
 
@@ -101,7 +100,7 @@ export default function Quest({
   return (
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
       <Formik
-        initialValues={{ fallbackAddress: wallet.account, claimDeposit, ...data }}
+        initialValues={{ fallbackAddress: wallet.account, ...data }}
         validateOnBlur
         validationSchema={Yup.object().shape({
           description: Yup.string().required(),

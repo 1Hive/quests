@@ -52,8 +52,6 @@ function AmountFieldInput({
 
   if (!value.token) value.token = defaultToken;
 
-  useEffect(() => {}, []);
-
   const onAmountChange = (e: any) => {
     const newValue = +e.target.value;
     setAmount(newValue);

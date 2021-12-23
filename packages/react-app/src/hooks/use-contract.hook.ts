@@ -1,11 +1,11 @@
-import { Contract, ContractInterface, ethers as ethersUtil } from 'ethers';
+import { Contract, ContractInterface } from 'ethers';
 import { useMemo } from 'react';
 import { Token } from 'src/models/token';
 import { Logger } from 'src/utils/logger';
 import { fromBigNumber, getDefaultProvider } from 'src/utils/web3.utils';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20 from '../contracts/ERC20.json';
-import GovernQueueAbi from '../contracts/GovernQueue.json';
+import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
 import { useWallet } from '../providers/wallet.context';
@@ -41,7 +41,7 @@ function getContractsJson(network?: any) {
   network = network ?? getNetwork();
   return {
     ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
-    GovernQueue: GovernQueueAbi,
+    GovernQueue,
     ERC20,
   };
 }
