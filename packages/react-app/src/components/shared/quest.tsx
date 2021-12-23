@@ -24,7 +24,6 @@ import { useWallet } from 'use-wallet';
 import * as Yup from 'yup';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
-import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import IdentityBadge from './identity-badge';
@@ -84,6 +83,7 @@ export default function Quest({
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [bounty, setBounty] = useState<TokenAmount>();
   const [claimDeposit, setClaimDeposit] = useState(DEFAULT_AMOUNT);
   const toast = useToast();
