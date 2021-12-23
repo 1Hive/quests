@@ -235,15 +235,15 @@ export default function Quest({
               }
               secondary={
                 <Outset gu16>
-                  <AmountFieldInputFormik
+                  {/* <AmountFieldInputFormik
                     id="bounty"
                     label={questMode === QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
                     isEdit={isEdit}
                     value={bounty}
                     isLoading={loading || (!isEdit && !bounty)}
                     formik={formRef}
-                  />
-                  {!isEdit && (
+                  /> */}
+                  {/* {!isEdit && (
                     <AmountFieldInput
                       id="claimDeposit"
                       label="Claim deposit"
@@ -251,7 +251,7 @@ export default function Quest({
                       value={claimDeposit || (!isEdit && !claimDeposit)}
                       isLoading={loading}
                     />
-                  )}
+                  )} */}
                   {/* {(!!values.tags?.length || editMode) && (
                     <TagFieldInputFormik
                       id="tags"
