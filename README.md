@@ -4,6 +4,8 @@
 [![codecov](https://codecov.io/gh/1hive/quests/branch/main/graph/badge.svg?token=IDwI3r7ExZ)](https://codecov.io/gh/1hive/quests)
 [![CodeQL](https://github.com/1Hive/quests/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/1Hive/quests/actions/workflows/codeql-analysis.yml)
 
+### STAGE : _MVP_
+
 Quests is a bounty board for 1Hive swarms.
 
 ## Setup & Launch
@@ -43,6 +45,7 @@ yarn start
 - Play quest
 - Create quest
 - Fund quest
+- Challenge quest
 
 #### Connect
 
