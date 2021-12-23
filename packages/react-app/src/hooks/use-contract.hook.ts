@@ -86,5 +86,5 @@ export function useGovernQueueContract() {
 }
 
 export function useERC20Contract(token: Token) {
-  return useContract('ERC20', token.address);
+  return useContract('ERC20', token.address, false);
 }
