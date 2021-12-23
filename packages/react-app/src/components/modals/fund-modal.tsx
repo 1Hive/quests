@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
+import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import * as QuestService from '../../services/quest.service';
@@ -25,8 +26,8 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const toast = useToast();
-  // TODO : take token from fundAmount
-  const contractERC20 = useERC20Contract(DEFAULT_AMOUNT.token);
+  const { defaultToken } = getNetwork();
+  const contractERC20 = useERC20Contract(defaultToken);
   const onModalClose = () => {
     setOpened(false);
     onClose();

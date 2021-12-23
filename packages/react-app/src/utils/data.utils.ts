@@ -1,13 +1,18 @@
 import { Fund } from 'src/models/fund';
 import { Token } from 'src/models/token';
 import { TokenAmount } from 'src/models/token-amount';
+import { getNetwork } from 'src/networks';
 import { TOKENS } from '../constants';
 import { Logger } from './logger';
 
 export async function convertTo(from: TokenAmount, toToken: Token) {
+  const { defaultToken } = getNetwork();
+  if (!from?.token) {
+    from.token = defaultToken;
+  }
   const res = await fetch(
     `https://coingecko.p.rapidapi.com/simple/price?ids=${[
-      from.token.symb,
+      from.token!.symb,
       toToken.symb,
     ]}&vs_currencies=usd`,
     {

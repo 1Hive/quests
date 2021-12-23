@@ -1,4 +1,3 @@
-import { Contract } from 'ethers';
 import { request } from 'graphql-request';
 import { Filter } from 'src/models/filter';
 import { QuestData } from 'src/models/quest-data';
@@ -7,8 +6,7 @@ import { getNetwork } from 'src/networks';
 import { QuestEntitiesQuery } from 'src/queries/quest-entities.query';
 import { QuestEntityQuery } from 'src/queries/quest-entity.query';
 import { toAscii, toChecksumAddress } from 'web3-utils';
-import { DEFAULT_AMOUNT, DEFAULT_TOKEN, GQL_MAX_INT, TOKENS } from '../constants';
-import ERC20Abi from '../contracts/ERC20.json';
+import { DEFAULT_AMOUNT, GQL_MAX_INT, TOKENS } from '../constants';
 import { wrapError } from '../utils/errors.util';
 import { Logger } from '../utils/logger';
 import { toBigNumber, toHex } from '../utils/web3.utils';
@@ -18,13 +16,17 @@ let questList: QuestData[] = [];
 
 // #region Private
 function mapQuest(questEntity: any) {
+  const { defaultToken } = getNetwork();
   try {
     const quest = {
       address: toChecksumAddress(questEntity.questAddress),
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
-      rewardTokenAddress: questEntity.questRewardTokenAddress,
+      rewardToken: {
+        ...defaultToken,
+        address: questEntity.questRewardTokenAddress,
+      },
       expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
     } as QuestData;
     if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
@@ -124,13 +126,12 @@ export function getTagSuggestions() {
 }
 
 // TODO : To verify
-export async function fetchAvailableBounty(quest: QuestData, account: any) {
-  if (!quest?.rewardTokenAddress) return DEFAULT_AMOUNT;
-  const contract = new Contract(quest.rewardTokenAddress, ERC20Abi, account);
-  const balance = await contract.balanceOf(quest.address);
+export async function fetchAvailableBounty(quest: QuestData, erc20Contract: any) {
+  if (!quest?.rewardToken) return DEFAULT_AMOUNT;
+  const balance = await erc20Contract.balanceOf(quest.address);
   return {
     amount: balance.toString(),
-    token: DEFAULT_TOKEN,
+    token: quest.rewardToken,
   } as TokenAmount;
 }
 

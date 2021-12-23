@@ -1,3 +1,4 @@
+import { Token } from './token';
 import { TokenAmount } from './token-amount';
 
 export type QuestData = {
@@ -10,7 +11,7 @@ export type QuestData = {
   // Computed
   address?: string;
   bounty?: TokenAmount;
-  rewardTokenAddress?: string;
+  rewardToken?: Token;
   detailsRefIpfs?: string;
   creatorAddress?: string;
 };

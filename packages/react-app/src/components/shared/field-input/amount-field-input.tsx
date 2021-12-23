@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { TokenAmount } from 'src/models/token-amount';
+import { getNetwork } from 'src/networks';
 import styled from 'styled-components';
 
 // #region StyledComponents
@@ -43,10 +44,15 @@ function AmountFieldInput({
   wide = false,
   formik,
 }: Props) {
+  const { defaultToken } = getNetwork();
   const [amount, setAmount] = useState(value.amount);
   useEffect(() => {
     setAmount(value.amount);
   }, [value.amount]);
+
+  if (!value.token) value.token = defaultToken;
+
+  useEffect(() => {}, []);
 
   const onAmountChange = (e: any) => {
     const newValue = +e.target.value;
@@ -77,8 +83,8 @@ function AmountFieldInput({
             )}
           </AmountStyled>
           <TokenBadge
-            symbol={value.token.symb}
-            address={value.token.address}
+            symbol={value.token!.symb}
+            address={value.token!.address}
             networkType="private"
           />
         </LineStyled>

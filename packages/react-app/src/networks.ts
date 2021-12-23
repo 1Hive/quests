@@ -1,6 +1,7 @@
 import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getDefaultChain } from './local-settings';
 import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
+import { TOKENS } from './constants';
 
 const networks = {
   mainnet: {
@@ -19,6 +20,7 @@ const networks = {
     questFactory: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     govern: '0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697',
     governQueue: '0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697',
+    defaultToken: TOKENS.Honey,
   },
   xdai: {
     chainId: 100,
