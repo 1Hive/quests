@@ -65,7 +65,7 @@ function useContract(contractName: string, addressOverride?: string, withSignerI
       const contract = getContract(
         contractAddress,
         contractAbi,
-        ethers,
+        withSignerIfPossible && ethers ? ethers : undefined,
         withSignerIfPossible && account ? account : undefined,
       );
 
