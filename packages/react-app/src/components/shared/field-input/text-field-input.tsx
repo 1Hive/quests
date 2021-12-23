@@ -2,6 +2,7 @@ import { Field, TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+// eslint-disable-next-line import/no-unresolved
 import parse from 'html-react-parser';
 import styled from 'styled-components';
 

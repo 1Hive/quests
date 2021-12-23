@@ -18,6 +18,7 @@ function App() {
   };
 
   return (
+    // Trigger sentry.io
     <ErrorBoundary>
       <WalletProvider>
         <Main assetsUrl="/aragon-ui/" layout={false} scrollView={false} theme={currentTheme}>
