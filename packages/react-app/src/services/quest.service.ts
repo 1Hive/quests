@@ -16,7 +16,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { DEAULT_CLAIM_EXECUTION_DELAY, CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
-import { fromBigNumber, toBigNumber, toHex } from '../utils/web3.utils';
+import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { isDelayOver } from '../utils/date.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
@@ -130,7 +130,7 @@ async function getContainer(claimData: ClaimModel, execTime?: number): Promise<C
   const executionTime = execTime ?? currentBlock.timestamp + DEAULT_CLAIM_EXECUTION_DELAY + 60;
 
   // Claim user data
-  const evidenceIpfsHash = toHex(await pushObjectToIpfs(claimData.evidence));
+  const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = getQuestContractInterface().encodeFunctionData('claim', [
     evidenceIpfsHash,
     claimData.playerAddress,
@@ -211,7 +211,7 @@ export async function saveQuest(
     const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
     const tx = await questFactoryContract.createQuest(
       data.title,
-      toHex(ipfsHash), // Push description to IPFS and push hash to quest contract
+      ipfsHash, // Push description to IPFS and push hash to quest contract
       TOKENS.Honey.address,
       questExpireTimeUtcSec,
       fallbackAddress,
@@ -249,7 +249,6 @@ export async function executeQuestClaim(
   execTime?: number,
 ) {
   const container = await getContainer(claimData, execTime);
-
   Logger.debug('Executing claim ...', { container, claimData });
   // const tx = await governQueueContract.execute(container);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
@@ -259,9 +258,9 @@ export async function executeQuestClaim(
 
 export async function challengeQuestClaim(governQueueContract: any, challenge: ChallengeModel) {
   const container = await getContainer(challenge.claim);
-
-  Logger.debug('Executing challenge ...', { container, claimData: challenge });
-  // const tx = await governQueueContract.challenge(container, );
+  Logger.debug('Executing challenge ...', { container, challenge });
+  // const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
+  // const tx = await governQueueContract.challenge(container, challengeReasonIpfs);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
   // Logger.info(logs);
   Logger.info(`Claim challenged`);
@@ -292,7 +291,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         const [evidenceIpfsHash, playerAddress, claimAmount] =
           getQuestContractInterface().decodeFunctionData('claim', claimAction.data);
 
-        const evidence = await getObjectFromIpfs(toAscii(evidenceIpfsHash));
+        const evidence = await getObjectFromIpfs(evidenceIpfsHash);
 
         return {
           claimAmount: { token: quest.rewardToken, amount: +claimAmount },

@@ -1,5 +1,6 @@
 import ipfsAPI, { Options } from 'ipfs-http-client';
 import { Logger } from 'src/utils/logger';
+import { toAscii, toHex } from 'web3-utils';
 
 const config = {
   host: 'ipfs.infura.io',
@@ -15,12 +16,12 @@ export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
   const response = await ipfs.add(obj.toString());
   const cid = response.cid.toString();
   Logger.debug('New IPFS at address', cid);
-  return cid;
+  return toHex(cid);
 };
 
-export const getObjectFromIpfs = async (objHash: string) => {
+export const getObjectFromIpfs = async (objHasHex: string) => {
   // eslint-disable-next-line no-restricted-syntax
-  for await (const value of ipfs.get(objHash)) {
+  for await (const value of ipfs.get(toAscii(objHasHex))) {
     const decodedSplit = new TextDecoder('utf-8')
       .decode(value)
       .trim()
