@@ -11,12 +11,14 @@ import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
+import { Outset } from '../shared/utils/spacer-util';
 
 // #region StyledComponents
 
 const FormStyled = styled(Form)`
   width: 100%;
 `;
+
 // #endregion
 
 type Props = {
@@ -37,7 +39,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
 
   return (
     <ModalBase
-      title="Challenge"
+      title="Challenge quest"
       openButton={
         <Button
           icon={<IconFlag />}
@@ -47,6 +49,14 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
         />
       }
       buttons={[
+        <AmountFieldInputFormik
+          id="challengeDeposit"
+          label="Challenge Deposit"
+          isEdit={false}
+          isLoading={loading}
+          value={claim.challengeDeposit}
+          compact
+        />,
         <Button
           key="confirmButton"
           icon={<IconFlag />}
@@ -62,11 +72,16 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
       <Formik
         initialValues={{ reason: '' }}
         onSubmit={(values, { setSubmitting }) => {
-          setTimeout(async () => {
-            if (values.reason) {
+          const errors = [];
+          if (!values.reason) errors.push('Reason is required');
+          if (errors.length) {
+            errors.forEach(toast);
+          } else {
+            setTimeout(async () => {
               try {
                 setLoading(true);
-                toast('Quest claim challenging ...');
+                // toast('Quest claim challenging ...');
+                toast('Comming soon ...');
                 await QuestService.challengeQuestClaim(governQueueContract, {
                   claim,
                   reason: values.reason,
@@ -84,30 +99,25 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
                 setSubmitting(false);
                 setLoading(false);
               }
-            }
-          }, 400);
+            }, 400);
+          }
         }}
       >
         {({ values, handleSubmit, handleChange }) => (
-          <FormStyled id="form-claim" onSubmit={handleSubmit} ref={formRef}>
-            <TextFieldInput
-              id="reason"
-              isEdit
-              label="Reason of challenge"
-              isLoading={loading}
-              value={values.reason}
-              onChange={handleChange}
-              multiline
-              wide
-              css={{ height: 100 }}
-            />
-            <AmountFieldInputFormik
-              id="challengeDeposit"
-              label="Challenge Deposit"
-              isEdit={false}
-              isLoading={loading}
-              value={claim.challengeDeposit}
-            />
+          <FormStyled id="form-challenge" onSubmit={handleSubmit} ref={formRef}>
+            <Outset gu16>
+              <TextFieldInput
+                id="reason"
+                isEdit
+                label="Reason of challenge"
+                isLoading={loading}
+                value={values.reason}
+                onChange={handleChange}
+                multiline
+                wide
+                css={{ height: 100 }}
+              />
+            </Outset>
           </FormStyled>
         )}
       </Formik>

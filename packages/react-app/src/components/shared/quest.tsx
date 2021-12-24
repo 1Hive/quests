@@ -1,4 +1,13 @@
-import { AddressField, Button, Card, GU, IconPlus, Split, useToast } from '@1hive/1hive-ui';
+import {
+  AddressField,
+  Button,
+  Card,
+  GU,
+  IconPlus,
+  Split,
+  useToast,
+  TransactionProgress,
+} from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
@@ -14,7 +23,6 @@ import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
-import * as Yup from 'yup';
 import { fetchClaimDeposit } from 'src/services/quest.service';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
@@ -256,46 +264,53 @@ export default function Quest({
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
       <Formik
         initialValues={{ fallbackAddress: wallet.account, ...data }}
-        validateOnBlur
-        validationSchema={Yup.object().shape({
-          description: Yup.string().required(),
-          title: Yup.string().required(),
-        })}
         onSubmit={(values, { setSubmitting }) => {
-          setTimeout(async () => {
-            setLoading(true);
-            try {
-              // Set noon to prevent rounding form changing date
-              const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
-              toast('Quest creating ...');
-              if (!questFactoryContract) {
-                Logger.error(
-                  'QuestFactory contract was not loaded correctly (maybe account is disabled)',
+          const errors = [];
+          if (!values.description) errors.push('Description is required');
+          if (!values.title) errors.push('Title is required');
+          if (!values.fallbackAddress) errors.push('Funds fallback address is required');
+          if (values.expireTimeMs < Date.now()) errors.push('Expiration have to be later than now');
+
+          if (errors.length) {
+            errors.forEach(toast);
+          } else {
+            setTimeout(async () => {
+              setLoading(true);
+              try {
+                // Set noon to prevent rounding form changing date
+                const timeValue =
+                  new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
+                toast('Quest creating ...');
+                if (!questFactoryContract) {
+                  Logger.error(
+                    'QuestFactory contract was not loaded correctly (maybe account is disabled)',
+                  );
+                }
+                const createdQuestAddress = await QuestService.saveQuest(
+                  questFactoryContract,
+                  values.fallbackAddress!,
+                  { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
+                );
+                if (!createdQuestAddress) throw Error();
+                if (values.bounty?.amount) {
+                  toast('Quest funding ...');
+                  await QuestService.fundQuest(erc20Contract, createdQuestAddress, values.bounty);
+                }
+                toast('Quest created successfully');
+                onSave(createdQuestAddress);
+              } catch (e: any) {
+                Logger.error(e);
+                toast(
+                  !e?.message || e.message.includes('\n') || e.message.length > 75
+                    ? 'Oops. Something went wrong.'
+                    : e.message,
                 );
               }
-              const createdQuestAddress = await QuestService.saveQuest(
-                questFactoryContract,
-                values.fallbackAddress!,
-                { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
-              );
-              if (values.bounty?.amount) {
-                toast('Quest funding ...');
-                await QuestService.fundQuest(erc20Contract, createdQuestAddress, values.bounty);
-              }
-              toast('Quest created successfully');
-              onSave(createdQuestAddress);
-            } catch (e: any) {
-              Logger.error(e);
-              toast(
-                e.message.includes('\n') || e.message.length > 50
-                  ? 'Oops. Something went wrong.'
-                  : e.message,
-              );
-            }
 
-            setSubmitting(false);
-            setLoading(false);
-          }, 400);
+              setSubmitting(false);
+              setLoading(false);
+            }, 0);
+          }
         }}
       >
         {({ values, handleChange, handleSubmit }) =>

@@ -50,7 +50,7 @@ export default function ClaimList({ quest }: Props) {
   return (
     <WrapperStyled>
       <Outset>
-        {claims && (
+        {!!claims?.length && (
           <Accordion
             items={claims.map((x: ClaimModel) => [
               <RowStyled>

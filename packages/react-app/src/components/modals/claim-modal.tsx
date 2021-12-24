@@ -14,12 +14,14 @@ import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
+import { Outset } from '../shared/utils/spacer-util';
 
 // #region StyledComponents
 
 const FormStyled = styled(Form)`
   width: 100%;
 `;
+
 // #endregion
 
 type Props = {
@@ -42,7 +44,7 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
 
   return (
     <ModalBase
-      title="Claim"
+      title="Claim quest"
       openButton={
         <Button
           icon={<GiBroadsword />}
@@ -52,6 +54,14 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
         />
       }
       buttons={[
+        <AmountFieldInputFormik
+          id="claimDeposit"
+          label="Claim Deposit"
+          isEdit={false}
+          isLoading={loading}
+          value={claimDeposit}
+          compact
+        />,
         <Button
           key="confirmButton"
           icon={<GiBroadsword />}
@@ -67,11 +77,17 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
       <Formik
         initialValues={{ evidence: '', claimedAmount: DEFAULT_AMOUNT }}
         onSubmit={(values, { setSubmitting }) => {
-          setTimeout(async () => {
-            if (values.claimedAmount && values.evidence && questAddress) {
+          const errors = [];
+          if (!values.claimedAmount?.amount) errors.push('Claimed amount is required');
+          if (!values.evidence) errors.push('Evidence of completion is required');
+          if (errors.length) {
+            errors.forEach(toast);
+          } else {
+            setTimeout(async () => {
               try {
                 setLoading(true);
-                toast('Quest claiming ...');
+                // toast('Quest claiming ...');
+                toast('Comming soon ...');
                 await QuestService.scheduleQuestClaim(governQueueContract, {
                   claimAmount: values.claimedAmount,
                   evidence: values.evidence,
@@ -79,7 +95,7 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
                   questAddress,
                 });
                 onModalClose();
-                toast('Operation succeed');
+                // toast('Operation succeed');
               } catch (e: any) {
                 Logger.error(e);
                 toast(
@@ -91,37 +107,32 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
                 setSubmitting(false);
                 setLoading(false);
               }
-            }
-          }, 400);
+            }, 0);
+          }
         }}
       >
         {({ values, handleSubmit, handleChange }) => (
           <FormStyled id="form-claim" onSubmit={handleSubmit} ref={formRef}>
-            <TextFieldInput
-              id="evidence"
-              isEdit
-              label="Evidence of completion"
-              isLoading={loading}
-              value={values.evidence}
-              onChange={handleChange}
-              multiline
-              wide
-              css={{ height: 100 }}
-            />
-            <AmountFieldInputFormik
-              id="claimedAmount"
-              isEdit
-              label="Claimed amount"
-              isLoading={loading}
-              value={values.claimedAmount}
-            />
-            <AmountFieldInputFormik
-              id="claimDeposit"
-              label="Claim Deposit"
-              isEdit={false}
-              isLoading={loading}
-              value={claimDeposit}
-            />
+            <Outset gu16>
+              <TextFieldInput
+                id="evidence"
+                isEdit
+                label="Evidence of completion"
+                isLoading={loading}
+                value={values.evidence}
+                onChange={handleChange}
+                multiline
+                wide
+                css={{ height: 100 }}
+              />
+              <AmountFieldInputFormik
+                id="claimedAmount"
+                isEdit
+                label="Claimed amount"
+                isLoading={loading}
+                value={values.claimedAmount}
+              />
+            </Outset>
           </FormStyled>
         )}
       </Formik>

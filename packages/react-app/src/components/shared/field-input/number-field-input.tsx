@@ -1,6 +1,15 @@
 import { Field, TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import Skeleton from 'react-loading-skeleton';
+import styled from 'styled-components';
+
+// #region StyledComponents
+
+const FieldStyled = styled(Field)`
+  ${({ compact }: any) => (compact ? 'margin:0' : '')}
+`;
+
+// #endregion
 
 type Props = {
   id?: string;
@@ -15,6 +24,7 @@ type Props = {
   value?: number;
   wide?: boolean;
   suffix?: string;
+  compact?: boolean;
 };
 
 export default function NumberFieldInput({
@@ -30,6 +40,7 @@ export default function NumberFieldInput({
   min,
   isRequired = false,
   suffix = '',
+  compact = false,
 }: Props) {
   let content;
   if (isEdit)
@@ -47,8 +58,8 @@ export default function NumberFieldInput({
     );
   else content = value + suffix;
   return (
-    <Field label={label} key={id}>
+    <FieldStyled label={label} key={id} compact={compact}>
       {isLoading ? <Skeleton /> : content}
-    </Field>
+    </FieldStyled>
   );
 }

@@ -7,9 +7,15 @@ import parse from 'html-react-parser';
 import styled from 'styled-components';
 
 // #region Styled
+
 const TextContainerStyled = styled.div`
   white-space: pre-wrap;
 `;
+
+const FieldStyled = styled(Field)`
+  ${({ compact }: any) => (compact ? 'margin:0' : '')}
+`;
+
 // #endregion
 
 type Props = {
@@ -26,6 +32,7 @@ type Props = {
   autoLinks?: boolean;
   fontSize?: string;
   rows?: number;
+  compact?: boolean;
   css?: React.CSSProperties;
 };
 export default function TextFieldInput({
@@ -42,13 +49,14 @@ export default function TextFieldInput({
   multiline = false,
   autoLinks = false,
   rows = 10,
+  compact = false,
   css,
 }: Props) {
   if (isLoading)
     return (
-      <Field label={label} key={id}>
+      <FieldStyled label={label} key={id} compact={compact}>
         <Skeleton />
-      </Field>
+      </FieldStyled>
     );
   const content = value.substring(0, maxLength);
   const readOnlyContent = (
@@ -56,7 +64,7 @@ export default function TextFieldInput({
       {autoLinks
         ? parse(content.replace(/(https?:\/\/)([^ ]+)/g, '<a target="_blank" href="$&">$2</a>'))
         : content}
-      {maxLength && value.length > maxLength && '...'}
+      {maxLength && value.length > maxLength && <span title={value}>...</span>}
     </>
   );
   const loadableContent = isEdit ? (
@@ -67,7 +75,7 @@ export default function TextFieldInput({
       onChange={onChange}
       placeHolder={placeHolder}
       multiline={multiline}
-      style={{ ...css, fontSize }}
+      style={css}
       rows={rows}
     />
   ) : (

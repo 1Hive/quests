@@ -5,10 +5,17 @@ import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { dateFormat } from '../../../utils/date.utils';
 
+// #region StyledComponents
 const InputStyled = styled.input`
   background-color: ${({ background }: any) => background};
   border: none;
 `;
+
+const FieldStyled = styled(Field)`
+  ${({ compact }: any) => (compact ? 'margin:0' : '')}
+`;
+
+// #endregion
 
 type Props = {
   id: string;
@@ -18,6 +25,7 @@ type Props = {
   onChange?: Function;
   value?: number;
   css?: CSSProperties;
+  compact?: boolean;
 };
 
 export default function DateFieldInput({
@@ -28,14 +36,15 @@ export default function DateFieldInput({
   value = Date.now(),
   onChange = noop,
   css,
+  compact = false,
 }: Props) {
   const theme = useTheme();
 
   if (isLoading)
     return (
-      <Field label={label} key={id}>
+      <FieldStyled label={label} key={id} compact={compact}>
         <Skeleton />
-      </Field>
+      </FieldStyled>
     );
 
   const valFormat = dateFormat(value, 'iso');

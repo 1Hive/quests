@@ -14,6 +14,7 @@ import { BigNumber, ethers } from 'ethers';
 import { ConfigModel, ContainerModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
+import { noop } from 'lodash';
 import { DEAULT_CLAIM_EXECUTION_DELAY, CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -203,6 +204,7 @@ export async function saveQuest(
   fallbackAddress: string,
   data: Partial<QuestModel>,
   address?: string,
+  onTrx?: (hash: string) => void,
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (questFactoryContract) {
@@ -216,54 +218,75 @@ export async function saveQuest(
       questExpireTimeUtcSec,
       fallbackAddress,
     );
-    Logger.info('TX HASH', tx.hash);
-    const receipt = await tx.wait();
-    const questDeployedAddress = receipt?.events[0]?.args[0];
+    onTrx?.(tx.hash);
+    Logger.info('TRX hash', tx.hash);
+    const receipt = (await tx.wait()) as ethers.ContractReceipt;
+    Logger.info('TRX logs', receipt.logs);
 
-    return questDeployedAddress;
+    return (receipt?.events?.[0] as any)?.args?.[0] ?? null;
   }
 
   return null;
 }
 
-export function fundQuest(contractERC20: any, questAddress: string, amount: TokenAmountModel) {
-  return contractERC20.transfer(questAddress, toBigNumber(amount));
+export async function fundQuest(
+  contractERC20: any,
+  questAddress: string,
+  amount: TokenAmountModel,
+  onTrx?: (hash: string) => void,
+) {
+  const tx = await contractERC20.transfer(questAddress, toBigNumber(amount));
+  onTrx?.(tx.hash);
+  await tx.wait();
+  Logger.info('TX HASH', tx.hash);
 }
 
 export async function scheduleQuestClaim(
   governQueueContract: any,
   claimData: ClaimModel,
   execTime?: number,
+  onTrx?: (hash: string) => void,
 ) {
   const container = await getContainer(claimData, execTime);
   Logger.debug('Scheduling claim ...', { container, claimData });
   // const tx = await governQueueContract.schedule(container);
+  // onTrx?.(tx.hash);
+  // Logger.info('TRX hash', tx.hash);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
-  // Logger.info(logs);
-  Logger.debug(`Claim scheduled, execution time ${container.payload.executionTime}`);
+  // Logger.info('TRX logs', logs);
+  // Logger.debug(`Claim scheduled, execution time ${container.payload.executionTime}`);
 }
 
 export async function executeQuestClaim(
   governQueueContract: any,
   claimData: ClaimModel,
   execTime?: number,
+  onTrx?: Function,
 ) {
   const container = await getContainer(claimData, execTime);
   Logger.debug('Executing claim ...', { container, claimData });
   // const tx = await governQueueContract.execute(container);
+  // onTrx?.(tx.hash);
+  // Logger.info('TRX hash', tx.hash);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
-  // Logger.info(logs);
-  Logger.info(`Claim executed`);
+  // Logger.info('TRX logs', logs);
+  // Logger.info(`Claim executed`);
 }
 
-export async function challengeQuestClaim(governQueueContract: any, challenge: ChallengeModel) {
+export async function challengeQuestClaim(
+  governQueueContract: any,
+  challenge: ChallengeModel,
+  onTrx?: Function,
+) {
   const container = await getContainer(challenge.claim);
   Logger.debug('Executing challenge ...', { container, challenge });
   // const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
   // const tx = await governQueueContract.challenge(container, challengeReasonIpfs);
+  // onTrx?.(tx.hash);
+  // Logger.info('TRX hash', tx.hash);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
-  // Logger.info(logs);
-  Logger.info(`Claim challenged`);
+  // Logger.info('TRX logs', logs);
+  // Logger.info(`Claim challenged`);
 }
 
 export async function isQuestClaimScheduleEnded(questAddress: string, playerAddress: string) {

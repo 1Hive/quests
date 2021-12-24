@@ -19,6 +19,14 @@ const AmountStyled = styled.div`
   margin-right: ${GU}px;
 `;
 
+const FieldStyled = styled(Field)`
+  ${({ compact }: any) => (compact ? 'margin:0' : '')}
+`;
+
+const TokenBadgeStyled = styled(TokenBadge)`
+  width: fit-content;
+`;
+
 // #endregion
 
 type Props = {
@@ -31,6 +39,7 @@ type Props = {
   onChange?: Function;
   wide?: boolean;
   formik?: any;
+  compact?: boolean;
 };
 
 function AmountFieldInput({
@@ -43,6 +52,7 @@ function AmountFieldInput({
   onChange = noop,
   wide = false,
   formik,
+  compact = false,
 }: Props) {
   const { defaultToken } = getNetwork();
   const [amount, setAmount] = useState(value.amount);
@@ -61,7 +71,7 @@ function AmountFieldInput({
   };
 
   return (
-    <Field label={label} key={id}>
+    <FieldStyled label={label} key={id} compact={compact}>
       {isLoading ? (
         <Skeleton />
       ) : (
@@ -80,14 +90,14 @@ function AmountFieldInput({
               amount
             )}
           </AmountStyled>
-          <TokenBadge
+          <TokenBadgeStyled
             symbol={value.token!.symb}
             address={value.token!.address}
             networkType="private"
           />
         </LineStyled>
       )}
-    </Field>
+    </FieldStyled>
   );
 }
 
