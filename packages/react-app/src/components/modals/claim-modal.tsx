@@ -8,6 +8,7 @@ import { useWallet } from 'use-wallet';
 import { Formik, Form } from 'formik';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { Logger } from 'src/utils/logger';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import ModalBase from './modal-base';
 import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
@@ -23,10 +24,11 @@ const FormStyled = styled(Form)`
 
 type Props = {
   questAddress: string;
+  claimDeposit?: TokenAmountModel;
   onClose?: Function;
 };
 
-export default function ClaimModal({ questAddress, onClose = noop }: Props) {
+export default function ClaimModal({ questAddress, claimDeposit, onClose = noop }: Props) {
   const toast = useToast();
   const wallet = useWallet();
   const [loading, setLoading] = useState(false);
@@ -112,6 +114,13 @@ export default function ClaimModal({ questAddress, onClose = noop }: Props) {
               label="Claimed amount"
               isLoading={loading}
               value={values.claimedAmount}
+            />
+            <AmountFieldInputFormik
+              id="claimDeposit"
+              label="Claim Deposit"
+              isEdit={false}
+              isLoading={loading}
+              value={claimDeposit}
             />
           </FormStyled>
         )}

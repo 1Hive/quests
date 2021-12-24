@@ -42,6 +42,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
       buttons={
         <Button icon={<GiTwoCoins />} type="submit" form="form-fund" label="Fund" mode="strong" />
       }
+      onClose={onModalClose}
       isOpen={opened}
     >
       <Formik

@@ -25,6 +25,7 @@ type Props = {
   multiline?: boolean;
   autoLinks?: boolean;
   fontSize?: string;
+  rows?: number;
   css?: React.CSSProperties;
 };
 export default function TextFieldInput({
@@ -40,6 +41,7 @@ export default function TextFieldInput({
   wide = false,
   multiline = false,
   autoLinks = false,
+  rows = 10,
   css,
 }: Props) {
   if (isLoading)
@@ -66,6 +68,7 @@ export default function TextFieldInput({
       placeHolder={placeHolder}
       multiline={multiline}
       style={{ ...css, fontSize }}
+      rows={rows}
     />
   ) : (
     <TextContainerStyled style={{ ...css, fontSize }}>{readOnlyContent}</TextContainerStyled>

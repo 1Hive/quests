@@ -240,7 +240,9 @@ export default function Quest({
               {questMode !== QUEST_MODE.ReadSummary && questData.address && wallet.account && (
                 <ChildSpacer>
                   <FundModal questAddress={questData.address} />
-                  <ClaimModal questAddress={questData.address} />
+                  {claimDeposit && (
+                    <ClaimModal questAddress={questData.address} claimDeposit={claimDeposit} />
+                  )}
                 </ChildSpacer>
               )}
             </Outset>

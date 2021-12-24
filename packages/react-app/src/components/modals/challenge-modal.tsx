@@ -105,7 +105,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
               id="challengeDeposit"
               label="Challenge Deposit"
               isEdit={false}
-              isLoading={loading || !claim.challengeDeposit}
+              isLoading={loading}
               value={claim.challengeDeposit}
             />
           </FormStyled>
