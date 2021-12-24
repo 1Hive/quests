@@ -2,15 +2,10 @@
 import { Button, useToast, IconFlag } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useState, useRef } from 'react';
-import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
-import { useWallet } from 'use-wallet';
 import { Formik, Form } from 'formik';
-import { DEFAULT_AMOUNT } from 'src/constants';
 import { Logger } from 'src/utils/logger';
-import { ChallengeModel } from 'src/models/challenge.model';
 import { ClaimModel } from 'src/models/claim.model';
-import { TokenAmountModel } from 'src/models/token-amount.model';
 import ModalBase from './modal-base';
 import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';

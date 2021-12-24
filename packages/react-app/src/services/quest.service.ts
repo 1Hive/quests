@@ -4,23 +4,17 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { QuestEntityQuery, QuestEntitiesQuery } from 'src/queries/quest-entity.query';
-import { toAscii, toBN, toChecksumAddress } from 'web3-utils';
+import { toAscii, toChecksumAddress } from 'web3-utils';
 import {
+  fakeContainerResult,
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
-  fakeContainerResult,
 } from 'src/queries/govern-queue-entity.query';
 import { BigNumber, ethers } from 'ethers';
 import { ConfigModel, ContainerModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
-import {
-  DEAULT_CLAIM_EXECUTION_DELAY,
-  CLAIM_STATUS,
-  DEFAULT_AMOUNT,
-  GQL_MAX_INT,
-  TOKENS,
-} from '../constants';
+import { DEAULT_CLAIM_EXECUTION_DELAY, CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber, toHex } from '../utils/web3.utils';
 import { isDelayOver } from '../utils/date.utils';
@@ -89,35 +83,33 @@ async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel 
 
 async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
   const { governSubgraph, governQueue } = getNetwork();
-  // const result = await request(governSubgraph, GovernQueueEntityContainersQuery, {
-  //   ID: governQueue.toLowerCase(),
-  // });
-  // if (!result?.governQueue)
-  //   throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
+  const result = await request(governSubgraph, GovernQueueEntityContainersQuery, {
+    ID: governQueue.toLowerCase(),
+  });
+  if (!result?.governQueue)
+    throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
 
-  // TODO : UNFAKE
-
-  const containers = Promise.all(
-    fakeContainerResult.map(
-      async (x: any) =>
-        ({
-          id: x.id,
-          payload: {
-            id: x.payload.id,
-            actions: x.payload.actions,
-            executionTime: +x.payload.executionTime,
-            proof: x.payload.proof,
-            submitter: x.payload.submitter,
+  // const containers = result.governQueue.containers.map( // TODO : UNFAKE
+  const containers = fakeContainerResult.map(
+    (x: any) =>
+      ({
+        id: x.id,
+        payload: {
+          id: x.payload.id,
+          actions: x.payload.actions,
+          executionTime: +x.payload.executionTime,
+          proof: x.payload.proof,
+          submitter: x.payload.submitter,
+        },
+        state: x.state,
+        config: {
+          challengeDeposit: {
+            amount: x.config.challengeDeposit.amount,
           },
-          state: x.state,
-          config: {
-            challengeDeposit: {
-              amount: x.config.challengeDeposit.amount,
-            },
-          },
-        } as ContainerModel),
-    ),
+        },
+      } as ContainerModel),
   );
+
   return containers;
 }
 

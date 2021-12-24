@@ -1,9 +1,9 @@
-import { AddressField, Help, Button, IconFlag, Box, Field, Accordion, GU } from '@1hive/1hive-ui';
+import { AddressField, Field, Accordion, GU } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ClaimModel } from 'src/models/claim.model';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/providers/wallet.context';
-import { fetchQuestClaims, challengeQuestClaim } from 'src/services/quest.service';
+import { fetchQuestClaims } from 'src/services/quest.service';
 import styled from 'styled-components';
 import ChallengeModal from '../modals/challenge-modal';
 import AmountFieldInput from './field-input/amount-field-input';
@@ -40,6 +40,7 @@ export default function ClaimList({ quest }: Props) {
   useEffect(() => {
     const fetchClaims = async () => {
       const result = await fetchQuestClaims(quest);
+
       setClaims(result);
     };
 
