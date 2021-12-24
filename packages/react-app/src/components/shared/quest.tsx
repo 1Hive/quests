@@ -15,6 +15,7 @@ import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import * as Yup from 'yup';
+import { fetchClaimDeposit } from 'src/services/quest.service';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
 import DateFieldInput from './field-input/date-field-input';
@@ -89,8 +90,6 @@ export default function Quest({
   }, [questMode]);
 
   useEffect(() => {
-    console.log('getBalanceOfQuest');
-
     const getBalanceOfQuest = async (address: string) => {
       try {
         const result = await getBalanceOf(defaultToken, address);
@@ -101,6 +100,17 @@ export default function Quest({
     };
     if (data.address) getBalanceOfQuest(data.address);
   }, [wallet.account]);
+
+  useEffect(() => {
+    const getClaimDeposit = async () => {
+      try {
+        setClaimDeposit(await fetchClaimDeposit());
+      } catch (error) {
+        Logger.error(error);
+      }
+    };
+    getClaimDeposit();
+  }, []);
 
   const questContent = (questData: QuestModel, handleChange = noop) => (
     <>

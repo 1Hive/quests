@@ -4,15 +4,16 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { QuestEntityQuery, QuestEntitiesQuery } from 'src/queries/quest-entity.query';
-import { toAscii, toChecksumAddress } from 'web3-utils';
+import { toAscii, toBN, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
   fakeContainerResult,
 } from 'src/queries/govern-queue-entity.query';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { ConfigModel, ContainerModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
+import { ChallengeModel } from 'src/models/challenge.model';
 import {
   DEAULT_CLAIM_EXECUTION_DELAY,
   CLAIM_STATUS,
@@ -21,7 +22,7 @@ import {
   TOKENS,
 } from '../constants';
 import { Logger } from '../utils/logger';
-import { toBigNumber, toHex } from '../utils/web3.utils';
+import { fromBigNumber, toBigNumber, toHex } from '../utils/web3.utils';
 import { isDelayOver } from '../utils/date.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
@@ -56,16 +57,31 @@ function mapQuestList(quests: any[]): QuestModel[] {
 }
 
 async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
-  const { governSubgraph, governQueue } = getNetwork();
+  const { governSubgraph, governQueue, defaultToken } = getNetwork();
 
   const result = await request(governSubgraph, GovernQueueEntityQuery, {
     ID: governQueue.toLowerCase(),
   });
   if (!result?.governQueue)
     throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
+  const { config } = result.governQueue;
   return (
     result.governQueue && {
-      config: result.governQueue.config,
+      config: {
+        ...config,
+        challengeDeposit: {
+          amount: fromBigNumber(
+            BigNumber.from(config.challengeDeposit.amount),
+            defaultToken.decimals,
+          ),
+        },
+        scheduleDeposit: {
+          amount: fromBigNumber(
+            BigNumber.from(config.scheduleDeposit.amount),
+            defaultToken.decimals,
+          ),
+        },
+      },
       nonce: +result.governQueue.nonce,
     }
   );
@@ -80,20 +96,27 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
   //   throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
 
   // TODO : UNFAKE
-  const containers = fakeContainerResult.map(
-    (x: any) =>
-      ({
-        id: x.id,
-        payload: {
-          id: x.payload.id,
-          actions: x.payload.actions,
-          executionTime: +x.payload.executionTime,
-          proof: x.payload.proof,
-          submitter: x.payload.submitter,
-        },
-        state: x.state,
-        config: undefined,
-      } as ContainerModel),
+
+  const containers = Promise.all(
+    fakeContainerResult.map(
+      async (x: any) =>
+        ({
+          id: x.id,
+          payload: {
+            id: x.payload.id,
+            actions: x.payload.actions,
+            executionTime: +x.payload.executionTime,
+            proof: x.payload.proof,
+            submitter: x.payload.submitter,
+          },
+          state: x.state,
+          config: {
+            challengeDeposit: {
+              amount: x.config.challengeDeposit.amount,
+            },
+          },
+        } as ContainerModel),
+    ),
   );
   return containers;
 }
@@ -151,9 +174,9 @@ export async function getMoreQuests(
   count: number,
   filter: FilterModel,
 ): Promise<QuestModel[]> {
-  const network = getNetwork();
+  const { questSubgraph } = getNetwork();
   const queryResult = (
-    await request(network.subgraph, QuestEntitiesQuery, {
+    await request(questSubgraph, QuestEntitiesQuery, {
       skip: currentIndex,
       first: count,
       expireTimeLower: filter.expire?.start
@@ -173,9 +196,9 @@ export async function getMoreQuests(
   return newQuests;
 }
 export async function getQuest(address: string) {
-  const network = getNetwork();
+  const { questSubgraph } = getNetwork();
   const queryResult = (
-    await request(network.subgraph, QuestEntityQuery, {
+    await request(questSubgraph, QuestEntityQuery, {
       ID: address.toLowerCase(), // Subgraph address are stored lowercase
     })
   ).questEntity;
@@ -221,13 +244,11 @@ export async function scheduleQuestClaim(
   execTime?: number,
 ) {
   const container = await getContainer(claimData, execTime);
-  console.log({ container, claimData }, 'Scheduling claim ...');
-
-  Logger.debug(`Scheduling container...`);
+  Logger.debug('Scheduling claim ...', { container, claimData });
   // const tx = await governQueueContract.schedule(container);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
   // Logger.info(logs);
-  Logger.debug(`Container scheduled, execution time ${container.payload.executionTime}`);
+  Logger.debug(`Claim scheduled, execution time ${container.payload.executionTime}`);
 }
 
 export async function executeQuestClaim(
@@ -237,16 +258,21 @@ export async function executeQuestClaim(
 ) {
   const container = await getContainer(claimData, execTime);
 
-  console.log({ container, claimData }, 'Executing claim ...');
-  Logger.debug(`Executing container...`);
+  Logger.debug('Executing claim ...', { container, claimData });
   // const tx = await governQueueContract.execute(container);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
   // Logger.info(logs);
-  Logger.info(`Container executed`);
+  Logger.info(`Claim executed`);
 }
 
-export async function challengeQuestClaim(claim: ClaimModel) {
-  return Promise.resolve();
+export async function challengeQuestClaim(governQueueContract: any, challenge: ChallengeModel) {
+  const container = await getContainer(challenge.claim);
+
+  Logger.debug('Executing challenge ...', { container, claimData: challenge });
+  // const tx = await governQueueContract.challenge(container, );
+  // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
+  // Logger.info(logs);
+  Logger.info(`Claim challenged`);
 }
 
 export async function isQuestClaimScheduleEnded(questAddress: string, playerAddress: string) {
@@ -260,6 +286,7 @@ export async function isQuestClaimScheduleEnded(questAddress: string, playerAddr
 }
 
 export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
+  const { defaultToken } = getNetwork();
   const res = await fetchGovernQueueContainers();
   return Promise.all(
     res
@@ -272,36 +299,33 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         const claimAction = x.payload.actions[0];
         const [evidenceIpfsHash, playerAddress, claimAmount] =
           getQuestContractInterface().decodeFunctionData('claim', claimAction.data);
+
         const evidence = await getObjectFromIpfs(toAscii(evidenceIpfsHash));
+
         return {
           claimAmount: { token: quest.rewardToken, amount: +claimAmount },
           evidence,
           playerAddress,
           questAddress: quest.address,
           state: x.state,
+          challengeDeposit: {
+            amount: fromBigNumber(
+              BigNumber.from(x.config.challengeDeposit.amount),
+              defaultToken.decimals,
+            ),
+          },
         } as ClaimModel;
       }),
   );
 }
 
+export async function fetchClaimDeposit() {
+  const { config } = await fetchGovernQueue();
+  return config.scheduleDeposit;
+}
+
 export function getTagSuggestions() {
   return []; // TODO : Restore after MVP questList.map((x) => x.tags).flat();
-}
-
-// TODO : To verify
-export async function fetchAvailableBounty(quest: QuestModel, erc20Contract: any) {
-  if (!quest?.rewardToken) return DEFAULT_AMOUNT;
-  const balance = await erc20Contract.balanceOf(quest.address);
-  return {
-    amount: balance.toString(),
-    token: quest.rewardToken,
-  } as TokenAmountModel;
-}
-
-// TODO
-export function fetchClaimingPlayers(quest: QuestModel) {
-  Logger.debug(quest);
-  return [];
 }
 
 // #endregion

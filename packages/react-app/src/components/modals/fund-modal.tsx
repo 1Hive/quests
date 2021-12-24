@@ -54,7 +54,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
                 toast('Quest funding ...');
                 await QuestService.fundQuest(contractERC20, questAddress, values.fundAmount);
                 onModalClose();
-                toast('Quest funded');
+                toast('Operation succeed');
               } catch (e: any) {
                 Logger.error(e);
                 toast(
@@ -70,12 +70,13 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
           }, 400);
         }}
       >
-        {({ values, handleSubmit }) => (
+        {({ values, handleSubmit, handleChange }) => (
           <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <AmountFieldInputFormik
               id="fundAmount"
               isEdit
               label="Amount"
+              onChange={handleChange}
               isLoading={loading}
               value={values.fundAmount}
             />

@@ -65,7 +65,7 @@ function useContract(contractName: string, addressOverride?: string, withSignerI
   const provider = getDefaultProvider();
 
   const handleGetContract = () => {
-    if (!contractAddress) Logger.warn('Address was not defined for contract ', contractName);
+    if (!contractAddress) Logger.debug('Address was not defined for contract ', contractName);
     if (!contractAddress || !contractAbi || !provider) return null;
     try {
       return getContract(

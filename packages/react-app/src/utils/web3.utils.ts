@@ -157,7 +157,7 @@ export function toBigNumber(amount: TokenAmountModel) {
   return ethers.utils.parseUnits(amount.amount.toString(), amount.token!.decimals);
 }
 
-export function fromBigNumber(bigNumber: BigNumber, decimals: number) {
+export function fromBigNumber(bigNumber: BigNumber, decimals: number = 18): number {
   return bigNumber.div(BigNumber.from(10).pow(decimals)).toNumber();
 }
 

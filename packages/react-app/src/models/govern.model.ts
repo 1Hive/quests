@@ -24,6 +24,6 @@ export type ConfigModel = {
 export type ContainerModel = {
   id: string;
   payload: PayloadModel;
-  config?: ConfigModel;
+  config: ConfigModel;
   state: string;
 };
