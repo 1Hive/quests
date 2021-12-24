@@ -14,7 +14,6 @@ import { BigNumber, ethers } from 'ethers';
 import { ConfigModel, ContainerModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
-import { noop } from 'lodash';
 import { DEAULT_CLAIM_EXECUTION_DELAY, CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -204,6 +203,7 @@ export async function saveQuest(
   fallbackAddress: string,
   data: Partial<QuestModel>,
   address?: string,
+  // eslint-disable-next-line no-unused-vars
   onTrx?: (hash: string) => void,
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
@@ -233,6 +233,7 @@ export async function fundQuest(
   contractERC20: any,
   questAddress: string,
   amount: TokenAmountModel,
+  // eslint-disable-next-line no-unused-vars
   onTrx?: (hash: string) => void,
 ) {
   const tx = await contractERC20.transfer(questAddress, toBigNumber(amount));
@@ -245,6 +246,7 @@ export async function scheduleQuestClaim(
   governQueueContract: any,
   claimData: ClaimModel,
   execTime?: number,
+  // eslint-disable-next-line no-unused-vars
   onTrx?: (hash: string) => void,
 ) {
   const container = await getContainer(claimData, execTime);
@@ -261,7 +263,8 @@ export async function executeQuestClaim(
   governQueueContract: any,
   claimData: ClaimModel,
   execTime?: number,
-  onTrx?: Function,
+  // eslint-disable-next-line no-unused-vars
+  onTrx?: (hash: string) => void,
 ) {
   const container = await getContainer(claimData, execTime);
   Logger.debug('Executing claim ...', { container, claimData });
@@ -276,7 +279,8 @@ export async function executeQuestClaim(
 export async function challengeQuestClaim(
   governQueueContract: any,
   challenge: ChallengeModel,
-  onTrx?: Function,
+  // eslint-disable-next-line no-unused-vars
+  onTrx?: (hash: string) => void,
 ) {
   const container = await getContainer(challenge.claim);
   Logger.debug('Executing challenge ...', { container, challenge });
