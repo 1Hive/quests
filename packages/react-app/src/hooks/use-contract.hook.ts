@@ -1,4 +1,4 @@
-import { Contract, ContractInterface, ethers as ethersUtil } from 'ethers';
+import { Contract, ContractInterface } from 'ethers';
 import { useMemo } from 'react';
 import { Token } from 'src/models/token';
 import { Logger } from 'src/utils/logger';
