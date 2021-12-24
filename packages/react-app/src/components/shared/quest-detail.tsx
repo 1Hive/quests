@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PAGES, QUEST_MODE } from 'src/constants';
 import { useQuery } from 'src/hooks/use-query-params';
-import { QuestData } from 'src/models/quest-data';
+import { QuestModel } from 'src/models/quest-data.model';
 import { usePageContext } from 'src/providers/page.context';
 import { getQuest } from 'src/services/quest.service';
 import Quest from './quest';
@@ -9,7 +9,7 @@ import Quest from './quest';
 export default function QuestDetail() {
   const { setPage } = usePageContext();
   const id = useQuery().get('id');
-  const [quest, setQuest] = useState<QuestData>();
+  const [quest, setQuest] = useState<QuestModel>();
 
   useEffect(() => {
     setPage(PAGES.Detail);

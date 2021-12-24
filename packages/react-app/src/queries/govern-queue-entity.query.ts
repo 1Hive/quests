@@ -1,0 +1,105 @@
+import gql from 'graphql-tag';
+
+export const GovernQueueEntityQuery = gql`
+  query governQueue($ID: String) {
+    governQueue(id: $ID) {
+      nonce
+      config {
+        resolver
+        executionDelay
+        scheduleDeposit {
+          amount
+          token
+          decimals
+          name
+          symbol
+        }
+        challengeDeposit {
+          amount
+          token
+          decimals
+          name
+          symbol
+        }
+        maxCalldataSize
+      }
+    }
+  }
+`;
+
+export const GovernQueueEntityContainersQuery = gql`
+  query governQueue($ID: String) {
+    governQueue(id: $ID) {
+      id
+      containers {
+        id
+        state
+        payload {
+          id
+          proof
+          submitter
+          executionTime
+          actions {
+            to
+            value
+            data
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const fakeContainerResult = [
+  {
+    id: '0x7bdc0233fe34aa837a9867d307193bc89e7a97306069f9499d720fd49f74200c',
+    payload: {
+      id: '0x7bdc0233fe34aa837a9867d307193bc89e7a97306069f9499d720fd49f74200c',
+      executionTime: '1633199142',
+      actions: [
+        {
+          to: '0xdEa39302f2b04f022C596006000175fE7746a0a5',
+          value: 0,
+          data: '0x99b44ba0000000000000000000000000000000000000000000000000000000000000006000000000000000000000000091b0d67d3f47a30fbeeb159e67209ad6cb2ce22e0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000002e516d517766434a63436d51626b3236346b376f527a3755627932524b706b34454834746e797941564e664b464642000000000000000000000000000000000000',
+        },
+      ],
+      proof: '0x0170122069b6bcd1361c67515217eb962aaf70ee623c50e893d883512c1624b3eab5beb7',
+      submitter: '0xfc238ca84ab7f9c420407b8d2f72c70c239e0d41',
+    },
+    state: 'Scheduled',
+  },
+  {
+    id: '0xd68da90e6267a181562ba69336499ccbe4e25bb474c868b6c53e603ce2e40cdb',
+    payload: {
+      id: '0xd68da90e6267a181562ba69336499ccbe4e25bb474c868b6c53e603ce2e40cdb',
+      executionTime: '1633199423',
+      actions: [
+        {
+          to: '0xdEa39302f2b04f022C596006000175fE7746a0a5',
+          value: 0,
+          data: '0x99b44ba0000000000000000000000000000000000000000000000000000000000000006000000000000000000000000091b0d67d3f47a30fbeeb159e67209ad6cb2ce22e0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000002e516d517766434a63436d51626b3236346b376f527a3755627932524b706b34454834746e797941564e664b464642000000000000000000000000000000000000',
+        },
+      ],
+      proof: '0x017012205979922c2fa64a36c76663d1fd7582f06493c641f5d8797caf07728c1485608f',
+      submitter: '0xfc238ca84ab7f9c420407b8d2f72c70c239e0d41',
+    },
+    state: 'Scheduled',
+  },
+  {
+    id: '0xd9fdbef5c07529f3cf904ae44b47ec11d5e58d333630d2256c0f488d9408e0f3',
+    payload: {
+      id: '0xd9fdbef5c07529f3cf904ae44b47ec11d5e58d333630d2256c0f488d9408e0f3',
+      executionTime: '1633199663',
+      actions: [
+        {
+          to: '0xdEa39302f2b04f022C596006000175fE7746a0a5',
+          value: 0,
+          data: '0x99b44ba0000000000000000000000000000000000000000000000000000000000000006000000000000000000000000091b0d67d3f47a30fbeeb159e67209ad6cb2ce22e0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000002e516d517766434a63436d51626b3236346b376f527a3755627932524b706b34454834746e797941564e664b464642000000000000000000000000000000000000',
+        },
+      ],
+      proof: '0x01701220c2bed2035e4518551ee9ce5ed93d2b5ffb2b405dc811ce074890fab75e9fd238',
+      submitter: '0xfc238ca84ab7f9c420407b8d2f72c70c239e0d41',
+    },
+    state: 'Executed',
+  },
+];

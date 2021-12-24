@@ -1,9 +1,9 @@
-import { Contract, ContractInterface } from 'ethers';
-import { toNumber } from 'lodash';
+import { Contract, ContractInterface, ethers as ethersUtil } from 'ethers';
 import { useMemo } from 'react';
 import { Token } from 'src/models/token';
 import { Logger } from 'src/utils/logger';
 import { fromBigNumber, getDefaultProvider } from 'src/utils/web3.utils';
+import { toNumber } from 'web3-utils';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';

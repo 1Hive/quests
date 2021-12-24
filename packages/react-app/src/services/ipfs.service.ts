@@ -1,8 +1,10 @@
-import ipfsAPI from 'ipfs-http-client';
+import ipfsAPI, { Options } from 'ipfs-http-client';
 
 const config = {
-  url: 'http://api.thegraph.com/ipfs/api/v0',
-};
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+} as Options;
 
 const ipfs = ipfsAPI.create(config);
 
