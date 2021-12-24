@@ -1,4 +1,5 @@
 import { Contract, ContractInterface } from 'ethers';
+import { toNumber } from 'lodash';
 import { useMemo } from 'react';
 import { Token } from 'src/models/token';
 import { Logger } from 'src/utils/logger';
@@ -33,6 +34,11 @@ export function getContract(
   if (!address || address === ADDRESS_ZERO) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
   }
+
+  // Check if wallet chain is same as app
+  const { chainId } = getNetwork();
+  const provider = (window as any).ethereum || (window as any).web3.currentProvider;
+  if (!provider || toNumber(provider?.chainId) !== chainId) return null;
 
   return new Contract(address, ABI, getProviderOrSigner(ethersProvider, account));
 }
