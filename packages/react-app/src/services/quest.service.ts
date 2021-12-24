@@ -244,6 +244,10 @@ export async function executeQuestClaim(
   Logger.info(`Container executed`);
 }
 
+export async function challengeQuestClaim(claim: ClaimModel) {
+  return Promise.resolve();
+}
+
 export async function isQuestClaimScheduleEnded(questAddress: string, playerAddress: string) {
   const governQueueContainers = await fetchGovernQueueContainers();
   return (
