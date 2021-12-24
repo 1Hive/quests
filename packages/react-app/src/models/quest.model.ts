@@ -1,7 +1,7 @@
-import { Token } from './token';
-import { TokenAmount } from './token-amount';
+import { TokenModel } from './token.model';
+import { TokenAmountModel } from './token-amount.model';
 
-export type QuestData = {
+export type QuestModel = {
   // User defined
   title?: string;
   description?: string;
@@ -10,8 +10,8 @@ export type QuestData = {
 
   // Computed
   address?: string;
-  bounty?: TokenAmount;
-  rewardToken?: Token;
+  bounty?: TokenAmountModel;
+  rewardToken?: TokenModel;
   detailsRefIpfs?: string;
   creatorAddress?: string;
 };

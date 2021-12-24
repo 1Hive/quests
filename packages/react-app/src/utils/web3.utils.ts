@@ -1,7 +1,7 @@
 import { BigNumber, ethers, ethers as ethersUtil } from 'ethers';
 import { noop } from 'lodash-es';
 import { getProvider } from 'src/ethereum-providers';
-import { TokenAmount } from 'src/models/token-amount';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
@@ -129,7 +129,7 @@ export function addressesEqualNoSum(first: string, second: string) {
   return first === second;
 }
 
-export async function sendTransaction(to: string, amount: TokenAmount, onCompleted: any) {
+export async function sendTransaction(to: string, amount: TokenAmountModel, onCompleted: any) {
   const from = await getCurrentAccount();
   if (!from)
     return Promise.reject(
@@ -149,7 +149,7 @@ export async function sendTransaction(to: string, amount: TokenAmount, onComplet
   );
 }
 
-export function toBigNumber(amount: TokenAmount) {
+export function toBigNumber(amount: TokenAmountModel) {
   const { defaultToken } = getNetwork();
   if (!amount.token) {
     amount.token = amount.token ?? defaultToken;

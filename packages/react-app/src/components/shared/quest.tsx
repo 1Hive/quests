@@ -6,8 +6,8 @@ import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { PAGES, QUEST_MODE, QUEST_SUMMARY_MAX_CHARACTERS } from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
-import { QuestData } from 'src/models/quest-data';
-import { TokenAmount } from 'src/models/token-amount';
+import { QuestModel } from 'src/models/quest.model';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
@@ -17,11 +17,11 @@ import { useWallet } from 'use-wallet';
 import * as Yup from 'yup';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
-import { AmountFieldInputFormik } from './field-input/amount-field-input';
 import DateFieldInput from './field-input/date-field-input';
+import { ChildSpacer, Outset } from './utils/spacer-util';
+import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import IdentityBadge from './identity-badge';
-import { ChildSpacer, Outset } from './utils/spacer-util';
 import ClaimList from './claim-list';
 // #region StyledComponents
 
@@ -55,7 +55,7 @@ const FormStyled = styled(Form)`
 // #endregion
 
 type Props = {
-  data?: QuestData;
+  data?: QuestModel;
   questMode?: string;
   isLoading?: boolean;
   onSave?: Function;
@@ -79,7 +79,8 @@ export default function Quest({
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
-  const [bounty, setBounty] = useState<TokenAmount | null>();
+  const [bounty, setBounty] = useState<TokenAmountModel | null>();
+  const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
   const questFactoryContract = useFactoryContract();
 
@@ -88,6 +89,8 @@ export default function Quest({
   }, [questMode]);
 
   useEffect(() => {
+    console.log('getBalanceOfQuest');
+
     const getBalanceOfQuest = async (address: string) => {
       try {
         const result = await getBalanceOf(defaultToken, address);
@@ -97,7 +100,7 @@ export default function Quest({
       }
     };
     if (data.address) getBalanceOfQuest(data.address);
-  }, [data.address]);
+  }, [wallet.account]);
 
   const questContent = (questData: QuestModel, handleChange = noop) => (
     <>
@@ -177,17 +180,17 @@ export default function Quest({
                 label={questMode === QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
                 isEdit={isEdit}
                 value={bounty}
-                isLoading={loading || (!isEdit && bounty === undefined)}
+                isLoading={loading || (!isEdit && !bounty)}
                 formik={formRef}
               />
             )}
-            {!isEdit && (
+            {!isEdit && claimDeposit !== null && (
               <AmountFieldInput
                 id="claimDeposit"
                 label="Claim deposit"
                 isEdit={false}
-                value={claimDeposit || (!isEdit && !claimDeposit)}
-                isLoading={loading}
+                value={claimDeposit}
+                isLoading={loading || (!isEdit && !claimDeposit)}
               />
             )}
             {/* {(!!values.tags?.length || editMode) && (
@@ -214,7 +217,7 @@ export default function Quest({
       />
       {!loading && !isEdit && (
         <>
-          <ClaimList quest={data} />
+          {questMode === QUEST_MODE.ReadDetail && <ClaimList quest={data} />}
           <QuestFooterStyled>
             <Outset gu8 vertical>
               {questMode !== QUEST_MODE.ReadDetail && (

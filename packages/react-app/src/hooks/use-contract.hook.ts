@@ -1,6 +1,6 @@
-import { Contract, ContractInterface } from 'ethers';
+import { Contract, ContractInterface, ethers } from 'ethers';
 import { useMemo } from 'react';
-import { Token } from 'src/models/token';
+import { TokenModel } from 'src/models/token.model';
 import { Logger } from 'src/utils/logger';
 import { fromBigNumber, getDefaultProvider } from 'src/utils/web3.utils';
 import { toNumber } from 'web3-utils';
@@ -98,11 +98,11 @@ export function useGovernQueueContract() {
   return useContract('GovernQueue');
 }
 
-export function useERC20Contract(token: Token, withSignerIfPossible = true) {
+export function useERC20Contract(token: TokenModel, withSignerIfPossible = true) {
   return useContract('ERC20', token.address, withSignerIfPossible);
 }
 
-export async function getBalanceOf(token: Token, address: string) {
+export async function getBalanceOf(token: TokenModel, address: string) {
   const contract = useERC20Contract(token, false);
   if (!contract) return null;
   const balance = await contract.balanceOf(address);
@@ -110,4 +110,8 @@ export async function getBalanceOf(token: Token, address: string) {
     token,
     amount: fromBigNumber(balance, token.decimals),
   };
+}
+
+export function getQuestContractInterface() {
+  return new ethers.utils.Interface(getContractsJson().Quest.abi);
 }

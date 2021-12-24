@@ -1,5 +1,5 @@
-import { Filter } from './models/filter';
-import { Token } from './models/token';
+import { FilterModel } from './models/filter.model';
+import { TokenModel } from './models/token.model';
 
 export const PCT_BASE = BigInt(1e18);
 
@@ -19,13 +19,13 @@ export const TOKENS = {
     symb: 'HNYT',
     address: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
     decimals: 18,
-  } as Token,
+  } as TokenModel,
   Theter: {
     name: 'Tether',
     symb: 'USDT',
     address: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
     decimals: 18,
-  } as Token,
+  } as TokenModel,
 };
 
 // Constants
@@ -65,6 +65,17 @@ export const PAGES = {
   Detail: 'detail',
 };
 
+export const CLAIM_STATUS = {
+  Approved: 'Approved',
+  Cancelled: 'Cancelled',
+  Vetoed: 'Vetoed',
+  Challenged: 'Challenged',
+  Executed: 'Executed',
+  None: 'None',
+  Rejected: 'Rejected',
+  Scheduled: 'Scheduled',
+};
+
 // Default values
 
 export const DEFAULT_AMOUNT = {
@@ -80,6 +91,8 @@ export const DEFAULT_FILTER = {
   description: '',
   expire: { start: undefined, end: undefined },
   bounty: DEFAULT_AMOUNT,
-} as Filter;
+} as FilterModel;
 
 export const GQL_MAX_INT = 2 ** 31 - 1;
+
+export const DEAULT_CLAIM_EXECUTION_DELAY = 60;

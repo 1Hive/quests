@@ -1,11 +1,11 @@
-import { Fund } from 'src/models/fund';
-import { Token } from 'src/models/token';
-import { TokenAmount } from 'src/models/token-amount';
+import { TokenModel } from 'src/models/token.model';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
+import { FundModel } from 'src/models/fund.model';
 import { TOKENS } from '../constants';
 import { Logger } from './logger';
 
-export async function convertTo(from: TokenAmount, toToken: Token) {
+export async function convertTo(from: TokenAmountModel, toToken: TokenModel) {
   const { defaultToken } = getNetwork();
   if (!from?.token) {
     from.token = defaultToken;
@@ -24,7 +24,7 @@ export async function convertTo(from: TokenAmount, toToken: Token) {
   return { amount: res, token: toToken };
 }
 
-export async function computeTotalFunds(funds: Fund[]) {
+export async function computeTotalFunds(funds: FundModel[]) {
   if (!funds?.length) return { amount: 0, token: TOKENS.Theter };
   Logger.debug(funds);
   const tetherFunds = await Promise.all(funds.map((x) => convertTo(x.amount, TOKENS.Theter)));

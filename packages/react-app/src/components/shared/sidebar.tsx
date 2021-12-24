@@ -1,6 +1,6 @@
 import { Box, GU } from '@1hive/1hive-ui';
 import { useHistory } from 'react-router-dom';
-import { Filter as FilterModel } from 'src/models/filter';
+import { FilterModel } from 'src/models/filter.model';
 import { useFilterContext } from 'src/providers/filter.context';
 import { usePageContext } from 'src/providers/page.context';
 import styled from 'styled-components';

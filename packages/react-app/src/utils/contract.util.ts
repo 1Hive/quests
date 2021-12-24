@@ -1,5 +1,5 @@
 import { Contract } from 'ethers';
-import { Token } from 'src/models/token';
+import { TokenModel } from 'src/models/token.model';
 import { Logger } from 'src/utils/logger';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20Abi from '../contracts/ERC20.json';
@@ -61,6 +61,6 @@ export function getGovernQueueContract() {
   return getContract('GovernQueue');
 }
 
-export function getERC20Contract(token: Token) {
+export function getERC20Contract(token: TokenModel) {
   return getContract('ERC20', token.address);
 }

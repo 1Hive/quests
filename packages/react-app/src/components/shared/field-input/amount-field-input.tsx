@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { DEFAULT_AMOUNT } from 'src/constants';
-import { TokenAmount } from 'src/models/token-amount';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import styled from 'styled-components';
 
@@ -27,7 +27,7 @@ type Props = {
   isLoading?: boolean;
   label?: string;
   placeHolder?: string;
-  value?: TokenAmount;
+  value?: TokenAmountModel;
   onChange?: Function;
   wide?: boolean;
   formik?: any;

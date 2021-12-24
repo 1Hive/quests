@@ -1,7 +1,7 @@
 import { AddressField, Help, Button, IconFlag, Box, Field } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ClaimModel } from 'src/models/claim.model';
-import { QuestModel } from 'src/models/quest-data.model';
+import { QuestModel } from 'src/models/quest.model';
 import { fetchQuestClaims, challengeQuestClaim } from 'src/services/quest.service';
 import styled from 'styled-components';
 import AmountFieldInput from './field-input/amount-field-input';

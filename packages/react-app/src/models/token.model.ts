@@ -1,4 +1,4 @@
-export type Token = {
+export type TokenModel = {
   name: string;
   symb: string;
   address: string;
