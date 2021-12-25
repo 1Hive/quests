@@ -16,10 +16,10 @@ let logLevel: LogLevels = process.env.NODE_ENV === 'production' ? LogLevels.INFO
 console.log('logLevel', logLevel);
 
 const debug =
-  process.env.NODE_ENV !== 'production' && logLevel < LogLevels.DEBUG ? console.debug : noop;
-const info = logLevel < LogLevels.INFO ? console.info : noop;
-const warn = logLevel < LogLevels.WARN ? console.warn : noop;
-const error = logLevel < LogLevels.ERROR ? console.error : noop;
+  process.env.NODE_ENV !== 'production' && logLevel <= LogLevels.DEBUG ? console.debug : noop;
+const info = logLevel <= LogLevels.INFO ? console.info : noop;
+const warn = logLevel <= LogLevels.WARN ? console.warn : noop;
+const error = logLevel <= LogLevels.ERROR ? console.error : noop;
 
 function setLogLevel(level: LogLevels) {
   logLevel = level;

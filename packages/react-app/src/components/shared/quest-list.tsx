@@ -4,17 +4,17 @@ import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
 import { PAGES, QUEST_MODE } from 'src/constants';
-import { QuestData } from 'src/models/quest-data';
+import { FilterModel } from 'src/models/filter.model';
+import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/providers/page.context';
 import * as QuestService from 'src/services/quest.service';
-import { Filter } from '../../models/filter';
 import { useFilterContext } from '../../providers/filter.context';
 import { Outset } from './utils/spacer-util';
 
 const batchSize = 3;
 
 export default function QuestList() {
-  const [quests, setQuests] = useState<QuestData[]>([]);
+  const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const { filter } = useFilterContext();
@@ -22,7 +22,7 @@ export default function QuestList() {
   const { setPage } = usePageContext();
   useEffect(() => setPage(PAGES.List), [setPage]);
 
-  const refresh = (_filter?: Filter) => {
+  const refresh = (_filter?: FilterModel) => {
     if (!isLoading) {
       setQuests([]);
       setIsLoading(true);
@@ -81,7 +81,7 @@ export default function QuestList() {
       scrollThreshold="50px"
     >
       <div>
-        {quests.map((x: QuestData) => (
+        {quests.map((x: QuestModel) => (
           <Outset gu16 key={x.address}>
             <Quest questMode={QUEST_MODE.ReadSummary} data={x} />
           </Outset>

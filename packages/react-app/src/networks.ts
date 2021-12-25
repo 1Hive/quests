@@ -2,6 +2,7 @@ import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getDefaultChain } from './local-settings';
 import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { TOKENS } from './constants';
+import { NetworkModel } from './models/network.model';
 
 const networks = {
   mainnet: {
@@ -16,12 +17,14 @@ const networks = {
     name: 'Rinkeby',
     type: 'rinkeby',
     defaultEthNode: 'https://rinkeby.eth.aragon.network/',
-    subgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
+    questSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
+    governSubgraph: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
     questFactory: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
-    govern: '0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697',
-    governQueue: '0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697',
+    govern: '0x0f37760f7bF292A3E1578583bDb8db9835E37229',
+    governQueue: '0x034464e101eb7a0e8daa4cca220f40696ace0053', // TODO:Restore real govern queue '0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697',
+    celeste: '0x949f75Ab8362B4e53967742dC93CC289eFb43f6D',
     defaultToken: TOKENS.Honey,
-  },
+  } as NetworkModel,
   xdai: {
     chainId: 100,
     name: 'xDai',
@@ -45,6 +48,6 @@ function getNetworkInternalName(chainId = getDefaultChain()) {
   return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkType(chainId);
 }
 
-export function getNetwork(chainId = getDefaultChain()) {
+export function getNetwork(chainId = getDefaultChain()): NetworkModel {
   return networks[getNetworkInternalName(chainId)];
 }

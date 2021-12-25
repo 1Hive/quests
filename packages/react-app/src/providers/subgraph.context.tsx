@@ -14,7 +14,7 @@ const SubgraphContext = React.createContext({ resetSubgraphClient: noop });
 
 const newClient = () =>
   createClient({
-    url: getNetwork().subgraph,
+    url: getNetwork().questSubgraph,
     exchanges: [debugExchange, devtoolsExchange, cacheExchange, fetchExchange],
   });
 

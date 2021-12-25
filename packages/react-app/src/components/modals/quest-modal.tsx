@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { FaSave } from 'react-icons/fa';
 import { QUEST_MODE } from 'src/constants';
-import { QuestData } from 'src/models/quest-data';
+import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
 import Quest from '../shared/quest';
 import ModalBase from './modal-base';
@@ -17,7 +17,7 @@ const QuestActionButtonStyled = styled(Button)`
 // #endregion
 
 type Props = {
-  data?: QuestData;
+  data?: QuestModel;
   onClose?: Function;
   questMode: string;
 };
@@ -72,17 +72,17 @@ export default function QuestModal({
           onClick={onOpenButtonClick}
         />
       }
-      buttons={
+      buttons={[
         (questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update) && (
           <QuestActionButtonStyled
             label="Save"
             icon={<FaSave />}
             mode="positive"
             type="submit"
-            form="quest-form-new"
+            form={`form-quest-form-${data?.address ?? 'new'}`}
           />
-        )
-      }
+        ),
+      ]}
       isOpen={opened}
       onClose={onModalClose}
     >

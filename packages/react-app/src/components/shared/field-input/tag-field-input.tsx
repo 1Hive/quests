@@ -4,8 +4,17 @@ import { noop } from 'lodash-es';
 import React, { useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
+import styled from 'styled-components';
 import * as QuestService from '../../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
+
+// #region StyledComponents
+
+const FieldStyled = styled(Field)`
+  ${({ compact }: any) => (compact ? 'margin:0' : '')}
+`;
+
+// #endregion
 
 type Props = {
   id: string;
@@ -18,6 +27,7 @@ type Props = {
   tagSuggestions?: string[];
   value?: string[];
   formik?: any;
+  compact?: boolean;
 };
 
 function TagFieldInput({
@@ -31,6 +41,7 @@ function TagFieldInput({
   isEdit = false,
   isLoading = false,
   formik,
+  compact = false,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState<string>();
   const autoCompleteRef: React.Ref<any> = useRef(null);
@@ -59,7 +70,7 @@ function TagFieldInput({
   };
 
   return (
-    <Field label={label} key={id}>
+    <FieldStyled label={label} key={id} compact={compact}>
       {isLoading ? (
         <Skeleton />
       ) : (
@@ -87,7 +98,7 @@ function TagFieldInput({
             ))}
         </>
       )}
-    </Field>
+    </FieldStyled>
   );
 }
 

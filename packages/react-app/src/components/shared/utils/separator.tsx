@@ -7,7 +7,7 @@ const SeparatorStyled = styled.div`
 
 export default function Separator() {
   return (
-    <Outset gu16 vertical>
+    <Outset gu8 vertical>
       <SeparatorStyled />
     </Outset>
   );
