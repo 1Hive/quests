@@ -182,7 +182,7 @@ export default function Quest({
           </Outset>
         }
         secondary={
-          <Outset gu16>
+          <Outset>
             {bounty !== null && (
               <AmountFieldInputFormik
                 id="bounty"
