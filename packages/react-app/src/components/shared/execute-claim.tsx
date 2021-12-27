@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import * as QuestService from 'src/services/quest.service';
 import { Button, Timer, useToast } from '@1hive/1hive-ui';
 import { GiBroadsword } from 'react-icons/gi';
 import { ClaimModel } from 'src/models/claim.model';
 import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
 import styled from 'styled-components';
+import { CLAIM_STATUS } from 'src/constants';
 
 // #region StyledComponents
 
@@ -37,21 +38,28 @@ export function ExecuteClaim({ claim }: Props) {
     // toast('Operation succeed');
   };
 
+  const [buttonLabel, setButtonLabel] = useState<ReactNode>();
+
+  useEffect(() => {
+    if (claim.state === CLAIM_STATUS.Challenged) setButtonLabel('Challenged by someone');
+    else if (!scheduleTimeout && claim.executionTime)
+      setButtonLabel(
+        <>
+          Claimable in
+          <TimerStyled end={new Date(claim.executionTime)} />
+        </>,
+      );
+    else setButtonLabel('Claim');
+  }, [claim.state, claim.executionTime, scheduleTimeout]);
+
   return (
     <>
       {claim.executionTime && (
         <Button
           icon={<GiBroadsword />}
           onClick={() => executeClaim()}
-          label={
-            <>
-              Execute claim
-              {!scheduleTimeout && claim.executionTime && (
-                <TimerStyled end={new Date(claim.executionTime)} />
-              )}
-            </>
-          }
-          disabled={!scheduleTimeout}
+          label={buttonLabel}
+          disabled={!scheduleTimeout || claim.state === CLAIM_STATUS.Challenged}
           mode="positive"
         />
       )}
