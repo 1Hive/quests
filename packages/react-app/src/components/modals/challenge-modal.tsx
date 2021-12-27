@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
+import { CLAIM_STATUS } from 'src/constants';
 import ModalBase from './modal-base';
 import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
@@ -64,13 +65,17 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
           icon={<IconFlag />}
           onClick={() => setOpened(true)}
           label={
-            <>
-              Challenge
-              {claim.executionTime && <TimerStyled end={new Date(claim.executionTime)} />}
-            </>
+            claim?.state === CLAIM_STATUS.Challenged ? (
+              'Already challenged'
+            ) : (
+              <>
+                Challenge
+                {claim.executionTime && <TimerStyled end={new Date(claim.executionTime)} />}
+              </>
+            )
           }
           mode="negative"
-          disabled={challengeTimeout}
+          disabled={challengeTimeout || claim.state === CLAIM_STATUS.Challenged}
         />
       }
       buttons={[
