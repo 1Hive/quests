@@ -1,14 +1,10 @@
 import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 
 // #region Styled
-
-const TextContainerStyled = styled.div`
-  white-space: pre-wrap;
-`;
 
 const FieldStyled = styled(Field)`
   ${({ compact }: any) => (compact ? 'margin:0' : '')}
@@ -16,11 +12,14 @@ const FieldStyled = styled(Field)`
 
 const EllipsisStyled = styled.div`
   overflow: hidden;
-  display: inline-block;
-  word-break: break-word;
-  text-align: justify;
-  max-height: 12em;
-  line-height: 1.2em;
+  margin-bottom: 8px;
+  line-height: 1.4em;
+  ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.4}em;` : '')}
+
+  p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
 `;
 
 // #endregion
@@ -41,6 +40,7 @@ type Props = {
   css?: React.CSSProperties;
   maxLine?: number;
   isMarkDown?: boolean;
+  ellipsis?: ReactNode;
 };
 export default function TextFieldInput({
   id,
@@ -58,6 +58,7 @@ export default function TextFieldInput({
   css,
   maxLine,
   isMarkDown = false,
+  ellipsis,
 }: Props) {
   if (isLoading)
     return (
@@ -65,7 +66,21 @@ export default function TextFieldInput({
         <Skeleton />
       </FieldStyled>
     );
-  const readOnlyContent = <>{isMarkDown ? <Markdown normalized content={value} /> : value}</>;
+  const readOnlyContent = (
+    <>
+      {isMarkDown ? (
+        <Markdown
+          normalized
+          markdownToJsxOptions={(o: any) => ({
+            ...o,
+          })}
+          content={value}
+        />
+      ) : (
+        value
+      )}
+    </>
+  );
   const loadableContent = isEdit ? (
     <TextInput
       id={id}
@@ -78,9 +93,16 @@ export default function TextFieldInput({
       rows={rows}
     />
   ) : (
-    <TextContainerStyled style={{ ...css, fontSize }}>
-      <EllipsisStyled className="ellipsis">{readOnlyContent}</EllipsisStyled>
-    </TextContainerStyled>
+    <div style={{ ...css, fontSize }}>
+      {maxLine ? (
+        <div>
+          <EllipsisStyled maxLine={maxLine}>{readOnlyContent}</EllipsisStyled>
+          {ellipsis}
+        </div>
+      ) : (
+        readOnlyContent
+      )}
+    </div>
   );
   return label ? (
     <Field label={label} key={id}>

@@ -15,7 +15,6 @@ import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { fetchClaimDeposit } from 'src/services/quest.service';
-import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
 import DateFieldInput from './field-input/date-field-input';
@@ -28,6 +27,7 @@ import ClaimList from './claim-list';
 
 const LinkStyled = styled(Link)`
   text-decoration: none;
+  color: dodgerblue;
 `;
 const CardStyled = styled(Card)`
   justify-content: flex-start;
@@ -157,7 +157,10 @@ export default function Quest({
                 wide
                 multiline
                 isMarkDown
-                maxLine={10}
+                maxLine={questMode === QUEST_MODE.ReadSummary ? 10 : undefined}
+                ellipsis={
+                  <LinkStyled to={`/${PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
+                }
               />
               {isEdit && (
                 <>
