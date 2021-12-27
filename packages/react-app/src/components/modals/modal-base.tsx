@@ -1,6 +1,6 @@
 import { GU, Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
-import { debounce, noop } from 'lodash-es';
-import React, { useCallback, useEffect } from 'react';
+import { noop } from 'lodash-es';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
 
@@ -43,32 +43,20 @@ export default function ModalBase({
   css,
 }: Props) {
   // TODO : Not clean
-  const escFunction = useCallback(
-    debounce((e: any) => {
-      if (
-        e.key === 'Escape' &&
-        (e.target.tagName.toUpperCase() === 'BODY' || e.target.type?.toLowerCase() === 'button')
-      ) {
-        onClose();
-      }
-    }, 500),
-    [],
-  );
-
-  useEffect(() => {
-    document.addEventListener('keydown', escFunction, false);
-    return () => {
-      document.removeEventListener('keydown', escFunction, false);
-      escFunction.cancel();
-    };
-  }, []);
+  const escFunction = (e: any) => {
+    if (
+      e.key === 'Escape' &&
+      (e.target.tagName.toUpperCase() === 'BODY' || e.target.type?.toLowerCase() === 'button')
+    ) {
+      onClose();
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
-        document.getElementById('modalContainer')?.focus();
-      }, 100);
-    }
+      document.addEventListener('keydown', escFunction, false);
+    } else document.removeEventListener('keydown', escFunction, false);
+    return () => document.removeEventListener('keydown', escFunction, false);
   }, [isOpen]);
 
   return (
