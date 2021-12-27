@@ -115,7 +115,7 @@ export default function Quest({
     <>
       <Split
         primary={
-          <Outset gu16>
+          <Outset gu16={questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update}>
             <Outset gu8 vertical className="block">
               <Split
                 primary={
