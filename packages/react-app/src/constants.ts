@@ -37,8 +37,6 @@ export const QUEST_STATUS = {
   Draft: { id: 'draft', label: 'Draft' },
 };
 
-export const QUEST_SUMMARY_MAX_CHARACTERS = 600;
-
 // Enums
 export const QUEST_MODE = {
   Create: 'CREATE',

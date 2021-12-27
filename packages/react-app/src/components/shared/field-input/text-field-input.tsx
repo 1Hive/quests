@@ -1,9 +1,7 @@
-import { Field, TextInput } from '@1hive/1hive-ui';
+import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
-// eslint-disable-next-line import/no-unresolved
-import parse from 'html-react-parser';
 import styled from 'styled-components';
 
 // #region Styled
@@ -16,6 +14,15 @@ const FieldStyled = styled(Field)`
   ${({ compact }: any) => (compact ? 'margin:0' : '')}
 `;
 
+const EllipsisStyled = styled.div`
+  overflow: hidden;
+  display: inline-block;
+  word-break: break-word;
+  text-align: justify;
+  max-height: 12em;
+  line-height: 1.2em;
+`;
+
 // #endregion
 
 type Props = {
@@ -23,17 +30,17 @@ type Props = {
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
-  maxLength?: number;
   onChange?: Function;
   placeHolder?: string;
   value?: string;
   wide?: boolean;
   multiline?: boolean;
-  autoLinks?: boolean;
   fontSize?: string;
   rows?: number;
   compact?: boolean;
   css?: React.CSSProperties;
+  maxLine?: number;
+  isMarkDown?: boolean;
 };
 export default function TextFieldInput({
   id,
@@ -41,16 +48,16 @@ export default function TextFieldInput({
   isLoading = false,
   label = '',
   fontSize,
-  maxLength,
   placeHolder = '',
   value = '',
   onChange = noop,
   wide = false,
   multiline = false,
-  autoLinks = false,
   rows = 10,
   compact = false,
   css,
+  maxLine,
+  isMarkDown = false,
 }: Props) {
   if (isLoading)
     return (
@@ -58,15 +65,7 @@ export default function TextFieldInput({
         <Skeleton />
       </FieldStyled>
     );
-  const content = value.substring(0, maxLength);
-  const readOnlyContent = (
-    <>
-      {autoLinks
-        ? parse(content.replace(/(https?:\/\/)([^ ]+)/g, '<a target="_blank" href="$&">$2</a>'))
-        : content}
-      {maxLength && value.length > maxLength && <span title={value}>...</span>}
-    </>
-  );
+  const readOnlyContent = <>{isMarkDown ? <Markdown normalized content={value} /> : value}</>;
   const loadableContent = isEdit ? (
     <TextInput
       id={id}
@@ -79,7 +78,9 @@ export default function TextFieldInput({
       rows={rows}
     />
   ) : (
-    <TextContainerStyled style={{ ...css, fontSize }}>{readOnlyContent}</TextContainerStyled>
+    <TextContainerStyled style={{ ...css, fontSize }}>
+      <EllipsisStyled className="ellipsis">{readOnlyContent}</EllipsisStyled>
+    </TextContainerStyled>
   );
   return label ? (
     <Field label={label} key={id}>

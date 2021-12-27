@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { PAGES, QUEST_MODE, QUEST_SUMMARY_MAX_CHARACTERS } from 'src/constants';
+import { PAGES, QUEST_MODE } from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -15,6 +15,7 @@ import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { fetchClaimDeposit } from 'src/services/quest.service';
+import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import ClaimModal from '../modals/claim-modal';
 import FundModal from '../modals/fund-modal';
 import DateFieldInput from './field-input/date-field-input';
@@ -148,9 +149,6 @@ export default function Quest({
               <TextFieldInput
                 id="description"
                 label={isEdit ? 'Description' : undefined}
-                maxLength={
-                  questMode === QUEST_MODE.ReadSummary ? QUEST_SUMMARY_MAX_CHARACTERS : undefined
-                }
                 value={questData.description}
                 isEdit={isEdit}
                 isLoading={loading}
@@ -158,8 +156,8 @@ export default function Quest({
                 onChange={handleChange}
                 wide
                 multiline
-                autoLinks
-                css={{ height: '100px', whiteSpace: 'pre-wrap' }}
+                isMarkDown
+                maxLine={10}
               />
               {isEdit && (
                 <>
