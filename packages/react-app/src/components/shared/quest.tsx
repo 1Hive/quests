@@ -14,8 +14,8 @@ import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
-import { fetchClaimDeposit } from 'src/services/quest.service';
-import ClaimModal from '../modals/claim-modal';
+import { ClaimModel } from 'src/models/claim.model';
+import ScheduleClaimModal from '../modals/schedule-claim-modal';
 import FundModal from '../modals/fund-modal';
 import DateFieldInput from './field-input/date-field-input';
 import { ChildSpacer, Outset } from './utils/spacer-util';
@@ -23,6 +23,7 @@ import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-f
 import TextFieldInput from './field-input/text-field-input';
 import IdentityBadge from './identity-badge';
 import ClaimList from './claim-list';
+import { ExecuteClaim } from './execute-claim';
 // #region StyledComponents
 
 const LinkStyled = styled(Link)`
@@ -80,15 +81,33 @@ export default function Quest({
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
+  const [claims, setClaims] = useState<ClaimModel[]>();
+
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
   const questFactoryContract = useFactoryContract();
+  const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | undefined>();
 
   useEffect(() => {
     setIsEdit(questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update);
   }, [questMode]);
 
   useEffect(() => {
+    if (claims) setCurrentPlayerClaim(claims.find((x) => x.playerAddress === wallet.account));
+  }, [claims]);
+
+  useEffect(() => {
+    const getClaimDeposit = async () => {
+      try {
+        setClaimDeposit(await QuestService.fetchClaimDeposit());
+      } catch (error) {
+        Logger.error(error);
+      }
+    };
+    const fetchClaims = async () => {
+      const result = await QuestService.getQuestClaims(data);
+      setClaims(result);
+    };
     const getBalanceOfQuest = async (address: string) => {
       try {
         const result = await getBalanceOf(defaultToken, address);
@@ -97,17 +116,9 @@ export default function Quest({
         Logger.error(error);
       }
     };
-    if (data.address) getBalanceOfQuest(data.address);
-  }, [wallet.account]);
 
-  useEffect(() => {
-    const getClaimDeposit = async () => {
-      try {
-        setClaimDeposit(await fetchClaimDeposit());
-      } catch (error) {
-        Logger.error(error);
-      }
-    };
+    if (data.address) getBalanceOfQuest(data.address);
+    fetchClaims();
     getClaimDeposit();
   }, []);
 
@@ -202,17 +213,6 @@ export default function Quest({
                 isLoading={loading || (!isEdit && !claimDeposit)}
               />
             )}
-            {/* {(!!values.tags?.length || editMode) && (
-                    <TagFieldInputFormik
-                      id="tags"
-                      label="Tags"
-                      isEdit={editMode}
-                      isLoading={loading}
-                      value={values.tags}
-                      formik={formRef}
-                      // onTagClick={(x: String[]) => Logger.debug('Tag clicked : ', x)} // TODO : Restore filter by tag on tag click
-                    />
-                  )} TODO : No tags for MVP */}
             <DateFieldInput
               id="expireTimeMs"
               label="Expire time"
@@ -224,9 +224,9 @@ export default function Quest({
           </Outset>
         }
       />
-      {!loading && !isEdit && (
+      {!loading && !isEdit && data.address && (
         <>
-          {questMode === QUEST_MODE.ReadDetail && <ClaimList quest={data} />}
+          {questMode === QUEST_MODE.ReadDetail && claims && <ClaimList claims={claims} />}
           <QuestFooterStyled>
             <Outset gu8 vertical>
               {questMode !== QUEST_MODE.ReadDetail && (
@@ -239,8 +239,12 @@ export default function Quest({
               {questMode !== QUEST_MODE.ReadSummary && questData.address && wallet.account && (
                 <ChildSpacer>
                   <FundModal questAddress={questData.address} />
-                  {claimDeposit && (
-                    <ClaimModal questAddress={questData.address} claimDeposit={claimDeposit} />
+                  {currentPlayerClaim ? (
+                    <ExecuteClaim claim={currentPlayerClaim} />
+                  ) : (
+                    claimDeposit && (
+                      <ScheduleClaimModal questAddress={data.address} claimDeposit={claimDeposit} />
+                    )
                   )}
                 </ChildSpacer>
               )}

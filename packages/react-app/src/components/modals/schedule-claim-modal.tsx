@@ -1,16 +1,15 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import { Button, useToast } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
-import { useWallet } from 'use-wallet';
 import { Formik, Form } from 'formik';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
+import { useWallet } from 'src/providers/wallet.context';
 import ModalBase from './modal-base';
-import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
@@ -30,13 +29,14 @@ type Props = {
   onClose?: Function;
 };
 
-export default function ClaimModal({ questAddress, claimDeposit, onClose = noop }: Props) {
+export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose = noop }: Props) {
   const toast = useToast();
   const wallet = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
+
   const onModalClose = () => {
     setOpened(false);
     onClose();
@@ -49,12 +49,13 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
         <Button
           icon={<GiBroadsword />}
           onClick={() => setOpened(true)}
-          label="Claim"
+          label="Schedule claim"
           mode="positive"
         />
       }
       buttons={[
         <AmountFieldInputFormik
+          key="claimDeposit"
           id="claimDeposit"
           label="Claim Deposit"
           isEdit={false}
@@ -65,7 +66,7 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
         <Button
           key="confirmButton"
           icon={<GiBroadsword />}
-          label="Claim"
+          label="Schedule claim"
           mode="positive"
           type="submit"
           form="form-claim"
@@ -78,7 +79,7 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
         initialValues={{ evidence: '', claimedAmount: DEFAULT_AMOUNT }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
-          if (!values.claimedAmount?.amount) errors.push('Claimed amount is required');
+          if (!values.claimedAmount) errors.push('Claimed amount is required');
           if (!values.evidence) errors.push('Evidence of completion is required');
           if (errors.length) {
             errors.forEach(toast);
@@ -88,12 +89,16 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
                 setLoading(true);
                 // toast('Quest claiming ...');
                 toast('Comming soon ...');
-                await QuestService.scheduleQuestClaim(governQueueContract, {
-                  claimAmount: values.claimedAmount,
-                  evidence: values.evidence,
-                  playerAddress: wallet.account,
-                  questAddress,
-                });
+                await QuestService.scheduleQuestClaim(
+                  governQueueContract,
+                  {
+                    claimAmount: values.claimedAmount,
+                    evidence: values.evidence,
+                    playerAddress: wallet.account,
+                    questAddress,
+                  },
+                  claimDeposit!,
+                );
                 onModalClose();
                 // toast('Operation succeed');
               } catch (e: any) {

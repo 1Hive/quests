@@ -91,11 +91,12 @@ function useContract(contractName: string, addressOverride?: string, withSignerI
 }
 
 export function useFactoryContract() {
-  return useContract('QuestFactory');
+  return useContract('QuestFactory', undefined, true);
 }
 
 export function useGovernQueueContract() {
-  return useContract('GovernQueue');
+  const { governQueue } = getNetwork();
+  return useContract('GovernQueue', governQueue, true);
 }
 
 export function useERC20Contract(token: TokenModel, withSignerIfPossible = true) {

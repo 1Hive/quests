@@ -1,9 +1,6 @@
 import { AddressField, Field, Accordion, GU } from '@1hive/1hive-ui';
-import { useEffect, useState } from 'react';
 import { ClaimModel } from 'src/models/claim.model';
-import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/providers/wallet.context';
-import { fetchQuestClaims } from 'src/services/quest.service';
 import styled from 'styled-components';
 import ChallengeModal from '../modals/challenge-modal';
 import AmountFieldInput from './field-input/amount-field-input';
@@ -22,7 +19,7 @@ const RowStyled = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: center;
   margin: ${GU}px;
 `;
@@ -30,22 +27,11 @@ const RowStyled = styled.div`
 // #endregion
 
 type Props = {
-  quest: QuestModel;
+  claims: ClaimModel[];
 };
 
-export default function ClaimList({ quest }: Props) {
-  const [claims, setClaims] = useState<ClaimModel[]>();
+export default function ClaimList({ claims }: Props) {
   const wallet = useWallet();
-
-  useEffect(() => {
-    const fetchClaims = async () => {
-      const result = await fetchQuestClaims(quest);
-
-      setClaims(result);
-    };
-
-    fetchClaims();
-  }, []);
 
   return (
     <WrapperStyled>
@@ -54,7 +40,7 @@ export default function ClaimList({ quest }: Props) {
           <Accordion
             items={claims.map((x: ClaimModel) => [
               <RowStyled>
-                <Field label="Claiming player">
+                <Field label={wallet?.account === x.playerAddress ? 'You' : 'Claiming player'}>
                   <AddressField address={x.playerAddress} autofocus={false} />
                 </Field>
                 <AmountFieldInput

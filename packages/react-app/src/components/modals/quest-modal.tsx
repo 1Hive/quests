@@ -75,6 +75,7 @@ export default function QuestModal({
       buttons={[
         (questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update) && (
           <QuestActionButtonStyled
+            key="btn-save"
             label="Save"
             icon={<FaSave />}
             mode="positive"

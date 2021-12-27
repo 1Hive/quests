@@ -11,6 +11,8 @@ const networks = {
     type: 'mainnet',
     defaultEthNode: 'https://eth.aragon.network/',
     subgraph: '',
+    defaultToken: TOKENS.HoneyTest,
+    nativeToken: TOKENS.Ether,
   },
   rinkeby: {
     chainId: 4,
@@ -23,7 +25,8 @@ const networks = {
     govern: '0x0f37760f7bF292A3E1578583bDb8db9835E37229',
     governQueue: '0x034464e101eb7a0e8daa4cca220f40696ace0053', // TODO:Restore real govern queue '0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697',
     celeste: '0x949f75Ab8362B4e53967742dC93CC289eFb43f6D',
-    defaultToken: TOKENS.Honey,
+    defaultToken: TOKENS.HoneyTest,
+    nativeToken: TOKENS.xDAI,
   } as NetworkModel,
   xdai: {
     chainId: 100,
@@ -32,6 +35,8 @@ const networks = {
     defaultEthNode: 'https://xdai.poanetwork.dev/',
     questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai
+    defaultToken: TOKENS.Honey,
+    nativeToken: TOKENS.xDAI,
   },
   local: {
     chainId: 1337,

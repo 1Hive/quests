@@ -12,5 +12,6 @@ export type NetworkModel = {
   governQueue: string;
   celeste: string;
   defaultToken: TokenModel;
+  nativeToken: TokenModel;
   ensRegistry?: string;
 };

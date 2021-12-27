@@ -1,23 +1,23 @@
+/* eslint-disable no-unused-vars */
 import { request } from 'graphql-request';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { QuestEntityQuery, QuestEntitiesQuery } from 'src/queries/quest-entity.query';
-import { toAscii, toChecksumAddress } from 'web3-utils';
+import { toAscii, toChecksumAddress, toHex } from 'web3-utils';
 import {
   fakeContainerResult,
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
 } from 'src/queries/govern-queue-entity.query';
 import { BigNumber, ethers } from 'ethers';
-import { ConfigModel, ContainerModel } from 'src/models/govern.model';
+import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { DEAULT_CLAIM_EXECUTION_DELAY, CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
-import { isDelayOver } from '../utils/date.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
 
@@ -51,7 +51,7 @@ function mapQuestList(quests: any[]): QuestModel[] {
 }
 
 async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
-  const { governSubgraph, governQueue, defaultToken } = getNetwork();
+  const { governSubgraph, governQueue, defaultToken, nativeToken } = getNetwork();
 
   const result = await request(governSubgraph, GovernQueueEntityQuery, {
     ID: governQueue.toLowerCase(),
@@ -68,12 +68,14 @@ async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel 
             BigNumber.from(config.challengeDeposit.amount),
             defaultToken.decimals,
           ),
+          token: nativeToken,
         },
         scheduleDeposit: {
           amount: fromBigNumber(
             BigNumber.from(config.scheduleDeposit.amount),
             defaultToken.decimals,
           ),
+          token: nativeToken,
         },
       },
       nonce: +result.governQueue.nonce,
@@ -113,7 +115,7 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
   return containers;
 }
 
-async function getContainer(claimData: ClaimModel, execTime?: number): Promise<ContainerModel> {
+async function getContainer(claimData: ClaimModel): Promise<ContainerModel> {
   const { govern, celeste } = getNetwork();
 
   const governQueueResult = await fetchGovernQueue();
@@ -127,15 +129,11 @@ async function getContainer(claimData: ClaimModel, execTime?: number): Promise<C
   const currentBlock = await ethers.getDefaultProvider().getBlock('latest');
 
   // A bit more than the execution delay
-  const executionTime = execTime ?? currentBlock.timestamp + DEAULT_CLAIM_EXECUTION_DELAY + 60;
+  const executionTime =
+    claimData.executionTime ?? currentBlock.timestamp + DEAULT_CLAIM_EXECUTION_DELAY + 60;
 
-  // Claim user data
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
-  const claimCall = getQuestContractInterface().encodeFunctionData('claim', [
-    evidenceIpfsHash,
-    claimData.playerAddress,
-    claimData.claimAmount.amount,
-  ]);
+  const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
 
   return {
     config: ERC3000Config,
@@ -155,6 +153,20 @@ async function getContainer(claimData: ClaimModel, execTime?: number): Promise<C
       proof: evidenceIpfsHash,
     },
   } as ContainerModel;
+}
+
+function decodeClaimAction(payload: PayloadModel) {
+  const [evidenceIpfsHash, playerAddress, claimAmount] =
+    getQuestContractInterface().decodeFunctionData('claim', payload.actions[0].data);
+  return { evidenceIpfsHash, playerAddress, claimAmount };
+}
+
+function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
+  return getQuestContractInterface().encodeFunctionData('claim', [
+    toHex(evidenceIpfsHash),
+    claimData.playerAddress,
+    claimData.claimAmount.amount,
+  ]);
 }
 
 // #endregion
@@ -187,6 +199,7 @@ export async function getMoreQuests(
   questList = questList.concat(newQuests);
   return newQuests;
 }
+
 export async function getQuest(address: string) {
   const { questSubgraph } = getNetwork();
   const queryResult = (
@@ -245,13 +258,15 @@ export async function fundQuest(
 export async function scheduleQuestClaim(
   governQueueContract: any,
   claimData: ClaimModel,
-  execTime?: number,
+  scheduleDeposit: TokenAmountModel,
   // eslint-disable-next-line no-unused-vars
   onTrx?: (hash: string) => void,
 ) {
-  const container = await getContainer(claimData, execTime);
-  Logger.debug('Scheduling claim ...', { container, claimData });
-  // const tx = await governQueueContract.schedule(container);
+  const container = await getContainer(claimData);
+  Logger.debug('Scheduling quest claim ...', { container, claimData });
+  // const tx = await governQueueContract.schedule(container).send({
+  //   value: scheduleDeposit.amount,
+  // });
   // onTrx?.(tx.hash);
   // Logger.info('TRX hash', tx.hash);
   // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
@@ -266,8 +281,8 @@ export async function executeQuestClaim(
   // eslint-disable-next-line no-unused-vars
   onTrx?: (hash: string) => void,
 ) {
-  const container = await getContainer(claimData, execTime);
-  Logger.debug('Executing claim ...', { container, claimData });
+  const container = await getContainer(claimData);
+  Logger.debug('Executing quest claim ...', { container, claimData });
   // const tx = await governQueueContract.execute(container);
   // onTrx?.(tx.hash);
   // Logger.info('TRX hash', tx.hash);
@@ -283,7 +298,7 @@ export async function challengeQuestClaim(
   onTrx?: (hash: string) => void,
 ) {
   const container = await getContainer(challenge.claim);
-  Logger.debug('Executing challenge ...', { container, challenge });
+  Logger.debug('Challenging quest ...', { container, challenge });
   // const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
   // const tx = await governQueueContract.challenge(container, challengeReasonIpfs);
   // onTrx?.(tx.hash);
@@ -293,19 +308,20 @@ export async function challengeQuestClaim(
   // Logger.info(`Claim challenged`);
 }
 
-export async function isQuestClaimScheduleEnded(questAddress: string, playerAddress: string) {
+export async function getClaimExecutableTime(questAddress: string, playerAddress: string) {
   const governQueueContainers = await fetchGovernQueueContainers();
-  return (
-    governQueueContainers?.find(
-      (x: ContainerModel) =>
-        x.payload.submitter === playerAddress && isDelayOver(+x.payload.executionTime),
-    ) ?? false
+  const container: ContainerModel | undefined = governQueueContainers?.find(
+    (x: ContainerModel) =>
+      x.payload.submitter === playerAddress && x.payload.actions[0].to === questAddress,
   );
+
+  return container && +container.payload.executionTime * 1000; // Convert Sec to MS
 }
 
-export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
-  const { defaultToken } = getNetwork();
+export async function getQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
+  const { defaultToken, nativeToken } = getNetwork();
   const res = await fetchGovernQueueContainers();
+
   return Promise.all(
     res
       .filter(
@@ -314,10 +330,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           (x.state === CLAIM_STATUS.Scheduled || x.state === CLAIM_STATUS.Challenged),
       )
       .map(async (x) => {
-        const claimAction = x.payload.actions[0];
-        const [evidenceIpfsHash, playerAddress, claimAmount] =
-          getQuestContractInterface().decodeFunctionData('claim', claimAction.data);
-
+        const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);
         const evidence = await getObjectFromIpfs(evidenceIpfsHash);
 
         return {
@@ -331,7 +344,9 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
               BigNumber.from(x.config.challengeDeposit.amount),
               defaultToken.decimals,
             ),
+            token: nativeToken,
           },
+          executionTime: +x.payload.executionTime * 1000, // Sec to MS
         } as ClaimModel;
       }),
   );

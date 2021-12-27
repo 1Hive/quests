@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Button, useToast, IconFlag } from '@1hive/1hive-ui';
+import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
@@ -19,6 +19,12 @@ const FormStyled = styled(Form)`
   width: 100%;
 `;
 
+const TimerStyled = styled(Timer)`
+  svg {
+    color: white !important;
+  }
+`;
+
 // #endregion
 
 type Props = {
@@ -32,6 +38,19 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
+  const [challengeTimeout, setChallengedTimeout] = useState(false);
+
+  useEffect(() => {
+    let handle: any;
+    if (claim.executionTime)
+      handle = setTimeout(() => {
+        setChallengedTimeout(true);
+      }, claim.executionTime - Date.now());
+    return () => {
+      if (handle) clearTimeout(handle);
+    };
+  }, [claim.executionTime]);
+
   const onModalClose = () => {
     setOpened(false);
     onClose();
@@ -44,12 +63,19 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
         <Button
           icon={<IconFlag />}
           onClick={() => setOpened(true)}
-          label="Challenge"
+          label={
+            <>
+              Challenge
+              {claim.executionTime && <TimerStyled end={new Date(claim.executionTime)} />}
+            </>
+          }
           mode="negative"
+          disabled={challengeTimeout}
         />
       }
       buttons={[
         <AmountFieldInputFormik
+          key="challengeDeposit"
           id="challengeDeposit"
           label="Challenge Deposit"
           isEdit={false}
@@ -85,9 +111,10 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
                 await QuestService.challengeQuestClaim(governQueueContract, {
                   claim,
                   reason: values.reason,
+                  deposit: claim.challengeDeposit!,
                 });
                 onModalClose();
-                toast('Operation succeed');
+                // toast('Operation succeed');
               } catch (e: any) {
                 Logger.error(e);
                 toast(
