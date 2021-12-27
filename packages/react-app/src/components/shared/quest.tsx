@@ -182,7 +182,7 @@ export default function Quest({
           </Outset>
         }
         secondary={
-          <Outset gu16={questMode !== QUEST_MODE.Create && questMode !== QUEST_MODE.Update}>
+          <Outset gu16={!isEdit}>
             {bounty !== null && (
               <AmountFieldInputFormik
                 id="bounty"
