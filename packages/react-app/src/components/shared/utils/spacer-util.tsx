@@ -43,7 +43,6 @@ export function Outset({
   let classes = className;
   if (vertical && horizontal) {
     if (gu4) classes += ' p-4';
-    else if (gu8) classes += ' p-8';
     else if (gu16) classes += ' p-16';
     else if (gu24) classes += ' p-24';
     else if (gu32) classes += ' p-32';
@@ -51,9 +50,9 @@ export function Outset({
     else if (gu48) classes += ' p-48';
     else if (gu56) classes += ' p-56';
     else if (gu64) classes += ' p-64';
+    else if (gu8) classes += ' p-8';
   } else if (vertical) {
     if (gu4) classes += ' pt-4 pb-4';
-    else if (gu8) classes += ' pt-8 pb-8';
     else if (gu16) classes += ' pt-16 pb-16';
     else if (gu24) classes += ' pt-24 pb-24';
     else if (gu32) classes += ' pt-32 pb-32';
@@ -61,9 +60,9 @@ export function Outset({
     else if (gu48) classes += ' pt-48 pb-48';
     else if (gu56) classes += ' pt-56 pb-56';
     else if (gu64) classes += ' pt-64 pb-64';
+    else if (gu8) classes += ' pt-8 pb-8';
   } else if (horizontal) {
     if (gu4) classes += ' pl-4 pr-4';
-    else if (gu8) classes += ' pl-8 pr-8';
     else if (gu16) classes += ' pl-16 pr-16';
     else if (gu24) classes += ' pl-24 pr-24';
     else if (gu32) classes += ' pl-32 pr-32';
@@ -71,6 +70,7 @@ export function Outset({
     else if (gu48) classes += ' pl-48 pr-48';
     else if (gu56) classes += ' pl-56 pr-56';
     else if (gu64) classes += ' pl-64 pr-64';
+    else if (gu8) classes += ' pl-8 pr-8';
   }
   return (
     <div className={classes} style={css}>
@@ -99,7 +99,6 @@ export function Inset({
   let classes = className;
   if (vertical && horizontal) {
     if (gu4) classes += ' m-4';
-    else if (gu8) classes += ' m-8';
     else if (gu16) classes += ' m-16';
     else if (gu24) classes += ' m-24';
     else if (gu32) classes += ' m-32';
@@ -107,9 +106,9 @@ export function Inset({
     else if (gu48) classes += ' m-48';
     else if (gu56) classes += ' m-56';
     else if (gu64) classes += ' m-64';
+    else if (gu8) classes += ' m-8';
   } else if (vertical) {
     if (gu4) classes += ' mt-4 mb-4';
-    else if (gu8) classes += ' mt-8 mb-8';
     else if (gu16) classes += ' mt-16 mb-16';
     else if (gu24) classes += ' mt-24 mb-24';
     else if (gu32) classes += ' mt-32 mb-32';
@@ -117,9 +116,9 @@ export function Inset({
     else if (gu48) classes += ' mt-48 mb-48';
     else if (gu56) classes += ' mt-56 mb-56';
     else if (gu64) classes += ' mt-64 mb-64';
+    else if (gu8) classes += ' mt-8 mb-8';
   } else if (horizontal) {
     if (gu4) classes += ' ml-4 mr-4';
-    else if (gu8) classes += ' ml-8 mr-8';
     else if (gu16) classes += ' ml-16 mr-16';
     else if (gu24) classes += ' ml-24 mr-24';
     else if (gu32) classes += ' ml-32 mr-32';
@@ -127,6 +126,7 @@ export function Inset({
     else if (gu48) classes += ' ml-48 mr-48';
     else if (gu56) classes += ' ml-56 mr-56';
     else if (gu64) classes += ' ml-64 mr-64';
+    else if (gu8) classes += ' ml-8 mr-8';
   }
   return (
     <div className={classes} style={css}>
