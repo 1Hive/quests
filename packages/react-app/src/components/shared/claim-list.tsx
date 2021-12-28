@@ -55,7 +55,7 @@ export default function ClaimList({ claims }: Props) {
                 <TextFieldInput
                   id="evidence"
                   value={x.evidence}
-                  autoLinks
+                  isMarkDown
                   wide
                   label="Evidence of completion"
                 />
