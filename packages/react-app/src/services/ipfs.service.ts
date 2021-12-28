@@ -2,18 +2,23 @@ import ipfsAPI, { Options } from 'ipfs-http-client';
 import { Logger } from 'src/utils/logger';
 import { toAscii, toHex } from 'web3-utils';
 
-const config = {
+const configInfura = {
   host: 'ipfs.infura.io',
   port: 5001,
   protocol: 'https',
 } as Options;
 
-const ipfs = ipfsAPI.create(config);
+const configTheGraph = {
+  url: 'http://api.thegraph.com/ipfs/api/v0',
+};
 
-export const getIpfsBaseUri = () => `${config.url}/cat?arg=`;
+const ipfsInfura = ipfsAPI.create(configInfura);
+const ipfsTheGraph = ipfsAPI.create(configTheGraph);
+
+export const getIpfsBaseUri = () => `${configTheGraph.url}/cat?arg=`;
 
 export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
-  const response = await ipfs.add(obj.toString());
+  const response = await ipfsTheGraph.add(obj.toString());
   const cid = response.cid.toString();
   Logger.debug('New IPFS at address', cid);
   return toHex(cid);
@@ -21,7 +26,7 @@ export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
 
 export const getObjectFromIpfs = async (objHasHex: string) => {
   // eslint-disable-next-line no-restricted-syntax
-  for await (const value of ipfs.get(toAscii(objHasHex))) {
+  for await (const value of ipfsInfura.get(toAscii(objHasHex))) {
     const decodedSplit = new TextDecoder('utf-8')
       .decode(value)
       .trim()

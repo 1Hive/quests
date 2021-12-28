@@ -1,19 +1,25 @@
-import { Field, TextInput } from '@1hive/1hive-ui';
+import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
-// eslint-disable-next-line import/no-unresolved
-import parse from 'html-react-parser';
 import styled from 'styled-components';
 
 // #region Styled
 
-const TextContainerStyled = styled.div`
-  white-space: pre-wrap;
-`;
-
 const FieldStyled = styled(Field)`
   ${({ compact }: any) => (compact ? 'margin:0' : '')}
+`;
+
+const MaxHeightStyled = styled.div`
+  overflow: hidden;
+  margin-bottom: 8px;
+  line-height: 1.4em;
+  ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.4}em;` : '')}
+
+  p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
 `;
 
 // #endregion
@@ -23,17 +29,18 @@ type Props = {
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
-  maxLength?: number;
   onChange?: Function;
   placeHolder?: string;
   value?: string;
   wide?: boolean;
   multiline?: boolean;
-  autoLinks?: boolean;
   fontSize?: string;
   rows?: number;
   compact?: boolean;
   css?: React.CSSProperties;
+  maxLine?: number;
+  isMarkDown?: boolean;
+  ellipsis?: ReactNode;
 };
 export default function TextFieldInput({
   id,
@@ -41,16 +48,17 @@ export default function TextFieldInput({
   isLoading = false,
   label = '',
   fontSize,
-  maxLength,
   placeHolder = '',
   value = '',
   onChange = noop,
   wide = false,
   multiline = false,
-  autoLinks = false,
   rows = 10,
   compact = false,
   css,
+  maxLine,
+  isMarkDown = false,
+  ellipsis,
 }: Props) {
   if (isLoading)
     return (
@@ -58,13 +66,19 @@ export default function TextFieldInput({
         <Skeleton />
       </FieldStyled>
     );
-  const content = value.substring(0, maxLength);
   const readOnlyContent = (
     <>
-      {autoLinks
-        ? parse(content.replace(/(https?:\/\/)([^ ]+)/g, '<a target="_blank" href="$&">$2</a>'))
-        : content}
-      {maxLength && value.length > maxLength && <span title={value}>...</span>}
+      {isMarkDown ? (
+        <Markdown
+          normalized
+          markdownToJsxOptions={(o: any) => ({
+            ...o,
+          })}
+          content={value}
+        />
+      ) : (
+        value
+      )}
     </>
   );
   const loadableContent = isEdit ? (
@@ -79,7 +93,16 @@ export default function TextFieldInput({
       rows={rows}
     />
   ) : (
-    <TextContainerStyled style={{ ...css, fontSize }}>{readOnlyContent}</TextContainerStyled>
+    <div style={{ ...css, fontSize }}>
+      {maxLine ? (
+        <div>
+          <MaxHeightStyled maxLine={maxLine}>{readOnlyContent}</MaxHeightStyled>
+          {ellipsis}
+        </div>
+      ) : (
+        readOnlyContent
+      )}
+    </div>
   );
   return label ? (
     <Field label={label} key={id}>

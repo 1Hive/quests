@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { PAGES, QUEST_MODE, QUEST_SUMMARY_MAX_CHARACTERS } from 'src/constants';
+import { PAGES, QUEST_MODE } from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -27,6 +27,7 @@ import ClaimList from './claim-list';
 
 const LinkStyled = styled(Link)`
   text-decoration: none;
+  color: dodgerblue;
 `;
 const CardStyled = styled(Card)`
   justify-content: flex-start;
@@ -148,9 +149,6 @@ export default function Quest({
               <TextFieldInput
                 id="description"
                 label={isEdit ? 'Description' : undefined}
-                maxLength={
-                  questMode === QUEST_MODE.ReadSummary ? QUEST_SUMMARY_MAX_CHARACTERS : undefined
-                }
                 value={questData.description}
                 isEdit={isEdit}
                 isLoading={loading}
@@ -158,8 +156,11 @@ export default function Quest({
                 onChange={handleChange}
                 wide
                 multiline
-                autoLinks
-                css={{ height: '100px', whiteSpace: 'pre-wrap' }}
+                isMarkDown
+                maxLine={questMode === QUEST_MODE.ReadSummary ? 10 : undefined}
+                ellipsis={
+                  <LinkStyled to={`/${PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
+                }
               />
               {isEdit && (
                 <>
@@ -182,7 +183,7 @@ export default function Quest({
           </Outset>
         }
         secondary={
-          <Outset gu16>
+          <Outset gu16={!isEdit}>
             {bounty !== null && (
               <AmountFieldInputFormik
                 id="bounty"

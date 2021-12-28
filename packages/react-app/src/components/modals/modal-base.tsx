@@ -1,6 +1,6 @@
 import { GU, Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
 
@@ -42,12 +42,29 @@ export default function ModalBase({
   isOpen = false,
   css,
 }: Props) {
+  // TODO : Not clean
+  const escFunction = (e: any) => {
+    if (
+      e.key === 'Escape' &&
+      (e.target.tagName.toUpperCase() === 'BODY' || e.target.type?.toLowerCase() === 'button')
+    ) {
+      onClose();
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', escFunction, false);
+    } else document.removeEventListener('keydown', escFunction, false);
+    return () => document.removeEventListener('keydown', escFunction, false);
+  }, [isOpen]);
+
   return (
     <>
       {openButton}
       <ModalStyled
         visible={isOpen}
-        onClose={onClose}
+        onClose={(e: any) => e && onClose()}
         width={(viewport: VisualViewport) => Math.min(viewport.width - 48, 1200)}
         style={css}
       >
