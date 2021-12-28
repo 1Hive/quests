@@ -43,7 +43,6 @@
     "ethereumjs-util": "^7.0.8",
     "ethers": "^5.3.1",
     "formik": "^2.2.6",
-    "ftellipsis": "^0.2.3",
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
     "graphql-tag": "^2.11.0",

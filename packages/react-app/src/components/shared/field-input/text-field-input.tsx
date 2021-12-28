@@ -10,7 +10,7 @@ const FieldStyled = styled(Field)`
   ${({ compact }: any) => (compact ? 'margin:0' : '')}
 `;
 
-const EllipsisStyled = styled.div`
+const MaxHeightStyled = styled.div`
   overflow: hidden;
   margin-bottom: 8px;
   line-height: 1.4em;
@@ -96,7 +96,7 @@ export default function TextFieldInput({
     <div style={{ ...css, fontSize }}>
       {maxLine ? (
         <div>
-          <EllipsisStyled maxLine={maxLine}>{readOnlyContent}</EllipsisStyled>
+          <MaxHeightStyled maxLine={maxLine}>{readOnlyContent}</MaxHeightStyled>
           {ellipsis}
         </div>
       ) : (
