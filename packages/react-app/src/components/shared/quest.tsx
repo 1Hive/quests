@@ -95,7 +95,7 @@ export default function Quest({
 
   useEffect(() => {
     if (claims) setCurrentPlayerClaim(claims.find((x) => x.playerAddress === wallet.account));
-  }, [claims]);
+  }, [claims, wallet.account]);
 
   useEffect(() => {
     const getClaimDeposit = async () => {

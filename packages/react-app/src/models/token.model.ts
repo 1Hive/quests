@@ -3,4 +3,5 @@ export type TokenModel = {
   symb: string;
   address: string;
   decimals: number;
+  native: boolean;
 };

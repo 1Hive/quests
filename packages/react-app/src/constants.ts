@@ -14,12 +14,21 @@ export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
 // Cryptos
 export const TOKENS = {
+  // Native tokens
   Ether: {
     name: 'Ether',
     symb: 'ETH',
     address: '',
     decimals: 18,
+    native: true,
   } as TokenModel,
+  xDAI: {
+    name: 'xDAI',
+    symb: 'xDAI',
+    decimals: 18,
+    native: true,
+  } as TokenModel,
+  // ERC20 tokens
   Honey: {
     name: 'Honey',
     symb: 'HNY',
@@ -36,12 +45,6 @@ export const TOKENS = {
     name: 'Tether',
     symb: 'USDT',
     address: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
-    decimals: 18,
-  } as TokenModel,
-  xDAI: {
-    name: 'xDAI',
-    symb: 'xDAI',
-    address: '0x26472cc7f4cb43ae9b3f18c705de8c34578933f9',
     decimals: 18,
   } as TokenModel,
 };
