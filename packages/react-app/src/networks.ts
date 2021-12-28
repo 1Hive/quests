@@ -26,7 +26,7 @@ const networks = {
     governQueue: '0x034464e101eb7a0e8daa4cca220f40696ace0053', // TODO:Restore real govern queue '0x1EF2B45F8707E981cdf6859C22Dc1390cCc01697',
     celeste: '0x949f75Ab8362B4e53967742dC93CC289eFb43f6D',
     defaultToken: TOKENS.HoneyTest,
-    nativeToken: TOKENS.xDAI,
+    nativeToken: TOKENS.Ether,
   } as NetworkModel,
   xdai: {
     chainId: 100,
