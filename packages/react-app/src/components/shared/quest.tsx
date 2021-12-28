@@ -153,6 +153,8 @@ export default function Quest({
                 isEdit={isEdit}
                 isLoading={loading}
                 placeHolder="Quest description"
+                tooltip="YOOO"
+                tooltipDetail="allo"
                 onChange={handleChange}
                 wide
                 multiline

@@ -1,9 +1,10 @@
-import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
+import { Field, TextInput, Help, GU, Markdown } from '@1hive/1hive-ui';
+
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-
+import HelpLogo from '../../../assets/help.svg';
 // #region Styled
 
 const FieldStyled = styled(Field)`
@@ -22,6 +23,13 @@ const MaxHeightStyled = styled.div`
   }
 `;
 
+const SpanStyled = styled.span`
+  margin-left: ${1 * GU}px;
+  text-decoration: underline;
+  font-size: medium;
+  font-weight: 600;
+  color: #88a8e4;
+`;
 // #endregion
 
 type Props = {
@@ -41,6 +49,8 @@ type Props = {
   maxLine?: number;
   isMarkDown?: boolean;
   ellipsis?: ReactNode;
+  tooltip?: string;
+  tooltipDetail?: React.ReactNode;
 };
 export default function TextFieldInput({
   id,
@@ -59,6 +69,8 @@ export default function TextFieldInput({
   maxLine,
   isMarkDown = false,
   ellipsis,
+  tooltipDetail,
+  tooltip,
 }: Props) {
   if (isLoading)
     return (
@@ -105,9 +117,34 @@ export default function TextFieldInput({
     </div>
   );
   return label ? (
-    <Field label={label} key={id}>
-      {loadableContent}
-    </Field>
+    <>
+      <Field
+        label={
+          <>
+            {tooltipDetail ? (
+              <>
+                {label} <Help hint={tooltip}>{tooltipDetail}</Help>
+              </>
+            ) : (
+              <>
+                <span title={tooltip}>
+                  <>
+                    {label}
+                    {tooltip && <img src={HelpLogo} alt="help.svg" />}
+                  </>
+                </span>
+              </>
+            )}
+          </>
+        }
+        key={id}
+      >
+        {loadableContent}
+      </Field>
+      {/* {tooltip?(
+
+        )} */}
+    </>
   ) : (
     loadableContent
   );
