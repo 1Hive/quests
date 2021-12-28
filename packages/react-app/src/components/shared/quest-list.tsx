@@ -6,9 +6,9 @@ import Quest from 'src/components/shared/quest';
 import { PAGES, QUEST_MODE } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
-import { usePageContext } from 'src/providers/page.context';
+import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
-import { useFilterContext } from '../../providers/filter.context';
+import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from './utils/spacer-util';
 
 const batchSize = 3;

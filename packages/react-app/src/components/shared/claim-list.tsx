@@ -1,6 +1,6 @@
 import { AddressField, Field, Accordion, GU } from '@1hive/1hive-ui';
 import { ClaimModel } from 'src/models/claim.model';
-import { useWallet } from 'src/providers/wallet.context';
+import { useWallet } from 'src/contexts/wallet.context';
 import styled from 'styled-components';
 import ChallengeModal from '../modals/challenge-modal';
 import AmountFieldInput from './field-input/amount-field-input';

@@ -1,10 +1,19 @@
 // @ts-nocheck
-import { BackButton, Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
-import React from 'react';
+import {
+  BackButton,
+  Button,
+  GU,
+  useTheme,
+  useViewport,
+  IconNotifications,
+  TransactionProgress,
+} from '@1hive/1hive-ui';
+import { useState, useEffect, useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import { PAGES } from 'src/constants';
-import { usePageContext } from 'src/providers/page.context';
+import { usePageContext } from 'src/contexts/page.context';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import styled from 'styled-components';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
@@ -61,6 +70,11 @@ function Header({ toggleTheme, currentTheme }: Props) {
   const { below } = useViewport();
   const layoutSmall = below('medium');
 
+  const [trxVisible, setTrxVisible] = useState(false);
+  const opener = useRef<any>();
+
+  const { transaction } = useTransactionContext();
+
   return (
     <HeaderWraper background={theme.surface}>
       <HeaderLayoutContent>
@@ -83,6 +97,29 @@ function Header({ toggleTheme, currentTheme }: Props) {
             display="icon"
             onClick={toggleTheme}
           />
+          {transaction && (
+            <>
+              <div ref={opener}>
+                <Button
+                  ref={opener}
+                  className="ml-8"
+                  label="Check transaction"
+                  icon={<IconNotifications />}
+                  display="icon"
+                  onClick={toggleTheme}
+                />
+              </div>
+              <TransactionProgress
+                transactionHashUrl={`https://etherscan.io/tx/${transaction}`}
+                progress={0.3}
+                visible={trxVisible}
+                endTime={new Date(Date.now() + 100000)}
+                onClose={() => setTrxVisible(false)}
+                opener={opener}
+                slow
+              />
+            </>
+          )}
         </HeaderRightPanel>
       </HeaderLayoutContent>
     </HeaderWraper>

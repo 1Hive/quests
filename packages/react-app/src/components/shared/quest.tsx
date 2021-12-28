@@ -54,6 +54,10 @@ const FormStyled = styled(Form)`
   }
 `;
 
+const NoPaddingSplitStyled = styled(Split)`
+  padding-bottom: 0 !important;
+`;
+
 // #endregion
 
 type Props = {
@@ -123,13 +127,65 @@ export default function Quest({
     getClaimDeposit();
   }, []);
 
+  const onQuestSubmit = (values: QuestModel, { setSubmitting }: any) => {
+    const errors = [];
+    if (!values.description) errors.push('Description is required');
+    if (!values.title) errors.push('Title is required');
+    if (!values.fallbackAddress) errors.push('Funds fallback address is required');
+    if (values.expireTimeMs < Date.now()) errors.push('Expiration have to be later than now');
+
+    if (errors.length) {
+      errors.forEach(toast);
+    } else {
+      setTimeout(async () => {
+        setLoading(true);
+        let createdQuestAddress;
+        try {
+          // Set noon to prevent rounding form changing date
+          const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
+          toast('Quest creating ...');
+          if (!questFactoryContract) {
+            Logger.error(
+              'QuestFactory contract was not loaded correctly (maybe account is disabled)',
+            );
+          }
+          createdQuestAddress = await QuestService.saveQuest(
+            questFactoryContract,
+            values.fallbackAddress!,
+            { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
+          );
+          if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
+          if (values.bounty?.amount) {
+            toast('Quest funding ...');
+            await QuestService.fundQuest(erc20Contract, createdQuestAddress, values.bounty);
+          }
+        } catch (e: any) {
+          Logger.error(e);
+          toast(
+            !e?.message || e.message.includes('\n') || e.message.length > 75
+              ? 'Oops. Something went wrong'
+              : e.message,
+          );
+        } finally {
+          if (createdQuestAddress) {
+            toast('Quest created successfully');
+            onSave(createdQuestAddress);
+          }
+        }
+
+        setSubmitting(false);
+        setLoading(false);
+      }, 0);
+    }
+  };
+
   const questContent = (questData: QuestModel, handleChange = noop) => (
     <>
-      <Split
+      <NoPaddingSplitStyled
         primary={
-          <Outset gu16>
+          <Outset gu16 className="pb-0">
             <Outset gu8 vertical className="block">
-              <Split
+              <NoPaddingSplitStyled
                 primary={
                   <TextFieldInput
                     id="title"
@@ -194,7 +250,7 @@ export default function Quest({
           </Outset>
         }
         secondary={
-          <Outset gu16={!isEdit}>
+          <Outset horizontal gu16={!isEdit}>
             {bounty !== null && (
               <AmountFieldInputFormik
                 id="bounty"
@@ -260,54 +316,7 @@ export default function Quest({
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
       <Formik
         initialValues={{ fallbackAddress: wallet.account, ...data }}
-        onSubmit={(values, { setSubmitting }) => {
-          const errors = [];
-          if (!values.description) errors.push('Description is required');
-          if (!values.title) errors.push('Title is required');
-          if (!values.fallbackAddress) errors.push('Funds fallback address is required');
-          if (values.expireTimeMs < Date.now()) errors.push('Expiration have to be later than now');
-
-          if (errors.length) {
-            errors.forEach(toast);
-          } else {
-            setTimeout(async () => {
-              setLoading(true);
-              try {
-                // Set noon to prevent rounding form changing date
-                const timeValue =
-                  new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
-                toast('Quest creating ...');
-                if (!questFactoryContract) {
-                  Logger.error(
-                    'QuestFactory contract was not loaded correctly (maybe account is disabled)',
-                  );
-                }
-                const createdQuestAddress = await QuestService.saveQuest(
-                  questFactoryContract,
-                  values.fallbackAddress!,
-                  { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
-                );
-                if (!createdQuestAddress) throw Error();
-                if (values.bounty?.amount) {
-                  toast('Quest funding ...');
-                  await QuestService.fundQuest(erc20Contract, createdQuestAddress, values.bounty);
-                }
-                toast('Quest created successfully');
-                onSave(createdQuestAddress);
-              } catch (e: any) {
-                Logger.error(e);
-                toast(
-                  !e?.message || e.message.includes('\n') || e.message.length > 75
-                    ? 'Oops. Something went wrong.'
-                    : e.message,
-                );
-              }
-
-              setSubmitting(false);
-              setLoading(false);
-            }, 0);
-          }
-        }}
+        onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, { setSubmitting })}
       >
         {({ values, handleChange, handleSubmit }) =>
           isEdit ? (

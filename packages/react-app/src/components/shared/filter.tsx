@@ -1,5 +1,5 @@
 import { Button, DateRangePicker, Field, IconClose, SearchInput } from '@1hive/1hive-ui';
-import { useFilterContext } from 'src/providers/filter.context';
+import { useFilterContext } from 'src/contexts/filter.context';
 import { DEFAULT_FILTER } from '../../constants';
 
 export function Filter() {

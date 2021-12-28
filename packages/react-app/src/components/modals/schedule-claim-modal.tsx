@@ -8,7 +8,7 @@ import { DEFAULT_AMOUNT } from 'src/constants';
 import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
-import { useWallet } from 'src/providers/wallet.context';
+import { useWallet } from 'src/contexts/wallet.context';
 import ModalBase from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';

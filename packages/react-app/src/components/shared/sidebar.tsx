@@ -1,11 +1,11 @@
 import { Box, GU } from '@1hive/1hive-ui';
 import { useHistory } from 'react-router-dom';
 import { FilterModel } from 'src/models/filter.model';
-import { useFilterContext } from 'src/providers/filter.context';
-import { usePageContext } from 'src/providers/page.context';
+import { useFilterContext } from 'src/contexts/filter.context';
+import { usePageContext } from 'src/contexts/page.context';
 import styled from 'styled-components';
 import { PAGES, QUEST_MODE } from '../../constants';
-import { useWallet } from '../../providers/wallet.context';
+import { useWallet } from '../../contexts/wallet.context';
 import QuestModal from '../modals/quest-modal';
 import { Filter } from './filter';
 import Separator from './utils/separator';

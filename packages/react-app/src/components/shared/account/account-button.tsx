@@ -1,6 +1,6 @@
 import { EthIdenticon, GU, RADIUS, shortenAddress, textStyle, useTheme } from '@1hive/1hive-ui';
 import styled from 'styled-components';
-import { useWallet } from '../../../providers/wallet.context';
+import { useWallet } from '../../../contexts/wallet.context';
 import HeaderModule from '../header/header-module';
 
 // #region StyledComponents

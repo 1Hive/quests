@@ -1,11 +1,12 @@
 import { Root } from '@1hive/1hive-ui';
 import React, { useEffect } from 'react';
-import { PageContextProvider } from 'src/providers/page.context';
-import { useWallet } from 'src/providers/wallet.context';
+import { PageContextProvider } from 'src/contexts/page.context';
+import { TransactionContextProvider } from 'src/contexts/transaction.context';
+import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { FilterContextProvider } from '../../providers/filter.context';
+import { FilterContextProvider } from '../../contexts/filter.context';
 import Header from './header';
 import MainScrollWithSidebarLayout from './side-content-layout';
 import Sidebar from './sidebar';
@@ -58,16 +59,18 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
 
   return (
     <PageContextProvider>
-      <MainViewStyled currentTheme={currentTheme}>
-        <HeaderWrapperStyled>
-          <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
-        </HeaderWrapperStyled>
-        <Root.Provider>
-          <FilterContextProvider>
-            <MainScrollWithSidebarLayout main={children} side={<Sidebar />} />
-          </FilterContextProvider>
-        </Root.Provider>
-      </MainViewStyled>
+      <TransactionContextProvider>
+        <MainViewStyled currentTheme={currentTheme}>
+          <HeaderWrapperStyled>
+            <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
+          </HeaderWrapperStyled>
+          <Root.Provider>
+            <FilterContextProvider>
+              <MainScrollWithSidebarLayout main={children} side={<Sidebar />} />
+            </FilterContextProvider>
+          </Root.Provider>
+        </MainViewStyled>
+      </TransactionContextProvider>
     </PageContextProvider>
   );
 }

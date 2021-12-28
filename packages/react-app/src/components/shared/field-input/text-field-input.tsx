@@ -13,8 +13,8 @@ const FieldStyled = styled(Field)`
 const MaxHeightStyled = styled.div`
   overflow: hidden;
   margin-bottom: 8px;
-  line-height: 1.4em;
-  ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.4}em;` : '')}
+  line-height: 1.5em;
+  ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.5}em;` : '')}
 
   p {
     margin-top: 0 !important;

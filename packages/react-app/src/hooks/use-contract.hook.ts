@@ -9,7 +9,7 @@ import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
-import { useWallet } from '../providers/wallet.context';
+import { useWallet } from '../contexts/wallet.context';
 
 let contracts: any;
 
