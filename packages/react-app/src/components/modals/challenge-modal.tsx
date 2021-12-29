@@ -12,7 +12,6 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
 import { Outset } from '../shared/utils/spacer-util';
-import Help from '../shared/field-input/help-icon';
 
 // #region StyledComponents
 

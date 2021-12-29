@@ -1,10 +1,10 @@
-import { Field, TextInput, Help, GU, Markdown } from '@1hive/1hive-ui';
+import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
 
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-import HelpLogo from '../../../assets/help.svg';
+
 import HelpIcon from './help-icon';
 // #region Styled
 
@@ -24,13 +24,6 @@ const MaxHeightStyled = styled.div`
   }
 `;
 
-const SpanStyled = styled.span`
-  margin-left: ${1 * GU}px;
-  text-decoration: underline;
-  font-size: medium;
-  font-weight: 600;
-  color: #88a8e4;
-`;
 // #endregion
 
 type Props = {
