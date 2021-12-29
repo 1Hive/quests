@@ -94,7 +94,7 @@ function AmountFieldInput({
             symbol={value.token!.symb}
             address={value.token!.address}
             badgeOnly={value.token.native}
-            networkType="main"
+            networkType="private"
           />
         </LineStyled>
       )}
