@@ -158,7 +158,7 @@ export function toBigNumber(amount: TokenAmountModel) {
 }
 
 export function fromBigNumber(bigNumber: BigNumber, decimals: number = 18): number {
-  return bigNumber.div(BigNumber.from(10).pow(decimals)).toNumber();
+  return +ethers.utils.formatUnits(bigNumber, decimals);
 }
 
 export function getDefaultProvider() {
