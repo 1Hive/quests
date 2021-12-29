@@ -45,7 +45,7 @@ const networks = {
     chainId: 1337,
     name: 'Localhost',
     type: 'private',
-    subgraph: 'http://localhost:8000/subgraphs/name/corantin/quests-subgraph',
+    subgraph: 'https://localhost:8000/subgraphs/name/corantin/quests-subgraph',
     defaultEthNode: 'http://0.0.0.0:8545/',
     questFactory: HardhatDeployement[1337].localhost.contracts.QuestFactory.address,
     govern: 0,
