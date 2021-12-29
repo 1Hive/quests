@@ -165,7 +165,7 @@ function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
   return getQuestContractInterface().encodeFunctionData('claim', [
     toHex(evidenceIpfsHash),
     claimData.playerAddress,
-    claimData.claimAmount.amount,
+    claimData.claimedAmount.amount,
   ]);
 }
 
@@ -217,29 +217,25 @@ export async function saveQuest(
   data: Partial<QuestModel>,
   address?: string,
   // eslint-disable-next-line no-unused-vars
-  onTrx?: (hash: string) => void,
+  onTxx?: (hash: string) => void,
 ) {
   if (address) throw Error('Saving existing quest is not yet implemented');
-  if (questFactoryContract) {
-    const ipfsHash = await pushObjectToIpfs(data.description ?? '');
+  if (!questFactoryContract) throw Error('QuestFactoryContract parameter is required');
+  const ipfsHash = await pushObjectToIpfs(data.description ?? '');
 
-    const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
-    const tx = await questFactoryContract.createQuest(
-      data.title,
-      ipfsHash, // Push description to IPFS and push hash to quest contract
-      TOKENS.Honey.address,
-      questExpireTimeUtcSec,
-      fallbackAddress,
-    );
-    onTrx?.(tx.hash);
-    Logger.info('TRX hash', tx.hash);
-    const receipt = (await tx.wait()) as ethers.ContractReceipt;
-    Logger.info('TRX logs', receipt.logs);
-
-    return (receipt?.events?.[0] as any)?.args?.[0] ?? null;
-  }
-
-  return null;
+  const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
+  const tx = await questFactoryContract.createQuest(
+    data.title,
+    ipfsHash, // Push description to IPFS and push hash to quest contract
+    TOKENS.Honey.address,
+    questExpireTimeUtcSec,
+    fallbackAddress,
+  );
+  onTxx?.(tx.hash);
+  Logger.info('Tx hash', tx.hash);
+  const receipt = (await tx.wait()) as ethers.ContractReceipt;
+  Logger.info('Tx logs', receipt.logs);
+  return receipt;
 }
 
 export async function fundQuest(
@@ -247,12 +243,14 @@ export async function fundQuest(
   questAddress: string,
   amount: TokenAmountModel,
   // eslint-disable-next-line no-unused-vars
-  onTrx?: (hash: string) => void,
+  onTxx?: (hash: string) => void,
 ) {
   const tx = await contractERC20.transfer(questAddress, toBigNumber(amount));
-  onTrx?.(tx.hash);
-  await tx.wait();
+  onTxx?.(tx.hash);
   Logger.info('TX HASH', tx.hash);
+  const receipt = (await tx.wait()) as ethers.ContractReceipt;
+  Logger.info('Tx logs', receipt.logs);
+  return receipt;
 }
 
 export async function scheduleQuestClaim(
@@ -260,18 +258,18 @@ export async function scheduleQuestClaim(
   claimData: ClaimModel,
   scheduleDeposit: TokenAmountModel,
   // eslint-disable-next-line no-unused-vars
-  onTrx?: (hash: string) => void,
+  onTxx?: (hash: string) => void,
 ) {
   const container = await getContainer(claimData);
   Logger.debug('Scheduling quest claim ...', { container, claimData });
-  // const tx = await governQueueContract.schedule(container).send({
-  //   value: scheduleDeposit.amount,
-  // });
-  // onTrx?.(tx.hash);
-  // Logger.info('TRX hash', tx.hash);
-  // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
-  // Logger.info('TRX logs', logs);
-  // Logger.debug(`Claim scheduled, execution time ${container.payload.executionTime}`);
+  const tx = await governQueueContract.schedule(container).send({
+    value: scheduleDeposit.amount,
+  });
+  onTxx?.(tx.hash);
+  Logger.info('TX HASH', tx.hash);
+  const receipt = (await tx.wait()) as ethers.ContractReceipt;
+  Logger.info('Tx logs', receipt.logs);
+  return receipt;
 }
 
 export async function executeQuestClaim(
@@ -279,33 +277,33 @@ export async function executeQuestClaim(
   claimData: ClaimModel,
   execTime?: number,
   // eslint-disable-next-line no-unused-vars
-  onTrx?: (hash: string) => void,
+  onTxx?: (hash: string) => void,
 ) {
   const container = await getContainer(claimData);
   Logger.debug('Executing quest claim ...', { container, claimData });
-  // const tx = await governQueueContract.execute(container);
-  // onTrx?.(tx.hash);
-  // Logger.info('TRX hash', tx.hash);
-  // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
-  // Logger.info('TRX logs', logs);
-  // Logger.info(`Claim executed`);
+  const tx = await governQueueContract.execute(container);
+  onTxx?.(tx.hash);
+  Logger.info('TX HASH', tx.hash);
+  const receipt = (await tx.wait()) as ethers.ContractReceipt;
+  Logger.info('Tx logs', receipt.logs);
+  return receipt;
 }
 
 export async function challengeQuestClaim(
   governQueueContract: any,
   challenge: ChallengeModel,
   // eslint-disable-next-line no-unused-vars
-  onTrx?: (hash: string) => void,
+  onTxx?: (hash: string) => void,
 ) {
   const container = await getContainer(challenge.claim);
   Logger.debug('Challenging quest ...', { container, challenge });
-  // const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
-  // const tx = await governQueueContract.challenge(container, challengeReasonIpfs);
-  // onTrx?.(tx.hash);
-  // Logger.info('TRX hash', tx.hash);
-  // const { logs } = (await tx.wait()) as ethers.ContractReceipt;
-  // Logger.info('TRX logs', logs);
-  // Logger.info(`Claim challenged`);
+  const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
+  const tx = await governQueueContract.challenge(container, challengeReasonIpfs);
+  onTxx?.(tx.hash);
+  Logger.info('TX HASH', tx.hash);
+  const receipt = (await tx.wait()) as ethers.ContractReceipt;
+  Logger.info('Tx logs', receipt.logs);
+  return receipt;
 }
 
 export async function getClaimExecutableTime(questAddress: string, playerAddress: string) {
@@ -334,7 +332,7 @@ export async function getQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
         const evidence = await getObjectFromIpfs(evidenceIpfsHash);
 
         return {
-          claimAmount: { token: quest.rewardToken, amount: +claimAmount },
+          claimedAmount: { token: quest.rewardToken, amount: +claimAmount },
           evidence,
           playerAddress,
           questAddress: quest.address,

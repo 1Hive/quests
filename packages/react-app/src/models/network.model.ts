@@ -4,6 +4,7 @@ export type NetworkModel = {
   chainId: number;
   name: string;
   type: string;
+  explorerBase: string;
   defaultEthNode: string;
   questSubgraph: string;
   governSubgraph: string;

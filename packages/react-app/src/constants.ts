@@ -95,6 +95,14 @@ export const CLAIM_STATUS = {
   Scheduled: 'Scheduled',
 };
 
+export const TRANSACTION_STATUS = {
+  Confirmed: 'TX_STATUS_CONFIRMED',
+  Failed: 'TX_STATUS_FAILED',
+  Pending: 'TX_STATUS_PENDING',
+  SignatureFailed: 'TX_STATUS_SIGNATURE_FAILED',
+  Signed: 'TX_STATUS_SIGNED',
+};
+
 // Default values
 
 export const DEFAULT_AMOUNT = {

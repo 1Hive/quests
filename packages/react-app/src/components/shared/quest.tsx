@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { PAGES, QUEST_MODE } from 'src/constants';
+import { PAGES, QUEST_MODE, TRANSACTION_STATUS } from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -15,6 +15,7 @@ import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { ClaimModel } from 'src/models/claim.model';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import ScheduleClaimModal from '../modals/schedule-claim-modal';
 import FundModal from '../modals/fund-modal';
 import DateFieldInput from './field-input/date-field-input';
@@ -87,7 +88,9 @@ export default function Quest({
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claims, setClaims] = useState<ClaimModel[]>();
-
+  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
+  (window as any).pushTransaction = pushTransaction;
+  (window as any).updateTransactionStatus = updateTransactionStatus;
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
   const questFactoryContract = useFactoryContract();
@@ -127,7 +130,7 @@ export default function Quest({
     getClaimDeposit();
   }, []);
 
-  const onQuestSubmit = (values: QuestModel, { setSubmitting }: any) => {
+  const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
     if (!values.description) errors.push('Description is required');
     if (!values.title) errors.push('Title is required');
@@ -137,45 +140,74 @@ export default function Quest({
     if (errors.length) {
       errors.forEach(toast);
     } else {
-      setTimeout(async () => {
-        setLoading(true);
-        let createdQuestAddress;
-        try {
-          // Set noon to prevent rounding form changing date
-          const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
-          toast('Quest creating ...');
-          if (!questFactoryContract) {
-            Logger.error(
-              'QuestFactory contract was not loaded correctly (maybe account is disabled)',
-            );
-          }
-          createdQuestAddress = await QuestService.saveQuest(
-            questFactoryContract,
-            values.fallbackAddress!,
-            { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
+      setLoading(true);
+      let createdQuestAddress;
+      try {
+        // Set noon to prevent rounding form changing date
+        const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
+        if (!questFactoryContract) {
+          Logger.error(
+            'QuestFactory contract was not loaded correctly (maybe account is disabled)',
           );
+        }
+        const txReceiptSaveQuest = await QuestService.saveQuest(
+          questFactoryContract,
+          values.fallbackAddress!,
+          { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
+          undefined,
+          (tx) => {
+            pushTransaction({
+              hash: tx,
+              estimatedEnd: Date.now() + 15 * 1000, // 15 sec
+              pendingMessage: 'Quest creating...',
+              status: TRANSACTION_STATUS.Pending,
+            });
+            onSave();
+          },
+        );
+        updateTransactionStatus({
+          hash: txReceiptSaveQuest.transactionHash,
+          status: TRANSACTION_STATUS.Confirmed,
+        });
+        if (createdQuestAddress) {
+          toast('Quest created successfully');
+        }
+        if (values.bounty?.amount) {
+          createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
           if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
-          if (values.bounty?.amount) {
-            toast('Quest funding ...');
-            await QuestService.fundQuest(erc20Contract, createdQuestAddress, values.bounty);
-          }
-        } catch (e: any) {
-          Logger.error(e);
-          toast(
-            !e?.message || e.message.includes('\n') || e.message.length > 75
-              ? 'Oops. Something went wrong'
-              : e.message,
+          toast('Quest funding ...');
+          const txReceiptFundQuest = await QuestService.fundQuest(
+            erc20Contract,
+            createdQuestAddress,
+            values.bounty,
+            (tx) => {
+              pushTransaction({
+                hash: tx,
+                estimatedEnd: Date.now() + 15 * 1000,
+                pendingMessage: 'Quest funding...',
+                status: TRANSACTION_STATUS.Pending,
+              });
+            },
           );
-        } finally {
+          updateTransactionStatus({
+            hash: txReceiptFundQuest.transactionHash,
+            status: TRANSACTION_STATUS.Confirmed,
+          });
           if (createdQuestAddress) {
-            toast('Quest created successfully');
-            onSave(createdQuestAddress);
+            toast('Quest funded successfully');
           }
         }
-
+      } catch (e: any) {
+        Logger.error(e);
+        toast(
+          !e?.message || e.message.includes('\n') || e.message.length > 75
+            ? 'Oops. Something went wrong'
+            : e.message,
+        );
+      } finally {
         setSubmitting(false);
         setLoading(false);
-      }, 0);
+      }
     }
   };
 
@@ -316,7 +348,7 @@ export default function Quest({
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
       <Formik
         initialValues={{ fallbackAddress: wallet.account, ...data }}
-        onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, { setSubmitting })}
+        onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
       >
         {({ values, handleChange, handleSubmit }) =>
           isEdit ? (

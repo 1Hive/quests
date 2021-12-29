@@ -4,11 +4,13 @@ import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { DEFAULT_AMOUNT } from 'src/constants';
+import { DEFAULT_AMOUNT, TRANSACTION_STATUS } from 'src/constants';
 import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
 import { useWallet } from 'src/contexts/wallet.context';
+import { ClaimModel } from 'src/models/claim.model';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import ModalBase from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
@@ -36,10 +38,52 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
   const [opened, setOpened] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
+  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
 
   const onModalClose = () => {
     setOpened(false);
     onClose();
+  };
+
+  const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
+    try {
+      setLoading(true);
+      toast('Comming soon...');
+      const txReceipt = await QuestService.scheduleQuestClaim(
+        governQueueContract,
+        {
+          claimedAmount: values.claimedAmount!,
+          evidence: values.evidence!,
+          playerAddress: wallet.account,
+          questAddress,
+        },
+        claimDeposit!,
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + 10 * 1000,
+            pendingMessage: 'Quest claiming...',
+            status: TRANSACTION_STATUS.Pending,
+          });
+          onModalClose();
+        },
+      );
+      updateTransactionStatus({
+        hash: txReceipt.transactionHash,
+        status: TRANSACTION_STATUS.Confirmed,
+      });
+      toast('Operation succeed');
+    } catch (e: any) {
+      Logger.error(e);
+      toast(
+        e.message.includes('\n') || e.message.length > 50
+          ? 'Oops. Something went wrong.'
+          : e.message,
+      );
+    } finally {
+      setSubmitting(false);
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,40 +123,12 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
         initialValues={{ evidence: '', claimedAmount: DEFAULT_AMOUNT }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
-          if (!values.claimedAmount) errors.push('Claimed amount is required');
-          if (!values.evidence) errors.push('Evidence of completion is required');
+          if (!values.claimedAmount) errors.push('Validation : Claimed amount is required');
+          if (!values.evidence) errors.push('Validation : Evidence of completion is required');
           if (errors.length) {
             errors.forEach(toast);
           } else {
-            setTimeout(async () => {
-              try {
-                setLoading(true);
-                // toast('Quest claiming ...');
-                toast('Comming soon ...');
-                await QuestService.scheduleQuestClaim(
-                  governQueueContract,
-                  {
-                    claimAmount: values.claimedAmount,
-                    evidence: values.evidence,
-                    playerAddress: wallet.account,
-                    questAddress,
-                  },
-                  claimDeposit!,
-                );
-                onModalClose();
-                // toast('Operation succeed');
-              } catch (e: any) {
-                Logger.error(e);
-                toast(
-                  e.message.includes('\n') || e.message.length > 50
-                    ? 'Oops. Something went wrong.'
-                    : e.message,
-                );
-              } finally {
-                setSubmitting(false);
-                setLoading(false);
-              }
-            }, 0);
+            scheduleClaimTx(values, setSubmitting);
           }
         }}
       >

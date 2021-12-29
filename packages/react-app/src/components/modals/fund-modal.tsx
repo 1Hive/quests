@@ -3,11 +3,12 @@ import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
-import { DEFAULT_AMOUNT } from 'src/constants';
+import { DEFAULT_AMOUNT, TRANSACTION_STATUS } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
 import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
@@ -26,12 +27,48 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
   const toast = useToast();
   const { defaultToken } = getNetwork();
   const contractERC20 = useERC20Contract(defaultToken);
   const onModalClose = () => {
     setOpened(false);
     onClose();
+  };
+
+  const fundModalTx = async (values: any, setSubmitting: Function) => {
+    try {
+      setLoading(true);
+      const txReceipt = await QuestService.fundQuest(
+        contractERC20,
+        questAddress,
+        values.fundAmount,
+        (txHash) => {
+          pushTransaction({
+            hash: txHash,
+            estimatedEnd: Date.now() + 15 * 1000,
+            pendingMessage: 'Quest funding...',
+            status: TRANSACTION_STATUS.Pending,
+          });
+          onModalClose();
+        },
+      );
+      updateTransactionStatus({
+        hash: txReceipt.transactionHash!,
+        status: TRANSACTION_STATUS.Confirmed,
+      });
+      toast('Quest funded successfully');
+    } catch (e: any) {
+      Logger.error(e);
+      toast(
+        e.message.includes('\n') || e.message.length > 50
+          ? 'Oops. Something went wrong.'
+          : e.message,
+      );
+    } finally {
+      setSubmitting(false);
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,29 +87,11 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
         initialValues={{ fundAmount: DEFAULT_AMOUNT }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
-          if (!values.fundAmount?.amount) errors.push('Amount is required...');
+          if (!values.fundAmount?.amount) errors.push('Validation : Amount is required');
           if (errors.length) {
             errors.forEach(toast);
           } else {
-            setTimeout(async () => {
-              try {
-                setLoading(true);
-                toast('Quest funding ...');
-                await QuestService.fundQuest(contractERC20, questAddress, values.fundAmount);
-                onModalClose();
-                toast('Operation succeed');
-              } catch (e: any) {
-                Logger.error(e);
-                toast(
-                  e.message.includes('\n') || e.message.length > 50
-                    ? 'Oops. Something went wrong.'
-                    : e.message,
-                );
-              } finally {
-                setSubmitting(false);
-                setLoading(false);
-              }
-            }, 0);
+            fundModalTx(values, setSubmitting);
           }
         }}
       >

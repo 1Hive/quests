@@ -42,6 +42,7 @@ export default function QuestModal({
     setOpened(false);
     onClose(address);
   };
+
   useEffect(() => {
     switch (questMode) {
       case QUEST_MODE.Create:

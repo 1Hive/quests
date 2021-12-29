@@ -6,18 +6,20 @@ import {
   useTheme,
   useViewport,
   IconNotifications,
-  TransactionProgress,
+  Popover,
 } from '@1hive/1hive-ui';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, createRef, useRef, useCallback } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import { PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { getNetwork } from 'src/networks';
 import styled from 'styled-components';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
+import { TransactionProgressButton } from '../transaction-progress-button';
 
 // #region StyledComponents
 const HeaderWraper = styled.header`
@@ -64,16 +66,11 @@ type Props = {
 
 function Header({ toggleTheme, currentTheme }: Props) {
   const theme = useTheme();
-
   const history = useHistory();
   const { page } = usePageContext();
   const { below } = useViewport();
   const layoutSmall = below('medium');
-
-  const [trxVisible, setTrxVisible] = useState(false);
-  const opener = useRef<any>();
-
-  const { transaction } = useTransactionContext();
+  const activityOpener = useRef<any>();
 
   return (
     <HeaderWraper background={theme.surface}>
@@ -91,35 +88,14 @@ function Header({ toggleTheme, currentTheme }: Props) {
         <HeaderRightPanel>
           <AccountModule compact={layoutSmall} />
           <Button
+            ref={activityOpener}
             className="ml-8"
             label={currentTheme === 'dark' ? 'Light' : 'Dark'}
             icon={currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
             display="icon"
             onClick={toggleTheme}
           />
-          {transaction && (
-            <>
-              <div ref={opener}>
-                <Button
-                  ref={opener}
-                  className="ml-8"
-                  label="Check transaction"
-                  icon={<IconNotifications />}
-                  display="icon"
-                  onClick={toggleTheme}
-                />
-              </div>
-              <TransactionProgress
-                transactionHashUrl={`https://etherscan.io/tx/${transaction}`}
-                progress={0.3}
-                visible={trxVisible}
-                endTime={new Date(Date.now() + 100000)}
-                onClose={() => setTrxVisible(false)}
-                opener={opener}
-                slow
-              />
-            </>
-          )}
+          <TransactionProgressButton />
         </HeaderRightPanel>
       </HeaderLayoutContent>
     </HeaderWraper>

@@ -6,7 +6,10 @@ import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
-import { CLAIM_STATUS } from 'src/constants';
+import { CLAIM_STATUS, TRANSACTION_STATUS } from 'src/constants';
+import { startIdleTransaction } from '@sentry/tracing';
+import { useTransactionContext } from 'src/contexts/transaction.context';
+import { ChallengeModel } from 'src/models/challenge.model';
 import ModalBase from './modal-base';
 import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
@@ -37,6 +40,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
   const [challengeTimeout, setChallengedTimeout] = useState(false);
@@ -55,6 +59,45 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
   const onModalClose = () => {
     setOpened(false);
     onClose();
+  };
+
+  const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
+    try {
+      setLoading(true);
+      // toast('Quest claim challenging ...');
+      toast('Comming soon...');
+      const txReceipt = await QuestService.challengeQuestClaim(
+        governQueueContract,
+        {
+          claim,
+          reason: values.reason,
+          deposit: claim.challengeDeposit!,
+        },
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + 10 * 1000,
+            pendingMessage: 'Quest challenging...',
+          });
+          onModalClose();
+        },
+      );
+      updateTransactionStatus({
+        hash: txReceipt.transactionHash!,
+        status: TRANSACTION_STATUS.Confirmed,
+      });
+      toast('Operation succeed');
+    } catch (e: any) {
+      Logger.error(e);
+      toast(
+        e.message.includes('\n') || e.message.length > 75
+          ? 'Oops. Something went wrong.'
+          : e.message,
+      );
+    } finally {
+      setSubmitting(false);
+      setLoading(false);
+    }
   };
 
   return (
@@ -104,34 +147,11 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
         initialValues={{ reason: '' }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
-          if (!values.reason) errors.push('Reason is required');
+          if (!values.reason) errors.push('Validation : Reason is required');
           if (errors.length) {
             errors.forEach(toast);
           } else {
-            setTimeout(async () => {
-              try {
-                setLoading(true);
-                // toast('Quest claim challenging ...');
-                toast('Comming soon ...');
-                await QuestService.challengeQuestClaim(governQueueContract, {
-                  claim,
-                  reason: values.reason,
-                  deposit: claim.challengeDeposit!,
-                });
-                onModalClose();
-                // toast('Operation succeed');
-              } catch (e: any) {
-                Logger.error(e);
-                toast(
-                  e.message.includes('\n') || e.message.length > 75
-                    ? 'Oops. Something went wrong.'
-                    : e.message,
-                );
-              } finally {
-                setSubmitting(false);
-                setLoading(false);
-              }
-            }, 400);
+            challengeTx(values, setSubmitting);
           }
         }}
       >

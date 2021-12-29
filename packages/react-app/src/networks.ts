@@ -9,6 +9,7 @@ const networks = {
     chainId: 1,
     name: 'Mainnet',
     type: 'mainnet',
+    explorerBase: 'https://etherscan.io/tx/',
     defaultEthNode: 'https://eth.aragon.network/',
     subgraph: '',
     defaultToken: TOKENS.HoneyTest,
@@ -18,6 +19,7 @@ const networks = {
     chainId: 4,
     name: 'Rinkeby',
     type: 'rinkeby',
+    explorerBase: 'https://rinkeby.etherscan.io/tx/',
     defaultEthNode: 'https://rinkeby.eth.aragon.network/',
     questSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/aragon/aragon-govern-rinkeby',
@@ -32,6 +34,7 @@ const networks = {
     chainId: 100,
     name: 'xDai',
     type: 'xdai',
+    explorerBase: 'https://etherscan.io/tx/',
     defaultEthNode: 'https://xdai.poanetwork.dev/',
     questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai

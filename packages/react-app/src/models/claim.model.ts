@@ -3,7 +3,7 @@ import { TokenAmountModel } from './token-amount.model';
 export type ClaimModel = {
   questAddress: string;
   playerAddress: string;
-  claimAmount: TokenAmountModel;
+  claimedAmount: TokenAmountModel;
   evidence: string;
   executionTime?: number;
   state?: string;

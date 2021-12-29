@@ -47,7 +47,7 @@ export default function ClaimList({ claims }: Props) {
                   id="amount"
                   isEdit={false}
                   label="Claiming amount"
-                  value={x.claimAmount}
+                  value={x.claimedAmount}
                 />
                 {wallet?.account && <ChallengeModal claim={x} />}
               </RowStyled>,
