@@ -1,5 +1,6 @@
 import { FilterModel } from './models/filter.model';
 import { TokenModel } from './models/token.model';
+import { ONE_DAY_IN_MS, ONE_WEEK_IN_MS } from './utils/date.utils';
 
 export const PCT_BASE = BigInt(1e18);
 
@@ -93,4 +94,4 @@ export const DEFAULT_FILTER = {
 
 export const GQL_MAX_INT = 2 ** 31 - 1;
 
-export const DEAULT_CLAIM_EXECUTION_DELAY = 60;
+export const DEAULT_CLAIM_EXECUTION_DELAY = ONE_WEEK_IN_MS;

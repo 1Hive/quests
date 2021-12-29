@@ -1,8 +1,9 @@
 import { Field, TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
+import { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-
+import HelpIcon from './help-icon';
 // #region StyledComponents
 
 const FieldStyled = styled(Field)`
@@ -23,6 +24,8 @@ type Props = {
   placeHolder?: string;
   value?: number;
   wide?: boolean;
+  tooltip?: string;
+  tooltipDetail?: ReactNode;
   suffix?: string;
   compact?: boolean;
 };
@@ -39,6 +42,8 @@ export default function NumberFieldInput({
   max,
   min,
   isRequired = false,
+  tooltip,
+  tooltipDetail,
   suffix = '',
   compact = false,
 }: Props) {
@@ -58,7 +63,16 @@ export default function NumberFieldInput({
     );
   else content = value + suffix;
   return (
-    <FieldStyled label={label} key={id} compact={compact}>
+    <FieldStyled
+      label={
+        <>
+          {label}
+          {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+        </>
+      }
+      key={id}
+      compact={compact}
+    >
       {isLoading ? <Skeleton /> : content}
     </FieldStyled>
   );

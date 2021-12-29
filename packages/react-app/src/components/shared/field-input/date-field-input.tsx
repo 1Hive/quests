@@ -1,10 +1,10 @@
 import { Field, useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { CSSProperties } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { dateFormat } from '../../../utils/date.utils';
-
+import HelpIcon from './help-icon';
 // #region StyledComponents
 const InputStyled = styled.input`
   background-color: ${({ background }: any) => background};
@@ -25,6 +25,8 @@ type Props = {
   onChange?: Function;
   value?: number;
   css?: CSSProperties;
+  tooltip?: string;
+  tooltipDetail?: ReactNode;
   compact?: boolean;
 };
 
@@ -36,6 +38,8 @@ export default function DateFieldInput({
   value = Date.now(),
   onChange = noop,
   css,
+  tooltip,
+  tooltipDetail,
   compact = false,
 }: Props) {
   const theme = useTheme();
@@ -70,7 +74,15 @@ export default function DateFieldInput({
     <span>{new Date(value).toDateString()}</span>
   );
   return label ? (
-    <Field label={label} key={id}>
+    <Field
+      label={
+        <>
+          {label}
+          {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+        </>
+      }
+      key={id}
+    >
       {loadableContent}
     </Field>
   ) : (

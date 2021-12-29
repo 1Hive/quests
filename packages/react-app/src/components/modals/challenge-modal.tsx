@@ -12,6 +12,7 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
 import { Outset } from '../shared/utils/spacer-util';
+import Help from '../shared/field-input/help-icon';
 
 // #region StyledComponents
 
@@ -52,6 +53,8 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
         <AmountFieldInputFormik
           id="challengeDeposit"
           label="Challenge Deposit"
+          tooltip="Amount"
+          tooltipDetail="This amount will be staked when challenging this claim. For a failed challenge attempt, you will lose this deposit"
           isEdit={false}
           isLoading={loading}
           value={claim.challengeDeposit}
@@ -109,7 +112,9 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
               <TextFieldInput
                 id="reason"
                 isEdit
-                label="Reason of challenge"
+                label="Challenge reason"
+                tooltip="Challenge reason"
+                tooltipDetail="Reason why this claim should be challenged"
                 isLoading={loading}
                 value={values.reason}
                 onChange={handleChange}

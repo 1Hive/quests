@@ -1,13 +1,13 @@
 import { Field, GU, TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import styled from 'styled-components';
-
+import HelpIcon from './help-icon';
 // #region StyledComponents
 
 const LineStyled = styled.div`
@@ -40,6 +40,8 @@ type Props = {
   wide?: boolean;
   formik?: any;
   compact?: boolean;
+  tooltip?: string;
+  tooltipDetail?: ReactNode;
 };
 
 function AmountFieldInput({
@@ -52,6 +54,8 @@ function AmountFieldInput({
   onChange = noop,
   wide = false,
   formik,
+  tooltip,
+  tooltipDetail,
   compact = false,
 }: Props) {
   const { defaultToken } = getNetwork();
@@ -71,7 +75,16 @@ function AmountFieldInput({
   };
 
   return (
-    <FieldStyled label={label} key={id} compact={compact}>
+    <FieldStyled
+      label={
+        <>
+          {label}
+          {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+        </>
+      }
+      key={id}
+      compact={compact}
+    >
       {isLoading ? (
         <Skeleton />
       ) : (

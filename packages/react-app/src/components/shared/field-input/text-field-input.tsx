@@ -5,6 +5,7 @@ import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import HelpLogo from '../../../assets/help.svg';
+import HelpIcon from './help-icon';
 // #region Styled
 
 const FieldStyled = styled(Field)`
@@ -121,20 +122,8 @@ export default function TextFieldInput({
       <Field
         label={
           <>
-            {tooltipDetail ? (
-              <>
-                {label} <Help hint={tooltip}>{tooltipDetail}</Help>
-              </>
-            ) : (
-              <>
-                <span title={tooltip}>
-                  <>
-                    {label}
-                    {tooltip && <img src={HelpLogo} alt="help.svg" />}
-                  </>
-                </span>
-              </>
-            )}
+            {label}
+            {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
           </>
         }
         key={id}
