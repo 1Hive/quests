@@ -1,6 +1,6 @@
-import { GU, Modal, ScrollView, textStyle, TransactionProgress, Button } from '@1hive/1hive-ui';
+import { GU, Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
 

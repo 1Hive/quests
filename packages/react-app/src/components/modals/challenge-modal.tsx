@@ -7,7 +7,6 @@ import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
 import { CLAIM_STATUS, TRANSACTION_STATUS } from 'src/constants';
-import { startIdleTransaction } from '@sentry/tracing';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import ModalBase from './modal-base';

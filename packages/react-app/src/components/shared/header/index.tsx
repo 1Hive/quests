@@ -1,20 +1,10 @@
 // @ts-nocheck
-import {
-  BackButton,
-  Button,
-  GU,
-  useTheme,
-  useViewport,
-  IconNotifications,
-  Popover,
-} from '@1hive/1hive-ui';
-import { useState, useEffect, createRef, useRef, useCallback } from 'react';
+import { BackButton, Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
+import { useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import { PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
-import { useTransactionContext } from 'src/contexts/transaction.context';
-import { getNetwork } from 'src/networks';
 import styled from 'styled-components';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
