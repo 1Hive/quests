@@ -1,4 +1,4 @@
-import { AddressField, Button, Card, GU, IconPlus, Split, useToast } from '@1hive/1hive-ui';
+import { AddressField, Button, Card, GU, IconPlus, IconCoin, Split, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
@@ -327,6 +327,7 @@ export default function Quest({
               )}
               {questMode !== QUEST_MODE.ReadSummary && questData.address && wallet.account && (
                 <ChildSpacer>
+                {questData.expireTimeMs > Date.now() ? (
                   <FundModal questAddress={questData.address} />
                   {currentPlayerClaim ? (
                     <ExecuteClaim claim={currentPlayerClaim} />
@@ -335,8 +336,12 @@ export default function Quest({
                       <ScheduleClaimModal questAddress={data.address} claimDeposit={claimDeposit} />
                     )
                   )}
+                  ) : (
+                    <Button icon={<IconCoin/>} label="Reclaim funds" wide mode="strong">
+                  ))
+                }
                 </ChildSpacer>
-              )}
+                  
             </Outset>
           </QuestFooterStyled>
         </>
