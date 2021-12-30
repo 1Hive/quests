@@ -53,7 +53,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
           id="challengeDeposit"
           label="Challenge Deposit"
           tooltip="Amount"
-          tooltipDetail="This amount will be staked when challenging this claim. For a failed challenge attempt, you will lose this deposit"
+          tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
           isEdit={false}
           isLoading={loading}
           value={claim.challengeDeposit}
@@ -113,7 +113,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
                 isEdit
                 label="Challenge reason"
                 tooltip="Challenge reason"
-                tooltipDetail="Reason why this claim should be challenged"
+                tooltipDetail="Reason why this claim should be challenged."
                 isLoading={loading}
                 value={values.reason}
                 onChange={handleChange}

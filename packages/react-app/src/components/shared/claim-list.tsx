@@ -73,7 +73,7 @@ export default function ClaimList({ quest }: Props) {
                 tooltipDetail={`A claim includes the proof of the quest's completion. This claim can be challenged within ${roundDecimals(
                   DEAULT_CLAIM_EXECUTION_DELAY / ONE_DAY_IN_MS,
                   0,
-                )} days`}
+                )} days.`}
               />
             </ClaimStyled>
 
