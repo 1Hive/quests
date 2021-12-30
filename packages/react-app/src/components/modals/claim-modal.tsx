@@ -58,6 +58,8 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
           id="claimDeposit"
           label="Claim Deposit"
           isEdit={false}
+          tooltip="Claim deposit"
+          tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
           isLoading={loading}
           value={claimDeposit}
           compact
@@ -118,6 +120,8 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
                 id="evidence"
                 isEdit
                 label="Evidence of completion"
+                tooltip="Evidence of completion"
+                tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
                 isLoading={loading}
                 value={values.evidence}
                 onChange={handleChange}
@@ -128,6 +132,8 @@ export default function ClaimModal({ questAddress, claimDeposit, onClose = noop 
               <AmountFieldInputFormik
                 id="claimedAmount"
                 isEdit
+                tooltip="Claimed  amount"
+                tooltipDetail="The expected amount to claim considering the agreement."
                 label="Claimed amount"
                 isLoading={loading}
                 value={values.claimedAmount}
