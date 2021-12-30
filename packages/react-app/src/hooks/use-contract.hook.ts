@@ -54,7 +54,11 @@ function getContractsJson(network?: any) {
 
 // account is optional
 // returns null on errors
-function useContract(contractName: string, addressOverride?: string, withSignerIfPossible = true) {
+function useContract(
+  contractName: string,
+  addressOverride?: string | null,
+  withSignerIfPossible = true,
+) {
   let account: any;
   if (withSignerIfPossible) account = useWallet().account;
   const network = getNetwork();

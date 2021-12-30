@@ -360,6 +360,8 @@ export function getTagSuggestions() {
 }
 
 export async function reclaimUnusedFunds(questContract: any, onTx?: (hash: string) => void) {
+  console.log('questContract', questContract);
+
   const tx = await questContract.recoverUnclaimedFunds();
   onTx?.(tx.hash);
   Logger.info('Tx hash', tx.hash);
