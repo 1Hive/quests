@@ -35,6 +35,7 @@ function getRelativeTime(from: Date, to: Date) {
 }
 
 export const ONE_HOUR_IN_MS = 1000 * 60 * 60;
+export const ONE_DAY_IN_MS = ONE_HOUR_IN_MS * 24;
 export const ONE_WEEK_IN_MS = ONE_HOUR_IN_MS * 24 * 7;
 export const ONE_YEAR_IN_MS = ONE_WEEK_IN_MS * 52;
 export const IN_A_WEEK_IN_MS = Date.now() + ONE_WEEK_IN_MS;

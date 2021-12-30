@@ -16,6 +16,7 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
 import { Outset } from '../shared/utils/spacer-util';
+import { HelpIcon } from '../shared/field-input/icon-tooltip';
 
 // #region StyledComponents
 
@@ -23,14 +24,21 @@ const FormStyled = styled(Form)`
   width: 100%;
 `;
 
-const TimerStyled = styled(Timer)`
-  svg {
-    color: white !important;
-  }
+const OpenButtonStyled = styled(Button)`
+  margin: ${GUpx()};
 `;
 
-const OpenButtonStyled = styled(Button)`
-  margin: 0 ${GUpx()};
+const HeaderStyled = styled.div`
+  width: 18%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const OpenButtonWrapperStyled = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 // #endregion
@@ -48,6 +56,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
   const [challengeTimeout, setChallengedTimeout] = useState(false);
+  const [openButtonLabel, setOpenButtonLabel] = useState<string>();
 
   useEffect(() => {
     let handle: any;
@@ -64,6 +73,12 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
     setOpened(false);
     onClose();
   };
+
+  useEffect(() => {
+    if (claim?.state === CLAIM_STATUS.Challenged) setOpenButtonLabel('Already challenged');
+    else if (challengeTimeout) setOpenButtonLabel('No more challengable');
+    else setOpenButtonLabel('Challenge');
+  }, [claim.state, challengeTimeout]);
 
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
     try {
@@ -106,30 +121,38 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
 
   return (
     <ModalBase
-      title="Challenge quest"
+      title={
+        <HeaderStyled>
+          <h1>Challenge quest</h1>{' '}
+          <HelpIcon
+            tooltip="What is a challenge?"
+            tooltipDetail="A challenge allows you to deny a claim. It will be raised to Celeste and conviction voting will be used to determine the validity of this challenge."
+          />
+        </HeaderStyled>
+      }
       openButton={
-        <OpenButtonStyled
-          icon={<IconFlag />}
-          onClick={() => setOpened(true)}
-          label={
-            claim?.state === CLAIM_STATUS.Challenged ? (
-              'Already challenged'
-            ) : (
-              <>
-                Challenge
-                {claim.executionTime && <TimerStyled end={new Date(claim.executionTime)} />}
-              </>
-            )
-          }
-          mode="negative"
-          disabled={challengeTimeout || claim.state === CLAIM_STATUS.Challenged}
-        />
+        <OpenButtonWrapperStyled>
+          {openButtonLabel && (
+            <OpenButtonStyled
+              icon={<IconFlag />}
+              onClick={() => setOpened(true)}
+              label={openButtonLabel}
+              mode="negative"
+              disabled={challengeTimeout || claim.state === CLAIM_STATUS.Challenged}
+            />
+          )}
+          {!challengeTimeout && claim.executionTime && (
+            <Timer end={new Date(claim.executionTime)} />
+          )}
+        </OpenButtonWrapperStyled>
       }
       buttons={[
         <AmountFieldInputFormik
           key="challengeDeposit"
           id="challengeDeposit"
           label="Challenge Deposit"
+          tooltip="Amount"
+          tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
           isEdit={false}
           isLoading={loading}
           value={claim.challengeDeposit}
@@ -165,7 +188,9 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
               <TextFieldInput
                 id="reason"
                 isEdit
-                label="Reason of challenge"
+                label="Challenge reason"
+                tooltip="Challenge reason"
+                tooltipDetail="Reason why this claim should be challenged."
                 isLoading={loading}
                 value={values.reason}
                 onChange={handleChange}

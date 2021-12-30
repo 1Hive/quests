@@ -1,6 +1,7 @@
 import { GU, Link, useTheme } from '@1hive/1hive-ui';
 import styled from 'styled-components';
-
+import { FaBug } from 'react-icons/fa';
+import Separator from '../utils/separator';
 // #region StyledComponents
 
 const HeaderNavStyled = styled.nav`
@@ -13,6 +14,9 @@ const HeaderNavStyled = styled.nav`
 const HeaderNavItemStyled = styled(Link)`
   color: ${({ color }: any) => color} !important;
   margin-right: ${3 * GU}px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 // #endregion
@@ -40,6 +44,15 @@ export default function HeaderMenu({ below }: Props) {
           color={theme.contentSecondary}
         >
           FAQ
+        </HeaderNavItemStyled>
+        <Separator horizontal />
+        <HeaderNavItemStyled
+          href="https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board?repos=362850649"
+          external
+          color={theme.contentSecondary}
+        >
+          <FaBug className="mb-4" />
+          <span className="ml-8 ">Report a Bug</span>
         </HeaderNavItemStyled>
       </HeaderNavStyled>
     )

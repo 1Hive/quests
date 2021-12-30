@@ -47,7 +47,7 @@ const QuestFooterStyled = styled.div`
   text-align: right;
   padding: ${GUpx(2)};
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
 `;
 
@@ -88,6 +88,7 @@ export default function Quest({
     description: '',
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
     state: QUEST_STATE.Draft,
+    fallbackAddress: '',
   },
   isLoading = false,
   questMode = QUEST_MODE.ReadDetail,
@@ -127,7 +128,7 @@ export default function Quest({
       }
     };
     const fetchClaims = async () => {
-      const result = await QuestService.getQuestClaims(data);
+      const result = await QuestService.fetchQuestClaims(data);
       setClaims(result);
     };
     const getBalanceOfQuest = async (address: string) => {
@@ -240,6 +241,7 @@ export default function Quest({
                       value={questData.title}
                       onChange={handleChange}
                       fontSize="24px"
+                      tooltip="Title of your quest"
                       wide
                     />
                     <StateTag
@@ -272,6 +274,23 @@ export default function Quest({
                 isEdit={isEdit}
                 isLoading={loading}
                 placeHolder="Quest description"
+                tooltip="Quest Description"
+                tooltipDetail={
+                  <div>
+                    The quest description should include: <br />
+                    -Details about what the quest entails.
+                    <br />
+                    -What evidence must be submitted by users claiming a reward for completing the
+                    quest.
+                    <br />
+                    -The payout amount. This could be a constant amount for quests that payout
+                    multiple times, a range with reference to what determines what amount, the
+                    contracts balance at time of claim.
+                    {/* contracts balance at time of claim. This shouldn’t be a percentage of the
+                    contracts balance, as claims are not guaranteed to happen in order as they
+                    can be cancelled, messing up the valid claim amounts. */}
+                  </div>
+                }
                 onChange={handleChange}
                 wide
                 multiline
@@ -288,6 +307,8 @@ export default function Quest({
                     label="Funds fallback address"
                     value={questData.fallbackAddress}
                     isLoading={loading}
+                    tooltip="Fallback Address"
+                    tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
                     isEdit
                     placeHolder="Funds fallback address"
                     onChange={handleChange}
@@ -308,6 +329,12 @@ export default function Quest({
                 id="bounty"
                 label={questMode === QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
                 isEdit={isEdit}
+                tooltip="Bounty"
+                tooltipDetail={
+                  isEdit
+                    ? "The initial amount of this quest's funding pool."
+                    : "The available amount of this quest's funding pool."
+                }
                 value={bounty}
                 isLoading={loading || (!isEdit && !bounty)}
                 formik={formRef}
@@ -317,6 +344,8 @@ export default function Quest({
               <AmountFieldInput
                 id="claimDeposit"
                 label="Claim deposit"
+                // tooltip="Bounty"
+                // tooltipDetail="The initial amount that users can claim when completing a quest. This doesn't include the potential funds"
                 isEdit={false}
                 value={claimDeposit}
                 isLoading={loading || (!isEdit && !claimDeposit)}
@@ -325,6 +354,8 @@ export default function Quest({
             <DateFieldInput
               id="expireTimeMs"
               label="Expire time"
+              tooltip="Expire time"
+              tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
               isEdit={isEdit}
               isLoading={loading}
               value={questData.expireTimeMs}

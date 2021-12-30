@@ -1,9 +1,11 @@
 import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
+
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 
+import HelpIcon from './help-icon';
 // #region Styled
 
 const FieldStyled = styled(Field)`
@@ -41,6 +43,8 @@ type Props = {
   maxLine?: number;
   isMarkDown?: boolean;
   ellipsis?: ReactNode;
+  tooltip?: string;
+  tooltipDetail?: React.ReactNode;
 };
 export default function TextFieldInput({
   id,
@@ -59,6 +63,8 @@ export default function TextFieldInput({
   maxLine,
   isMarkDown = false,
   ellipsis,
+  tooltipDetail,
+  tooltip,
 }: Props) {
   if (isLoading)
     return (
@@ -105,9 +111,22 @@ export default function TextFieldInput({
     </div>
   );
   return label ? (
-    <Field label={label} key={id}>
-      {loadableContent}
-    </Field>
+    <>
+      <Field
+        label={
+          <>
+            {label}
+            {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+          </>
+        }
+        key={id}
+      >
+        {loadableContent}
+      </Field>
+      {/* {tooltip?(
+
+        )} */}
+    </>
   ) : (
     loadableContent
   );
