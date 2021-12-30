@@ -1,12 +1,13 @@
 import { ButtonBase, GU, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import React from 'react';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 
 // #region StyledComponents
 
 const HeaderAccountButtonStyled = styled(ButtonBase)`
   height: 100%;
-  padding: ${1 * GU}px;
+  padding: ${GUpx()};
   background: ${({ background }: any) => background};
   &:active {
     background: ${({ backgroundActive }: any) => backgroundActive};
@@ -38,7 +39,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
           display: flex;
           align-items: center;
           text-align: left;
-          padding: 0 ${1 * GU}px;
+          padding: 0 ${GUpx()};
         `}
       >
         <>
@@ -48,7 +49,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
               <div
                 // @ts-ignore
                 css={`
-                  padding-left: ${1 * GU}px;
+                  padding-left: ${GUpx()};
                   padding-right: ${0.5 * GU}px;
                 `}
               >

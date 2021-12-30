@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable react/no-array-index-key */
 import React from 'react';
 
 type Props = {
@@ -143,14 +143,14 @@ type ChildSpacerProps = {
 
 export function ChildSpacer({ children, size = 8, vertical = false }: ChildSpacerProps) {
   if (!children) return <></>;
-  return React.Children.map(children, (child) => {
+  return React.Children.map(children, (child, i) => {
     let className = `p${vertical ? 't' : 'l'}-${size}`;
     className += ` p${vertical ? 'b' : 'r'}-${size}`;
     return (
       <div
         style={vertical ? { display: 'block' } : { display: 'inline-block' }}
         className={className}
-        // key={`child-${i}`}
+        key={`child-${i}`}
       >
         {child}
       </div>

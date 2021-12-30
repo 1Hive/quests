@@ -1,4 +1,4 @@
-import { Field, GU, TextInput, TokenBadge } from '@1hive/1hive-ui';
+import { Field, TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
@@ -6,6 +6,7 @@ import Skeleton from 'react-loading-skeleton';
 import { DEFAULT_AMOUNT } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 
 // #region StyledComponents
@@ -16,7 +17,7 @@ const LineStyled = styled.div`
 `;
 const AmountStyled = styled.div`
   margin-top: 2px;
-  margin-right: ${GU}px;
+  margin-right: ${GUpx()};
 `;
 
 const FieldStyled = styled(Field)`

@@ -9,6 +9,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { CLAIM_STATUS, TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
+import { GUpx } from 'src/utils/css.util';
 import ModalBase from './modal-base';
 import { useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
@@ -26,6 +27,10 @@ const TimerStyled = styled(Timer)`
   svg {
     color: white !important;
   }
+`;
+
+const OpenButtonStyled = styled(Button)`
+  margin: 0 ${GUpx()};
 `;
 
 // #endregion
@@ -103,7 +108,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
     <ModalBase
       title="Challenge quest"
       openButton={
-        <Button
+        <OpenButtonStyled
           icon={<IconFlag />}
           onClick={() => setOpened(true)}
           label={

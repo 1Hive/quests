@@ -17,7 +17,7 @@ export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filter } = useFilterContext();
+  const { filter } = useFilterContext()!;
 
   const { setPage } = usePageContext();
   useEffect(() => setPage(PAGES.List), [setPage]);
@@ -26,7 +26,7 @@ export default function QuestList() {
     if (!isLoading) {
       setQuests([]);
       setIsLoading(true);
-      QuestService.getMoreQuests(0, batchSize, _filter ?? filter).then((res) => {
+      QuestService.fetchQuestsPaging(0, batchSize, _filter ?? filter).then((res) => {
         setIsLoading(false);
         setQuests(res);
         setHasMore(res.length >= batchSize);
@@ -36,7 +36,7 @@ export default function QuestList() {
 
   const loadMore = () => {
     setIsLoading(true);
-    QuestService.getMoreQuests(quests.length, batchSize, filter).then((res) => {
+    QuestService.fetchQuestsPaging(quests.length, batchSize, filter).then((res) => {
       setIsLoading(false);
       setQuests(quests.concat(res));
       setHasMore(res.length >= batchSize);

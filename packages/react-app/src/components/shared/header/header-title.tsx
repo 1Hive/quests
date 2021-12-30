@@ -1,6 +1,7 @@
-import { GU, textStyle, useTheme } from '@1hive/1hive-ui';
+import { textStyle, useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash';
 import { Link } from 'react-router-dom';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { APP_TITLE, PAGES } from '../../../constants';
 import logo from './assets/logo.svg';
@@ -16,7 +17,7 @@ const TitleLinkWrapperStyled = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
-  margin-left: ${GU}px;
+  margin-left: ${GUpx()};
 `;
 
 const TitleTextStyled = styled.span`

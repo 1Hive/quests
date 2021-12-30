@@ -6,4 +6,5 @@ export type FilterModel = {
   description: string;
   expire: { start?: Date; end?: Date };
   bounty: TokenAmountModel;
+  showExpired: boolean;
 };

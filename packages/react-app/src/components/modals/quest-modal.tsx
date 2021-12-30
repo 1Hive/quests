@@ -1,9 +1,10 @@
-import { Button, GU, IconPlus } from '@1hive/1hive-ui';
+import { Button, IconPlus } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { FaSave } from 'react-icons/fa';
 import { QUEST_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import Quest from '../shared/quest';
 import ModalBase from './modal-base';
@@ -11,7 +12,7 @@ import ModalBase from './modal-base';
 // #region StyledComponents
 
 const QuestActionButtonStyled = styled(Button)`
-  margin: ${1 * GU}px;
+  margin: ${GUpx()};
 `;
 
 // #endregion

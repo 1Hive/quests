@@ -1,5 +1,6 @@
-import { Box, GU } from '@1hive/1hive-ui';
+import { Box } from '@1hive/1hive-ui';
 import { usePageContext } from 'src/contexts/page.context';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { PAGES, QUEST_MODE } from '../../constants';
 import { useWallet } from '../../contexts/wallet.context';
@@ -13,7 +14,7 @@ import { Outset } from './utils/spacer-util';
 const BoxStyled = styled(Box)`
   width: 100%;
   min-width: fit-content;
-  margin: ${5 * GU}px 0;
+  margin: ${GUpx(5)} 0;
 `;
 
 // #endregion

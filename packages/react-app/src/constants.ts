@@ -51,11 +51,12 @@ export const TOKENS = {
 
 // Constants
 
-export const QUEST_STATUS = {
-  Active: { id: 'active', label: 'Active' },
-  Completed: { id: 'completed', label: 'Completed' },
-  Aborted: { id: 'aborted', label: 'Aborted' },
-  Draft: { id: 'draft', label: 'Draft' },
+export const QUEST_STATE = {
+  Draft: 'Draft', // Not yet saved
+  Active: 'Active', // Contract created
+  // Played: 'Played', // At least one active claim
+  Expired: 'Expired', // When expireTime is past
+  Archived: 'Archived', // When no more funds
 };
 
 // Enums

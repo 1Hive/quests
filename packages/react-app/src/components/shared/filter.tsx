@@ -1,9 +1,9 @@
-import { Button, DateRangePicker, Field, IconClose, SearchInput } from '@1hive/1hive-ui';
+import { Button, DateRangePicker, Field, IconClose, SearchInput, Switch } from '@1hive/1hive-ui';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { DEFAULT_FILTER } from '../../constants';
 
 export function Filter() {
-  const { filter, setFilter } = useFilterContext();
+  const { filter, setFilter } = useFilterContext()!;
   return (
     <>
       <Field label="Address">
@@ -35,6 +35,12 @@ export function Filter() {
           startDate={filter.expire?.start}
           endDate={filter.expire?.end}
           onChange={(val: any) => setFilter({ ...filter, expire: val })}
+        />
+      </Field>
+      <Field label="Show expired">
+        <Switch
+          checked={filter.showExpired}
+          onChange={(val: any) => setFilter({ ...filter, showExpired: val })}
         />
       </Field>
       {

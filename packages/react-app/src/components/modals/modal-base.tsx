@@ -1,13 +1,14 @@
-import { GU, Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
+import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
 
 const ModalFooterStyled = styled.div`
   width: 100%;
   text-align: right;
-  padding: ${1 * GU}px;
+  padding: ${GUpx()};
 `;
 
 const TitleStyled = styled.div`
@@ -15,7 +16,7 @@ const TitleStyled = styled.div`
 `;
 
 const ModalStyled = styled(Modal)`
-  padding: ${GU}px;
+  padding: ${GUpx()};
 `;
 
 const ScrollViewStyled = styled(ScrollView)`

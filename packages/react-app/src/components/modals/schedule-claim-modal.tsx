@@ -11,6 +11,7 @@ import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
 import { useWallet } from 'src/contexts/wallet.context';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { GUpx } from 'src/utils/css.util';
 import ModalBase from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
@@ -21,6 +22,10 @@ import { Outset } from '../shared/utils/spacer-util';
 
 const FormStyled = styled(Form)`
   width: 100%;
+`;
+
+const OpenButtonStyled = styled(Button)`
+  margin: 0 ${GUpx()};
 `;
 
 // #endregion
@@ -90,7 +95,7 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
     <ModalBase
       title="Claim quest"
       openButton={
-        <Button
+        <OpenButtonStyled
           icon={<GiBroadsword />}
           onClick={() => setOpened(true)}
           label="Schedule claim"

@@ -9,19 +9,24 @@ import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { GUpx } from 'src/utils/css.util';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
 import ModalBase from './modal-base';
 
+const FormStyled = styled(Form)`
+  width: 100%;
+`;
+
+const OpenButtonStyled = styled(Button)`
+  margin: 0 ${GUpx()};
+`;
+
 type Props = {
   onClose?: Function;
   questAddress: string;
 };
-
-const FormStyled = styled(Form)`
-  width: 100%;
-`;
 
 export default function FundModal({ questAddress, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
@@ -57,7 +62,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
         hash: txReceipt.transactionHash!,
         status: TRANSACTION_STATUS.Confirmed,
       });
-      toast('Quest funded successfully');
+      toast('Operation succeed');
     } catch (e: any) {
       Logger.error(e);
       toast(
@@ -75,7 +80,12 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
     <ModalBase
       title="Fund quest"
       openButton={
-        <Button icon={<GiTwoCoins />} onClick={() => setOpened(true)} label="Fund" mode="strong" />
+        <OpenButtonStyled
+          icon={<GiTwoCoins />}
+          onClick={() => setOpened(true)}
+          label="Fund"
+          mode="strong"
+        />
       }
       buttons={
         <Button icon={<GiTwoCoins />} type="submit" form="form-fund" label="Fund" mode="strong" />

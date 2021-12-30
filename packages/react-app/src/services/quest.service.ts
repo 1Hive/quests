@@ -15,11 +15,13 @@ import { BigNumber, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
+import { exposeGlobally } from 'src/utils/debug-util';
 import { DEAULT_CLAIM_EXECUTION_DELAY, CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
+import { processQuestState } from './state-machine';
 
 let questList: QuestModel[] = [];
 
@@ -27,7 +29,7 @@ let questList: QuestModel[] = [];
 function mapQuest(questEntity: any) {
   const { defaultToken } = getNetwork();
   try {
-    const quest = {
+    let quest = {
       address: toChecksumAddress(questEntity.questAddress),
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
@@ -38,6 +40,7 @@ function mapQuest(questEntity: any) {
       },
       expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
     } as QuestModel;
+    quest = processQuestState(quest);
     if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
     return quest;
   } catch (error) {
@@ -169,26 +172,34 @@ function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
   ]);
 }
 
+// exposeGlobally(encodeClaimAction); // TODO : Remove when see
+
 // #endregion
 
 // #region Public
 
-export async function getMoreQuests(
+export async function fetchQuestsPaging(
   currentIndex: number,
   count: number,
   filter: FilterModel,
 ): Promise<QuestModel[]> {
   const { questSubgraph } = getNetwork();
+  const now = Math.round(Date.now() / 1000);
+  let expireTimeLower;
+  let expireTimeUpper;
+  if (filter.expire?.start) expireTimeLower = Math.round(filter.expire.start.getTime() / 1000);
+  // MS to Sec
+  else expireTimeLower = filter.showExpired ? 0 : now;
+  if (filter.expire?.end) expireTimeUpper = Math.round(filter.expire.end.getTime() / 1000);
+  // MS to Sec
+  // TODO : Change to a later time when supported by grapql-request
+  else expireTimeUpper = filter.showExpired ? now : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
   const queryResult = (
     await request(questSubgraph, QuestEntitiesQuery, {
       skip: currentIndex,
       first: count,
-      expireTimeLower: filter.expire?.start
-        ? Math.round(filter.expire.start.getTime() / 1000) // MS to Sec
-        : 0,
-      expireTimeUpper: filter.expire?.end
-        ? Math.round(filter.expire.end.getTime() / 1000) // MS to Sec
-        : GQL_MAX_INT, // January 18, 2038 10:14:07 PM  // TODO : Change to a later time when supported by grapql-request
+      expireTimeLower,
+      expireTimeUpper,
       address: filter.address.toLowerCase(), // Quest address was not stored with mixed-case
       title: filter.title,
       description: filter.description,

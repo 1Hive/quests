@@ -1,10 +1,10 @@
-import { AddressField, Button, Card, GU, IconPlus, Split, useToast } from '@1hive/1hive-ui';
+import { AddressField, Button, Card, IconPlus, Split, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { PAGES, QUEST_MODE, TRANSACTION_STATUS } from 'src/constants';
+import { PAGES, QUEST_MODE, QUEST_STATE, TRANSACTION_STATUS } from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -16,16 +16,19 @@ import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { GUpx } from 'src/utils/css.util';
 import ScheduleClaimModal from '../modals/schedule-claim-modal';
 import FundModal from '../modals/fund-modal';
 import ReclaimFundsModal from '../modals/reclaim-funds-modal';
 import DateFieldInput from './field-input/date-field-input';
-import { ChildSpacer, Outset } from './utils/spacer-util';
+import { Outset } from './utils/spacer-util';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import IdentityBadge from './identity-badge';
 import ClaimList from './claim-list';
-import { ExecuteClaim } from './execute-claim';
+import { processQuestState } from '../../services/state-machine';
+import { StateTag } from '../state-tag';
+import ExecuteClaimModal from '../modals/execute-claim-modal';
 // #region StyledComponents
 
 const LinkStyled = styled(Link)`
@@ -42,7 +45,10 @@ const CardStyled = styled(Card)`
 const QuestFooterStyled = styled.div`
   width: 100%;
   text-align: right;
-  padding: ${1 * GU}px;
+  padding: ${GUpx(2)};
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 const FormStyled = styled(Form)`
@@ -60,6 +66,12 @@ const NoPaddingSplitStyled = styled(Split)`
   padding-bottom: 0 !important;
 `;
 
+const TitleStateWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
 // #endregion
 
 type Props = {
@@ -75,6 +87,7 @@ export default function Quest({
     title: '',
     description: '',
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
+    state: QUEST_STATE.Draft,
   },
   isLoading = false,
   questMode = QUEST_MODE.ReadDetail,
@@ -120,6 +133,8 @@ export default function Quest({
     const getBalanceOfQuest = async (address: string) => {
       try {
         const result = await getBalanceOf(defaultToken, address);
+        data.bounty = result ?? undefined;
+        processQuestState(data);
         setBounty(result);
       } catch (error) {
         Logger.error(error);
@@ -170,9 +185,6 @@ export default function Quest({
           hash: txReceiptSaveQuest.transactionHash,
           status: TRANSACTION_STATUS.Confirmed,
         });
-        if (createdQuestAddress) {
-          toast('Quest created successfully');
-        }
         if (values.bounty?.amount) {
           createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
           if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
@@ -194,9 +206,6 @@ export default function Quest({
             hash: txReceiptFundQuest.transactionHash,
             status: TRANSACTION_STATUS.Confirmed,
           });
-          if (createdQuestAddress) {
-            toast('Quest funded successfully');
-          }
         }
       } catch (e: any) {
         Logger.error(e);
@@ -206,6 +215,7 @@ export default function Quest({
             : e.message,
         );
       } finally {
+        toast('Operation succeed');
         setSubmitting(false);
         setLoading(false);
       }
@@ -220,17 +230,26 @@ export default function Quest({
             <Outset gu8 vertical className="block">
               <NoPaddingSplitStyled
                 primary={
-                  <TextFieldInput
-                    id="title"
-                    label={isEdit ? 'Title' : undefined}
-                    isEdit={isEdit}
-                    isLoading={loading}
-                    placeHolder="Quest title"
-                    value={questData.title}
-                    onChange={handleChange}
-                    fontSize="24px"
-                    wide
-                  />
+                  <TitleStateWrapper>
+                    <TextFieldInput
+                      id="title"
+                      label={isEdit ? 'Title' : undefined}
+                      isEdit={isEdit}
+                      isLoading={loading}
+                      placeHolder="Quest title"
+                      value={questData.title}
+                      onChange={handleChange}
+                      fontSize="24px"
+                      wide
+                    />
+                    <StateTag
+                      state={data.state}
+                      visible={
+                        questData.state === QUEST_STATE.Expired ||
+                        questData.state === QUEST_STATE.Archived
+                      }
+                    />
+                  </TitleStateWrapper>
                 }
                 secondary={
                   !isEdit &&
@@ -318,36 +337,28 @@ export default function Quest({
         <>
           {questMode === QUEST_MODE.ReadDetail && claims && <ClaimList claims={claims} />}
           <QuestFooterStyled>
-            <Outset gu8 vertical>
-              {questMode !== QUEST_MODE.ReadDetail && (
-                <ChildSpacer>
-                  <LinkStyled to={`/${PAGES.Detail}?id=${questData.address}`}>
-                    <Button icon={<IconPlus />} label="Details" wide mode="strong" />
-                  </LinkStyled>
-                </ChildSpacer>
-              )}
-              {questMode !== QUEST_MODE.ReadSummary && questData.address && wallet.account && (
-                <ChildSpacer>
-                  {questData.expireTimeMs > Date.now() ? (
-                    <>
-                      <FundModal questAddress={questData.address} />
-                      {currentPlayerClaim ? (
-                        <ExecuteClaim claim={currentPlayerClaim} />
-                      ) : (
-                        claimDeposit && (
-                          <ScheduleClaimModal
-                            questAddress={data.address}
-                            claimDeposit={claimDeposit}
-                          />
-                        )
-                      )}
-                    </>
+            {questMode !== QUEST_MODE.ReadDetail && (
+              <LinkStyled to={`/${PAGES.Detail}?id=${questData.address}`}>
+                <Button icon={<IconPlus />} label="Details" wide mode="strong" />
+              </LinkStyled>
+            )}
+            {questMode !== QUEST_MODE.ReadSummary &&
+              questData.address &&
+              wallet.account &&
+              (questData.state === QUEST_STATE.Active ? (
+                <>
+                  <FundModal questAddress={questData.address} />
+                  {currentPlayerClaim ? (
+                    <ExecuteClaimModal claim={currentPlayerClaim} />
                   ) : (
-                    bounty && <ReclaimFundsModal bounty={bounty} questData={questData} />
+                    claimDeposit && (
+                      <ScheduleClaimModal questAddress={data.address} claimDeposit={claimDeposit} />
+                    )
                   )}
-                </ChildSpacer>
-              )}
-            </Outset>
+                </>
+              ) : (
+                bounty && <ReclaimFundsModal bounty={bounty} questData={questData} />
+              ))}
           </QuestFooterStyled>
         </>
       )}

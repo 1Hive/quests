@@ -7,16 +7,22 @@ import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import styled from 'styled-components';
+import { GUpx } from 'src/utils/css.util';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
 import ModalBase from './modal-base';
 import IdentityBadge from '../shared/identity-badge';
 
+const OpenButtonStyled = styled(Button)`
+  margin: 0 ${GUpx()};
+`;
+
 type Props = {
-  onClose?: Function;
   questData: QuestModel;
   bounty: TokenAmountModel;
+  onClose?: Function;
 };
 
 export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
@@ -30,7 +36,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
     onClose();
   };
 
-  const reclaimFundModalTx = async (values: any, setSubmitting: Function) => {
+  const reclaimFundTx = async () => {
     try {
       setLoading(true);
       const txReceiptReclaim = await QuestService.reclaimUnusedFunds(questContract, (tx) => {
@@ -45,7 +51,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
         hash: txReceiptReclaim.transactionHash,
         status: TRANSACTION_STATUS.Confirmed,
       });
-      toast('Funds reclaimed successfully');
+      toast('Operation succeed');
     } catch (e: any) {
       Logger.error(e);
       toast(
@@ -54,7 +60,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           : e.message,
       );
     } finally {
-      setSubmitting(false);
       setLoading(false);
     }
   };
@@ -64,7 +69,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       <ModalBase
         title="Reclaim unused quest funds"
         openButton={
-          <Button
+          <OpenButtonStyled
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
             label="Reclaim funds"
@@ -76,7 +81,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
         }
         buttons={
           <Button
-            onClick={reclaimFundModalTx}
+            onClick={reclaimFundTx}
             icon={<IconCoin />}
             label="Reclaim funds"
             wide
@@ -87,9 +92,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
         isOpen={opened}
       >
         <Outset gu16>
-          <Field label="Reclaim funds destination">
-            <IdentityBadge entity={questData.fallbackAddress!} badgeOnly />
-          </Field>
           <AmountFieldInputFormik
             id="bounty"
             isEdit={false}
@@ -97,6 +99,9 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             isLoading={loading}
             value={bounty}
           />
+          <Field label="will be send to">
+            <IdentityBadge entity={questData.fallbackAddress!} badgeOnly />
+          </Field>
         </Outset>
       </ModalBase>
     </>

@@ -1,7 +1,8 @@
-import { AddressField, Field, Accordion, GU } from '@1hive/1hive-ui';
+import { AddressField, Field, Accordion } from '@1hive/1hive-ui';
 import { ClaimModel } from 'src/models/claim.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import styled from 'styled-components';
+import { GUpx } from 'src/utils/css.util';
 import ChallengeModal from '../modals/challenge-modal';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
@@ -21,7 +22,7 @@ const RowStyled = styled.div`
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  margin: ${GU}px;
+  margin: ${GUpx()};
 `;
 
 // #endregion
