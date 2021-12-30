@@ -4,11 +4,16 @@ import { Outset } from './spacer-util';
 const SeparatorStyled = styled.div`
   border-top: 1px solid #efefef;
 `;
-
-export default function Separator() {
+const HorizontalSeparatorStyled = styled.div`
+  border-left: 2px solid #818181;
+`;
+type Props = {
+  horizontal?: boolean;
+};
+export default function Separator({ horizontal }: Props) {
   return (
     <Outset gu8 vertical>
-      <SeparatorStyled />
+      {horizontal ? <HorizontalSeparatorStyled /> : <SeparatorStyled />}
     </Outset>
   );
 }
