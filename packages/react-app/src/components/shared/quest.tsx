@@ -121,6 +121,7 @@ export default function Quest({
 
   useEffect(() => {
     const getClaimDeposit = async () => {
+      // Don't show deposit of expired
       if (data.state === QUEST_STATE.Archived || data.state === QUEST_STATE.Expired)
         setClaimDeposit(null);
       else
@@ -135,14 +136,17 @@ export default function Quest({
       setClaims(result);
     };
     const getBalanceOfQuest = async (address: string) => {
-      try {
-        const result = await getBalanceOf(defaultToken, address);
-        data.bounty = result ?? undefined;
-        processQuestState(data);
-        setBounty(result);
-      } catch (error) {
-        Logger.error(error);
-      }
+      // Don't show empty bounty
+      if (data.state === QUEST_STATE.Archived) setBounty(null);
+      else
+        try {
+          const result = await getBalanceOf(defaultToken, address);
+          data.bounty = result ?? undefined;
+          processQuestState(data);
+          setBounty(result);
+        } catch (error) {
+          Logger.error(error);
+        }
     };
 
     if (data.address) getBalanceOfQuest(data.address);
@@ -391,7 +395,7 @@ export default function Quest({
                   )}
                 </>
               ) : (
-                bounty && <ReclaimFundsModal bounty={bounty} questData={questData} />
+                !!bounty?.amount && <ReclaimFundsModal bounty={bounty} questData={questData} />
               ))}
           </QuestFooterStyled>
         </>
