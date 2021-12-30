@@ -6,7 +6,10 @@
     { "name": "Services", "path": "./packages/services" },
     { "name": "Root", "path": "." }
   ],
-  "settings": {},
+  "settings": {
+    "typescript.tsdk": "WebApp/node_modules/typescript/lib",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "extensions": {
     "recommendations": [
       "esbenp.prettier-vscode",

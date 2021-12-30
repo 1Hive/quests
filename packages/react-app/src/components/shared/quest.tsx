@@ -14,7 +14,12 @@ import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { PAGES, QUEST_MODE, TRANSACTION_STATUS } from 'src/constants';
-import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
+import {
+  getBalanceOf,
+  useERC20Contract,
+  useFactoryContract,
+  useQuestContract,
+} from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
@@ -92,6 +97,7 @@ export default function Quest({
   const wallet = useWallet();
   const { defaultToken } = getNetwork();
   const erc20Contract = useERC20Contract(data.rewardToken ?? defaultToken);
+  const questContract = useQuestContract(data.address, true);
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
@@ -138,6 +144,22 @@ export default function Quest({
     fetchClaims();
     getClaimDeposit();
   }, []);
+
+  const callReclaimFunds = async () => {
+    const txReceiptReclaim = await QuestService.reclaimUnusedFunds(questContract, (tx) => {
+      pushTransaction({
+        hash: tx,
+        estimatedEnd: Date.now() + 10 * 1000, // 10 sec
+        pendingMessage: 'Reclaiming unused fund...',
+        status: TRANSACTION_STATUS.Pending,
+      });
+      onSave();
+    });
+    updateTransactionStatus({
+      hash: txReceiptReclaim.transactionHash,
+      status: TRANSACTION_STATUS.Confirmed,
+    });
+  };
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -351,7 +373,13 @@ export default function Quest({
                       )}
                     </>
                   ) : (
-                    <Button icon={<IconCoin />} label="Reclaim funds" wide mode="strong" />
+                    <Button
+                      onClick={callReclaimFunds}
+                      icon={<IconCoin />}
+                      label="Reclaim funds"
+                      wide
+                      mode="strong"
+                    />
                   )}
                 </ChildSpacer>
               )}

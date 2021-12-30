@@ -359,4 +359,13 @@ export function getTagSuggestions() {
   return []; // TODO : Restore after MVP questList.map((x) => x.tags).flat();
 }
 
+export async function reclaimUnusedFunds(questContract: any, onTx?: (hash: string) => void) {
+  const tx = await questContract.recoverUnclaimedFunds();
+  onTx?.(tx.hash);
+  Logger.info('Tx hash', tx.hash);
+  const receipt = (await tx.wait()) as ethers.ContractReceipt;
+  Logger.info('Tx logs', receipt.logs);
+  return receipt;
+}
+
 // #endregion

@@ -60,7 +60,7 @@ function useContract(contractName: string, addressOverride?: string, withSignerI
   const network = getNetwork();
   if (!contracts) contracts = getContractsJson(network);
   const askedContract = contracts[contractName];
-  const contractAddress = addressOverride ?? askedContract.address;
+  const contractAddress = addressOverride === undefined ? askedContract.address : addressOverride;
   const contractAbi = askedContract.abi ?? askedContract;
   const provider = getDefaultProvider();
 
@@ -101,6 +101,10 @@ export function useGovernQueueContract() {
 
 export function useERC20Contract(token: TokenModel, withSignerIfPossible = true) {
   return useContract('ERC20', token.address, withSignerIfPossible);
+}
+
+export function useQuestContract(address?: string, withSignerIfPossible = true) {
+  return useContract('Quest', address ?? null, withSignerIfPossible);
 }
 
 export async function getBalanceOf(token: TokenModel, address: string) {
