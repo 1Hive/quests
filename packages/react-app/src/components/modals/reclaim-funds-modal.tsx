@@ -1,36 +1,30 @@
-import { Button, useToast } from '@1hive/1hive-ui';
-import { Form, Formik } from 'formik';
+import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { useRef, useState } from 'react';
-import { GiTwoCoins } from 'react-icons/gi';
-import { DEFAULT_AMOUNT, TRANSACTION_STATUS } from 'src/constants';
-import { useERC20Contract } from 'src/hooks/use-contract.hook';
-import { getNetwork } from 'src/networks';
+import { useState } from 'react';
+import { TRANSACTION_STATUS } from 'src/constants';
+import { useQuestContract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
-import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { QuestModel } from 'src/models/quest.model';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
 import ModalBase from './modal-base';
+import IdentityBadge from '../shared/identity-badge';
 
 type Props = {
   onClose?: Function;
-  questAddress: string;
+  questData: QuestModel;
+  bounty: TokenAmountModel;
 };
 
-const FormStyled = styled(Form)`
-  width: 100%;
-`;
-
-export default function ReclaimFundModal({questAddress, bounty, onClose = noop }: Props) {
+export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
+  const questContract = useQuestContract(questData.address, true);
   const toast = useToast();
-  const { defaultToken } = getNetwork();
-  const contractERC20 = useERC20Contract(defaultToken);
   const onModalClose = () => {
     setOpened(false);
     onClose();
@@ -46,13 +40,12 @@ export default function ReclaimFundModal({questAddress, bounty, onClose = noop }
           pendingMessage: 'Reclaiming unused fund...',
           status: TRANSACTION_STATUS.Pending,
         });
-        onSave();
       });
       updateTransactionStatus({
         hash: txReceiptReclaim.transactionHash,
         status: TRANSACTION_STATUS.Confirmed,
       });
-      toast('Fund Reclaimed successfully');
+      toast('Funds reclaimed successfully');
     } catch (e: any) {
       Logger.error(e);
       toast(
@@ -67,58 +60,45 @@ export default function ReclaimFundModal({questAddress, bounty, onClose = noop }
   };
 
   return (
-    <ModalBase
-      title="Fund quest"
-      openButton={
-        <Button
-                      onClick={() => setOpened(true)
-                      icon={<IconCoin />}
-                      label="Reclaim funds"
-                      wide
-                      mode="strong"
-                    />
-        <Button icon={<GiTwoCoins />} onClick={() => setOpened(true)} label="Fund" mode="strong" />
-      }
-      buttons={
-        <Button
-                      onClick={() => reclaimFundModalTx)
-                      icon={<IconCoin />}
-                      label="Reclaim funds"
-                      wide
-                      mode="strong"
-                    />
-        <Button icon={<GiTwoCoins />} type="submit" form="form-fund" label="Fund" mode="strong" />
-      }
-      onClose={onModalClose}
-      isOpen={opened}
-    >
-      <Formik
-        initialValues={{ fundAmount: DEFAULT_AMOUNT }}
-        onSubmit={(values, { setSubmitting }) => {
-          const errors = [];
-          if (!values.fundAmount?.amount) errors.push('Validation : Amount is required');
-          if (errors.length) {
-            errors.forEach(toast);
-          } else {
-            fundModalTx(values, setSubmitting);
-          }
-        }}
+    <>
+      <ModalBase
+        title="Reclaim unused quest funds"
+        openButton={
+          <Button
+            onClick={() => setOpened(true)}
+            icon={<IconCoin />}
+            label="Reclaim funds"
+            wide
+            disabled={!bounty.amount}
+            title={bounty.amount ? 'Reclaim funds' : 'No more funds'}
+            mode="strong"
+          />
+        }
+        buttons={
+          <Button
+            onClick={reclaimFundModalTx}
+            icon={<IconCoin />}
+            label="Reclaim funds"
+            wide
+            mode="strong"
+          />
+        }
+        onClose={onModalClose}
+        isOpen={opened}
       >
-        {({ values, handleSubmit, handleChange }) => (
-          <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
-            <Outset gu16>
-              <AmountFieldInputFormik
-                id="fundAmount"
-                isEdit
-                label="Amount"
-                onChange={handleChange}
-                isLoading={loading}
-                value={values.fundAmount}
-              />
-            </Outset>
-          </FormStyled>
-        )}
-      </Formik>
-    </ModalBase>
+        <Outset gu16>
+          <Field label="Reclaim funds destination">
+            <IdentityBadge entity={questData.fallbackAddress!} badgeOnly />
+          </Field>
+          <AmountFieldInputFormik
+            id="bounty"
+            isEdit={false}
+            label="Reclaimable funds"
+            isLoading={loading}
+            value={bounty}
+          />
+        </Outset>
+      </ModalBase>
+    </>
   );
 }

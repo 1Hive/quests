@@ -1,25 +1,11 @@
-import {
-  AddressField,
-  Button,
-  Card,
-  GU,
-  IconPlus,
-  IconCoin,
-  Split,
-  useToast,
-} from '@1hive/1hive-ui';
+import { AddressField, Button, Card, GU, IconPlus, Split, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { PAGES, QUEST_MODE, TRANSACTION_STATUS } from 'src/constants';
-import {
-  getBalanceOf,
-  useERC20Contract,
-  useFactoryContract,
-  useQuestContract,
-} from 'src/hooks/use-contract.hook';
+import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
@@ -32,7 +18,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import ScheduleClaimModal from '../modals/schedule-claim-modal';
 import FundModal from '../modals/fund-modal';
-import ReclaimFundModal from '../modals/reclaim-funds-modal';
+import ReclaimFundsModal from '../modals/reclaim-funds-modal';
 import DateFieldInput from './field-input/date-field-input';
 import { ChildSpacer, Outset } from './utils/spacer-util';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
@@ -98,7 +84,6 @@ export default function Quest({
   const wallet = useWallet();
   const { defaultToken } = getNetwork();
   const erc20Contract = useERC20Contract(data.rewardToken ?? defaultToken);
-  const questContract = useQuestContract(data.address, true);
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
@@ -145,10 +130,6 @@ export default function Quest({
     fetchClaims();
     getClaimDeposit();
   }, []);
-
-  const callReclaimFunds = async () => {
-    
-  };
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -362,8 +343,7 @@ export default function Quest({
                       )}
                     </>
                   ) : (
-                    <ReclaimFundModal/>
-        
+                    bounty && <ReclaimFundsModal bounty={bounty} questData={questData} />
                   )}
                 </ChildSpacer>
               )}
