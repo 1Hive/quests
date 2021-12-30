@@ -32,6 +32,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import ScheduleClaimModal from '../modals/schedule-claim-modal';
 import FundModal from '../modals/fund-modal';
+import ReclaimFundModal from '../modals/reclaim-funds-modal';
 import DateFieldInput from './field-input/date-field-input';
 import { ChildSpacer, Outset } from './utils/spacer-util';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
@@ -146,19 +147,7 @@ export default function Quest({
   }, []);
 
   const callReclaimFunds = async () => {
-    const txReceiptReclaim = await QuestService.reclaimUnusedFunds(questContract, (tx) => {
-      pushTransaction({
-        hash: tx,
-        estimatedEnd: Date.now() + 10 * 1000, // 10 sec
-        pendingMessage: 'Reclaiming unused fund...',
-        status: TRANSACTION_STATUS.Pending,
-      });
-      onSave();
-    });
-    updateTransactionStatus({
-      hash: txReceiptReclaim.transactionHash,
-      status: TRANSACTION_STATUS.Confirmed,
-    });
+    
   };
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
@@ -373,13 +362,8 @@ export default function Quest({
                       )}
                     </>
                   ) : (
-                    <Button
-                      onClick={callReclaimFunds}
-                      icon={<IconCoin />}
-                      label="Reclaim funds"
-                      wide
-                      mode="strong"
-                    />
+                    <ReclaimFundModal/>
+        
                   )}
                 </ChildSpacer>
               )}
