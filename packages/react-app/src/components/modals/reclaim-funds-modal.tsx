@@ -81,14 +81,17 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       <ModalBase
         title="Reclaim unused quest funds"
         openButton={
-          <OpenButtonStyled
-            onClick={() => setOpened(true)}
-            icon={<IconCoin />}
-            label="Reclaim funds"
-            disabled={!bounty.amount}
-            title={bounty.amount ? 'Reclaim funds' : 'No more funds'}
-            mode="strong"
-          />
+          bounty.amount ? (
+            <OpenButtonStyled
+              onClick={() => setOpened(true)}
+              icon={<IconCoin />}
+              label="Reclaim funds"
+              title={bounty.amount ? 'Reclaim funds' : 'No more funds'}
+              mode="strong"
+            />
+          ) : (
+            <></>
+          )
         }
         buttons={
           <Button onClick={reclaimFundTx} icon={<IconCoin />} label="Reclaim funds" mode="strong" />
