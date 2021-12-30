@@ -11,7 +11,7 @@ import {
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
 } from 'src/queries/govern-queue-entity.query';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, Contract, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
@@ -118,7 +118,7 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
   return containers;
 }
 
-async function getContainer(claimData: ClaimModel): Promise<ContainerModel> {
+async function computeContainer(claimData: ClaimModel): Promise<ContainerModel> {
   const { govern, celeste } = getNetwork();
 
   const governQueueResult = await fetchGovernQueue();
@@ -211,11 +211,11 @@ export async function fetchQuestsPaging(
   return newQuests;
 }
 
-export async function getQuest(address: string) {
+export async function fetchQuest(questAddress: string) {
   const { questSubgraph } = getNetwork();
   const queryResult = (
     await request(questSubgraph, QuestEntityQuery, {
-      ID: address.toLowerCase(), // Subgraph address are stored lowercase
+      ID: questAddress.toLowerCase(), // Subgraph address are stored lowercase
     })
   ).questEntity;
   const newQuest = mapQuest(queryResult);
@@ -271,7 +271,7 @@ export async function scheduleQuestClaim(
   // eslint-disable-next-line no-unused-vars
   onTxx?: (hash: string) => void,
 ) {
-  const container = await getContainer(claimData);
+  const container = await computeContainer(claimData);
   Logger.debug('Scheduling quest claim ...', { container, claimData });
   const tx = await governQueueContract.schedule(container).send({
     value: scheduleDeposit.amount,
@@ -290,7 +290,7 @@ export async function executeQuestClaim(
   // eslint-disable-next-line no-unused-vars
   onTxx?: (hash: string) => void,
 ) {
-  const container = await getContainer(claimData);
+  const container = await computeContainer(claimData);
   Logger.debug('Executing quest claim ...', { container, claimData });
   const tx = await governQueueContract.execute(container);
   onTxx?.(tx.hash);
@@ -306,7 +306,7 @@ export async function challengeQuestClaim(
   // eslint-disable-next-line no-unused-vars
   onTxx?: (hash: string) => void,
 ) {
-  const container = await getContainer(challenge.claim);
+  const container = await computeContainer(challenge.claim);
   Logger.debug('Challenging quest ...', { container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
   const tx = await governQueueContract.challenge(container, challengeReasonIpfs);
@@ -327,7 +327,7 @@ export async function getClaimExecutableTime(questAddress: string, playerAddress
   return container && +container.payload.executionTime * 1000; // Convert Sec to MS
 }
 
-export async function getQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
+export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
   const { defaultToken, nativeToken } = getNetwork();
   const res = await fetchGovernQueueContainers();
 
@@ -336,7 +336,8 @@ export async function getQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
       .filter(
         (x) =>
           x.payload.actions[0].to === quest.address &&
-          (x.state === CLAIM_STATUS.Scheduled || x.state === CLAIM_STATUS.Challenged),
+          (x.state === CLAIM_STATUS.Scheduled || x.state === CLAIM_STATUS.Challenged) &&
+          +x.payload.executionTime * 1000 > Date.now(),
       )
       .map(async (x) => {
         const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);

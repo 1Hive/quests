@@ -1,4 +1,4 @@
-import { Button, useToast, IconCoin, Field, Timer, Help } from '@1hive/1hive-ui';
+import { Button, useToast, IconCoin, Field, Timer } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import { CLAIM_STATUS, TRANSACTION_STATUS } from 'src/constants';
@@ -18,12 +18,12 @@ import IdentityBadge from '../shared/identity-badge';
 
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx()};
+  margin-bottom: ${GUpx()};
 `;
 
-const TimerStyled = styled(Timer)`
-  svg {
-    color: black !important;
-  }
+const OpenButtonWrapperStyled = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 // #endregion
@@ -51,9 +51,8 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
 
   useEffect(() => {
     if (claim.state === CLAIM_STATUS.Challenged) setButtonLabel('Challenged by someone');
-    else if (!scheduleTimeout && claim.executionTime) setButtonLabel('Not claimable yet');
+    else if (!scheduleTimeout && claim.executionTime) setButtonLabel('Claimable in');
     else setButtonLabel('Claim');
-    console.log({ executionTime: claim.executionTime });
   }, [claim.state, claim.executionTime, scheduleTimeout]);
 
   const onModalClose = () => {
@@ -97,9 +96,9 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
   return (
     <>
       <ModalBase
-        title="Reclaim unused funds"
+        title="Claim quest bounty"
         openButton={
-          <>
+          <OpenButtonWrapperStyled>
             <OpenButtonStyled
               onClick={() => setOpened(true)}
               icon={<IconCoin />}
@@ -108,11 +107,9 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
               disabled={!scheduleTimeout || claim.state === CLAIM_STATUS.Challenged}
             />
             {!scheduleTimeout && claim.executionTime && (
-              <Help hint="Show remaining time">
-                <TimerStyled end={new Date(claim.executionTime)} />
-              </Help>
+              <Timer end={new Date(claim.executionTime)} />
             )}
-          </>
+          </OpenButtonWrapperStyled>
         }
         buttons={
           <Button

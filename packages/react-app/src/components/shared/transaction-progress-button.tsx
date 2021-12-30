@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import { TransactionProgress, Button, IconNotifications, FloatIndicator } from '@1hive/1hive-ui';
+import { TransactionProgress, Button, IconNotifications, SyncIndicator } from '@1hive/1hive-ui';
 import { getNetwork } from 'src/networks';
 import { useEffect, useRef, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -123,7 +123,7 @@ export function TransactionProgressButton() {
             opener={activityOpener.current}
             endTime={new Date(currentTx.estimatedEnd ?? Date.now())}
           />
-          <FloatIndicator>{currentTx.pendingMessage}</FloatIndicator>
+          <SyncIndicator>{currentTx.pendingMessage}</SyncIndicator>
         </>
       )}
     </Outset>

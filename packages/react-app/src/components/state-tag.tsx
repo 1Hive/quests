@@ -15,23 +15,36 @@ type Props = {
 
 export function StateTag({ state, visible }: Props) {
   const [mode, setMode] = useState<string>();
+  const [tooltip, setTooltip] = useState<string>();
   useEffect(() => {
     switch (state) {
       case QUEST_STATE.Draft:
         setMode('new');
+        setTooltip('Not yet saved');
         break;
       case QUEST_STATE.Active:
         setMode('indicator');
+        setTooltip('Active');
         break;
       case QUEST_STATE.Expired:
         setMode('identifier');
+        setTooltip('Expire time has reached');
         break;
       case QUEST_STATE.Archived:
         setMode('identifier');
+        setTooltip('Expired and no funds');
         break;
       default:
         break;
     }
   }, [state]);
-  return <>{visible && <StateTagStyled mode={mode}>{state}</StateTagStyled>}</>;
+  return (
+    <>
+      {visible && (
+        <StateTagStyled title={tooltip} mode={mode}>
+          {state}
+        </StateTagStyled>
+      )}
+    </>
+  );
 }

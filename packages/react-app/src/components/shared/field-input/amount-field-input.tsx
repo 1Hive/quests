@@ -8,7 +8,8 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import HelpIcon from './help-icon';
+import { HelpIcon } from './icon-tooltip';
+
 // #region StyledComponents
 
 const LineStyled = styled.div`
@@ -79,7 +80,7 @@ function AmountFieldInput({
     <FieldStyled
       label={
         <>
-          {label}
+          <span title={tooltip}>{label}</span>
           {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
         </>
       }

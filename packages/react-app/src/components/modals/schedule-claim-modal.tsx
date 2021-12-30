@@ -107,6 +107,8 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
           key="claimDeposit"
           id="claimDeposit"
           label="Claim Deposit"
+          tooltip="Claim deposit"
+          tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
           isEdit={false}
           isLoading={loading}
           value={claimDeposit}
@@ -144,6 +146,8 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
                 id="evidence"
                 isEdit
                 label="Evidence of completion"
+                tooltip="Evidence of completion"
+                tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
                 isLoading={loading}
                 value={values.evidence}
                 onChange={handleChange}
@@ -155,6 +159,8 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
                 id="claimedAmount"
                 isEdit
                 label="Claimed amount"
+                tooltip="Claimed amount"
+                tooltipDetail="The expected amount to claim considering the quest agreement."
                 isLoading={loading}
                 value={values.claimedAmount}
               />

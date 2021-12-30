@@ -7,7 +7,7 @@ import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import * as QuestService from '../../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
-import HelpIcon from './help-icon';
+import { HelpIcon } from './icon-tooltip';
 
 // #region StyledComponents
 
@@ -78,7 +78,7 @@ function TagFieldInput({
     <FieldStyled
       label={
         <>
-          {label}
+          <span title={tooltip}>{label}</span>
           {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
         </>
       }

@@ -1,6 +1,6 @@
 import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TRANSACTION_STATUS } from 'src/constants';
 import { useQuestContract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
@@ -9,6 +9,7 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
+import Skeleton from 'react-loading-skeleton';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
@@ -27,7 +28,10 @@ type Props = {
 
 export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [fallbackAddress, setFallbackAddress] = useState<string | undefined>(
+    questData.fallbackAddress,
+  );
   const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
   const questContract = useQuestContract(questData.address, true);
   const toast = useToast();
@@ -35,6 +39,13 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
     setOpened(false);
     onClose();
   };
+
+  useEffect(() => {
+    if (questContract && !fallbackAddress) {
+      questContract.fundsRecoveryAddress().then(setFallbackAddress);
+      setLoading(false);
+    }
+  }, [questContract]);
 
   const reclaimFundTx = async () => {
     try {
@@ -46,6 +57,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           pendingMessage: 'Reclaiming unused fund...',
           status: TRANSACTION_STATUS.Pending,
         });
+        onModalClose();
       });
       updateTransactionStatus({
         hash: txReceiptReclaim.transactionHash,
@@ -73,20 +85,13 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
             label="Reclaim funds"
-            wide
             disabled={!bounty.amount}
             title={bounty.amount ? 'Reclaim funds' : 'No more funds'}
             mode="strong"
           />
         }
         buttons={
-          <Button
-            onClick={reclaimFundTx}
-            icon={<IconCoin />}
-            label="Reclaim funds"
-            wide
-            mode="strong"
-          />
+          <Button onClick={reclaimFundTx} icon={<IconCoin />} label="Reclaim funds" mode="strong" />
         }
         onClose={onModalClose}
         isOpen={opened}
@@ -98,9 +103,14 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             label="Reclaimable funds"
             isLoading={loading}
             value={bounty}
+            wide
           />
           <Field label="will be send to">
-            <IdentityBadge entity={questData.fallbackAddress!} badgeOnly />
+            {!loading && fallbackAddress ? (
+              <IdentityBadge entity={fallbackAddress} badgeOnly />
+            ) : (
+              <Skeleton />
+            )}
           </Field>
         </Outset>
       </ModalBase>
