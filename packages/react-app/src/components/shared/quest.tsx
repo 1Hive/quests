@@ -121,11 +121,14 @@ export default function Quest({
 
   useEffect(() => {
     const getClaimDeposit = async () => {
-      try {
-        setClaimDeposit(await QuestService.fetchClaimDeposit());
-      } catch (error) {
-        Logger.error(error);
-      }
+      if (data.state === QUEST_STATE.Archived || data.state === QUEST_STATE.Expired)
+        setClaimDeposit(null);
+      else
+        try {
+          setClaimDeposit(await QuestService.fetchClaimDeposit());
+        } catch (error) {
+          Logger.error(error);
+        }
     };
     const fetchClaims = async () => {
       const result = await QuestService.fetchQuestClaims(data);
