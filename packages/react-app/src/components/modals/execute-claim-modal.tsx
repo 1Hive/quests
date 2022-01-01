@@ -10,7 +10,7 @@ import { GUpx } from 'src/utils/css.util';
 import { ClaimModel } from 'src/models/claim.model';
 import { ethers } from 'ethers';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { getLastBlockDate, getLastBlockTimestamp } from 'src/utils/date.utils';
+import { getLastBlockDate } from 'src/utils/date.utils';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';

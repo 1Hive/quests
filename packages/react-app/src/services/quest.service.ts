@@ -17,9 +17,7 @@ import { ChallengeModel } from 'src/models/challenge.model';
 import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { ContractError } from 'src/models/contract-error';
-import { parseUnits } from 'ethers/lib/utils';
-import { toLower } from 'lodash';
-import { DEAULT_CLAIM_EXECUTION_DELAY_MS, CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
+import { CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
@@ -210,12 +208,6 @@ export async function computeContainer(claimData: ClaimModel): Promise<Container
   const executionTime = claimData.executionTimeMs
     ? Math.round(claimData.executionTimeMs / 1000)
     : +lastBlockTimestamp + +erc3000Config.executionDelay + 60;
-
-  console.log('currentBlock.timestamp', {
-    timestamp: lastBlockTimestamp,
-    executionDelay: erc3000Config.executionDelay,
-    executionTime,
-  });
 
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);

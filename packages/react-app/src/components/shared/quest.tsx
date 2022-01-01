@@ -66,13 +66,6 @@ const NoPaddingSplitStyled = styled(Split)`
   padding-bottom: 0 !important;
 `;
 
-const TitleStateWrapper = styled.div`
-  width: 100%;
-  display: block;
-  flex-direction: column;
-  align-items: center;
-`;
-
 // #endregion
 
 type Props = {

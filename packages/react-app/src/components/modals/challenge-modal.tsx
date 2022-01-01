@@ -18,7 +18,7 @@ import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input
 import TextFieldInput from '../shared/field-input/text-field-input';
 import { Outset } from '../shared/utils/spacer-util';
 import { HelpIcon } from '../shared/field-input/icon-tooltip';
-import { getLastBlockDate, getLastBlockTimestamp } from '../../utils/date.utils';
+import { getLastBlockDate } from '../../utils/date.utils';
 
 // #region StyledComponents
 
