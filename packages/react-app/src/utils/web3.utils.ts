@@ -156,7 +156,7 @@ export function toBigNumber(amount: TokenAmountModel) {
   if (!amount.token) {
     amount.token = defaultToken;
   }
-  return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
+  return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals + 1);
 }
 
 export function fromBigNumber(bigNumber: BigNumber | string, decimals: number): number {

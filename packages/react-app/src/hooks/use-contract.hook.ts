@@ -125,7 +125,7 @@ export function useQuestContract(
 
 export async function getBalanceOf(token: TokenModel, address: string): Promise<TokenAmountModel> {
   const contract = useERC20Contract(token, false);
-  if (contract instanceof ContractError) throw contract; // Throw error
+  if (contract instanceof ContractError) throw contract; // Trhow error
   const balance = await contract.balanceOf(address);
   return {
     token,
