@@ -52,7 +52,7 @@ function TagFieldInput({
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
   tagSuggestions = (tagSuggestions ?? [])
-    .concat(QuestService.getTagSuggestions())
+    // .concat(QuestService.getTagSuggestions())
     .filter((name) => searchTerm && name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
 
   if (!tagSuggestions.length && searchTerm) tagSuggestions.push(searchTerm);

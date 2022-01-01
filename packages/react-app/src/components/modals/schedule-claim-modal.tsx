@@ -4,11 +4,10 @@ import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { DEFAULT_AMOUNT, TRANSACTION_STATUS } from 'src/constants';
+import { DEFAULT_AMOUNT, TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
-import { useWallet } from 'src/contexts/wallet.context';
+import { useERC20Contract, useGovernQueueContract } from 'src/hooks/use-contract.hook';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
@@ -32,18 +31,25 @@ const OpenButtonStyled = styled(Button)`
 
 type Props = {
   questAddress: string;
-  claimDeposit?: TokenAmountModel;
+  claimDeposit: TokenAmountModel;
+  playerAddress: string;
   onClose?: Function;
 };
 
-export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose = noop }: Props) {
+export default function ScheduleClaimModal({
+  questAddress,
+  claimDeposit,
+  playerAddress,
+  onClose = noop,
+}: Props) {
   const toast = useToast();
-  const wallet = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
-  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
+  const erc20Contract = useERC20Contract(claimDeposit!.token!);
+  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
+    useTransactionContext()!;
 
   const onModalClose = () => {
     setOpened(false);
@@ -54,31 +60,49 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
     try {
       setLoading(true);
       toast('Comming soon...');
-      const txReceipt = await QuestService.scheduleQuestClaim(
-        governQueueContract,
-        {
-          claimedAmount: values.claimedAmount!,
-          evidence: values.evidence!,
-          playerAddress: wallet.account,
-          questAddress,
-        },
-        claimDeposit!,
+      const container = await QuestService.computeContainer({
+        claimedAmount: values.claimedAmount!,
+        evidence: values.evidence!,
+        playerAddress,
+        questAddress,
+      });
+      const approveTxReceipt = await QuestService.approveTokenAmount(
+        erc20Contract,
+        playerAddress,
+        container.config.scheduleDeposit,
         (tx) => {
           pushTransaction({
             hash: tx,
-            estimatedEnd: Date.now() + 10 * 1000,
-            pendingMessage: 'Quest claiming...',
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
+            pendingMessage: 'Claim deposit approval...',
             status: TRANSACTION_STATUS.Pending,
           });
-          onModalClose();
         },
       );
       updateTransactionStatus({
-        hash: txReceipt.transactionHash,
-        status: TRANSACTION_STATUS.Confirmed,
+        hash: approveTxReceipt.transactionHash,
+        status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
-      toast('Operation succeed');
+      const scheduleReceipt = await QuestService.scheduleQuestClaim(
+        governQueueContract,
+        container,
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimScheduling,
+            pendingMessage: 'Quest claim scheduling...',
+            status: TRANSACTION_STATUS.Pending,
+          });
+        },
+      );
+      updateTransactionStatus({
+        hash: scheduleReceipt.transactionHash,
+        status: scheduleReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+      });
+      onModalClose();
+      if (scheduleReceipt.status) toast('Operation succeed');
     } catch (e: any) {
+      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50
@@ -121,6 +145,7 @@ export default function ScheduleClaimModal({ questAddress, claimDeposit, onClose
           mode="positive"
           type="submit"
           form="form-claim"
+          disabled={loading || !governQueueContract || !erc20Contract}
         />,
       ]}
       onClose={onModalClose}

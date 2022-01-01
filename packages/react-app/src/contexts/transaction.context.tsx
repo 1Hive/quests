@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { createContext, useContext, useState } from 'react';
+import { TRANSACTION_STATUS } from 'src/constants';
 import { TransactionModel } from 'src/models/transaction.model';
 
 type TransactionContextModel = {
@@ -7,6 +8,7 @@ type TransactionContextModel = {
   pushTransaction: (tx: TransactionModel) => void;
   updatedTransactionStatus: TransactionModel | undefined;
   updateTransactionStatus: (tx: TransactionModel) => void;
+  updateLastTransactionStatus: (status: string) => void;
 };
 
 const TransactionContext = createContext<TransactionContextModel | undefined>(undefined);
@@ -18,9 +20,19 @@ type Props = {
 export const TransactionContextProvider = ({ children }: Props) => {
   const [newTransaction, pushTransaction] = useState<TransactionModel>();
   const [updatedTransactionStatus, updateTransactionStatus] = useState<TransactionModel>();
+  const updateLastTransactionStatus = (status: string) => {
+    if (newTransaction) newTransaction.status = status;
+    updateTransactionStatus(newTransaction);
+  };
   return (
     <TransactionContext.Provider
-      value={{ newTransaction, pushTransaction, updatedTransactionStatus, updateTransactionStatus }}
+      value={{
+        newTransaction,
+        pushTransaction,
+        updatedTransactionStatus,
+        updateTransactionStatus,
+        updateLastTransactionStatus,
+      }}
     >
       {children}
     </TransactionContext.Provider>

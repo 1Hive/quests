@@ -3,7 +3,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
-import { DEAULT_CLAIM_EXECUTION_DELAY } from 'src/constants';
+import { DEAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
 import { roundNumber } from 'src/utils/math.utils';
 import { ONE_DAY_IN_MS } from 'src/utils/date.utils';
 import ChallengeModal from '../modals/challenge-modal';
@@ -61,7 +61,7 @@ export default function ClaimList({ claims }: Props) {
               <IconTooltip
                 tooltip="Claims"
                 tooltipDetail={`A claim includes the proof of the quest's completion. This claim can be challenged within ${roundNumber(
-                  DEAULT_CLAIM_EXECUTION_DELAY / ONE_DAY_IN_MS,
+                  DEAULT_CLAIM_EXECUTION_DELAY_MS / ONE_DAY_IN_MS,
                   0,
                 )} days.`}
               />
@@ -79,7 +79,9 @@ export default function ClaimList({ claims }: Props) {
                     label="Claiming amount"
                     value={x.claimedAmount}
                   />
-                  {wallet?.account && <ChallengeModal claim={x} />}
+                  {wallet?.account && (
+                    <ChallengeModal claim={x} challengerAddress={wallet.account} />
+                  )}
                 </RowStyled>,
                 <Outset gu8>
                   <TextFieldInput

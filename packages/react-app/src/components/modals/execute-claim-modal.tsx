@@ -1,13 +1,14 @@
 import { Button, useToast, IconCoin, Field, Timer } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
-import { CLAIM_STATUS, TRANSACTION_STATUS } from 'src/constants';
+import { CLAIM_STATUS, ENUM, TRANSACTION_STATUS } from 'src/constants';
 import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
 import { ClaimModel } from 'src/models/claim.model';
+import { ethers } from 'ethers';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
@@ -39,7 +40,8 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
   const [scheduleTimeout, setScheduleTimeout] = useState(false);
   const [buttonLabel, setButtonLabel] = useState<ReactNode>();
   const governQueueContract = useGovernQueueContract();
-  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
+  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
+    useTransactionContext()!;
   const toast = useToast();
 
   useEffect(() => {
@@ -63,24 +65,26 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
   const reclaimFundModalTx = async (values: any, setSubmitting: Function) => {
     try {
       setLoading(true);
-      const txClaimExecuteReceipt = await QuestService.executeQuestClaim(
-        governQueueContract,
+      const txReceipt: ethers.ContractReceipt = await QuestService.executeQuestClaim(
+        governQueueContract!,
         claim,
         undefined,
         (tx) =>
           pushTransaction({
             hash: tx,
-            estimatedEnd: Date.now() + 10 * 1000,
-            pendingMessage: 'Sending quest claim to player...',
-            status: TRANSACTION_STATUS.Pending,
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimExecuting,
+            pendingMessage: 'Sending claimed amount to you...',
+            status: txReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
           }),
       );
       updateTransactionStatus({
-        hash: txClaimExecuteReceipt.transactionHash,
+        hash: txReceipt.transactionHash,
         status: TRANSACTION_STATUS.Confirmed,
       });
-      toast('Operation succeed');
+      onModalClose();
+      if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
+      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50
@@ -104,7 +108,9 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
               icon={<IconCoin />}
               label={buttonLabel}
               mode="strong"
-              disabled={!scheduleTimeout || claim.state === CLAIM_STATUS.Challenged}
+              disabled={
+                !scheduleTimeout || claim.state === CLAIM_STATUS.Challenged || !governQueueContract
+              }
             />
             {!scheduleTimeout && claim.executionTime && (
               <Timer end={new Date(claim.executionTime)} />

@@ -4,7 +4,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { PAGES, QUEST_MODE, QUEST_STATE, TRANSACTION_STATUS } from 'src/constants';
+import { ENUM, PAGES, QUEST_MODE, QUEST_STATE, TRANSACTION_STATUS } from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -160,6 +160,12 @@ export default function Quest({
     if (!values.title) errors.push('Title is required');
     if (!values.fallbackAddress) errors.push('Funds fallback address is required');
     if (values.expireTimeMs < Date.now()) errors.push('Expiration have to be later than now');
+    if (!questFactoryContract) {
+      Logger.error(
+        `Error : failed to instanciate contract <questFactoryContract>, enable verbose to see error`,
+      );
+      return;
+    }
 
     if (errors.length) {
       errors.forEach(toast);
@@ -167,13 +173,13 @@ export default function Quest({
       setLoading(true);
       let createdQuestAddress;
       try {
-        // Set noon to prevent rounding form changing date
-        const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
         if (!questFactoryContract) {
-          Logger.error(
-            'QuestFactory contract was not loaded correctly (maybe account is disabled)',
+          throw new Error(
+            `Failed to instanciate contract <questFactoryContract>, enable verbose to see error`,
           );
         }
+        // Set noon to prevent rounding form changing date
+        const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
         const txReceiptSaveQuest = await QuestService.saveQuest(
           questFactoryContract,
           values.fallbackAddress!,
@@ -182,7 +188,7 @@ export default function Quest({
           (tx) => {
             pushTransaction({
               hash: tx,
-              estimatedEnd: Date.now() + 15 * 1000, // 15 sec
+              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.QuestCreating, // 15 sec
               pendingMessage: 'Quest creating...',
               status: TRANSACTION_STATUS.Pending,
             });
@@ -193,27 +199,31 @@ export default function Quest({
           hash: txReceiptSaveQuest.transactionHash,
           status: TRANSACTION_STATUS.Confirmed,
         });
-        if (values.bounty?.amount) {
-          createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
-          if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
-          toast('Quest funding ...');
-          const txReceiptFundQuest = await QuestService.fundQuest(
-            erc20Contract,
-            createdQuestAddress,
-            values.bounty,
-            (tx) => {
-              pushTransaction({
-                hash: tx,
-                estimatedEnd: Date.now() + 15 * 1000,
-                pendingMessage: 'Quest funding...',
-                status: TRANSACTION_STATUS.Pending,
-              });
-            },
-          );
-          updateTransactionStatus({
-            hash: txReceiptFundQuest.transactionHash,
-            status: TRANSACTION_STATUS.Confirmed,
-          });
+        if (txReceiptSaveQuest.status) {
+          if (!values.bounty?.parsedAmount) toast('Operation succeed');
+          else {
+            createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
+            if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
+            toast('Quest funding ...');
+            const txReceiptFundQuest = await QuestService.fundQuest(
+              erc20Contract!,
+              createdQuestAddress,
+              values.bounty,
+              (tx) => {
+                pushTransaction({
+                  hash: tx,
+                  estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.QuestFunding,
+                  pendingMessage: 'Quest funding...',
+                  status: TRANSACTION_STATUS.Pending,
+                });
+              },
+            );
+            updateTransactionStatus({
+              hash: txReceiptFundQuest.transactionHash,
+              status: TRANSACTION_STATUS.Confirmed,
+            });
+            if (txReceiptFundQuest) toast('Operation succeed');
+          }
         }
       } catch (e: any) {
         Logger.error(e);
@@ -223,7 +233,6 @@ export default function Quest({
             : e.message,
         );
       } finally {
-        toast('Operation succeed');
         setSubmitting(false);
         setLoading(false);
       }
@@ -390,12 +399,18 @@ export default function Quest({
                     <ExecuteClaimModal claim={currentPlayerClaim} />
                   ) : (
                     claimDeposit && (
-                      <ScheduleClaimModal questAddress={data.address} claimDeposit={claimDeposit} />
+                      <ScheduleClaimModal
+                        questAddress={data.address}
+                        claimDeposit={claimDeposit}
+                        playerAddress={wallet.account}
+                      />
                     )
                   )}
                 </>
               ) : (
-                !!bounty?.amount && <ReclaimFundsModal bounty={bounty} questData={questData} />
+                !!bounty?.parsedAmount && (
+                  <ReclaimFundsModal bounty={bounty} questData={questData} />
+                )
               ))}
           </QuestFooterStyled>
         </>

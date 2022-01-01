@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { TransactionModel } from 'src/models/transaction.model';
 import styled from 'styled-components';
+import { ENUM, TRANSACTION_STATUS } from 'src/constants';
 import { Outset } from './utils/spacer-util';
-import { TRANSACTION_STATUS } from '../../constants';
 
 const NotificationButtonStyled = styled(Button)`
   &::after {
@@ -44,6 +44,7 @@ export function TransactionProgressButton() {
   const [txList, setTxList] = useState<TransactionModel[]>([]);
   const [notifCount, setNotifCount] = useState(0);
   const [currentTx, setCurrentTx] = useState<TransactionModel>();
+  const [slow, setSlow] = useState(false);
   const activityOpener = useRef<any>();
 
   const toggleTransactionPopup = () => {
@@ -53,6 +54,12 @@ export function TransactionProgressButton() {
   const nextTx = (tx: TransactionModel | undefined) => {
     if (!tx) return;
     setCurrentTx(tx);
+    clearTimeout();
+    setSlow(false);
+    if (tx.estimatedEnd)
+      setTimeout(() => {
+        setSlow(true);
+      }, tx.estimatedEnd - Date.now());
   };
 
   useEffect(() => {
@@ -62,7 +69,7 @@ export function TransactionProgressButton() {
           txList.concat({
             status: TRANSACTION_STATUS.Pending,
             progress: 0,
-            estimatedEnd: Date.now() + 15 * 1000, // In 15 seconds
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.Default,
             ...newTransaction,
           }),
         );
@@ -79,7 +86,10 @@ export function TransactionProgressButton() {
       if (updatedTransactionStatus.status === TRANSACTION_STATUS.Confirmed) {
         setTxList(txList.filter((x: TransactionModel) => x.hash !== updatedTransactionStatus.hash));
       }
-      if (updatedTransactionStatus.hash === currentTx?.hash)
+      if (
+        updatedTransactionStatus.hash === currentTx?.hash &&
+        updatedTransactionStatus.status === TRANSACTION_STATUS.Confirmed
+      )
         nextTx(
           txList.find(
             (x: TransactionModel) =>
@@ -99,6 +109,8 @@ export function TransactionProgressButton() {
   }, [txList]);
 
   const onClose = () => {
+    if (currentTx?.status !== TRANSACTION_STATUS.Pending)
+      nextTx(txList.find((x: TransactionModel) => x.status === TRANSACTION_STATUS.Pending));
     setTxOpened(false);
   };
 
@@ -122,8 +134,11 @@ export function TransactionProgressButton() {
             onClose={onClose}
             opener={activityOpener.current}
             endTime={new Date(currentTx.estimatedEnd ?? Date.now())}
+            slow={slow}
           />
-          <SyncIndicator>{currentTx.pendingMessage}</SyncIndicator>
+          {currentTx.status === TRANSACTION_STATUS.Pending && (
+            <SyncIndicator>{currentTx.pendingMessage}</SyncIndicator>
+          )}
         </>
       )}
     </Outset>

@@ -6,6 +6,7 @@ export const GovernQueueEntityQuery = gql`
       nonce
       config {
         resolver
+        rules
         executionDelay
         scheduleDeposit {
           amount

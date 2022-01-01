@@ -6,12 +6,12 @@ import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
-import { CLAIM_STATUS, TRANSACTION_STATUS } from 'src/constants';
+import { CLAIM_STATUS, ENUM, TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
 import ModalBase from './modal-base';
-import { useGovernQueueContract } from '../../hooks/use-contract.hook';
+import { useERC20Contract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
@@ -45,16 +45,19 @@ const OpenButtonWrapperStyled = styled.div`
 
 type Props = {
   claim: ClaimModel;
+  challengerAddress: string;
   onClose?: Function;
 };
 
-export default function ChallengeModal({ claim, onClose = noop }: Props) {
+export default function ChallengeModal({ claim, challengerAddress, onClose = noop }: Props) {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
-  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
+  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
+    useTransactionContext()!;
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
+  const erc20Contract = useERC20Contract(claim.challengeDeposit!.token!);
   const [challengeTimeout, setChallengedTimeout] = useState(false);
   const [openButtonLabel, setOpenButtonLabel] = useState<string>();
 
@@ -85,8 +88,26 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
       setLoading(true);
       // toast('Quest claim challenging ...');
       toast('Comming soon...');
-      const txReceipt = await QuestService.challengeQuestClaim(
+      const container = await QuestService.computeContainer(claim);
+      const approveTxReceipt = await QuestService.approveTokenAmount(
+        erc20Contract,
+        challengerAddress,
+        container.config.scheduleDeposit,
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
+            pendingMessage: 'Challenge deposit approval...',
+          });
+        },
+      );
+      updateTransactionStatus({
+        hash: approveTxReceipt.transactionHash!,
+        status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+      });
+      const challengeTxReceipt = await QuestService.challengeQuestClaim(
         governQueueContract,
+        container,
         {
           claim,
           reason: values.reason,
@@ -95,18 +116,21 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
         (tx) => {
           pushTransaction({
             hash: tx,
-            estimatedEnd: Date.now() + 10 * 1000,
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
             pendingMessage: 'Quest challenging...',
           });
-          onModalClose();
         },
       );
       updateTransactionStatus({
-        hash: txReceipt.transactionHash!,
-        status: TRANSACTION_STATUS.Confirmed,
+        hash: challengeTxReceipt.transactionHash!,
+        status: challengeTxReceipt.status
+          ? TRANSACTION_STATUS.Confirmed
+          : TRANSACTION_STATUS.Failed,
       });
-      toast('Operation succeed');
+      onModalClose();
+      if (challengeTxReceipt.status) if (challengeTxReceipt.status) toast('Operation succeed');
     } catch (e: any) {
+      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 75
@@ -138,7 +162,12 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
               onClick={() => setOpened(true)}
               label={openButtonLabel}
               mode="negative"
-              disabled={challengeTimeout || claim.state === CLAIM_STATUS.Challenged}
+              disabled={
+                challengeTimeout ||
+                claim.state === CLAIM_STATUS.Challenged ||
+                !erc20Contract ||
+                !governQueueContract
+              }
             />
           )}
           {!challengeTimeout && claim.executionTime && (
@@ -165,6 +194,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
           mode="negative"
           type="submit"
           form="form-challenge"
+          disabled={loading}
         />,
       ]}
       onClose={onModalClose}

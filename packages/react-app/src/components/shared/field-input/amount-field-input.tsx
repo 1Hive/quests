@@ -61,17 +61,17 @@ function AmountFieldInput({
   compact = false,
 }: Props) {
   const { defaultToken } = getNetwork();
-  const [amount, setAmount] = useState(value.amount);
+  const [amount, setAmount] = useState(value.parsedAmount);
   useEffect(() => {
-    setAmount(value.amount);
-  }, [value.amount]);
+    setAmount(value.parsedAmount);
+  }, [value.parsedAmount]);
 
   if (!value.token) value.token = defaultToken;
 
   const onAmountChange = (e: any) => {
     const newValue = +e.target.value;
     setAmount(newValue);
-    value = { ...value, amount: newValue };
+    value = { ...value, parsedAmount: newValue };
     if (formik) formik.setFieldValue(id, value);
     else onChange(value);
   };
@@ -106,8 +106,8 @@ function AmountFieldInput({
             )}
           </AmountStyled>
           <TokenBadgeStyled
-            symbol={value.token!.symb}
-            address={value.token!.address}
+            symbol={value.token!.symbol}
+            address={value.token!.token}
             badgeOnly={value.token.native}
             networkType="private"
           />

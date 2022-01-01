@@ -1,4 +1,5 @@
 import { TokenAmountModel } from './token-amount.model';
+import { TokenModel } from './token.model';
 
 export type PayloadModel = {
   id: string;
@@ -14,8 +15,8 @@ export type PayloadModel = {
 export type ConfigModel = {
   id: string;
   executionDelay: number; // how many seconds to wait before being able to call `execute`.
-  scheduleDeposit: TokenAmountModel; // fees for scheduling
-  challengeDeposit: TokenAmountModel; // fees for challenging
+  scheduleDeposit: TokenModel; // fees for scheduling
+  challengeDeposit: TokenModel; // fees for challenging
   resolver: string; // resolver that will rule the disputes
   rules: any; // rules of how DAO should be managed
   maxCalldataSize: number; // max calldatasize for the schedule

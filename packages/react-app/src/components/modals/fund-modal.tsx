@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
-import { DEFAULT_AMOUNT, TRANSACTION_STATUS } from 'src/constants';
+import { DEFAULT_AMOUNT, ESTIMATED_TX_TIME_MS, TRANSACTION_STATUS } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
 import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
@@ -32,7 +32,8 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
+  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
+    useTransactionContext()!;
   const toast = useToast();
   const { defaultToken } = getNetwork();
   const contractERC20 = useERC20Contract(defaultToken);
@@ -45,25 +46,26 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
     try {
       setLoading(true);
       const txReceipt = await QuestService.fundQuest(
-        contractERC20,
+        contractERC20!,
         questAddress,
         values.fundAmount,
         (txHash) => {
           pushTransaction({
             hash: txHash,
-            estimatedEnd: Date.now() + 15 * 1000,
+            estimatedEnd: Date.now() + ESTIMATED_TX_TIME_MS.QuestFunding,
             pendingMessage: 'Quest funding...',
             status: TRANSACTION_STATUS.Pending,
           });
-          onModalClose();
         },
       );
       updateTransactionStatus({
         hash: txReceipt.transactionHash!,
-        status: TRANSACTION_STATUS.Confirmed,
+        status: txReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
-      toast('Operation succeed');
+      onModalClose();
+      if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
+      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50
@@ -88,7 +90,14 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
         />
       }
       buttons={
-        <Button icon={<GiTwoCoins />} type="submit" form="form-fund" label="Fund" mode="strong" />
+        <Button
+          icon={<GiTwoCoins />}
+          type="submit"
+          form="form-fund"
+          label="Fund"
+          mode="strong"
+          disabled={loading || !contractERC20}
+        />
       }
       onClose={onModalClose}
       isOpen={opened}
@@ -97,7 +106,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
         initialValues={{ fundAmount: DEFAULT_AMOUNT }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
-          if (!values.fundAmount?.amount) errors.push('Validation : Amount is required');
+          if (!values.fundAmount?.parsedAmount) errors.push('Validation : Amount is required');
           if (errors.length) {
             errors.forEach(toast);
           } else {

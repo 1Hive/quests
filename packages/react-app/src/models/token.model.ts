@@ -1,7 +1,8 @@
 export type TokenModel = {
+  amount: string;
   name: string;
-  symb: string;
-  address: string;
+  symbol: string;
+  token: string;
   decimals: number;
   native: boolean;
 };

@@ -1,4 +1,5 @@
 import { FilterModel } from './models/filter.model';
+import { TokenAmountModel } from './models/token-amount.model';
 import { TokenModel } from './models/token.model';
 import { ONE_WEEK_IN_MS } from './utils/date.utils';
 
@@ -18,34 +19,34 @@ export const TOKENS = {
   // Native tokens
   Ether: {
     name: 'Ether',
-    symb: 'ETH',
-    address: '',
+    symbol: 'ETH',
+    token: '',
     decimals: 18,
     native: true,
   } as TokenModel,
   xDAI: {
     name: 'xDAI',
-    symb: 'xDAI',
+    symbol: 'xDAI',
     decimals: 18,
     native: true,
   } as TokenModel,
   // ERC20 tokens
   Honey: {
     name: 'Honey',
-    symb: 'HNY',
-    address: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
+    symbol: 'HNY',
+    token: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
     decimals: 18,
   } as TokenModel,
   HoneyTest: {
     name: 'HoneyTest',
-    symb: 'HNYT',
-    address: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
+    symbol: 'HNYT',
+    token: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
     decimals: 18,
   } as TokenModel,
   Theter: {
     name: 'Tether',
-    symb: 'USDT',
-    address: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
+    symbol: 'USDT',
+    token: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
     decimals: 18,
   } as TokenModel,
 };
@@ -105,12 +106,32 @@ export const TRANSACTION_STATUS = {
   Signed: 'TX_STATUS_SIGNED',
 };
 
+export const ESTIMATED_TX_TIME_MS = {
+  Default: 15 * 1000,
+  QuestCreating: 15 * 1000,
+  QuestFunding: 15 * 1000,
+  QuestFundsReclaiming: 15 * 1000,
+  ClaimScheduling: 30 * 1000,
+  ClaimChallenging: 30 * 1000,
+  ClaimExecuting: 30 * 1000,
+  TokenAproval: 20 * 1000,
+};
+
+export const ENUM = {
+  QUEST_MODE,
+  BREAKPOINTS,
+  PAGES,
+  CLAIM_STATUS,
+  TRANSACTION_STATUS,
+  ESTIMATED_TX_TIME_MS,
+};
+
 // Default values
 
 export const DEFAULT_AMOUNT = {
-  amount: 0,
+  parsedAmount: 0,
   token: undefined,
-};
+} as TokenAmountModel;
 
 export const DEFAULT_PAGE = PAGES.List;
 
@@ -124,4 +145,12 @@ export const DEFAULT_FILTER = {
 
 export const GQL_MAX_INT = 2 ** 31 - 1;
 
-export const DEAULT_CLAIM_EXECUTION_DELAY = ONE_WEEK_IN_MS;
+export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
+
+export const DEAULTS = {
+  DEFAULT_AMOUNT,
+  DEFAULT_PAGE,
+  DEFAULT_FILTER,
+  GQL_MAX_INT,
+  DEAULT_CLAIM_EXECUTION_DELAY_MS,
+};

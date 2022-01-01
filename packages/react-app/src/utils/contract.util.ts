@@ -62,5 +62,5 @@ export function getGovernQueueContract() {
 }
 
 export function getERC20Contract(token: TokenModel) {
-  return getContract('ERC20', token.address);
+  return getContract('ERC20', token.token);
 }
