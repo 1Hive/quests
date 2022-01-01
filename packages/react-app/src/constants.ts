@@ -1,7 +1,6 @@
 import { FilterModel } from './models/filter.model';
 import { TokenAmountModel } from './models/token-amount.model';
 import { TokenModel } from './models/token.model';
-import { ONE_WEEK_IN_MS } from './utils/date.utils';
 
 export const PCT_BASE = BigInt(1e18);
 
