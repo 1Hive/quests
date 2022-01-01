@@ -107,8 +107,8 @@ export const TRANSACTION_STATUS = {
 
 export const ESTIMATED_TX_TIME_MS = {
   Default: 15 * 1000,
-  QuestCreating: 15 * 1000,
-  QuestFunding: 15 * 1000,
+  QuestCreating: 20 * 1000,
+  QuestFunding: 20 * 1000,
   QuestFundsReclaiming: 15 * 1000,
   ClaimScheduling: 30 * 1000,
   ClaimChallenging: 30 * 1000,

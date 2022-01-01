@@ -11,6 +11,7 @@ import { useERC20Contract, useGovernQueueContract } from 'src/hooks/use-contract
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
+import { getNetwork } from 'src/networks';
 import ModalBase from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
@@ -59,16 +60,16 @@ export default function ScheduleClaimModal({
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
-      toast('Comming soon...');
       const container = await QuestService.computeContainer({
         claimedAmount: values.claimedAmount!,
         evidence: values.evidence!,
         playerAddress,
         questAddress,
       });
+      const { governQueue } = getNetwork();
       const approveTxReceipt = await QuestService.approveTokenAmount(
         erc20Contract,
-        playerAddress,
+        governQueue,
         container.config.scheduleDeposit,
         (tx) => {
           pushTransaction({
@@ -83,24 +84,26 @@ export default function ScheduleClaimModal({
         hash: approveTxReceipt.transactionHash,
         status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
-      const scheduleReceipt = await QuestService.scheduleQuestClaim(
-        governQueueContract,
-        container,
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimScheduling,
-            pendingMessage: 'Quest claim scheduling...',
-            status: TRANSACTION_STATUS.Pending,
-          });
-        },
-      );
-      updateTransactionStatus({
-        hash: scheduleReceipt.transactionHash,
-        status: scheduleReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
-      });
+      if (approveTxReceipt.status) {
+        const scheduleReceipt = await QuestService.scheduleQuestClaim(
+          governQueueContract,
+          container,
+          (tx) => {
+            pushTransaction({
+              hash: tx,
+              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimScheduling,
+              pendingMessage: 'Quest claim scheduling...',
+              status: TRANSACTION_STATUS.Pending,
+            });
+          },
+        );
+        updateTransactionStatus({
+          hash: scheduleReceipt.transactionHash,
+          status: scheduleReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+        });
+        if (scheduleReceipt.status) toast('Operation succeed');
+      }
       onModalClose();
-      if (scheduleReceipt.status) toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
       Logger.error(e);

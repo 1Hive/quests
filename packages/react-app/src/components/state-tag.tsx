@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
 
 const StateTagStyled = styled(Tag)`
-  margin-left: ${GUpx()};
+  width: fit-content;
+  margin-left: ${GUpx(2)};
 `;
 
 type Props = {

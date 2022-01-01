@@ -79,9 +79,7 @@ export default function ClaimList({ claims }: Props) {
                     label="Claiming amount"
                     value={x.claimedAmount}
                   />
-                  {wallet?.account && (
-                    <ChallengeModal claim={x} challengerAddress={wallet.account} />
-                  )}
+                  {wallet?.account && <ChallengeModal claim={x} />}
                 </RowStyled>,
                 <Outset gu8>
                   <TextFieldInput

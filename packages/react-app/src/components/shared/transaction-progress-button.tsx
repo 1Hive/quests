@@ -86,10 +86,7 @@ export function TransactionProgressButton() {
       if (updatedTransactionStatus.status === TRANSACTION_STATUS.Confirmed) {
         setTxList(txList.filter((x: TransactionModel) => x.hash !== updatedTransactionStatus.hash));
       }
-      if (
-        updatedTransactionStatus.hash === currentTx?.hash &&
-        updatedTransactionStatus.status === TRANSACTION_STATUS.Confirmed
-      )
+      if (updatedTransactionStatus.hash === currentTx?.hash)
         nextTx(
           txList.find(
             (x: TransactionModel) =>

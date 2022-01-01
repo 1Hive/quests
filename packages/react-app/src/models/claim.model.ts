@@ -5,7 +5,7 @@ export type ClaimModel = {
   playerAddress: string;
   claimedAmount: TokenAmountModel;
   evidence: string;
-  executionTime?: number;
+  executionTimeMs?: number;
   state?: string;
   challengeDeposit?: TokenAmountModel; // Only set when fetching claims
 };

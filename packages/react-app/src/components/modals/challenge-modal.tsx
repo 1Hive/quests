@@ -10,6 +10,7 @@ import { CLAIM_STATUS, ENUM, TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
+import { getNetwork } from 'src/networks';
 import ModalBase from './modal-base';
 import { useERC20Contract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
@@ -17,6 +18,7 @@ import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input
 import TextFieldInput from '../shared/field-input/text-field-input';
 import { Outset } from '../shared/utils/spacer-util';
 import { HelpIcon } from '../shared/field-input/icon-tooltip';
+import { getLastBlockDate, getLastBlockTimestamp } from '../../utils/date.utils';
 
 // #region StyledComponents
 
@@ -45,13 +47,12 @@ const OpenButtonWrapperStyled = styled.div`
 
 type Props = {
   claim: ClaimModel;
-  challengerAddress: string;
   onClose?: Function;
 };
 
-export default function ChallengeModal({ claim, challengerAddress, onClose = noop }: Props) {
+export default function ChallengeModal({ claim, onClose = noop }: Props) {
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
@@ -63,14 +64,22 @@ export default function ChallengeModal({ claim, challengerAddress, onClose = noo
 
   useEffect(() => {
     let handle: any;
-    if (claim.executionTime)
-      handle = setTimeout(() => {
-        setChallengedTimeout(true);
-      }, claim.executionTime - Date.now());
+    const launchSetTimeoutAsync = async (execTimeMs: number) => {
+      const now = await getLastBlockDate();
+      if (now > execTimeMs) setChallengedTimeout(true);
+      else {
+        setChallengedTimeout(false);
+        setTimeout(() => {
+          setChallengedTimeout(true);
+        }, execTimeMs - now); // To ms
+      }
+      setLoading(false);
+    };
+    if (claim.executionTimeMs) launchSetTimeoutAsync(claim.executionTimeMs);
     return () => {
       if (handle) clearTimeout(handle);
     };
-  }, [claim.executionTime]);
+  }, [claim.executionTimeMs]);
 
   const onModalClose = () => {
     setOpened(false);
@@ -86,12 +95,11 @@ export default function ChallengeModal({ claim, challengerAddress, onClose = noo
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
-      // toast('Quest claim challenging ...');
-      toast('Comming soon...');
       const container = await QuestService.computeContainer(claim);
+      const { governQueue } = getNetwork();
       const approveTxReceipt = await QuestService.approveTokenAmount(
         erc20Contract,
-        challengerAddress,
+        governQueue,
         container.config.scheduleDeposit,
         (tx) => {
           pushTransaction({
@@ -105,30 +113,32 @@ export default function ChallengeModal({ claim, challengerAddress, onClose = noo
         hash: approveTxReceipt.transactionHash!,
         status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
-      const challengeTxReceipt = await QuestService.challengeQuestClaim(
-        governQueueContract,
-        container,
-        {
-          claim,
-          reason: values.reason,
-          deposit: claim.challengeDeposit!,
-        },
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
-            pendingMessage: 'Quest challenging...',
-          });
-        },
-      );
-      updateTransactionStatus({
-        hash: challengeTxReceipt.transactionHash!,
-        status: challengeTxReceipt.status
-          ? TRANSACTION_STATUS.Confirmed
-          : TRANSACTION_STATUS.Failed,
-      });
+      if (approveTxReceipt.status) {
+        const challengeTxReceipt = await QuestService.challengeQuestClaim(
+          governQueueContract,
+          container,
+          {
+            claim,
+            reason: values.reason,
+            deposit: claim.challengeDeposit!,
+          },
+          (tx) => {
+            pushTransaction({
+              hash: tx,
+              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
+              pendingMessage: 'Quest challenging...',
+            });
+          },
+        );
+        updateTransactionStatus({
+          hash: challengeTxReceipt.transactionHash!,
+          status: challengeTxReceipt.status
+            ? TRANSACTION_STATUS.Confirmed
+            : TRANSACTION_STATUS.Failed,
+        });
+        if (challengeTxReceipt.status) toast('Operation succeed');
+      }
       onModalClose();
-      if (challengeTxReceipt.status) if (challengeTxReceipt.status) toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
       Logger.error(e);
@@ -163,6 +173,7 @@ export default function ChallengeModal({ claim, challengerAddress, onClose = noo
               label={openButtonLabel}
               mode="negative"
               disabled={
+                loading ||
                 challengeTimeout ||
                 claim.state === CLAIM_STATUS.Challenged ||
                 !erc20Contract ||
@@ -170,8 +181,8 @@ export default function ChallengeModal({ claim, challengerAddress, onClose = noo
               }
             />
           )}
-          {!challengeTimeout && claim.executionTime && (
-            <Timer end={new Date(claim.executionTime)} />
+          {!loading && !challengeTimeout && claim.executionTimeMs && (
+            <Timer end={new Date(claim.executionTimeMs)} />
           )}
         </OpenButtonWrapperStyled>
       }

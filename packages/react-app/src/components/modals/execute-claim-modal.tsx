@@ -9,6 +9,8 @@ import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
 import { ClaimModel } from 'src/models/claim.model';
 import { ethers } from 'ethers';
+import { TokenAmountModel } from 'src/models/token-amount.model';
+import { getLastBlockDate, getLastBlockTimestamp } from 'src/utils/date.utils';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
@@ -31,55 +33,70 @@ const OpenButtonWrapperStyled = styled.div`
 
 type Props = {
   claim: ClaimModel;
+  questTotalBounty?: TokenAmountModel;
   onClose?: Function;
 };
 
-export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
+export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [scheduleTimeout, setScheduleTimeout] = useState(false);
-  const [buttonLabel, setButtonLabel] = useState<ReactNode>();
+  const [loading, setLoading] = useState(true);
+  const [amount, setAmount] = useState<TokenAmountModel>();
+  const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
+  const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
   const governQueueContract = useGovernQueueContract();
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
   const toast = useToast();
 
   useEffect(() => {
-    if (claim.executionTime)
-      setTimeout(() => {
-        setScheduleTimeout(true);
-      }, claim.executionTime - Date.now());
+    const launchTimeoutAsync = async (execTimeMs: number) => {
+      const now = await getLastBlockDate();
+      if (now > execTimeMs) setScheduleTimeout(true);
+      else {
+        setScheduleTimeout(false);
+        setTimeout(() => {
+          setScheduleTimeout(true);
+        }, execTimeMs - now); // To ms
+      }
+      setLoading(false);
+    };
+    if (claim.executionTimeMs) launchTimeoutAsync(claim.executionTimeMs);
   }, []);
 
   useEffect(() => {
+    if (scheduleTimeout === undefined) return;
     if (claim.state === CLAIM_STATUS.Challenged) setButtonLabel('Challenged by someone');
-    else if (!scheduleTimeout && claim.executionTime) setButtonLabel('Claimable in');
+    else if (!scheduleTimeout && claim.executionTimeMs) setButtonLabel('Claimable in');
     else setButtonLabel('Claim');
-  }, [claim.state, claim.executionTime, scheduleTimeout]);
+  }, [claim.state, claim.executionTimeMs, scheduleTimeout]);
+
+  useEffect(() => {
+    if (claim.claimedAmount.parsedAmount) setAmount(claim.claimedAmount);
+    else setAmount(questTotalBounty); // Claim all funds
+  }, [claim.claimedAmount]);
 
   const onModalClose = () => {
     setOpened(false);
     onClose();
   };
 
-  const reclaimFundModalTx = async (values: any, setSubmitting: Function) => {
+  const reclaimFundModalTx = async () => {
     try {
       setLoading(true);
       const txReceipt: ethers.ContractReceipt = await QuestService.executeQuestClaim(
-        governQueueContract!,
+        governQueueContract,
         claim,
-        undefined,
         (tx) =>
           pushTransaction({
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimExecuting,
-            pendingMessage: 'Sending claimed amount to you...',
-            status: txReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+            pendingMessage: 'Sending claimed amount to your wallet...',
+            status: TRANSACTION_STATUS.Pending,
           }),
       );
       updateTransactionStatus({
         hash: txReceipt.transactionHash,
-        status: TRANSACTION_STATUS.Confirmed,
+        status: txReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
       onModalClose();
       if (txReceipt.status) toast('Operation succeed');
@@ -92,7 +109,6 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
           : e.message,
       );
     } finally {
-      setSubmitting(false);
       setLoading(false);
     }
   };
@@ -109,19 +125,23 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
               label={buttonLabel}
               mode="strong"
               disabled={
-                !scheduleTimeout || claim.state === CLAIM_STATUS.Challenged || !governQueueContract
+                loading ||
+                !scheduleTimeout ||
+                claim.state === CLAIM_STATUS.Challenged ||
+                !governQueueContract
               }
             />
-            {!scheduleTimeout && claim.executionTime && (
-              <Timer end={new Date(claim.executionTime)} />
+            {!loading && !scheduleTimeout && claim.executionTimeMs && (
+              <Timer end={new Date(claim.executionTimeMs)} />
             )}
           </OpenButtonWrapperStyled>
         }
         buttons={
           <Button
-            onClick={reclaimFundModalTx}
+            onClick={() => reclaimFundModalTx()}
             icon={<IconCoin />}
             label="Claim bounty"
+            disabled={loading}
             wide
             mode="strong"
           />
@@ -135,7 +155,7 @@ export default function ExecuteClaimModal({ claim, onClose = noop }: Props) {
             isEdit={false}
             label="Claim amount"
             isLoading={loading}
-            value={claim.claimedAmount}
+            value={amount}
           />
           <Field label="will be send to">
             <IdentityBadge entity={claim.playerAddress} badgeOnly />

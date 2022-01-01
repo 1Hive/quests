@@ -67,8 +67,9 @@ const NoPaddingSplitStyled = styled(Split)`
 `;
 
 const TitleStateWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
+  width: 100%;
+  display: block;
+  flex-direction: column;
   align-items: center;
 `;
 
@@ -241,33 +242,34 @@ export default function Quest({
 
   const questContent = (questData: QuestModel, handleChange = noop) => (
     <>
+      {!loading && (
+        <StateTag
+          state={data.state}
+          visible={
+            questData.state === QUEST_STATE.Expired ||
+            questData.state === QUEST_STATE.Archived ||
+            data.state === QUEST_STATE.Draft
+          }
+        />
+      )}
       <NoPaddingSplitStyled
         primary={
           <Outset gu16 className="pb-0">
             <Outset gu8 vertical className="block">
               <NoPaddingSplitStyled
                 primary={
-                  <TitleStateWrapper>
-                    <TextFieldInput
-                      id="title"
-                      label={isEdit ? 'Title' : undefined}
-                      isEdit={isEdit}
-                      isLoading={loading}
-                      placeHolder="Quest title"
-                      value={questData.title}
-                      onChange={handleChange}
-                      fontSize="24px"
-                      tooltip="Title of your quest"
-                      wide
-                    />
-                    <StateTag
-                      state={data.state}
-                      visible={
-                        questData.state === QUEST_STATE.Expired ||
-                        questData.state === QUEST_STATE.Archived
-                      }
-                    />
-                  </TitleStateWrapper>
+                  <TextFieldInput
+                    id="title"
+                    label={isEdit ? 'Title' : undefined}
+                    isEdit={isEdit}
+                    isLoading={loading}
+                    placeHolder="Quest title"
+                    value={questData.title}
+                    onChange={handleChange}
+                    fontSize="24px"
+                    tooltip="Title of your quest"
+                    wide
+                  />
                 }
                 secondary={
                   !isEdit &&
@@ -392,11 +394,12 @@ export default function Quest({
             {questMode !== QUEST_MODE.ReadSummary &&
               questData.address &&
               wallet.account &&
+              bounty &&
               (questData.state === QUEST_STATE.Active ? (
                 <>
                   <FundModal questAddress={questData.address} />
                   {currentPlayerClaim ? (
-                    <ExecuteClaimModal claim={currentPlayerClaim} />
+                    <ExecuteClaimModal claim={currentPlayerClaim} questTotalBounty={bounty} />
                   ) : (
                     claimDeposit && (
                       <ScheduleClaimModal
