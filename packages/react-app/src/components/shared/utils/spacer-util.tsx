@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const ChildWrapperStyled = styled.div`
-  display: flex;
+  display: ${({ vertical }: any) => (vertical ? 'block' : 'inline-block')};
 `;
 
 type Props = {
@@ -161,7 +161,12 @@ export function ChildSpacer({
     if (i !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
     if (i !== childList.length - 1) className += ` p${vertical ? 'b' : 'r'}-${size}`;
     return (
-      <ChildWrapperStyled align={align} className={className} key={`child-${i}`}>
+      <ChildWrapperStyled
+        vertical={vertical}
+        align={align}
+        className={className}
+        key={`child-${i}`}
+      >
         {child}
       </ChildWrapperStyled>
     );
