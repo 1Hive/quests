@@ -1,4 +1,4 @@
-import { Button, useToast, Split } from '@1hive/1hive-ui';
+import { Button, useToast } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
