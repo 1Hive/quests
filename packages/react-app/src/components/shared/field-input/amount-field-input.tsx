@@ -48,7 +48,7 @@ type Props = {
 
 function AmountFieldInput({
   id,
-  isEdit = true,
+  isEdit = false,
   isLoading = false,
   label = '',
   placeHolder = '',

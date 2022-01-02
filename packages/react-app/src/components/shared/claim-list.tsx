@@ -77,7 +77,6 @@ export default function ClaimList({ claims, challengeDeposit, questTotalBounty }
                   </Field>
                   <AmountFieldInput
                     id="amount"
-                    isEdit={false}
                     label="Claimed amount"
                     isLoading={!x.claimedAmount.parsedAmount && questTotalBounty === undefined}
                     value={

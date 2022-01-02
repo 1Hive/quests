@@ -54,6 +54,7 @@ export function TransactionProgressButton() {
   const nextTx = (tx: TransactionModel | undefined) => {
     setCurrentTx(tx);
     clearTimeout();
+    setSlow(false);
     if (tx?.estimatedEnd) {
       setTimeout(() => {
         setSlow(true);

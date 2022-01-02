@@ -1,4 +1,4 @@
-import { Button, useToast } from '@1hive/1hive-ui';
+import { Button, useToast, Split } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
@@ -16,7 +16,7 @@ import ModalBase from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
-import { Outset } from '../shared/utils/spacer-util';
+import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
 
 // #region StyledComponents
 
@@ -32,6 +32,7 @@ const OpenButtonStyled = styled(Button)`
 
 type Props = {
   questAddress: string;
+  questTotalBounty: TokenAmountModel;
   claimDeposit: TokenAmountModel;
   playerAddress: string;
   onClose?: Function;
@@ -39,6 +40,7 @@ type Props = {
 
 export default function ScheduleClaimModal({
   questAddress,
+  questTotalBounty,
   claimDeposit,
   playerAddress,
   onClose = noop,
@@ -136,7 +138,6 @@ export default function ScheduleClaimModal({
           label="Claim Deposit"
           tooltip="Claim deposit"
           tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
-          isEdit={false}
           isLoading={loading}
           value={claimDeposit}
           compact
@@ -181,17 +182,24 @@ export default function ScheduleClaimModal({
                 onChange={handleChange}
                 multiline
                 wide
-                css={{ height: 100 }}
               />
-              <AmountFieldInputFormik
-                id="claimedAmount"
-                isEdit
-                label="Claimed amount"
-                tooltip="Claimed amount"
-                tooltipDetail="The expected amount to claim considering the quest agreement."
-                isLoading={loading}
-                value={values.claimedAmount}
-              />
+              <ChildSpacer size={64}>
+                <AmountFieldInputFormik
+                  id="claimedAmount"
+                  isEdit
+                  label="Claimed amount"
+                  tooltip="Claimed amount"
+                  tooltipDetail="The expected amount to claim considering the quest agreement."
+                  isLoading={loading}
+                  value={values.claimedAmount}
+                />
+                <AmountFieldInputFormik
+                  id="questBounty"
+                  label="Available bounty"
+                  isLoading={loading}
+                  value={questTotalBounty}
+                />
+              </ChildSpacer>
             </Outset>
           </FormStyled>
         )}

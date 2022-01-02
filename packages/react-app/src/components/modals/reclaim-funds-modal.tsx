@@ -108,7 +108,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
         <Outset gu16>
           <AmountFieldInputFormik
             id="bounty"
-            isEdit={false}
             label="Reclaimable funds"
             isLoading={loading}
             value={bounty}

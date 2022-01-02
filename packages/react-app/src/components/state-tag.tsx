@@ -6,17 +6,25 @@ import { GUpx } from 'src/utils/css.util';
 
 const StateTagStyled = styled(Tag)`
   width: fit-content;
-  margin-left: ${GUpx(2)};
+`;
+
+const StateWrapperStyled = styled.div`
+  width: 100%;
+  text-align: left;
+  padding: ${GUpx(1)};
 `;
 
 type Props = {
   state: string;
-  visible: boolean;
 };
 
-export function StateTag({ state, visible }: Props) {
+const VISIBLE_STATES = [QUEST_STATE.Expired, QUEST_STATE.Archived, QUEST_STATE.Draft];
+
+export function StateTag({ state }: Props) {
   const [mode, setMode] = useState<string>();
   const [tooltip, setTooltip] = useState<string>();
+  const [visible, setVisible] = useState<boolean>(false);
+
   useEffect(() => {
     switch (state) {
       case QUEST_STATE.Draft:
@@ -38,13 +46,16 @@ export function StateTag({ state, visible }: Props) {
       default:
         break;
     }
+    setVisible(VISIBLE_STATES.includes(state));
   }, [state]);
   return (
     <>
       {visible && (
-        <StateTagStyled title={tooltip} mode={mode}>
-          {state}
-        </StateTagStyled>
+        <StateWrapperStyled>
+          <StateTagStyled title={tooltip} mode={mode}>
+            {state}
+          </StateTagStyled>
+        </StateWrapperStyled>
       )}
     </>
   );

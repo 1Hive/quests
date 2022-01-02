@@ -198,7 +198,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           label="Challenge Deposit"
           tooltip="Amount"
           tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
-          isEdit={false}
           isLoading={loading}
           value={challengeDeposit}
           compact

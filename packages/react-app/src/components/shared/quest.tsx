@@ -239,16 +239,6 @@ export default function Quest({
 
   const questContent = (values: QuestModel, handleChange = noop) => (
     <>
-      {!loading && (
-        <StateTag
-          state={data.state}
-          visible={
-            values.state === QUEST_STATE.Expired ||
-            values.state === QUEST_STATE.Archived ||
-            data.state === QUEST_STATE.Draft
-          }
-        />
-      )}
       <NoPaddingSplitStyled
         primary={
           <Outset gu16 className="pb-0">
@@ -355,13 +345,12 @@ export default function Quest({
                 formik={formRef}
               />
             )}
-            {!isEdit && claimDeposit !== null && (
+            {questMode === QUEST_MODE.ReadDetail && claimDeposit !== null && (
               <AmountFieldInput
                 id="claimDeposit"
                 label="Claim deposit"
                 // tooltip="Bounty"
                 // tooltipDetail="The initial amount that users can claim when completing a quest. This doesn't include the potential funds"
-                isEdit={false}
                 value={claimDeposit}
                 isLoading={loading || (!isEdit && !claimDeposit)}
               />
@@ -407,6 +396,7 @@ export default function Quest({
                     claimDeposit && (
                       <ScheduleClaimModal
                         questAddress={data.address}
+                        questTotalBounty={bounty}
                         claimDeposit={claimDeposit}
                         playerAddress={wallet.account}
                       />
@@ -424,6 +414,7 @@ export default function Quest({
 
   return (
     <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
+      {!loading && <StateTag state={data.state} />}
       <Formik
         initialValues={{ fallbackAddress: wallet.account, ...data }}
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}

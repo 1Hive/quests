@@ -56,7 +56,7 @@ type Props = {
 };
 
 function AccountModule({ compact = false }: Props) {
-  const buttonRef = useRef();
+  const buttonRef = useRef<any>();
   const wallet = useWallet();
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
@@ -159,7 +159,7 @@ function AccountModule({ compact = false }: Props) {
   }, [screenId]);
 
   return (
-    <AccountWrapperStyled ref={buttonRef} tabIndex="0">
+    <AccountWrapperStyled ref={buttonRef}>
       {screen.id === 'connected' ? (
         <AccountButton onClick={toggle} />
       ) : (

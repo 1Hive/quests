@@ -152,7 +152,6 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         <Outset gu16>
           <AmountFieldInputFormik
             id="bounty"
-            isEdit={false}
             label="Claim amount"
             isLoading={loading}
             value={amount}
