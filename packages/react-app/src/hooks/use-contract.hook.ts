@@ -91,8 +91,8 @@ function useContract(
     );
   } catch (error) {
     return new ContractError(
-      `failed to instanciate contract <${contractName}>`,
       contractName,
+      `Failed to instanciate contract <${contractName}>`,
       error,
     );
   }

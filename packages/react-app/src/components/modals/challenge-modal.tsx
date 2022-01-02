@@ -88,7 +88,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
 
   useEffect(() => {
     if (claim?.state === CLAIM_STATUS.Challenged) setOpenButtonLabel('Already challenged');
-    else if (challengeTimeout) setOpenButtonLabel('No more challengable');
+    else if (challengeTimeout) setOpenButtonLabel('Challenge period over');
     else setOpenButtonLabel('Challenge');
   }, [claim.state, challengeTimeout]);
 

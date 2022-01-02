@@ -80,7 +80,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
     onClose();
   };
 
-  const reclaimFundModalTx = async () => {
+  const claimTx = async () => {
     try {
       setLoading(true);
       const txReceipt: ethers.ContractReceipt = await QuestService.executeQuestClaim(
@@ -123,7 +123,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
               onClick={() => setOpened(true)}
               icon={<IconCoin />}
               label={buttonLabel}
-              mode="strong"
+              mode="positive"
               disabled={
                 loading ||
                 !scheduleTimeout ||
@@ -138,12 +138,12 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         }
         buttons={
           <Button
-            onClick={() => reclaimFundModalTx()}
+            onClick={() => claimTx()}
             icon={<IconCoin />}
-            label="Claim bounty"
+            label="Claim"
             disabled={loading}
             wide
-            mode="strong"
+            mode="positive"
           />
         }
         onClose={onModalClose}

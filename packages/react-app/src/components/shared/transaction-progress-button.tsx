@@ -52,14 +52,14 @@ export function TransactionProgressButton() {
   };
 
   const nextTx = (tx: TransactionModel | undefined) => {
-    if (!tx) return;
     setCurrentTx(tx);
     clearTimeout();
     setSlow(false);
-    if (tx.estimatedEnd)
+    if (tx?.estimatedEnd) {
       setTimeout(() => {
         setSlow(true);
       }, tx.estimatedEnd - Date.now());
+    }
   };
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export function TransactionProgressButton() {
 
   useEffect(() => {
     if (updatedTransactionStatus && txList.find((x) => x.hash === updatedTransactionStatus.hash)) {
-      if (updatedTransactionStatus.status === TRANSACTION_STATUS.Confirmed) {
+      if (updatedTransactionStatus.status !== TRANSACTION_STATUS.Pending) {
         setTxList(txList.filter((x: TransactionModel) => x.hash !== updatedTransactionStatus.hash));
       }
       if (updatedTransactionStatus.hash === currentTx?.hash)

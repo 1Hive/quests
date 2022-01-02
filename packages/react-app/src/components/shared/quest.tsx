@@ -233,14 +233,14 @@ export default function Quest({
     }
   };
 
-  const questContent = (questData: QuestModel, handleChange = noop) => (
+  const questContent = (values: QuestModel, handleChange = noop) => (
     <>
       {!loading && (
         <StateTag
           state={data.state}
           visible={
-            questData.state === QUEST_STATE.Expired ||
-            questData.state === QUEST_STATE.Archived ||
+            values.state === QUEST_STATE.Expired ||
+            values.state === QUEST_STATE.Archived ||
             data.state === QUEST_STATE.Draft
           }
         />
@@ -257,7 +257,7 @@ export default function Quest({
                     isEdit={isEdit}
                     isLoading={loading}
                     placeHolder="Quest title"
-                    value={questData.title}
+                    value={values.title}
                     onChange={handleChange}
                     fontSize="24px"
                     tooltip="Title of your quest"
@@ -266,12 +266,12 @@ export default function Quest({
                 }
                 secondary={
                   !isEdit &&
-                  questData.address &&
+                  values.address &&
                   (loading ? (
                     <Skeleton />
                   ) : (
                     <>
-                      <AddressField id="address" address={questData.address} autofocus={false} />
+                      <AddressField id="address" address={values.address} autofocus={false} />
                     </>
                   ))
                 }
@@ -281,7 +281,7 @@ export default function Quest({
               <TextFieldInput
                 id="description"
                 label={isEdit ? 'Description' : undefined}
-                value={questData.description}
+                value={values.description}
                 isEdit={isEdit}
                 isLoading={loading}
                 placeHolder="Quest description"
@@ -316,7 +316,7 @@ export default function Quest({
                   <TextFieldInput
                     id="fallbackAddress"
                     label="Funds fallback address"
-                    value={questData.fallbackAddress}
+                    value={values.fallbackAddress}
                     isLoading={loading}
                     tooltip="Fallback Address"
                     tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
@@ -325,8 +325,8 @@ export default function Quest({
                     onChange={handleChange}
                     wide
                   />
-                  {!loading && questData.fallbackAddress && (
-                    <IdentityBadge entity={questData.fallbackAddress} badgeOnly />
+                  {!loading && values.fallbackAddress && (
+                    <IdentityBadge entity={values.fallbackAddress} badgeOnly />
                   )}
                 </>
               )}
@@ -369,7 +369,7 @@ export default function Quest({
               tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
               isEdit={isEdit}
               isLoading={loading}
-              value={questData.expireTimeMs}
+              value={values.expireTimeMs}
               onChange={handleChange}
             />
           </Outset>
@@ -377,20 +377,22 @@ export default function Quest({
       />
       {!loading && !isEdit && data.address && (
         <>
-          {questMode === QUEST_MODE.ReadDetail && claims && <ClaimList claims={claims} />}
+          {questMode === QUEST_MODE.ReadDetail && claims && (
+            <ClaimList claims={claims} questTotalBounty={bounty} />
+          )}
           <QuestFooterStyled>
             {questMode !== QUEST_MODE.ReadDetail && (
-              <LinkStyled to={`/${PAGES.Detail}?id=${questData.address}`}>
+              <LinkStyled to={`/${PAGES.Detail}?id=${values.address}`}>
                 <Button icon={<IconPlus />} label="Details" wide mode="strong" />
               </LinkStyled>
             )}
             {questMode !== QUEST_MODE.ReadSummary &&
-              questData.address &&
+              values.address &&
               wallet.account &&
               bounty &&
-              (questData.state === QUEST_STATE.Active ? (
+              (values.state === QUEST_STATE.Active ? (
                 <>
-                  <FundModal questAddress={questData.address} />
+                  <FundModal questAddress={values.address} />
                   {currentPlayerClaim ? (
                     <ExecuteClaimModal claim={currentPlayerClaim} questTotalBounty={bounty} />
                   ) : (
@@ -404,9 +406,7 @@ export default function Quest({
                   )}
                 </>
               ) : (
-                !!bounty?.parsedAmount && (
-                  <ReclaimFundsModal bounty={bounty} questData={questData} />
-                )
+                !!bounty?.parsedAmount && <ReclaimFundsModal bounty={bounty} questData={values} />
               ))}
           </QuestFooterStyled>
         </>

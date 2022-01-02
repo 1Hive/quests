@@ -6,6 +6,7 @@ import { GUpx } from 'src/utils/css.util';
 import { DEAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
 import { roundNumber } from 'src/utils/math.utils';
 import { ONE_DAY_IN_MS } from 'src/utils/date.utils';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import ChallengeModal from '../modals/challenge-modal';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
@@ -46,11 +47,11 @@ const HeaderStyled = styled.h1`
 
 type Props = {
   claims: ClaimModel[];
+  questTotalBounty?: TokenAmountModel | null;
 };
 
-export default function ClaimList({ claims }: Props) {
+export default function ClaimList({ claims, questTotalBounty }: Props) {
   const wallet = useWallet();
-
   return (
     <WrapperStyled>
       <Outset>
@@ -76,8 +77,13 @@ export default function ClaimList({ claims }: Props) {
                   <AmountFieldInput
                     id="amount"
                     isEdit={false}
-                    label="Claiming amount"
-                    value={x.claimedAmount}
+                    label="Claimed amount"
+                    isLoading={!x.claimedAmount.parsedAmount && questTotalBounty === undefined}
+                    value={
+                      x.claimedAmount.parsedAmount || !questTotalBounty
+                        ? x.claimedAmount
+                        : questTotalBounty
+                    }
                   />
                   {wallet?.account && <ChallengeModal claim={x} />}
                 </RowStyled>,
