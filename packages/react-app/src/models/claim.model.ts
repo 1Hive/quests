@@ -1,3 +1,4 @@
+import { ContainerModel } from './govern.model';
 import { TokenAmountModel } from './token-amount.model';
 
 export type ClaimModel = {
@@ -7,4 +8,5 @@ export type ClaimModel = {
   evidence: string;
   executionTimeMs?: number;
   state?: string;
+  container?: ContainerModel; // Only set when fetch
 };

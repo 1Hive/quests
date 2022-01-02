@@ -178,6 +178,7 @@ export default function Quest({
         }
         // Set noon to prevent rounding form changing date
         const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
+        toast('Creating Quest...');
         const txReceiptSaveQuest = await QuestService.saveQuest(
           questFactoryContract,
           values.fallbackAddress!,
@@ -187,7 +188,7 @@ export default function Quest({
             pushTransaction({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.QuestCreating, // 15 sec
-              pendingMessage: 'Quest creating...',
+              pendingMessage: 'Creating Quest...',
               status: TRANSACTION_STATUS.Pending,
             });
             onSave();
@@ -202,7 +203,7 @@ export default function Quest({
           else {
             createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
             if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
-            toast('Quest funding ...');
+            toast('Sending funds to Quest...');
             const txReceiptFundQuest = await QuestService.fundQuest(
               erc20Contract!,
               createdQuestAddress,

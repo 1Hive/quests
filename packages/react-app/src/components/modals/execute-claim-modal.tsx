@@ -83,6 +83,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const claimTx = async () => {
     try {
       setLoading(true);
+      toast('Sending claimed amount to your wallet...');
       const txReceipt: ethers.ContractReceipt = await QuestService.executeQuestClaim(
         governQueueContract,
         claim,

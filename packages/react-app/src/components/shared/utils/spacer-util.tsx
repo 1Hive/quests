@@ -144,31 +144,23 @@ type ChildSpacerProps = {
   children?: ReactNode;
   size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
   vertical?: boolean;
-  align?: boolean;
 };
 
-export function ChildSpacer({
-  children,
-  size = 8,
-  vertical = false,
-  align = true,
-}: ChildSpacerProps) {
+export function ChildSpacer({ children, size = 8, vertical = false }: ChildSpacerProps) {
   const childList = children as any;
 
-  if (!childList?.length) return <></>;
-  return React.Children.map(children, (child, i) => {
-    let className = '';
-    if (i !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
-    if (i !== childList.length - 1) className += ` p${vertical ? 'b' : 'r'}-${size}`;
-    return (
-      <ChildWrapperStyled
-        vertical={vertical}
-        align={align}
-        className={className}
-        key={`child-${i}`}
-      >
-        {child}
-      </ChildWrapperStyled>
-    );
-  }) as any;
+  return (
+    <>
+      {React.Children.map(children, (child, i) => {
+        let className = '';
+        if (i !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
+        if (i !== childList.length - 1) className += ` p${vertical ? 'b' : 'r'}-${size}`;
+        return (
+          <ChildWrapperStyled vertical={vertical} className={className} key={`child-${i}`}>
+            {child}
+          </ChildWrapperStyled>
+        );
+      })}
+    </>
+  );
 }

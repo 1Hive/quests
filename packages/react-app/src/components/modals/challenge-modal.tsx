@@ -98,17 +98,17 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
-      const container = await QuestService.computeContainer(claim);
       const { governQueue } = getNetwork();
+      toast('Approving challenge deposit...');
       const approveTxReceipt = await QuestService.approveTokenAmount(
         erc20Contract,
         governQueue,
-        container.config.scheduleDeposit,
+        claim.container!.config.challengeDeposit,
         (tx) => {
           pushTransaction({
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
-            pendingMessage: 'Challenge deposit approval...',
+            pendingMessage: 'Approving challenge deposit...',
             status: TRANSACTION_STATUS.Pending,
           });
         },
@@ -118,9 +118,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
       if (approveTxReceipt.status) {
+        toast('Challenging Quest...');
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           governQueueContract,
-          container,
           {
             claim,
             reason: values.reason,
@@ -130,7 +130,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             pushTransaction({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
-              pendingMessage: 'Quest challenging...',
+              pendingMessage: 'Challenging Quest...',
               status: TRANSACTION_STATUS.Pending,
             });
           },

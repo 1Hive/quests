@@ -64,15 +64,16 @@ async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel 
 
   if (!result?.governQueue)
     throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
-  const { config } = result.governQueue;
+  const { config, nonce } = result.governQueue;
   return (
     result.governQueue && {
       config: {
         ...config,
-        maxCalldataSize: +config.maxCalldataSize,
         rules: hexToBytes(config.rules),
+        maxCalldataSize: +config.maxCalldataSize,
+        executionDelay: +config.executionDelay,
       },
-      nonce: +result.governQueue.nonce,
+      nonce: +nonce,
     }
   );
 }
@@ -86,26 +87,31 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
     throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
 
   const containers = result.governQueue.containers.map(
-    //  const containers = fakeContainerResult.map(
     (x: any) =>
       ({
-        id: x.id,
         payload: {
-          id: x.payload.id,
-          actions: x.payload.actions,
+          ...x.payload,
           executionTime: +x.payload.executionTime,
-          proof: x.payload.proof,
-          submitter: x.payload.submitter,
+          nonce: +x.payload.nonce,
+          actions: x.payload.actions.map((a: any) => ({
+            to: toChecksumAddress(a.to),
+            data: a.data,
+            value: +a.value,
+          })),
+          executor: toChecksumAddress(x.payload.executor.id),
+          submitter: toChecksumAddress(x.payload.submitter),
+          allowFailuresMap: x.payload.allowFailuresMap,
         },
         state: x.state,
         config: {
-          challengeDeposit: x.config.challengeDeposit,
-          scheduleDeposit: x.config.scheduleDeposit,
+          ...x.config,
+          rules: x.config.rules,
+          maxCalldataSize: +x.config.maxCalldataSize,
         },
       } as ContainerModel),
   );
 
-  return containers;
+  return containers as ContainerModel[];
 }
 
 function decodeClaimAction(payload: PayloadModel) {
@@ -189,8 +195,8 @@ export async function fetchQuest(questAddress: string) {
   return newQuest;
 }
 
-export async function computeContainer(claimData: ClaimModel): Promise<ContainerModel> {
-  const { govern, celeste } = getNetwork();
+export async function computeScheduleContainer(claimData: ClaimModel): Promise<ContainerModel> {
+  const { govern } = getNetwork();
 
   const governQueueResult = await fetchGovernQueue();
 
@@ -233,7 +239,6 @@ export async function computeContainer(claimData: ClaimModel): Promise<Container
 }
 
 export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
-  const { nativeToken } = getNetwork();
   const res = await fetchGovernQueueContainers();
 
   return Promise.all(
@@ -253,6 +258,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           questAddress: quest.address,
           state: x.state,
           executionTimeMs: +x.payload.executionTime * 1000, // Sec to MS
+          container: x,
         } as ClaimModel;
       }),
   );
@@ -338,27 +344,35 @@ export async function executeQuestClaim(
   if (governQueueContract instanceof ContractError) throw governQueueContract; // Throw error
   if (!governQueueContract?.address)
     throw Error('ContractError : <governQueueContract> has not been set properly');
-  const container = await computeContainer(claimData);
-  Logger.debug('Executing quest claim...', { container, claimData });
-  const tx = await governQueueContract.execute(container, { gasLimit: 12e6, gasPrice: 2e9 });
+  Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
+  const tx = await governQueueContract.execute(
+    { config: claimData.container!.config, payload: claimData.container!.payload },
+    {
+      gasLimit: 12e6,
+      gasPrice: 2e9,
+    },
+  );
   return handleTransaction(tx, onTx);
 }
 
 export async function challengeQuestClaim(
   governQueueContract: Contract | ContractError,
-  container: ContainerModel,
   challenge: ChallengeModel,
   onTx?: (hash: string) => void,
 ) {
   if (governQueueContract instanceof ContractError) throw governQueueContract; // Throw error
   if (!governQueueContract?.address)
     throw Error('ContractError : <governQueueContract> has not been set properly');
-  Logger.debug('Challenging quest...', { container, challenge });
+  Logger.debug('Challenging quest...', { container: challenge.claim.container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
-  const tx = await governQueueContract.functions.challenge(container, challengeReasonIpfs, {
-    gasLimit: 12e6,
-    gasPrice: 2e9,
-  });
+  const tx = await governQueueContract.functions.challenge(
+    { config: challenge.claim.container!.config, payload: challenge.claim.container!.payload },
+    challengeReasonIpfs,
+    {
+      gasLimit: 12e6,
+      gasPrice: 2e9,
+    },
+  );
   return handleTransaction(tx, onTx);
 }
 

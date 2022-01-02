@@ -21,13 +21,11 @@ export const TOKENS = {
     symbol: 'ETH',
     token: '',
     decimals: 18,
-    native: true,
   } as TokenModel,
   xDAI: {
     name: 'xDAI',
     symbol: 'xDAI',
     decimals: 18,
-    native: true,
   } as TokenModel,
   // ERC20 tokens
   Honey: {

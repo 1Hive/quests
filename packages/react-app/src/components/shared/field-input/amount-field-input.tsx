@@ -108,7 +108,6 @@ function AmountFieldInput({
           <TokenBadgeStyled
             symbol={value.token!.symbol}
             address={value.token!.token}
-            badgeOnly={value.token.native}
             networkType="private"
           />
         </LineStyled>

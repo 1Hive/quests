@@ -45,6 +45,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   const fundModalTx = async (values: any, setSubmitting: Function) => {
     try {
       setLoading(true);
+      toast('Sending funds to Quest...');
       const txReceipt = await QuestService.fundQuest(
         contractERC20!,
         questAddress,
@@ -53,7 +54,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
           pushTransaction({
             hash: txHash,
             estimatedEnd: Date.now() + ESTIMATED_TX_TIME_MS.QuestFunding,
-            pendingMessage: 'Quest funding...',
+            pendingMessage: 'Sending funds to Quest...',
             status: TRANSACTION_STATUS.Pending,
           });
         },

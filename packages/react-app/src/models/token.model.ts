@@ -4,5 +4,4 @@ export type TokenModel = {
   symbol: string;
   token: string;
   decimals: number;
-  native: boolean;
 };

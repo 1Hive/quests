@@ -37,20 +37,42 @@ export const GovernQueueEntityContainersQuery = gql`
         state
         payload {
           id
+          nonce
           proof
           submitter
           executionTime
+          executor {
+            id
+          }
           actions {
             to
             value
             data
           }
+          allowFailuresMap
         }
         config {
-          challengeDeposit {
+          id
+          executionDelay
+          scheduleDeposit {
+            id
             token
             amount
+            decimals
+            name
+            symbol
           }
+          challengeDeposit {
+            id
+            token
+            amount
+            decimals
+            name
+            symbol
+          }
+          resolver
+          rules
+          maxCalldataSize
         }
       }
     }

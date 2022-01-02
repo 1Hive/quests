@@ -52,6 +52,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const reclaimFundTx = async () => {
     try {
       setLoading(true);
+      toast('Reclaiming unused fund...');
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(questContract!, (tx) => {
         pushTransaction({
           hash: tx,

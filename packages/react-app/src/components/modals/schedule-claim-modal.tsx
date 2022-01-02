@@ -54,21 +54,22 @@ export default function ScheduleClaimModal({
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
 
-  const onModalClose = () => {
+  const onModalClose = (succeed: any) => {
     setOpened(false);
-    onClose();
+    onClose(succeed);
   };
 
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
-      const container = await QuestService.computeContainer({
+      const container = await QuestService.computeScheduleContainer({
         claimedAmount: values.claimedAmount!,
         evidence: values.evidence!,
         playerAddress,
         questAddress,
       });
       const { governQueue } = getNetwork();
+      toast('Approving claim deposit...');
       const approveTxReceipt = await QuestService.approveTokenAmount(
         erc20Contract,
         governQueue,
@@ -77,7 +78,7 @@ export default function ScheduleClaimModal({
           pushTransaction({
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
-            pendingMessage: 'Claim deposit approval...',
+            pendingMessage: 'Approving claim deposit...',
             status: TRANSACTION_STATUS.Pending,
           });
         },
@@ -87,6 +88,7 @@ export default function ScheduleClaimModal({
         status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
       if (approveTxReceipt.status) {
+        toast('Scheduling claim...');
         const scheduleReceipt = await QuestService.scheduleQuestClaim(
           governQueueContract,
           container,
@@ -94,7 +96,7 @@ export default function ScheduleClaimModal({
             pushTransaction({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimScheduling,
-              pendingMessage: 'Quest claim scheduling...',
+              pendingMessage: 'Scheduling claim...',
               status: TRANSACTION_STATUS.Pending,
             });
           },
@@ -105,7 +107,7 @@ export default function ScheduleClaimModal({
         });
         if (scheduleReceipt.status) toast('Operation succeed');
       }
-      onModalClose();
+      onModalClose(true);
     } catch (e: any) {
       updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
       Logger.error(e);
