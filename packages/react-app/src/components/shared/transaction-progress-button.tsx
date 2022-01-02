@@ -54,7 +54,6 @@ export function TransactionProgressButton() {
   const nextTx = (tx: TransactionModel | undefined) => {
     setCurrentTx(tx);
     clearTimeout();
-    setSlow(false);
     if (tx?.estimatedEnd) {
       setTimeout(() => {
         setSlow(true);
@@ -86,13 +85,15 @@ export function TransactionProgressButton() {
       if (updatedTransactionStatus.status !== TRANSACTION_STATUS.Pending) {
         setTxList(txList.filter((x: TransactionModel) => x.hash !== updatedTransactionStatus.hash));
       }
-      if (updatedTransactionStatus.hash === currentTx?.hash)
+      if (updatedTransactionStatus.hash === currentTx?.hash) {
+        setSlow(false);
         nextTx(
           txList.find(
             (x: TransactionModel) =>
               x.hash !== updatedTransactionStatus.hash && x.status === TRANSACTION_STATUS.Pending,
           ),
         );
+      }
     }
   }, [updatedTransactionStatus]);
 

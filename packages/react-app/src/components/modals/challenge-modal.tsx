@@ -11,6 +11,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import ModalBase from './modal-base';
 import { useERC20Contract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
@@ -47,10 +48,11 @@ const OpenButtonWrapperStyled = styled.div`
 
 type Props = {
   claim: ClaimModel;
+  challengeDeposit: TokenAmountModel;
   onClose?: Function;
 };
 
-export default function ChallengeModal({ claim, onClose = noop }: Props) {
+export default function ChallengeModal({ claim, challengeDeposit, onClose = noop }: Props) {
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
@@ -58,7 +60,8 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
     useTransactionContext()!;
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
-  const erc20Contract = useERC20Contract(claim.challengeDeposit!.token!);
+
+  const erc20Contract = useERC20Contract(challengeDeposit.token!);
   const [challengeTimeout, setChallengedTimeout] = useState(false);
   const [openButtonLabel, setOpenButtonLabel] = useState<string>();
 
@@ -106,6 +109,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
             pendingMessage: 'Challenge deposit approval...',
+            status: TRANSACTION_STATUS.Pending,
           });
         },
       );
@@ -120,13 +124,14 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
           {
             claim,
             reason: values.reason,
-            deposit: claim.challengeDeposit!,
+            deposit: challengeDeposit,
           },
           (tx) => {
             pushTransaction({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
               pendingMessage: 'Quest challenging...',
+              status: TRANSACTION_STATUS.Pending,
             });
           },
         );
@@ -195,7 +200,7 @@ export default function ChallengeModal({ claim, onClose = noop }: Props) {
           tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
           isEdit={false}
           isLoading={loading}
-          value={claim.challengeDeposit}
+          value={challengeDeposit}
           compact
         />,
         <Button

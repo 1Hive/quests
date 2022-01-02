@@ -1,4 +1,3 @@
-import { TokenAmountModel } from './token-amount.model';
 import { TokenModel } from './token.model';
 
 export type PayloadModel = {

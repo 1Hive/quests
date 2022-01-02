@@ -7,5 +7,4 @@ export type ClaimModel = {
   evidence: string;
   executionTimeMs?: number;
   state?: string;
-  challengeDeposit?: TokenAmountModel; // Only set when fetching claims
 };

@@ -47,10 +47,11 @@ const HeaderStyled = styled.h1`
 
 type Props = {
   claims: ClaimModel[];
+  challengeDeposit: TokenAmountModel;
   questTotalBounty?: TokenAmountModel | null;
 };
 
-export default function ClaimList({ claims, questTotalBounty }: Props) {
+export default function ClaimList({ claims, challengeDeposit, questTotalBounty }: Props) {
   const wallet = useWallet();
   return (
     <WrapperStyled>
@@ -85,7 +86,9 @@ export default function ClaimList({ claims, questTotalBounty }: Props) {
                         : questTotalBounty
                     }
                   />
-                  {wallet?.account && <ChallengeModal claim={x} />}
+                  {wallet?.account && (
+                    <ChallengeModal claim={x} challengeDeposit={challengeDeposit} />
+                  )}
                 </RowStyled>,
                 <Outset gu8>
                   <TextFieldInput

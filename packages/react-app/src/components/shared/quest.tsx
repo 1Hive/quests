@@ -101,26 +101,23 @@ export default function Quest({
   (window as any).pushTransaction = pushTransaction;
   (window as any).updateTransactionStatus = updateTransactionStatus;
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
+  const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
   const questFactoryContract = useFactoryContract();
   const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | undefined>();
 
   useEffect(() => {
     setIsEdit(questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update);
-  }, [questMode]);
 
-  useEffect(() => {
-    if (claims) setCurrentPlayerClaim(claims.find((x) => x.playerAddress === wallet.account));
-  }, [claims, wallet.account]);
-
-  useEffect(() => {
     const getClaimDeposit = async () => {
       // Don't show deposit of expired
       if (data.state === QUEST_STATE.Archived || data.state === QUEST_STATE.Expired)
         setClaimDeposit(null);
       else
         try {
-          setClaimDeposit(await QuestService.fetchClaimDeposit());
+          const { challenge, claim } = await QuestService.fetchDeposits();
+          setClaimDeposit(claim);
+          setChallengeDeposit(challenge);
         } catch (error) {
           Logger.error(error);
         }
@@ -144,9 +141,16 @@ export default function Quest({
     };
 
     if (data.address) getBalanceOfQuest(data.address);
-    fetchClaims();
-    getClaimDeposit();
-  }, []);
+
+    if (questMode === QUEST_MODE.ReadDetail) {
+      fetchClaims();
+      getClaimDeposit();
+    }
+  }, [questMode]);
+
+  useEffect(() => {
+    if (claims) setCurrentPlayerClaim(claims.find((x) => x.playerAddress === wallet.account));
+  }, [claims, wallet.account]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -377,8 +381,12 @@ export default function Quest({
       />
       {!loading && !isEdit && data.address && (
         <>
-          {questMode === QUEST_MODE.ReadDetail && claims && (
-            <ClaimList claims={claims} questTotalBounty={bounty} />
+          {questMode === QUEST_MODE.ReadDetail && claims && challengeDeposit && (
+            <ClaimList
+              claims={claims}
+              questTotalBounty={bounty}
+              challengeDeposit={challengeDeposit}
+            />
           )}
           <QuestFooterStyled>
             {questMode !== QUEST_MODE.ReadDetail && (

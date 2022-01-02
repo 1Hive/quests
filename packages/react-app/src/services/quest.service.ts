@@ -252,22 +252,18 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           playerAddress,
           questAddress: quest.address,
           state: x.state,
-          challengeDeposit: {
-            parsedAmount: fromBigNumber(
-              BigNumber.from(x.config.challengeDeposit.amount),
-              x.config.challengeDeposit.decimals,
-            ),
-            token: nativeToken,
-          },
           executionTimeMs: +x.payload.executionTime * 1000, // Sec to MS
         } as ClaimModel;
       }),
   );
 }
 
-export async function fetchClaimDeposit() {
+export async function fetchDeposits() {
   const { config } = await fetchGovernQueue();
-  return toTokenAmountModel(config.scheduleDeposit);
+  return {
+    claim: toTokenAmountModel(config.scheduleDeposit),
+    challenge: toTokenAmountModel(config.challengeDeposit),
+  };
 }
 
 export async function getClaimExecutableTime(questAddress: string, playerAddress: string) {
@@ -359,7 +355,10 @@ export async function challengeQuestClaim(
     throw Error('ContractError : <governQueueContract> has not been set properly');
   Logger.debug('Challenging quest...', { container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
-  const tx = await governQueueContract.functions.challenge(container, challengeReasonIpfs);
+  const tx = await governQueueContract.functions.challenge(container, challengeReasonIpfs, {
+    gasLimit: 12e6,
+    gasPrice: 2e9,
+  });
   return handleTransaction(tx, onTx);
 }
 
