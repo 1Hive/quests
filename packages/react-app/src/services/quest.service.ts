@@ -17,6 +17,7 @@ import { ChallengeModel } from 'src/models/challenge.model';
 import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { ContractError } from 'src/models/contract-error';
+import { number } from 'prop-types';
 import { CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -196,7 +197,10 @@ export async function fetchQuest(questAddress: string) {
   return newQuest;
 }
 
-export async function computeScheduleContainer(claimData: ClaimModel): Promise<ContainerModel> {
+export async function computeScheduleContainer(
+  claimData: ClaimModel,
+  extraDelaySec?: number,
+): Promise<ContainerModel> {
   const { governAddress: govern } = getNetwork();
 
   const governQueueResult = await fetchGovernQueue();
@@ -214,7 +218,7 @@ export async function computeScheduleContainer(claimData: ClaimModel): Promise<C
   // A bit more than the execution delay
   const executionTime = claimData.executionTimeMs
     ? Math.round(claimData.executionTimeMs / 1000)
-    : +lastBlockTimestamp + +erc3000Config.executionDelay + 60;
+    : +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec ?? 3600);
 
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
@@ -288,13 +292,31 @@ export async function getClaimExecutableTime(questAddress: string, playerAddress
 
 export async function fetchChallengeFee(): Promise<TokenAmountModel> {
   const { celesteSubgraph } = getNetwork();
-  const result = await request(celesteSubgraph, CelesteCourtConfigQuery, {
-    first: 1,
-    skip: 0,
-  });
-  console.log({ result });
+  // const result = await request(celesteSubgraph, CelesteCourtConfigQuery, {
+  //   first: 1,
+  //   skip: 0,
+  // });
+  // TODO : UNFAKE
+  const result = {
+    courtConfigs: [
+      {
+        feeToken: {
+          id: '0x3050e20fabe19f8576865811c9f28e85b96fa4f9',
+          decimals: 18,
+          name: 'HoneyTest',
+          symbol: 'HNYT',
+        },
+        id: '0x35e7433141d5f7f2eb7081186f5284dcdd2ccace',
+        settleFee: '1000000000000000000000000',
+      },
+    ],
+  };
   const { feeToken, settleFee } = result.courtConfigs[0];
-  return toTokenAmountModel({ ...feeToken, amount: settleFee });
+  return toTokenAmountModel({
+    ...feeToken,
+    token: feeToken.id,
+    amount: settleFee,
+  });
 }
 
 // #endregion
@@ -413,7 +435,10 @@ export async function approveTokenAmount(
     throw erc20Contract;
   }
   Logger.debug('Approving token amount ...', { tokenAmount, fromAddress: toAddress });
-  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount);
+  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
+    gasLimit: 12e6,
+    gasPrice: 2e9,
+  });
   return handleTransaction(tx, onTx);
 }
 

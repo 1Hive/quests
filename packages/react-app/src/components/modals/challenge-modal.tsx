@@ -64,7 +64,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     useTransactionContext()!;
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
-  const erc20Contract = useERC20Contract(challengeDeposit.token);
+  const erc20DepositContract = useERC20Contract(challengeDeposit.token);
+  const erc20FeeContract = useERC20Contract(challengeFee?.token);
 
   useEffect(() => {
     const fetchFee = async () => {
@@ -109,11 +110,14 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       const { governQueueAddress } = getNetwork();
       const feeAndDepositSameToken =
         challengeFee?.token?.token === claim.container?.config.challengeDeposit.token;
-      if (challengeFee?.parsedAmount && !feeAndDepositSameToken) {
+      if (
+        challengeFee?.parsedAmount &&
+        (!feeAndDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
+      ) {
         const pendingMessage = 'Approving challenge fee...';
         toast(pendingMessage);
         const approveTxReceipt = await QuestService.approveTokenAmount(
-          erc20Contract,
+          erc20FeeContract,
           governQueueAddress,
           challengeFee.token,
           (tx) => {
@@ -144,7 +148,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         }
         toast(pendingMessage);
         const approveTxReceipt = await QuestService.approveTokenAmount(
-          erc20Contract,
+          erc20DepositContract,
           governQueueAddress,
           claim.container!.config.challengeDeposit,
           (tx) => {
@@ -228,7 +232,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 loading ||
                 challengeTimeout ||
                 claim.state === CLAIM_STATUS.Challenged ||
-                !erc20Contract ||
+                !erc20DepositContract ||
+                !erc20FeeContract ||
                 !governQueueContract
               }
             />
@@ -240,6 +245,16 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       }
       buttons={[
         <AmountFieldInputFormik
+          key="challengeDeposit"
+          id="challengeDeposit"
+          label="Challenge Deposit"
+          tooltip="Challenge Deposit"
+          tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
+          isLoading={loading}
+          value={challengeDeposit}
+          compact
+        />,
+        <AmountFieldInputFormik
           key="challengeFee"
           id="challengeFee"
           label="Challenge fee"
@@ -247,16 +262,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           tooltipDetail="This is the challenge cost defined by Celeste."
           isLoading={loading || challengeFee === undefined}
           value={challengeFee}
-          compact
-        />,
-        <AmountFieldInputFormik
-          key="challengeDeposit"
-          id="challengeDeposit"
-          label="Challenge Deposit"
-          tooltip="Challenge Deposit"
-          tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
-          isLoading={loading || challengeDeposit === undefined}
-          value={challengeDeposit}
           compact
         />,
         <Button

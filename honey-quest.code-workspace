@@ -2,7 +2,7 @@
   "folders": [
     { "name": "WebApp", "path": "./packages/react-app" },
     { "name": "Hardhat", "path": "./packages/hardhat" },
-    { "name": "Subgraph", "path": "./packages/subgraph" },
+    { "name": "Subgraph", "path": "./packages/subgraphs" },
     { "name": "Services", "path": "./packages/services" },
     { "name": "Root", "path": "." }
   ],

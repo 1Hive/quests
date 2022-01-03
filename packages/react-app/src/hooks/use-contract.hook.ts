@@ -110,10 +110,10 @@ export function useGovernQueueContract(): Contract | ContractError {
 }
 
 export function useERC20Contract(
-  token: TokenModel,
+  token?: TokenModel,
   withSignerIfPossible = true,
 ): Contract | ContractError {
-  return useContract('ERC20', token.token, withSignerIfPossible);
+  return useContract('ERC20', token?.token, withSignerIfPossible);
 }
 
 export function useQuestContract(
