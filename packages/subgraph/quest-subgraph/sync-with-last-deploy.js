@@ -1,6 +1,6 @@
 const network = process.argv.slice(2)[0];
 console.log(network);
-const QuestFactory = require(`../hardhat/deployments/${network}/QuestFactory.json`);
+const QuestFactory = require(`../../hardhat/deployments/${network}/QuestFactory.json`);
 const ConfigJson = require(`./config/${network}.json`);
 const yaml = require("js-yaml");
 const fs = require("fs");

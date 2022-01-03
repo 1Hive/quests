@@ -1,0 +1,24 @@
+specVersion: 0.0.2
+schema:
+  file: ./src/schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: QuestFactory
+    network: rinkeby
+    source:
+      address: "0xCacDFC978Bda030Ce5064700f9cdE36288Da99eD"
+      abi: QuestFactory
+      startBlock: 9924658
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreated
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256)
+          handler: handleQuestCreated
+      file: ./src/mapping.ts

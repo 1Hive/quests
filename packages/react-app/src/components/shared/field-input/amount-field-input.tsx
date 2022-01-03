@@ -105,11 +105,13 @@ function AmountFieldInput({
               amount
             )}
           </AmountStyled>
-          <TokenBadgeStyled
-            symbol={value.token!.symbol}
-            address={value.token!.token}
-            networkType="private"
-          />
+          {value.token.symbol && (
+            <TokenBadgeStyled
+              symbol={value.token.symbol}
+              address={value.token.token}
+              networkType="private"
+            />
+          )}
         </LineStyled>
       )}
     </FieldStyled>

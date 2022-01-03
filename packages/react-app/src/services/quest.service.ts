@@ -303,7 +303,7 @@ export async function saveQuest(
   const tx = await questFactoryContract.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    TOKENS.Honey.token,
+    TOKENS.HoneyTest.token,
     questExpireTimeUtcSec,
     fallbackAddress,
   );

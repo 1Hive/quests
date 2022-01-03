@@ -69,44 +69,49 @@ export default function ScheduleClaimModal({
         questAddress,
       });
       const { governQueue } = getNetwork();
-      toast('Approving claim deposit...');
-      const approveTxReceipt = await QuestService.approveTokenAmount(
-        erc20Contract,
-        governQueue,
-        container.config.scheduleDeposit,
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
-            pendingMessage: 'Approving claim deposit...',
-            status: TRANSACTION_STATUS.Pending,
-          });
-        },
-      );
-      updateTransactionStatus({
-        hash: approveTxReceipt.transactionHash,
-        status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
-      });
-      if (approveTxReceipt.status) {
-        toast('Scheduling claim...');
-        const scheduleReceipt = await QuestService.scheduleQuestClaim(
-          governQueueContract,
-          container,
+
+      if (+container.config.scheduleDeposit.amount) {
+        toast('Approving claim deposit...');
+        const approveTxReceipt = await QuestService.approveTokenAmount(
+          erc20Contract,
+          governQueue,
+          container.config.scheduleDeposit,
           (tx) => {
             pushTransaction({
               hash: tx,
-              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimScheduling,
-              pendingMessage: 'Scheduling claim...',
+              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
+              pendingMessage: 'Approving claim deposit...',
               status: TRANSACTION_STATUS.Pending,
             });
           },
         );
         updateTransactionStatus({
-          hash: scheduleReceipt.transactionHash,
-          status: scheduleReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+          hash: approveTxReceipt.transactionHash,
+          status: approveTxReceipt.status
+            ? TRANSACTION_STATUS.Confirmed
+            : TRANSACTION_STATUS.Failed,
         });
-        if (scheduleReceipt.status) toast('Operation succeed');
+        if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
       }
+      toast('Scheduling claim...');
+      const scheduleReceipt = await QuestService.scheduleQuestClaim(
+        governQueueContract,
+        container,
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimScheduling,
+            pendingMessage: 'Scheduling claim...',
+            status: TRANSACTION_STATUS.Pending,
+          });
+        },
+      );
+      updateTransactionStatus({
+        hash: scheduleReceipt.transactionHash,
+        status: scheduleReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+      });
+      if (!scheduleReceipt.status) throw new Error('Failed to schedule the claim');
+      toast('Operation succeed');
       onModalClose(true);
     } catch (e: any) {
       updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
@@ -116,6 +121,7 @@ export default function ScheduleClaimModal({
           ? 'Oops. Something went wrong.'
           : e.message,
       );
+      onModalClose(false);
     } finally {
       setSubmitting(false);
       setLoading(false);

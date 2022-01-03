@@ -99,50 +99,54 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     try {
       setLoading(true);
       const { governQueue } = getNetwork();
-      toast('Approving challenge deposit...');
-      const approveTxReceipt = await QuestService.approveTokenAmount(
-        erc20Contract,
-        governQueue,
-        claim.container!.config.challengeDeposit,
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
-            pendingMessage: 'Approving challenge deposit...',
-            status: TRANSACTION_STATUS.Pending,
-          });
-        },
-      );
-      updateTransactionStatus({
-        hash: approveTxReceipt.transactionHash!,
-        status: approveTxReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
-      });
-      if (approveTxReceipt.status) {
-        toast('Challenging Quest...');
-        const challengeTxReceipt = await QuestService.challengeQuestClaim(
-          governQueueContract,
-          {
-            claim,
-            reason: values.reason,
-            deposit: challengeDeposit,
-          },
+      if (+claim.container!.config.challengeDeposit.amount) {
+        toast('Approving challenge deposit...');
+        const approveTxReceipt = await QuestService.approveTokenAmount(
+          erc20Contract,
+          governQueue,
+          claim.container!.config.challengeDeposit,
           (tx) => {
             pushTransaction({
               hash: tx,
-              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
-              pendingMessage: 'Challenging Quest...',
+              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
+              pendingMessage: 'Approving challenge deposit...',
               status: TRANSACTION_STATUS.Pending,
             });
           },
         );
         updateTransactionStatus({
-          hash: challengeTxReceipt.transactionHash!,
-          status: challengeTxReceipt.status
+          hash: approveTxReceipt.transactionHash!,
+          status: approveTxReceipt.status
             ? TRANSACTION_STATUS.Confirmed
             : TRANSACTION_STATUS.Failed,
         });
-        if (challengeTxReceipt.status) toast('Operation succeed');
+        if (!approveTxReceipt.status) throw new Error('Failed to aprove deposit');
       }
+      toast('Challenging Quest...');
+      const challengeTxReceipt = await QuestService.challengeQuestClaim(
+        governQueueContract,
+        {
+          claim,
+          reason: values.reason,
+          deposit: challengeDeposit,
+        },
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
+            pendingMessage: 'Challenging Quest...',
+            status: TRANSACTION_STATUS.Pending,
+          });
+        },
+      );
+      updateTransactionStatus({
+        hash: challengeTxReceipt.transactionHash!,
+        status: challengeTxReceipt.status
+          ? TRANSACTION_STATUS.Confirmed
+          : TRANSACTION_STATUS.Failed,
+      });
+      if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
+      toast('Operation succeed');
       onModalClose();
     } catch (e: any) {
       updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
