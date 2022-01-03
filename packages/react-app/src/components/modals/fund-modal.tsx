@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
-import { DEFAULT_AMOUNT, ESTIMATED_TX_TIME_MS, TRANSACTION_STATUS } from 'src/constants';
+import { ESTIMATED_TX_TIME_MS, TRANSACTION_STATUS } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
 import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
@@ -45,7 +45,8 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   const fundModalTx = async (values: any, setSubmitting: Function) => {
     try {
       setLoading(true);
-      toast('Sending funds to Quest...');
+      const pendingMessage = 'Sending funds to Quest...';
+      toast(pendingMessage);
       const txReceipt = await QuestService.fundQuest(
         contractERC20!,
         questAddress,
@@ -54,7 +55,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
           pushTransaction({
             hash: txHash,
             estimatedEnd: Date.now() + ESTIMATED_TX_TIME_MS.QuestFunding,
-            pendingMessage: 'Sending funds to Quest...',
+            pendingMessage,
             status: TRANSACTION_STATUS.Pending,
           });
         },
@@ -104,7 +105,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
       isOpen={opened}
     >
       <Formik
-        initialValues={{ fundAmount: DEFAULT_AMOUNT }}
+        initialValues={{ fundAmount: { parsedAmount: 0, token: defaultToken } }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
           if (!values.fundAmount?.parsedAmount) errors.push('Validation : Amount is required');

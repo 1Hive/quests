@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { DEFAULT_AMOUNT, TRANSACTION_STATUS, ENUM } from 'src/constants';
+import { TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { useERC20Contract, useGovernQueueContract } from 'src/hooks/use-contract.hook';
@@ -50,9 +50,10 @@ export default function ScheduleClaimModal({
   const [opened, setOpened] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
-  const erc20Contract = useERC20Contract(claimDeposit!.token!);
+  const erc20Contract = useERC20Contract(claimDeposit!.token);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
+  const { defaultToken } = getNetwork();
 
   const onModalClose = (succeed: any) => {
     setOpened(false);
@@ -68,13 +69,13 @@ export default function ScheduleClaimModal({
         playerAddress,
         questAddress,
       });
-      const { governQueue } = getNetwork();
+      const { governQueueAddress } = getNetwork();
 
       if (+container.config.scheduleDeposit.amount) {
         toast('Approving claim deposit...');
         const approveTxReceipt = await QuestService.approveTokenAmount(
           erc20Contract,
-          governQueue,
+          governQueueAddress,
           container.config.scheduleDeposit,
           (tx) => {
             pushTransaction({
@@ -110,7 +111,8 @@ export default function ScheduleClaimModal({
         hash: scheduleReceipt.transactionHash,
         status: scheduleReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
       });
-      if (!scheduleReceipt.status) throw new Error('Failed to schedule the claim');
+      if (!scheduleReceipt.status)
+        throw new Error('Failed to schedule the claim, please try again in a few seconds');
       toast('Operation succeed');
       onModalClose(true);
     } catch (e: any) {
@@ -164,7 +166,7 @@ export default function ScheduleClaimModal({
       isOpen={opened}
     >
       <Formik
-        initialValues={{ evidence: '', claimedAmount: DEFAULT_AMOUNT }}
+        initialValues={{ evidence: '', claimedAmount: { parsedAmount: 0, token: defaultToken } }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
           if (!values.claimedAmount) errors.push('Validation : Claimed amount is required');

@@ -12,6 +12,7 @@ import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import { BigNumber } from 'ethers';
 import ModalBase from './modal-base';
 import { useERC20Contract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
@@ -54,16 +55,24 @@ type Props = {
 
 export default function ChallengeModal({ claim, challengeDeposit, onClose = noop }: Props) {
   const toast = useToast();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [challengeTimeout, setChallengedTimeout] = useState<boolean | undefined>(undefined);
+  const [openButtonLabel, setOpenButtonLabel] = useState<string>();
+  const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
   const formRef = useRef<HTMLFormElement>(null);
   const governQueueContract = useGovernQueueContract();
+  const erc20Contract = useERC20Contract(challengeDeposit.token);
 
-  const erc20Contract = useERC20Contract(challengeDeposit.token!);
-  const [challengeTimeout, setChallengedTimeout] = useState(false);
-  const [openButtonLabel, setOpenButtonLabel] = useState<string>();
+  useEffect(() => {
+    const fetchFee = async () => {
+      const feeAmount = await QuestService.fetchChallengeFee();
+      setChallengeFee(feeAmount);
+    };
+    fetchFee();
+  }, []);
 
   useEffect(() => {
     let handle: any;
@@ -76,7 +85,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           setChallengedTimeout(true);
         }, execTimeMs - now); // To ms
       }
-      setLoading(false);
     };
     if (claim.executionTimeMs) launchSetTimeoutAsync(claim.executionTimeMs);
     return () => {
@@ -84,32 +92,35 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     };
   }, [claim.executionTimeMs]);
 
-  const onModalClose = () => {
-    setOpened(false);
-    onClose();
-  };
-
   useEffect(() => {
     if (claim?.state === CLAIM_STATUS.Challenged) setOpenButtonLabel('Already challenged');
     else if (challengeTimeout) setOpenButtonLabel('Challenge period over');
     else setOpenButtonLabel('Challenge');
   }, [claim.state, challengeTimeout]);
 
+  const onModalClose = () => {
+    setOpened(false);
+    onClose();
+  };
+
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
-      const { governQueue } = getNetwork();
-      if (+claim.container!.config.challengeDeposit.amount) {
-        toast('Approving challenge deposit...');
+      const { governQueueAddress } = getNetwork();
+      const feeAndDepositSameToken =
+        challengeFee?.token?.token === claim.container?.config.challengeDeposit.token;
+      if (challengeFee?.parsedAmount && !feeAndDepositSameToken) {
+        const pendingMessage = 'Approving challenge fee...';
+        toast(pendingMessage);
         const approveTxReceipt = await QuestService.approveTokenAmount(
           erc20Contract,
-          governQueue,
-          claim.container!.config.challengeDeposit,
+          governQueueAddress,
+          challengeFee.token,
           (tx) => {
             pushTransaction({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
-              pendingMessage: 'Approving challenge deposit...',
+              pendingMessage,
               status: TRANSACTION_STATUS.Pending,
             });
           },
@@ -120,9 +131,41 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             ? TRANSACTION_STATUS.Confirmed
             : TRANSACTION_STATUS.Failed,
         });
-        if (!approveTxReceipt.status) throw new Error('Failed to aprove deposit');
+        if (!approveTxReceipt.status) throw new Error('Failed to approve fee');
       }
-      toast('Challenging Quest...');
+      if (+claim.container!.config.challengeDeposit.amount) {
+        const pendingMessage = feeAndDepositSameToken
+          ? 'Approving challenge fee + deposit...'
+          : 'Approving challenge deposit...';
+        if (feeAndDepositSameToken) {
+          const approvingAmount = BigNumber.from(claim.container!.config.challengeDeposit);
+          approvingAmount.add(BigNumber.from(challengeFee?.token?.amount ?? '0'));
+          claim.container!.config.challengeDeposit.amount = approvingAmount.toString();
+        }
+        toast(pendingMessage);
+        const approveTxReceipt = await QuestService.approveTokenAmount(
+          erc20Contract,
+          governQueueAddress,
+          claim.container!.config.challengeDeposit,
+          (tx) => {
+            pushTransaction({
+              hash: tx,
+              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
+              pendingMessage,
+              status: TRANSACTION_STATUS.Pending,
+            });
+          },
+        );
+        updateTransactionStatus({
+          hash: approveTxReceipt.transactionHash!,
+          status: approveTxReceipt.status
+            ? TRANSACTION_STATUS.Confirmed
+            : TRANSACTION_STATUS.Failed,
+        });
+        if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
+      }
+      const pendingMessage = 'Challenging Quest...';
+      toast(pendingMessage);
       const challengeTxReceipt = await QuestService.challengeQuestClaim(
         governQueueContract,
         {
@@ -134,7 +177,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           pushTransaction({
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
-            pendingMessage: 'Challenging Quest...',
+            pendingMessage,
             status: TRANSACTION_STATUS.Pending,
           });
         },
@@ -197,12 +240,22 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       }
       buttons={[
         <AmountFieldInputFormik
+          key="challengeFee"
+          id="challengeFee"
+          label="Challenge fee"
+          tooltip="Challenge fee"
+          tooltipDetail="This is the challenge cost defined by Celeste."
+          isLoading={loading || challengeFee === undefined}
+          value={challengeFee}
+          compact
+        />,
+        <AmountFieldInputFormik
           key="challengeDeposit"
           id="challengeDeposit"
           label="Challenge Deposit"
-          tooltip="Amount"
+          tooltip="Challenge Deposit"
           tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
-          isLoading={loading}
+          isLoading={loading || challengeDeposit === undefined}
           value={challengeDeposit}
           compact
         />,

@@ -52,12 +52,13 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const reclaimFundTx = async () => {
     try {
       setLoading(true);
-      toast('Reclaiming unused fund...');
+      const pendingMessage = 'Reclaiming unused fund...';
+      toast(pendingMessage);
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(questContract!, (tx) => {
         pushTransaction({
           hash: tx,
           estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
-          pendingMessage: 'Reclaiming unused fund...',
+          pendingMessage,
           status: TRANSACTION_STATUS.Pending,
         });
       });

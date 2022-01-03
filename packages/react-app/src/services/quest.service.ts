@@ -24,6 +24,7 @@ import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.serv
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
+import { CelesteCourtConfigQuery } from '../queries/celeste-config-entity.query';
 
 let questList: QuestModel[] = [];
 
@@ -56,14 +57,14 @@ function mapQuestList(quests: any[]): QuestModel[] {
 }
 
 async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
-  const { governSubgraph, governQueue, defaultToken, nativeToken } = getNetwork();
+  const { governSubgraph, governQueueAddress } = getNetwork();
 
   const result = await request(governSubgraph, GovernQueueEntityQuery, {
-    ID: governQueue.toLowerCase(),
+    ID: governQueueAddress.toLowerCase(),
   });
 
   if (!result?.governQueue)
-    throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
+    throw new Error(`GovernQueue does not exist at this address : ${governQueueAddress}`);
   const { config, nonce } = result.governQueue;
   return (
     result.governQueue && {
@@ -79,12 +80,12 @@ async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel 
 }
 
 async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
-  const { governSubgraph, governQueue } = getNetwork();
+  const { governSubgraph, governQueueAddress } = getNetwork();
   const result = await request(governSubgraph, GovernQueueEntityContainersQuery, {
-    ID: governQueue.toLowerCase(),
+    ID: governQueueAddress.toLowerCase(),
   });
   if (!result?.governQueue)
-    throw new Error(`GovernQueue does not exist at this address : ${governQueue}`);
+    throw new Error(`GovernQueue does not exist at this address : ${governQueueAddress}`);
 
   const containers = result.governQueue.containers.map(
     (x: any) =>
@@ -124,7 +125,7 @@ function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
   return getQuestContractInterface().encodeFunctionData('claim', [
     evidenceIpfsHash,
     claimData.playerAddress,
-    claimData.claimedAmount.parsedAmount,
+    toBigNumber(claimData.claimedAmount),
   ]);
 }
 
@@ -196,7 +197,7 @@ export async function fetchQuest(questAddress: string) {
 }
 
 export async function computeScheduleContainer(claimData: ClaimModel): Promise<ContainerModel> {
-  const { govern } = getNetwork();
+  const { governAddress: govern } = getNetwork();
 
   const governQueueResult = await fetchGovernQueue();
 
@@ -252,7 +253,10 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);
         const evidence = await getObjectFromIpfs(evidenceIpfsHash);
         return {
-          claimedAmount: { token: quest.rewardToken, parsedAmount: +claimAmount },
+          claimedAmount: {
+            token: quest.rewardToken,
+            parsedAmount: fromBigNumber(BigNumber.from(claimAmount), quest.rewardToken?.decimals),
+          },
           evidence,
           playerAddress,
           questAddress: quest.address,
@@ -282,6 +286,17 @@ export async function getClaimExecutableTime(questAddress: string, playerAddress
   return container && +container.payload.executionTime * 1000; // Convert Sec to MS
 }
 
+export async function fetchChallengeFee(): Promise<TokenAmountModel> {
+  const { celesteSubgraph } = getNetwork();
+  const result = await request(celesteSubgraph, CelesteCourtConfigQuery, {
+    first: 1,
+    skip: 0,
+  });
+  console.log({ result });
+  const { feeToken, settleFee } = result.courtConfigs[0];
+  return toTokenAmountModel({ ...feeToken, amount: settleFee });
+}
+
 // #endregion
 
 // #region Contracts transactions
@@ -297,13 +312,14 @@ export async function saveQuest(
   if (address) throw Error('Saving existing quest is not yet implemented');
   if (!questFactoryContract?.address)
     throw Error('ContractError : <questFactoryContract> has not been set properly');
+  const { defaultToken } = getNetwork();
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
   const ipfsHash = await pushObjectToIpfs(data.description ?? '');
   const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
   const tx = await questFactoryContract.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    TOKENS.HoneyTest.token,
+    defaultToken,
     questExpireTimeUtcSec,
     fallbackAddress,
   );

@@ -158,9 +158,9 @@ export function toBigNumber(amount: TokenAmountModel) {
   return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
 
-export function fromBigNumber(bigNumber: BigNumber | string, decimals: number): number {
+export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | undefined): number {
   if (typeof bigNumber === 'string') bigNumber = BigNumber.from(bigNumber);
-  return roundNumber(+ethers.utils.formatUnits(bigNumber, decimals), 3);
+  return roundNumber(+ethers.utils.formatUnits(bigNumber, decimals ?? 18), 3);
 }
 
 export function getDefaultProvider() {

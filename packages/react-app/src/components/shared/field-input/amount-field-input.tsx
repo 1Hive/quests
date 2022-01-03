@@ -3,7 +3,6 @@ import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { DEFAULT_AMOUNT } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/css.util';
@@ -52,7 +51,7 @@ function AmountFieldInput({
   isLoading = false,
   label = '',
   placeHolder = '',
-  value = DEFAULT_AMOUNT,
+  value,
   onChange = noop,
   wide = false,
   formik,
@@ -61,17 +60,16 @@ function AmountFieldInput({
   compact = false,
 }: Props) {
   const { defaultToken } = getNetwork();
-  const [amount, setAmount] = useState(value.parsedAmount);
+  const [amount, setAmount] = useState(value?.parsedAmount ?? 0);
   useEffect(() => {
-    setAmount(value.parsedAmount);
-  }, [value.parsedAmount]);
-
-  if (!value.token) value.token = defaultToken;
+    setAmount(value?.parsedAmount ?? 0);
+    if (value && !value.token) value.token = defaultToken;
+  }, [value]);
 
   const onAmountChange = (e: any) => {
     const newValue = +e.target.value;
     setAmount(newValue);
-    value = { ...value, parsedAmount: newValue };
+    value = { token: value!.token, parsedAmount: newValue };
     if (formik) formik.setFieldValue(id, value);
     else onChange(value);
   };
@@ -105,7 +103,7 @@ function AmountFieldInput({
               amount
             )}
           </AmountStyled>
-          {value.token.symbol && (
+          {value?.token.symbol && (
             <TokenBadgeStyled
               symbol={value.token.symbol}
               address={value.token.token}

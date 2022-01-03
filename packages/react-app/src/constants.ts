@@ -1,5 +1,4 @@
 import { FilterModel } from './models/filter.model';
-import { TokenAmountModel } from './models/token-amount.model';
 import { TokenModel } from './models/token.model';
 
 export const PCT_BASE = BigInt(1e18);
@@ -125,11 +124,6 @@ export const ENUM = {
 
 // Default values
 
-export const DEFAULT_AMOUNT = {
-  parsedAmount: 0,
-  token: undefined,
-} as TokenAmountModel;
-
 export const DEFAULT_PAGE = PAGES.List;
 
 export const DEFAULT_FILTER = {
@@ -137,7 +131,7 @@ export const DEFAULT_FILTER = {
   title: '',
   description: '',
   expire: { start: undefined, end: undefined },
-  bounty: DEFAULT_AMOUNT,
+  bounty: undefined,
 } as FilterModel;
 
 export const GQL_MAX_INT = 2 ** 31 - 1;
@@ -145,7 +139,6 @@ export const GQL_MAX_INT = 2 ** 31 - 1;
 export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
 
 export const DEAULTS = {
-  DEFAULT_AMOUNT,
   DEFAULT_PAGE,
   DEFAULT_FILTER,
   GQL_MAX_INT,

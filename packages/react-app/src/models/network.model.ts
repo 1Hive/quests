@@ -8,10 +8,11 @@ export type NetworkModel = {
   defaultEthNode: string;
   questSubgraph: string;
   governSubgraph: string;
-  questFactory: string;
-  govern: string;
-  governQueue: string;
-  celeste: string;
+  celesteSubgraph: string;
+  questFactoryAddress: string;
+  governAddress: string;
+  governQueueAddress: string;
+  celesteAddress: string;
   defaultToken: TokenModel;
   nativeToken: TokenModel;
   ensRegistry?: string;

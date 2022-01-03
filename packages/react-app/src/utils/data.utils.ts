@@ -13,7 +13,7 @@ export async function convertTo(from: TokenAmountModel, toToken: TokenModel) {
   }
   const res = await fetch(
     `https://coingecko.p.rapidapi.com/simple/price?ids=${[
-      from.token!.symbol,
+      from.token.symbol,
       toToken.symbol,
     ]}&vs_currencies=usd`,
     {

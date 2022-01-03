@@ -83,7 +83,8 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const claimTx = async () => {
     try {
       setLoading(true);
-      toast('Sending claimed amount to your wallet...');
+      const pendingMessage = 'Sending claimed amount to your wallet...';
+      toast(pendingMessage);
       const txReceipt: ethers.ContractReceipt = await QuestService.executeQuestClaim(
         governQueueContract,
         claim,
@@ -91,7 +92,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
           pushTransaction({
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimExecuting,
-            pendingMessage: 'Sending claimed amount to your wallet...',
+            pendingMessage,
             status: TRANSACTION_STATUS.Pending,
           }),
       );

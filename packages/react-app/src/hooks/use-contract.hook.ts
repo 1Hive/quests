@@ -105,8 +105,8 @@ export function useFactoryContract() {
 }
 
 export function useGovernQueueContract(): Contract | ContractError {
-  const { governQueue } = getNetwork();
-  return useContract('GovernQueue', governQueue, true);
+  const { governQueueAddress } = getNetwork();
+  return useContract('GovernQueue', governQueueAddress, true);
 }
 
 export function useERC20Contract(
