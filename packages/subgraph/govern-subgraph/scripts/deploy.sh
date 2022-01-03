@@ -7,6 +7,7 @@ set -o errexit
 USER=$1
 NAME=$2
 NETWORK=$3
+GRAPHKEY=$4
 
 # Build manifest
 echo ''
@@ -19,9 +20,9 @@ echo '> Generating types'
 graph codegen
 
 # Prepare subgraph name
-FULLNAME=$USER/aragon-$NAME-$NETWORK
+FULLNAME=$USER/$NAME
 if [ "$STAGING" ]; then
-  FULLNAME=$FULLNAME-staging
+    FULLNAME=$FULLNAME-staging
 fi
 echo ''
 echo '> Deploying subgraph: '$FULLNAME
@@ -29,13 +30,13 @@ echo '> Deploying subgraph: '$FULLNAME
 # Deploy subgraph
 if [ "$LOCAL" ]; then
     graph deploy $FULLNAME \
-        --ipfs http://localhost:5001 \
-        --node http://localhost:8020
+    --ipfs http://localhost:5001 \
+    --node http://localhost:8020 || $SHELL
 else
     graph deploy $FULLNAME \
-        --ipfs https://api.thegraph.com/ipfs/ \
-        --node https://api.thegraph.com/deploy/ \
-        --access-token $GRAPHKEY > deploy-output.txt
+    --ipfs https://api.thegraph.com/ipfs/ \
+    --node https://api.thegraph.com/deploy/ \
+    --access-token $GRAPHKEY >deploy-output.txt || $SHELL
 
     SUBGRAPH_ID=$(grep "Build completed:" deploy-output.txt | grep -oE "Qm[a-zA-Z0-9]{44}")
     rm deploy-output.txt

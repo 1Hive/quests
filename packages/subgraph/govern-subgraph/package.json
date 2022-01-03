@@ -9,14 +9,14 @@
     "manifest-rinkeby-staging": "STAGING=true scripts/build-manifest.sh rinkeby",
     "manifest-xdai": "scripts/build-manifest.sh xdai",
     "manifest-xdai-staging": "STAGING=true scripts/build-manifest.sh xdai",
-    "deploy-mainnet": "scripts/deploy.sh corantin govern-1hive-rinkeby mainnet",
-    "deploy-mainnet-staging": "STAGING=true scripts/deploy.sh corantin govern-1hive-rinkeby mainnet",
-    "deploy-rinkeby": "graph deploy corantin --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token $GRAPHKEY",
-    "deploy-rinkeby-staging": "STAGING=true graph deploy corantin --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token $GRAPHKEY",
-    "deploy-xdai": "scripts/deploy.sh corantin govern-1hive-rinkeby xdai",
-    "deploy-xdai-staging": "STAGING=true scripts/deploy.sh corantin govern-1hive-rinkeby xdai",
-    "deploy-local": "LOCAL=true scripts/deploy.sh corantin govern-1hive-rinkeby local",
-    "create-local": "graph create corantin/govern-1hive-rinkeby --node http://localhost:8020"
+    "deploy-mainnet": "scripts/deploy.sh corantin govern-1hive-mainnet mainnet <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-mainnet-staging": "STAGING=true scripts/deploy.sh corantin govern-1hive-mainnet mainnet <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-rinkeby": "scripts/deploy.sh corantin govern-1hive-rinkeby rinkeby <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-rinkeby-staging": "STAGING=truecripts/deploy.sh corantin govern-1hive-rinkeby rinkeby <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-xdai": "scripts/deploy.sh corantin govern-1hive-xdai xdai <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-xdai-staging": "STAGING=true scripts/deploy.sh corantin govern-1hive-xdai xdai <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-local": "LOCAL=true scripts/deploy.sh corantin govern-1hive-local local",
+    "create-local": "graph create corantin/govern-1hive-local --node http://localhost:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.19.0",
