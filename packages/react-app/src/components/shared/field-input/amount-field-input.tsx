@@ -6,6 +6,7 @@ import Skeleton from 'react-loading-skeleton';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/css.util';
+import { floorNumber } from 'src/utils/math.utils';
 import styled from 'styled-components';
 import { HelpIcon } from './icon-tooltip';
 
@@ -43,6 +44,7 @@ type Props = {
   compact?: boolean;
   tooltip?: string;
   tooltipDetail?: ReactNode;
+  maxDecimals?: number;
 };
 
 function AmountFieldInput({
@@ -58,9 +60,19 @@ function AmountFieldInput({
   tooltip,
   tooltipDetail,
   compact = false,
+  maxDecimals,
 }: Props) {
   const { defaultToken } = getNetwork();
   const [amount, setAmount] = useState(value?.parsedAmount ?? 0);
+  const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
+
+  useEffect(() => {
+    if (!isEdit) {
+      const decimalPos = maxDecimals ? 0 : Math.floor(Math.log10(0.0000002)) * -1;
+      if (decimalPos > 0) setDecimalsCount(maxDecimals ?? decimalPos);
+    }
+  }, [maxDecimals, isEdit]);
+
   useEffect(() => {
     setAmount(value?.parsedAmount ?? 0);
     if (value && !value.token) value.token = defaultToken;
@@ -100,7 +112,7 @@ function AmountFieldInput({
                 value={amount}
               />
             ) : (
-              amount
+              floorNumber(amount, decimalsCount)
             )}
           </AmountStyled>
           {value?.token.symbol && (

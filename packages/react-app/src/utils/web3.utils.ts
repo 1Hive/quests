@@ -10,7 +10,6 @@ import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { wrapError } from './errors.util';
 import { Logger } from './logger';
-import { roundNumber } from './math.utils';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
 
@@ -160,7 +159,7 @@ export function toBigNumber(amount: TokenAmountModel) {
 
 export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | undefined): number {
   if (typeof bigNumber === 'string') bigNumber = BigNumber.from(bigNumber);
-  return roundNumber(+ethers.utils.formatUnits(bigNumber, decimals ?? 18), 3);
+  return +ethers.utils.formatUnits(bigNumber, decimals ?? 18);
 }
 
 export function getDefaultProvider() {

@@ -138,9 +138,15 @@ export const GQL_MAX_INT = 2 ** 31 - 1;
 
 export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
 
+export const DEFAULT_GAZ = {
+  gasLimit: 12e6,
+  gasPrice: 2e9,
+};
+
 export const DEAULTS = {
   DEFAULT_PAGE,
   DEFAULT_FILTER,
   GQL_MAX_INT,
   DEAULT_CLAIM_EXECUTION_DELAY_MS,
+  DEFAULT_GAZ,
 };

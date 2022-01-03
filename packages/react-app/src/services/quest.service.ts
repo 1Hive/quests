@@ -18,7 +18,7 @@ import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { ContractError } from 'src/models/contract-error';
 import { number } from 'prop-types';
-import { CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
+import { CLAIM_STATUS, DEFAULT_GAZ, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
@@ -307,7 +307,7 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel> {
           symbol: 'HNYT',
         },
         id: '0x35e7433141d5f7f2eb7081186f5284dcdd2ccace',
-        settleFee: '1000000000000000000000000',
+        settleFee: '36231884057971',
       },
     ],
   };
@@ -385,10 +385,7 @@ export async function executeQuestClaim(
   Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
   const tx = await governQueueContract.execute(
     { config: claimData.container!.config, payload: claimData.container!.payload },
-    {
-      gasLimit: 12e6,
-      gasPrice: 2e9,
-    },
+    DEFAULT_GAZ,
   );
   return handleTransaction(tx, onTx);
 }
@@ -406,10 +403,7 @@ export async function challengeQuestClaim(
   const tx = await governQueueContract.functions.challenge(
     { config: challenge.claim.container!.config, payload: challenge.claim.container!.payload },
     challengeReasonIpfs,
-    {
-      gasLimit: 12e6,
-      gasPrice: 2e9,
-    },
+    DEFAULT_GAZ,
   );
   return handleTransaction(tx, onTx);
 }
@@ -435,10 +429,7 @@ export async function approveTokenAmount(
     throw erc20Contract;
   }
   Logger.debug('Approving token amount ...', { tokenAmount, fromAddress: toAddress });
-  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
-    gasLimit: 12e6,
-    gasPrice: 2e9,
-  });
+  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, DEFAULT_GAZ);
   return handleTransaction(tx, onTx);
 }
 
