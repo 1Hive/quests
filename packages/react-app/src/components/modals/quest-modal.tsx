@@ -2,7 +2,7 @@ import { Button, IconPlus } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { FaSave } from 'react-icons/fa';
-import { QUEST_MODE } from 'src/constants';
+import { ENUM_QUEST_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
@@ -26,7 +26,7 @@ type Props = {
 export default function QuestModal({
   data = undefined,
   onClose = noop,
-  questMode = QUEST_MODE.ReadSummary,
+  questMode = ENUM_QUEST_MODE.ReadSummary,
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
@@ -46,15 +46,15 @@ export default function QuestModal({
 
   useEffect(() => {
     switch (questMode) {
-      case QUEST_MODE.Create:
+      case ENUM_QUEST_MODE.Create:
         setButtonLabel('Create quest');
         break;
 
-      case QUEST_MODE.Update:
+      case ENUM_QUEST_MODE.Update:
         setButtonLabel('Update quest');
         break;
 
-      case QUEST_MODE.ReadDetail:
+      case ENUM_QUEST_MODE.ReadDetail:
         setButtonLabel('Details');
         break;
 
@@ -75,7 +75,7 @@ export default function QuestModal({
         />
       }
       buttons={[
-        (questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update) && (
+        (questMode === ENUM_QUEST_MODE.Create || questMode === ENUM_QUEST_MODE.Update) && (
           <QuestActionButtonStyled
             key="btn-save"
             label="Save"

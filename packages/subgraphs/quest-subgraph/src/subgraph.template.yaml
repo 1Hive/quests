@@ -6,7 +6,7 @@ dataSources:
     name: QuestFactory
     network: {{network}}
     source:
-      address: "{{contractAddress}}"
+      address: "{{questFactoryAddress}}"
       abi: QuestFactory
       startBlock: {{startBlock}}
     mapping:

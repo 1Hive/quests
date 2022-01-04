@@ -4,7 +4,13 @@ import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { ENUM, PAGES, QUEST_MODE, QUEST_STATE, TRANSACTION_STATUS } from 'src/constants';
+import {
+  ENUM,
+  ENUM_PAGES,
+  ENUM_QUEST_MODE,
+  ENUM_QUEST_STATE,
+  ENUM_TRANSACTION_STATUS,
+} from 'src/constants';
 import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -24,11 +30,11 @@ import DateFieldInput from './field-input/date-field-input';
 import { Outset } from './utils/spacer-util';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
-import IdentityBadge from './identity-badge';
 import ClaimList from './claim-list';
 import { processQuestState } from '../../services/state-machine';
 import { StateTag } from '../state-tag';
 import ExecuteClaimModal from '../modals/execute-claim-modal';
+import { AddressFieldInput } from './field-input/address-field-input';
 // #region StyledComponents
 
 const LinkStyled = styled(Link)`
@@ -66,6 +72,13 @@ const NoPaddingSplitStyled = styled(Split)`
   padding-bottom: 0 !important;
 `;
 
+const FallbackWrapperStyled = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 // #endregion
 
 type Props = {
@@ -78,14 +91,11 @@ type Props = {
 
 export default function Quest({
   data = {
-    title: '',
-    description: '',
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
-    state: QUEST_STATE.Draft,
-    fallbackAddress: '',
+    state: ENUM_QUEST_STATE.Draft,
   },
   isLoading = false,
-  questMode = QUEST_MODE.ReadDetail,
+  questMode = ENUM_QUEST_MODE.ReadDetail,
   onSave = noop,
   css,
 }: Props) {
@@ -107,11 +117,11 @@ export default function Quest({
   const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | undefined>();
 
   useEffect(() => {
-    setIsEdit(questMode === QUEST_MODE.Create || questMode === QUEST_MODE.Update);
+    setIsEdit(questMode === ENUM_QUEST_MODE.Create || questMode === ENUM_QUEST_MODE.Update);
 
     const getClaimDeposit = async () => {
       // Don't show deposit of expired
-      if (data.state === QUEST_STATE.Archived || data.state === QUEST_STATE.Expired)
+      if (data.state === ENUM_QUEST_STATE.Archived || data.state === ENUM_QUEST_STATE.Expired)
         setClaimDeposit(null);
       else
         try {
@@ -128,7 +138,7 @@ export default function Quest({
     };
     const getBalanceOfQuest = async (address: string) => {
       // Don't show empty bounty
-      if (data.state === QUEST_STATE.Archived) setBounty(null);
+      if (data.state === ENUM_QUEST_STATE.Archived) setBounty(null);
       else
         try {
           const result = await getBalanceOf(defaultToken, address);
@@ -142,14 +152,17 @@ export default function Quest({
 
     if (data.address) getBalanceOfQuest(data.address);
 
-    if (questMode === QUEST_MODE.ReadDetail) {
+    if (questMode === ENUM_QUEST_MODE.ReadDetail) {
       fetchClaims();
       getClaimDeposit();
     }
   }, [questMode]);
 
   useEffect(() => {
-    if (claims) setCurrentPlayerClaim(claims.find((x) => x.playerAddress === wallet.account));
+    if (wallet.account) {
+      if (claims) setCurrentPlayerClaim(claims.find((x) => x.playerAddress === wallet.account));
+      // values.fallbackAddress = wallet.account;
+    }
   }, [claims, wallet.account]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
@@ -188,17 +201,17 @@ export default function Quest({
           (tx) => {
             pushTransaction({
               hash: tx,
-              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.QuestCreating, // 15 sec
+              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating, // 15 sec
               pendingMessage,
-              status: TRANSACTION_STATUS.Pending,
+              status: ENUM_TRANSACTION_STATUS.Pending,
             });
-            onSave();
           },
         );
         updateTransactionStatus({
           hash: txReceiptSaveQuest.transactionHash,
-          status: TRANSACTION_STATUS.Confirmed,
+          status: ENUM_TRANSACTION_STATUS.Confirmed,
         });
+        onSave();
         if (txReceiptSaveQuest.status) {
           if (!values.bounty?.parsedAmount) toast('Operation succeed');
           else {
@@ -212,15 +225,15 @@ export default function Quest({
               (tx) => {
                 pushTransaction({
                   hash: tx,
-                  estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.QuestFunding,
+                  estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
                   pendingMessage: 'Quest funding...',
-                  status: TRANSACTION_STATUS.Pending,
+                  status: ENUM_TRANSACTION_STATUS.Pending,
                 });
               },
             );
             updateTransactionStatus({
               hash: txReceiptFundQuest.transactionHash,
-              status: TRANSACTION_STATUS.Confirmed,
+              status: ENUM_TRANSACTION_STATUS.Confirmed,
             });
             if (txReceiptFundQuest) toast('Operation succeed');
           }
@@ -294,37 +307,34 @@ export default function Quest({
                     multiple times, a range with reference to what determines what amount, the
                     contracts balance at time of claim.
                     {/* contracts balance at time of claim. This shouldn’t be a percentage of the
-                    contracts balance, as claims are not guaranteed to happen in order as they
-                    can be cancelled, messing up the valid claim amounts. */}
+                        contracts balance, as claims are not guaranteed to happen in order as they
+                        can be cancelled, messing up the valid claim amounts. */}
                   </div>
                 }
                 onChange={handleChange}
                 wide
                 multiline
                 isMarkDown
-                maxLine={questMode === QUEST_MODE.ReadSummary ? 10 : undefined}
+                maxLine={questMode === ENUM_QUEST_MODE.ReadSummary ? 10 : undefined}
                 ellipsis={
-                  <LinkStyled to={`/${PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
+                  <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
                 }
               />
               {isEdit && (
-                <>
-                  <TextFieldInput
-                    id="fallbackAddress"
-                    label="Funds fallback address"
-                    value={values.fallbackAddress}
-                    isLoading={loading}
-                    tooltip="Fallback Address"
-                    tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                    isEdit
-                    placeHolder="Funds fallback address"
-                    onChange={handleChange}
-                    wide
-                  />
-                  {!loading && values.fallbackAddress && (
-                    <IdentityBadge entity={values.fallbackAddress} badgeOnly />
-                  )}
-                </>
+                <FallbackWrapperStyled>
+                  <div style={{ width: '80%' }}>
+                    <AddressFieldInput
+                      id="fallbackAddress"
+                      label="Funds fallback address"
+                      value={values.fallbackAddress}
+                      isLoading={loading}
+                      tooltip="Fallback Address"
+                      tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                      isEdit
+                      onChange={handleChange}
+                    />
+                  </div>
+                </FallbackWrapperStyled>
               )}
             </Outset>
           </Outset>
@@ -334,7 +344,7 @@ export default function Quest({
             {bounty !== null && (
               <AmountFieldInputFormik
                 id="bounty"
-                label={questMode === QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
+                label={questMode === ENUM_QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
                 isEdit={isEdit}
                 tooltip="Bounty"
                 tooltipDetail={
@@ -347,7 +357,7 @@ export default function Quest({
                 formik={formRef}
               />
             )}
-            {questMode === QUEST_MODE.ReadDetail && claimDeposit !== null && (
+            {questMode === ENUM_QUEST_MODE.ReadDetail && claimDeposit !== null && (
               <AmountFieldInput
                 id="claimDeposit"
                 label="Claim deposit"
@@ -372,7 +382,7 @@ export default function Quest({
       />
       {!loading && !isEdit && data.address && (
         <>
-          {questMode === QUEST_MODE.ReadDetail && claims && challengeDeposit && (
+          {questMode === ENUM_QUEST_MODE.ReadDetail && claims && challengeDeposit && (
             <ClaimList
               claims={claims}
               questTotalBounty={bounty}
@@ -380,16 +390,16 @@ export default function Quest({
             />
           )}
           <QuestFooterStyled>
-            {questMode !== QUEST_MODE.ReadDetail && (
-              <LinkStyled to={`/${PAGES.Detail}?id=${values.address}`}>
+            {questMode !== ENUM_QUEST_MODE.ReadDetail && (
+              <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
                 <Button icon={<IconPlus />} label="Details" wide mode="strong" />
               </LinkStyled>
             )}
-            {questMode !== QUEST_MODE.ReadSummary &&
+            {questMode !== ENUM_QUEST_MODE.ReadSummary &&
               values.address &&
               wallet.account &&
               bounty &&
-              (values.state === QUEST_STATE.Active ? (
+              (values.state === ENUM_QUEST_STATE.Active ? (
                 <>
                   <FundModal questAddress={values.address} />
                   {currentPlayerClaim ? (
@@ -415,26 +425,30 @@ export default function Quest({
   );
 
   return (
-    <CardStyled style={css} isSummary={questMode === QUEST_MODE.ReadSummary} id={data.address}>
+    <CardStyled style={css} isSummary={questMode === ENUM_QUEST_MODE.ReadSummary} id={data.address}>
       {!loading && <StateTag state={data.state} />}
-      <Formik
-        initialValues={{ fallbackAddress: wallet.account, ...data }}
-        onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
-      >
-        {({ values, handleChange, handleSubmit }) =>
-          isEdit ? (
-            <FormStyled
-              onSubmit={handleSubmit}
-              ref={formRef}
-              id={`form-quest-form-${data.address ?? 'new'}`}
-            >
-              {questContent(values, handleChange)}
-            </FormStyled>
-          ) : (
-            questContent(values, handleChange)
-          )
-        }
-      </Formik>
+      {wallet.account && (
+        <Formik
+          initialValues={
+            { ...data, fallbackAddress: data.fallbackAddress ?? wallet.account } as QuestModel
+          }
+          onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
+        >
+          {({ values, handleChange, handleSubmit }) =>
+            isEdit ? (
+              <FormStyled
+                onSubmit={handleSubmit}
+                ref={formRef}
+                id={`form-quest-form-${data.address ?? 'new'}`}
+              >
+                {questContent(values, handleChange)}
+              </FormStyled>
+            ) : (
+              questContent(values, handleChange)
+            )
+          }
+        </Formik>
+      )}
     </CardStyled>
   );
 }

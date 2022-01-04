@@ -16,4 +16,9 @@ export type NetworkModel = {
   defaultToken: TokenModel;
   nativeToken: TokenModel;
   ensRegistry?: string;
+  isTestNetwork: boolean;
+  defaultGazFees: {
+    gasLimit: number;
+    gasPrice: number;
+  };
 };

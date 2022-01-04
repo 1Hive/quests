@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PAGES, QUEST_MODE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_MODE } from 'src/constants';
 import { useQuery } from 'src/hooks/use-query-params';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -14,7 +14,7 @@ export default function QuestDetail() {
   const [quest, setQuest] = useState<QuestModel>();
 
   useEffect(() => {
-    setPage(PAGES.Detail);
+    setPage(ENUM_PAGES.Detail);
     const fetchQuestAsync = async (questAddress: string) => {
       const q = await fetchQuest(questAddress);
       if (!q) toast('Failed to get quest, verify address');
@@ -26,7 +26,7 @@ export default function QuestDetail() {
   return (
     <>
       {quest ? (
-        <Quest data={quest} questMode={QUEST_MODE.ReadDetail} />
+        <Quest data={quest} questMode={ENUM_QUEST_MODE.ReadDetail} />
       ) : (
         <>
           <Quest isLoading />

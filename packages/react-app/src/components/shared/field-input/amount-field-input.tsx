@@ -7,6 +7,7 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/css.util';
 import { floorNumber } from 'src/utils/math.utils';
+import { toBigNumber } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { HelpIcon } from './icon-tooltip';
 
@@ -81,7 +82,8 @@ function AmountFieldInput({
   const onAmountChange = (e: any) => {
     const newValue = +e.target.value;
     setAmount(newValue);
-    value = { token: value!.token, parsedAmount: newValue };
+    value = { token: value?.token ?? defaultToken, parsedAmount: newValue };
+    value.token.amount = toBigNumber(value).toString();
     if (formik) formik.setFieldValue(id, value);
     else onChange(value);
   };

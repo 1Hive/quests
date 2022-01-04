@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
-import { ESTIMATED_TX_TIME_MS, TRANSACTION_STATUS } from 'src/constants';
+import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
 import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
@@ -54,20 +54,22 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
         (txHash) => {
           pushTransaction({
             hash: txHash,
-            estimatedEnd: Date.now() + ESTIMATED_TX_TIME_MS.QuestFunding,
+            estimatedEnd: Date.now() + ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
             pendingMessage,
-            status: TRANSACTION_STATUS.Pending,
+            status: ENUM_TRANSACTION_STATUS.Pending,
           });
         },
       );
       updateTransactionStatus({
         hash: txReceipt.transactionHash!,
-        status: txReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+        status: txReceipt.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
       });
       onModalClose();
       if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
+      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50

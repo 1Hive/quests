@@ -5,7 +5,7 @@ set -o errexit
 
 # Court known addresses
 court_staging=
-court_rinkeby=0x35e7433141D5f7f2EB7081186f5284dCDD2ccacE
+court_rinkeby=0x949f75Ab8362B4e53967742dC93CC289eFb43f6D
 court_xdai=0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85
 court_polygon=0xf0C8376065fadfACB706caFbaaC96B321069C015
 

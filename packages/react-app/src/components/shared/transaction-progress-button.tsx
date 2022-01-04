@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { TransactionModel } from 'src/models/transaction.model';
 import styled from 'styled-components';
-import { ENUM, TRANSACTION_STATUS } from 'src/constants';
+import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { Outset } from './utils/spacer-util';
 
 const NotificationButtonStyled = styled(Button)`
@@ -67,13 +67,13 @@ export function TransactionProgressButton() {
       if (newTransaction) {
         setTxList(
           txList.concat({
-            status: TRANSACTION_STATUS.Pending,
+            status: ENUM_TRANSACTION_STATUS.Pending,
             progress: 0,
-            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.Default,
+            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.Default,
             ...newTransaction,
           }),
         );
-        if (newTransaction.status === TRANSACTION_STATUS.Pending) setTxOpened(true);
+        if (newTransaction.status === ENUM_TRANSACTION_STATUS.Pending) setTxOpened(true);
 
         if (!currentTx) nextTx(newTransaction);
       }
@@ -83,7 +83,7 @@ export function TransactionProgressButton() {
 
   useEffect(() => {
     if (updatedTransactionStatus && txList.find((x) => x.hash === updatedTransactionStatus.hash)) {
-      if (updatedTransactionStatus.status !== TRANSACTION_STATUS.Pending) {
+      if (updatedTransactionStatus.status !== ENUM_TRANSACTION_STATUS.Pending) {
         setTxList(txList.filter((x: TransactionModel) => x.hash !== updatedTransactionStatus.hash));
       }
       if (updatedTransactionStatus.hash === currentTx?.hash) {
@@ -91,7 +91,8 @@ export function TransactionProgressButton() {
         nextTx(
           txList.find(
             (x: TransactionModel) =>
-              x.hash !== updatedTransactionStatus.hash && x.status === TRANSACTION_STATUS.Pending,
+              x.hash !== updatedTransactionStatus.hash &&
+              x.status === ENUM_TRANSACTION_STATUS.Pending,
           ),
         );
       }
@@ -99,7 +100,7 @@ export function TransactionProgressButton() {
   }, [updatedTransactionStatus]);
 
   useEffect(() => {
-    const count = txList.filter((x) => x.status === TRANSACTION_STATUS.Pending).length;
+    const count = txList.filter((x) => x.status === ENUM_TRANSACTION_STATUS.Pending).length;
     setNotifCount(count);
     if (count === 0) {
       setTxOpened(false);
@@ -108,8 +109,8 @@ export function TransactionProgressButton() {
   }, [txList]);
 
   const onClose = () => {
-    if (currentTx?.status !== TRANSACTION_STATUS.Pending)
-      nextTx(txList.find((x: TransactionModel) => x.status === TRANSACTION_STATUS.Pending));
+    if (currentTx?.status !== ENUM_TRANSACTION_STATUS.Pending)
+      nextTx(txList.find((x: TransactionModel) => x.status === ENUM_TRANSACTION_STATUS.Pending));
     setTxOpened(false);
   };
 
@@ -135,7 +136,7 @@ export function TransactionProgressButton() {
             endTime={new Date(currentTx.estimatedEnd ?? Date.now())}
             slow={slow}
           />
-          {currentTx.status === TRANSACTION_STATUS.Pending && (
+          {currentTx.status === ENUM_TRANSACTION_STATUS.Pending && (
             <SyncIndicator>{currentTx.pendingMessage}</SyncIndicator>
           )}
         </>

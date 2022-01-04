@@ -6,15 +6,20 @@ import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
-import { CLAIM_STATUS, ENUM, TRANSACTION_STATUS } from 'src/constants';
+import { ENUM_CLAIM_STATUS, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { BigNumber } from 'ethers';
+import { useWallet } from 'src/contexts/wallet.context';
 import ModalBase from './modal-base';
-import { useERC20Contract, useGovernQueueContract } from '../../hooks/use-contract.hook';
+import {
+  useCelesteContract,
+  useERC20Contract,
+  useGovernQueueContract,
+} from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
@@ -66,14 +71,16 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const governQueueContract = useGovernQueueContract();
   const erc20DepositContract = useERC20Contract(challengeDeposit.token);
   const erc20FeeContract = useERC20Contract(challengeFee?.token);
+  const celesteContract = useCelesteContract();
+  const wallet = useWallet();
 
   useEffect(() => {
     const fetchFee = async () => {
-      const feeAmount = await QuestService.fetchChallengeFee();
+      const feeAmount = await QuestService.fetchChallengeFee(celesteContract);
       setChallengeFee(feeAmount);
     };
-    fetchFee();
-  }, []);
+    if (celesteContract && wallet.account) fetchFee();
+  }, [wallet.account]);
 
   useEffect(() => {
     let handle: any;
@@ -94,7 +101,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   }, [claim.executionTimeMs]);
 
   useEffect(() => {
-    if (claim?.state === CLAIM_STATUS.Challenged) setOpenButtonLabel('Already challenged');
+    if (claim?.state === ENUM_CLAIM_STATUS.Challenged) setOpenButtonLabel('Already challenged');
     else if (challengeTimeout) setOpenButtonLabel('Challenge period over');
     else setOpenButtonLabel('Challenge');
   }, [claim.state, challengeTimeout]);
@@ -104,7 +111,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     onClose();
   };
 
-  const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
+  const challengeTx = async (values: ChallengeModel, setSubmitting: Function) => {
     try {
       setLoading(true);
       const { governQueueAddress } = getNetwork();
@@ -123,17 +130,17 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           (tx) => {
             pushTransaction({
               hash: tx,
-              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
+              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
               pendingMessage,
-              status: TRANSACTION_STATUS.Pending,
+              status: ENUM_TRANSACTION_STATUS.Pending,
             });
           },
         );
         updateTransactionStatus({
           hash: approveTxReceipt.transactionHash!,
           status: approveTxReceipt.status
-            ? TRANSACTION_STATUS.Confirmed
-            : TRANSACTION_STATUS.Failed,
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
         });
         if (!approveTxReceipt.status) throw new Error('Failed to approve fee');
       }
@@ -154,49 +161,51 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           (tx) => {
             pushTransaction({
               hash: tx,
-              estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.TokenAproval,
+              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
               pendingMessage,
-              status: TRANSACTION_STATUS.Pending,
+              status: ENUM_TRANSACTION_STATUS.Pending,
             });
           },
         );
         updateTransactionStatus({
           hash: approveTxReceipt.transactionHash!,
           status: approveTxReceipt.status
-            ? TRANSACTION_STATUS.Confirmed
-            : TRANSACTION_STATUS.Failed,
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
         });
         if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
       }
+
+      if (!claim.container) throw new Error('Container is not defined');
       const pendingMessage = 'Challenging Quest...';
       toast(pendingMessage);
       const challengeTxReceipt = await QuestService.challengeQuestClaim(
         governQueueContract,
         {
-          claim,
           reason: values.reason,
           deposit: challengeDeposit,
         },
+        claim.container,
         (tx) => {
           pushTransaction({
             hash: tx,
-            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimChallenging,
+            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
             pendingMessage,
-            status: TRANSACTION_STATUS.Pending,
+            status: ENUM_TRANSACTION_STATUS.Pending,
           });
         },
       );
       updateTransactionStatus({
         hash: challengeTxReceipt.transactionHash!,
         status: challengeTxReceipt.status
-          ? TRANSACTION_STATUS.Confirmed
-          : TRANSACTION_STATUS.Failed,
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
       });
       if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
       toast('Operation succeed');
       onModalClose();
     } catch (e: any) {
-      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
+      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 75
@@ -231,7 +240,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               disabled={
                 loading ||
                 challengeTimeout ||
-                claim.state === CLAIM_STATUS.Challenged ||
+                claim.state === ENUM_CLAIM_STATUS.Challenged ||
                 !erc20DepositContract ||
                 !erc20FeeContract ||
                 !governQueueContract
@@ -285,7 +294,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           if (errors.length) {
             errors.forEach(toast);
           } else {
-            challengeTx(values, setSubmitting);
+            challengeTx(
+              {
+                reason: values.reason,
+                deposit: challengeDeposit,
+              },
+              setSubmitting,
+            );
           }
         }}
       >

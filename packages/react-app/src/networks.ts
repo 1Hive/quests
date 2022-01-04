@@ -14,6 +14,7 @@ const networks = {
     subgraph: '',
     defaultToken: TOKENS.HoneyTest,
     nativeToken: TOKENS.Ether,
+    isTestNetwork: false,
   },
   rinkeby: {
     chainId: 4,
@@ -23,14 +24,18 @@ const networks = {
     defaultEthNode: 'https://rinkeby.eth.aragon.network/',
     questSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
-    celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/celeste-rinkeby',
-    celesteConfigAddress: '0x35e7433141d5f7f2eb7081186f5284dcdd2ccace',
+    celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     governAddress: '0x0f37760f7bF292A3E1578583bDb8db9835E37229',
-    governQueueAddress: '0x72c757c2F7302D15e81ddc5c9E4a724aeB09F567',
-    celesteAddress: '0x949f75Ab8362B4e53967742dC93CC289eFb43f6D',
+    governQueueAddress: '0xf4b90Fa2BD7c95afb248E9D4B98EdD30b8A4B452',
+    celesteAddress: '0x02FCedD2aA71C343E024f1FbDBE69Ff65Bd1858b',
     defaultToken: TOKENS.HoneyTest,
     nativeToken: TOKENS.Ether,
+    isTestNetwork: true,
+    defaultGazFees: {
+      gasLimit: 1048034,
+      gasPrice: 1.5e9,
+    },
   } as NetworkModel,
   xdai: {
     chainId: 100,
@@ -42,6 +47,7 @@ const networks = {
     govern: '', // TODO : When govern will be on xDai
     defaultToken: TOKENS.Honey,
     nativeToken: TOKENS.xDAI,
+    isTestNetwork: false,
   },
   local: {
     chainId: 1337,
@@ -51,6 +57,7 @@ const networks = {
     defaultEthNode: 'http://0.0.0.0:8545/',
     questFactory: HardhatDeployement[1337].localhost.contracts.QuestFactory.address,
     govern: 0,
+    isTestNetwork: true,
   },
 };
 

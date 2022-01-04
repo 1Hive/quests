@@ -3,7 +3,7 @@ import { noop } from 'lodash';
 import { Link } from 'react-router-dom';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { APP_TITLE, PAGES } from '../../../constants';
+import { APP_TITLE, ENUM_PAGES } from '../../../constants';
 import logo from './assets/logo.svg';
 
 // #region StyledComponents
@@ -38,7 +38,7 @@ export default function HeaderTitle({ onClick = noop }: Props) {
   const theme = useTheme();
 
   return (
-    <TitleLinkStyled onClick={onClick} to={PAGES.List} color={theme.accent}>
+    <TitleLinkStyled onClick={onClick} to={ENUM_PAGES.List} color={theme.accent}>
       <TitleLinkWrapperStyled>
         <img src={logo} alt="" />
         <TitleTextStyled color={theme.accent}>{APP_TITLE}</TitleTextStyled>

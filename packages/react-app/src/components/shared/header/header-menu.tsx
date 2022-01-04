@@ -39,11 +39,11 @@ export default function HeaderMenu({ below }: Props) {
           Get Honey
         </HeaderNavItemStyled>
         <HeaderNavItemStyled
-          href="https://github.com/1Hive/quests/wiki"
+          href="https://wiki.1hive.org/projects/quests"
           external
           color={theme.contentSecondary}
         >
-          FAQ
+          Wiki
         </HeaderNavItemStyled>
         <Separator horizontal />
         <HeaderNavItemStyled

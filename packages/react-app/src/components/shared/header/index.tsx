@@ -3,7 +3,7 @@ import { BackButton, Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
-import { PAGES } from 'src/constants';
+import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import styled from 'styled-components';
 import AccountModule from '../account/account-module';
@@ -66,8 +66,8 @@ function Header({ toggleTheme, currentTheme }: Props) {
     <HeaderWraper background={theme.surface}>
       <HeaderLayoutContent>
         <HeaderLayoutContentFlex>
-          {page !== PAGES.List ? (
-            <BackButtonStyled onClick={() => history.push(PAGES.List)} label="" />
+          {page !== ENUM_PAGES.List ? (
+            <BackButtonStyled onClick={() => history.push(ENUM_PAGES.List)} label="" />
           ) : (
             <BackButtonSpacerStyled />
           )}

@@ -1,7 +1,7 @@
 import { Button, useToast, IconCoin, Field, Timer } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
-import { CLAIM_STATUS, ENUM, TRANSACTION_STATUS } from 'src/constants';
+import { ENUM_CLAIM_STATUS, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useGovernQueueContract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -65,7 +65,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
 
   useEffect(() => {
     if (scheduleTimeout === undefined) return;
-    if (claim.state === CLAIM_STATUS.Challenged) setButtonLabel('Challenged by someone');
+    if (claim.state === ENUM_CLAIM_STATUS.Challenged) setButtonLabel('Challenged by someone');
     else if (!scheduleTimeout && claim.executionTimeMs) setButtonLabel('Claimable in');
     else setButtonLabel('Claim');
   }, [claim.state, claim.executionTimeMs, scheduleTimeout]);
@@ -91,19 +91,21 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         (tx) =>
           pushTransaction({
             hash: tx,
-            estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.ClaimExecuting,
+            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
             pendingMessage,
-            status: TRANSACTION_STATUS.Pending,
+            status: ENUM_TRANSACTION_STATUS.Pending,
           }),
       );
       updateTransactionStatus({
         hash: txReceipt.transactionHash,
-        status: txReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+        status: txReceipt.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
       });
       onModalClose();
       if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
+      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50
@@ -129,7 +131,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
               disabled={
                 loading ||
                 !scheduleTimeout ||
-                claim.state === CLAIM_STATUS.Challenged ||
+                claim.state === ENUM_CLAIM_STATUS.Challenged ||
                 !governQueueContract
               }
             />

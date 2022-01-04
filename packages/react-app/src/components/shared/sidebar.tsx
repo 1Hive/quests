@@ -2,7 +2,7 @@ import { Box } from '@1hive/1hive-ui';
 import { usePageContext } from 'src/contexts/page.context';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { PAGES, QUEST_MODE } from '../../constants';
+import { ENUM_PAGES, ENUM_QUEST_MODE } from '../../constants';
 import { useWallet } from '../../contexts/wallet.context';
 import QuestModal from '../modals/quest-modal';
 import { Filter } from './filter';
@@ -24,12 +24,12 @@ export default function Sidebar() {
   const { page } = usePageContext();
 
   return (
-    (account || page === PAGES.List) && (
+    (account || page === ENUM_PAGES.List) && (
       <BoxStyled>
         <Outset gu8>
-          {page === PAGES.List && <Filter />}
-          {page === PAGES.List && account && <Separator />}
-          {account && <QuestModal questMode={QUEST_MODE.Create} />}
+          {page === ENUM_PAGES.List && <Filter />}
+          {page === ENUM_PAGES.List && account && <Separator gu16 />}
+          {account && <QuestModal questMode={ENUM_QUEST_MODE.Create} />}
         </Outset>
       </BoxStyled>
     )

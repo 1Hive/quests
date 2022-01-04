@@ -20,6 +20,7 @@ export type ConfigModel = {
 };
 
 export type ContainerModel = {
+  id: string;
   payload: PayloadModel;
   config: ConfigModel;
   state?: string;

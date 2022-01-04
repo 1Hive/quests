@@ -1,7 +1,7 @@
 import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
-import { TRANSACTION_STATUS, ENUM } from 'src/constants';
+import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { useQuestContract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -10,7 +10,7 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
 import Skeleton from 'react-loading-skeleton';
-import { ContractError } from 'src/models/contract-error';
+import { ContractInstanceError } from 'src/models/contract-error';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';
@@ -43,7 +43,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   };
 
   useEffect(() => {
-    if (questContract && !(questContract instanceof ContractError) && !fallbackAddress) {
+    if (questContract && !(questContract instanceof ContractInstanceError) && !fallbackAddress) {
       questContract.fundsRecoveryAddress().then(setFallbackAddress);
       setLoading(false);
     }
@@ -57,19 +57,21 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(questContract!, (tx) => {
         pushTransaction({
           hash: tx,
-          estimatedEnd: Date.now() + ENUM.ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
+          estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
           pendingMessage,
-          status: TRANSACTION_STATUS.Pending,
+          status: ENUM_TRANSACTION_STATUS.Pending,
         });
       });
       updateTransactionStatus({
         hash: txReceipt.transactionHash,
-        status: txReceipt.status ? TRANSACTION_STATUS.Confirmed : TRANSACTION_STATUS.Failed,
+        status: txReceipt.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
       });
       onModalClose();
       if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(TRANSACTION_STATUS.Failed);
+      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50

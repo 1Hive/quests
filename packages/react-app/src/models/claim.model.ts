@@ -6,7 +6,9 @@ export type ClaimModel = {
   playerAddress: string;
   claimedAmount: TokenAmountModel;
   evidence: string;
+
+  // Only set when fetch
   executionTimeMs?: number;
   state?: string;
-  container?: ContainerModel; // Only set when fetch
+  container?: ContainerModel;
 };

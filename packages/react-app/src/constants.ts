@@ -49,7 +49,11 @@ export const TOKENS = {
 
 // Constants
 
-export const QUEST_STATE = {
+export const GQL_MAX_INT = 2 ** 31 - 1;
+
+// Enums
+
+export const ENUM_QUEST_STATE = {
   Draft: 'Draft', // Not yet saved
   Active: 'Active', // Contract created
   // Played: 'Played', // At least one active claim
@@ -57,15 +61,14 @@ export const QUEST_STATE = {
   Archived: 'Archived', // When no more funds
 };
 
-// Enums
-export const QUEST_MODE = {
+export const ENUM_QUEST_MODE = {
   Create: 'CREATE',
   Update: 'UPDATE',
   ReadSummary: 'SUMMARY',
   ReadDetail: 'DETAIL',
 };
 
-export const BREAKPOINTS = {
+export const ENUM_BREAKPOINTS = {
   4: '4',
   8: '8',
   16: '16',
@@ -78,12 +81,12 @@ export const BREAKPOINTS = {
   72: '72',
 };
 
-export const PAGES = {
+export const ENUM_PAGES = {
   List: 'list',
   Detail: 'detail',
 };
 
-export const CLAIM_STATUS = {
+export const ENUM_CLAIM_STATUS = {
   Approved: 'Approved',
   Cancelled: 'Cancelled',
   Vetoed: 'Vetoed',
@@ -94,7 +97,7 @@ export const CLAIM_STATUS = {
   Scheduled: 'Scheduled',
 };
 
-export const TRANSACTION_STATUS = {
+export const ENUM_TRANSACTION_STATUS = {
   Confirmed: 'TX_STATUS_CONFIRMED',
   Failed: 'TX_STATUS_FAILED',
   Pending: 'TX_STATUS_PENDING',
@@ -102,7 +105,7 @@ export const TRANSACTION_STATUS = {
   Signed: 'TX_STATUS_SIGNED',
 };
 
-export const ESTIMATED_TX_TIME_MS = {
+export const ENUM_ESTIMATED_TX_TIME_MS = {
   Default: 15 * 1000,
   QuestCreating: 20 * 1000,
   QuestFunding: 20 * 1000,
@@ -113,18 +116,27 @@ export const ESTIMATED_TX_TIME_MS = {
   TokenAproval: 20 * 1000,
 };
 
+export const ENUM_DISPUTE_STATES = {
+  NotDisputed: 0,
+  Disputed: 1,
+  DisputeNotRuled: 2,
+  DisputeRuledForChallenger: 3,
+  DisputeRuledForSubmitter: 4,
+};
+
 export const ENUM = {
-  QUEST_MODE,
-  BREAKPOINTS,
-  PAGES,
-  CLAIM_STATUS,
-  TRANSACTION_STATUS,
-  ESTIMATED_TX_TIME_MS,
+  ENUM_QUEST_MODE,
+  ENUM_BREAKPOINTS,
+  ENUM_PAGES,
+  ENUM_CLAIM_STATUS,
+  ENUM_TRANSACTION_STATUS,
+  ENUM_ESTIMATED_TX_TIME_MS,
+  ENUM_DISPUTE_STATES,
 };
 
 // Default values
 
-export const DEFAULT_PAGE = PAGES.List;
+export const DEFAULT_PAGE = ENUM_PAGES.List;
 
 export const DEFAULT_FILTER = {
   address: '',
@@ -134,19 +146,10 @@ export const DEFAULT_FILTER = {
   bounty: undefined,
 } as FilterModel;
 
-export const GQL_MAX_INT = 2 ** 31 - 1;
-
 export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
-
-export const DEFAULT_GAZ = {
-  gasLimit: 12e6,
-  gasPrice: 2e9,
-};
 
 export const DEAULTS = {
   DEFAULT_PAGE,
   DEFAULT_FILTER,
-  GQL_MAX_INT,
   DEAULT_CLAIM_EXECUTION_DELAY_MS,
-  DEFAULT_GAZ,
 };

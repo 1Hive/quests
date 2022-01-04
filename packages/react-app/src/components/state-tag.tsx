@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Tag } from '@1hive/1hive-ui';
-import { QUEST_STATE } from 'src/constants';
+import { ENUM_QUEST_STATE } from 'src/constants';
 import { useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
 
@@ -18,7 +18,11 @@ type Props = {
   state: string;
 };
 
-const VISIBLE_STATES = [QUEST_STATE.Expired, QUEST_STATE.Archived, QUEST_STATE.Draft];
+const VISIBLE_STATES = [
+  ENUM_QUEST_STATE.Expired,
+  ENUM_QUEST_STATE.Archived,
+  ENUM_QUEST_STATE.Draft,
+];
 
 export function StateTag({ state }: Props) {
   const [mode, setMode] = useState<string>();
@@ -27,19 +31,19 @@ export function StateTag({ state }: Props) {
 
   useEffect(() => {
     switch (state) {
-      case QUEST_STATE.Draft:
+      case ENUM_QUEST_STATE.Draft:
         setMode('new');
         setTooltip('Not yet saved');
         break;
-      case QUEST_STATE.Active:
+      case ENUM_QUEST_STATE.Active:
         setMode('indicator');
         setTooltip('Active');
         break;
-      case QUEST_STATE.Expired:
+      case ENUM_QUEST_STATE.Expired:
         setMode('identifier');
         setTooltip('Expire time has reached');
         break;
-      case QUEST_STATE.Archived:
+      case ENUM_QUEST_STATE.Archived:
         setMode('identifier');
         setTooltip('Expired and no funds');
         break;
