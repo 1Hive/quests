@@ -67,52 +67,54 @@ const config: HardhatUserConfig = {
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: [process.env.ETH_KEY],
+      accounts: {
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
+      },
     },
     kovan: {
       url: "https://kovan.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: {
         // gasPrice: mainnetGwei * 1000000000, TODO : Consider uncoment if using mainnet
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     ropsten: {
       url: "https://ropsten.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
       },
     },
     goerli: {
       url: "https://goerli.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     xdai: {
       url: "https://rpc.xdaichain.com/",
       gasPrice: 1000000000,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     matic: {
       url: "https://rpc-mainnet.maticvigil.com/",
       gasPrice: 1000000000,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     rinkebyArbitrum: {
       url: "https://rinkeby.arbitrum.io/rpc",
       gasPrice: 0,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
       companionNetworks: {
         l1: "rinkeby",
@@ -122,7 +124,7 @@ const config: HardhatUserConfig = {
       url: "http://localhost:8547",
       gasPrice: 0,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
       companionNetworks: {
         l1: "localArbitrumL1",
@@ -132,7 +134,7 @@ const config: HardhatUserConfig = {
       url: "http://localhost:7545",
       gasPrice: 0,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
       companionNetworks: {
         l2: "localArbitrum",
@@ -142,7 +144,7 @@ const config: HardhatUserConfig = {
       url: "https://kovan.optimism.io",
       gasPrice: 0,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
       ovm: true,
       companionNetworks: {
@@ -153,7 +155,7 @@ const config: HardhatUserConfig = {
       url: "http://localhost:8545",
       gasPrice: 0,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
       ovm: true,
       companionNetworks: {
@@ -164,7 +166,7 @@ const config: HardhatUserConfig = {
       url: "http://localhost:9545",
       gasPrice: 0,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
       companionNetworks: {
         l2: "localOptimism",
@@ -175,7 +177,7 @@ const config: HardhatUserConfig = {
       gasPrice: 225000000000,
       chainId: 43112,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     fujiAvalanche: {
@@ -183,7 +185,7 @@ const config: HardhatUserConfig = {
       gasPrice: 225000000000,
       chainId: 43113,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     mainnetAvalanche: {
@@ -191,7 +193,7 @@ const config: HardhatUserConfig = {
       gasPrice: 225000000000,
       chainId: 43114,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     testnetHarmony: {
@@ -199,7 +201,7 @@ const config: HardhatUserConfig = {
       gasPrice: 1000000000,
       chainId: 1666700000,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     mainnetHarmony: {
@@ -207,7 +209,7 @@ const config: HardhatUserConfig = {
       gasPrice: 1000000000,
       chainId: 1666600000,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
   },
