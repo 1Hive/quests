@@ -9,7 +9,7 @@ import { GUpx } from 'src/utils/css.util';
 import { floorNumber } from 'src/utils/math.utils';
 import { toBigNumber } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { HelpIcon } from './icon-tooltip';
+import { IconTooltip } from './icon-tooltip';
 
 // #region StyledComponents
 
@@ -93,7 +93,7 @@ function AmountFieldInput({
       label={
         <>
           <span title={tooltip}>{label}</span>
-          {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
         </>
       }
       key={id}

@@ -5,7 +5,7 @@ import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 
-import { HelpIcon } from './icon-tooltip';
+import { IconTooltip } from './icon-tooltip';
 
 // #region Styled
 
@@ -74,7 +74,7 @@ export function AddressFieldInput({
         label={
           <>
             <span title={tooltip}>{label}</span>
-            {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
           </>
         }
         key={id}

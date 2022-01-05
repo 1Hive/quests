@@ -207,7 +207,7 @@ export default function ScheduleClaimModal({
                   isEdit
                   label="Claimed amount"
                   tooltip="Claimed amount"
-                  tooltipDetail="The expected amount to claim considering the quest agreement."
+                  tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
                   isLoading={loading}
                   value={values.claimedAmount}
                 />

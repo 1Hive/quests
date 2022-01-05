@@ -366,8 +366,8 @@ export default function Quest({
               <AmountFieldInput
                 id="claimDeposit"
                 label="Claim deposit"
-                // tooltip="Bounty"
-                // tooltipDetail="The initial amount that users can claim when completing a quest. This doesn't include the potential funds"
+                tooltip="Claim deposit"
+                tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
                 value={claimDeposit}
                 isLoading={loading || (!isEdit && !claimDeposit)}
               />

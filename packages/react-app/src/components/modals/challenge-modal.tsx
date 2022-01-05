@@ -24,7 +24,7 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
 import { Outset } from '../shared/utils/spacer-util';
-import { HelpIcon } from '../shared/field-input/icon-tooltip';
+import { IconTooltip } from '../shared/field-input/icon-tooltip';
 import { getLastBlockDate } from '../../utils/date.utils';
 
 // #region StyledComponents
@@ -38,11 +38,9 @@ const OpenButtonStyled = styled(Button)`
 `;
 
 const HeaderStyled = styled.div`
-  width: 18%;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
 `;
 
 const OpenButtonWrapperStyled = styled.div`
@@ -232,8 +230,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     <ModalBase
       title={
         <HeaderStyled>
-          <h1>Challenge quest</h1>{' '}
-          <HelpIcon
+          <h1>Challenge quest</h1>
+          <IconTooltip
             tooltip="What is a challenge?"
             tooltipDetail="A challenge allows you to deny a claim. It will be raised to Celeste and conviction voting will be used to determine the validity of this challenge."
           />

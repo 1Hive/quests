@@ -47,7 +47,7 @@ export default function HeaderMenu({ below }: Props) {
         </HeaderNavItemStyled>
         <Separator horizontal />
         <HeaderNavItemStyled
-          href="https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board?repos=362850649"
+          href="https://github.com/1Hive/quests/issues/new?assignees=&labels=&template=bug----bug_title-.md&title="
           external
           color={theme.contentSecondary}
         >
