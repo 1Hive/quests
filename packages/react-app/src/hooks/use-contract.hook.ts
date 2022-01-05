@@ -1,9 +1,9 @@
 import { Contract, ContractInterface, ethers } from 'ethers';
 import { useMemo } from 'react';
 import { TokenModel } from 'src/models/token.model';
-import { fromBigNumber, getDefaultProvider } from 'src/utils/web3.utils';
+// eslint-disable-next-line no-unused-vars
+import { getDefaultProvider } from 'src/utils/web3.utils';
 import { toNumber } from 'web3-utils';
-import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20 from '../contracts/ERC20.json';

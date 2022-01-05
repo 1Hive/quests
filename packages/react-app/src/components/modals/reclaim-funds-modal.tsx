@@ -10,7 +10,6 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
 import Skeleton from 'react-loading-skeleton';
-import { ContractInstanceError } from 'src/models/contract-error';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import { Outset } from '../shared/utils/spacer-util';

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATE } from 'src/constants';
+import { ENUM, ENUM_TRANSACTION_STATE } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
