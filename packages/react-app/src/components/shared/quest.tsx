@@ -143,12 +143,13 @@ export default function Quest({
       if (data.state === ENUM_QUEST_STATE.Archived) setBounty(null);
       else
         try {
-          const result = undefined; // await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
+          const result = await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
           data.bounty = result ?? undefined;
           processQuestState(data);
           setBounty(result);
         } catch (error) {
           Logger.error(error);
+          setBounty(null);
         }
     };
 

@@ -50,7 +50,7 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   useEffect(() => {
     const tryConnect = async () => {
       try {
-        // if (await isConnected()) wallet.activate().catch(Logger.error);
+        if (await isConnected()) wallet.activate().catch(Logger.error);
       } catch (error) {
         Logger.error(error);
       }
