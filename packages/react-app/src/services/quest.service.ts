@@ -434,7 +434,6 @@ export async function fetchChallengeFee(
 ): Promise<TokenAmountModel> {
   if (celesteContract instanceof ContractInstanceError) throw celesteContract;
   const [celesteAddress, feeToken, feeAmount] = await celesteContract.getDisputeFees();
-  console.log({ feeAmount, feeToken, celesteContract });
 
   return toTokenAmountModel({
     ...TOKENS.Honey,
