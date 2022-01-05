@@ -8,7 +8,7 @@ dataSources:
     source:
       address: "0x087b70F3F98ebcBf7aed2E50A5035F60F52e9972"
       abi: QuestFactory
-      startBlock: 9933072
+      startBlock: 9936882
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

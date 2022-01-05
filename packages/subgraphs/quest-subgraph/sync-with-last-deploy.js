@@ -17,7 +17,7 @@ try {
 
 // Fetch last contract address for rinkeby
 try {
-  ConfigJson.contractAddress = QuestFactory.address;
+  ConfigJson.questFactoryAddress = QuestFactory.address;
   fs.writeFileSync(`./config/${network}.json`, JSON.stringify(ConfigJson));
   //file written successfully
 } catch (err) {

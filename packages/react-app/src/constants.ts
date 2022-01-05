@@ -61,7 +61,7 @@ export const ENUM_QUEST_STATE = {
   Archived: 'Archived', // When no more funds
 };
 
-export const ENUM_QUEST_MODE = {
+export const ENUM_QUEST_VIEW_MODE = {
   Create: 'CREATE',
   Update: 'UPDATE',
   ReadSummary: 'SUMMARY',
@@ -86,7 +86,7 @@ export const ENUM_PAGES = {
   Detail: 'detail',
 };
 
-export const ENUM_CLAIM_STATUS = {
+export const ENUM_CLAIM_STATE = {
   Approved: 'Approved',
   Cancelled: 'Cancelled',
   Vetoed: 'Vetoed',
@@ -97,7 +97,7 @@ export const ENUM_CLAIM_STATUS = {
   Scheduled: 'Scheduled',
 };
 
-export const ENUM_TRANSACTION_STATUS = {
+export const ENUM_TRANSACTION_STATE = {
   Confirmed: 'TX_STATUS_CONFIRMED',
   Failed: 'TX_STATUS_FAILED',
   Pending: 'TX_STATUS_PENDING',
@@ -113,6 +113,7 @@ export const ENUM_ESTIMATED_TX_TIME_MS = {
   ClaimScheduling: 30 * 1000,
   ClaimChallenging: 30 * 1000,
   ClaimExecuting: 30 * 1000,
+  ChallengeResolving: 20 * 1000,
   TokenAproval: 20 * 1000,
 };
 
@@ -125,11 +126,11 @@ export const ENUM_DISPUTE_STATES = {
 };
 
 export const ENUM = {
-  ENUM_QUEST_MODE,
+  ENUM_QUEST_VIEW_MODE,
   ENUM_BREAKPOINTS,
   ENUM_PAGES,
-  ENUM_CLAIM_STATUS,
-  ENUM_TRANSACTION_STATUS,
+  ENUM_CLAIM_STATE,
+  ENUM_TRANSACTION_STATE,
   ENUM_ESTIMATED_TX_TIME_MS,
   ENUM_DISPUTE_STATES,
 };

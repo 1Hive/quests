@@ -91,7 +91,15 @@ export const GovernQueueChallengesQuery = gql`
       reason
       createdAt
       resolver
-      collateral
+      challenger
+      collateral {
+        id
+        token
+        amount
+        decimals
+        name
+        symbol
+      }
       container {
         queue {
           id

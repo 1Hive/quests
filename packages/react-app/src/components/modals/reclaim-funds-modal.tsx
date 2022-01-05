@@ -1,7 +1,7 @@
 import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
-import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
+import { ENUM_TRANSACTION_STATE, ENUM } from 'src/constants';
 import { useQuestContract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -43,11 +43,11 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   };
 
   useEffect(() => {
-    if (questContract && !(questContract instanceof ContractInstanceError) && !fallbackAddress) {
-      questContract.fundsRecoveryAddress().then(setFallbackAddress);
+    if (questContract.instance?.address && !fallbackAddress) {
+      questContract.instance.fundsRecoveryAddress().then(setFallbackAddress);
       setLoading(false);
     }
-  }, [questContract]);
+  }, [questContract.instance?.address]);
 
   const reclaimFundTx = async () => {
     try {
@@ -59,19 +59,17 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           hash: tx,
           estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
           pendingMessage,
-          status: ENUM_TRANSACTION_STATUS.Pending,
+          status: ENUM_TRANSACTION_STATE.Pending,
         });
       });
       updateTransactionStatus({
         hash: txReceipt.transactionHash,
-        status: txReceipt.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+        status: txReceipt.status ? ENUM_TRANSACTION_STATE.Confirmed : ENUM_TRANSACTION_STATE.Failed,
       });
       onModalClose();
       if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      updateLastTransactionStatus(ENUM_TRANSACTION_STATE.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50

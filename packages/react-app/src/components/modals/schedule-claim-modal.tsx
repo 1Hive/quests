@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
+import { ENUM_TRANSACTION_STATE, ENUM } from 'src/constants';
 import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { useERC20Contract, useGovernQueueContract } from 'src/hooks/use-contract.hook';
@@ -82,15 +82,15 @@ export default function ScheduleClaimModal({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
               pendingMessage: 'Approving claim deposit...',
-              status: ENUM_TRANSACTION_STATUS.Pending,
+              status: ENUM_TRANSACTION_STATE.Pending,
             });
           },
         );
         updateTransactionStatus({
           hash: approveTxReceipt.transactionHash,
           status: approveTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
+            ? ENUM_TRANSACTION_STATE.Confirmed
+            : ENUM_TRANSACTION_STATE.Failed,
         });
         if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
       }
@@ -103,22 +103,22 @@ export default function ScheduleClaimModal({
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
             pendingMessage: 'Scheduling claim...',
-            status: ENUM_TRANSACTION_STATUS.Pending,
+            status: ENUM_TRANSACTION_STATE.Pending,
           });
         },
       );
       updateTransactionStatus({
         hash: scheduleReceipt.transactionHash,
         status: scheduleReceipt.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+          ? ENUM_TRANSACTION_STATE.Confirmed
+          : ENUM_TRANSACTION_STATE.Failed,
       });
       if (!scheduleReceipt.status)
         throw new Error('Failed to schedule the claim, please try again in a few seconds');
       toast('Operation succeed');
       onModalClose(true);
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      updateLastTransactionStatus(ENUM_TRANSACTION_STATE.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50
@@ -195,7 +195,13 @@ export default function ScheduleClaimModal({
                 multiline
                 wide
               />
-              <ChildSpacer size={64}>
+              <ChildSpacer size={16} justify="start" vertical>
+                <AmountFieldInputFormik
+                  id="questBounty"
+                  label="Available bounty"
+                  isLoading={loading}
+                  value={questTotalBounty}
+                />
                 <AmountFieldInputFormik
                   id="claimedAmount"
                   isEdit
@@ -204,12 +210,6 @@ export default function ScheduleClaimModal({
                   tooltipDetail="The expected amount to claim considering the quest agreement."
                   isLoading={loading}
                   value={values.claimedAmount}
-                />
-                <AmountFieldInputFormik
-                  id="questBounty"
-                  label="Available bounty"
-                  isLoading={loading}
-                  value={questTotalBounty}
                 />
               </ChildSpacer>
             </Outset>

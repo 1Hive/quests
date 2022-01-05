@@ -26,7 +26,7 @@ const networks = {
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
     celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
-    governAddress: '0x0f37760f7bF292A3E1578583bDb8db9835E37229',
+    governAddress: '0xa67e303bf51b3696d9b6b89ff3137aa100d908c2',
     governQueueAddress: '0xf4b90Fa2BD7c95afb248E9D4B98EdD30b8A4B452',
     celesteAddress: '0x02FCedD2aA71C343E024f1FbDBE69Ff65Bd1858b',
     defaultToken: TOKENS.HoneyTest,

@@ -3,7 +3,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
-import { DEAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
+import { DEAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from 'src/constants';
 import { roundNumber } from 'src/utils/math.utils';
 import { ONE_DAY_IN_MS } from 'src/utils/date.utils';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -12,6 +12,7 @@ import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import { Outset } from './utils/spacer-util';
 import { IconTooltip } from './field-input/icon-tooltip';
+import ResolveChallengeModal from '../modals/resolve-challenge-modal';
 
 // #region StyledComponents
 
@@ -85,9 +86,12 @@ export default function ClaimList({ claims, challengeDeposit, questTotalBounty }
                         : questTotalBounty
                     }
                   />
-                  {wallet?.account && (
-                    <ChallengeModal claim={x} challengeDeposit={challengeDeposit} />
-                  )}
+                  {wallet?.account &&
+                    (x.state === ENUM_CLAIM_STATE.Challenged ? (
+                      <ResolveChallengeModal claim={x} />
+                    ) : (
+                      <ChallengeModal claim={x} challengeDeposit={challengeDeposit} />
+                    ))}
                 </RowStyled>,
                 <Outset gu8>
                   <TextFieldInput

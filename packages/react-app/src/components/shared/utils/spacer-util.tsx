@@ -3,7 +3,10 @@ import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const ChildWrapperStyled = styled.div`
-  display: ${({ vertical }: any) => (vertical ? 'block' : 'inline-block')};
+  display: flex;
+  flex-direction: ${(props: any) => (props.vertical ? 'column' : 'row')};
+  justify-content: ${(props: any) => props.justify};
+  align-items: ${(props: any) => props.align};
 `;
 
 type Props = {
@@ -144,23 +147,31 @@ type ChildSpacerProps = {
   children?: ReactNode;
   size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
   vertical?: boolean;
+  justify?: 'start' | 'middle' | 'end';
+  align?: 'start' | 'middle' | 'end';
 };
 
-export function ChildSpacer({ children, size = 8, vertical = false }: ChildSpacerProps) {
+export function ChildSpacer({
+  children,
+  size = 8,
+  vertical = false,
+  justify = 'start',
+  align = 'middle',
+}: ChildSpacerProps) {
   const childList = children as any;
 
   return (
-    <>
+    <ChildWrapperStyled justify={justify} vertical={vertical} align={align}>
       {React.Children.map(children, (child, i) => {
         let className = '';
         if (i !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
         if (i !== childList.length - 1) className += ` p${vertical ? 'b' : 'r'}-${size}`;
         return (
-          <ChildWrapperStyled vertical={vertical} className={className} key={`child-${i}`}>
+          <div className={className} key={`child-${i}`}>
             {child}
-          </ChildWrapperStyled>
+          </div>
         );
       })}
-    </>
+    </ChildWrapperStyled>
   );
 }

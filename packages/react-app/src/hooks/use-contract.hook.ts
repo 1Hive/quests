@@ -4,7 +4,7 @@ import { TokenModel } from 'src/models/token.model';
 import { fromBigNumber, getDefaultProvider } from 'src/utils/web3.utils';
 import { toNumber } from 'web3-utils';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { ContractInstanceError } from 'src/models/contract-error';
+import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';
@@ -61,7 +61,7 @@ function useContract(
   contractName: string,
   addressOverride?: string | null,
   withSignerIfPossible = true,
-): Contract | ContractInstanceError {
+): NullableContract {
   try {
     let account: any;
     if (withSignerIfPossible) account = useWallet().account;
@@ -72,30 +72,25 @@ function useContract(
     const contractAbi = askedContract.abi ?? askedContract;
     const provider = getDefaultProvider();
 
-    const handleGetContract = (): Contract => {
+    return useMemo(() => {
       if (!contractAddress) throw new Error(`${contractName} Address was not defined`);
       if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
-      return getContract(
-        contractAddress,
-        contractAbi,
-        provider,
-        withSignerIfPossible && account ? account : undefined,
+      return new NullableContract(
+        getContract(
+          contractAddress,
+          contractAbi,
+          provider,
+          withSignerIfPossible && account ? account : undefined,
+        ),
       );
-    };
-
-    if (!withSignerIfPossible) {
-      return handleGetContract();
-    }
-
-    return useMemo(
-      () => handleGetContract(),
-      [contractAddress, contractAbi, provider, withSignerIfPossible, account],
-    );
+    }, [contractAddress, contractAbi, provider, withSignerIfPossible, account]);
   } catch (error) {
-    return new ContractInstanceError(
-      contractName,
-      `Failed to instanciate contract <${contractName}>`,
-      error,
+    return new NullableContract(
+      new ContractInstanceError(
+        contractName,
+        `Failed to instanciate contract <${contractName}>`,
+        error,
+      ),
     );
   }
 }
@@ -106,7 +101,7 @@ export function useFactoryContract() {
   return useContract('QuestFactory', undefined, true);
 }
 
-export function useGovernQueueContract(): Contract | ContractInstanceError {
+export function useGovernQueueContract(): NullableContract {
   const { governQueueAddress } = getNetwork();
   return useContract('GovernQueue', governQueueAddress, true);
 }
@@ -114,30 +109,17 @@ export function useGovernQueueContract(): Contract | ContractInstanceError {
 export function useERC20Contract(
   token?: TokenModel,
   withSignerIfPossible = true,
-): Contract | ContractInstanceError {
+): NullableContract {
   return useContract('ERC20', token?.token, withSignerIfPossible);
 }
 
-export function useQuestContract(
-  address?: string,
-  withSignerIfPossible = true,
-): Contract | ContractInstanceError {
+export function useQuestContract(address?: string, withSignerIfPossible = true): NullableContract {
   return useContract('Quest', address ?? null, withSignerIfPossible);
 }
 
 export function useCelesteContract() {
   const { celesteAddress } = getNetwork();
-  return useContract('Celeste', celesteAddress, true);
-}
-
-export async function getBalanceOf(token: TokenModel, address: string): Promise<TokenAmountModel> {
-  const contract = useERC20Contract(token, false);
-  if (contract instanceof ContractInstanceError) throw contract; // Trhow error
-  const balance = await contract.balanceOf(address);
-  return {
-    token,
-    parsedAmount: fromBigNumber(balance, token.decimals),
-  };
+  return useContract('Celeste', celesteAddress, false);
 }
 
 export function getQuestContractInterface() {

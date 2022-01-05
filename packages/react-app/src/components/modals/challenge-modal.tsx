@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM_CLAIM_STATUS, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
+import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATE } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
@@ -79,8 +79,10 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       const feeAmount = await QuestService.fetchChallengeFee(celesteContract);
       setChallengeFee(feeAmount);
     };
-    if (celesteContract && wallet.account) fetchFee();
-  }, [wallet.account]);
+    if (celesteContract) {
+      fetchFee();
+    }
+  }, [celesteContract.instance?.address]);
 
   useEffect(() => {
     let handle: any;
@@ -101,9 +103,12 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   }, [claim.executionTimeMs]);
 
   useEffect(() => {
-    if (claim?.state === ENUM_CLAIM_STATUS.Challenged) setOpenButtonLabel('Already challenged');
-    else if (challengeTimeout) setOpenButtonLabel('Challenge period over');
-    else setOpenButtonLabel('Challenge');
+    if (challengeTimeout !== undefined) {
+      if (challengeTimeout)
+        // wait to load
+        setOpenButtonLabel('Challenge period over');
+      else setOpenButtonLabel('Challenge');
+    }
   }, [claim.state, challengeTimeout]);
 
   const onModalClose = () => {
@@ -111,110 +116,115 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     onClose();
   };
 
-  const challengeTx = async (values: ChallengeModel, setSubmitting: Function) => {
-    try {
-      setLoading(true);
-      const { governQueueAddress } = getNetwork();
-      const feeAndDepositSameToken =
-        challengeFee?.token?.token === claim.container?.config.challengeDeposit.token;
-      if (
-        challengeFee?.parsedAmount &&
-        (!feeAndDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
-      ) {
-        const pendingMessage = 'Approving challenge fee...';
-        toast(pendingMessage);
-        const approveTxReceipt = await QuestService.approveTokenAmount(
-          erc20FeeContract,
-          governQueueAddress,
-          challengeFee.token,
-          (tx) => {
-            pushTransaction({
-              hash: tx,
-              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-              pendingMessage,
-              status: ENUM_TRANSACTION_STATUS.Pending,
-            });
-          },
-        );
-        updateTransactionStatus({
-          hash: approveTxReceipt.transactionHash!,
-          status: approveTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-        if (!approveTxReceipt.status) throw new Error('Failed to approve fee');
-      }
-      if (+claim.container!.config.challengeDeposit.amount) {
-        const pendingMessage = feeAndDepositSameToken
-          ? 'Approving challenge fee + deposit...'
-          : 'Approving challenge deposit...';
-        if (feeAndDepositSameToken) {
-          const approvingAmount = BigNumber.from(claim.container!.config.challengeDeposit);
-          approvingAmount.add(BigNumber.from(challengeFee?.token?.amount ?? '0'));
-          claim.container!.config.challengeDeposit.amount = approvingAmount.toString();
-        }
-        toast(pendingMessage);
-        const approveTxReceipt = await QuestService.approveTokenAmount(
-          erc20DepositContract,
-          governQueueAddress,
-          claim.container!.config.challengeDeposit,
-          (tx) => {
-            pushTransaction({
-              hash: tx,
-              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-              pendingMessage,
-              status: ENUM_TRANSACTION_STATUS.Pending,
-            });
-          },
-        );
-        updateTransactionStatus({
-          hash: approveTxReceipt.transactionHash!,
-          status: approveTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-        if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
-      }
-
-      if (!claim.container) throw new Error('Container is not defined');
-      const pendingMessage = 'Challenging Quest...';
-      toast(pendingMessage);
-      const challengeTxReceipt = await QuestService.challengeQuestClaim(
-        governQueueContract,
-        {
-          reason: values.reason,
-          deposit: challengeDeposit,
-        },
-        claim.container,
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
-            pendingMessage,
-            status: ENUM_TRANSACTION_STATUS.Pending,
+  const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
+    if (!values.reason) {
+      toast('Validation : Reason is required');
+    } else {
+      try {
+        setLoading(true);
+        const { governQueueAddress } = getNetwork();
+        const feeAndDepositSameToken =
+          challengeFee?.token?.token === claim.container?.config.challengeDeposit.token;
+        if (
+          challengeFee?.parsedAmount &&
+          (!feeAndDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
+        ) {
+          const pendingMessage = 'Approving challenge fee...';
+          toast(pendingMessage);
+          const approveTxReceipt = await QuestService.approveTokenAmount(
+            erc20FeeContract,
+            governQueueAddress,
+            challengeFee.token,
+            (tx) => {
+              pushTransaction({
+                hash: tx,
+                estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+                pendingMessage,
+                status: ENUM_TRANSACTION_STATE.Pending,
+              });
+            },
+          );
+          updateTransactionStatus({
+            hash: approveTxReceipt.transactionHash!,
+            status: approveTxReceipt.status
+              ? ENUM_TRANSACTION_STATE.Confirmed
+              : ENUM_TRANSACTION_STATE.Failed,
           });
-        },
-      );
-      updateTransactionStatus({
-        hash: challengeTxReceipt.transactionHash!,
-        status: challengeTxReceipt.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      });
-      if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
-      toast('Operation succeed');
-      onModalClose();
-    } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      Logger.error(e);
-      toast(
-        e.message.includes('\n') || e.message.length > 75
-          ? 'Oops. Something went wrong.'
-          : e.message,
-      );
-    } finally {
-      setSubmitting(false);
-      setLoading(false);
+          if (!approveTxReceipt.status) throw new Error('Failed to approve fee');
+        }
+        if (+claim.container!.config.challengeDeposit.amount) {
+          const pendingMessage = feeAndDepositSameToken
+            ? 'Approving challenge fee + deposit...'
+            : 'Approving challenge deposit...';
+          if (feeAndDepositSameToken) {
+            const approvingAmount = BigNumber.from(claim.container!.config.challengeDeposit);
+            approvingAmount.add(BigNumber.from(challengeFee?.token?.amount ?? '0'));
+            claim.container!.config.challengeDeposit.amount = approvingAmount.toString();
+          }
+          toast(pendingMessage);
+          const approveTxReceipt = await QuestService.approveTokenAmount(
+            erc20DepositContract,
+            governQueueAddress,
+            claim.container!.config.challengeDeposit,
+            (tx) => {
+              pushTransaction({
+                hash: tx,
+                estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+                pendingMessage,
+                status: ENUM_TRANSACTION_STATE.Pending,
+              });
+            },
+          );
+          updateTransactionStatus({
+            hash: approveTxReceipt.transactionHash!,
+            status: approveTxReceipt.status
+              ? ENUM_TRANSACTION_STATE.Confirmed
+              : ENUM_TRANSACTION_STATE.Failed,
+          });
+          if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
+        }
+
+        if (!claim.container) throw new Error('Container is not defined');
+        const pendingMessage = 'Challenging Quest...';
+        toast(pendingMessage);
+        const challengeTxReceipt = await QuestService.challengeQuestClaim(
+          governQueueContract,
+          {
+            reason: values.reason,
+            deposit: challengeDeposit,
+            challengerAddress: wallet.account,
+          },
+          claim.container,
+          (tx) => {
+            pushTransaction({
+              hash: tx,
+              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
+              pendingMessage,
+              status: ENUM_TRANSACTION_STATE.Pending,
+            });
+          },
+        );
+        updateTransactionStatus({
+          hash: challengeTxReceipt.transactionHash!,
+          status: challengeTxReceipt.status
+            ? ENUM_TRANSACTION_STATE.Confirmed
+            : ENUM_TRANSACTION_STATE.Failed,
+        });
+        if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
+        toast('Operation succeed');
+        onModalClose();
+      } catch (e: any) {
+        updateLastTransactionStatus(ENUM_TRANSACTION_STATE.Failed);
+        Logger.error(e);
+        toast(
+          e.message.includes('\n') || e.message.length > 75
+            ? 'Oops. Something went wrong.'
+            : e.message,
+        );
+      } finally {
+        setSubmitting(false);
+        setLoading(false);
+      }
     }
   };
 
@@ -238,16 +248,16 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               label={openButtonLabel}
               mode="negative"
               disabled={
+                !openButtonLabel ||
                 loading ||
                 challengeTimeout ||
-                claim.state === ENUM_CLAIM_STATUS.Challenged ||
                 !erc20DepositContract ||
                 !erc20FeeContract ||
                 !governQueueContract
               }
             />
           )}
-          {!loading && !challengeTimeout && claim.executionTimeMs && (
+          {!loading && challengeTimeout === false && claim.executionTimeMs && (
             <Timer end={new Date(claim.executionTimeMs)} />
           )}
         </OpenButtonWrapperStyled>
@@ -289,19 +299,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       <Formik
         initialValues={{ reason: '' }}
         onSubmit={(values, { setSubmitting }) => {
-          const errors = [];
-          if (!values.reason) errors.push('Validation : Reason is required');
-          if (errors.length) {
-            errors.forEach(toast);
-          } else {
-            challengeTx(
-              {
-                reason: values.reason,
-                deposit: challengeDeposit,
-              },
-              setSubmitting,
-            );
-          }
+          challengeTx(
+            {
+              reason: values.reason,
+              deposit: challengeDeposit,
+            },
+            setSubmitting,
+          );
         }}
       >
         {({ values, handleSubmit, handleChange }) => (
@@ -318,7 +322,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 onChange={handleChange}
                 multiline
                 wide
-                css={{ height: 100 }}
               />
             </Outset>
           </FormStyled>

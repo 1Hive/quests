@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
-import { ENUM_PAGES, ENUM_QUEST_MODE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -83,7 +83,7 @@ export default function QuestList() {
       <div>
         {quests.map((x: QuestModel) => (
           <Outset gu16 key={x.address}>
-            <Quest questMode={ENUM_QUEST_MODE.ReadSummary} data={x} />
+            <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} data={x} />
           </Outset>
         ))}
         {isLoading && skeletonQuests}

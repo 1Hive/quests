@@ -17,10 +17,10 @@ import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
-import { ContractInstanceError } from 'src/models/contract-error';
+import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
 import { number } from 'prop-types';
 import { DisputeModel } from 'src/models/dispute.model';
-import { ENUM_CLAIM_STATUS, GQL_MAX_INT, TOKENS } from '../constants';
+import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
@@ -96,6 +96,7 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
   const containers = result.governQueue.containers.map(
     (x: any) =>
       ({
+        id: x.id,
         payload: {
           ...x.payload,
           executionTime: +x.payload.executionTime,
@@ -255,7 +256,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
       .filter(
         (x) =>
           x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase() &&
-          (x.state === ENUM_CLAIM_STATUS.Scheduled || x.state === ENUM_CLAIM_STATUS.Challenged),
+          (x.state === ENUM_CLAIM_STATE.Scheduled || x.state === ENUM_CLAIM_STATE.Challenged),
       )
       .map(async (x) => {
         const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);
@@ -294,13 +295,20 @@ export async function getClaimExecutableTime(questAddress: string, playerAddress
   return container && +container.payload.executionTime * 1000; // Convert Sec to MS
 }
 
-export async function fetchChallenge(container: ContainerModel): Promise<ChallengeModel> {
+export async function fetchChallenge(container: ContainerModel): Promise<ChallengeModel | null> {
   const { governSubgraph, governQueueAddress } = getNetwork();
-  const { disputeId, reason, createdAt, resolver, collateral } = (
+  const result = (
     await request(governSubgraph, GovernQueueChallengesQuery, {
       containerId: container.id,
     })
   ).containerEventChallenges.find((x: any) => x.container.queue.id === governQueueAddress); // Validate same queue as app GovernQueue
+  if (!result)
+    return {
+      reason: 'Fake reason',
+      challengerAddress: '0xf4b90fa2bd7c95afb248e9d4b98edd30b8a4b452',
+    } as any; // TODO  unfake
+
+  const { disputeId, reason, createdAt, resolver, collateral, challenger } = result;
   return {
     deposit: {
       parsedAmount: fromBigNumber(collateral.amount, collateral.decimals),
@@ -309,29 +317,31 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
     reason: (await getObjectFromIpfs(reason)) ?? '',
     createdAt,
     resolver,
+    challengerAddress: challenger,
+    disputeId,
   };
 }
 
 // #endregion
 
-// #region Contracts transactions
+// #region QuestFactory
 
 export async function saveQuest(
-  questFactoryContract: Contract | ContractInstanceError,
+  questFactoryContract: NullableContract,
   fallbackAddress: string,
   data: Partial<QuestModel>,
   address?: string,
   onTx?: (hash: string) => void,
 ) {
-  if (questFactoryContract instanceof ContractInstanceError) throw questFactoryContract;
+  if (!questFactoryContract.instance) throw questFactoryContract.error;
   if (address) throw Error('Saving existing quest is not yet implemented');
-  if (!questFactoryContract?.address)
+  if (!questFactoryContract.instance?.address)
     throw Error('ContractError : <questFactoryContract> has not been set properly');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
   const { defaultToken, defaultGazFees } = getNetwork();
   const ipfsHash = await pushObjectToIpfs(data.description ?? '');
   const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
-  const tx = await questFactoryContract.createQuest(
+  const tx = await questFactoryContract.instance.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
     defaultToken.token,
@@ -342,41 +352,91 @@ export async function saveQuest(
   return handleTransaction(tx, onTx);
 }
 
+// #endregion
+
+// #region Quest
+
+export async function reclaimQuestUnusedFunds(
+  questContract: NullableContract,
+  onTx?: (hash: string) => void,
+) {
+  if (!questContract.instance) throw questContract.error;
+  Logger.debug('Reclaiming quest unused funds...', { quest: questContract.instance.address });
+  const tx = await questContract.instance.recoverUnclaimedFunds();
+  return handleTransaction(tx, onTx);
+}
+
+// #region
+
+// #region ERC20
+
 export async function fundQuest(
-  erc20Contract: Contract | ContractInstanceError,
+  erc20Contract: NullableContract,
   questAddress: string,
   amount: TokenAmountModel,
   onTx?: (hash: string) => void,
 ) {
-  if (erc20Contract instanceof ContractInstanceError) throw erc20Contract;
+  if (!erc20Contract.instance) throw erc20Contract.error;
   Logger.debug('Funding quest...', { questAddress, amount });
-  const tx = await erc20Contract.transfer(questAddress, toBigNumber(amount));
+  const tx = await erc20Contract.instance.transfer(questAddress, toBigNumber(amount));
   return handleTransaction(tx, onTx);
 }
 
+export async function getBalanceOf(
+  erc20Contract: NullableContract,
+  token: TokenModel,
+  address: string,
+): Promise<TokenAmountModel> {
+  if (!erc20Contract.instance) throw erc20Contract.error;
+  const balance = await erc20Contract.instance.balanceOf(address);
+  return {
+    token,
+    parsedAmount: fromBigNumber(balance, token.decimals),
+  };
+}
+
+export async function approveTokenAmount(
+  erc20Contract: NullableContract,
+  toAddress: string,
+  tokenAmount: TokenModel,
+  onTx?: (hash: string) => void,
+) {
+  if (!erc20Contract.instance) throw erc20Contract.error;
+
+  const { defaultGazFees } = getNetwork();
+  Logger.debug('Approving token amount ...', { tokenAmount, fromAddress: toAddress });
+  const tx = await erc20Contract.instance.approve(toAddress, tokenAmount.amount, defaultGazFees);
+  return handleTransaction(tx, onTx);
+}
+
+// #endregion
+
+// #region GovernQueue
+
 export async function scheduleQuestClaim(
-  governQueueContract: Contract | ContractInstanceError,
+  governQueueContract: NullableContract,
   container: ContainerModel,
   onTx?: (hash: string) => void,
 ) {
-  if (governQueueContract instanceof ContractInstanceError) throw governQueueContract;
+  if (!governQueueContract.instance) throw governQueueContract.error;
   const { defaultGazFees } = getNetwork();
   Logger.debug('Scheduling quest claim...', { container });
-  const tx = (await governQueueContract.schedule(container, defaultGazFees)) as ContractTransaction;
+  const tx = (await governQueueContract.instance.schedule(
+    container,
+    defaultGazFees,
+  )) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
 
 export async function executeQuestClaim(
-  governQueueContract: Contract | ContractInstanceError,
+  governQueueContract: NullableContract,
   claimData: ClaimModel,
   onTx?: (hash: string) => void,
 ) {
-  if (governQueueContract instanceof ContractInstanceError) throw governQueueContract;
-  if (!governQueueContract?.address)
-    throw Error('ContractError : <governQueueContract> has not been set properly');
+  if (!governQueueContract.instance) throw governQueueContract.error;
   const { defaultGazFees } = getNetwork();
   Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
-  const tx = await governQueueContract.execute(
+  const tx = await governQueueContract.instance.execute(
     { config: claimData.container!.config, payload: claimData.container!.payload },
     defaultGazFees,
   );
@@ -384,18 +444,16 @@ export async function executeQuestClaim(
 }
 
 export async function challengeQuestClaim(
-  governQueueContract: Contract | ContractInstanceError,
+  governQueueContract: NullableContract,
   challenge: ChallengeModel,
   container: ContainerModel,
   onTx?: (hash: string) => void,
 ) {
-  if (governQueueContract instanceof ContractInstanceError) throw governQueueContract;
-  if (!governQueueContract?.address)
-    throw Error('ContractError : <governQueueContract> has not been set properly');
+  if (!governQueueContract.instance) throw governQueueContract.error;
   Logger.debug('Challenging quest...', { container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
   const { defaultGazFees } = getNetwork();
-  const tx = await governQueueContract.functions.challenge(
+  const tx = await governQueueContract.instance.challenge(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
     defaultGazFees,
@@ -403,37 +461,32 @@ export async function challengeQuestClaim(
   return handleTransaction(tx, onTx);
 }
 
-export async function reclaimQuestUnusedFunds(
-  questContract: Contract | ContractInstanceError,
+export async function resolveClaimChallenge(
+  governQueueContract: NullableContract,
+  container: ContainerModel,
+  dispute: DisputeModel,
   onTx?: (hash: string) => void,
 ) {
-  if (questContract instanceof ContractInstanceError) throw questContract;
-  Logger.debug('Reclaiming quest unused funds...', { quest: questContract.address });
-  const tx = await questContract.recoverUnclaimedFunds();
+  if (!governQueueContract.instance) throw governQueueContract.error;
+  Logger.debug('Resolving claim challenge...', { container, dispute });
+  const { defaultGazFees } = getNetwork();
+  const tx = await governQueueContract.instance.resolveClaimChallenge(
+    container,
+    dispute.id,
+    defaultGazFees,
+  );
   return handleTransaction(tx, onTx);
 }
 
-export async function approveTokenAmount(
-  erc20Contract: Contract | ContractInstanceError,
-  toAddress: string,
-  tokenAmount: TokenModel,
-  onTx?: (hash: string) => void,
-) {
-  if (erc20Contract instanceof ContractInstanceError) throw erc20Contract;
-  if (erc20Contract instanceof ContractInstanceError || !erc20Contract?.address) {
-    throw erc20Contract;
-  }
-  const { defaultGazFees } = getNetwork();
-  Logger.debug('Approving token amount ...', { tokenAmount, fromAddress: toAddress });
-  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, defaultGazFees);
-  return handleTransaction(tx, onTx);
-}
+// #region
+
+// #region Celeste
 
 export async function fetchChallengeFee(
-  celesteContract: Contract | ContractInstanceError,
+  celesteContract: NullableContract,
 ): Promise<TokenAmountModel> {
-  if (celesteContract instanceof ContractInstanceError) throw celesteContract;
-  const [celesteAddress, feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  if (!celesteContract.instance) throw celesteContract.error;
+  const [, feeToken, feeAmount] = await celesteContract.instance.getDisputeFees();
 
   return toTokenAmountModel({
     ...TOKENS.Honey,
@@ -443,18 +496,16 @@ export async function fetchChallengeFee(
 }
 
 export async function fetchChallengeDispute(
-  celesteContract: Contract,
-  container: ContainerModel,
+  celesteContract: NullableContract,
+  challenge: ChallengeModel,
 ): Promise<DisputeModel> {
-  if (!container) throw new Error('Container is required to fetch container disputes');
-  const challenge = await fetchChallenge(container);
+  if (!celesteContract.instance) throw celesteContract.error;
+  if (!challenge.disputeId) throw new Error('Dispute does not exist yet, please try again later');
 
-  if (challenge.disputeId) throw new Error('Dispute does not exist yet, please try again later');
-
-  const { state } = await celesteContract.disputes(challenge.disputeId);
+  const { state } = await celesteContract.instance.disputes(challenge.disputeId);
 
   return {
-    id: challenge.disputeId!,
+    id: challenge.disputeId,
     state,
   };
 }

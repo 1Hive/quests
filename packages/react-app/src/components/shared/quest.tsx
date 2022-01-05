@@ -7,11 +7,11 @@ import { Link } from 'react-router-dom';
 import {
   ENUM,
   ENUM_PAGES,
-  ENUM_QUEST_MODE,
+  ENUM_QUEST_VIEW_MODE,
   ENUM_QUEST_STATE,
-  ENUM_TRANSACTION_STATUS,
+  ENUM_TRANSACTION_STATE,
 } from 'src/constants';
-import { getBalanceOf, useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
+import { useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
@@ -95,7 +95,7 @@ export default function Quest({
     state: ENUM_QUEST_STATE.Draft,
   },
   isLoading = false,
-  questMode = ENUM_QUEST_MODE.ReadDetail,
+  questMode = ENUM_QUEST_VIEW_MODE.ReadDetail,
   onSave = noop,
   css,
 }: Props) {
@@ -117,7 +117,9 @@ export default function Quest({
   const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | undefined>();
 
   useEffect(() => {
-    setIsEdit(questMode === ENUM_QUEST_MODE.Create || questMode === ENUM_QUEST_MODE.Update);
+    setIsEdit(
+      questMode === ENUM_QUEST_VIEW_MODE.Create || questMode === ENUM_QUEST_VIEW_MODE.Update,
+    );
 
     const getClaimDeposit = async () => {
       // Don't show deposit of expired
@@ -141,7 +143,7 @@ export default function Quest({
       if (data.state === ENUM_QUEST_STATE.Archived) setBounty(null);
       else
         try {
-          const result = await getBalanceOf(defaultToken, address);
+          const result = await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
           data.bounty = result ?? undefined;
           processQuestState(data);
           setBounty(result);
@@ -152,7 +154,7 @@ export default function Quest({
 
     if (data.address) getBalanceOfQuest(data.address);
 
-    if (questMode === ENUM_QUEST_MODE.ReadDetail) {
+    if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       fetchClaims();
       getClaimDeposit();
     }
@@ -203,13 +205,13 @@ export default function Quest({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating, // 15 sec
               pendingMessage,
-              status: ENUM_TRANSACTION_STATUS.Pending,
+              status: ENUM_TRANSACTION_STATE.Pending,
             });
           },
         );
         updateTransactionStatus({
           hash: txReceiptSaveQuest.transactionHash,
-          status: ENUM_TRANSACTION_STATUS.Confirmed,
+          status: ENUM_TRANSACTION_STATE.Confirmed,
         });
         onSave();
         if (txReceiptSaveQuest.status) {
@@ -227,13 +229,13 @@ export default function Quest({
                   hash: tx,
                   estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
                   pendingMessage: 'Quest funding...',
-                  status: ENUM_TRANSACTION_STATUS.Pending,
+                  status: ENUM_TRANSACTION_STATE.Pending,
                 });
               },
             );
             updateTransactionStatus({
               hash: txReceiptFundQuest.transactionHash,
-              status: ENUM_TRANSACTION_STATUS.Confirmed,
+              status: ENUM_TRANSACTION_STATE.Confirmed,
             });
             if (txReceiptFundQuest) toast('Operation succeed');
           }
@@ -315,7 +317,7 @@ export default function Quest({
                 wide
                 multiline
                 isMarkDown
-                maxLine={questMode === ENUM_QUEST_MODE.ReadSummary ? 10 : undefined}
+                maxLine={questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? 10 : undefined}
                 ellipsis={
                   <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
                 }
@@ -344,7 +346,9 @@ export default function Quest({
             {bounty !== null && (
               <AmountFieldInputFormik
                 id="bounty"
-                label={questMode === ENUM_QUEST_MODE.Create ? 'Initial bounty' : 'Available bounty'}
+                label={
+                  questMode === ENUM_QUEST_VIEW_MODE.Create ? 'Initial bounty' : 'Available bounty'
+                }
                 isEdit={isEdit}
                 tooltip="Bounty"
                 tooltipDetail={
@@ -357,7 +361,7 @@ export default function Quest({
                 formik={formRef}
               />
             )}
-            {questMode === ENUM_QUEST_MODE.ReadDetail && claimDeposit !== null && (
+            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
               <AmountFieldInput
                 id="claimDeposit"
                 label="Claim deposit"
@@ -382,7 +386,7 @@ export default function Quest({
       />
       {!loading && !isEdit && data.address && (
         <>
-          {questMode === ENUM_QUEST_MODE.ReadDetail && claims && challengeDeposit && (
+          {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claims && challengeDeposit && (
             <ClaimList
               claims={claims}
               questTotalBounty={bounty}
@@ -390,12 +394,12 @@ export default function Quest({
             />
           )}
           <QuestFooterStyled>
-            {questMode !== ENUM_QUEST_MODE.ReadDetail && (
+            {questMode !== ENUM_QUEST_VIEW_MODE.ReadDetail && (
               <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
                 <Button icon={<IconPlus />} label="Details" wide mode="strong" />
               </LinkStyled>
             )}
-            {questMode !== ENUM_QUEST_MODE.ReadSummary &&
+            {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
               values.address &&
               wallet.account &&
               bounty &&
@@ -425,7 +429,11 @@ export default function Quest({
   );
 
   return (
-    <CardStyled style={css} isSummary={questMode === ENUM_QUEST_MODE.ReadSummary} id={data.address}>
+    <CardStyled
+      style={css}
+      isSummary={questMode === ENUM_QUEST_VIEW_MODE.ReadSummary}
+      id={data.address}
+    >
       {!loading && <StateTag state={data.state} />}
       {wallet.account && (
         <Formik
