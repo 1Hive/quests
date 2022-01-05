@@ -203,7 +203,7 @@ export default function Quest({
           (tx) => {
             pushTransaction({
               hash: tx,
-              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating, // 15 sec
+              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
               pendingMessage,
               status: ENUM_TRANSACTION_STATE.Pending,
             });
