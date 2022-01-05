@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { createContext, useContext, useState } from 'react';
-import { ENUM_TRANSACTION_STATE } from 'src/constants';
+import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TransactionModel } from 'src/models/transaction.model';
 
 type TransactionContextModel = {

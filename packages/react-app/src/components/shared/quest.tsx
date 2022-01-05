@@ -9,7 +9,7 @@ import {
   ENUM_PAGES,
   ENUM_QUEST_VIEW_MODE,
   ENUM_QUEST_STATE,
-  ENUM_TRANSACTION_STATE,
+  ENUM_TRANSACTION_STATUS,
 } from 'src/constants';
 import { useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
@@ -143,7 +143,7 @@ export default function Quest({
       if (data.state === ENUM_QUEST_STATE.Archived) setBounty(null);
       else
         try {
-          const result = await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
+          const result = undefined; // await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
           data.bounty = result ?? undefined;
           processQuestState(data);
           setBounty(result);
@@ -205,13 +205,13 @@ export default function Quest({
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
               pendingMessage,
-              status: ENUM_TRANSACTION_STATE.Pending,
+              status: ENUM_TRANSACTION_STATUS.Pending,
             });
           },
         );
         updateTransactionStatus({
           hash: txReceiptSaveQuest.transactionHash,
-          status: ENUM_TRANSACTION_STATE.Confirmed,
+          status: ENUM_TRANSACTION_STATUS.Confirmed,
         });
         onSave();
         if (txReceiptSaveQuest.status) {
@@ -229,13 +229,13 @@ export default function Quest({
                   hash: tx,
                   estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
                   pendingMessage: 'Quest funding...',
-                  status: ENUM_TRANSACTION_STATE.Pending,
+                  status: ENUM_TRANSACTION_STATUS.Pending,
                 });
               },
             );
             updateTransactionStatus({
               hash: txReceiptFundQuest.transactionHash,
-              status: ENUM_TRANSACTION_STATE.Confirmed,
+              status: ENUM_TRANSACTION_STATUS.Confirmed,
             });
             if (txReceiptFundQuest) toast('Operation succeed');
           }
@@ -435,28 +435,26 @@ export default function Quest({
       id={data.address}
     >
       {!loading && <StateTag state={data.state} />}
-      {wallet.account && (
-        <Formik
-          initialValues={
-            { ...data, fallbackAddress: data.fallbackAddress ?? wallet.account } as QuestModel
-          }
-          onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
-        >
-          {({ values, handleChange, handleSubmit }) =>
-            isEdit ? (
-              <FormStyled
-                onSubmit={handleSubmit}
-                ref={formRef}
-                id={`form-quest-form-${data.address ?? 'new'}`}
-              >
-                {questContent(values, handleChange)}
-              </FormStyled>
-            ) : (
-              questContent(values, handleChange)
-            )
-          }
-        </Formik>
-      )}
+      <Formik
+        initialValues={
+          { ...data, fallbackAddress: data.fallbackAddress ?? wallet.account } as QuestModel
+        }
+        onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
+      >
+        {({ values, handleChange, handleSubmit }) =>
+          isEdit ? (
+            <FormStyled
+              onSubmit={handleSubmit}
+              ref={formRef}
+              id={`form-quest-form-${data.address ?? 'new'}`}
+            >
+              {questContent(values, handleChange)}
+            </FormStyled>
+          ) : (
+            questContent(values, handleChange)
+          )
+        }
+      </Formik>
     </CardStyled>
   );
 }

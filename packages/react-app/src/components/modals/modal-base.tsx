@@ -1,8 +1,10 @@
-import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
+import { Modal, ScrollView, textStyle, IconConnection } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
+import { TransactionModel } from 'src/models/transaction.model';
+import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
 
 const ModalFooterStyled = styled.div`
@@ -24,6 +26,18 @@ const ScrollViewStyled = styled(ScrollView)`
   max-height: calc(60vh) !important;
 `;
 
+const IconConnectionStyled = styled(IconConnection)`
+  @keyframes scaling {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(2);
+    }
+  }
+  animation: scaling 5s infinite alternate;
+`;
+
 type Props = {
   children?: React.ReactNode;
   title?: React.ReactNode | string;
@@ -31,6 +45,7 @@ type Props = {
   buttons?: React.ReactNode;
   onClose?: Function;
   isOpen: boolean;
+  tx?: TransactionModel;
   css?: React.CSSProperties;
 };
 
@@ -41,9 +56,9 @@ export default function ModalBase({
   buttons,
   onClose = noop,
   isOpen = false,
+  tx,
   css,
 }: Props) {
-  // TODO : Not clean
   const escFunction = (e: any) => {
     if (
       e.key === 'Escape' &&
@@ -57,6 +72,13 @@ export default function ModalBase({
     if (isOpen) {
       document.addEventListener('keydown', escFunction, false);
     } else document.removeEventListener('keydown', escFunction, false);
+
+    tx = {
+      pendingMessage: 'Creating quests',
+      status: ENUM_TRANSACTION_STATUS.Pending,
+      hash: 'xxxxxx',
+    };
+
     return () => document.removeEventListener('keydown', escFunction, false);
   }, [isOpen]);
 
@@ -72,7 +94,15 @@ export default function ModalBase({
         <Outset gu8>
           <TitleStyled>{title}</TitleStyled>
         </Outset>
-        <ScrollViewStyled vertical>{children}</ScrollViewStyled>
+        <ScrollViewStyled vertical>
+          {tx ? (
+            <>
+              <IconConnectionStyled />
+            </>
+          ) : (
+            children
+          )}
+        </ScrollViewStyled>
         {buttons && (
           <ModalFooterStyled>
             <ChildSpacer justify="end" align="middle">

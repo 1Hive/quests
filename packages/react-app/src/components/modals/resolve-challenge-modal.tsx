@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATE } from 'src/constants';
+import { ENUM, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
@@ -133,21 +133,21 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
             pendingMessage,
-            status: ENUM_TRANSACTION_STATE.Pending,
+            status: ENUM_TRANSACTION_STATUS.Pending,
           });
         },
       );
       updateTransactionStatus({
         hash: challengeTxReceipt.transactionHash!,
         status: challengeTxReceipt.status
-          ? ENUM_TRANSACTION_STATE.Confirmed
-          : ENUM_TRANSACTION_STATE.Failed,
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
       });
       if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
       toast('Operation succeed');
       onModalClose();
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATE.Failed);
+      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 75

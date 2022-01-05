@@ -48,13 +48,14 @@ type Props = {
 function MainView({ children, toggleTheme, currentTheme }: Props) {
   const wallet = useWallet();
   useEffect(() => {
-    if (!wallet.account) {
-      isConnected()
-        .then((connected) => {
-          if (connected) wallet.activate().catch(Logger.error);
-        })
-        .catch(Logger.error);
-    }
+    const tryConnect = async () => {
+      try {
+        // if (await isConnected()) wallet.activate().catch(Logger.error);
+      } catch (error) {
+        Logger.error(error);
+      }
+    };
+    if (!wallet.account) tryConnect();
   }, []);
 
   return (

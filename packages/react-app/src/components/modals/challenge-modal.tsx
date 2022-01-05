@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM, ENUM_TRANSACTION_STATE } from 'src/constants';
+import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
@@ -140,15 +140,15 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 hash: tx,
                 estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
                 pendingMessage,
-                status: ENUM_TRANSACTION_STATE.Pending,
+                status: ENUM_TRANSACTION_STATUS.Pending,
               });
             },
           );
           updateTransactionStatus({
             hash: approveTxReceipt.transactionHash!,
             status: approveTxReceipt.status
-              ? ENUM_TRANSACTION_STATE.Confirmed
-              : ENUM_TRANSACTION_STATE.Failed,
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
           });
           if (!approveTxReceipt.status) throw new Error('Failed to approve fee');
         }
@@ -171,15 +171,15 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 hash: tx,
                 estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
                 pendingMessage,
-                status: ENUM_TRANSACTION_STATE.Pending,
+                status: ENUM_TRANSACTION_STATUS.Pending,
               });
             },
           );
           updateTransactionStatus({
             hash: approveTxReceipt.transactionHash!,
             status: approveTxReceipt.status
-              ? ENUM_TRANSACTION_STATE.Confirmed
-              : ENUM_TRANSACTION_STATE.Failed,
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
           });
           if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
         }
@@ -200,21 +200,21 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
               pendingMessage,
-              status: ENUM_TRANSACTION_STATE.Pending,
+              status: ENUM_TRANSACTION_STATUS.Pending,
             });
           },
         );
         updateTransactionStatus({
           hash: challengeTxReceipt.transactionHash!,
           status: challengeTxReceipt.status
-            ? ENUM_TRANSACTION_STATE.Confirmed
-            : ENUM_TRANSACTION_STATE.Failed,
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
         });
         if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
         toast('Operation succeed');
         onModalClose();
       } catch (e: any) {
-        updateLastTransactionStatus(ENUM_TRANSACTION_STATE.Failed);
+        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
         Logger.error(e);
         toast(
           e.message.includes('\n') || e.message.length > 75
