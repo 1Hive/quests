@@ -4,7 +4,7 @@ import { CSSProperties, ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { dateFormat } from '../../../utils/date.utils';
-import { HelpIcon } from './icon-tooltip';
+import { IconTooltip } from './icon-tooltip';
 
 // #region StyledComponents
 const InputStyled = styled.input`
@@ -78,7 +78,7 @@ export default function DateFieldInput({
       label={
         <>
           <span title={tooltip}>{label}</span>
-          {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
         </>
       }
       key={id}

@@ -1,6 +1,7 @@
 import { Help, IconQuestion, useTheme } from '@1hive/1hive-ui';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
+import { GUpx } from 'src/utils/css.util';
 
 const IconSpanStyled = styled.span`
   margin-top: 0px;
@@ -25,7 +26,9 @@ const IconSpanStyled = styled.span`
 const TooltipWrapperStyled = styled.div`
   color: #637381;
 `;
-
+const HelpWrapperStyled = styled.div`
+  margin: 0 ${GUpx()};
+`;
 type Props = {
   tooltip: string;
   tooltipDetail?: ReactNode;
@@ -36,7 +39,7 @@ type Props = {
 export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) => {
   const theme = useTheme();
   return (
-    <>
+    <HelpWrapperStyled>
       {tooltipDetail || children ? (
         <Help hint={tooltip}>
           <TooltipWrapperStyled color={theme.accentContent}>
@@ -46,8 +49,6 @@ export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) =
       ) : (
         <IconSpanStyled title={tooltip}>{icon ?? <IconQuestion size="tiny" />}</IconSpanStyled>
       )}
-    </>
+    </HelpWrapperStyled>
   );
 };
-
-export const HelpIcon = (props: Props) => <IconTooltip {...props} />;
