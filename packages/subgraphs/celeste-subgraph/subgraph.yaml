@@ -1,0 +1,240 @@
+specVersion: 0.0.2
+description: 1Hive Celeste subgraph
+repository: https://github.com/1hive/celeste-subgraph/
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: AragonCourt
+    network: rinkeby
+    source:
+      address: '0x949f75Ab8362B4e53967742dC93CC289eFb43f6D'
+      abi: AragonCourt
+      startBlock: 8250225
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - CourtConfig
+        - CourtModule
+        - ERC20
+        - SubscriptionModule
+        - SubscriptionPeriod
+        - JurorSubscriptionFee
+        - BrightIdRegisterModule
+      abis:
+        - name: AragonCourt
+          file: ./abi/AragonCourt.json
+        - name: JurorsRegistry
+          file: ./node_modules/@aragon/court/abi/JurorsRegistry.json
+        - name: Subscriptions
+          file: ./abi/CourtSubscriptions.json
+        - name: ERC20
+          file: ./node_modules/@aragon/minime/abi/MiniMeToken.json
+        - name: BrightIdRegister
+          file: ./abi/BrightIdRegister.json
+      eventHandlers:
+        - event: Heartbeat(uint64,uint64)
+          handler: handleHeartbeat
+        - event: FundsGovernorChanged(address,address)
+          handler: handleFundsGovernorChanged
+        - event: ConfigGovernorChanged(address,address)
+          handler: handleConfigGovernorChanged
+        - event: FeesUpdaterChanged(address,address)
+          handler: handleFeesUpdaterChanged
+        - event: ModulesGovernorChanged(address,address)
+          handler: handleModulesGovernorChanged
+        - event: ModuleSet(bytes32,address)
+          handler: handleModuleSet
+
+      file: ./src/AragonCourt.ts
+templates:
+  - kind: ethereum/contract
+    name: DisputeManager
+    network: rinkeby
+    source:
+      abi: DisputeManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Arbitrable
+        - Dispute
+        - AdjudicationRound
+        - Juror
+        - JurorDispute
+        - JurorDraft
+        - ANJMovement
+        - FeeMovement
+        - Appeal
+      abis:
+        - name: Arbitrable
+          file: ./node_modules/@aragon/court/abi/IArbitrable.json
+        - name: Agreement
+          file: ./abi/IAgreement.json
+        - name: Controller
+          file: ./node_modules/@aragon/court/abi/Controller.json
+        - name: DisputeManager
+          file: ./abi/DisputeManager.json
+      eventHandlers:
+        - event: NewDispute(indexed uint256,indexed address,indexed uint64,uint64,bytes)
+          handler: handleNewDispute
+        - event: EvidenceSubmitted(indexed uint256,indexed address,bytes)
+          handler: handleEvidenceSubmitted
+        - event: EvidencePeriodClosed(indexed uint256,indexed uint64)
+          handler: handleEvidencePeriodClosed
+        - event: JurorDrafted(indexed uint256,indexed uint256,indexed address)
+          handler: handleJurorDrafted
+        - event: DisputeStateChanged(indexed uint256,indexed uint8)
+          handler: handleDisputeStateChanged
+        - event: RulingAppealed(indexed uint256,indexed uint256,uint8)
+          handler: handleRulingAppealed
+        - event: RulingAppealConfirmed(indexed uint256,indexed uint256,indexed uint64,uint256)
+          handler: handleRulingAppealConfirmed
+        - event: PenaltiesSettled(indexed uint256,indexed uint256,uint256)
+          handler: handlePenaltiesSettled
+        - event: RewardSettled(indexed uint256,indexed uint256,address,uint256,uint256)
+          handler: handleRewardSettled
+        - event: AppealDepositSettled(indexed uint256,indexed uint256)
+          handler: handleAppealDepositSettled
+        - event: RulingComputed(indexed uint256,indexed uint8)
+          handler: handleRulingComputed
+      file: ./src/DisputeManager.ts
+  - kind: ethereum/contract
+    name: JurorsRegistry
+    network: rinkeby
+    source:
+      abi: JurorsRegistry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Juror
+        - JurorDraft
+        - JurorDispute
+        - ANJMovement
+        - FeeMovement
+        - JurorsRegistryModule
+      abis:
+        - name: Controller
+          file: ./node_modules/@aragon/court/abi/Controller.json
+        - name: JurorsRegistry
+          file: ./node_modules/@aragon/court/abi/JurorsRegistry.json
+      eventHandlers:
+        - event: Staked(indexed address,uint256,uint256,bytes)
+          handler: handleStaked
+        - event: Unstaked(indexed address,uint256,uint256,bytes)
+          handler: handleUnstaked
+        - event: JurorActivated(indexed address,uint64,uint256,address)
+          handler: handleJurorActivated
+        - event: JurorBalanceLocked(indexed address,uint256)
+          handler: handleJurorBalanceLocked
+        - event: JurorBalanceUnlocked(indexed address,uint256)
+          handler: handleJurorBalanceUnlocked
+        - event: JurorDeactivationRequested(indexed address,uint64,uint256)
+          handler: handleJurorDeactivationRequested
+        - event: JurorDeactivationUpdated(indexed address,uint64,uint256,uint64)
+          handler: handleJurorDeactivationUpdated
+        - event: JurorDeactivationProcessed(indexed address,uint64,uint256,uint64)
+          handler: handleJurorDeactivationProcessed
+        - event: JurorTokensAssigned(indexed address,uint256)
+          handler: handleJurorTokensAssigned
+        - event: JurorTokensCollected(indexed address,uint256,uint64)
+          handler: handleJurorTokensCollected
+        - event: JurorSlashed(indexed address,uint256,uint64)
+          handler: handleJurorSlashed
+      file: ./src/JurorsRegistry.ts
+  - kind: ethereum/contract
+    name: Voting
+    network: rinkeby
+    source:
+      abi: Voting
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - JurorDraft
+        - Vote
+      abis:
+        - name: Voting
+          file: ./node_modules/@aragon/court/abi/CRVoting.json
+        - name: DisputeManager
+          file: ./abi/DisputeManager.json
+        - name: Controller
+          file: ./node_modules/@aragon/court/abi/Controller.json
+      eventHandlers:
+        - event: VoteCommitted(indexed uint256,indexed address,bytes32)
+          handler: handleVoteCommitted
+        - event: VoteLeaked(indexed uint256,indexed address,uint8,address)
+          handler: handleVoteLeaked
+        - event: VoteRevealed(indexed uint256,indexed address,uint8,address)
+          handler: handleVoteRevealed
+      file: ./src/Voting.ts
+  - kind: ethereum/contract
+    name: Treasury
+    network: rinkeby
+    source:
+      abi: Treasury
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - FeeMovement
+        - TreasuryBalance
+      abis:
+        - name: Treasury
+          file: ./node_modules/@aragon/court/abi/CourtTreasury.json
+      eventHandlers:
+        - event: Assign(indexed address,indexed address,indexed address,uint256)
+          handler: handleAssign
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdraw
+      file: ./src/Treasury.ts
+  - kind: ethereum/contract
+    name: Subscriptions
+    network: rinkeby
+    source:
+      abi: Subscriptions
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - FeeMovement
+        - SubscriptionModule
+        - SubscriptionPeriod
+        - JurorSubscriptionFee
+      abis:
+        - name: Subscriptions
+          file: ./abi/CourtSubscriptions.json
+      eventHandlers:
+        - event: FeesClaimed(indexed address,indexed uint256,uint256)
+          handler: handleJurorFeesClaimed
+        - event: FeeTokenChanged(address,address)
+          handler: handleFeeTokenChanged
+        - event: PeriodPercentageYieldChanged(uint256,uint256)
+          handler: handlePeriodPercentageYieldChanged
+      file: ./src/Subscriptions.ts
+  - kind: ethereum/contract
+    name: BrightIdRegister
+    network: rinkeby
+    source:
+      abi: BrightIdRegister
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Juror
+      abis:
+        - name: BrightIdRegister
+          file: ./abi/BrightIdRegister.json
+      eventHandlers:
+        - event: Register(address)
+          handler: handleUserRegistered
+      file: ./src/BrightIdRegister.ts

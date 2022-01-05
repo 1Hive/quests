@@ -3,12 +3,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/shared/quest';
-import { PAGES, QUEST_MODE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
-import { usePageContext } from 'src/providers/page.context';
+import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
-import { useFilterContext } from '../../providers/filter.context';
+import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from './utils/spacer-util';
 
 const batchSize = 3;
@@ -17,16 +17,16 @@ export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filter } = useFilterContext();
+  const { filter } = useFilterContext()!;
 
   const { setPage } = usePageContext();
-  useEffect(() => setPage(PAGES.List), [setPage]);
+  useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
   const refresh = (_filter?: FilterModel) => {
     if (!isLoading) {
       setQuests([]);
       setIsLoading(true);
-      QuestService.getMoreQuests(0, batchSize, _filter ?? filter).then((res) => {
+      QuestService.fetchQuestsPaging(0, batchSize, _filter ?? filter).then((res) => {
         setIsLoading(false);
         setQuests(res);
         setHasMore(res.length >= batchSize);
@@ -36,7 +36,7 @@ export default function QuestList() {
 
   const loadMore = () => {
     setIsLoading(true);
-    QuestService.getMoreQuests(quests.length, batchSize, filter).then((res) => {
+    QuestService.fetchQuestsPaging(quests.length, batchSize, filter).then((res) => {
       setIsLoading(false);
       setQuests(quests.concat(res));
       setHasMore(res.length >= batchSize);
@@ -83,7 +83,7 @@ export default function QuestList() {
       <div>
         {quests.map((x: QuestModel) => (
           <Outset gu16 key={x.address}>
-            <Quest questMode={QUEST_MODE.ReadSummary} data={x} />
+            <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} data={x} />
           </Outset>
         ))}
         {isLoading && skeletonQuests}

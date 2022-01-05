@@ -1,7 +1,6 @@
 import {
   Button,
   ButtonBase,
-  GU,
   IconCheck,
   IconCopy,
   RADIUS,
@@ -9,6 +8,7 @@ import {
   useTheme,
 } from '@1hive/1hive-ui';
 import { useCallback } from 'react';
+import { GUpx } from 'src/utils/css.util';
 import { getProviderFromUseWalletId } from '../../../ethereum-providers';
 import { useCopyToClipboard } from '../../../hooks/use-copy-to-clipboard.hook';
 import { getNetworkName } from '../../../utils/web3.utils';
@@ -41,13 +41,13 @@ function AccountScreenConnected({ wallet }: Props) {
     <div
       // @ts-ignore
       css={`
-        padding: ${2 * GU}px;
+        padding: ${GUpx(2)};
       `}
     >
       <div
         // @ts-ignore
         css={`
-          padding-top: ${2 * GU}px;
+          padding-top: ${GUpx(2)};
         `}
       >
         <h4
@@ -55,7 +55,7 @@ function AccountScreenConnected({ wallet }: Props) {
           css={`
             ${textStyle('label2')};
             color: ${theme.contentSecondary};
-            margin-bottom: ${2 * GU}px;
+            margin-bottom: ${GUpx(2)};
           `}
         >
           Active Wallet
@@ -73,7 +73,7 @@ function AccountScreenConnected({ wallet }: Props) {
             css={`
               display: flex;
               align-items: center;
-              margin-right: ${3 * GU}px;
+              margin-right: ${GUpx(3)};
             `}
           >
             <img
@@ -81,9 +81,9 @@ function AccountScreenConnected({ wallet }: Props) {
               alt=""
               // @ts-ignore
               css={`
-                width: ${2.5 * GU}px;
-                height: ${2.5 * GU}px;
-                margin-right: ${0.5 * GU}px;
+                width: ${GUpx(2.5)};
+                height: ${GUpx(2.5)};
+                margin-right: ${GUpx(0.5)};
                 transform: translateY(-2px);
               `}
             />
@@ -105,7 +105,7 @@ function AccountScreenConnected({ wallet }: Props) {
                 display: flex;
                 align-items: center;
                 justify-self: flex-end;
-                padding: ${0.5 * GU}px;
+                padding: ${GUpx(0.5)}px;
                 &:active {
                   background: ${theme.surfacePressed};
                 }
@@ -131,7 +131,7 @@ function AccountScreenConnected({ wallet }: Props) {
         <div
           // @ts-ignore
           css={`
-            padding: ${2 * GU}px 0;
+            padding: ${GUpx(2)} 0;
           `}
         >
           <div
@@ -147,7 +147,7 @@ function AccountScreenConnected({ wallet }: Props) {
             <span
               // @ts-ignore
               css={`
-                margin-left: ${0.5 * GU}px;
+                margin-left: ${GUpx(0.5)}px;
               `}
             >
               {`Connected to ${networkName} Network`}
@@ -160,7 +160,7 @@ function AccountScreenConnected({ wallet }: Props) {
         onClick={handleDeactivate}
         wide
         css={`
-          margin-top: ${2 * GU}px;
+          margin-top: ${GUpx(2)};
         `}
         mode="negative"
       >

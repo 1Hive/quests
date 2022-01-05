@@ -1,5 +1,13 @@
-// eslint-disable-next-line no-use-before-define
-import React from 'react';
+/* eslint-disable react/no-array-index-key */
+import React, { ReactNode } from 'react';
+import styled from 'styled-components';
+
+const ChildWrapperStyled = styled.div`
+  display: flex;
+  flex-direction: ${(props: any) => (props.vertical ? 'column' : 'row')};
+  justify-content: ${(props: any) => props.justify};
+  align-items: ${(props: any) => props.align};
+`;
 
 type Props = {
   children?: React.ReactNode;
@@ -136,24 +144,34 @@ export function Inset({
 }
 
 type ChildSpacerProps = {
-  children?: React.ReactNode;
+  children?: ReactNode;
   size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
   vertical?: boolean;
+  justify?: 'start' | 'middle' | 'end';
+  align?: 'start' | 'middle' | 'end';
 };
 
-export function ChildSpacer({ children, size = 8, vertical = false }: ChildSpacerProps) {
-  if (!children) return <></>;
-  return React.Children.map(children, (child) => {
-    let className = `p${vertical ? 't' : 'l'}-${size}`;
-    className += ` p${vertical ? 'b' : 'r'}-${size}`;
-    return (
-      <div
-        style={vertical ? { display: 'block' } : { display: 'inline-block' }}
-        className={className}
-        // key={`child-${i}`}
-      >
-        {child}
-      </div>
-    );
-  }) as any;
+export function ChildSpacer({
+  children,
+  size = 8,
+  vertical = false,
+  justify = 'start',
+  align = 'middle',
+}: ChildSpacerProps) {
+  const childList = children as any;
+
+  return (
+    <ChildWrapperStyled justify={justify} vertical={vertical} align={align}>
+      {React.Children.map(children, (child, i) => {
+        let className = '';
+        if (i !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
+        if (i !== childList.length - 1) className += ` p${vertical ? 'b' : 'r'}-${size}`;
+        return (
+          <div className={className} key={`child-${i}`}>
+            {child}
+          </div>
+        );
+      })}
+    </ChildWrapperStyled>
+  );
 }

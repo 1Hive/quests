@@ -14,4 +14,5 @@ export type QuestModel = {
   rewardToken?: TokenModel;
   detailsRefIpfs?: string;
   creatorAddress?: string;
+  state: string;
 };

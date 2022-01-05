@@ -3,15 +3,13 @@ import { Integrations } from '@sentry/tracing';
 import React from 'react';
 
 Sentry.init({
-  dsn: 'https://331a9ba277c0463ebfa17c3af2b2f731@o606795.ingest.sentry.io/5745163',
+  dsn: '[DSN]', // TODO : Get it from https://sentry.io/settings/1hive/projects/quests-4u/keys/
   integrations: [new Integrations.BrowserTracing()],
-
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
   tracesSampleRate: 0,
 });
-
 Sentry.configureScope((scope) => {
   scope.setLevel(Sentry.Severity.Warning);
 });
@@ -31,9 +29,10 @@ export default class ErrorBoundary extends React.Component<Props> {
   }
 
   componentDidCatch(error: Error) {
-    Sentry.captureException(error, {
-      level: Sentry.Severity.Error,
-    });
+    // TODO : Restore when https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/issues/1hive/quests/108
+    // Sentry.captureException(error, {
+    //   level: Sentry.Severity.Error,
+    // });
   }
 
   render() {

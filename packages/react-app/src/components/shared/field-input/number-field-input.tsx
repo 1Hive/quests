@@ -3,7 +3,8 @@ import { noop } from 'lodash-es';
 import { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-import HelpIcon from './help-icon';
+import { HelpIcon } from './icon-tooltip';
+
 // #region StyledComponents
 
 const FieldStyled = styled(Field)`
@@ -66,7 +67,7 @@ export default function NumberFieldInput({
     <FieldStyled
       label={
         <>
-          {label}
+          <span title={tooltip}>{label}</span>
           {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
         </>
       }

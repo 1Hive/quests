@@ -1,6 +1,6 @@
 import { TokenModel } from './token.model';
 
 export type TokenAmountModel = {
-  amount: number;
-  token?: TokenModel;
+  parsedAmount: number;
+  token: TokenModel;
 };

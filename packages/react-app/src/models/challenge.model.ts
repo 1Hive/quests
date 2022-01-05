@@ -1,6 +1,12 @@
-import { ClaimModel } from './claim.model';
+import { TokenAmountModel } from './token-amount.model';
 
 export type ChallengeModel = {
-  claim: ClaimModel;
-  reason?: string;
+  deposit: TokenAmountModel;
+  reason: string;
+  challengerAddress: string;
+
+  // Set when fetch from subgraph only
+  createdAt?: number;
+  resolver?: string;
+  disputeId?: number;
 };

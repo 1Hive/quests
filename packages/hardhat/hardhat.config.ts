@@ -13,6 +13,7 @@ import "hardhat-typechain";
 import { task, HardhatUserConfig } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
+import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
@@ -38,13 +39,25 @@ function mnemonic() {
     return process.env.MNEMONIC;
   } catch (e) {
     if (defaultNetwork !== "localhost") {
-      console.log(
+      console.warn(
         "☢️ WARNING: No mnemonic file created for a deploy account. Try `yarn run generate` and then `yarn run account`."
       );
     }
   }
-  return "";
+
+  return "test test test test test test test test test test test junk";
 }
+
+function getAccounts(): HardhatNetworkAccountsUserConfig {
+  if (process.env.ETH_KEY) {
+    return [process.env.ETH_KEY as any];
+  }
+
+  return {
+    mnemonic: mnemonic(),
+  };
+}
+
 const config: HardhatUserConfig = {
   defaultNetwork,
 
@@ -67,53 +80,43 @@ const config: HardhatUserConfig = {
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: [process.env.ETH_KEY],
+      accounts: getAccounts(),
     },
     kovan: {
       url: "https://kovan.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: {
         // gasPrice: mainnetGwei * 1000000000, TODO : Consider uncoment if using mainnet
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
       },
     },
     ropsten: {
       url: "https://ropsten.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
       },
     },
     goerli: {
       url: "https://goerli.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     xdai: {
       url: "https://rpc.xdaichain.com/",
       gasPrice: 1000000000,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     matic: {
       url: "https://rpc-mainnet.maticvigil.com/",
       gasPrice: 1000000000,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     rinkebyArbitrum: {
       url: "https://rinkeby.arbitrum.io/rpc",
       gasPrice: 0,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
       companionNetworks: {
         l1: "rinkeby",
       },
@@ -121,9 +124,7 @@ const config: HardhatUserConfig = {
     localArbitrum: {
       url: "http://localhost:8547",
       gasPrice: 0,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
       companionNetworks: {
         l1: "localArbitrumL1",
       },
@@ -131,9 +132,7 @@ const config: HardhatUserConfig = {
     localArbitrumL1: {
       url: "http://localhost:7545",
       gasPrice: 0,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
       companionNetworks: {
         l2: "localArbitrum",
       },
@@ -141,9 +140,7 @@ const config: HardhatUserConfig = {
     kovanOptimism: {
       url: "https://kovan.optimism.io",
       gasPrice: 0,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
       ovm: true,
       companionNetworks: {
         l1: "kovan",
@@ -152,9 +149,7 @@ const config: HardhatUserConfig = {
     localOptimism: {
       url: "http://localhost:8545",
       gasPrice: 0,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
       ovm: true,
       companionNetworks: {
         l1: "localOptimismL1",
@@ -163,9 +158,7 @@ const config: HardhatUserConfig = {
     localOptimismL1: {
       url: "http://localhost:9545",
       gasPrice: 0,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
       companionNetworks: {
         l2: "localOptimism",
       },
@@ -174,41 +167,31 @@ const config: HardhatUserConfig = {
       url: "http://localhost:9650/ext/bc/C/rpc",
       gasPrice: 225000000000,
       chainId: 43112,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     fujiAvalanche: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       gasPrice: 225000000000,
       chainId: 43113,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     mainnetAvalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       gasPrice: 225000000000,
       chainId: 43114,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     testnetHarmony: {
       url: "https://api.s0.b.hmny.io",
       gasPrice: 1000000000,
       chainId: 1666700000,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
     mainnetHarmony: {
       url: "https://api.harmony.one",
       gasPrice: 1000000000,
       chainId: 1666600000,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: getAccounts(),
     },
   },
   solidity: {

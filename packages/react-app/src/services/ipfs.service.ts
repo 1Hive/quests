@@ -9,7 +9,7 @@ const configInfura = {
 } as Options;
 
 const configTheGraph = {
-  url: 'http://api.thegraph.com/ipfs/api/v0',
+  url: 'https://api.thegraph.com/ipfs/api/v0',
 };
 
 const ipfsInfura = ipfsAPI.create(configInfura);

@@ -2,18 +2,21 @@
   "folders": [
     { "name": "WebApp", "path": "./packages/react-app" },
     { "name": "Hardhat", "path": "./packages/hardhat" },
-    { "name": "Subgraph", "path": "./packages/subgraph" },
+    { "name": "Subgraph", "path": "./packages/subgraphs" },
     { "name": "Services", "path": "./packages/services" },
     { "name": "Root", "path": "." }
   ],
-  "settings": {},
+  "settings": {
+    "typescript.tsdk": "WebApp/node_modules/typescript/lib",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "extensions": {
     "recommendations": [
       "esbenp.prettier-vscode",
       "dsznajder.es7-react-js-snippets",
       "dbaeumer.vscode-eslint",
       "xabikos.javascriptsnippets",
-      "jpoissonnier.vscode-styled-components"
+      "styled-components.vscode-styled-components"
     ]
   }
 }

@@ -1,0 +1,26 @@
+# GovernRegistry
+- kind: ethereum/contract
+  name: {{name}}
+  network: {{network}}
+  source:
+    abi: GovernRegistry
+    address: '{{address}}'
+    startBlock: {{startBlock}}
+  mapping:
+    kind: ethereum/events
+    apiVersion: 0.0.1
+    language: wasm/assemblyscript
+    entities:
+      - RegistryEntry
+      - Govern
+    abis:
+      - name: GovernRegistry
+        file: $GOVERN_CORE_MODULE/abi/contracts/GovernRegistry.sol/GovernRegistry.json
+      - name: GovernQueue
+        file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+    eventHandlers:
+      - event: Registered(indexed address,address,indexed address,address,indexed address,string)
+        handler: handleRegistered
+      - event: SetMetadata(indexed address,bytes)
+        handler: handleSetMetadata
+    file: ./src/GovernRegistry.ts

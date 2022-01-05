@@ -1,18 +1,19 @@
-import { AddressField, Field, Accordion, GU } from '@1hive/1hive-ui';
-import { useEffect, useState } from 'react';
+import { AddressField, Field, Accordion } from '@1hive/1hive-ui';
 import { ClaimModel } from 'src/models/claim.model';
-import { QuestModel } from 'src/models/quest.model';
-import { useWallet } from 'src/providers/wallet.context';
-import { fetchQuestClaims } from 'src/services/quest.service';
+import { useWallet } from 'src/contexts/wallet.context';
 import styled from 'styled-components';
-import { DEAULT_CLAIM_EXECUTION_DELAY } from 'src/constants';
+import { GUpx } from 'src/utils/css.util';
+import { DEAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from 'src/constants';
+import { roundNumber } from 'src/utils/math.utils';
 import { ONE_DAY_IN_MS } from 'src/utils/date.utils';
-import { roundDecimals } from 'src/utils/math.utils';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import ChallengeModal from '../modals/challenge-modal';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import { Outset } from './utils/spacer-util';
-import Help from './field-input/help-icon';
+import { IconTooltip } from './field-input/icon-tooltip';
+import ResolveChallengeModal from '../modals/resolve-challenge-modal';
+
 // #region StyledComponents
 
 const WrapperStyled = styled.div`
@@ -25,10 +26,11 @@ const RowStyled = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: center;
-  margin: ${GU}px;
+  margin: ${GUpx()};
 `;
+
 const ClaimStyled = styled.div`
   display: flex;
   flex-direction: row;
@@ -36,31 +38,22 @@ const ClaimStyled = styled.div`
   justify-content: space-between;
   width: 8%;
 `;
+
 const HeaderStyled = styled.h1`
   font-size: large;
-  margin-left: 8px;
+  margin-left: ${GUpx()};
 `;
 
 // #endregion
 
 type Props = {
-  quest: QuestModel;
+  claims: ClaimModel[];
+  challengeDeposit: TokenAmountModel;
+  questTotalBounty?: TokenAmountModel | null;
 };
 
-export default function ClaimList({ quest }: Props) {
-  const [claims, setClaims] = useState<ClaimModel[]>();
+export default function ClaimList({ claims, challengeDeposit, questTotalBounty }: Props) {
   const wallet = useWallet();
-
-  useEffect(() => {
-    const fetchClaims = async () => {
-      const result = await fetchQuestClaims(quest);
-
-      setClaims(result);
-    };
-
-    fetchClaims();
-  }, []);
-
   return (
     <WrapperStyled>
       <Outset>
@@ -68,10 +61,10 @@ export default function ClaimList({ quest }: Props) {
           <>
             <ClaimStyled>
               <HeaderStyled>Claims </HeaderStyled>
-              <Help
+              <IconTooltip
                 tooltip="Claims"
-                tooltipDetail={`A claim includes the proof of the quest's completion. This claim can be challenged within ${roundDecimals(
-                  DEAULT_CLAIM_EXECUTION_DELAY / ONE_DAY_IN_MS,
+                tooltipDetail={`A claim includes the proof of the quest's completion. This claim can be challenged within ${roundNumber(
+                  DEAULT_CLAIM_EXECUTION_DELAY_MS / ONE_DAY_IN_MS,
                   0,
                 )} days.`}
               />
@@ -80,16 +73,25 @@ export default function ClaimList({ quest }: Props) {
             <Accordion
               items={claims.map((x: ClaimModel) => [
                 <RowStyled>
-                  <Field label="Claiming player">
+                  <Field label={wallet?.account === x.playerAddress ? 'You' : 'Claiming player'}>
                     <AddressField address={x.playerAddress} autofocus={false} />
                   </Field>
                   <AmountFieldInput
                     id="amount"
-                    isEdit={false}
-                    label="Claiming amount"
-                    value={x.claimAmount}
+                    label="Claimed amount"
+                    isLoading={!x.claimedAmount.parsedAmount && questTotalBounty === undefined}
+                    value={
+                      x.claimedAmount.parsedAmount || !questTotalBounty
+                        ? x.claimedAmount
+                        : questTotalBounty
+                    }
                   />
-                  {wallet?.account && <ChallengeModal claim={x} />}
+                  {wallet?.account &&
+                    (x.state === ENUM_CLAIM_STATE.Challenged ? (
+                      <ResolveChallengeModal claim={x} />
+                    ) : (
+                      <ChallengeModal claim={x} challengeDeposit={challengeDeposit} />
+                    ))}
                 </RowStyled>,
                 <Outset gu8>
                   <TextFieldInput

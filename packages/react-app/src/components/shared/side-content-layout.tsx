@@ -1,5 +1,6 @@
-import { GU, useViewport } from '@1hive/1hive-ui';
+import { useViewport } from '@1hive/1hive-ui';
 import React, { useEffect, useState } from 'react';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { BREAKPOINTS } from '../../styles/breakpoints';
 
@@ -22,7 +23,7 @@ const ScrollViewStyled = styled.div`
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
   height: calc(100vh - 64px);
-  padding: ${3 * GU}px 0;
+  padding: ${GUpx(3)} 0;
 `;
 
 type Props = {

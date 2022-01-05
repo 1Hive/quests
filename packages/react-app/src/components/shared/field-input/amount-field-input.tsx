@@ -1,13 +1,16 @@
-import { Field, GU, TextInput, TokenBadge } from '@1hive/1hive-ui';
+import { Field, TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { DEFAULT_AMOUNT } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
+import { GUpx } from 'src/utils/css.util';
+import { floorNumber } from 'src/utils/math.utils';
+import { toBigNumber } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import HelpIcon from './help-icon';
+import { HelpIcon } from './icon-tooltip';
+
 // #region StyledComponents
 
 const LineStyled = styled.div`
@@ -16,7 +19,7 @@ const LineStyled = styled.div`
 `;
 const AmountStyled = styled.div`
   margin-top: 2px;
-  margin-right: ${GU}px;
+  margin-right: ${GUpx()};
 `;
 
 const FieldStyled = styled(Field)`
@@ -42,34 +45,45 @@ type Props = {
   compact?: boolean;
   tooltip?: string;
   tooltipDetail?: ReactNode;
+  maxDecimals?: number;
 };
 
 function AmountFieldInput({
   id,
-  isEdit = true,
+  isEdit = false,
   isLoading = false,
   label = '',
   placeHolder = '',
-  value = DEFAULT_AMOUNT,
+  value,
   onChange = noop,
   wide = false,
   formik,
   tooltip,
   tooltipDetail,
   compact = false,
+  maxDecimals,
 }: Props) {
   const { defaultToken } = getNetwork();
-  const [amount, setAmount] = useState(value.amount);
-  useEffect(() => {
-    setAmount(value.amount);
-  }, [value.amount]);
+  const [amount, setAmount] = useState(value?.parsedAmount ?? 0);
+  const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
 
-  if (!value.token) value.token = defaultToken;
+  useEffect(() => {
+    if (!isEdit) {
+      const decimalPos = maxDecimals ? 0 : Math.floor(Math.log10(0.0000002)) * -1;
+      if (decimalPos > 0) setDecimalsCount(maxDecimals ?? decimalPos);
+    }
+  }, [maxDecimals, isEdit]);
+
+  useEffect(() => {
+    setAmount(value?.parsedAmount ?? 0);
+    if (value && !value.token) value.token = defaultToken;
+  }, [value]);
 
   const onAmountChange = (e: any) => {
     const newValue = +e.target.value;
     setAmount(newValue);
-    value = { ...value, amount: newValue };
+    value = { token: value?.token ?? defaultToken, parsedAmount: newValue };
+    value.token.amount = toBigNumber(value).toString();
     if (formik) formik.setFieldValue(id, value);
     else onChange(value);
   };
@@ -78,7 +92,7 @@ function AmountFieldInput({
     <FieldStyled
       label={
         <>
-          {label}
+          <span title={tooltip}>{label}</span>
           {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
         </>
       }
@@ -100,14 +114,16 @@ function AmountFieldInput({
                 value={amount}
               />
             ) : (
-              amount
+              floorNumber(amount, decimalsCount)
             )}
           </AmountStyled>
-          <TokenBadgeStyled
-            symbol={value.token!.symb}
-            address={value.token!.address}
-            networkType="private"
-          />
+          {value?.token.symbol && (
+            <TokenBadgeStyled
+              symbol={value.token.symbol}
+              address={value.token.token}
+              networkType="private"
+            />
+          )}
         </LineStyled>
       )}
     </FieldStyled>

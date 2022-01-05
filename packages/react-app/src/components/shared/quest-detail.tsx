@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { PAGES, QUEST_MODE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useQuery } from 'src/hooks/use-query-params';
 import { QuestModel } from 'src/models/quest.model';
-import { usePageContext } from 'src/providers/page.context';
-import { getQuest } from 'src/services/quest.service';
+import { usePageContext } from 'src/contexts/page.context';
+import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
 import Quest from './quest';
 
@@ -14,19 +14,19 @@ export default function QuestDetail() {
   const [quest, setQuest] = useState<QuestModel>();
 
   useEffect(() => {
-    setPage(PAGES.Detail);
-    const fetchQuest = async (questAddress: string) => {
-      const q = await getQuest(questAddress);
+    setPage(ENUM_PAGES.Detail);
+    const fetchQuestAsync = async (questAddress: string) => {
+      const q = await fetchQuest(questAddress);
       if (!q) toast('Failed to get quest, verify address');
       else setQuest(q);
     };
-    if (id) fetchQuest(id);
+    if (id) fetchQuestAsync(id);
   }, [id]);
 
   return (
     <>
       {quest ? (
-        <Quest data={quest} questMode={QUEST_MODE.ReadDetail} />
+        <Quest data={quest} questMode={ENUM_QUEST_VIEW_MODE.ReadDetail} />
       ) : (
         <>
           <Quest isLoading />

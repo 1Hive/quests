@@ -1,6 +1,7 @@
-import { EthIdenticon, GU, RADIUS, shortenAddress, textStyle, useTheme } from '@1hive/1hive-ui';
+import { EthIdenticon, RADIUS, shortenAddress, textStyle, useTheme } from '@1hive/1hive-ui';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { useWallet } from '../../../providers/wallet.context';
+import { useWallet } from '../../../contexts/wallet.context';
 import HeaderModule from '../header/header-module';
 
 // #region StyledComponents
@@ -27,7 +28,7 @@ const AccountButtonContentStyled = styled.div`
 
 const AccountButtonContentWrapperStyled = styled.div`
   overflow: hidden;
-  max-width: ${16 * GU}px;
+  max-width: ${GUpx(16)};
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
