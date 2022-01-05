@@ -67,9 +67,7 @@ const config: HardhatUserConfig = {
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: [process.env.ETH_KEY],
     },
     kovan: {
       url: "https://kovan.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
@@ -237,7 +235,7 @@ const config: HardhatUserConfig = {
     govern: {
       default: 1,
       xdai: 0, // TODO : Add XDai Govern Address
-      rinkeby: "0x0f37760f7bF292A3E1578583bDb8db9835E37229", // Govern address on rinkeby
+      rinkeby: "0xc483A9365ac8e39EA208603ce06856e3936E1193", // Govern address on rinkeby
     },
   },
 };
