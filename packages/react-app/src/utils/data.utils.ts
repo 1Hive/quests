@@ -4,6 +4,7 @@ import { getNetwork } from 'src/networks';
 import { FundModel } from 'src/models/fund.model';
 import { TOKENS } from '../constants';
 import { Logger } from './logger';
+import { fromBigNumber } from './web3.utils';
 
 export async function convertTo(from: TokenAmountModel, toToken: TokenModel) {
   const { defaultToken } = getNetwork();
@@ -12,8 +13,8 @@ export async function convertTo(from: TokenAmountModel, toToken: TokenModel) {
   }
   const res = await fetch(
     `https://coingecko.p.rapidapi.com/simple/price?ids=${[
-      from.token!.symb,
-      toToken.symb,
+      from.token.symbol,
+      toToken.symbol,
     ]}&vs_currencies=usd`,
     {
       method: 'GET',
@@ -31,4 +32,11 @@ export async function computeTotalFunds(funds: FundModel[]) {
   // @ts-ignore
   const amount = tetherFunds.reduce((total, x) => total + x.amount);
   return { amount, token: TOKENS.Theter };
+}
+
+export function toTokenAmountModel(tokenModel: TokenModel) {
+  return {
+    parsedAmount: fromBigNumber(tokenModel.amount, tokenModel.decimals),
+    token: tokenModel,
+  } as TokenAmountModel;
 }

@@ -5,7 +5,7 @@ import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
 import styled from 'styled-components';
-import { useWallet } from '../../../providers/wallet.context';
+import { useWallet } from '../../../contexts/wallet.context';
 import { getUseWalletProviders } from '../../../utils/web3.utils';
 import HeaderPopover from '../header/header-popover';
 import AccountButton from './account-button';
@@ -56,7 +56,7 @@ type Props = {
 };
 
 function AccountModule({ compact = false }: Props) {
-  const buttonRef = useRef();
+  const buttonRef = useRef<any>();
   const wallet = useWallet();
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
@@ -159,7 +159,7 @@ function AccountModule({ compact = false }: Props) {
   }, [screenId]);
 
   return (
-    <AccountWrapperStyled ref={buttonRef} tabIndex="0">
+    <AccountWrapperStyled ref={buttonRef}>
       {screen.id === 'connected' ? (
         <AccountButton onClick={toggle} />
       ) : (

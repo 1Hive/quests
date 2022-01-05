@@ -212,11 +212,7 @@
           "abi": [
             {
               "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_aragonGovernAddress",
-                  "type": "address"
-                }
+                { "internalType": "address", "name": "_aragonGovernAddress", "type": "address" }
               ],
               "stateMutability": "nonpayable",
               "type": "constructor"
@@ -261,38 +257,16 @@
             {
               "inputs": [],
               "name": "aragonGovernAddress",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
               "stateMutability": "view",
               "type": "function"
             },
             {
               "inputs": [
-                {
-                  "internalType": "string",
-                  "name": "_questTitle",
-                  "type": "string"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "_questDetailsRef",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "contract IERC20",
-                  "name": "_rewardToken",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "_expireTime",
-                  "type": "uint256"
-                },
+                { "internalType": "string", "name": "_questTitle", "type": "string" },
+                { "internalType": "bytes", "name": "_questDetailsRef", "type": "bytes" },
+                { "internalType": "contract IERC20", "name": "_rewardToken", "type": "address" },
+                { "internalType": "uint256", "name": "_expireTime", "type": "uint256" },
                 {
                   "internalType": "address payable",
                   "name": "_fundsRecoveryAddress",
@@ -300,13 +274,7 @@
                 }
               ],
               "name": "createQuest",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
             }

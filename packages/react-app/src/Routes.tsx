@@ -1,15 +1,15 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
 import QuestDetail from './components/shared/quest-detail';
 import QuestList from './components/shared/quest-list';
-import { PAGES } from './constants';
+import { ENUM_PAGES } from './constants';
 
 export default function Routes() {
   return (
     <Switch>
       <Redirect exact from="/" to="/home" />
-      <Redirect exact from={`/${PAGES.List}`} to="/home" />
+      <Redirect exact from={`/${ENUM_PAGES.List}`} to="/home" />
       <Route path="/home" component={QuestList} />
-      <Route path={`/${PAGES.Detail}`} component={QuestDetail} />
+      <Route path={`/${ENUM_PAGES.Detail}`} component={QuestDetail} />
     </Switch>
   );
 }

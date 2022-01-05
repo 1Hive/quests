@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import App from './app';
-import { SubgraphProvider } from './providers/subgraph.context';
-import './style.scss';
+import { SubgraphProvider } from './contexts/subgraph.context';
+import './styles/style.scss';
 
 ReactDOM.render(
   <SubgraphProvider>

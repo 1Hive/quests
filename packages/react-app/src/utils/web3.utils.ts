@@ -10,7 +10,6 @@ import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { wrapError } from './errors.util';
 import { Logger } from './logger';
-import { roundDecimals } from './math.utils';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
 
@@ -141,7 +140,7 @@ export async function sendTransaction(to: string, amount: TokenAmountModel, onCo
       ?.eth.sendTransaction({
         from,
         to,
-        value: toWei(amount.amount.toString(), 'ether'),
+        value: toWei(amount.parsedAmount.toString(), 'ether'),
         chain: getNetworkType(),
       })
       .on('transactionHash', res)
@@ -153,13 +152,14 @@ export async function sendTransaction(to: string, amount: TokenAmountModel, onCo
 export function toBigNumber(amount: TokenAmountModel) {
   const { defaultToken } = getNetwork();
   if (!amount.token) {
-    amount.token = amount.token ?? defaultToken;
+    amount.token = defaultToken;
   }
-  return ethers.utils.parseUnits(amount.amount.toString(), amount.token!.decimals);
+  return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
 
-export function fromBigNumber(bigNumber: BigNumber, decimals: number = 18): number {
-  return roundDecimals(+ethers.utils.formatUnits(bigNumber, decimals), 3);
+export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | undefined): number {
+  if (typeof bigNumber === 'string') bigNumber = BigNumber.from(bigNumber);
+  return +ethers.utils.formatUnits(bigNumber, decimals ?? 18);
 }
 
 export function getDefaultProvider() {

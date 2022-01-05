@@ -1,14 +1,15 @@
 // @ts-nocheck
 import { BackButton, Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
-import React from 'react';
+import { useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
-import { PAGES } from 'src/constants';
-import { usePageContext } from 'src/providers/page.context';
+import { ENUM_PAGES } from 'src/constants';
+import { usePageContext } from 'src/contexts/page.context';
 import styled from 'styled-components';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
+import { TransactionProgressButton } from '../transaction-progress-button';
 
 // #region StyledComponents
 const HeaderWraper = styled.header`
@@ -55,18 +56,18 @@ type Props = {
 
 function Header({ toggleTheme, currentTheme }: Props) {
   const theme = useTheme();
-
   const history = useHistory();
   const { page } = usePageContext();
   const { below } = useViewport();
   const layoutSmall = below('medium');
+  const activityOpener = useRef<any>();
 
   return (
     <HeaderWraper background={theme.surface}>
       <HeaderLayoutContent>
         <HeaderLayoutContentFlex>
-          {page !== PAGES.List ? (
-            <BackButtonStyled onClick={() => history.push(PAGES.List)} label="" />
+          {page !== ENUM_PAGES.List ? (
+            <BackButtonStyled onClick={() => history.push(ENUM_PAGES.List)} label="" />
           ) : (
             <BackButtonSpacerStyled />
           )}
@@ -77,12 +78,14 @@ function Header({ toggleTheme, currentTheme }: Props) {
         <HeaderRightPanel>
           <AccountModule compact={layoutSmall} />
           <Button
+            ref={activityOpener}
             className="ml-8"
             label={currentTheme === 'dark' ? 'Light' : 'Dark'}
             icon={currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
             display="icon"
             onClick={toggleTheme}
           />
+          <TransactionProgressButton />
         </HeaderRightPanel>
       </HeaderLayoutContent>
     </HeaderWraper>

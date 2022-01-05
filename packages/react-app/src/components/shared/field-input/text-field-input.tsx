@@ -1,8 +1,11 @@
 import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
+
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
+
+import { HelpIcon } from './icon-tooltip';
 
 // #region Styled
 
@@ -13,8 +16,8 @@ const FieldStyled = styled(Field)`
 const MaxHeightStyled = styled.div`
   overflow: hidden;
   margin-bottom: 8px;
-  line-height: 1.4em;
-  ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.4}em;` : '')}
+  line-height: 1.5em;
+  ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.5}em;` : '')}
 
   p {
     margin-top: 0 !important;
@@ -41,6 +44,8 @@ type Props = {
   maxLine?: number;
   isMarkDown?: boolean;
   ellipsis?: ReactNode;
+  tooltip?: string;
+  tooltipDetail?: React.ReactNode;
 };
 export default function TextFieldInput({
   id,
@@ -59,6 +64,8 @@ export default function TextFieldInput({
   maxLine,
   isMarkDown = false,
   ellipsis,
+  tooltipDetail,
+  tooltip,
 }: Props) {
   if (isLoading)
     return (
@@ -105,9 +112,22 @@ export default function TextFieldInput({
     </div>
   );
   return label ? (
-    <Field label={label} key={id}>
-      {loadableContent}
-    </Field>
+    <>
+      <Field
+        label={
+          <>
+            <span title={tooltip}>{label}</span>
+            {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+          </>
+        }
+        key={id}
+      >
+        {loadableContent}
+      </Field>
+      {/* {tooltip?(
+
+        )} */}
+    </>
   ) : (
     loadableContent
   );

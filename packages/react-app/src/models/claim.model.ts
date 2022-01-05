@@ -1,9 +1,14 @@
+import { ContainerModel } from './govern.model';
 import { TokenAmountModel } from './token-amount.model';
 
 export type ClaimModel = {
   questAddress: string;
   playerAddress: string;
-  claimAmount: TokenAmountModel;
+  claimedAmount: TokenAmountModel;
   evidence: string;
-  challengeDeposit?: TokenAmountModel; // Only set when fetching claims
+
+  // Only set when fetch
+  executionTimeMs?: number;
+  state?: string;
+  container?: ContainerModel;
 };

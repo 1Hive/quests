@@ -1,0 +1,33 @@
+{
+  "name": "@aragon/govern-subgraph",
+  "version": "1.0.0-beta.12",
+  "scripts": {
+    "build": "scripts/build-subgraph.sh",
+    "manifest-mainnet": "scripts/build-manifest.sh mainnet",
+    "manifest-mainnet-staging": "STAGING=true scripts/build-manifest.sh mainnet",
+    "manifest-rinkeby": "scripts/build-manifest.sh rinkeby",
+    "manifest-rinkeby-staging": "STAGING=true scripts/build-manifest.sh rinkeby",
+    "manifest-xdai": "scripts/build-manifest.sh xdai",
+    "manifest-xdai-staging": "STAGING=true scripts/build-manifest.sh xdai",
+    "deploy-mainnet": "scripts/deploy.sh corantin govern-1hive-mainnet mainnet <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-mainnet-staging": "STAGING=true scripts/deploy.sh corantin govern-1hive-mainnet mainnet <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-rinkeby": "scripts/deploy.sh corantin govern-1hive-rinkeby rinkeby <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-rinkeby-staging": "STAGING=truecripts/deploy.sh corantin govern-1hive-rinkeby rinkeby <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-xdai": "scripts/deploy.sh corantin govern-1hive-xdai xdai <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-xdai-staging": "STAGING=true scripts/deploy.sh corantin govern-1hive-xdai xdai <THE_GRAPH_ACCESS_TOKEN>",
+    "deploy-local": "LOCAL=true scripts/deploy.sh corantin govern-1hive-local local",
+    "create-local": "graph create corantin/govern-1hive-local --node http://localhost:8020"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.19.0",
+    "@graphprotocol/graph-ts": "^0.19.0",
+    "mustache": "^4.0.1"
+  },
+  "dependencies": {
+    "@aragon/govern-core": "^1.0.0-beta.12",
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
+    "file-type": "^16.5.0"
+  },
+  "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
+}

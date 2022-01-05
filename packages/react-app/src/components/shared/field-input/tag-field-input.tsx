@@ -1,12 +1,13 @@
 import { Field, IconClose, Tag, _AutoComplete as AutoComplete } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
-import React, { useRef, useState } from 'react';
+import React, { ReactNode, useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import * as QuestService from '../../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
+import { HelpIcon } from './icon-tooltip';
 
 // #region StyledComponents
 
@@ -27,6 +28,8 @@ type Props = {
   tagSuggestions?: string[];
   value?: string[];
   formik?: any;
+  tooltip?: string;
+  tooltipDetail?: ReactNode;
   compact?: boolean;
 };
 
@@ -41,13 +44,15 @@ function TagFieldInput({
   isEdit = false,
   isLoading = false,
   formik,
+  tooltip,
+  tooltipDetail,
   compact = false,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState<string>();
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
   tagSuggestions = (tagSuggestions ?? [])
-    .concat(QuestService.getTagSuggestions())
+    // .concat(QuestService.getTagSuggestions())
     .filter((name) => searchTerm && name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
 
   if (!tagSuggestions.length && searchTerm) tagSuggestions.push(searchTerm);
@@ -70,7 +75,16 @@ function TagFieldInput({
   };
 
   return (
-    <FieldStyled label={label} key={id} compact={compact}>
+    <FieldStyled
+      label={
+        <>
+          <span title={tooltip}>{label}</span>
+          {tooltip && <HelpIcon tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+        </>
+      }
+      key={id}
+      compact={compact}
+    >
       {isLoading ? (
         <Skeleton />
       ) : (

@@ -5,7 +5,7 @@ import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
 import MainView from './components/shared/main-view';
 import { defaultTheme } from './constants';
-import { WalletProvider } from './providers/wallet.context';
+import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
 
 function App() {
