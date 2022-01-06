@@ -28,7 +28,7 @@ type Props = {
 
 export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [fallbackAddress, setFallbackAddress] = useState<string | undefined>(
     questData.fallbackAddress,
   );
@@ -44,7 +44,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   useEffect(() => {
     if (questContract.instance?.address && !fallbackAddress) {
       questContract.instance.fundsRecoveryAddress().then(setFallbackAddress);
-      setLoading(false);
     }
   }, [questContract.instance?.address]);
 
