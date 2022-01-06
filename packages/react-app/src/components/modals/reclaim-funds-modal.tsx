@@ -125,7 +125,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           </Field>
         </Outset>
       </ModalBase>
-      )
     </>
   );
 }
