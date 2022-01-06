@@ -24,14 +24,24 @@ export default function Sidebar() {
   const { page } = usePageContext();
 
   return (
-    (account || page === ENUM_PAGES.List) && (
-      <BoxStyled>
-        <Outset gu8>
-          {page === ENUM_PAGES.List && <Filter />}
-          {page === ENUM_PAGES.List && account && <Separator gu16 />}
-          {account && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
-        </Outset>
-      </BoxStyled>
-    )
+    <>
+      {page === ENUM_PAGES.List && (
+        <BoxStyled>
+          <Outset gu8>
+            {page === ENUM_PAGES.List && (
+              <>
+                <Filter />
+                {account && (
+                  <>
+                    <Separator gu16 />
+                    <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
+                  </>
+                )}
+              </>
+            )}
+          </Outset>
+        </BoxStyled>
+      )}
+    </>
   );
 }
