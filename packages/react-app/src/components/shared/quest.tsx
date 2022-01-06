@@ -139,18 +139,15 @@ export default function Quest({
       setClaims(result);
     };
     const getBalanceOfQuest = async (address: string) => {
-      // Don't show empty bounty
-      if (data.state === ENUM_QUEST_STATE.Archived) setBounty(null);
-      else
-        try {
-          const result = await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
-          data.bounty = result ?? undefined;
-          processQuestState(data);
-          setBounty(result);
-        } catch (error) {
-          Logger.error(error);
-          setBounty(null);
-        }
+      try {
+        const result = await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
+        data.bounty = result ?? undefined;
+        processQuestState(data);
+        setBounty(result);
+      } catch (error) {
+        Logger.error(error);
+        setBounty(null);
+      }
     };
 
     if (data.address) getBalanceOfQuest(data.address);
