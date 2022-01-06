@@ -21,7 +21,7 @@ import {
   useGovernQueueContract,
 } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
-import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
+import AmountFieldInput, { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
 import TextFieldInput from '../shared/field-input/text-field-input';
 import { Outset } from '../shared/utils/spacer-util';
 import { IconTooltip } from '../shared/field-input/icon-tooltip';
@@ -261,7 +261,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         </OpenButtonWrapperStyled>
       }
       buttons={[
-        <AmountFieldInputFormik
+        <AmountFieldInput
           key="challengeDeposit"
           id="challengeDeposit"
           label="Challenge Deposit"
@@ -271,7 +271,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           value={challengeDeposit}
           compact
         />,
-        <AmountFieldInputFormik
+        <AmountFieldInput
           key="challengeFee"
           id="challengeFee"
           label="Challenge fee"
