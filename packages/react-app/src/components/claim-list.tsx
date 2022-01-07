@@ -7,12 +7,12 @@ import { DEAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from 'src/constants
 import { roundNumber } from 'src/utils/math.utils';
 import { ONE_DAY_IN_MS } from 'src/utils/date.utils';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import ChallengeModal from '../modals/challenge-modal';
+import ChallengeModal from './modals/challenge-modal';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import { Outset } from './utils/spacer-util';
 import { IconTooltip } from './field-input/icon-tooltip';
-import ResolveChallengeModal from '../modals/resolve-challenge-modal';
+import ResolveChallengeModal from './modals/resolve-challenge-modal';
 
 // #region StyledComponents
 

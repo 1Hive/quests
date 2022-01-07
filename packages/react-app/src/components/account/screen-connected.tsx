@@ -9,9 +9,9 @@ import {
 } from '@1hive/1hive-ui';
 import { useCallback } from 'react';
 import { GUpx } from 'src/utils/css.util';
-import { getProviderFromUseWalletId } from '../../../ethereum-providers';
-import { useCopyToClipboard } from '../../../hooks/use-copy-to-clipboard.hook';
-import { getNetworkName } from '../../../utils/web3.utils';
+import { getProviderFromUseWalletId } from '../../ethereum-providers';
+import { useCopyToClipboard } from '../../hooks/use-copy-to-clipboard.hook';
+import { getNetworkName } from '../../utils/web3.utils';
 import IdentityBadge from '../identity-badge';
 
 type Props = {

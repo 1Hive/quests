@@ -5,7 +5,7 @@ import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
-import Quest from './quest';
+import Quest from '../quest';
 
 export default function QuestDetail() {
   const { setPage } = usePageContext();

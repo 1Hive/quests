@@ -23,17 +23,17 @@ import { useWallet } from 'use-wallet';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
-import ScheduleClaimModal from '../modals/schedule-claim-modal';
-import FundModal from '../modals/fund-modal';
-import ReclaimFundsModal from '../modals/reclaim-funds-modal';
+import ScheduleClaimModal from './modals/schedule-claim-modal';
+import FundModal from './modals/fund-modal';
+import ReclaimFundsModal from './modals/reclaim-funds-modal';
 import DateFieldInput from './field-input/date-field-input';
 import { Outset } from './utils/spacer-util';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
-import { processQuestState } from '../../services/state-machine';
-import { StateTag } from '../state-tag';
-import ExecuteClaimModal from '../modals/execute-claim-modal';
+import { processQuestState } from '../services/state-machine';
+import { StateTag } from './state-tag';
+import ExecuteClaimModal from './modals/execute-claim-modal';
 import { AddressFieldInput } from './field-input/address-field-input';
 // #region StyledComponents
 

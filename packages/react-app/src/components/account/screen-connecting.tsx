@@ -1,7 +1,7 @@
 import { Button, GU, textStyle, useTheme } from '@1hive/1hive-ui';
 import React from 'react';
 import { keyframes } from 'styled-components';
-import { getProviderFromUseWalletId, getProviderString } from '../../../ethereum-providers';
+import { getProviderFromUseWalletId, getProviderString } from '../../ethereum-providers';
 import loadingRing from './assets/loading-ring.svg';
 
 const spin = keyframes`

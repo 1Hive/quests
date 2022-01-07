@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
-import { TransactionProgressButton } from '../transaction-progress-button';
+import { TransactionProgressButton } from '../utils/transaction-progress-button';
 
 // #region StyledComponents
 const HeaderWraper = styled.header`

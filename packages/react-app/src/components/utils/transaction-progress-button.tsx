@@ -6,7 +6,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { TransactionModel } from 'src/models/transaction.model';
 import styled from 'styled-components';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
-import { Outset } from './utils/spacer-util';
+import { Outset } from './spacer-util';
 
 const NotificationButtonStyled = styled(Button)`
   &::after {
