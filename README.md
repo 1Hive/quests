@@ -27,7 +27,7 @@ Start the project
 ```sh
 # Rinkeby testnet
 yarn start
-# Local chain (three different terminals)
+# Local chain (not working for the moment, missing the local subgraph)
 > yarn start:local
 > yarn chain
 > yarn deploy:local
