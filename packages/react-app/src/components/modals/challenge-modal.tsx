@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useState, useRef, useEffect } from 'react';
@@ -21,10 +20,10 @@ import {
   useGovernQueueContract,
 } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
-import AmountFieldInput, { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
-import TextFieldInput from '../shared/field-input/text-field-input';
-import { Outset } from '../shared/utils/spacer-util';
-import { IconTooltip } from '../shared/field-input/icon-tooltip';
+import AmountFieldInput from '../field-input/amount-field-input';
+import TextFieldInput from '../field-input/text-field-input';
+import { Outset } from '../utils/spacer-util';
+import { IconTooltip } from '../field-input/icon-tooltip';
 import { getLastBlockDate } from '../../utils/date.utils';
 
 // #region StyledComponents

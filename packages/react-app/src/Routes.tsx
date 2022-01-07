@@ -1,6 +1,6 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
-import QuestDetail from './components/shared/quest-detail';
-import QuestList from './components/shared/quest-list';
+import QuestDetail from './components/views/quest-detail';
+import QuestList from './components/views/quest-list';
 import { ENUM_PAGES } from './constants';
 
 export default function Routes() {

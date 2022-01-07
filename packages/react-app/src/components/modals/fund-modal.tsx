@@ -11,8 +11,8 @@ import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import * as QuestService from '../../services/quest.service';
-import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
-import { Outset } from '../shared/utils/spacer-util';
+import { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import { Outset } from '../utils/spacer-util';
 import ModalBase from './modal-base';
 
 const FormStyled = styled(Form)`

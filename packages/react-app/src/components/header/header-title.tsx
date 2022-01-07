@@ -3,7 +3,7 @@ import { noop } from 'lodash';
 import { Link } from 'react-router-dom';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { APP_TITLE, ENUM_PAGES } from '../../../constants';
+import { APP_TITLE, ENUM_PAGES } from '../../constants';
 import logo from './assets/logo.svg';
 
 // #region StyledComponents

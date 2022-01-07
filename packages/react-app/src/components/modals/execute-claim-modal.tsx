@@ -12,10 +12,10 @@ import { ethers } from 'ethers';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getLastBlockDate } from 'src/utils/date.utils';
 import * as QuestService from '../../services/quest.service';
-import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
-import { Outset } from '../shared/utils/spacer-util';
+import { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import { Outset } from '../utils/spacer-util';
 import ModalBase from './modal-base';
-import IdentityBadge from '../shared/identity-badge';
+import IdentityBadge from '../identity-badge';
 
 // #region StyledComponents
 

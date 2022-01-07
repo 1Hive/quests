@@ -6,7 +6,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { FilterContextProvider } from '../../contexts/filter.context';
+import { FilterContextProvider } from '../contexts/filter.context';
 import Header from './header';
 import MainScrollWithSidebarLayout from './side-content-layout';
 import Sidebar from './sidebar';

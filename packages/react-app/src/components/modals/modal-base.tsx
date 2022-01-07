@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
+import { ChildSpacer, Outset } from '../utils/spacer-util';
 
 const ModalFooterStyled = styled.div`
   width: 100%;

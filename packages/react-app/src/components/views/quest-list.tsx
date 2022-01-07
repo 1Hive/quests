@@ -2,14 +2,14 @@ import { debounce } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Quest from 'src/components/shared/quest';
+import Quest from 'src/components/quest';
 import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
 import { useFilterContext } from '../../contexts/filter.context';
-import { Outset } from './utils/spacer-util';
+import { Outset } from '../utils/spacer-util';
 
 const batchSize = 3;
 

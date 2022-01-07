@@ -11,10 +11,10 @@ import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
 import Skeleton from 'react-loading-skeleton';
 import * as QuestService from '../../services/quest.service';
-import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
-import { Outset } from '../shared/utils/spacer-util';
+import { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import { Outset } from '../utils/spacer-util';
 import ModalBase from './modal-base';
-import IdentityBadge from '../shared/identity-badge';
+import IdentityBadge from '../identity-badge';
 
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx()};

@@ -14,9 +14,9 @@ import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
 import ModalBase from './modal-base';
 import * as QuestService from '../../services/quest.service';
-import { AmountFieldInputFormik } from '../shared/field-input/amount-field-input';
-import TextFieldInput from '../shared/field-input/text-field-input';
-import { ChildSpacer, Outset } from '../shared/utils/spacer-util';
+import { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import TextFieldInput from '../field-input/text-field-input';
+import { ChildSpacer, Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
 

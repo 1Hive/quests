@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-import { dateFormat } from '../../../utils/date.utils';
+import { dateFormat } from '../../utils/date.utils';
 import { IconTooltip } from './icon-tooltip';
 
 // #region StyledComponents

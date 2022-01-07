@@ -1,6 +1,6 @@
 import { IdentityBadge as Badge } from '@1hive/1hive-ui';
 import React from 'react';
-import { getNetworkType } from '../../utils/web3.utils';
+import { getNetworkType } from '../utils/web3.utils';
 
 type Props = {
   entity: string;

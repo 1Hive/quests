@@ -6,7 +6,7 @@ import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import Quest from '../shared/quest';
+import Quest from '../quest';
 import ModalBase from './modal-base';
 
 // #region StyledComponents

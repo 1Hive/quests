@@ -2,7 +2,7 @@ import { useViewport } from '@1hive/1hive-ui';
 import React, { useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { BREAKPOINTS } from '../../styles/breakpoints';
+import { BREAKPOINTS } from '../styles/breakpoints';
 
 const WrapperStyled = styled.div`
   display: flex;

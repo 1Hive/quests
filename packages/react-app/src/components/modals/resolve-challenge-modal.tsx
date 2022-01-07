@@ -22,9 +22,9 @@ import Skeleton from 'react-loading-skeleton';
 import ModalBase from './modal-base';
 import { useCelesteContract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
-import { Outset } from '../shared/utils/spacer-util';
+import { Outset } from '../utils/spacer-util';
 import { DisputeModel } from '../../models/dispute.model';
-import TextFieldInput from '../shared/field-input/text-field-input';
+import TextFieldInput from '../field-input/text-field-input';
 
 // #region StyledComponents
 
