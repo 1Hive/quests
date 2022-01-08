@@ -9,7 +9,7 @@ import {
   IconCaution,
 } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import styled from 'styled-components';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
@@ -84,6 +84,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [isRuled, setRuled] = useState(false);
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
+  const [isStackholder, setIsStackholder] = useState(false);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
   const governQueueContract = useGovernQueueContract();
@@ -112,6 +113,13 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForSubmitter,
       );
   }, [dispute?.state]);
+
+  useEffect(() => {
+    if (challenge && claim)
+      setIsStackholder(
+        challenge.challengerAddress === wallet.account || claim.playerAddress === wallet.account,
+      );
+  }, [claim, challenge]);
 
   const onModalClose = () => {
     setOpened(false);
@@ -217,14 +225,14 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         // )
       }
       buttons={[
-        <>
-          {isRuled && (
+        <Fragment key="warnMessage">
+          {isRuled && !isStackholder && (
             <OnlySHWarn mode="warning">
               <IconCaution />
               <span> Only a stackholder of this challenge may resolve it</span>
             </OnlySHWarn>
           )}
-        </>,
+        </Fragment>,
         <Button
           key="confirmButton"
           icon={<IconFlag />}
