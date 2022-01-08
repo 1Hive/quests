@@ -1,9 +1,11 @@
-import { Field, TextInput, TokenBadge } from '@1hive/1hive-ui';
+import { Field, TextInput, TokenBadge, _AutoComplete as AutoComplete } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
-import { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { NETWORK_TOKENS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/css.util';
 import { floorNumber } from 'src/utils/math.utils';
@@ -30,6 +32,10 @@ const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
 `;
 
+const AutoCompleteStyled = styled(AutoComplete)`
+  display: block;
+`;
+
 // #endregion
 
 type Props = {
@@ -47,6 +53,8 @@ type Props = {
   tooltipDetail?: ReactNode;
   maxDecimals?: number;
   disabled?: boolean;
+  min?: number;
+  max?: number;
 };
 
 function AmountFieldInput({
@@ -64,17 +72,26 @@ function AmountFieldInput({
   compact = false,
   maxDecimals,
   disabled = false,
+  min,
+  max,
 }: Props) {
-  const { defaultToken } = getNetwork();
+  const { defaultToken, type } = getNetwork();
   const [amount, setAmount] = useState(value?.parsedAmount ?? 0);
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
+  const [tokens, setTokens] = useState<TokenModel[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string | null>();
+  const autoCompleteRef: React.Ref<any> = useRef(null);
+
+  useEffect(() => {
+    setTokens(NETWORK_TOKENS[type]);
+  }, []);
 
   useEffect(() => {
     if (!isEdit) {
-      const decimalPos = maxDecimals ? 0 : Math.floor(Math.log10(0.0000002)) * -1;
-      if (decimalPos > 0) setDecimalsCount(maxDecimals ?? decimalPos);
+      if (value?.parsedAmount && (!maxDecimals || maxDecimals > 0))
+        setDecimalsCount(maxDecimals ?? Math.floor(Math.log10(value.parsedAmount)) * -1);
     }
-  }, [maxDecimals, isEdit]);
+  }, [maxDecimals, isEdit, value?.parsedAmount]);
 
   useEffect(() => {
     setAmount(value?.parsedAmount ?? 0);
@@ -88,6 +105,11 @@ function AmountFieldInput({
     value.token.amount = toBigNumber(value).toString();
     if (formik) formik.setFieldValue(id, value);
     else onChange(value);
+  };
+
+  const onTokenSelect = (newValue: TokenModel) => {
+    autoCompleteRef.current.value = newValue.symbol;
+    setSearchTerm(null);
   };
 
   return (
@@ -113,6 +135,8 @@ function AmountFieldInput({
                 onChange={onAmountChange}
                 placeHolder={placeHolder}
                 type="number"
+                min={min}
+                max={max}
                 value={amount}
                 disabled={disabled}
               />
@@ -120,11 +144,28 @@ function AmountFieldInput({
               floorNumber(amount, decimalsCount)
             )}
           </AmountStyled>
-          {value?.token.symbol && (
+          {value?.token.token ? (
             <TokenBadgeStyled
               symbol={value.token.symbol}
               address={value.token.token}
               networkType="private"
+            />
+          ) : (
+            <AutoCompleteStyled
+              items={tokens.filter((x) =>
+                new RegExp([x.name, x.symbol].join('|'), 'i').test(searchTerm ?? ''),
+              )}
+              onChange={setSearchTerm}
+              onSelect={onTokenSelect}
+              ref={autoCompleteRef}
+              placeholder="Search name or paste address"
+              renderItem={(x: TokenModel) => (
+                <>
+                  <span>{x.name}</span>
+                  <TokenBadgeStyled symbol={x.symbol} address={x.token} networkType="private" />
+                </>
+              )}
+              wide
             />
           )}
         </LineStyled>

@@ -47,6 +47,11 @@ export const TOKENS = {
   } as TokenModel,
 };
 
+export const NETWORK_TOKENS = {
+  rinkeby: [TOKENS.HoneyTest],
+  xdai: [TOKENS.Honey],
+};
+
 // Constants
 
 export const GQL_MAX_INT = 2 ** 31 - 1;
