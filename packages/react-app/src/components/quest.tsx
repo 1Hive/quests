@@ -106,7 +106,7 @@ export default function Quest({
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel>();
-  const [newClaim, setNewClaim] = useState(0);
+  const [claimUpdated, setClaimUpdate] = useState(0);
   const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
   (window as any).pushTransaction = pushTransaction;
   (window as any).updateTransactionStatus = updateTransactionStatus;
@@ -243,7 +243,7 @@ export default function Quest({
 
   const onScheduleModalClosed = (success: boolean) => {
     if (success) {
-      setNewClaim(newClaim + 1); // Trigger a claim update in claim list
+      setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
     }
   };
 
@@ -251,6 +251,7 @@ export default function Quest({
     setTimeout(() => {
       if (success && data.address && data.rewardToken) {
         fetchBalanceOfQuest(data.address, data.rewardToken);
+        setClaimUpdate(claimUpdated + 1);
       }
     }, 500);
   };
@@ -389,7 +390,7 @@ export default function Quest({
         <>
           {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
             <ClaimList
-              newClaim={newClaim}
+              newClaim={claimUpdated}
               questData={data}
               questTotalBounty={bounty}
               challengeDeposit={challengeDeposit}
