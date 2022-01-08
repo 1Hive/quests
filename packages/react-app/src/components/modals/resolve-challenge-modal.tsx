@@ -70,6 +70,10 @@ const OnlySHWarn = styled(Info)`
   align-items: center;
 `;
 
+const LinkStyled = styled(Link)`
+  margin-left: ${GUpx()};
+`;
+
 // #endregion
 
 type Props = {
