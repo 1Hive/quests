@@ -134,22 +134,7 @@ export default function Quest({
         }
     };
 
-    const getBalanceOfQuest = (address: string, token: TokenModel) => {
-      setInterval(() => {
-        QuestService.getBalanceOf(erc20Contract, token, address)
-          .then((result) => {
-            data.bounty = result ?? undefined;
-            processQuestState(data);
-            setBounty(result);
-          })
-          .catch((err) => {
-            Logger.error(err);
-            setBounty(undefined);
-          });
-      }, 1000); // Refresh balance each seconds
-    };
-
-    if (data.rewardToken && data.address) getBalanceOfQuest(data.address, data.rewardToken);
+    if (data.rewardToken && data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
@@ -243,10 +228,31 @@ export default function Quest({
     }
   };
 
-  const onScheduleClose = (success: boolean) => {
+  const fetchBalanceOfQuest = (address: string, token: TokenModel) => {
+    QuestService.getBalanceOf(erc20Contract, token, address)
+      .then((result) => {
+        data.bounty = result ?? undefined;
+        processQuestState(data);
+        setBounty(result);
+      })
+      .catch((err) => {
+        Logger.error(err);
+        setBounty(undefined);
+      });
+  };
+
+  const onScheduleModalClosed = (success: boolean) => {
     if (success) {
       setNewClaim(newClaim + 1); // Trigger a claim update in claim list
     }
+  };
+
+  const onFundModalClosed = (success: boolean) => {
+    setTimeout(() => {
+      if (success && data.address && data.rewardToken) {
+        fetchBalanceOfQuest(data.address, data.rewardToken);
+      }
+    }, 500);
   };
 
   const questContent = (values: QuestModel, handleChange = noop) => (
@@ -401,14 +407,14 @@ export default function Quest({
               bounty &&
               (values.state === ENUM_QUEST_STATE.Active ? (
                 <>
-                  <FundModal questAddress={values.address} />
+                  <FundModal questAddress={values.address} onClose={onFundModalClosed} />
                   {claimDeposit && (
                     <ScheduleClaimModal
                       questAddress={data.address}
                       questTotalBounty={bounty}
                       claimDeposit={claimDeposit}
                       playerAddress={wallet.account}
-                      onClose={onScheduleClose}
+                      onClose={onScheduleModalClosed}
                     />
                   )}
                 </>

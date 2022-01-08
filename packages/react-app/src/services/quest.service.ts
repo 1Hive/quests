@@ -22,10 +22,16 @@ import { DisputeModel } from 'src/models/dispute.model';
 import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
-import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
+import {
+  getIpfsBaseUri,
+  getObjectFromIpfs,
+  pushObjectToIpfs,
+  formatIpfsMarkdownLink,
+} from './ipfs.service';
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
+import { compareCaseInsensitive } from '../utils/string.util';
 
 let questList: QuestModel[] = [];
 
@@ -45,7 +51,10 @@ function mapQuest(questEntity: any) {
       expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
     } as QuestModel;
     quest = processQuestState(quest);
-    if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
+    if (!quest.detailsRefIpfs) quest.description = '[No description]';
+    // If failed to fetch ipfs description
+    else if (!quest.description)
+      quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
     return quest;
   } catch (error) {
     Logger.error('Failed to map quest : ', questEntity);
@@ -245,7 +254,15 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
       )
       .map(async (x) => {
         const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);
-        const evidence = await getObjectFromIpfs(evidenceIpfsHash);
+        let evidence: string | undefined;
+        try {
+          evidence = await getObjectFromIpfs(evidenceIpfsHash);
+        } catch (error) {
+          Logger.error('Failed to get IPFS object when fetching claims', error);
+        }
+        // If failed to fetch ipfs evidence
+        if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
+
         return {
           claimedAmount: {
             token: quest.rewardToken,
@@ -286,20 +303,25 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
     await request(governSubgraph, GovernQueueChallengesQuery, {
       containerId: container.id,
     })
-  ).containerEventChallenges.find((x: any) => x.container.queue.id === governQueueAddress); // Validate same queue as app GovernQueue
-  if (!result)
-    return {
-      reason: 'Fake reason',
-      challengerAddress: '0xf4b90fa2bd7c95afb248e9d4b98edd30b8a4b452',
-    } as any; // TODO  unfake
+  ).containerEventChallenges.find((x: any) =>
+    x.container.queue.id.localeCompare(governQueueAddress),
+  ); // Validate same queue as app GovernQueue
+
+  if (!result) return null;
 
   const { disputeId, reason, createdAt, resolver, collateral, challenger } = result;
+  let fetchedReason: string | undefined;
+  try {
+    fetchedReason = await getObjectFromIpfs(reason);
+  } catch (error) {
+    Logger.error('Failed to get IPFS object when fetching challenge', error);
+  }
   return {
     deposit: {
       parsedAmount: fromBigNumber(collateral.amount, collateral.decimals),
       token: collateral,
     },
-    reason: (await getObjectFromIpfs(reason)) ?? '',
+    reason: fetchedReason ?? formatIpfsMarkdownLink(reason, 'See reason'),
     createdAt,
     resolver,
     challengerAddress: challenger,
@@ -484,7 +506,9 @@ export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel> {
   if (!celesteContract.instance) throw celesteContract.error;
-  if (!challenge.disputeId) throw new Error('Dispute does not exist yet, please try again later');
+
+  if (challenge.disputeId === undefined)
+    throw new Error('Dispute does not exist yet, please try again later');
 
   const { state } = await celesteContract.instance.disputes(challenge.disputeId);
 

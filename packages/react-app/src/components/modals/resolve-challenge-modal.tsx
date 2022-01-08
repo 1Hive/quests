@@ -9,7 +9,7 @@ import {
   IconCaution,
 } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import styled from 'styled-components';
 import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
@@ -95,6 +95,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       if (celesteContract) {
         if (!claim.container) throw new Error('Container is required to fetch challenge disputes');
         const challengeResult = await QuestService.fetchChallenge(claim.container);
+        if (!challengeResult)
+          throw new Error(`Failed to fetch challenge with container id ${claim.container.id}`);
         setChallenge(challengeResult);
         if (challengeResult) {
           setDispute(await QuestService.fetchChallengeDispute(celesteContract, challengeResult));
@@ -112,6 +114,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForSubmitter,
       );
   }, [dispute?.state]);
+
+  useEffect(() => {}, [claim]);
 
   const resolveChallengeTx = async () => {
     try {
@@ -204,27 +208,25 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         </HeaderStyled>
       }
       openButton={
-        // challenge && (
         <OpenButtonWrapperStyled>
           <OpenButtonStyled
             icon={<IconFlag />}
             onClick={() => setOpened(true)}
-            label="Resolve"
+            label="Open resolve"
             mode="positive"
             disabled={loading || !dispute || !governQueueContract || !celesteContract}
           />
         </OpenButtonWrapperStyled>
-        // )
       }
       buttons={[
-        <>
+        <Fragment key="warnMessage">
           {isRuled && (
             <OnlySHWarn mode="warning">
               <IconCaution />
               <span> Only a stackholder of this challenge may resolve it</span>
             </OnlySHWarn>
           )}
-        </>,
+        </Fragment>,
         <Button
           key="confirmButton"
           icon={<IconFlag />}

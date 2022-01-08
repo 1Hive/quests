@@ -13,6 +13,7 @@ import { getNetwork } from 'src/networks';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { BigNumber } from 'ethers';
 import { useWallet } from 'src/contexts/wallet.context';
+import { TokenModel } from 'src/models/token.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import {
   useCelesteContract,
@@ -121,7 +122,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         setLoading(true);
         const { governQueueAddress } = getNetwork();
         const feeAndDepositSameToken =
-          challengeFee?.token?.token === claim.container?.config.challengeDeposit.token;
+          challengeFee?.token?.token.toLowerCase() ===
+          claim.container?.config.challengeDeposit.token.toLowerCase();
+
         if (
           challengeFee?.parsedAmount &&
           (!feeAndDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
@@ -150,19 +153,25 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           if (!approveTxReceipt.status) throw new Error('Failed to approve fee');
         }
         if (+claim.container!.config.challengeDeposit.amount) {
+          let tokenToApprove: TokenModel;
           const pendingMessage = feeAndDepositSameToken
             ? 'Approving challenge fee + deposit...'
             : 'Approving challenge deposit...';
-          if (feeAndDepositSameToken) {
-            const approvingAmount = BigNumber.from(claim.container!.config.challengeDeposit);
-            approvingAmount.add(BigNumber.from(challengeFee?.token?.amount ?? '0'));
-            claim.container!.config.challengeDeposit.amount = approvingAmount.toString();
+          if (feeAndDepositSameToken && challengeFee?.token?.amount) {
+            let approvingAmount = BigNumber.from(claim.container!.config.challengeDeposit.amount);
+            approvingAmount = approvingAmount.add(BigNumber.from(challengeFee.token.amount));
+            tokenToApprove = {
+              ...challengeFee.token,
+              amount: approvingAmount.toString(),
+            };
+          } else {
+            tokenToApprove = claim.container!.config.challengeDeposit;
           }
           toast(pendingMessage);
           const approveTxReceipt = await QuestService.approveTokenAmount(
             erc20DepositContract,
             governQueueAddress,
-            claim.container!.config.challengeDeposit,
+            tokenToApprove,
             (tx) => {
               pushTransaction({
                 hash: tx,

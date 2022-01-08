@@ -17,6 +17,9 @@ const ipfsTheGraph = ipfsAPI.create(configTheGraph);
 
 export const getIpfsBaseUri = () => `${configTheGraph.url}/cat?arg=`;
 
+export const formatIpfsMarkdownLink = (ipfsHash: string, label: string) =>
+  `[${label}](${ipfsHash})`;
+
 export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
   const response = await ipfsTheGraph.add(obj.toString());
   const cid = response.cid.toString();

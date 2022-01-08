@@ -68,6 +68,10 @@ export default function ClaimList({
   const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | null>();
 
   useEffect(() => {
+    fetchClaims();
+  }, []);
+
+  useEffect(() => {
     if (wallet.account) {
       if (claims) {
         const result = claims.find((x) => x.playerAddress === wallet.account);
@@ -87,13 +91,14 @@ export default function ClaimList({
     return result;
   };
 
-  const fetchNewClaimChanges = (success: boolean) => {
-    const oldClaimsSnapshot = JSON.stringify(claims);
+  const fetchNewClaimChanges = (success: boolean, oldClaimsSnapshot?: string) => {
+    oldClaimsSnapshot = oldClaimsSnapshot ?? JSON.stringify(claims);
     // Refresh until different
     if (success) {
-      const intervalHandle = setInterval(async () => {
+      setTimeout(async () => {
         const newClaimsSnapshot = JSON.stringify(await fetchClaims());
-        if (oldClaimsSnapshot !== newClaimsSnapshot) clearInterval(intervalHandle); // If new result, stop interval pulling
+        if (oldClaimsSnapshot === newClaimsSnapshot)
+          fetchNewClaimChanges(success, oldClaimsSnapshot); // If same result keep pulling
       }, 1000);
     }
   };
