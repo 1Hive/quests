@@ -1,15 +1,17 @@
 import { QuestCreated } from "../generated/QuestFactory/QuestFactory";
 import { QuestEntity } from "../generated/schema";
-import { Bytes, ipfs, json } from "@graphprotocol/graph-ts";
+import { Bytes, ipfs } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
 
   questEntity.questAddress = event.params.questAddress.toHexString();
   questEntity.questTitle = event.params.questTitle;
+  questEntity.questDetailsRef = event.params.questDetailsRef;
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
-  questEntity.questDetailsRef = event.params.questDetailsRef;
+  questEntity.creationTimestamp = event.params.creationTime;
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = "";

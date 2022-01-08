@@ -34,8 +34,8 @@ export const QuestEntitiesQuery = gql`
         questTitle_contains: $title
         questDescription_contains: $description
       }
-      orderBy: questExpireTimeSec
-      orderDirection: asc
+      orderBy: creationTimestamp
+      orderDirection: desc
       subgraphError: allow
     ) {
       id

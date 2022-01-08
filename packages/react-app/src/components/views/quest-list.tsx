@@ -8,16 +8,26 @@ import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
+import { useQuestsContext } from 'src/contexts/quests.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 
 const batchSize = 3;
+const skeletonQuests: any[] = [];
+for (let i = 0; i < batchSize; i += 1) {
+  skeletonQuests.push(
+    <Outset gu16 key={`${i}`}>
+      <Quest isLoading />
+    </Outset>,
+  );
+}
 
 export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filter } = useFilterContext()!;
+  const { filter, refreshed } = useFilterContext()!;
+  const { newQuest } = useQuestsContext()!;
 
   const { setPage } = usePageContext();
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
@@ -43,23 +53,27 @@ export default function QuestList() {
     });
   };
 
-  const skeletonQuests = [];
-  for (let i = 0; i < batchSize; i += 1) {
-    skeletonQuests.push(
-      <Outset gu16 key={`${i}`}>
-        <Quest isLoading />
-      </Outset>,
-    );
-  }
-
   const debounceFilter = useCallback(
     debounce((nextFilter) => refresh(nextFilter), 500),
     [], // will be created only once initially
   );
+
   useEffect(() => {
     debounceFilter(filter);
     return () => debounceFilter.cancel();
   }, [filter]);
+
+  useEffect(() => {
+    refresh();
+  }, [refreshed]);
+
+  useEffect(() => {
+    // Should not be nullish and not already exist in list
+    if (newQuest && !quests.find((x) => x.address === newQuest.address)) {
+      // Insert the newQuest at the top of the list
+      setQuests([newQuest, ...quests]);
+    }
+  }, [newQuest]);
 
   return (
     <InfiniteScroll

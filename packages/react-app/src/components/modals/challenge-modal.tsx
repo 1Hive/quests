@@ -13,7 +13,7 @@ import { getNetwork } from 'src/networks';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { BigNumber } from 'ethers';
 import { useWallet } from 'src/contexts/wallet.context';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 import {
   useCelesteContract,
   useERC20Contract,
@@ -52,7 +52,7 @@ const OpenButtonWrapperStyled = styled.div`
 type Props = {
   claim: ClaimModel;
   challengeDeposit: TokenAmountModel;
-  onClose?: Function;
+  onClose?: ModalCallback;
 };
 
 export default function ChallengeModal({ claim, challengeDeposit, onClose = noop }: Props) {
@@ -108,9 +108,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     }
   }, [claim.state, challengeTimeout]);
 
-  const onModalClose = () => {
+  const closeModal = (success: boolean) => {
     setOpened(false);
-    onClose();
+    onClose(success);
   };
 
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
@@ -209,7 +209,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         });
         if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
         toast('Operation succeed');
-        onModalClose();
+        closeModal(true);
       } catch (e: any) {
         updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
         Logger.error(e);
@@ -290,7 +290,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           disabled={loading}
         />,
       ]}
-      onClose={onModalClose}
+      onClose={() => closeModal(false)}
       isOpen={opened}
     >
       <Formik

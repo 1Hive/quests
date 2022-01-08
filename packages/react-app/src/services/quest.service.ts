@@ -17,8 +17,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
-import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
-import { number } from 'prop-types';
+import { NullableContract } from 'src/models/contract-error';
 import { DisputeModel } from 'src/models/dispute.model';
 import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
@@ -27,10 +26,6 @@ import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.serv
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
-import {
-  CelesteCourtConfigEntitiesQuery,
-  CelesteDisputeEntityQuery,
-} from '../queries/celeste-config-entity.query';
 
 let questList: QuestModel[] = [];
 
@@ -207,22 +202,14 @@ export async function computeScheduleContainer(
   claimData: ClaimModel,
   extraDelaySec?: number,
 ): Promise<ContainerModel> {
-  const { governAddress: govern } = getNetwork();
-
+  const { governAddress } = getNetwork();
   const governQueueResult = await fetchGovernQueue();
-
-  const ERC3000Config = {
-    ...governQueueResult.config, // default config fetched from govern subgraph
-    // resolver: celeste, // Celeste
-    // executionDelay: Math.round(DEAULT_CLAIM_EXECUTION_DELAY_MS / 1000), // delay after which the claim can be executed by player
-  } as ConfigModel;
-
   const erc3000Config = governQueueResult.config;
-
   const lastBlockTimestamp = await getLastBlockTimestamp();
 
   // A bit more than the execution delay
-  const executionTime = +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec ?? 60); // Add 1 minute by default
+  const executionTime =
+    +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec || 3600); // Add 1 minute by default
 
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
@@ -233,7 +220,7 @@ export async function computeScheduleContainer(
       nonce: governQueueResult.nonce + 1, // Increment nonce for each schedule
       executionTime,
       submitter: claimData.playerAddress,
-      executor: govern,
+      executor: governAddress,
       actions: [
         {
           to: claimData.questAddress,
@@ -381,19 +368,6 @@ export async function fundQuest(
   return handleTransaction(tx, onTx);
 }
 
-export async function getBalanceOf(
-  erc20Contract: NullableContract,
-  token: TokenModel,
-  address: string,
-): Promise<TokenAmountModel> {
-  if (!erc20Contract.instance) throw erc20Contract.error;
-  const balance = await erc20Contract.instance.balanceOf(address);
-  return {
-    token,
-    parsedAmount: fromBigNumber(balance, token.decimals),
-  };
-}
-
 export async function approveTokenAmount(
   erc20Contract: NullableContract,
   toAddress: string,
@@ -406,6 +380,19 @@ export async function approveTokenAmount(
   Logger.debug('Approving token amount ...', { tokenAmount, fromAddress: toAddress });
   const tx = await erc20Contract.instance.approve(toAddress, tokenAmount.amount, defaultGazFees);
   return handleTransaction(tx, onTx);
+}
+
+export async function getBalanceOf(
+  erc20Contract: NullableContract,
+  token: TokenModel,
+  address: string,
+): Promise<TokenAmountModel> {
+  if (!erc20Contract.instance) throw erc20Contract.error;
+  const balance = await erc20Contract.instance.balanceOf(address);
+  return {
+    token,
+    parsedAmount: fromBigNumber(balance, token.decimals),
+  };
 }
 
 // #endregion
@@ -486,7 +473,7 @@ export async function fetchChallengeFee(
 ): Promise<TokenAmountModel> {
   if (!celesteContract.instance) throw celesteContract.error;
   const [, feeToken, feeAmount] = await celesteContract.instance.getDisputeFees();
-
+  console.log(feeToken, feeAmount);
   return toTokenAmountModel({
     ...TOKENS.Honey,
     token: feeToken,

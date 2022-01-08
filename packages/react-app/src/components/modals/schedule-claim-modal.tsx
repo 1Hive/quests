@@ -12,7 +12,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
@@ -35,7 +35,7 @@ type Props = {
   questTotalBounty: TokenAmountModel;
   claimDeposit: TokenAmountModel;
   playerAddress: string;
-  onClose?: Function;
+  onClose?: ModalCallback;
 };
 
 export default function ScheduleClaimModal({
@@ -55,7 +55,7 @@ export default function ScheduleClaimModal({
     useTransactionContext()!;
   const { defaultToken } = getNetwork();
 
-  const onModalClose = (succeed: any) => {
+  const closeModal = (succeed: any) => {
     setOpened(false);
     onClose(succeed);
   };
@@ -116,7 +116,7 @@ export default function ScheduleClaimModal({
       if (!scheduleReceipt.status)
         throw new Error('Failed to schedule the claim, please try again in a few seconds');
       toast('Operation succeed');
-      onModalClose(true);
+      closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
@@ -125,7 +125,6 @@ export default function ScheduleClaimModal({
           ? 'Oops. Something went wrong.'
           : e.message,
       );
-      onModalClose(false);
     } finally {
       setSubmitting(false);
       setLoading(false);
@@ -164,7 +163,7 @@ export default function ScheduleClaimModal({
           disabled={loading || !governQueueContract || !erc20Contract}
         />,
       ]}
-      onClose={onModalClose}
+      onClose={() => closeModal(false)}
       isOpen={opened}
     >
       <Formik

@@ -20,6 +20,7 @@ export class QuestEntity extends Entity {
     this.set("questTitle", Value.fromString(""));
     this.set("questDetailsRef", Value.fromBytes(Bytes.empty()));
     this.set("questRewardTokenAddress", Value.fromBytes(Bytes.empty()));
+    this.set("creationTimestamp", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -116,5 +117,14 @@ export class QuestEntity extends Entity {
 
   set questRewardTokenAddress(value: Bytes) {
     this.set("questRewardTokenAddress", Value.fromBytes(value));
+  }
+
+  get creationTimestamp(): BigInt {
+    let value = this.get("creationTimestamp");
+    return value!.toBigInt();
+  }
+
+  set creationTimestamp(value: BigInt) {
+    this.set("creationTimestamp", Value.fromBigInt(value));
   }
 }

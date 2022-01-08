@@ -19,7 +19,7 @@ import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 import { useCelesteContract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -74,7 +74,7 @@ const OnlySHWarn = styled(Info)`
 
 type Props = {
   claim: ClaimModel;
-  onClose?: Function;
+  onClose?: ModalCallback;
 };
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
@@ -113,11 +113,6 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       );
   }, [dispute?.state]);
 
-  const onModalClose = () => {
-    setOpened(false);
-    onClose();
-  };
-
   const resolveChallengeTx = async () => {
     try {
       setLoading(true);
@@ -145,7 +140,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       });
       if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
       toast('Operation succeed');
-      onModalClose();
+      closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
@@ -157,6 +152,11 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     } finally {
       setLoading(false);
     }
+  };
+
+  const closeModal = (success: boolean) => {
+    setOpened(false);
+    onClose(success);
   };
 
   const player = (
@@ -235,7 +235,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           title={isRuled ? 'Publish dispute result' : 'Need to be ruled'}
         />,
       ]}
-      onClose={onModalClose}
+      onClose={() => closeModal(false)}
       isOpen={opened}
     >
       <Outset gu16>
