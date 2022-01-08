@@ -84,6 +84,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [isRuled, setRuled] = useState(false);
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
+  const [isStackholder, setIsStackholder] = useState(false);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
   const governQueueContract = useGovernQueueContract();
@@ -115,7 +116,12 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       );
   }, [dispute?.state]);
 
-  useEffect(() => {}, [claim]);
+  useEffect(() => {
+    if (challenge && claim)
+      setIsStackholder(
+        challenge.challengerAddress === wallet.account || claim.playerAddress === wallet.account,
+      );
+  }, [claim, challenge]);
 
   const resolveChallengeTx = async () => {
     try {
@@ -220,7 +226,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       }
       buttons={[
         <Fragment key="warnMessage">
-          {isRuled && (
+          {isRuled && !isStackholder && (
             <OnlySHWarn mode="warning">
               <IconCaution />
               <span> Only a stackholder of this challenge may resolve it</span>
