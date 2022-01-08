@@ -22,16 +22,10 @@ import { DisputeModel } from 'src/models/dispute.model';
 import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
-import {
-  getIpfsBaseUri,
-  getObjectFromIpfs,
-  pushObjectToIpfs,
-  formatIpfsMarkdownLink,
-} from './ipfs.service';
+import { getObjectFromIpfs, pushObjectToIpfs, formatIpfsMarkdownLink } from './ipfs.service';
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
-import { compareCaseInsensitive } from '../utils/string.util';
 
 let questList: QuestModel[] = [];
 
