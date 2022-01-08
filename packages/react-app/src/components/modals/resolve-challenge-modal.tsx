@@ -121,7 +121,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       setIsStackholder(
         challenge.challengerAddress === wallet.account || claim.playerAddress === wallet.account,
       );
-  }, [claim, challenge]);
+  }, [claim, challenge, wallet.account]);
 
   const resolveChallengeTx = async () => {
     try {
@@ -191,11 +191,13 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         <RulingInfoStyled mode={isRuled ? 'info' : 'warning'}>
           <FinalRulingStyled>
             {isRuled ? (
-              'Final ruling in favor of'
+              'Ruled in favor of'
             ) : (
               <>
-                Ruling in progress, please come back later...{' '}
-                <Link href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>See dispute</Link>
+                Ruling in progress, please come back later...
+                <LinkStyled href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>
+                  See dispute
+                </LinkStyled>
               </>
             )}
           </FinalRulingStyled>

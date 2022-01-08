@@ -318,7 +318,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
     reason: fetchedReason ?? formatIpfsMarkdownLink(reason, 'See reason'),
     createdAt,
     resolver,
-    challengerAddress: challenger,
+    challengerAddress: toChecksumAddress(challenger),
     disputeId,
   };
 }
