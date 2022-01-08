@@ -11,7 +11,7 @@ import {
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
 } from 'src/queries/govern-queue-entity.query';
-import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers';
+import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
@@ -208,8 +208,7 @@ export async function computeScheduleContainer(
   const lastBlockTimestamp = await getLastBlockTimestamp();
 
   // A bit more than the execution delay
-  const executionTime =
-    +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec || 3600); // Add 1 minute by default
+  const executionTime = +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec || 60); // Add 1 minute by default
 
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
@@ -473,7 +472,6 @@ export async function fetchChallengeFee(
 ): Promise<TokenAmountModel> {
   if (!celesteContract.instance) throw celesteContract.error;
   const [, feeToken, feeAmount] = await celesteContract.instance.getDisputeFees();
-  console.log(feeToken, feeAmount);
   return toTokenAmountModel({
     ...TOKENS.Honey,
     token: feeToken,

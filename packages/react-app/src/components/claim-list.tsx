@@ -92,7 +92,6 @@ export default function ClaimList({
     // Refresh until different
     if (success) {
       const intervalHandle = setInterval(async () => {
-        console.log('Fetching again');
         const newClaimsSnapshot = JSON.stringify(await fetchClaims());
         if (oldClaimsSnapshot !== newClaimsSnapshot) clearInterval(intervalHandle); // If new result, stop interval pulling
       }, 1000);
