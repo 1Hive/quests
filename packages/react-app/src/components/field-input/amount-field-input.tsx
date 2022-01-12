@@ -120,13 +120,11 @@ function AmountFieldInput({
               floorNumber(amount, decimalsCount)
             )}
           </AmountStyled>
-          {value?.token.symbol && (
-            <TokenBadgeStyled
-              symbol={value.token.symbol}
-              address={value.token.token}
-              networkType="private"
-            />
-          )}
+          <TokenBadgeStyled
+            symbol={value?.token.symbol ?? defaultToken.symbol}
+            address={value?.token.token ?? defaultToken.token}
+            networkType="private"
+          />
         </LineStyled>
       )}
     </FieldStyled>
