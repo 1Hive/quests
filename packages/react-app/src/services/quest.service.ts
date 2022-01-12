@@ -11,26 +11,21 @@ import {
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
 } from 'src/queries/govern-queue-entity.query';
-import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers';
+import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
-import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
-import { number } from 'prop-types';
+import { NullableContract } from 'src/models/contract-error';
 import { DisputeModel } from 'src/models/dispute.model';
 import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
-import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
+import { getObjectFromIpfs, pushObjectToIpfs, formatIpfsMarkdownLink } from './ipfs.service';
 import { getQuestContractInterface } from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
-import {
-  CelesteCourtConfigEntitiesQuery,
-  CelesteDisputeEntityQuery,
-} from '../queries/celeste-config-entity.query';
 
 let questList: QuestModel[] = [];
 
@@ -50,7 +45,10 @@ function mapQuest(questEntity: any) {
       expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
     } as QuestModel;
     quest = processQuestState(quest);
-    if (!quest.description) quest.description = getIpfsBaseUri() + quest.detailsRefIpfs;
+    if (!quest.detailsRefIpfs) quest.description = '[No description]';
+    // If failed to fetch ipfs description
+    else if (!quest.description)
+      quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
     return quest;
   } catch (error) {
     Logger.error('Failed to map quest : ', questEntity);
@@ -207,22 +205,13 @@ export async function computeScheduleContainer(
   claimData: ClaimModel,
   extraDelaySec?: number,
 ): Promise<ContainerModel> {
-  const { governAddress: govern } = getNetwork();
-
+  const { governAddress } = getNetwork();
   const governQueueResult = await fetchGovernQueue();
-
-  const ERC3000Config = {
-    ...governQueueResult.config, // default config fetched from govern subgraph
-    // resolver: celeste, // Celeste
-    // executionDelay: Math.round(DEAULT_CLAIM_EXECUTION_DELAY_MS / 1000), // delay after which the claim can be executed by player
-  } as ConfigModel;
-
   const erc3000Config = governQueueResult.config;
-
   const lastBlockTimestamp = await getLastBlockTimestamp();
 
   // A bit more than the execution delay
-  const executionTime = +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec ?? 60); // Add 1 minute by default
+  const executionTime = +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec || 60); // Add 1 minute by default
 
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
@@ -233,7 +222,7 @@ export async function computeScheduleContainer(
       nonce: governQueueResult.nonce + 1, // Increment nonce for each schedule
       executionTime,
       submitter: claimData.playerAddress,
-      executor: govern,
+      executor: governAddress,
       actions: [
         {
           to: claimData.questAddress,
@@ -259,7 +248,15 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
       )
       .map(async (x) => {
         const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);
-        const evidence = await getObjectFromIpfs(evidenceIpfsHash);
+        let evidence: string | undefined;
+        try {
+          evidence = await getObjectFromIpfs(evidenceIpfsHash);
+        } catch (error) {
+          Logger.error('Failed to get IPFS object when fetching claims', error);
+        }
+        // If failed to fetch ipfs evidence
+        if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
+
         return {
           claimedAmount: {
             token: quest.rewardToken,
@@ -300,23 +297,28 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
     await request(governSubgraph, GovernQueueChallengesQuery, {
       containerId: container.id,
     })
-  ).containerEventChallenges.find((x: any) => x.container.queue.id === governQueueAddress); // Validate same queue as app GovernQueue
-  if (!result)
-    return {
-      reason: 'Fake reason',
-      challengerAddress: '0xf4b90fa2bd7c95afb248e9d4b98edd30b8a4b452',
-    } as any; // TODO  unfake
+  ).containerEventChallenges.find((x: any) =>
+    x.container.queue.id.localeCompare(governQueueAddress),
+  ); // Validate same queue as app GovernQueue
+
+  if (!result) return null;
 
   const { disputeId, reason, createdAt, resolver, collateral, challenger } = result;
+  let fetchedReason: string | undefined;
+  try {
+    fetchedReason = await getObjectFromIpfs(reason);
+  } catch (error) {
+    Logger.error('Failed to get IPFS object when fetching challenge', error);
+  }
   return {
     deposit: {
       parsedAmount: fromBigNumber(collateral.amount, collateral.decimals),
       token: collateral,
     },
-    reason: (await getObjectFromIpfs(reason)) ?? '',
+    reason: fetchedReason ?? formatIpfsMarkdownLink(reason, 'See reason'),
     createdAt,
     resolver,
-    challengerAddress: challenger,
+    challengerAddress: toChecksumAddress(challenger),
     disputeId,
   };
 }
@@ -381,19 +383,6 @@ export async function fundQuest(
   return handleTransaction(tx, onTx);
 }
 
-export async function getBalanceOf(
-  erc20Contract: NullableContract,
-  token: TokenModel,
-  address: string,
-): Promise<TokenAmountModel> {
-  if (!erc20Contract.instance) throw erc20Contract.error;
-  const balance = await erc20Contract.instance.balanceOf(address);
-  return {
-    token,
-    parsedAmount: fromBigNumber(balance, token.decimals),
-  };
-}
-
 export async function approveTokenAmount(
   erc20Contract: NullableContract,
   toAddress: string,
@@ -406,6 +395,19 @@ export async function approveTokenAmount(
   Logger.debug('Approving token amount ...', { tokenAmount, fromAddress: toAddress });
   const tx = await erc20Contract.instance.approve(toAddress, tokenAmount.amount, defaultGazFees);
   return handleTransaction(tx, onTx);
+}
+
+export async function getBalanceOf(
+  erc20Contract: NullableContract,
+  token: TokenModel,
+  address: string,
+): Promise<TokenAmountModel> {
+  if (!erc20Contract.instance) throw erc20Contract.error;
+  const balance = await erc20Contract.instance.balanceOf(address);
+  return {
+    token,
+    parsedAmount: fromBigNumber(balance, token.decimals),
+  };
 }
 
 // #endregion
@@ -486,7 +488,6 @@ export async function fetchChallengeFee(
 ): Promise<TokenAmountModel> {
   if (!celesteContract.instance) throw celesteContract.error;
   const [, feeToken, feeAmount] = await celesteContract.instance.getDisputeFees();
-
   return toTokenAmountModel({
     ...TOKENS.Honey,
     token: feeToken,
@@ -499,7 +500,9 @@ export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel> {
   if (!celesteContract.instance) throw celesteContract.error;
-  if (!challenge.disputeId) throw new Error('Dispute does not exist yet, please try again later');
+
+  if (challenge.disputeId === undefined)
+    throw new Error('Dispute does not exist yet, please try again later');
 
   const { state } = await celesteContract.instance.disputes(challenge.disputeId);
 

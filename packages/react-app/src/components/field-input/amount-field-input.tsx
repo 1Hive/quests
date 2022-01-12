@@ -46,6 +46,7 @@ type Props = {
   tooltip?: string;
   tooltipDetail?: ReactNode;
   maxDecimals?: number;
+  disabled?: boolean;
 };
 
 function AmountFieldInput({
@@ -62,6 +63,7 @@ function AmountFieldInput({
   tooltipDetail,
   compact = false,
   maxDecimals,
+  disabled = false,
 }: Props) {
   const { defaultToken } = getNetwork();
   const [amount, setAmount] = useState(value?.parsedAmount ?? 0);
@@ -112,6 +114,7 @@ function AmountFieldInput({
                 placeHolder={placeHolder}
                 type="number"
                 value={amount}
+                disabled={disabled}
               />
             ) : (
               floorNumber(amount, decimalsCount)

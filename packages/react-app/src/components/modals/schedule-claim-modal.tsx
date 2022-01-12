@@ -12,11 +12,12 @@ import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
+import CheckboxFieldInput from '../field-input/checkbox-field-input';
 
 // #region StyledComponents
 
@@ -35,7 +36,7 @@ type Props = {
   questTotalBounty: TokenAmountModel;
   claimDeposit: TokenAmountModel;
   playerAddress: string;
-  onClose?: Function;
+  onClose?: ModalCallback;
 };
 
 export default function ScheduleClaimModal({
@@ -55,7 +56,7 @@ export default function ScheduleClaimModal({
     useTransactionContext()!;
   const { defaultToken } = getNetwork();
 
-  const onModalClose = (succeed: any) => {
+  const closeModal = (succeed: any) => {
     setOpened(false);
     onClose(succeed);
   };
@@ -63,6 +64,7 @@ export default function ScheduleClaimModal({
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
+
       const container = await QuestService.computeScheduleContainer({
         claimedAmount: values.claimedAmount!,
         evidence: values.evidence!,
@@ -116,7 +118,7 @@ export default function ScheduleClaimModal({
       if (!scheduleReceipt.status)
         throw new Error('Failed to schedule the claim, please try again in a few seconds');
       toast('Operation succeed');
-      onModalClose(true);
+      closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
@@ -125,7 +127,6 @@ export default function ScheduleClaimModal({
           ? 'Oops. Something went wrong.'
           : e.message,
       );
-      onModalClose(false);
     } finally {
       setSubmitting(false);
       setLoading(false);
@@ -164,14 +165,20 @@ export default function ScheduleClaimModal({
           disabled={loading || !governQueueContract || !erc20Contract}
         />,
       ]}
-      onClose={onModalClose}
+      onClose={() => closeModal(false)}
       isOpen={opened}
     >
       <Formik
-        initialValues={{ evidence: '', claimedAmount: { parsedAmount: 0, token: defaultToken } }}
+        initialValues={{
+          evidence: '',
+          claimedAmount: { parsedAmount: 0, token: defaultToken } as TokenAmountModel,
+          claimAll: false,
+        }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
-          if (!values.claimedAmount) errors.push('Validation : Claimed amount is required');
+          if (!values.claimedAmount) errors.push('Validation : Claim amount is required');
+          if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
+            errors.push('Validation : Claim amount should not be hight than available bounty');
           if (!values.evidence) errors.push('Validation : Evidence of completion is required');
           if (errors.length) {
             errors.forEach(toast);
@@ -194,6 +201,8 @@ export default function ScheduleClaimModal({
                 onChange={handleChange}
                 multiline
                 wide
+                rows={5}
+                compact
               />
               <ChildSpacer size={16} justify="start" vertical>
                 <AmountFieldInputFormik
@@ -201,15 +210,27 @@ export default function ScheduleClaimModal({
                   label="Available bounty"
                   isLoading={loading}
                   value={questTotalBounty}
+                  compact
+                />
+                <CheckboxFieldInput
+                  id="claimAll"
+                  label="Claim all bounty"
+                  onChange={handleChange}
+                  value={values.claimAll}
+                  isLoading={loading}
+                  isEdit
+                  compact
                 />
                 <AmountFieldInputFormik
-                  id="claimedAmount"
+                  id="claimAmount"
                   isEdit
-                  label="Claimed amount"
-                  tooltip="Claimed amount"
+                  label="Claim amount"
+                  tooltip="Claim amount"
                   tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
                   isLoading={loading}
-                  value={values.claimedAmount}
+                  value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                  disabled={values.claimAll}
+                  compact
                 />
               </ChildSpacer>
             </Outset>

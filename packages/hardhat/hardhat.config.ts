@@ -218,7 +218,7 @@ const config: HardhatUserConfig = {
     govern: {
       default: 1,
       xdai: 0, // TODO : Add XDai Govern Address
-      rinkeby: "0xc483A9365ac8e39EA208603ce06856e3936E1193", // Govern address on rinkeby
+      rinkeby: "0xa0F5e6759d49063040eAB18c1B0E684C45a4B4cA", // Govern address on rinkeby
     },
   },
 };

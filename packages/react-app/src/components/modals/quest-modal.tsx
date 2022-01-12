@@ -6,8 +6,10 @@ import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
+import * as QuestService from 'src/services/quest.service';
 import Quest from '../quest';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
+import { useQuestsContext } from '../../contexts/quests.context';
 
 // #region StyledComponents
 
@@ -19,7 +21,7 @@ const QuestActionButtonStyled = styled(Button)`
 
 type Props = {
   data?: QuestModel;
-  onClose?: Function;
+  onClose?: ModalCallback;
   questMode: string;
 };
 
@@ -30,18 +32,26 @@ export default function QuestModal({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
+  const { setNewQuest } = useQuestsContext()!;
+
   const onOpenButtonClick = () => {
     setOpened(true);
   };
 
-  const onModalClose = () => {
+  const closeModal = (success: boolean) => {
     setOpened(false);
-    onClose();
+    onClose(success);
   };
 
-  const onSaveClick = (address: string) => {
-    setOpened(false);
-    onClose(address);
+  const fetchNewQuest = async (questAddress: string) => {
+    setInterval(async () => {
+      const newQuest = await QuestService.fetchQuest(questAddress);
+      if (newQuest) {
+        setNewQuest(newQuest);
+        clearInterval();
+        closeModal(true);
+      }
+    }, 1000); // Pull each seconds until the new quest is fetched
   };
 
   useEffect(() => {
@@ -88,9 +98,9 @@ export default function QuestModal({
         ),
       ]}
       isOpen={opened}
-      onClose={onModalClose}
+      onClose={() => closeModal(false)}
     >
-      <Quest questMode={questMode} data={data} onSave={onSaveClick} />
+      <Quest questMode={questMode} data={data} onSave={(x) => fetchNewQuest(x)} />
     </ModalBase>
   );
 }

@@ -19,7 +19,7 @@ import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 import { useCelesteContract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -70,11 +70,15 @@ const OnlySHWarn = styled(Info)`
   align-items: center;
 `;
 
+const LinkStyled = styled(Link)`
+  margin-left: ${GUpx()};
+`;
+
 // #endregion
 
 type Props = {
   claim: ClaimModel;
-  onClose?: Function;
+  onClose?: ModalCallback;
 };
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
@@ -96,6 +100,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       if (celesteContract) {
         if (!claim.container) throw new Error('Container is required to fetch challenge disputes');
         const challengeResult = await QuestService.fetchChallenge(claim.container);
+        if (!challengeResult)
+          throw new Error(`Failed to fetch challenge with container id ${claim.container.id}`);
         setChallenge(challengeResult);
         if (challengeResult) {
           setDispute(await QuestService.fetchChallengeDispute(celesteContract, challengeResult));
@@ -119,12 +125,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       setIsStackholder(
         challenge.challengerAddress === wallet.account || claim.playerAddress === wallet.account,
       );
-  }, [claim, challenge]);
-
-  const onModalClose = () => {
-    setOpened(false);
-    onClose();
-  };
+  }, [claim, challenge, wallet.account]);
 
   const resolveChallengeTx = async () => {
     try {
@@ -153,7 +154,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       });
       if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
       toast('Operation succeed');
-      onModalClose();
+      closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
@@ -165,6 +166,11 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     } finally {
       setLoading(false);
     }
+  };
+
+  const closeModal = (success: boolean) => {
+    setOpened(false);
+    onClose(success);
   };
 
   const player = (
@@ -189,11 +195,13 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         <RulingInfoStyled mode={isRuled ? 'info' : 'warning'}>
           <FinalRulingStyled>
             {isRuled ? (
-              'Final ruling in favor of'
+              'Ruled in favor of'
             ) : (
               <>
-                Ruling in progress, please come back later...{' '}
-                <Link href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>See dispute</Link>
+                Ruling in progress, please come back later...
+                <LinkStyled href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>
+                  See dispute
+                </LinkStyled>
               </>
             )}
           </FinalRulingStyled>
@@ -212,17 +220,15 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         </HeaderStyled>
       }
       openButton={
-        // challenge && (
         <OpenButtonWrapperStyled>
           <OpenButtonStyled
             icon={<IconFlag />}
             onClick={() => setOpened(true)}
-            label="Resolve"
+            label="Open resolve"
             mode="positive"
             disabled={loading || !dispute || !governQueueContract || !celesteContract}
           />
         </OpenButtonWrapperStyled>
-        // )
       }
       buttons={[
         <Fragment key="warnMessage">
@@ -243,7 +249,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           title={isRuled ? 'Publish dispute result' : 'Need to be ruled'}
         />,
       ]}
-      onClose={onModalClose}
+      onClose={() => closeModal(false)}
       isOpen={opened}
     >
       <Outset gu16>

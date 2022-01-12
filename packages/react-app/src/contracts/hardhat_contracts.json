@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "Quest": {
-          "address": "0xEA6015008c7926E84C76b70344EbD31a48A6fd2c",
+          "address": "0x53C6c56dF207a2049F917f800696843C2EbCaDaE",
           "abi": [
             {
               "inputs": [
@@ -208,11 +208,15 @@
           ]
         },
         "QuestFactory": {
-          "address": "0x1A506d3ed7E0865FFC980d2eB54662DDb587e885",
+          "address": "0x855a04deB27aBF93336d52A91F29A98Dd5605691",
           "abi": [
             {
               "inputs": [
-                { "internalType": "address", "name": "_aragonGovernAddress", "type": "address" }
+                {
+                  "internalType": "address",
+                  "name": "_aragonGovernAddress",
+                  "type": "address"
+                }
               ],
               "stateMutability": "nonpayable",
               "type": "constructor"
@@ -249,6 +253,12 @@
                   "internalType": "uint256",
                   "name": "expireTime",
                   "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "creationTime",
+                  "type": "uint256"
                 }
               ],
               "name": "QuestCreated",
@@ -257,16 +267,38 @@
             {
               "inputs": [],
               "name": "aragonGovernAddress",
-              "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
               "stateMutability": "view",
               "type": "function"
             },
             {
               "inputs": [
-                { "internalType": "string", "name": "_questTitle", "type": "string" },
-                { "internalType": "bytes", "name": "_questDetailsRef", "type": "bytes" },
-                { "internalType": "contract IERC20", "name": "_rewardToken", "type": "address" },
-                { "internalType": "uint256", "name": "_expireTime", "type": "uint256" },
+                {
+                  "internalType": "string",
+                  "name": "_questTitle",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_questDetailsRef",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_rewardToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_expireTime",
+                  "type": "uint256"
+                },
                 {
                   "internalType": "address payable",
                   "name": "_fundsRecoveryAddress",
@@ -274,7 +306,13 @@
                 }
               ],
               "name": "createQuest",
-              "outputs": [],
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
               "stateMutability": "nonpayable",
               "type": "function"
             }
