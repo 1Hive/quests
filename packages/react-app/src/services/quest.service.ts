@@ -171,10 +171,10 @@ export async function fetchQuestsPaging(
   let expireTimeLower;
   let expireTimeUpper;
   if (filter.expire?.start) expireTimeLower = Math.round(filter.expire.start.getTime() / 1000);
-  else expireTimeLower = filter.showExpired ? 0 : now;
+  else expireTimeLower = filter.showStatus ? 0 : now;
   if (filter.expire?.end) expireTimeUpper = Math.round(filter.expire.end.getTime() / 1000);
   // TODO : Change to a later time when supported by grapql-request
-  else expireTimeUpper = filter.showExpired ? now : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
+  else expireTimeUpper = filter.showStatus ? now : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
   const queryResult = (
     await request(questSubgraph, QuestEntitiesQuery, {
       skip: currentIndex,
