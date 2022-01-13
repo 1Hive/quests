@@ -1,7 +1,6 @@
 import { Button, IconPlus } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
-import { FaSave } from 'react-icons/fa';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { GUpx } from 'src/utils/css.util';

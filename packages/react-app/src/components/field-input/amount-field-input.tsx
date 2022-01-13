@@ -32,10 +32,6 @@ const AmountStyled = styled.div`
   margin-right: ${GUpx()};
 `;
 
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
-`;
-
 const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
 `;
