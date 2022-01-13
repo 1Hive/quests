@@ -12,7 +12,17 @@ import { IconTooltip } from './icon-tooltip';
 const FieldStyled = styled(Field)`
   ${({ compact }: any) => (compact ? 'margin:0' : '')}
 `;
+const FieldHeaderStyled = styled(Field)`
+  pointer-events: none;
+`;
 
+const LabelStyled = styled.div`
+  width: 16px;
+  justify-content: center;
+  margin-left: 8px;
+  display: flex;
+  pointer-events: all !important;
+`;
 const TextInputStyled = styled(TextInput)`
   height: 40px;
   width: 380px;
@@ -70,17 +80,19 @@ export function AddressFieldInput({
   );
   return label ? (
     <>
-      <Field
+      <FieldHeaderStyled
         label={
           <>
             <span title={tooltip}>{label}</span>
-            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+            <LabelStyled>
+              {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+            </LabelStyled>
           </>
         }
         key={id}
       >
         {loadableContent}
-      </Field>
+      </FieldHeaderStyled>
     </>
   ) : (
     loadableContent

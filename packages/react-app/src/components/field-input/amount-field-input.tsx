@@ -12,7 +12,17 @@ import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
 // #region StyledComponents
+const FieldHeaderStyled = styled(Field)`
+  pointer-events: none;
+`;
 
+const LabelStyled = styled.div`
+  width: 16px;
+  justify-content: center;
+  margin-left: 8px;
+  display: flex;
+  pointer-events: all !important;
+`;
 const LineStyled = styled.div`
   display: flex;
   align-items: center;
@@ -89,11 +99,13 @@ function AmountFieldInput({
   };
 
   return (
-    <FieldStyled
+    <FieldHeaderStyled
       label={
         <>
           <span title={tooltip}>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+          <LabelStyled>
+            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+          </LabelStyled>
         </>
       }
       key={id}
@@ -126,7 +138,7 @@ function AmountFieldInput({
           )}
         </LineStyled>
       )}
-    </FieldStyled>
+    </FieldHeaderStyled>
   );
 }
 

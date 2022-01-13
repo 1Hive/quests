@@ -1,10 +1,8 @@
 import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
-
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-
 import { IconTooltip } from './icon-tooltip';
 
 // #region Styled
@@ -12,7 +10,17 @@ import { IconTooltip } from './icon-tooltip';
 const FieldStyled = styled(Field)`
   ${({ compact }: any) => (compact ? 'margin:0' : '')}
 `;
+const FieldHeaderStyled = styled(Field)`
+  pointer-events: none;
+`;
 
+const LabelStyled = styled.div`
+  width: 16px;
+  justify-content: center;
+  margin-left: 8px;
+  display: flex;
+  pointer-events: all !important;
+`;
 const MaxHeightStyled = styled.div`
   overflow: hidden;
   margin-bottom: 8px;
@@ -113,17 +121,19 @@ export default function TextFieldInput({
   );
   return label ? (
     <>
-      <Field
+      <FieldHeaderStyled
         label={
           <>
             <span title={tooltip}>{label}</span>
-            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+            <LabelStyled>
+              {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+            </LabelStyled>
           </>
         }
         key={id}
       >
         {loadableContent}
-      </Field>
+      </FieldHeaderStyled>
     </>
   ) : (
     loadableContent

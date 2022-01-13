@@ -71,7 +71,10 @@ const FormStyled = styled(Form)`
 const NoPaddingSplitStyled = styled(Split)`
   padding-bottom: 0 !important;
 `;
-
+const TitleStyled = styled.h1`
+  font-size: x-large;
+  margin-bottom: 8px;
+`;
 const FallbackWrapperStyled = styled.div`
   width: 100%;
   display: flex;
@@ -257,6 +260,7 @@ export default function Quest({
       <NoPaddingSplitStyled
         primary={
           <Outset gu16 className="pb-0">
+            <TitleStyled>Create Quest</TitleStyled>
             <Outset gu8 vertical className="block">
               <NoPaddingSplitStyled
                 primary={

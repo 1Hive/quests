@@ -79,8 +79,8 @@ export default function QuestModal({
           questMode === ENUM_QUEST_VIEW_MODE.Update) && (
           <QuestActionButtonStyled
             key="btn-save"
-            label="Save"
-            icon={<FaSave />}
+            label="Create"
+            // icon={<FaSave />}
             mode="positive"
             type="submit"
             form={`form-quest-form-${data?.address ?? 'new'}`}
