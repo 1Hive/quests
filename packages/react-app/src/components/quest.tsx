@@ -1,4 +1,4 @@
-import { AddressField, Button, Card, IconPlus, Split, useToast } from '@1hive/1hive-ui';
+import { AddressField, Card, Split, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
@@ -38,8 +38,8 @@ import { AddressFieldInput } from './field-input/address-field-input';
 // #region StyledComponents
 
 const LinkStyled = styled(Link)`
-  text-decoration: none;
-  color: dodgerblue;
+  text-decoration: underline;
+  color: white;
 `;
 const CardStyled = styled(Card)`
   justify-content: flex-start;
@@ -260,22 +260,27 @@ export default function Quest({
       <NoPaddingSplitStyled
         primary={
           <Outset gu16 className="pb-0">
-            <TitleStyled>Create Quest</TitleStyled>
+            {isEdit && <TitleStyled>Create Quest</TitleStyled>}
             <Outset gu8 vertical className="block">
               <NoPaddingSplitStyled
                 primary={
-                  <TextFieldInput
-                    id="title"
-                    label={isEdit ? 'Title' : undefined}
-                    isEdit={isEdit}
-                    isLoading={loading}
-                    placeHolder="Quest title"
-                    value={values.title}
-                    onChange={handleChange}
-                    fontSize="24px"
-                    tooltip="Title of your quest"
-                    wide
-                  />
+                  // <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
+                  //   <Button icon={<IconPlus />} label="Details" wide mode="strong" />
+                  // </LinkStyled>
+                  <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
+                    <TextFieldInput
+                      id="title"
+                      label={isEdit ? 'Title' : undefined}
+                      isEdit={isEdit}
+                      isLoading={loading}
+                      placeHolder="Quest title"
+                      value={values.title}
+                      onChange={handleChange}
+                      fontSize="24px"
+                      tooltip="Title of your quest"
+                      wide
+                    />
+                  </LinkStyled>
                 }
                 secondary={
                   !isEdit &&
@@ -396,11 +401,11 @@ export default function Quest({
             />
           )}
           <QuestFooterStyled>
-            {questMode !== ENUM_QUEST_VIEW_MODE.ReadDetail && (
-              <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
-                <Button icon={<IconPlus />} label="Details" wide mode="strong" />
-              </LinkStyled>
-            )}
+            {/* {questMode !== ENUM_QUEST_VIEW_MODE.ReadDetail && (
+              // <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
+              //   <Button icon={<IconPlus />} label="Details" wide mode="strong" />
+              // </LinkStyled>
+            )} */}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
               values.address &&
               wallet.account &&
