@@ -1,6 +1,6 @@
 import { Button, DateRangePicker, Field, IconClose, SearchInput, DropDown } from '@1hive/1hive-ui';
 import { useFilterContext } from 'src/contexts/filter.context';
-import { DEFAULT_FILTER } from '../constants';
+import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
 
 export function Filter() {
   const { filter, setFilter } = useFilterContext()!;
@@ -40,9 +40,9 @@ export function Filter() {
       <Field label="Show status">
         <DropDown
           id="filterDropdown"
-          items={['Active', 'Expired']}
-          selected={filter.showStatus}
-          onChange={(val: number) => setFilter({ ...filter, showStatus: val })}
+          items={[ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired]}
+          selected={filter.status}
+          onChange={(val: number) => setFilter({ ...filter, status: val })}
         />
       </Field>
       {
