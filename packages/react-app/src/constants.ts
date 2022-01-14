@@ -154,7 +154,7 @@ export const DEFAULT_FILTER = {
 
 export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
 
-export const DEAULTS = {
+export const DEFAULTS = {
   DEFAULT_PAGE,
   DEFAULT_FILTER,
   DEAULT_CLAIM_EXECUTION_DELAY_MS,
