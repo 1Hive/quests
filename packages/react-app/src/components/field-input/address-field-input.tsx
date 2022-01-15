@@ -15,7 +15,9 @@ const FieldStyled = styled(Field)`
 const FieldHeaderStyled = styled(Field)`
   pointer-events: none;
 `;
-
+const DivStyled = styled.div`
+  pointer-events: all !important;
+`;
 const LabelStyled = styled.div`
   width: 16px;
   justify-content: center;
@@ -37,6 +39,7 @@ const EthIdenticonStyled = styled(EthIdenticon)`
 
 const WrapperStyled = styled.div`
   display: flex;
+  pointer-events: none !important;
   flex-wrap: nowrap;
 `;
 
@@ -72,7 +75,9 @@ export function AddressFieldInput({
     );
   const loadableContent = isEdit ? (
     <WrapperStyled>
-      <TextInputStyled id={id} value={value} onChange={onChange} />
+      <DivStyled>
+        <TextInputStyled id={id} value={value} onChange={onChange} />
+      </DivStyled>
       <EthIdenticonStyled address={value} scale={1.6} />
     </WrapperStyled>
   ) : (

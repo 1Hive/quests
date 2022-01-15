@@ -13,7 +13,9 @@ const FieldStyled = styled(Field)`
 const FieldHeaderStyled = styled(Field)`
   pointer-events: none;
 `;
-
+const DivStyled = styled.div`
+  pointer-events: all !important;
+`;
 const LabelStyled = styled.div`
   width: 16px;
   justify-content: center;
@@ -132,7 +134,7 @@ export default function TextFieldInput({
         }
         key={id}
       >
-        {loadableContent}
+        <DivStyled>{loadableContent}</DivStyled>
       </FieldHeaderStyled>
     </>
   ) : (

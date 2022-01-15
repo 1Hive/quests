@@ -15,7 +15,9 @@ import { IconTooltip } from './icon-tooltip';
 const FieldHeaderStyled = styled(Field)`
   pointer-events: none;
 `;
-
+const DivStyled = styled.div`
+  pointer-events: all !important;
+`;
 const LabelStyled = styled.div`
   width: 16px;
   justify-content: center;
@@ -110,17 +112,20 @@ function AmountFieldInput({
       {isLoading ? (
         <Skeleton />
       ) : (
+        // <DivStyled>
         <LineStyled>
           <AmountStyled>
             {isEdit ? (
-              <TextInput
-                id={id}
-                wide={wide}
-                onChange={onAmountChange}
-                placeHolder={placeHolder}
-                type="number"
-                value={amount}
-              />
+              <DivStyled>
+                <TextInput
+                  id={id}
+                  wide={wide}
+                  onChange={onAmountChange}
+                  placeHolder={placeHolder}
+                  type="number"
+                  value={amount}
+                />
+              </DivStyled>
             ) : (
               floorNumber(amount, decimalsCount)
             )}

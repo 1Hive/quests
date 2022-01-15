@@ -9,6 +9,7 @@ import { IconTooltip } from './icon-tooltip';
 // #region StyledComponents
 const InputStyled = styled.input`
   background-color: ${({ background }: any) => background};
+  pointer-events: all;
   border: none;
 `;
 
