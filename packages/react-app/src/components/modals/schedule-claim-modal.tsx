@@ -54,7 +54,6 @@ export default function ScheduleClaimModal({
   const erc20Contract = useERC20Contract(claimDeposit!.token);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
-  const { defaultToken } = getNetwork();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -171,7 +170,7 @@ export default function ScheduleClaimModal({
       <Formik
         initialValues={{
           evidence: '',
-          claimedAmount: { parsedAmount: 0, token: defaultToken } as TokenAmountModel,
+          claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
           claimAll: false,
         }}
         onSubmit={(values, { setSubmitting }) => {

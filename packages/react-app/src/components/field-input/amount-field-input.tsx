@@ -1,27 +1,50 @@
-import { Field, TextInput, TokenBadge, _AutoComplete as AutoComplete } from '@1hive/1hive-ui';
+import { Field, TextInput, TokenBadge, _AutoComplete as AutoComplete, Tag } from '@1hive/1hive-ui';
+import { parseUnits } from 'ethers/lib/utils';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { NETWORK_TOKENS } from 'src/constants';
+import { useWallet } from 'src/contexts/wallet.context';
+import { getTokenInfo } from 'src/hooks/use-contract.hook';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
+import { fetchRewardTokens } from 'src/services/quest.service';
+import { arrayDistinctBy } from 'src/utils/array.util';
 import { GUpx } from 'src/utils/css.util';
+import { Logger } from 'src/utils/logger';
 import { floorNumber } from 'src/utils/math.utils';
-import { toBigNumber } from 'src/utils/web3.utils';
+import { includesCaseInsensitive } from 'src/utils/string.util';
+import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
 // #region StyledComponents
 
-const LineStyled = styled.div`
+const ColumnStyled = styled.div`
   display: flex;
   align-items: center;
 `;
+
 const AmountStyled = styled.div`
   margin-top: 2px;
   margin-right: ${GUpx()};
+`;
+
+const AmountTextInputStyled = styled(TextInput)`
+  width: 75px;
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
 `;
 
 const FieldStyled = styled(Field)`
@@ -36,6 +59,10 @@ const AutoCompleteStyled = styled(AutoComplete)`
   display: block;
 `;
 
+const TokenNameStyled = styled.span`
+  margin-right: ${GUpx()};
+`;
+
 // #endregion
 
 type Props = {
@@ -46,15 +73,12 @@ type Props = {
   placeHolder?: string;
   value?: TokenAmountModel;
   onChange?: Function;
-  wide?: boolean;
   formik?: any;
   compact?: boolean;
   tooltip?: string;
   tooltipDetail?: ReactNode;
   maxDecimals?: number;
   disabled?: boolean;
-  min?: number;
-  max?: number;
 };
 
 function AmountFieldInput({
@@ -65,26 +89,55 @@ function AmountFieldInput({
   placeHolder = '',
   value,
   onChange = noop,
-  wide = false,
   formik,
   tooltip,
   tooltipDetail,
   compact = false,
   maxDecimals,
   disabled = false,
-  min,
-  max,
 }: Props) {
   const { defaultToken, type } = getNetwork();
-  const [amount, setAmount] = useState(value?.parsedAmount ?? 0);
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string | null>();
+  const [searchTerm, setSearchTerm] = useState<string>();
+  const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount ?? 0);
+  const [token, setToken] = useState<TokenModel>(value?.token ?? defaultToken);
+  const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
+  const wallet = useWallet();
+
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
   useEffect(() => {
-    setTokens(NETWORK_TOKENS[type]);
-  }, []);
+    const fetchAvailableTokens = async () => {
+      const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
+      const questsUsedTokens = await fetchRewardTokens();
+      setAvailableTokens(
+        arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
+      );
+    };
+
+    if (wallet.account && isEdit && !value?.token) fetchAvailableTokens();
+  }, [wallet.account]);
+
+  useEffect(() => {
+    if (availableTokens.length) {
+      if (searchTerm && isAddress(searchTerm)) {
+        setTokens([]);
+        getTokenInfo(searchTerm)
+          .then((tokenInfo: TokenModel) => {
+            setTokens([tokenInfo]);
+          })
+          .catch(Logger.error);
+      } else {
+        setTokens(
+          availableTokens.filter(
+            (x: TokenModel) =>
+              !searchTerm || includesCaseInsensitive([x.name, x.symbol].join('|'), searchTerm),
+          ),
+        );
+      }
+    }
+  }, [searchTerm, availableTokens]);
 
   useEffect(() => {
     if (!isEdit) {
@@ -94,22 +147,36 @@ function AmountFieldInput({
   }, [maxDecimals, isEdit, value?.parsedAmount]);
 
   useEffect(() => {
-    setAmount(value?.parsedAmount ?? 0);
-    if (value && !value.token) value.token = defaultToken;
+    setAmount(value?.parsedAmount);
+    setToken(value?.token ?? defaultToken);
   }, [value]);
 
   const onAmountChange = (e: any) => {
-    const newValue = +e.target.value;
-    setAmount(newValue);
-    value = { token: value?.token ?? defaultToken, parsedAmount: newValue };
-    value.token.amount = toBigNumber(value).toString();
-    if (formik) formik.setFieldValue(id, value);
-    else onChange(value);
+    const newAmount = e.target.value;
+    setAmount(newAmount);
+    if (newAmount) {
+      const nextValue = {
+        token: {
+          ...token,
+          amount: parseUnits(newAmount.toString(), token.decimals).toString(),
+        },
+        parsedAmount: +newAmount,
+      };
+      console.log({ nextValue });
+      if (formik) formik.setFieldValue(id, nextValue);
+      else onChange(nextValue);
+    }
   };
 
-  const onTokenSelect = (newValue: TokenModel) => {
-    autoCompleteRef.current.value = newValue.symbol;
-    setSearchTerm(null);
+  const onTokenChange = (newToken: TokenModel) => {
+    autoCompleteRef.current.value = newToken.symbol;
+    setSearchTerm(undefined);
+    setToken(newToken);
+    if (amount) {
+      const nextValue = { token: newToken, parsedAmount: amount };
+      if (formik) formik.setFieldValue(id, nextValue);
+      else onChange(nextValue);
+    }
   };
 
   return (
@@ -126,17 +193,14 @@ function AmountFieldInput({
       {isLoading ? (
         <Skeleton />
       ) : (
-        <LineStyled>
+        <ColumnStyled>
           <AmountStyled>
             {isEdit ? (
-              <TextInput
+              <AmountTextInputStyled
                 id={id}
-                wide={wide}
                 onChange={onAmountChange}
                 placeHolder={placeHolder}
                 type="number"
-                min={min}
-                max={max}
                 value={amount}
                 disabled={disabled}
               />
@@ -152,23 +216,22 @@ function AmountFieldInput({
             />
           ) : (
             <AutoCompleteStyled
-              items={tokens.filter((x) =>
-                new RegExp([x.name, x.symbol].join('|'), 'i').test(searchTerm ?? ''),
-              )}
+              items={tokens}
+              selected={token}
               onChange={setSearchTerm}
-              onSelect={onTokenSelect}
+              onSelect={onTokenChange}
               ref={autoCompleteRef}
-              placeholder="Search name or paste address"
+              placeholder="name / symbol / address"
+              renderSelected={(x: TokenModel) => `✔️${x.symbol}:${x.name}`}
               renderItem={(x: TokenModel) => (
                 <>
-                  <span>{x.name}</span>
-                  <TokenBadgeStyled symbol={x.symbol} address={x.token} networkType="private" />
+                  <TokenNameStyled>{x.name}</TokenNameStyled>
+                  <Tag mode="identifier">{x.symbol}</Tag>
                 </>
               )}
-              wide
             />
           )}
-        </LineStyled>
+        </ColumnStyled>
       )}
     </FieldStyled>
   );

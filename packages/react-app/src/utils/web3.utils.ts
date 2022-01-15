@@ -150,10 +150,6 @@ export async function sendTransaction(to: string, amount: TokenAmountModel, onCo
 }
 
 export function toBigNumber(amount: TokenAmountModel) {
-  const { defaultToken } = getNetwork();
-  if (!amount.token) {
-    amount.token = defaultToken;
-  }
   return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
 

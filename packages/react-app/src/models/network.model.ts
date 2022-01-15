@@ -6,7 +6,7 @@ export type NetworkModel = {
   type: string;
   explorerBase: string;
   defaultEthNode: string;
-  questSubgraph: string;
+  questsSubgraph: string;
   governSubgraph: string;
   celesteSubgraph: string;
   questFactoryAddress: string;

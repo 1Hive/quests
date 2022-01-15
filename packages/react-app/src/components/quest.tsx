@@ -143,10 +143,13 @@ export default function Quest({
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
-    if (!values.description) errors.push('Description is required');
-    if (!values.title) errors.push('Title is required');
-    if (!values.fallbackAddress) errors.push('Funds fallback address is required');
-    if (values.expireTimeMs < Date.now()) errors.push('Expiration have to be later than now');
+    if (!values.description) errors.push('Validation : Description is required');
+    if (!values.title) errors.push('Validation : Title is required');
+    if (!values.fallbackAddress) errors.push('Validation : Funds fallback address is required');
+    if (values.expireTimeMs < Date.now())
+      errors.push('Validation : Expiration have to be later than now');
+    if (!bounty?.token) errors.push('Validation : Bounty token is required');
+    else if (bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
     if (!questFactoryContract) {
       Logger.error(
         `Error : failed to instanciate contract <questFactoryContract>, enable verbose to see error`,
@@ -172,7 +175,12 @@ export default function Quest({
         const txReceiptSaveQuest = await QuestService.saveQuest(
           questFactoryContract,
           values.fallbackAddress!,
-          { ...values, expireTimeMs: timeValue, creatorAddress: wallet.account },
+          {
+            ...values,
+            expireTimeMs: timeValue,
+            creatorAddress: wallet.account,
+            rewardToken: bounty?.token ?? defaultToken,
+          },
           undefined,
           (tx) => {
             pushTransaction({
@@ -355,12 +363,12 @@ export default function Quest({
                 tooltip="Bounty"
                 tooltipDetail={
                   isEdit
-                    ? "The initial amount of this quest's funding pool."
+                    ? "The initial amount of this quest's funding pool. A token needs to be selected."
                     : "The available amount of this quest's funding pool."
                 }
                 value={bounty}
                 isLoading={loading || (!isEdit && !bounty)}
-                formik={formRef}
+                onChange={console.log}
               />
             )}
             {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
@@ -408,7 +416,7 @@ export default function Quest({
               bounty &&
               (values.state === ENUM_QUEST_STATE.Active ? (
                 <>
-                  <FundModal questAddress={values.address} onClose={onFundModalClosed} />
+                  <FundModal quest={data} onClose={onFundModalClosed} />
                   {claimDeposit && (
                     <ScheduleClaimModal
                       questAddress={data.address}
@@ -437,7 +445,10 @@ export default function Quest({
       {!loading && <StateTag state={data.state} />}
       <Formik
         initialValues={
-          { ...data, fallbackAddress: data.fallbackAddress ?? wallet.account } as QuestModel
+          {
+            ...data,
+            fallbackAddress: data.fallbackAddress ?? wallet.account,
+          } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
       >

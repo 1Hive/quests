@@ -22,7 +22,7 @@ const networks = {
     type: 'rinkeby',
     explorerBase: 'https://rinkeby.etherscan.io/tx',
     defaultEthNode: 'https://rinkeby.eth.aragon.network/',
-    questSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
     celesteSubgraph: 'https://iapi.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
@@ -45,7 +45,7 @@ const networks = {
     defaultEthNode: 'https://xdai.poanetwork.dev/',
     questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai
-    defaultToken: TOKENS.Honey,
+    defaultToken: TOKENS.xDAIHoney,
     nativeToken: TOKENS.xDAI,
     isTestNetwork: false,
   },

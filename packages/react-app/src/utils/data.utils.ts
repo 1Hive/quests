@@ -7,10 +7,6 @@ import { Logger } from './logger';
 import { fromBigNumber } from './web3.utils';
 
 export async function convertTo(from: TokenAmountModel, toToken: TokenModel) {
-  const { defaultToken } = getNetwork();
-  if (!from?.token) {
-    from.token = defaultToken;
-  }
   const res = await fetch(
     `https://coingecko.p.rapidapi.com/simple/price?ids=${[
       from.token.symbol,

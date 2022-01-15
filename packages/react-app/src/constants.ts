@@ -27,10 +27,16 @@ export const TOKENS = {
     decimals: 18,
   } as TokenModel,
   // ERC20 tokens
-  Honey: {
+  xDAIHoney: {
     name: 'Honey',
     symbol: 'HNY',
     token: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
+    decimals: 18,
+  } as TokenModel,
+  RinkebyHoney: {
+    name: 'Honey',
+    symbol: 'HNY',
+    token: '0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd',
     decimals: 18,
   } as TokenModel,
   HoneyTest: {
@@ -48,8 +54,8 @@ export const TOKENS = {
 };
 
 export const NETWORK_TOKENS = {
-  rinkeby: [TOKENS.HoneyTest],
-  xdai: [TOKENS.Honey],
+  rinkeby: [TOKENS.HoneyTest, TOKENS.Ether],
+  xdai: [TOKENS.xDAIHoney, TOKENS.xDAI],
 };
 
 // Constants

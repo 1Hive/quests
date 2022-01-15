@@ -1,9 +1,9 @@
-import { Contract, ContractInterface, ethers } from 'ethers';
+import { BigNumber, Contract, ContractInterface, ethers } from 'ethers';
 import { useMemo } from 'react';
 import { TokenModel } from 'src/models/token.model';
 // eslint-disable-next-line no-unused-vars
 import { getDefaultProvider } from 'src/utils/web3.utils';
-import { toNumber } from 'web3-utils';
+import { toChecksumAddress, toNumber } from 'web3-utils';
 import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20 from '../contracts/ERC20.json';
@@ -107,10 +107,30 @@ export function useGovernQueueContract(): NullableContract {
 }
 
 export function useERC20Contract(
-  token?: TokenModel,
+  token?: TokenModel | string,
   withSignerIfPossible = true,
 ): NullableContract {
-  return useContract('ERC20', token?.token, withSignerIfPossible);
+  const tokenAddress = typeof token === 'string' ? token : token?.token;
+  return useContract('ERC20', tokenAddress, withSignerIfPossible);
+}
+
+export async function getTokenInfo(tokenAddress: string) {
+  const tokenContract = getContract(
+    tokenAddress,
+    getContractsJson().ERC20.abi,
+    getDefaultProvider(),
+  );
+  const symbol = await tokenContract.symbol();
+  const decimals = await tokenContract.decimals();
+  const name = await tokenContract.name();
+
+  return {
+    symbol,
+    decimals,
+    name,
+    amount: BigNumber.from(0).toString(),
+    token: toChecksumAddress(tokenAddress),
+  } as TokenModel;
 }
 
 export function useQuestContract(address?: string, withSignerIfPossible = true): NullableContract {

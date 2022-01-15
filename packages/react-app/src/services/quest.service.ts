@@ -4,14 +4,18 @@ import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
-import { QuestEntityQuery, QuestEntitiesQuery } from 'src/queries/quest-entity.query';
+import {
+  QuestEntityQuery,
+  QuestEntitiesQuery,
+  QuestRewardTokens,
+} from 'src/queries/quest-entity.query';
 import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueChallengesQuery,
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
 } from 'src/queries/govern-queue-entity.query';
-import { BigNumber, ContractTransaction, ethers } from 'ethers';
+import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
@@ -19,29 +23,26 @@ import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { NullableContract } from 'src/models/contract-error';
 import { DisputeModel } from 'src/models/dispute.model';
+import { arrayDistinct } from 'src/utils/array.util';
 import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getObjectFromIpfs, pushObjectToIpfs, formatIpfsMarkdownLink } from './ipfs.service';
-import { getQuestContractInterface } from '../hooks/use-contract.hook';
+import { getTokenInfo, getQuestContractInterface } from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 
 let questList: QuestModel[] = [];
 
 // #region Private
-function mapQuest(questEntity: any) {
-  const { defaultToken } = getNetwork();
+async function mapQuest(questEntity: any) {
   try {
     let quest = {
       address: toChecksumAddress(questEntity.questAddress),
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
-      rewardToken: {
-        ...defaultToken,
-        token: questEntity.questRewardTokenAddress,
-      },
+      rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
     } as QuestModel;
     quest = processQuestState(quest);
@@ -56,8 +57,8 @@ function mapQuest(questEntity: any) {
   }
 }
 
-function mapQuestList(quests: any[]): QuestModel[] {
-  return quests.map(mapQuest).filter((quest) => !!quest) as QuestModel[]; // Filter out undefined quests (skiped)
+function mapQuestList(quests: any[]): Promise<QuestModel[]> {
+  return Promise.all(quests.map(mapQuest).filter((quest) => !!quest)) as Promise<QuestModel[]>; // Filter out undefined quests (skiped)
 }
 
 async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
@@ -153,8 +154,6 @@ async function handleTransaction(
   return receipt;
 }
 
-// exposeGlobally(encodeClaimAction); // TODO : Remove when see
-
 // #endregion
 
 // #region Subgraph Queries
@@ -164,7 +163,7 @@ export async function fetchQuestsPaging(
   count: number,
   filter: FilterModel,
 ): Promise<QuestModel[]> {
-  const { questSubgraph } = getNetwork();
+  const { questsSubgraph: questSubgraph } = getNetwork();
   const now = Math.round(Date.now() / 1000);
   let expireTimeLower;
   let expireTimeUpper;
@@ -185,13 +184,13 @@ export async function fetchQuestsPaging(
     })
   ).questEntities;
 
-  const newQuests = mapQuestList(queryResult);
+  const newQuests = await mapQuestList(queryResult);
   questList = questList.concat(newQuests);
   return newQuests;
 }
 
 export async function fetchQuest(questAddress: string) {
-  const { questSubgraph } = getNetwork();
+  const { questsSubgraph: questSubgraph } = getNetwork();
   const queryResult = (
     await request(questSubgraph, QuestEntityQuery, {
       ID: questAddress.toLowerCase(), // Subgraph address are stored lowercase
@@ -323,6 +322,14 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   };
 }
 
+export async function fetchRewardTokens() {
+  const { questsSubgraph } = getNetwork();
+  const tokenAddresses = (
+    await request(questsSubgraph, QuestRewardTokens, { first: 100 })
+  ).questEntities.map((x: any) => x.questRewardTokenAddress);
+  return Promise.all(arrayDistinct<string>(tokenAddresses).map(getTokenInfo));
+}
+
 // #endregion
 
 // #region QuestFactory
@@ -339,13 +346,13 @@ export async function saveQuest(
   if (!questFactoryContract.instance?.address)
     throw Error('ContractError : <questFactoryContract> has not been set properly');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
-  const { defaultToken, defaultGazFees } = getNetwork();
+  const { defaultGazFees } = getNetwork();
   const ipfsHash = await pushObjectToIpfs(data.description ?? '');
   const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
   const tx = await questFactoryContract.instance.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    defaultToken.token,
+    data.rewardToken,
     questExpireTimeUtcSec,
     fallbackAddress,
     defaultGazFees,
@@ -489,7 +496,7 @@ export async function fetchChallengeFee(
   if (!celesteContract.instance) throw celesteContract.error;
   const [, feeToken, feeAmount] = await celesteContract.instance.getDisputeFees();
   return toTokenAmountModel({
-    ...TOKENS.Honey,
+    ...TOKENS.xDAIHoney,
     token: feeToken,
     amount: feeAmount,
   });
