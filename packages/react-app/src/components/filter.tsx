@@ -1,9 +1,24 @@
-import { Button, DateRangePicker, Field, IconClose, SearchInput, DropDown } from '@1hive/1hive-ui';
+import {
+  Button,
+  DateRangePicker,
+  Field,
+  IconClose,
+  SearchInput,
+  DropDown,
+  useTheme,
+} from '@1hive/1hive-ui';
 import { useFilterContext } from 'src/contexts/filter.context';
+import styled from 'styled-components';
 import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
+
+const StatusDropdownStyled = styled(DropDown)`
+  border: 1px solid ${(props: any) => props.borderColor};
+`;
 
 export function Filter() {
   const { filter, setFilter } = useFilterContext()!;
+  const theme = useTheme();
+  const states = [ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   return (
     <>
       <Field label="Contract address">
@@ -38,11 +53,13 @@ export function Filter() {
         />
       </Field>
       <Field label="Show status">
-        <DropDown
-          id="filterDropdown"
-          items={[ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired]}
-          selected={filter.status}
-          onChange={(val: number) => setFilter({ ...filter, status: val })}
+        <StatusDropdownStyled
+          id="filterStatus"
+          items={states}
+          borderColor={theme.border}
+          selected={states.indexOf(filter.status)}
+          onChange={(i: number) => setFilter({ ...filter, status: states[i] })}
+          wide
         />
       </Field>
       {

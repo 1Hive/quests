@@ -20,7 +20,7 @@ import { toTokenAmountModel } from 'src/utils/data.utils';
 import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
 import { number } from 'prop-types';
 import { DisputeModel } from 'src/models/dispute.model';
-import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
+import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getIpfsBaseUri, getObjectFromIpfs, pushObjectToIpfs } from './ipfs.service';
@@ -171,10 +171,10 @@ export async function fetchQuestsPaging(
   let expireTimeLower;
   let expireTimeUpper;
   if (filter.expire?.start) expireTimeLower = Math.round(filter.expire.start.getTime() / 1000);
-  else expireTimeLower = filter.status ? 0 : now;
+  else expireTimeLower = filter.status === ENUM_QUEST_STATE.Expired ? 0 : now;
   if (filter.expire?.end) expireTimeUpper = Math.round(filter.expire.end.getTime() / 1000);
   // TODO : Change to a later time when supported by grapql-request
-  else expireTimeUpper = filter.status ? now : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
+  else expireTimeUpper = filter.status === ENUM_QUEST_STATE.Expired ? now : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
   const queryResult = (
     await request(questSubgraph, QuestEntitiesQuery, {
       skip: currentIndex,

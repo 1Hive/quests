@@ -29,10 +29,12 @@ export default function Sidebar() {
           <Outset gu8>
             {page === ENUM_PAGES.List && (
               <>
-                {account && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
-                <>
-                  <Outset gu16 />
-                </>
+                {account && (
+                  <>
+                    <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
+                    <Outset gu16 />
+                  </>
+                )}
                 <Filter />
               </>
             )}

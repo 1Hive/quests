@@ -145,7 +145,7 @@ export const DEFAULT_FILTER = {
   description: '',
   expire: { start: undefined, end: undefined },
   bounty: undefined,
-  status: 0,
+  status: ENUM_QUEST_STATE.Active,
 } as FilterModel;
 
 export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
