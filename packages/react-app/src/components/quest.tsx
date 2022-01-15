@@ -39,7 +39,6 @@ import { AddressFieldInput } from './field-input/address-field-input';
 
 const LinkStyled = styled(Link)`
   text-decoration: underline;
-  color: white;
   font-weight: bold;
 `;
 const CardStyled = styled(Card)`
@@ -414,11 +413,6 @@ export default function Quest({
             />
           )}
           <QuestFooterStyled>
-            {/* {questMode !== ENUM_QUEST_VIEW_MODE.ReadDetail && (
-              // <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
-              //   <Button icon={<IconPlus />} label="Details" wide mode="strong" />
-              // </LinkStyled>
-            )} */}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
               values.address &&
               wallet.account &&

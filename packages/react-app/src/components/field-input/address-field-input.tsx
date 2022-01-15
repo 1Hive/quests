@@ -3,6 +3,7 @@ import { Field, TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 
 import { IconTooltip } from './icon-tooltip';
@@ -19,7 +20,7 @@ const DivStyled = styled.div`
   pointer-events: all !important;
 `;
 const LabelStyled = styled.div`
-  width: 16px;
+  width: 16 ${GUpx()};
   justify-content: center;
   margin-left: 8px;
   display: flex;

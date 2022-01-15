@@ -79,7 +79,6 @@ export default function QuestModal({
           <QuestActionButtonStyled
             key="btn-save"
             label="Create"
-            // icon={<FaSave />}
             mode="positive"
             type="submit"
             form={`form-quest-form-${data?.address ?? 'new'}`}
