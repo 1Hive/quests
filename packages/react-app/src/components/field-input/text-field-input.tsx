@@ -1,23 +1,11 @@
-import { Field, TextInput, Markdown } from '@1hive/1hive-ui';
+import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region Styled
-
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
-`;
-const FieldHeaderStyled = styled(Field)`
-  pointer-events: none;
-`;
-const DivStyled = styled.div`
-  textarea {
-    pointer-events: all !important;
-  }
-`;
 
 const MaxHeightStyled = styled.div`
   overflow: hidden;
@@ -75,9 +63,9 @@ export default function TextFieldInput({
 }: Props) {
   if (isLoading)
     return (
-      <FieldStyled label={label} key={id} compact={compact}>
+      <FieldInput id={id} label={label} compact={compact}>
         <Skeleton />
-      </FieldStyled>
+      </FieldInput>
     );
   const readOnlyContent = (
     <>
@@ -118,20 +106,15 @@ export default function TextFieldInput({
     </div>
   );
   return label ? (
-    <>
-      <FieldHeaderStyled
-        label={
-          <>
-            <span title={tooltip}>{label}</span>
-
-            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-          </>
-        }
-        key={id}
-      >
-        <DivStyled> {loadableContent}</DivStyled>
-      </FieldHeaderStyled>
-    </>
+    <FieldInput
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
+      id={id}
+      compact={compact}
+    >
+      {loadableContent}
+    </FieldInput>
   ) : (
     loadableContent
   );

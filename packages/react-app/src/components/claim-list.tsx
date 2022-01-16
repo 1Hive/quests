@@ -127,8 +127,8 @@ export default function ClaimList({
 
   return (
     <WrapperStyled>
-      <Outset>
-        {!!claims?.length && (
+      {!!claims?.length && (
+        <Outset>
           <>
             <ClaimStyled>
               <HeaderStyled>Claims </HeaderStyled>
@@ -171,8 +171,8 @@ export default function ClaimList({
               ])}
             />
           </>
-        )}
-      </Outset>
+        </Outset>
+      )}
     </WrapperStyled>
   );
 }

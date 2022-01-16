@@ -9,15 +9,9 @@ import { GUpx } from 'src/utils/css.util';
 import { floorNumber } from 'src/utils/math.utils';
 import { toBigNumber } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region StyledComponents
-const FieldHeaderStyled = styled(Field)`
-  pointer-events: none;
-`;
-const DivStyled = styled.div`
-  pointer-events: all !important;
-`;
 
 const LineStyled = styled.div`
   display: flex;
@@ -35,7 +29,7 @@ const TokenBadgeStyled = styled(TokenBadge)`
 // #endregion
 
 type Props = {
-  id: string | number;
+  id: string;
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
@@ -93,14 +87,11 @@ function AmountFieldInput({
   };
 
   return (
-    <FieldHeaderStyled
-      label={
-        <>
-          <span title={tooltip}>{label}</span>
-          <>{tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}</>
-        </>
-      }
-      key={id}
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
       compact={compact}
     >
       {isLoading ? (
@@ -110,17 +101,15 @@ function AmountFieldInput({
         <LineStyled>
           <AmountStyled>
             {isEdit ? (
-              <DivStyled>
-                <TextInput
-                  id={id}
-                  wide={wide}
-                  onChange={onAmountChange}
-                  placeHolder={placeHolder}
-                  type="number"
-                  value={amount}
-                  disabled={disabled}
-                />
-              </DivStyled>
+              <TextInput
+                id={id}
+                wide={wide}
+                onChange={onAmountChange}
+                placeHolder={placeHolder}
+                type="number"
+                value={amount}
+                disabled={disabled}
+              />
             ) : (
               floorNumber(amount, decimalsCount)
             )}
@@ -132,7 +121,7 @@ function AmountFieldInput({
           />
         </LineStyled>
       )}
-    </FieldHeaderStyled>
+    </FieldInput>
   );
 }
 

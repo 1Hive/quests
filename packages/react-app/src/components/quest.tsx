@@ -39,25 +39,33 @@ import { AddressFieldInput } from './field-input/address-field-input';
 const TitleLinkStyled = styled(Link)`
   font-weight: 100;
 `;
+
 const LinkStyled = styled(Link)`
   font-weight: 100;
   color: dodgerblue;
   text-decoration: none;
 `;
-const AddressStyled = styled.div`
+
+const AddressWrapperStyled = styled.div`
   margin-bottom: ${GUpx(2)};
 `;
+
 const CardStyled = styled(Card)`
   justify-content: flex-start;
   width: 100%;
   height: fit-content;
   border: none;
+
+  & > div:first-child {
+    padding-bottom: 0;
+  }
 `;
 
 const QuestFooterStyled = styled.div`
   width: 100%;
   text-align: right;
   padding: ${GUpx(2)};
+  padding-top: 0;
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
@@ -76,12 +84,6 @@ const FormStyled = styled(Form)`
 
 const NoPaddingSplitStyled = styled(Split)`
   padding-bottom: 0 !important;
-`;
-const FallbackWrapperStyled = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 `;
 
 // #endregion
@@ -281,15 +283,13 @@ export default function Quest({
       <NoPaddingSplitStyled
         primary={
           <Outset gu16 className="pb-0">
-            <Outset gu8 vertical className="block">
-              {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
-                <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
-                  {titleInput(values.title, handleChange)}
-                </TitleLinkStyled>
-              ) : (
-                titleInput(values.title, handleChange)
-              )}
-            </Outset>
+            {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
+              <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
+                {titleInput(values.title, handleChange)}
+              </TitleLinkStyled>
+            ) : (
+              titleInput(values.title, handleChange)
+            )}
             <Outset gu8 vertical>
               <TextFieldInput
                 id="description"
@@ -325,36 +325,30 @@ export default function Quest({
                 }
               />
               {isEdit && (
-                <FallbackWrapperStyled>
-                  <div style={{ width: '80%' }}>
-                    <AddressFieldInput
-                      id="fallbackAddress"
-                      label="Funds fallback address"
-                      value={values.fallbackAddress}
-                      isLoading={loading}
-                      tooltip="Fallback Address"
-                      tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                      isEdit
-                      onChange={handleChange}
-                    />
-                  </div>
-                </FallbackWrapperStyled>
+                <AddressFieldInput
+                  id="fallbackAddress"
+                  label="Funds fallback address"
+                  value={values.fallbackAddress}
+                  isLoading={loading}
+                  tooltip="Fallback Address"
+                  tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                  isEdit
+                  onChange={handleChange}
+                />
               )}
             </Outset>
           </Outset>
         }
         secondary={
-          <Outset horizontal gu16={!isEdit}>
+          <Outset horizontal gu16={!isEdit} className="pb-0 pt-16">
             {!isEdit && values.address && (
-              <AddressStyled>
+              <AddressWrapperStyled>
                 {loading ? (
                   <Skeleton />
                 ) : (
-                  <>
-                    <AddressField id="address" address={values.address} autofocus={false} />
-                  </>
+                  <AddressField id="address" address={values.address} autofocus={false} />
                 )}
-              </AddressStyled>
+              </AddressWrapperStyled>
             )}
             {bounty !== null && (
               <AmountFieldInputFormik
@@ -407,32 +401,31 @@ export default function Quest({
               challengeDeposit={challengeDeposit}
             />
           )}
-
           {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
             values.address &&
             wallet.account &&
             bounty && (
               <QuestFooterStyled>
-                (values.state === ENUM_QUEST_STATE.Active ? (
-                <>
-                  <FundModal questAddress={values.address} onClose={onFundModalClosed} />
-                  {claimDeposit && (
-                    <ScheduleClaimModal
-                      questAddress={data.address}
-                      questTotalBounty={bounty}
-                      claimDeposit={claimDeposit}
-                      playerAddress={wallet.account}
-                      onClose={onScheduleModalClosed}
-                    />
-                  )}
-                </>
+                {values.state === ENUM_QUEST_STATE.Active ? (
+                  <>
+                    <FundModal questAddress={values.address} onClose={onFundModalClosed} />
+                    {claimDeposit && (
+                      <ScheduleClaimModal
+                        questAddress={data.address}
+                        questTotalBounty={bounty}
+                        claimDeposit={claimDeposit}
+                        playerAddress={wallet.account}
+                        onClose={onScheduleModalClosed}
+                      />
+                    )}
+                  </>
                 ) : (
-                <>
-                  {!!bounty?.parsedAmount && (
-                    <ReclaimFundsModal bounty={bounty} questData={values} />
-                  )}
-                </>
-                ))
+                  <>
+                    {!!bounty?.parsedAmount && (
+                      <ReclaimFundsModal bounty={bounty} questData={values} />
+                    )}
+                  </>
+                )}
               </QuestFooterStyled>
             )}
         </>

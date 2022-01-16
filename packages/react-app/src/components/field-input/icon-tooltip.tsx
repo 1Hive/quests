@@ -3,11 +3,13 @@ import { ReactNode } from 'react';
 import styled from 'styled-components';
 import { Outset } from '../utils/spacer-util';
 
+// #region Styled
+
 const IconSpanStyled = styled.span`
   margin-top: 0px;
-  margin-left: 8px;
   margin-bottom: 4px;
-
+  height: 16px;
+  width: 16px;
   display: flex;
   -webkit-box-align: center;
   align-items: center;
@@ -25,9 +27,13 @@ const IconSpanStyled = styled.span`
 const TooltipWrapperStyled = styled.div`
   color: #637381;
 `;
+
 const HelpWrapperStyled = styled.div`
-  pointer-events: all !important;
+  pointer-events: all;
+  width: 16px;
 `;
+
+// #endregion
 
 type Props = {
   tooltip: string;

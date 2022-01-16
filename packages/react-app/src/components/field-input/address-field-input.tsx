@@ -1,23 +1,12 @@
-import { Field, TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
+import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
 
 import { noop } from 'lodash-es';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region Styled
-
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
-`;
-const FieldHeaderStyled = styled(Field)`
-  pointer-events: none;
-`;
-const DivStyled = styled.div`
-  pointer-events: all !important;
-`;
 
 const TextInputStyled = styled(TextInput)`
   height: 40px;
@@ -33,7 +22,6 @@ const EthIdenticonStyled = styled(EthIdenticon)`
 
 const WrapperStyled = styled.div`
   display: flex;
-  pointer-events: none !important;
   flex-wrap: nowrap;
 `;
 
@@ -63,34 +51,28 @@ export function AddressFieldInput({
 }: Props) {
   if (isLoading)
     return (
-      <FieldStyled label={label} key={id} compact={compact}>
+      <FieldInput label={label} id={id} compact={compact}>
         <Skeleton />
-      </FieldStyled>
+      </FieldInput>
     );
   const loadableContent = isEdit ? (
     <WrapperStyled>
-      <DivStyled>
-        <TextInputStyled id={id} value={value} onChange={onChange} />
-      </DivStyled>
+      <TextInputStyled id={id} value={value} onChange={onChange} />
       <EthIdenticonStyled address={value} scale={1.6} />
     </WrapperStyled>
   ) : (
     <AddressField address={value} />
   );
   return label ? (
-    <>
-      <FieldHeaderStyled
-        label={
-          <>
-            <span title={tooltip}>{label}</span>
-            <>{tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}</>
-          </>
-        }
-        key={id}
-      >
-        {loadableContent}
-      </FieldHeaderStyled>
-    </>
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
+      compact={compact}
+    >
+      {loadableContent}
+    </FieldInput>
   ) : (
     loadableContent
   );
