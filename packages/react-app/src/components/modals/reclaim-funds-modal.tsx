@@ -13,7 +13,7 @@ import Skeleton from 'react-loading-skeleton';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 import IdentityBadge from '../identity-badge';
 
 const OpenButtonStyled = styled(Button)`
@@ -23,7 +23,7 @@ const OpenButtonStyled = styled(Button)`
 type Props = {
   questData: QuestModel;
   bounty: TokenAmountModel;
-  onClose?: Function;
+  onClose?: ModalCallback;
 };
 
 export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
@@ -36,10 +36,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
     useTransactionContext()!;
   const questContract = useQuestContract(questData.address, true);
   const toast = useToast();
-  const onModalClose = () => {
-    setOpened(false);
-    onClose();
-  };
 
   useEffect(() => {
     if (questContract.instance?.address && !fallbackAddress) {
@@ -66,7 +62,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           ? ENUM_TRANSACTION_STATUS.Confirmed
           : ENUM_TRANSACTION_STATUS.Failed,
       });
-      onModalClose();
+      closeModal(true);
       if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
@@ -79,6 +75,11 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
     } finally {
       setLoading(false);
     }
+  };
+
+  const closeModal = (success: boolean) => {
+    setOpened(false);
+    onClose(success);
   };
 
   return (
@@ -104,7 +105,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             disabled={loading || !questContract}
           />
         }
-        onClose={onModalClose}
+        onClose={() => closeModal(false)}
         isOpen={opened}
       >
         <Outset gu16>

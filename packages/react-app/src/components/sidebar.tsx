@@ -6,7 +6,6 @@ import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from '../constants';
 import { useWallet } from '../contexts/wallet.context';
 import QuestModal from './modals/quest-modal';
 import { Filter } from './filter';
-import Separator from './utils/separator';
 import { Outset } from './utils/spacer-util';
 
 // #region StyledComponent
@@ -29,13 +28,13 @@ export default function Sidebar() {
           <Outset gu8>
             {page === ENUM_PAGES.List && (
               <>
-                <Filter />
                 {account && (
                   <>
-                    <Separator gu16 />
                     <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
+                    <Outset gu16 />
                   </>
                 )}
+                <Filter />
               </>
             )}
           </Outset>

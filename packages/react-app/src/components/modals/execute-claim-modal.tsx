@@ -14,7 +14,7 @@ import { getLastBlockDate } from 'src/utils/date.utils';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 import IdentityBadge from '../identity-badge';
 
 // #region StyledComponents
@@ -34,7 +34,7 @@ const OpenButtonWrapperStyled = styled.div`
 type Props = {
   claim: ClaimModel;
   questTotalBounty?: TokenAmountModel;
-  onClose?: Function;
+  onClose?: ModalCallback;
 };
 
 export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = noop }: Props) {
@@ -47,7 +47,6 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
   const toast = useToast();
-
   useEffect(() => {
     const launchTimeoutAsync = async (execTimeMs: number) => {
       const now = await getLastBlockDate();
@@ -71,13 +70,15 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   }, [claim.state, claim.executionTimeMs, scheduleTimeout]);
 
   useEffect(() => {
-    if (claim.claimedAmount.parsedAmount) setAmount(claim.claimedAmount);
-    else setAmount(questTotalBounty); // Claim all funds
-  }, [claim.claimedAmount]);
+    if (questTotalBounty) {
+      if (claim.claimedAmount.parsedAmount) setAmount(claim.claimedAmount);
+      else setAmount(questTotalBounty); // Claim all funds
+    }
+  }, [claim.claimedAmount, questTotalBounty]);
 
-  const onModalClose = () => {
+  const closeModal = (success: boolean) => {
     setOpened(false);
-    onClose();
+    onClose(success);
   };
 
   const claimTx = async () => {
@@ -102,7 +103,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
           ? ENUM_TRANSACTION_STATUS.Confirmed
           : ENUM_TRANSACTION_STATUS.Failed,
       });
-      onModalClose();
+      closeModal(true);
       if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
@@ -150,7 +151,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             mode="positive"
           />
         }
-        onClose={onModalClose}
+        onClose={() => closeModal(false)}
         isOpen={opened}
       >
         <Outset gu16>

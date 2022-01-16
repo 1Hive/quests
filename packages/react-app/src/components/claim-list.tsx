@@ -7,12 +7,16 @@ import { DEAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from 'src/constants
 import { roundNumber } from 'src/utils/math.utils';
 import { ONE_DAY_IN_MS } from 'src/utils/date.utils';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import { QuestModel } from 'src/models/quest.model';
+import { useEffect, useState } from 'react';
 import ChallengeModal from './modals/challenge-modal';
-import AmountFieldInput from './field-input/amount-field-input';
-import TextFieldInput from './field-input/text-field-input';
-import { Outset } from './utils/spacer-util';
-import { IconTooltip } from './field-input/icon-tooltip';
 import ResolveChallengeModal from './modals/resolve-challenge-modal';
+import { Outset } from './utils/spacer-util';
+import AmountFieldInput from './field-input/amount-field-input';
+import { IconTooltip } from './field-input/icon-tooltip';
+import TextFieldInput from './field-input/text-field-input';
+import * as QuestService from '../services/quest.service';
+import ExecuteClaimModal from './modals/execute-claim-modal';
 
 // #region StyledComponents
 
@@ -47,13 +51,80 @@ const HeaderStyled = styled.h1`
 // #endregion
 
 type Props = {
-  claims: ClaimModel[];
+  questData: QuestModel;
+  newClaim: number;
   challengeDeposit: TokenAmountModel;
-  questTotalBounty?: TokenAmountModel | null;
+  questTotalBounty?: TokenAmountModel;
 };
 
-export default function ClaimList({ claims, challengeDeposit, questTotalBounty }: Props) {
+export default function ClaimList({
+  questData,
+  newClaim,
+  challengeDeposit,
+  questTotalBounty,
+}: Props) {
   const wallet = useWallet();
+  const [claims, setClaims] = useState<ClaimModel[]>();
+  const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | null>();
+
+  useEffect(() => {
+    fetchClaims();
+  }, []);
+
+  useEffect(() => {
+    if (wallet.account) {
+      if (claims) {
+        const result = claims.find((x) => x.playerAddress === wallet.account);
+        setCurrentPlayerClaim(result ?? null);
+      }
+    }
+  }, [claims, wallet.account]);
+
+  useEffect(() => {
+    if (!claims) fetchClaims();
+    else fetchNewClaimChanges(true);
+  }, [newClaim]);
+
+  const fetchClaims = async () => {
+    const result = await QuestService.fetchQuestClaims(questData);
+    setClaims(result);
+    return result;
+  };
+
+  const fetchNewClaimChanges = (success: boolean, oldClaimsSnapshot?: string) => {
+    oldClaimsSnapshot = oldClaimsSnapshot ?? JSON.stringify(claims);
+    // Refresh until different
+    if (success) {
+      setTimeout(async () => {
+        const newClaimsSnapshot = JSON.stringify(await fetchClaims());
+        if (oldClaimsSnapshot === newClaimsSnapshot)
+          fetchNewClaimChanges(success, oldClaimsSnapshot); // If same result keep pulling
+      }, 1000);
+    }
+  };
+
+  const actionButton = (claim: ClaimModel) => {
+    if (claim.state === ENUM_CLAIM_STATE.Challenged) {
+      return <ResolveChallengeModal claim={claim} onClose={fetchNewClaimChanges} />;
+    }
+    if (currentPlayerClaim) {
+      return (
+        <ExecuteClaimModal
+          claim={currentPlayerClaim}
+          questTotalBounty={questTotalBounty}
+          onClose={fetchNewClaimChanges}
+        />
+      );
+    }
+    return (
+      <ChallengeModal
+        claim={claim}
+        challengeDeposit={challengeDeposit}
+        onClose={fetchNewClaimChanges}
+      />
+    );
+  };
+
   return (
     <WrapperStyled>
       <Outset>
@@ -86,12 +157,7 @@ export default function ClaimList({ claims, challengeDeposit, questTotalBounty }
                         : questTotalBounty
                     }
                   />
-                  {wallet?.account &&
-                    (x.state === ENUM_CLAIM_STATE.Challenged ? (
-                      <ResolveChallengeModal claim={x} />
-                    ) : (
-                      <ChallengeModal claim={x} challengeDeposit={challengeDeposit} />
-                    ))}
+                  {wallet?.account && currentPlayerClaim !== undefined && actionButton(x)}
                 </RowStyled>,
                 <Outset gu8>
                   <TextFieldInput

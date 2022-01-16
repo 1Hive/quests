@@ -23,4 +23,5 @@ type QuestEntity @entity {
   questExpireTimeSec: BigInt
   questDetailsRef: Bytes!
   questRewardTokenAddress: Bytes!
+  creationTimestamp: BigInt!
 }

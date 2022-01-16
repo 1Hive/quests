@@ -1,6 +1,7 @@
 import { Root } from '@1hive/1hive-ui';
 import React, { useEffect } from 'react';
 import { PageContextProvider } from 'src/contexts/page.context';
+import { QuestsContextProvider } from 'src/contexts/quests.context';
 import { TransactionContextProvider } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
@@ -61,16 +62,18 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   return (
     <PageContextProvider>
       <TransactionContextProvider>
-        <MainViewStyled currentTheme={currentTheme}>
-          <HeaderWrapperStyled>
-            <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
-          </HeaderWrapperStyled>
-          <Root.Provider>
-            <FilterContextProvider>
-              <MainScrollWithSidebarLayout main={children} side={<Sidebar />} />
-            </FilterContextProvider>
-          </Root.Provider>
-        </MainViewStyled>
+        <QuestsContextProvider>
+          <MainViewStyled currentTheme={currentTheme}>
+            <HeaderWrapperStyled>
+              <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
+            </HeaderWrapperStyled>
+            <Root.Provider>
+              <FilterContextProvider>
+                <MainScrollWithSidebarLayout main={children} side={<Sidebar />} />
+              </FilterContextProvider>
+            </Root.Provider>
+          </MainViewStyled>
+        </QuestsContextProvider>
       </TransactionContextProvider>
     </PageContextProvider>
   );

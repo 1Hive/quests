@@ -20,9 +20,9 @@ import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from 'use-wallet';
-import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
+import { TokenModel } from 'src/models/token.model';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -33,7 +33,6 @@ import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
 import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
-import ExecuteClaimModal from './modals/execute-claim-modal';
 import { AddressFieldInput } from './field-input/address-field-input';
 // #region StyledComponents
 
@@ -91,7 +90,8 @@ type Props = {
   data?: QuestModel;
   questMode?: string;
   isLoading?: boolean;
-  onSave?: Function;
+  // eslint-disable-next-line no-unused-vars
+  onSave?: (questAddress: string) => void;
   css?: any;
 };
 
@@ -111,8 +111,8 @@ export default function Quest({
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
-  const [bounty, setBounty] = useState<TokenAmountModel | null>();
-  const [claims, setClaims] = useState<ClaimModel[]>();
+  const [bounty, setBounty] = useState<TokenAmountModel>();
+  const [claimUpdated, setClaimUpdate] = useState(0);
   const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
   (window as any).pushTransaction = pushTransaction;
   (window as any).updateTransactionStatus = updateTransactionStatus;
@@ -120,7 +120,6 @@ export default function Quest({
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
   const questFactoryContract = useFactoryContract();
-  const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | undefined>();
 
   useEffect(() => {
     setIsEdit(
@@ -140,36 +139,13 @@ export default function Quest({
           Logger.error(error);
         }
     };
-    const fetchClaims = async () => {
-      const result = await QuestService.fetchQuestClaims(data);
-      setClaims(result);
-    };
-    const getBalanceOfQuest = async (address: string) => {
-      try {
-        const result = await QuestService.getBalanceOf(erc20Contract, defaultToken, address);
-        data.bounty = result ?? undefined;
-        processQuestState(data);
-        setBounty(result);
-      } catch (error) {
-        Logger.error(error);
-        setBounty(null);
-      }
-    };
 
-    if (data.address) getBalanceOfQuest(data.address);
+    if (data.rewardToken && data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
-      fetchClaims();
       getClaimDeposit();
     }
-  }, [questMode]);
-
-  useEffect(() => {
-    if (wallet.account) {
-      if (claims) setCurrentPlayerClaim(claims.find((x) => x.playerAddress === wallet.account));
-      // values.fallbackAddress = wallet.account;
-    }
-  }, [claims, wallet.account]);
+  }, [questMode, data.rewardToken]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -217,7 +193,7 @@ export default function Quest({
           hash: txReceiptSaveQuest.transactionHash,
           status: ENUM_TRANSACTION_STATUS.Confirmed,
         });
-        onSave();
+        onSave(txReceiptSaveQuest.logs[0].address);
         if (txReceiptSaveQuest.status) {
           if (!values.bounty?.parsedAmount) toast('Operation succeed');
           else {
@@ -271,6 +247,34 @@ export default function Quest({
       wide
     />
   );
+
+  const fetchBalanceOfQuest = (address: string, token: TokenModel) => {
+    QuestService.getBalanceOf(erc20Contract, token, address)
+      .then((result) => {
+        data.bounty = result ?? undefined;
+        processQuestState(data);
+        setBounty(result);
+      })
+      .catch((err) => {
+        Logger.error(err);
+        setBounty(undefined);
+      });
+  };
+
+  const onScheduleModalClosed = (success: boolean) => {
+    if (success) {
+      setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
+    }
+  };
+
+  const onFundModalClosed = (success: boolean) => {
+    setTimeout(() => {
+      if (success && data.address && data.rewardToken) {
+        fetchBalanceOfQuest(data.address, data.rewardToken);
+        setClaimUpdate(claimUpdated + 1);
+      }
+    }, 500);
+  };
 
   const questContent = (values: QuestModel, handleChange = noop) => (
     <>
@@ -395,9 +399,10 @@ export default function Quest({
       />
       {!loading && !isEdit && data.address && (
         <>
-          {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claims && challengeDeposit && (
+          {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
             <ClaimList
-              claims={claims}
+              newClaim={claimUpdated}
+              questData={data}
               questTotalBounty={bounty}
               challengeDeposit={challengeDeposit}
             />
@@ -410,18 +415,15 @@ export default function Quest({
               <QuestFooterStyled>
                 (values.state === ENUM_QUEST_STATE.Active ? (
                 <>
-                  <FundModal questAddress={values.address} />
-                  {currentPlayerClaim ? (
-                    <ExecuteClaimModal claim={currentPlayerClaim} questTotalBounty={bounty} />
-                  ) : (
-                    claimDeposit && (
-                      <ScheduleClaimModal
-                        questAddress={data.address}
-                        questTotalBounty={bounty}
-                        claimDeposit={claimDeposit}
-                        playerAddress={wallet.account}
-                      />
-                    )
+                  <FundModal questAddress={values.address} onClose={onFundModalClosed} />
+                  {claimDeposit && (
+                    <ScheduleClaimModal
+                      questAddress={data.address}
+                      questTotalBounty={bounty}
+                      claimDeposit={claimDeposit}
+                      playerAddress={wallet.account}
+                      onClose={onScheduleModalClosed}
+                    />
                   )}
                 </>
                 ) : (

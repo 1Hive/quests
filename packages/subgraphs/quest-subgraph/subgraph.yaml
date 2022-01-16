@@ -6,7 +6,7 @@ dataSources:
     name: QuestFactory
     network: rinkeby
     source:
-      address: "0x087b70F3F98ebcBf7aed2E50A5035F60F52e9972"
+      address: "0x855a04deB27aBF93336d52A91F29A98Dd5605691"
       abi: QuestFactory
       startBlock: 9936882
     mapping:
@@ -19,6 +19,6 @@ dataSources:
         - name: QuestFactory
           file: ./abis/QuestFactory.json
       eventHandlers:
-        - event: QuestCreated(address,string,bytes,address,uint256)
+        - event: QuestCreated(address,string,bytes,address,uint256,uint256)
           handler: handleQuestCreated
       file: ./src/mapping.ts

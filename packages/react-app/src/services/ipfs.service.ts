@@ -1,6 +1,6 @@
 import ipfsAPI, { Options } from 'ipfs-http-client';
 import { Logger } from 'src/utils/logger';
-import { toAscii, toHex } from 'web3-utils';
+import { hexToAscii, toAscii, toHex } from 'web3-utils';
 
 const configInfura = {
   host: 'ipfs.infura.io',
@@ -16,6 +16,13 @@ const ipfsInfura = ipfsAPI.create(configInfura);
 const ipfsTheGraph = ipfsAPI.create(configTheGraph);
 
 export const getIpfsBaseUri = () => `${configTheGraph.url}/cat?arg=`;
+
+export const formatIpfsMarkdownLink = (ipfsHash: string, label: string) => {
+  if (ipfsHash.startsWith('0x')) {
+    ipfsHash = hexToAscii(ipfsHash);
+  }
+  return `[${label}](${getIpfsBaseUri()}${ipfsHash})`;
+};
 
 export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
   const response = await ipfsTheGraph.add(obj.toString());

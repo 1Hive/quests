@@ -13,7 +13,7 @@ import { GUpx } from 'src/utils/css.util';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
-import ModalBase from './modal-base';
+import ModalBase, { ModalCallback } from './modal-base';
 
 const FormStyled = styled(Form)`
   width: 100%;
@@ -24,7 +24,7 @@ const OpenButtonStyled = styled(Button)`
 `;
 
 type Props = {
-  onClose?: Function;
+  onClose?: ModalCallback;
   questAddress: string;
 };
 
@@ -37,9 +37,10 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
   const toast = useToast();
   const { defaultToken } = getNetwork();
   const contractERC20 = useERC20Contract(defaultToken);
-  const onModalClose = () => {
+
+  const closeModal = (success: boolean) => {
     setOpened(false);
-    onClose();
+    onClose(success);
   };
 
   const fundModalTx = async (values: any, setSubmitting: Function) => {
@@ -66,7 +67,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
           ? ENUM_TRANSACTION_STATUS.Confirmed
           : ENUM_TRANSACTION_STATUS.Failed,
       });
-      onModalClose();
+      closeModal(true);
       if (txReceipt.status) toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
@@ -103,7 +104,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
           disabled={loading || !contractERC20}
         />
       }
-      onClose={onModalClose}
+      onClose={() => closeModal(false)}
       isOpen={opened}
     >
       <Formik

@@ -12,7 +12,8 @@ contract QuestFactory {
         string questTitle,
         bytes questDetailsRef,
         address rewardTokenAddress,
-        uint256 expireTime
+        uint256 expireTime,
+        uint256 creationTime
     );
 
     constructor(address _aragonGovernAddress) {
@@ -39,7 +40,8 @@ contract QuestFactory {
             _questTitle,
             _questDetailsRef,
             address(_rewardToken),
-            _expireTime
+            _expireTime,
+            block.timestamp
         );
         return address(quest);
     }

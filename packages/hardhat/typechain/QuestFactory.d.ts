@@ -45,7 +45,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "QuestCreated(address,string,bytes,address,uint256)": EventFragment;
+    "QuestCreated(address,string,bytes,address,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "QuestCreated"): EventFragment;
@@ -140,7 +140,8 @@ export class QuestFactory extends Contract {
       questTitle: null,
       questDetailsRef: null,
       rewardTokenAddress: null,
-      expireTime: null
+      expireTime: null,
+      creationTime: null
     ): EventFilter;
   };
 
