@@ -1,4 +1,4 @@
-import { AddressField, Card, Split, useToast } from '@1hive/1hive-ui';
+import { AddressField, Card, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
