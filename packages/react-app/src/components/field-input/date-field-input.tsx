@@ -1,19 +1,16 @@
-import { Field, useTheme } from '@1hive/1hive-ui';
+import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { dateFormat } from '../../utils/date.utils';
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region StyledComponents
+
 const InputStyled = styled.input`
   background-color: ${({ background }: any) => background};
   border: none;
-`;
-
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
 `;
 
 // #endregion
@@ -47,9 +44,9 @@ export default function DateFieldInput({
 
   if (isLoading)
     return (
-      <FieldStyled label={label} key={id} compact={compact}>
+      <FieldInput label={label} id={id} compact={compact}>
         <Skeleton />
-      </FieldStyled>
+      </FieldInput>
     );
 
   const valFormat = dateFormat(value, 'iso');
@@ -74,17 +71,15 @@ export default function DateFieldInput({
     <span>{new Date(value).toDateString()}</span>
   );
   return label ? (
-    <Field
-      label={
-        <>
-          <span title={tooltip}>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-        </>
-      }
-      key={id}
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
+      compact={compact}
     >
       {loadableContent}
-    </Field>
+    </FieldInput>
   ) : (
     loadableContent
   );

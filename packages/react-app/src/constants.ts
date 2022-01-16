@@ -51,6 +51,8 @@ export const TOKENS = {
 
 export const GQL_MAX_INT = 2 ** 31 - 1;
 
+export const QUESTS_PAGE_SIZE = 4;
+
 // Enums
 
 export const ENUM_QUEST_STATE = {

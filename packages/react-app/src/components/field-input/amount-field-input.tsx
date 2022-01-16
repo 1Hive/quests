@@ -1,4 +1,4 @@
-import { Field, TextInput, TokenBadge } from '@1hive/1hive-ui';
+import { TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ import { GUpx } from 'src/utils/css.util';
 import { floorNumber } from 'src/utils/math.utils';
 import { toBigNumber } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region StyledComponents
 
@@ -22,10 +22,6 @@ const AmountStyled = styled.div`
   margin-right: ${GUpx()};
 `;
 
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
-`;
-
 const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
 `;
@@ -33,7 +29,7 @@ const TokenBadgeStyled = styled(TokenBadge)`
 // #endregion
 
 type Props = {
-  id: string | number;
+  id: string;
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
@@ -91,19 +87,17 @@ function AmountFieldInput({
   };
 
   return (
-    <FieldStyled
-      label={
-        <>
-          <span title={tooltip}>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-        </>
-      }
-      key={id}
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
       compact={compact}
     >
       {isLoading ? (
         <Skeleton />
       ) : (
+        // <DivStyled>
         <LineStyled>
           <AmountStyled>
             {isEdit ? (
@@ -127,7 +121,7 @@ function AmountFieldInput({
           />
         </LineStyled>
       )}
-    </FieldStyled>
+    </FieldInput>
   );
 }
 

@@ -18,11 +18,7 @@ type Props = {
   state: string;
 };
 
-const VISIBLE_STATES = [
-  ENUM_QUEST_STATE.Expired,
-  ENUM_QUEST_STATE.Archived,
-  ENUM_QUEST_STATE.Draft,
-];
+const VISIBLE_STATES = [ENUM_QUEST_STATE.Expired, ENUM_QUEST_STATE.Archived];
 
 export function StateTag({ state }: Props) {
   const [mode, setMode] = useState<string>();
