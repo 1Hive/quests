@@ -27,7 +27,7 @@ const AmountStyled = styled.div`
 `;
 
 const AmountTextInputStyled = styled(TextInput)`
-  width: 75px;
+  width: 150px;
   /* Chrome, Safari, Edge, Opera */
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
@@ -58,6 +58,7 @@ const LineStyled = styled.div`
   display: flex;
   pointer-events: all;
   justify-content: flex-start;
+  align-items: center;
 `;
 
 // #endregion
