@@ -93,6 +93,8 @@ export default function Quest({
   data = {
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
     state: ENUM_QUEST_STATE.Draft,
+    title: 'test HNY',
+    description: 'Test HNY',
   },
   isLoading = false,
   questMode = ENUM_QUEST_VIEW_MODE.ReadDetail,
@@ -108,8 +110,6 @@ export default function Quest({
   const [bounty, setBounty] = useState<TokenAmountModel>();
   const [claimUpdated, setClaimUpdate] = useState(0);
   const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
-  (window as any).pushTransaction = pushTransaction;
-  (window as any).updateTransactionStatus = updateTransactionStatus;
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
@@ -122,16 +122,19 @@ export default function Quest({
 
     const getClaimDeposit = async () => {
       // Don't show deposit of expired
-      if (data.state === ENUM_QUEST_STATE.Archived || data.state === ENUM_QUEST_STATE.Expired)
-        setClaimDeposit(null);
-      else
-        try {
-          const { challenge, claim } = await QuestService.fetchDeposits();
-          setClaimDeposit(claim);
-          setChallengeDeposit(challenge);
-        } catch (error) {
-          Logger.error(error);
+      if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
+        if (data.state === ENUM_QUEST_STATE.Archived || data.state === ENUM_QUEST_STATE.Expired) {
+          setClaimDeposit(null);
+        } else {
+          try {
+            const { challenge, claim } = await QuestService.fetchDeposits();
+            setClaimDeposit(claim);
+            setChallengeDeposit(challenge);
+          } catch (error) {
+            Logger.error(error);
+          }
         }
+      }
     };
 
     if (data.rewardToken && data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
@@ -148,8 +151,8 @@ export default function Quest({
     if (!values.fallbackAddress) errors.push('Validation : Funds fallback address is required');
     if (values.expireTimeMs < Date.now())
       errors.push('Validation : Expiration have to be later than now');
-    if (!bounty?.token) errors.push('Validation : Bounty token is required');
-    else if (bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
+    if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
+    else if (values.bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
     if (!questFactoryContract) {
       Logger.error(
         `Error : failed to instanciate contract <questFactoryContract>, enable verbose to see error`,
@@ -179,7 +182,7 @@ export default function Quest({
             ...values,
             expireTimeMs: timeValue,
             creatorAddress: wallet.account,
-            rewardToken: bounty?.token ?? defaultToken,
+            rewardToken: values.bounty!.token ?? defaultToken,
           },
           undefined,
           (tx) => {
@@ -197,15 +200,16 @@ export default function Quest({
         });
         onSave(txReceiptSaveQuest.logs[0].address);
         if (txReceiptSaveQuest.status) {
+          // If no funding needing
           if (!values.bounty?.parsedAmount) toast('Operation succeed');
           else {
             createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
             if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
             toast('Sending funds to Quest...');
             const txReceiptFundQuest = await QuestService.fundQuest(
-              erc20Contract!,
+              wallet.account,
               createdQuestAddress,
-              values.bounty,
+              values.bounty!,
               (tx) => {
                 pushTransaction({
                   hash: tx,
@@ -308,20 +312,21 @@ export default function Quest({
                 placeHolder="Quest description"
                 tooltip="Quest Description"
                 tooltipDetail={
-                  <div>
-                    The quest description should include: <br />
-                    -Details about what the quest entails.
-                    <br />
-                    -What evidence must be submitted by users claiming a reward for completing the
-                    quest.
-                    <br />
-                    -The payout amount. This could be a constant amount for quests that payout
-                    multiple times, a range with reference to what determines what amount, the
-                    contracts balance at time of claim.
-                    {/* contracts balance at time of claim. This shouldn’t be a percentage of the
-                        contracts balance, as claims are not guaranteed to happen in order as they
-                        can be cancelled, messing up the valid claim amounts. */}
-                  </div>
+                  <>
+                    <u>The quest description should include:</u>
+                    <ul>
+                      <li>Details about what the quest entails.</li>
+                      <li>
+                        What evidence must be submitted by users claiming a reward for completing
+                        the quest.
+                      </li>
+                      <li>
+                        The payout amount. This could be a constant amount for quests that payout
+                        multiple times, a range with reference to what determines what amount, the
+                        contracts balance at time of claim.
+                      </li>
+                    </ul>
+                  </>
                 }
                 onChange={handleChange}
                 wide
@@ -363,12 +368,12 @@ export default function Quest({
                 tooltip="Bounty"
                 tooltipDetail={
                   isEdit
-                    ? "The initial amount of this quest's funding pool. A token needs to be selected."
+                    ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
                     : "The available amount of this quest's funding pool."
                 }
                 value={bounty}
                 isLoading={loading || (!isEdit && !bounty)}
-                onChange={console.log}
+                formik={formRef}
               />
             )}
             {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (

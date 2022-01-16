@@ -2,7 +2,7 @@ import { Field, TextInput, TokenBadge, _AutoComplete as AutoComplete, Tag } from
 import { parseUnits } from 'ethers/lib/utils';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
-import React, { ReactNode, useEffect, useState, useRef } from 'react';
+import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { NETWORK_TOKENS } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
@@ -56,11 +56,17 @@ const TokenBadgeStyled = styled(TokenBadge)`
 `;
 
 const AutoCompleteStyled = styled(AutoComplete)`
-  display: block;
+  width: 50%;
 `;
 
 const TokenNameStyled = styled.span`
   margin-right: ${GUpx()};
+`;
+
+const LineStyled = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 `;
 
 // #endregion
@@ -147,14 +153,14 @@ function AmountFieldInput({
   }, [maxDecimals, isEdit, value?.parsedAmount]);
 
   useEffect(() => {
-    setAmount(value?.parsedAmount);
+    setAmount(value?.parsedAmount ?? 0);
     setToken(value?.token ?? defaultToken);
   }, [value]);
 
   const onAmountChange = (e: any) => {
     const newAmount = e.target.value;
     setAmount(newAmount);
-    if (newAmount) {
+    if (token) {
       const nextValue = {
         token: {
           ...token,
@@ -162,21 +168,19 @@ function AmountFieldInput({
         },
         parsedAmount: +newAmount,
       };
-      console.log({ nextValue });
       if (formik) formik.setFieldValue(id, nextValue);
       else onChange(nextValue);
     }
   };
 
-  const onTokenChange = (newToken: TokenModel) => {
+  const onTokenChange = (i: number) => {
+    const newToken = tokens[i];
     autoCompleteRef.current.value = newToken.symbol;
     setSearchTerm(undefined);
     setToken(newToken);
-    if (amount) {
-      const nextValue = { token: newToken, parsedAmount: amount };
-      if (formik) formik.setFieldValue(id, nextValue);
-      else onChange(nextValue);
-    }
+    const nextValue = { token: newToken, parsedAmount: amount };
+    if (formik) formik.setFieldValue(id, nextValue);
+    else onChange(nextValue);
   };
 
   return (
@@ -194,20 +198,22 @@ function AmountFieldInput({
         <Skeleton />
       ) : (
         <ColumnStyled>
-          <AmountStyled>
-            {isEdit ? (
-              <AmountTextInputStyled
-                id={id}
-                onChange={onAmountChange}
-                placeHolder={placeHolder}
-                type="number"
-                value={amount}
-                disabled={disabled}
-              />
-            ) : (
-              floorNumber(amount, decimalsCount)
-            )}
-          </AmountStyled>
+          {amount !== undefined && (
+            <AmountStyled>
+              {isEdit ? (
+                <AmountTextInputStyled
+                  id={id}
+                  onChange={onAmountChange}
+                  placeHolder={placeHolder}
+                  type="number"
+                  value={amount}
+                  disabled={disabled}
+                />
+              ) : (
+                floorNumber(amount, decimalsCount)
+              )}
+            </AmountStyled>
+          )}
           {value?.token.token ? (
             <TokenBadgeStyled
               symbol={value.token.symbol}
@@ -216,18 +222,20 @@ function AmountFieldInput({
             />
           ) : (
             <AutoCompleteStyled
-              items={tokens}
-              selected={token}
+              items={tokens.map((x, index: number) => index)}
               onChange={setSearchTerm}
               onSelect={onTokenChange}
               ref={autoCompleteRef}
-              placeholder="name / symbol / address"
-              renderSelected={(x: TokenModel) => `✔️${x.symbol}:${x.name}`}
-              renderItem={(x: TokenModel) => (
-                <>
-                  <TokenNameStyled>{x.name}</TokenNameStyled>
-                  <Tag mode="identifier">{x.symbol}</Tag>
-                </>
+              placeholder="search token"
+              wide
+              renderSelected={(i: number) => (
+                <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
+              )}
+              renderItem={(i: number) => (
+                <LineStyled key={tokens[i].symbol}>
+                  <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
+                  <Tag>{tokens[i].symbol}</Tag>
+                </LineStyled>
               )}
             />
           )}

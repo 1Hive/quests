@@ -2,7 +2,6 @@ import { BigNumber, ethers, ethers as ethersUtil } from 'ethers';
 import { noop } from 'lodash-es';
 import { getProvider } from 'src/ethereum-providers';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import { IS_DEV } from '../constants';

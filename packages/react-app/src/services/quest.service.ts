@@ -24,11 +24,17 @@ import { toTokenAmountModel } from 'src/utils/data.utils';
 import { NullableContract } from 'src/models/contract-error';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
+import { Account } from 'ethereumjs-util';
 import { ENUM_CLAIM_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getObjectFromIpfs, pushObjectToIpfs, formatIpfsMarkdownLink } from './ipfs.service';
-import { getTokenInfo, getQuestContractInterface } from '../hooks/use-contract.hook';
+import {
+  getTokenInfo,
+  getQuestContractInterface,
+  getContract,
+  getERC20Signed,
+} from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 
@@ -36,6 +42,7 @@ let questList: QuestModel[] = [];
 
 // #region Private
 async function mapQuest(questEntity: any) {
+  if (!questEntity) return undefined;
   try {
     let quest = {
       address: toChecksumAddress(questEntity.questAddress),
@@ -52,7 +59,7 @@ async function mapQuest(questEntity: any) {
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
     return quest;
   } catch (error) {
-    Logger.error('Failed to map quest : ', questEntity);
+    Logger.error('Failed to map quest : ', { questDate: questEntity, error });
     return undefined;
   }
 }
@@ -210,7 +217,7 @@ export async function computeScheduleContainer(
   const lastBlockTimestamp = await getLastBlockTimestamp();
 
   // A bit more than the execution delay
-  const executionTime = +lastBlockTimestamp + +erc3000Config.executionDelay + (extraDelaySec || 60); // Add 1 minute by default
+  const executionTime = lastBlockTimestamp + erc3000Config.executionDelay + (extraDelaySec || 60); // Add 1 minute by default
 
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
@@ -352,7 +359,7 @@ export async function saveQuest(
   const tx = await questFactoryContract.instance.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    data.rewardToken,
+    data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
     defaultGazFees,
@@ -379,14 +386,14 @@ export async function reclaimQuestUnusedFunds(
 // #region ERC20
 
 export async function fundQuest(
-  erc20Contract: NullableContract,
+  account: Account,
   questAddress: string,
   amount: TokenAmountModel,
   onTx?: (hash: string) => void,
 ) {
-  if (!erc20Contract.instance) throw erc20Contract.error;
+  const contract = getERC20Signed(amount.token, account);
   Logger.debug('Funding quest...', { questAddress, amount });
-  const tx = await erc20Contract.instance.transfer(questAddress, toBigNumber(amount));
+  const tx = await contract.transfer(questAddress, toBigNumber(amount));
   return handleTransaction(tx, onTx);
 }
 
@@ -423,9 +430,10 @@ export async function getBalanceOf(
 
 export async function scheduleQuestClaim(
   governQueueContract: NullableContract,
-  container: ContainerModel,
+  claimData: ClaimModel,
   onTx?: (hash: string) => void,
 ) {
+  const container = await computeScheduleContainer(claimData);
   if (!governQueueContract.instance) throw governQueueContract.error;
   const { defaultGazFees } = getNetwork();
   Logger.debug('Scheduling quest claim...', { container });
@@ -496,7 +504,7 @@ export async function fetchChallengeFee(
   if (!celesteContract.instance) throw celesteContract.error;
   const [, feeToken, feeAmount] = await celesteContract.instance.getDisputeFees();
   return toTokenAmountModel({
-    ...TOKENS.xDAIHoney,
+    ...TOKENS.Honey,
     token: feeToken,
     amount: feeAmount,
   });

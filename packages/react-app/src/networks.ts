@@ -4,7 +4,7 @@ import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { TOKENS } from './constants';
 import { NetworkModel } from './models/network.model';
 
-const networks = {
+export const networks = {
   mainnet: {
     chainId: 1,
     name: 'Mainnet',
@@ -14,6 +14,7 @@ const networks = {
     subgraph: '',
     defaultToken: TOKENS.HoneyTest,
     nativeToken: TOKENS.Ether,
+    stableToken: TOKENS.Thether,
     isTestNetwork: false,
   },
   rinkeby: {
@@ -45,8 +46,9 @@ const networks = {
     defaultEthNode: 'https://xdai.poanetwork.dev/',
     questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai
-    defaultToken: TOKENS.xDAIHoney,
+    defaultToken: TOKENS.Honey,
     nativeToken: TOKENS.xDAI,
+    stableToken: TOKENS.xDAI,
     isTestNetwork: false,
   },
   local: {

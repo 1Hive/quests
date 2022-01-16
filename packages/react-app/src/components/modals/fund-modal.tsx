@@ -5,14 +5,12 @@ import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
-import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
-import { FundModel } from 'src/models/fund.model';
 import { QuestModel } from 'src/models/quest.model';
-import { TokenAmountModel } from 'src/models/token-amount.model';
+import { useWallet } from 'src/contexts/wallet.context';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -32,6 +30,7 @@ type Props = {
 };
 
 export default function FundModal({ quest, onClose = noop }: Props) {
+  const wallet = useWallet();
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -51,7 +50,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       const pendingMessage = 'Sending funds to Quest...';
       toast(pendingMessage);
       const txReceipt = await QuestService.fundQuest(
-        contractERC20!,
+        wallet.account,
         quest.address!,
         values.fundAmount,
         (txHash) => {

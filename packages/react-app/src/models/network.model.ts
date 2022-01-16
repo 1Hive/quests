@@ -15,6 +15,7 @@ export type NetworkModel = {
   celesteAddress: string;
   defaultToken: TokenModel;
   nativeToken: TokenModel;
+  stableToken: TokenModel;
   ensRegistry?: string;
   isTestNetwork: boolean;
   defaultGazFees: {

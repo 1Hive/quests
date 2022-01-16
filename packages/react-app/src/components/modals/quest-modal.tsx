@@ -49,9 +49,9 @@ export default function QuestModal({
       if (newQuest) {
         setNewQuest(newQuest);
         clearInterval();
-        closeModal(true);
       }
     }, 1000); // Pull each seconds until the new quest is fetched
+    closeModal(true);
   };
 
   useEffect(() => {

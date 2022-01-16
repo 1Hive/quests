@@ -32,6 +32,39 @@ export default function QuestList() {
   const { setPage } = usePageContext();
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
+  useEffect(() => {
+    const scrollView = document.getElementById('scroll-view');
+    const handleScroll = (e: WheelEvent) => {
+      scrollView!.scrollTo(scrollView!.scrollLeft, scrollView!.scrollTop + e.deltaY / 2);
+    };
+    const preventScroll = (e: WheelEvent) => e.preventDefault();
+    if (!document.onwheel) {
+      document.addEventListener('wheel', handleScroll);
+      scrollView!.addEventListener('wheel', preventScroll);
+    }
+    return () => {
+      document.removeEventListener('wheel', handleScroll);
+      scrollView!.removeEventListener('wheel', preventScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    debounceFilter(filter);
+    return () => debounceFilter.cancel();
+  }, [filter]);
+
+  useEffect(() => {
+    refresh();
+  }, [refreshed]);
+
+  useEffect(() => {
+    // Should not be nullish and not already exist in list
+    if (newQuest && !quests.find((x) => x.address === newQuest.address)) {
+      // Insert the newQuest at the top of the list
+      setQuests([newQuest, ...quests]);
+    }
+  }, [newQuest]);
+
   const refresh = (_filter?: FilterModel) => {
     if (!isLoading) {
       setQuests([]);
@@ -57,23 +90,6 @@ export default function QuestList() {
     debounce((nextFilter) => refresh(nextFilter), 500),
     [], // will be created only once initially
   );
-
-  useEffect(() => {
-    debounceFilter(filter);
-    return () => debounceFilter.cancel();
-  }, [filter]);
-
-  useEffect(() => {
-    refresh();
-  }, [refreshed]);
-
-  useEffect(() => {
-    // Should not be nullish and not already exist in list
-    if (newQuest && !quests.find((x) => x.address === newQuest.address)) {
-      // Insert the newQuest at the top of the list
-      setQuests([newQuest, ...quests]);
-    }
-  }, [newQuest]);
 
   return (
     <InfiniteScroll

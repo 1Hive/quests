@@ -5,6 +5,7 @@ import { TokenModel } from 'src/models/token.model';
 import { getDefaultProvider } from 'src/utils/web3.utils';
 import { toChecksumAddress, toNumber } from 'web3-utils';
 import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
+import { Account } from 'ethereumjs-util';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';
@@ -144,6 +145,10 @@ export function useCelesteContract() {
 
 export function getQuestContractInterface() {
   return new ethers.utils.Interface(getContractsJson().Quest.abi);
+}
+
+export function getERC20Signed(token: TokenModel, account: Account) {
+  return getContract(token.token, getContractsJson().ERC20.abi, getDefaultProvider(), account);
 }
 
 // #endregion

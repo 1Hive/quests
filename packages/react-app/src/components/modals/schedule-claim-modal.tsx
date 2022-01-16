@@ -63,21 +63,14 @@ export default function ScheduleClaimModal({
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
-
-      const container = await QuestService.computeScheduleContainer({
-        claimedAmount: values.claimedAmount!,
-        evidence: values.evidence!,
-        playerAddress,
-        questAddress,
-      });
       const { governQueueAddress } = getNetwork();
-
-      if (+container.config.scheduleDeposit.amount) {
+      const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
+      if (scheduleDeposit.parsedAmount) {
         toast('Approving claim deposit...');
         const approveTxReceipt = await QuestService.approveTokenAmount(
           erc20Contract,
           governQueueAddress,
-          container.config.scheduleDeposit,
+          scheduleDeposit.token,
           (tx) => {
             pushTransaction({
               hash: tx,
@@ -98,7 +91,12 @@ export default function ScheduleClaimModal({
       toast('Scheduling claim...');
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         governQueueContract,
-        container,
+        {
+          claimedAmount: values.claimedAmount!,
+          evidence: values.evidence!,
+          playerAddress,
+          questAddress,
+        },
         (tx) => {
           pushTransaction({
             hash: tx,
