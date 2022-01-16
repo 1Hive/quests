@@ -18,14 +18,9 @@ import { floorNumber } from 'src/utils/math.utils';
 import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region StyledComponents
-
-const ColumnStyled = styled.div`
-  display: flex;
-  align-items: center;
-`;
 
 const AmountStyled = styled.div`
   margin-top: 2px;
@@ -45,10 +40,6 @@ const AmountTextInputStyled = styled(TextInput)`
   input[type='number'] {
     -moz-appearance: textfield;
   }
-`;
-
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
 `;
 
 const TokenBadgeStyled = styled(TokenBadge)`
@@ -72,7 +63,7 @@ const LineStyled = styled.div`
 // #endregion
 
 type Props = {
-  id: string | number;
+  id: string;
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
@@ -184,20 +175,17 @@ function AmountFieldInput({
   };
 
   return (
-    <FieldStyled
-      label={
-        <>
-          <span title={tooltip}>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-        </>
-      }
-      key={id}
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
       compact={compact}
     >
       {isLoading ? (
         <Skeleton />
       ) : (
-        <ColumnStyled>
+        <LineStyled>
           {amount !== undefined && (
             <AmountStyled>
               {isEdit ? (
@@ -239,9 +227,9 @@ function AmountFieldInput({
               )}
             />
           )}
-        </ColumnStyled>
+        </LineStyled>
       )}
-    </FieldStyled>
+    </FieldInput>
   );
 }
 

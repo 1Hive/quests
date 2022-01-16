@@ -21,7 +21,6 @@ const BoxStyled = styled(Box)`
 export default function Sidebar() {
   const { account } = useWallet();
   const { page } = usePageContext();
-
   return (
     <>
       {page === ENUM_PAGES.List && (

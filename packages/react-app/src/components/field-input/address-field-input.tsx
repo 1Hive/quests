@@ -1,17 +1,12 @@
-import { Field, TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
+import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
 
 import { noop } from 'lodash-es';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
-
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region Styled
-
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
-`;
 
 const TextInputStyled = styled(TextInput)`
   height: 40px;
@@ -56,9 +51,9 @@ export function AddressFieldInput({
 }: Props) {
   if (isLoading)
     return (
-      <FieldStyled label={label} key={id} compact={compact}>
+      <FieldInput label={label} id={id} compact={compact}>
         <Skeleton />
-      </FieldStyled>
+      </FieldInput>
     );
   const loadableContent = isEdit ? (
     <WrapperStyled>
@@ -69,19 +64,15 @@ export function AddressFieldInput({
     <AddressField address={value} />
   );
   return label ? (
-    <>
-      <Field
-        label={
-          <>
-            <span title={tooltip}>{label}</span>
-            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-          </>
-        }
-        key={id}
-      >
-        {loadableContent}
-      </Field>
-    </>
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
+      compact={compact}
+    >
+      {loadableContent}
+    </FieldInput>
   ) : (
     loadableContent
   );
