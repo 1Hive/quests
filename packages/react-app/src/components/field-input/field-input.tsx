@@ -4,14 +4,16 @@ import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
+  ${({ compact }: any) => (compact ? 'margin:0;' : '')}
   pointer-events: none;
 `;
 
 const ContentWrapperStyled = styled.div`
   textarea,
   input,
-  select {
+  select,
+  button,
+  :first-child {
     pointer-events: all !important;
   }
 `;

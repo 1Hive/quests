@@ -54,7 +54,6 @@ export default function ScheduleClaimModal({
   const erc20Contract = useERC20Contract(claimDeposit!.token);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
-  const { defaultToken } = getNetwork();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -64,21 +63,14 @@ export default function ScheduleClaimModal({
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
     try {
       setLoading(true);
-
-      const container = await QuestService.computeScheduleContainer({
-        claimedAmount: values.claimedAmount!,
-        evidence: values.evidence!,
-        playerAddress,
-        questAddress,
-      });
       const { governQueueAddress } = getNetwork();
-
-      if (+container.config.scheduleDeposit.amount) {
+      const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
+      if (scheduleDeposit.parsedAmount) {
         toast('Approving claim deposit...');
         const approveTxReceipt = await QuestService.approveTokenAmount(
           erc20Contract,
           governQueueAddress,
-          container.config.scheduleDeposit,
+          scheduleDeposit.token,
           (tx) => {
             pushTransaction({
               hash: tx,
@@ -99,7 +91,12 @@ export default function ScheduleClaimModal({
       toast('Scheduling claim...');
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         governQueueContract,
-        container,
+        {
+          claimedAmount: values.claimedAmount!,
+          evidence: values.evidence!,
+          playerAddress,
+          questAddress,
+        },
         (tx) => {
           pushTransaction({
             hash: tx,
@@ -171,7 +168,7 @@ export default function ScheduleClaimModal({
       <Formik
         initialValues={{
           evidence: '',
-          claimedAmount: { parsedAmount: 0, token: defaultToken } as TokenAmountModel,
+          claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
           claimAll: false,
         }}
         onSubmit={(values, { setSubmitting }) => {
@@ -190,21 +187,21 @@ export default function ScheduleClaimModal({
         {({ values, handleSubmit, handleChange }) => (
           <FormStyled id="form-claim" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
-              <TextFieldInput
-                id="evidence"
-                isEdit
-                label="Evidence of completion"
-                tooltip="Evidence of completion"
-                tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
-                isLoading={loading}
-                value={values.evidence}
-                onChange={handleChange}
-                multiline
-                wide
-                rows={5}
-                compact
-              />
               <ChildSpacer size={16} justify="start" vertical>
+                <TextFieldInput
+                  id="evidence"
+                  isEdit
+                  label="Evidence of completion"
+                  tooltip="Evidence of completion"
+                  tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                  isLoading={loading}
+                  value={values.evidence}
+                  onChange={handleChange}
+                  multiline
+                  wide
+                  rows={5}
+                  compact
+                />
                 <AmountFieldInputFormik
                   id="questBounty"
                   label="Available bounty"

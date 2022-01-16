@@ -27,10 +27,28 @@ export const TOKENS = {
     decimals: 18,
   } as TokenModel,
   // ERC20 tokens
+  Thether: {
+    name: 'Tether',
+    symbol: 'USDT',
+    token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    decimals: 18,
+  } as TokenModel,
   Honey: {
     name: 'Honey',
     symbol: 'HNY',
     token: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
+    decimals: 18,
+  } as TokenModel,
+  RinkebyTheter: {
+    name: 'Tether',
+    symbol: 'USDT',
+    token: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
+    decimals: 18,
+  } as TokenModel,
+  RinkebyHoney: {
+    name: 'Honey',
+    symbol: 'HNY',
+    token: '0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd',
     decimals: 18,
   } as TokenModel,
   HoneyTest: {
@@ -39,12 +57,18 @@ export const TOKENS = {
     token: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
     decimals: 18,
   } as TokenModel,
-  Theter: {
-    name: 'Tether',
-    symbol: 'USDT',
-    token: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
+  RinkebyDai: {
+    name: 'Dai Stablecoin',
+    symbol: 'DAI',
+    token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
     decimals: 18,
   } as TokenModel,
+};
+
+export const NETWORK_TOKENS = {
+  rinkeby: [TOKENS.HoneyTest, TOKENS.RinkebyTheter, TOKENS.RinkebyHoney, TOKENS.RinkebyDai],
+  xdai: [TOKENS.Honey],
+  mainnet: [TOKENS.Thether],
 };
 
 // Constants
@@ -152,7 +176,7 @@ export const DEFAULT_FILTER = {
 
 export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
 
-export const DEAULTS = {
+export const DEFAULTS = {
   DEFAULT_PAGE,
   DEFAULT_FILTER,
   DEAULT_CLAIM_EXECUTION_DELAY_MS,

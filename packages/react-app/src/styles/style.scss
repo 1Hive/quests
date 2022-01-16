@@ -77,3 +77,11 @@ span[class^='Switch_'] {
     margin-left: 0 !important;
   }
 }
+
+.p-event-all {
+  pointer-events: all;
+}
+
+.p-event-none {
+  pointer-events: none;
+}

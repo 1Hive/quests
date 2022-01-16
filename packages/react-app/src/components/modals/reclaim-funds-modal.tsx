@@ -114,7 +114,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             label="Reclaimable funds"
             isLoading={loading}
             value={bounty}
-            wide
           />
           <Field label="will be send to">
             {!loading && fallbackAddress ? (

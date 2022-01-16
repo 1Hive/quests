@@ -38,15 +38,19 @@ function SideContentLayout({ main, side }: Props) {
     setTwoCol(vw >= BREAKPOINTS.large);
   }, [vw]);
   return (
-    <WrapperStyled>
-      <MainBlockStyled twoCol={twoCol}>
-        <ScrollViewStyled id="scroll-view">
-          {twoCol === false && <>{side}</>}
-          {main}
-        </ScrollViewStyled>
-      </MainBlockStyled>
-      {twoCol && <SideBlockStyled>{side}</SideBlockStyled>}
-    </WrapperStyled>
+    <>
+      <WrapperStyled>
+        <MainBlockStyled twoCol={twoCol}>
+          <ScrollViewStyled id="scroll-view">
+            <>
+              {twoCol === false && <>{side}</>}
+              {main}
+            </>
+          </ScrollViewStyled>
+        </MainBlockStyled>
+        {twoCol && <SideBlockStyled>{side}</SideBlockStyled>}
+      </WrapperStyled>
+    </>
   );
 }
 
