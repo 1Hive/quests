@@ -35,8 +35,8 @@ export function Outset({
   css,
   className = '',
   inline = false,
-  horizontal = true,
-  vertical = true,
+  horizontal,
+  vertical,
   gu4 = false,
   gu8 = true,
   gu16 = false,
@@ -49,7 +49,7 @@ export function Outset({
 }: OutsetProps) {
   if (inline) css = { ...css, display: 'inline' };
   let classes = className;
-  if (vertical && horizontal) {
+  if ((vertical && horizontal) || (vertical === undefined && horizontal === undefined)) {
     if (gu4) classes += ' p-4';
     else if (gu16) classes += ' p-16';
     else if (gu24) classes += ' p-24';

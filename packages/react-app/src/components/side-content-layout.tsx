@@ -44,7 +44,6 @@ type Props = {
 function SideContentLayout({ main, side }: Props) {
   const { width: vw } = useViewport();
   const [twoCol, setTwoCol] = useState(true);
-  console.log({ side });
   useEffect(() => {
     setTwoCol(vw >= BREAKPOINTS.large);
   }, [vw]);

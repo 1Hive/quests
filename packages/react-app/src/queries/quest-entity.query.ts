@@ -62,3 +62,11 @@ export const QuestSearchQuery = gql`
     }
   }
 `;
+
+export const QuestRewardTokens = gql`
+  query questEntities($first: Int) {
+    questEntities(first: $first, orderBy: creationTimestamp, orderDirection: desc) {
+      questRewardTokenAddress
+    }
+  }
+`;

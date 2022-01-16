@@ -5,11 +5,12 @@ import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useERC20Contract } from 'src/hooks/use-contract.hook';
-import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
+import { QuestModel } from 'src/models/quest.model';
+import { useWallet } from 'src/contexts/wallet.context';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -25,18 +26,18 @@ const OpenButtonStyled = styled(Button)`
 
 type Props = {
   onClose?: ModalCallback;
-  questAddress: string;
+  quest: QuestModel;
 };
 
-export default function FundModal({ questAddress, onClose = noop }: Props) {
+export default function FundModal({ quest, onClose = noop }: Props) {
+  const wallet = useWallet();
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
   const toast = useToast();
-  const { defaultToken } = getNetwork();
-  const contractERC20 = useERC20Contract(defaultToken);
+  const contractERC20 = useERC20Contract(quest.rewardToken?.token);
 
   const closeModal = (success: boolean) => {
     setOpened(false);
@@ -49,8 +50,8 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
       const pendingMessage = 'Sending funds to Quest...';
       toast(pendingMessage);
       const txReceipt = await QuestService.fundQuest(
-        contractERC20!,
-        questAddress,
+        wallet.account,
+        quest.address!,
         values.fundAmount,
         (txHash) => {
           pushTransaction({
@@ -106,12 +107,14 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
       }
       onClose={() => closeModal(false)}
       isOpen={opened}
+      width={500}
     >
       <Formik
-        initialValues={{ fundAmount: { parsedAmount: 0, token: defaultToken } }}
+        initialValues={{ fundAmount: { parsedAmount: 0, token: quest.rewardToken! } }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
-          if (!values.fundAmount?.parsedAmount) errors.push('Validation : Amount is required');
+          if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
+            errors.push('Validation : Amount invalid');
           if (errors.length) {
             errors.forEach(toast);
           } else {
@@ -129,6 +132,7 @@ export default function FundModal({ questAddress, onClose = noop }: Props) {
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
+                wide
               />
             </Outset>
           </FormStyled>

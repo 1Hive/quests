@@ -2,36 +2,48 @@ import { TokenModel } from 'src/models/token.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { FundModel } from 'src/models/fund.model';
-import { TOKENS } from '../constants';
-import { Logger } from './logger';
 import { fromBigNumber } from './web3.utils';
 
-export async function convertTo(from: TokenAmountModel, toToken: TokenModel) {
-  const { defaultToken } = getNetwork();
-  if (!from?.token) {
-    from.token = defaultToken;
-  }
-  const res = await fetch(
-    `https://coingecko.p.rapidapi.com/simple/price?ids=${[
-      from.token.symbol,
-      toToken.symbol,
-    ]}&vs_currencies=usd`,
-    {
-      method: 'GET',
-    },
-  );
+export async function convertTo(
+  from: TokenAmountModel,
+  toToken: TokenModel,
+): Promise<TokenAmountModel> {
+  const { chainId, name } = getNetwork();
+  const baseApi = 'https://api.coingecko.com/api/v3';
+  const assetsPlatforms = await fetch(`${baseApi}/asset_platforms`, {
+    method: 'GET',
+  });
+  const networkPlatformId = (await ((await assetsPlatforms.json()) as Promise<any[]>)).find(
+    (x) => x.chain_identifier === chainId,
+  )?.id;
+  if (!networkPlatformId) throw new Error(`${name} network doesn't support asset conversion`);
+  const vsCurrency = 'usd';
+  const resObj = (
+    await fetch(
+      `https://coingecko.p.rapidapi.com/simple/token_price/${networkPlatformId}?contract_addresses=${from.token.token},${toToken.token}&vs_currencies=${vsCurrency}`,
+      {
+        method: 'GET',
+      },
+    )
+  ).json();
 
-  Logger.debug(res);
-  return { amount: res, token: toToken };
+  const fromPrice = resObj[from.token.token][vsCurrency];
+  const toPrice = resObj[toToken.token][vsCurrency];
+  const totalTo = (from.parsedAmount * fromPrice) / toPrice;
+
+  return { parsedAmount: totalTo, token: toToken };
 }
 
 export async function computeTotalFunds(funds: FundModel[]) {
-  if (!funds?.length) return { amount: 0, token: TOKENS.Theter };
-  Logger.debug(funds);
-  const tetherFunds = await Promise.all(funds.map((x) => convertTo(x.amount, TOKENS.Theter)));
-  // @ts-ignore
-  const amount = tetherFunds.reduce((total, x) => total + x.amount);
-  return { amount, token: TOKENS.Theter };
+  const { stableToken } = getNetwork();
+
+  if (!funds?.length) return { parsedAmount: 0, token: stableToken } as TokenAmountModel;
+  const usdFunds = await Promise.all(funds.map((x) => convertTo(x.amount, stableToken)));
+  const amount = usdFunds.reduce((total, x) => ({
+    parsedAmount: total.parsedAmount + x.parsedAmount,
+    token: total.token,
+  }));
+  return amount;
 }
 
 export function toTokenAmountModel(tokenModel: TokenModel) {

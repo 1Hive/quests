@@ -32,6 +32,7 @@ type Props = {
   onClose?: Function;
   isOpen: boolean;
   css?: React.CSSProperties;
+  width?: number;
 };
 
 export default function ModalBase({
@@ -41,6 +42,7 @@ export default function ModalBase({
   buttons,
   onClose = noop,
   isOpen = false,
+  width,
   css,
 }: Props) {
   const escFunction = (e: any) => {
@@ -66,7 +68,7 @@ export default function ModalBase({
       <ModalStyled
         visible={isOpen}
         onClose={(e: any) => e && onClose()}
-        width={(viewport: VisualViewport) => Math.min(viewport.width - 48, 1200)}
+        width={(viewport: VisualViewport) => width ?? Math.min(viewport.width - 48, 1200)}
         style={css}
       >
         <Outset gu8>

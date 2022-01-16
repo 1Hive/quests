@@ -6,7 +6,7 @@ export type NetworkModel = {
   type: string;
   explorerBase: string;
   defaultEthNode: string;
-  questSubgraph: string;
+  questsSubgraph: string;
   governSubgraph: string;
   celesteSubgraph: string;
   questFactoryAddress: string;
@@ -15,6 +15,7 @@ export type NetworkModel = {
   celesteAddress: string;
   defaultToken: TokenModel;
   nativeToken: TokenModel;
+  stableToken: TokenModel;
   ensRegistry?: string;
   isTestNetwork: boolean;
   defaultGazFees: {

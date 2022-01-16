@@ -1,19 +1,25 @@
-import { Field, useTheme } from '@1hive/1hive-ui';
+import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { dateFormat } from '../../utils/date.utils';
-import { IconTooltip } from './icon-tooltip';
+import { FieldInput } from './field-input';
 
 // #region StyledComponents
-const InputStyled = styled.input`
-  background-color: ${({ background }: any) => background};
-  border: none;
-`;
 
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
+const InputStyled = styled.input`
+  ${(props: any) => (props.wide ? 'width:100%;' : '')}
+  border: 1px solid ${(props: any) => props.borderColor};
+  border-radius: 12px;
+  background-color: ${({ background }: any) => background};
+  height: 40px;
+  padding: ${GUpx()};
+  &:focus-visible {
+    border: 1px solid ${(props: any) => props.focusBorderColor};
+    outline: none;
+  }
 `;
 
 // #endregion
@@ -29,6 +35,7 @@ type Props = {
   tooltip?: string;
   tooltipDetail?: ReactNode;
   compact?: boolean;
+  wide?: boolean;
 };
 
 export default function DateFieldInput({
@@ -42,14 +49,15 @@ export default function DateFieldInput({
   tooltip,
   tooltipDetail,
   compact = false,
+  wide = false,
 }: Props) {
   const theme = useTheme();
 
   if (isLoading)
     return (
-      <FieldStyled label={label} key={id} compact={compact}>
+      <FieldInput label={label} id={id} compact={compact}>
         <Skeleton />
-      </FieldStyled>
+      </FieldInput>
     );
 
   const valFormat = dateFormat(value, 'iso');
@@ -69,22 +77,23 @@ export default function DateFieldInput({
       onChange={handleChange}
       style={css}
       background={theme.surface}
+      wide={wide}
+      borderColor={theme.border}
+      focusBorderColor={theme.accent}
     />
   ) : (
     <span>{new Date(value).toDateString()}</span>
   );
   return label ? (
-    <Field
-      label={
-        <>
-          <span title={tooltip}>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-        </>
-      }
-      key={id}
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
+      compact={compact}
     >
       {loadableContent}
-    </Field>
+    </FieldInput>
   ) : (
     loadableContent
   );

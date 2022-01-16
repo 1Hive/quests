@@ -1,20 +1,11 @@
-import { Field, IconClose, Tag, _AutoComplete as AutoComplete } from '@1hive/1hive-ui';
+import { IconClose, Tag, _AutoComplete as AutoComplete } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
-import styled from 'styled-components';
 import { Outset } from '../utils/spacer-util';
-import { IconTooltip } from './icon-tooltip';
-
-// #region StyledComponents
-
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
-`;
-
-// #endregion
+import { FieldInput } from './field-input';
 
 type Props = {
   id: string;
@@ -74,14 +65,11 @@ function TagFieldInput({
   };
 
   return (
-    <FieldStyled
-      label={
-        <>
-          <span title={tooltip}>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-        </>
-      }
-      key={id}
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
       compact={compact}
     >
       {isLoading ? (
@@ -111,7 +99,7 @@ function TagFieldInput({
             ))}
         </>
       )}
-    </FieldStyled>
+    </FieldInput>
   );
 }
 

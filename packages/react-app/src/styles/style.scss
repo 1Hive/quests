@@ -71,3 +71,17 @@ span[class^='Switch_'] {
 .pointer {
   cursor: pointer;
 }
+
+.no-margin {
+  button {
+    margin-left: 0 !important;
+  }
+}
+
+.p-event-all {
+  pointer-events: all;
+}
+
+.p-event-none {
+  pointer-events: none;
+}

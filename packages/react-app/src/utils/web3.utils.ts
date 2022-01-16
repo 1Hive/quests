@@ -2,7 +2,6 @@ import { BigNumber, ethers, ethers as ethersUtil } from 'ethers';
 import { noop } from 'lodash-es';
 import { getProvider } from 'src/ethereum-providers';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import { IS_DEV } from '../constants';
@@ -150,10 +149,6 @@ export async function sendTransaction(to: string, amount: TokenAmountModel, onCo
 }
 
 export function toBigNumber(amount: TokenAmountModel) {
-  const { defaultToken } = getNetwork();
-  if (!amount.token) {
-    amount.token = defaultToken;
-  }
   return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
 

@@ -1,17 +1,8 @@
-import { Field, TextInput } from '@1hive/1hive-ui';
+import { TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import styled from 'styled-components';
-import { IconTooltip } from './icon-tooltip';
-
-// #region StyledComponents
-
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0' : '')}
-`;
-
-// #endregion
+import { FieldInput } from './field-input';
 
 type Props = {
   id?: string;
@@ -64,17 +55,14 @@ export default function NumberFieldInput({
     );
   else content = value + suffix;
   return (
-    <FieldStyled
-      label={
-        <>
-          <span title={tooltip}>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-        </>
-      }
-      key={id}
+    <FieldInput
+      id={id}
+      label={label}
+      tooltip={tooltip}
+      tooltipDetail={tooltipDetail}
       compact={compact}
     >
       {isLoading ? <Skeleton /> : content}
-    </FieldStyled>
+    </FieldInput>
   );
 }
