@@ -45,15 +45,6 @@ export default function HeaderMenu({ below }: Props) {
         >
           Wiki
         </HeaderNavItemStyled>
-        <Separator horizontal />
-        <HeaderNavItemStyled
-          href="https://github.com/1Hive/quests/issues/new?assignees=&labels=&template=bug----bug_title-.md&title="
-          external
-          color={theme.contentSecondary}
-        >
-          <FaBug className="mb-4" />
-          <span className="ml-8 ">Report a Bug</span>
-        </HeaderNavItemStyled>
       </HeaderNavStyled>
     )
   );

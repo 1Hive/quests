@@ -11,6 +11,7 @@ import { FilterContextProvider } from '../contexts/filter.context';
 import Header from './header';
 import MainScrollWithSidebarLayout from './side-content-layout';
 import Sidebar from './sidebar';
+import Footer from './footer';
 
 // #region StyledComponents
 
@@ -69,7 +70,11 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
             </HeaderWrapperStyled>
             <Root.Provider>
               <FilterContextProvider>
-                <MainScrollWithSidebarLayout main={children} side={<Sidebar />} />
+                <MainScrollWithSidebarLayout
+                  main={children}
+                  side={<Sidebar />}
+                  footer={<Footer />}
+                />
               </FilterContextProvider>
             </Root.Provider>
           </MainViewStyled>
