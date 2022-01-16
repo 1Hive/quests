@@ -1,4 +1,4 @@
-import { Field, TextInput, TokenBadge } from '@1hive/1hive-ui';
+import { TextInput, TokenBadge } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
