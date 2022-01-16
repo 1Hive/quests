@@ -187,21 +187,21 @@ export default function ScheduleClaimModal({
         {({ values, handleSubmit, handleChange }) => (
           <FormStyled id="form-claim" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
-              <TextFieldInput
-                id="evidence"
-                isEdit
-                label="Evidence of completion"
-                tooltip="Evidence of completion"
-                tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
-                isLoading={loading}
-                value={values.evidence}
-                onChange={handleChange}
-                multiline
-                wide
-                rows={5}
-                compact
-              />
               <ChildSpacer size={16} justify="start" vertical>
+                <TextFieldInput
+                  id="evidence"
+                  isEdit
+                  label="Evidence of completion"
+                  tooltip="Evidence of completion"
+                  tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                  isLoading={loading}
+                  value={values.evidence}
+                  onChange={handleChange}
+                  multiline
+                  wide
+                  rows={5}
+                  compact
+                />
                 <AmountFieldInputFormik
                   id="questBounty"
                   label="Available bounty"

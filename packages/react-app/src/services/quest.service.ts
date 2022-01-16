@@ -417,7 +417,9 @@ export async function getBalanceOf(
   address: string,
 ): Promise<TokenAmountModel> {
   if (!erc20Contract.instance) throw erc20Contract.error;
-  const balance = await erc20Contract.instance.balanceOf(address);
+  Logger.debug('Fetching balance ...', { address, token });
+  const balance = (await erc20Contract.instance.balanceOf(address)) as BigNumber;
+  token.amount = balance.toString();
   return {
     token,
     parsedAmount: fromBigNumber(balance, token.decimals),

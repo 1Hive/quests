@@ -27,7 +27,6 @@ import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
 import DateFieldInput from './field-input/date-field-input';
-import { Outset } from './utils/spacer-util';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
@@ -47,7 +46,7 @@ const LinkStyled = styled(Link)`
 `;
 
 const AddressWrapperStyled = styled.div`
-  margin-bottom: ${GUpx(3)};
+  width: 390px;
 `;
 
 const CardStyled = styled(Card)`
@@ -100,11 +99,19 @@ const SecondColStyled = styled.div`
   flex-grow: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
 `;
 
-const SecondaryBoxWrapperStyled = styled.div`
-  ${(props: any) => (props.wide ? 'width:100%px' : '')}
+const SpacerStyled = styled.div`
+  margin-top: ${GUpx(2)};
+`;
+
+const QuestHeaderStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: ${GUpx(3)};
+  padding-bottom: ${GUpx()};
+  width: 100%;
 `;
 
 // #endregion
@@ -191,7 +198,7 @@ export default function Quest({
       errors.forEach(toast);
     } else {
       setLoading(true);
-      let createdQuestAddress;
+      let createdQuestAddress: string;
       try {
         if (!questFactoryContract) {
           throw new Error(
@@ -225,7 +232,7 @@ export default function Quest({
           hash: txReceiptSaveQuest.transactionHash,
           status: ENUM_TRANSACTION_STATUS.Confirmed,
         });
-        onSave(txReceiptSaveQuest.logs[0].address);
+        onSave((txReceiptSaveQuest?.events?.[0] as any)?.args?.[0]);
         if (txReceiptSaveQuest.status) {
           // If no funding needing
           if (!values.bounty?.parsedAmount) toast('Operation succeed');
@@ -250,7 +257,14 @@ export default function Quest({
               hash: txReceiptFundQuest.transactionHash,
               status: ENUM_TRANSACTION_STATUS.Confirmed,
             });
-            if (txReceiptFundQuest) toast('Operation succeed');
+            if (txReceiptFundQuest) {
+              toast('Operation succeed');
+
+              setTimeout(
+                () => fetchBalanceOfQuest(createdQuestAddress, values.bounty!.token),
+                5000,
+              );
+            }
           }
         }
       } catch (e: any) {
@@ -266,20 +280,6 @@ export default function Quest({
       }
     }
   };
-  const titleInput = (title: any, handleChange: any) => (
-    <TextFieldInput
-      id="title"
-      label={isEdit ? 'Title' : undefined}
-      isEdit={isEdit}
-      isLoading={loading}
-      placeHolder="Quest title"
-      value={title}
-      onChange={handleChange}
-      fontSize="24px"
-      tooltip="Title of your quest"
-      wide
-    />
-  );
 
   const fetchBalanceOfQuest = (address: string, token: TokenModel) => {
     QuestService.getBalanceOf(erc20Contract, token, address)
@@ -309,19 +309,45 @@ export default function Quest({
     }, 500);
   };
 
-  const questContent = (values: QuestModel, handleChange = noop) => (
-    <>
-      <TwoColumnStyled isEdit={isEdit}>
-        <>
-          <FirstColStyled gu16 className="pb-0">
+  const questContent = (values: QuestModel, handleChange = noop) => {
+    const titleInput = (
+      <TextFieldInput
+        id="title"
+        label={isEdit ? 'Title' : undefined}
+        isEdit={isEdit}
+        isLoading={loading}
+        placeHolder="Quest title"
+        value={values.title}
+        onChange={handleChange}
+        fontSize="24px"
+        tooltip="Title of your quest"
+        wide
+      />
+    );
+    return (
+      <>
+        {!isEdit && (
+          <QuestHeaderStyled>
             {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
               <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
-                {titleInput(values.title, handleChange)}
+                {titleInput}
               </TitleLinkStyled>
             ) : (
-              titleInput(values.title, handleChange)
+              titleInput
             )}
-            <Outset gu8 vertical>
+            <AddressWrapperStyled>
+              {loading ? (
+                <Skeleton />
+              ) : (
+                <AddressField id="address" address={values.address} autofocus={false} />
+              )}
+            </AddressWrapperStyled>
+          </QuestHeaderStyled>
+        )}
+        <TwoColumnStyled isEdit={isEdit}>
+          <>
+            <FirstColStyled gu16 className="pb-0">
+              {isEdit && titleInput}
               <TextFieldInput
                 id="description"
                 label={isEdit ? 'Description' : undefined}
@@ -356,19 +382,8 @@ export default function Quest({
                   <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
                 }
               />
-            </Outset>
-          </FirstColStyled>
-          <SecondColStyled>
-            {!isEdit && values.address && (
-              <AddressWrapperStyled>
-                {loading ? (
-                  <Skeleton />
-                ) : (
-                  <AddressField id="address" address={values.address} autofocus={false} />
-                )}
-              </AddressWrapperStyled>
-            )}
-            <SecondaryBoxWrapperStyled wide={isEdit}>
+            </FirstColStyled>
+            <SecondColStyled wide={isEdit}>
               {bounty !== null && (
                 <AmountFieldInputFormik
                   id="bounty"
@@ -399,75 +414,79 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !claimDeposit)}
                 />
               )}
-              <DateFieldInput
-                id="expireTimeMs"
-                label="Expire time"
-                tooltip="Expire time"
-                tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
-                isEdit={isEdit}
-                isLoading={loading}
-                value={values.expireTimeMs}
-                onChange={handleChange}
-                wide
-              />
-              {isEdit && (
-                <AddressFieldInput
-                  id="fallbackAddress"
-                  label="Funds fallback address"
-                  value={values.fallbackAddress}
+              <SpacerStyled>
+                <DateFieldInput
+                  id="expireTimeMs"
+                  label="Expire time"
+                  tooltip="Expire time"
+                  tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
+                  isEdit={isEdit}
                   isLoading={loading}
-                  tooltip="Fallback Address"
-                  tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                  isEdit
+                  value={values.expireTimeMs}
                   onChange={handleChange}
                   wide
                 />
-              )}
-            </SecondaryBoxWrapperStyled>
-          </SecondColStyled>
-        </>
-      </TwoColumnStyled>
-      {!loading && !isEdit && data.address && (
-        <>
-          {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
-            <ClaimList
-              newClaim={claimUpdated}
-              questData={data}
-              questTotalBounty={bounty}
-              challengeDeposit={challengeDeposit}
-            />
-          )}
-          {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
-            values.address &&
-            wallet.account &&
-            bounty && (
-              <QuestFooterStyled>
-                {values.state === ENUM_QUEST_STATE.Active ? (
-                  <>
-                    <FundModal quest={data} onClose={onFundModalClosed} />
-                    {claimDeposit && (
-                      <ScheduleClaimModal
-                        questAddress={data.address}
-                        questTotalBounty={bounty}
-                        claimDeposit={claimDeposit}
-                        playerAddress={wallet.account}
-                        onClose={onScheduleModalClosed}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {!!bounty?.parsedAmount && (
-                      <ReclaimFundsModal bounty={bounty} questData={values} />
-                    )}
-                  </>
+                {isEdit && (
+                  <AddressWrapperStyled>
+                    <AddressFieldInput
+                      id="fallbackAddress"
+                      label="Funds fallback address"
+                      value={values.fallbackAddress}
+                      isLoading={loading}
+                      tooltip="Fallback Address"
+                      tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                      isEdit
+                      onChange={handleChange}
+                      wide
+                    />
+                  </AddressWrapperStyled>
                 )}
-              </QuestFooterStyled>
+              </SpacerStyled>
+            </SecondColStyled>
+          </>
+        </TwoColumnStyled>
+        {!loading && !isEdit && data.address && (
+          <>
+            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
+              <ClaimList
+                newClaim={claimUpdated}
+                questData={data}
+                questTotalBounty={bounty}
+                challengeDeposit={challengeDeposit}
+              />
             )}
-        </>
-      )}
-    </>
-  );
+            {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
+              values.address &&
+              wallet.account &&
+              bounty && (
+                <QuestFooterStyled>
+                  {values.state === ENUM_QUEST_STATE.Active ? (
+                    <>
+                      <FundModal quest={data} onClose={onFundModalClosed} />
+                      {claimDeposit && (
+                        <ScheduleClaimModal
+                          questAddress={data.address}
+                          questTotalBounty={bounty}
+                          claimDeposit={claimDeposit}
+                          playerAddress={wallet.account}
+                          onClose={onScheduleModalClosed}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {!!bounty?.parsedAmount && (
+                        <ReclaimFundsModal bounty={bounty} questData={values} />
+                      )}
+                    </>
+                  )}
+                </QuestFooterStyled>
+              )}
+          </>
+        )}
+      </>
+    );
+  };
 
   return (
     <CardStyled

@@ -18,35 +18,25 @@ import { floorNumber } from 'src/utils/math.utils';
 import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
+import { Outset } from '../utils/spacer-util';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
 
-const AmountStyled = styled.div`
-  margin-right: ${GUpx()};
-`;
-
 const AmountTextInputStyled = styled(TextInput)`
-  width: 150px;
-  /* Chrome, Safari, Edge, Opera */
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  /* Firefox */
-  input[type='number'] {
-    -moz-appearance: textfield;
-  }
+  pointer-events: all;
+  flex-grow: 1;
+  max-width: 200px;
 `;
 
 const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
+  pointer-events: all;
 `;
 
 const AutoCompleteWrapperStyled = styled.div`
-  flex-grow: 1;
+  flex-grow: 3;
+  pointer-events: all;
 `;
 
 const TokenNameStyled = styled.span`
@@ -56,9 +46,13 @@ const TokenNameStyled = styled.span`
 const LineStyled = styled.div`
   width: 100%;
   display: flex;
-  pointer-events: all;
+`;
+
+const AmountTokenWrapperStyled = styled.div`
+  display: flex;
   justify-content: flex-start;
   align-items: center;
+  ${(props: any) => (props.wide ? 'width:100%;' : '')}
 `;
 
 // #endregion
@@ -77,6 +71,7 @@ type Props = {
   tooltipDetail?: ReactNode;
   maxDecimals?: number;
   disabled?: boolean;
+  wide?: boolean;
 };
 
 function AmountFieldInput({
@@ -93,6 +88,7 @@ function AmountFieldInput({
   compact = false,
   maxDecimals,
   disabled = false,
+  wide = false,
 }: Props) {
   const { defaultToken, type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
@@ -152,7 +148,7 @@ function AmountFieldInput({
   const onAmountChange = (e: any) => {
     const newAmount = e.target.value;
     setAmount(newAmount);
-    if (token) {
+    if (token && e.target.value !== '') {
       const nextValue = {
         token: {
           ...token,
@@ -186,9 +182,9 @@ function AmountFieldInput({
       {isLoading ? (
         <Skeleton />
       ) : (
-        <LineStyled>
+        <AmountTokenWrapperStyled wide={wide}>
           {amount !== undefined && (
-            <AmountStyled>
+            <Outset horizontal>
               {isEdit ? (
                 <AmountTextInputStyled
                   id={id}
@@ -197,11 +193,12 @@ function AmountFieldInput({
                   type="number"
                   value={amount}
                   disabled={disabled}
+                  wide={wide}
                 />
               ) : (
                 floorNumber(amount, decimalsCount)
               )}
-            </AmountStyled>
+            </Outset>
           )}
           {value?.token.token ? (
             <TokenBadgeStyled
@@ -216,8 +213,8 @@ function AmountFieldInput({
                 onChange={setSearchTerm}
                 onSelect={onTokenChange}
                 ref={autoCompleteRef}
-                placeholder="search token"
-                wide
+                placeholder="search name or address"
+                wide={wide}
                 renderSelected={(i: number) => (
                   <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
                 )}
@@ -230,7 +227,7 @@ function AmountFieldInput({
               />
             </AutoCompleteWrapperStyled>
           )}
-        </LineStyled>
+        </AmountTokenWrapperStyled>
       )}
     </FieldInput>
   );

@@ -107,6 +107,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       }
       onClose={() => closeModal(false)}
       isOpen={opened}
+      width={500}
     >
       <Formik
         initialValues={{ fundAmount: { parsedAmount: 0, token: quest.rewardToken! } }}
@@ -131,6 +132,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
+                wide
               />
             </Outset>
           </FormStyled>
