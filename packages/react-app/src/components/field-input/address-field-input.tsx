@@ -23,6 +23,7 @@ const EthIdenticonStyled = styled(EthIdenticon)`
 const WrapperStyled = styled.div`
   display: flex;
   flex-wrap: nowrap;
+  ${(props: any) => (props.wide ? 'width:100%' : '')}
 `;
 
 // #endregion
@@ -37,6 +38,7 @@ type Props = {
   compact?: boolean;
   tooltip?: string;
   tooltipDetail?: React.ReactNode;
+  wide?: boolean;
 };
 export function AddressFieldInput({
   id,
@@ -48,6 +50,7 @@ export function AddressFieldInput({
   compact = false,
   tooltipDetail,
   tooltip,
+  wide = false,
 }: Props) {
   if (isLoading)
     return (
@@ -56,12 +59,12 @@ export function AddressFieldInput({
       </FieldInput>
     );
   const loadableContent = isEdit ? (
-    <WrapperStyled>
+    <WrapperStyled wide={wide}>
       <TextInputStyled id={id} value={value} onChange={onChange} />
       <EthIdenticonStyled address={value} scale={1.6} />
     </WrapperStyled>
   ) : (
-    <AddressField address={value} />
+    <AddressField address={value} wide={wide} />
   );
   return label ? (
     <FieldInput

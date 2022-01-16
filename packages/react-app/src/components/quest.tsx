@@ -1,4 +1,4 @@
-import { AddressField, Card, Split, useToast } from '@1hive/1hive-ui';
+import { AddressField, Card, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
@@ -82,8 +82,21 @@ const FormStyled = styled(Form)`
   }
 `;
 
-const NoPaddingSplitStyled = styled(Split)`
-  padding-bottom: 0 !important;
+const TwoColumnStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const FirstColStyled = styled.div`
+  margin: ${GUpx(2)};
+  flex-grow: 1;
+`;
+
+const SecondColStyled = styled.div`
+  margin: ${GUpx(2)};
+  flex-grow: 0;
 `;
 
 // #endregion
@@ -280,9 +293,9 @@ export default function Quest({
 
   const questContent = (values: QuestModel, handleChange = noop) => (
     <>
-      <NoPaddingSplitStyled
-        primary={
-          <Outset gu16 className="pb-0">
+      <TwoColumnStyled>
+        <>
+          <FirstColStyled gu16 className="pb-0">
             {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
               <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
                 {titleInput(values.title, handleChange)}
@@ -324,23 +337,9 @@ export default function Quest({
                   <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
                 }
               />
-              {isEdit && (
-                <AddressFieldInput
-                  id="fallbackAddress"
-                  label="Funds fallback address"
-                  value={values.fallbackAddress}
-                  isLoading={loading}
-                  tooltip="Fallback Address"
-                  tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                  isEdit
-                  onChange={handleChange}
-                />
-              )}
             </Outset>
-          </Outset>
-        }
-        secondary={
-          <Outset horizontal gu16={!isEdit} className="pb-0 pt-16">
+          </FirstColStyled>
+          <SecondColStyled>
             {!isEdit && values.address && (
               <AddressWrapperStyled>
                 {loading ? (
@@ -376,6 +375,7 @@ export default function Quest({
                 tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
                 value={claimDeposit}
                 isLoading={loading || (!isEdit && !claimDeposit)}
+                wide
               />
             )}
             <DateFieldInput
@@ -387,10 +387,24 @@ export default function Quest({
               isLoading={loading}
               value={values.expireTimeMs}
               onChange={handleChange}
+              wide
             />
-          </Outset>
-        }
-      />
+            {isEdit && (
+              <AddressFieldInput
+                id="fallbackAddress"
+                label="Funds fallback address"
+                value={values.fallbackAddress}
+                isLoading={loading}
+                tooltip="Fallback Address"
+                tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                isEdit
+                onChange={handleChange}
+                wide
+              />
+            )}
+          </SecondColStyled>
+        </>
+      </TwoColumnStyled>
       {!loading && !isEdit && data.address && (
         <>
           {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (

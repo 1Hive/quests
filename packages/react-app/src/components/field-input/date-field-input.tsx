@@ -2,6 +2,7 @@ import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { dateFormat } from '../../utils/date.utils';
 import { FieldInput } from './field-input';
@@ -9,8 +10,16 @@ import { FieldInput } from './field-input';
 // #region StyledComponents
 
 const InputStyled = styled.input`
+  ${(props: any) => (props.wide ? 'width:100%;' : '')}
+  border: 1px solid ${(props: any) => props.borderColor};
+  border-radius: 12px;
   background-color: ${({ background }: any) => background};
-  border: none;
+  height: 40px;
+  padding: ${GUpx()};
+  &:focus-visible {
+    border: 1px solid ${(props: any) => props.focusBorderColor};
+    outline: none;
+  }
 `;
 
 // #endregion
@@ -26,6 +35,7 @@ type Props = {
   tooltip?: string;
   tooltipDetail?: ReactNode;
   compact?: boolean;
+  wide?: boolean;
 };
 
 export default function DateFieldInput({
@@ -39,6 +49,7 @@ export default function DateFieldInput({
   tooltip,
   tooltipDetail,
   compact = false,
+  wide = false,
 }: Props) {
   const theme = useTheme();
 
@@ -66,6 +77,9 @@ export default function DateFieldInput({
       onChange={handleChange}
       style={css}
       background={theme.surface}
+      wide={wide}
+      borderColor={theme.border}
+      focusBorderColor={theme.accent}
     />
   ) : (
     <span>{new Date(value).toDateString()}</span>
