@@ -92,6 +92,7 @@ const TwoColumnStyled = styled.div`
 const FirstColStyled = styled.div`
   margin: ${GUpx(2)};
   flex-grow: 1;
+  width: 75%;
 `;
 
 const SecondColStyled = styled.div`
