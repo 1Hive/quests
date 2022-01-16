@@ -11,7 +11,8 @@ const FieldStyled = styled(Field)`
 const ContentWrapperStyled = styled.div`
   textarea,
   input,
-  select {
+  select,
+  :first-child {
     pointer-events: all !important;
   }
 `;

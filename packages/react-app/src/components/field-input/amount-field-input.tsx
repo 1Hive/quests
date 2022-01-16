@@ -1,4 +1,4 @@
-import { Field, TextInput, TokenBadge, _AutoComplete as AutoComplete, Tag } from '@1hive/1hive-ui';
+import { TextInput, TokenBadge, _AutoComplete as AutoComplete, Tag } from '@1hive/1hive-ui';
 import { parseUnits } from 'ethers/lib/utils';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
@@ -23,7 +23,6 @@ import { FieldInput } from './field-input';
 // #region StyledComponents
 
 const AmountStyled = styled.div`
-  margin-top: 2px;
   margin-right: ${GUpx()};
 `;
 
@@ -46,8 +45,8 @@ const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
 `;
 
-const AutoCompleteStyled = styled(AutoComplete)`
-  width: 50%;
+const AutoCompleteWrapperStyled = styled.div`
+  flex-grow: 1;
 `;
 
 const TokenNameStyled = styled.span`
@@ -57,7 +56,8 @@ const TokenNameStyled = styled.span`
 const LineStyled = styled.div`
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  pointer-events: all;
+  justify-content: flex-start;
 `;
 
 // #endregion
@@ -209,23 +209,25 @@ function AmountFieldInput({
               networkType="private"
             />
           ) : (
-            <AutoCompleteStyled
-              items={tokens.map((x, index: number) => index)}
-              onChange={setSearchTerm}
-              onSelect={onTokenChange}
-              ref={autoCompleteRef}
-              placeholder="search token"
-              wide
-              renderSelected={(i: number) => (
-                <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
-              )}
-              renderItem={(i: number) => (
-                <LineStyled key={tokens[i].symbol}>
-                  <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
-                  <Tag>{tokens[i].symbol}</Tag>
-                </LineStyled>
-              )}
-            />
+            <AutoCompleteWrapperStyled>
+              <AutoComplete
+                items={tokens.map((x, index: number) => index)}
+                onChange={setSearchTerm}
+                onSelect={onTokenChange}
+                ref={autoCompleteRef}
+                placeholder="search token"
+                wide
+                renderSelected={(i: number) => (
+                  <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
+                )}
+                renderItem={(i: number) => (
+                  <LineStyled key={tokens[i].symbol}>
+                    <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
+                    <Tag>{tokens[i].symbol}</Tag>
+                  </LineStyled>
+                )}
+              />
+            </AutoCompleteWrapperStyled>
           )}
         </LineStyled>
       )}

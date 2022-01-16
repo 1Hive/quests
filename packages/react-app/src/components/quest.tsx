@@ -47,7 +47,7 @@ const LinkStyled = styled(Link)`
 `;
 
 const AddressWrapperStyled = styled.div`
-  margin-bottom: ${GUpx(2)};
+  margin-bottom: ${GUpx(3)};
 `;
 
 const CardStyled = styled(Card)`
@@ -87,6 +87,7 @@ const TwoColumnStyled = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  margin: ${(props: any) => (props.isEdit ? 0 : GUpx())};
 `;
 
 const FirstColStyled = styled.div`
@@ -97,6 +98,13 @@ const FirstColStyled = styled.div`
 const SecondColStyled = styled.div`
   margin: ${GUpx(2)};
   flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`;
+
+const SecondaryBoxWrapperStyled = styled.div`
+  ${(props: any) => (props.wide ? 'width:100%px' : '')}
 `;
 
 // #endregion
@@ -114,8 +122,6 @@ export default function Quest({
   data = {
     expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
     state: ENUM_QUEST_STATE.Draft,
-    title: 'test HNY',
-    description: 'Test HNY',
   },
   isLoading = false,
   questMode = ENUM_QUEST_VIEW_MODE.ReadDetail,
@@ -305,7 +311,7 @@ export default function Quest({
 
   const questContent = (values: QuestModel, handleChange = noop) => (
     <>
-      <TwoColumnStyled>
+      <TwoColumnStyled isEdit={isEdit}>
         <>
           <FirstColStyled gu16 className="pb-0">
             {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
@@ -362,59 +368,62 @@ export default function Quest({
                 )}
               </AddressWrapperStyled>
             )}
-            {bounty !== null && (
-              <AmountFieldInputFormik
-                id="bounty"
-                label={
-                  questMode === ENUM_QUEST_VIEW_MODE.Create ? 'Initial bounty' : 'Available bounty'
-                }
+            <SecondaryBoxWrapperStyled wide={isEdit}>
+              {bounty !== null && (
+                <AmountFieldInputFormik
+                  id="bounty"
+                  label={
+                    questMode === ENUM_QUEST_VIEW_MODE.Create
+                      ? 'Initial bounty'
+                      : 'Available bounty'
+                  }
+                  isEdit={isEdit}
+                  tooltip="Bounty"
+                  tooltipDetail={
+                    isEdit
+                      ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
+                      : "The available amount of this quest's funding pool."
+                  }
+                  value={bounty}
+                  isLoading={loading || (!isEdit && !bounty)}
+                  formik={formRef}
+                />
+              )}
+              {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
+                <AmountFieldInput
+                  id="claimDeposit"
+                  label="Claim deposit"
+                  tooltip="Claim deposit"
+                  tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
+                  value={claimDeposit}
+                  isLoading={loading || (!isEdit && !claimDeposit)}
+                />
+              )}
+              <DateFieldInput
+                id="expireTimeMs"
+                label="Expire time"
+                tooltip="Expire time"
+                tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
                 isEdit={isEdit}
-                tooltip="Bounty"
-                tooltipDetail={
-                  isEdit
-                    ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
-                    : "The available amount of this quest's funding pool."
-                }
-                value={bounty}
-                isLoading={loading || (!isEdit && !bounty)}
-                formik={formRef}
-              />
-            )}
-            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
-              <AmountFieldInput
-                id="claimDeposit"
-                label="Claim deposit"
-                tooltip="Claim deposit"
-                tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
-                value={claimDeposit}
-                isLoading={loading || (!isEdit && !claimDeposit)}
-                wide
-              />
-            )}
-            <DateFieldInput
-              id="expireTimeMs"
-              label="Expire time"
-              tooltip="Expire time"
-              tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
-              isEdit={isEdit}
-              isLoading={loading}
-              value={values.expireTimeMs}
-              onChange={handleChange}
-              wide
-            />
-            {isEdit && (
-              <AddressFieldInput
-                id="fallbackAddress"
-                label="Funds fallback address"
-                value={values.fallbackAddress}
                 isLoading={loading}
-                tooltip="Fallback Address"
-                tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                isEdit
+                value={values.expireTimeMs}
                 onChange={handleChange}
                 wide
               />
-            )}
+              {isEdit && (
+                <AddressFieldInput
+                  id="fallbackAddress"
+                  label="Funds fallback address"
+                  value={values.fallbackAddress}
+                  isLoading={loading}
+                  tooltip="Fallback Address"
+                  tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                  isEdit
+                  onChange={handleChange}
+                  wide
+                />
+              )}
+            </SecondaryBoxWrapperStyled>
           </SecondColStyled>
         </>
       </TwoColumnStyled>
