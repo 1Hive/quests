@@ -18,13 +18,7 @@ const FieldHeaderStyled = styled(Field)`
 const DivStyled = styled.div`
   pointer-events: all !important;
 `;
-const LabelStyled = styled.div`
-  width: 16px;
-  justify-content: center;
-  margin-left: 8px;
-  display: flex;
-  pointer-events: all !important;
-`;
+
 const LineStyled = styled.div`
   display: flex;
   align-items: center;
@@ -101,9 +95,7 @@ function AmountFieldInput({
       label={
         <>
           <span title={tooltip}>{label}</span>
-          <LabelStyled>
-            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-          </LabelStyled>
+          <>{tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}</>
         </>
       }
       key={id}

@@ -37,9 +37,16 @@ import ExecuteClaimModal from './modals/execute-claim-modal';
 import { AddressFieldInput } from './field-input/address-field-input';
 // #region StyledComponents
 
+const TitleLinkStyled = styled(Link)`
+  font-weight: 100;
+`;
 const LinkStyled = styled(Link)`
-  text-decoration: underline;
-  font-weight: bold;
+  font-weight: 100;
+  color: dodgerblue;
+  text-decoration: none;
+`;
+const AddressStyled = styled.div`
+  margin-bottom: ${GUpx(2)};
 `;
 const CardStyled = styled(Card)`
   justify-content: flex-start;
@@ -70,10 +77,6 @@ const FormStyled = styled(Form)`
 
 const NoPaddingSplitStyled = styled(Split)`
   padding-bottom: 0 !important;
-`;
-const TitleStyled = styled.h1`
-  font-size: x-large;
-  margin-bottom: 8px;
 `;
 const FallbackWrapperStyled = styled.div`
   width: 100%;
@@ -254,58 +257,34 @@ export default function Quest({
       }
     }
   };
+  const titleInput = (title: any, handleChange: any) => (
+    <TextFieldInput
+      id="title"
+      label={isEdit ? 'Title' : undefined}
+      isEdit={isEdit}
+      isLoading={loading}
+      placeHolder="Quest title"
+      value={title}
+      onChange={handleChange}
+      fontSize="24px"
+      tooltip="Title of your quest"
+      wide
+    />
+  );
 
   const questContent = (values: QuestModel, handleChange = noop) => (
     <>
       <NoPaddingSplitStyled
         primary={
           <Outset gu16 className="pb-0">
-            {isEdit && <TitleStyled>Create Quest</TitleStyled>}
             <Outset gu8 vertical className="block">
-              <NoPaddingSplitStyled
-                primary={
-                  !isEdit ? (
-                    <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
-                      <TextFieldInput
-                        id="title"
-                        label={isEdit ? 'Title' : undefined}
-                        isEdit={isEdit}
-                        isLoading={loading}
-                        placeHolder="Quest title"
-                        value={values.title}
-                        onChange={handleChange}
-                        fontSize="24px"
-                        tooltip="Title of your quest"
-                        wide
-                      />
-                    </LinkStyled>
-                  ) : (
-                    <TextFieldInput
-                      id="title"
-                      label={isEdit ? 'Title' : undefined}
-                      isEdit={isEdit}
-                      isLoading={loading}
-                      placeHolder="Quest title"
-                      value={values.title}
-                      onChange={handleChange}
-                      fontSize="24px"
-                      tooltip="Title of your quest"
-                      wide
-                    />
-                  )
-                }
-                secondary={
-                  !isEdit &&
-                  values.address &&
-                  (loading ? (
-                    <Skeleton />
-                  ) : (
-                    <>
-                      <AddressField id="address" address={values.address} autofocus={false} />
-                    </>
-                  ))
-                }
-              />
+              {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
+                <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
+                  {titleInput(values.title, handleChange)}
+                </TitleLinkStyled>
+              ) : (
+                titleInput(values.title, handleChange)
+              )}
             </Outset>
             <Outset gu8 vertical>
               <TextFieldInput
@@ -362,6 +341,17 @@ export default function Quest({
         }
         secondary={
           <Outset horizontal gu16={!isEdit}>
+            {!isEdit && values.address && (
+              <AddressStyled>
+                {loading ? (
+                  <Skeleton />
+                ) : (
+                  <>
+                    <AddressField id="address" address={values.address} autofocus={false} />
+                  </>
+                )}
+              </AddressStyled>
+            )}
             {bounty !== null && (
               <AmountFieldInputFormik
                 id="bounty"
@@ -412,12 +402,13 @@ export default function Quest({
               challengeDeposit={challengeDeposit}
             />
           )}
-          <QuestFooterStyled>
-            {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
-              values.address &&
-              wallet.account &&
-              bounty &&
-              (values.state === ENUM_QUEST_STATE.Active ? (
+
+          {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
+            values.address &&
+            wallet.account &&
+            bounty && (
+              <QuestFooterStyled>
+                (values.state === ENUM_QUEST_STATE.Active ? (
                 <>
                   <FundModal questAddress={values.address} />
                   {currentPlayerClaim ? (
@@ -433,10 +424,15 @@ export default function Quest({
                     )
                   )}
                 </>
-              ) : (
-                !!bounty?.parsedAmount && <ReclaimFundsModal bounty={bounty} questData={values} />
-              ))}
-          </QuestFooterStyled>
+                ) : (
+                <>
+                  {!!bounty?.parsedAmount && (
+                    <ReclaimFundsModal bounty={bounty} questData={values} />
+                  )}
+                </>
+                ))
+              </QuestFooterStyled>
+            )}
         </>
       )}
     </>

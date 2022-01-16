@@ -64,6 +64,7 @@ export default function QuestModal({
 
   return (
     <ModalBase
+      title="Create quest"
       openButton={
         <Button
           icon={<IconPlus />}

@@ -14,15 +14,11 @@ const FieldHeaderStyled = styled(Field)`
   pointer-events: none;
 `;
 const DivStyled = styled.div`
-  pointer-events: all !important;
+  textarea {
+    pointer-events: all !important;
+  }
 `;
-const LabelStyled = styled.div`
-  width: 16px;
-  justify-content: center;
-  margin-left: 8px;
-  display: flex;
-  pointer-events: all !important;
-`;
+
 const MaxHeightStyled = styled.div`
   overflow: hidden;
   margin-bottom: 8px;
@@ -127,14 +123,13 @@ export default function TextFieldInput({
         label={
           <>
             <span title={tooltip}>{label}</span>
-            <LabelStyled>
-              {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-            </LabelStyled>
+
+            {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
           </>
         }
         key={id}
       >
-        <DivStyled>{loadableContent}</DivStyled>
+        <DivStyled> {loadableContent}</DivStyled>
       </FieldHeaderStyled>
     </>
   ) : (
