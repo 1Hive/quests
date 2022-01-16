@@ -1,7 +1,6 @@
 import { Help, IconQuestion, useTheme } from '@1hive/1hive-ui';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-import { GUpx } from 'src/utils/css.util';
 import { Outset } from '../utils/spacer-util';
 
 const IconSpanStyled = styled.span`

@@ -2,7 +2,6 @@ import { Field, useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { dateFormat } from '../../utils/date.utils';
 import { IconTooltip } from './icon-tooltip';
