@@ -5,13 +5,23 @@ import styled from 'styled-components';
 import { BREAKPOINTS } from '../styles/breakpoints';
 
 const WrapperStyled = styled.div`
-  display: flex;
-  justify-content: space-evenly;
+  display: grid;
+  grid-template-areas: ${(props: any) =>
+    props.twoCol ? "'m m s'\n'm m s'\n'f f f'" : "'s s s'\n'm m m'\n'f f f'"};
+
+  height: calc(100vh - 64px);
+  overflow-y: auto;
 `;
-const MainBlockStyled = styled.div`
-  width: ${({ twoCol }: any) => (twoCol ? '75' : '90')}%;
+
+const SideBlockStyled = styled.div`
+  grid-area: s;
+  padding: ${GUpx(4)} ${GUpx(6)};
+  padding-left: 0;
 `;
-const SideBlockStyled = styled.div``;
+
+const FooterStyled = styled.div`
+  grid-area: f;
+`;
 
 const ScrollViewStyled = styled.div`
   overflow-x: auto;
@@ -23,15 +33,17 @@ const ScrollViewStyled = styled.div`
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
   height: calc(100vh - 64px);
-  padding: ${GUpx(3)} 0;
+  padding: ${GUpx(4)};
+  grid-area: m;
 `;
 
 type Props = {
   main: React.ReactNode;
   side: React.ReactNode;
+  footer: React.ReactNode;
 };
 
-function SideContentLayout({ main, side }: Props) {
+function SideContentLayout({ main, side, footer }: Props) {
   const { width: vw } = useViewport();
   const [twoCol, setTwoCol] = useState(true);
   useEffect(() => {
@@ -39,16 +51,10 @@ function SideContentLayout({ main, side }: Props) {
   }, [vw]);
   return (
     <>
-      <WrapperStyled>
-        <MainBlockStyled twoCol={twoCol}>
-          <ScrollViewStyled id="scroll-view">
-            <>
-              {twoCol === false && <>{side}</>}
-              {main}
-            </>
-          </ScrollViewStyled>
-        </MainBlockStyled>
-        {twoCol && <SideBlockStyled>{side}</SideBlockStyled>}
+      <WrapperStyled twoCol={twoCol}>
+        <ScrollViewStyled id="scroll-view">{main}</ScrollViewStyled>
+        <SideBlockStyled>{side}</SideBlockStyled>
+        <FooterStyled>{footer}</FooterStyled>
       </WrapperStyled>
     </>
   );

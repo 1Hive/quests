@@ -238,10 +238,10 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     <ModalBase
       title={
         <HeaderStyled>
-          <h1>Challenge quest</h1>
+          <h1>Challenge quests</h1>
           <IconTooltip
             tooltip="What is a challenge?"
-            tooltipDetail="A challenge allows you to deny a claim. It will be raised to Celeste and conviction voting will be used to determine the validity of this challenge."
+            tooltipDetail="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge."
           />
         </HeaderStyled>
       }

@@ -32,22 +32,6 @@ export default function QuestList() {
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
   useEffect(() => {
-    const scrollView = document.getElementById('scroll-view');
-    const handleScroll = (e: WheelEvent) => {
-      scrollView!.scrollTo(scrollView!.scrollLeft, scrollView!.scrollTop + e.deltaY / 2);
-    };
-    const preventScroll = (e: WheelEvent) => e.preventDefault();
-    if (!document.onwheel) {
-      document.addEventListener('wheel', handleScroll);
-      scrollView!.addEventListener('wheel', preventScroll);
-    }
-    return () => {
-      document.removeEventListener('wheel', handleScroll);
-      scrollView!.removeEventListener('wheel', preventScroll);
-    };
-  }, []);
-
-  useEffect(() => {
     debounceFilter(filter);
     return () => debounceFilter.cancel();
   }, [filter]);

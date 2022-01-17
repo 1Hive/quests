@@ -1,7 +1,5 @@
 import { GU, Link, useTheme } from '@1hive/1hive-ui';
 import styled from 'styled-components';
-import { FaBug } from 'react-icons/fa';
-import Separator from '../utils/separator';
 // #region StyledComponents
 
 const HeaderNavStyled = styled.nav`
@@ -44,15 +42,6 @@ export default function HeaderMenu({ below }: Props) {
           color={theme.contentSecondary}
         >
           Wiki
-        </HeaderNavItemStyled>
-        <Separator horizontal />
-        <HeaderNavItemStyled
-          href="https://github.com/1Hive/quests/issues/new?assignees=&labels=&template=bug----bug_title-.md&title="
-          external
-          color={theme.contentSecondary}
-        >
-          <FaBug className="mb-4" />
-          <span className="ml-8 ">Report a Bug</span>
         </HeaderNavItemStyled>
       </HeaderNavStyled>
     )
