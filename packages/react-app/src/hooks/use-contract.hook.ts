@@ -5,7 +5,8 @@ import { TokenModel } from 'src/models/token.model';
 import { getDefaultProvider } from 'src/utils/web3.utils';
 import { toChecksumAddress, toNumber } from 'web3-utils';
 import { ContractInstanceError, NullableContract } from 'src/models/contract-error';
-import { Account } from 'ethereumjs-util';
+import { Account, AccountData } from 'ethereumjs-util';
+import { Logger } from 'src/utils/logger';
 import { ADDRESS_ZERO } from '../constants';
 import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';
@@ -23,7 +24,7 @@ export function getSigner(ethersProvider: any, account: any) {
 }
 
 // account is optional
-export function getProviderOrSigner(ethersProvider: any, account?: any) {
+export function getProviderOrSigner(ethersProvider: any, account?: AccountData) {
   return account ? getSigner(ethersProvider, account) : ethersProvider;
 }
 
@@ -32,7 +33,7 @@ export function getContract(
   address: string,
   ABI: ContractInterface,
   ethersProvider: any,
-  account?: any,
+  account?: AccountData,
 ): Contract {
   if (!address || address === ADDRESS_ZERO) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
@@ -115,23 +116,31 @@ export function useERC20Contract(
   return useContract('ERC20', tokenAddress, withSignerIfPossible);
 }
 
-export async function getTokenInfo(tokenAddress: string) {
-  const tokenContract = getContract(
-    tokenAddress,
-    getContractsJson().ERC20.abi,
-    getDefaultProvider(),
-  );
-  const symbol = await tokenContract.symbol();
-  const decimals = await tokenContract.decimals();
-  const name = await tokenContract.name();
+export function getERC20Contract(tokenAddress: string, account: AccountData) {
+  return getContract(tokenAddress, getContractsJson().ERC20.abi, getDefaultProvider(), account);
+}
 
-  return {
-    symbol,
-    decimals,
-    name,
-    amount: BigNumber.from(0).toString(),
-    token: toChecksumAddress(tokenAddress),
-  } as TokenModel;
+export async function getTokenInfo(tokenAddress: string) {
+  try {
+    const tokenContract = getContract(
+      tokenAddress,
+      getContractsJson().ERC20.abi,
+      getDefaultProvider(),
+    );
+    const symbol = await tokenContract.symbol();
+    const decimals = await tokenContract.decimals();
+    const name = await tokenContract.name();
+    return {
+      symbol,
+      decimals,
+      name,
+      amount: BigNumber.from(0).toString(),
+      token: toChecksumAddress(tokenAddress),
+    } as TokenModel;
+  } catch (error) {
+    Logger.error(error);
+    return tokenAddress;
+  }
 }
 
 export function useQuestContract(address?: string, withSignerIfPossible = true): NullableContract {

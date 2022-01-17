@@ -11,7 +11,7 @@ export type QuestModel = {
   // Computed
   address?: string;
   bounty?: TokenAmountModel;
-  rewardToken?: TokenModel;
+  rewardToken?: TokenModel | string;
   detailsRefIpfs?: string;
   creatorAddress?: string;
   state: string;

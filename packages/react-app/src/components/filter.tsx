@@ -18,7 +18,7 @@ const StatusDropdownStyled = styled(DropDown)`
 export function Filter() {
   const { filter, setFilter } = useFilterContext()!;
   const theme = useTheme();
-  const states = [ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
+  const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   return (
     <>
       <Field label="Contract address">
@@ -57,9 +57,10 @@ export function Filter() {
           id="filterStatus"
           items={states}
           borderColor={theme.border}
-          selected={states.indexOf(filter.status)}
+          selected={filter.expire.start ? 0 : states.indexOf(filter.status)}
           onChange={(i: number) => setFilter({ ...filter, status: states[i] })}
           wide
+          disabled={filter.expire.start}
         />
       </Field>
       {

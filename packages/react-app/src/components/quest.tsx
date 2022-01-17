@@ -11,7 +11,7 @@ import {
   ENUM_QUEST_STATE,
   ENUM_TRANSACTION_STATUS,
 } from 'src/constants';
-import { useERC20Contract, useFactoryContract } from 'src/hooks/use-contract.hook';
+import { useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
@@ -33,6 +33,7 @@ import ClaimList from './claim-list';
 import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
+
 // #region StyledComponents
 
 const TitleLinkStyled = styled(Link)`
@@ -90,13 +91,14 @@ const TwoColumnStyled = styled.div`
 `;
 
 const FirstColStyled = styled.div`
-  margin: ${GUpx(2)};
+  margin: ${GUpx(3)};
   flex-grow: 1;
-  width: 75%;
+  max-width: 80%;
+  overflow-wrap: break-word;
 `;
 
 const SecondColStyled = styled.div`
-  margin: ${GUpx(2)};
+  margin: ${GUpx(3)};
   flex-grow: 0;
   display: flex;
   flex-direction: column;
@@ -138,11 +140,10 @@ export default function Quest({
 }: Props) {
   const wallet = useWallet();
   const { defaultToken } = getNetwork();
-  const erc20Contract = useERC20Contract(data.rewardToken ?? defaultToken);
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
-  const [bounty, setBounty] = useState<TokenAmountModel>();
+  const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimUpdated, setClaimUpdate] = useState(0);
   const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
@@ -172,12 +173,13 @@ export default function Quest({
       }
     };
 
-    if (data.rewardToken && data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
+    if (!data.rewardToken) setBounty(null);
+    else if (data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
     }
-  }, [questMode, data.rewardToken]);
+  }, [questMode, data.rewardToken, wallet.account]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -260,11 +262,7 @@ export default function Quest({
             });
             if (txReceiptFundQuest) {
               toast('Operation succeed');
-
-              setTimeout(
-                () => fetchBalanceOfQuest(createdQuestAddress, values.bounty!.token),
-                5000,
-              );
+              fetchBalanceOfQuest(createdQuestAddress, values.bounty.token);
             }
           }
         }
@@ -282,8 +280,8 @@ export default function Quest({
     }
   };
 
-  const fetchBalanceOfQuest = (address: string, token: TokenModel) => {
-    QuestService.getBalanceOf(erc20Contract, token, address)
+  const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
+    QuestService.getBalanceOf(wallet.account, token, address)
       .then((result) => {
         data.bounty = result ?? undefined;
         processQuestState(data);
@@ -322,9 +320,11 @@ export default function Quest({
         onChange={handleChange}
         fontSize="24px"
         tooltip="Title of your quest"
+        tooltipDetail="Title should resume the quest"
         wide
       />
     );
+
     return (
       <>
         {!isEdit && (
@@ -385,7 +385,7 @@ export default function Quest({
               />
             </FirstColStyled>
             <SecondColStyled wide={isEdit}>
-              {bounty !== null && (
+              {(bounty !== null || isEdit) && (
                 <AmountFieldInputFormik
                   id="bounty"
                   label={
@@ -400,7 +400,7 @@ export default function Quest({
                       ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
                       : "The available amount of this quest's funding pool."
                   }
-                  value={bounty}
+                  value={bounty ?? undefined}
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                 />
@@ -448,14 +448,16 @@ export default function Quest({
         </TwoColumnStyled>
         {!loading && !isEdit && data.address && (
           <>
-            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
-              <ClaimList
-                newClaim={claimUpdated}
-                questData={data}
-                questTotalBounty={bounty}
-                challengeDeposit={challengeDeposit}
-              />
-            )}
+            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail &&
+              challengeDeposit &&
+              bounty !== null && (
+                <ClaimList
+                  newClaim={claimUpdated}
+                  questData={data}
+                  questTotalBounty={bounty}
+                  challengeDeposit={challengeDeposit}
+                />
+              )}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
               values.address &&
               wallet.account &&
