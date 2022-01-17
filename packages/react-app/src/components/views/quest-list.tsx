@@ -107,7 +107,7 @@ export default function QuestList() {
       pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
       releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
       scrollableTarget="scroll-view"
-      scrollThreshold="-50px"
+      scrollThreshold="50px"
     >
       <div>
         {quests.map((x: QuestModel) => (
