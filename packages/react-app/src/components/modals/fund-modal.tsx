@@ -11,6 +11,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
+import { TokenModel } from 'src/models/token.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -37,7 +38,9 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
   const toast = useToast();
-  const contractERC20 = useERC20Contract(quest.rewardToken?.token);
+  const contractERC20 = useERC20Contract(
+    typeof quest.rewardToken === 'string' ? quest.rewardToken : quest.rewardToken?.token,
+  );
 
   const closeModal = (success: boolean) => {
     setOpened(false);
@@ -110,7 +113,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       width={500}
     >
       <Formik
-        initialValues={{ fundAmount: { parsedAmount: 0, token: quest.rewardToken! } }}
+        initialValues={{ fundAmount: { parsedAmount: 0, token: quest.rewardToken as TokenModel } }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
           if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)

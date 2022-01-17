@@ -24,7 +24,7 @@ import { toTokenAmountModel } from 'src/utils/data.utils';
 import { NullableContract } from 'src/models/contract-error';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
-import { Account } from 'ethereumjs-util';
+import { Account, AccountData } from 'ethereumjs-util';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -34,6 +34,7 @@ import {
   getQuestContractInterface,
   getContract,
   getERC20Signed,
+  getERC20Contract,
 } from '../hooks/use-contract.hook';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
@@ -175,10 +176,18 @@ export async function fetchQuestsPaging(
   let expireTimeLower;
   let expireTimeUpper;
   if (filter.expire?.start) expireTimeLower = Math.round(filter.expire.start.getTime() / 1000);
-  else expireTimeLower = filter.status === ENUM_QUEST_STATE.Expired ? 0 : now;
+  else
+    expireTimeLower =
+      filter.status === ENUM_QUEST_STATE.Expired || filter.status === ENUM_QUEST_STATE.All
+        ? 0
+        : now;
   if (filter.expire?.end) expireTimeUpper = Math.round(filter.expire.end.getTime() / 1000);
   // TODO : Change to a later time when supported by grapql-request
-  else expireTimeUpper = filter.status === ENUM_QUEST_STATE.Expired ? now : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
+  else
+    expireTimeUpper =
+      filter.status === ENUM_QUEST_STATE.Expired && filter.status !== ENUM_QUEST_STATE.All
+        ? now
+        : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
   const queryResult = (
     await request(questSubgraph, QuestEntitiesQuery, {
       skip: currentIndex,
@@ -262,11 +271,14 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         }
         // If failed to fetch ipfs evidence
         if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
-
+        const tokenModel =
+          typeof quest.rewardToken === 'string'
+            ? ((await getTokenInfo(quest.rewardToken)) as TokenModel)
+            : quest.rewardToken;
         return {
           claimedAmount: {
-            token: quest.rewardToken,
-            parsedAmount: fromBigNumber(BigNumber.from(claimAmount), quest.rewardToken?.decimals),
+            token: tokenModel,
+            parsedAmount: fromBigNumber(BigNumber.from(claimAmount), tokenModel?.decimals),
           },
           evidence,
           playerAddress,
@@ -334,7 +346,11 @@ export async function fetchRewardTokens() {
   const tokenAddresses = (
     await request(questsSubgraph, QuestRewardTokens, { first: 100 })
   ).questEntities.map((x: any) => x.questRewardTokenAddress);
-  return Promise.all(arrayDistinct<string>(tokenAddresses).map(getTokenInfo));
+  return Promise.all(
+    arrayDistinct<string>(tokenAddresses)
+      .map(getTokenInfo)
+      .filter((x) => !!x),
+  ) as Promise<TokenModel[]>;
 }
 
 // #endregion
@@ -359,7 +375,7 @@ export async function saveQuest(
   const tx = await questFactoryContract.instance.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    data.rewardToken!.token,
+    typeof data.rewardToken === 'string' ? data.rewardToken : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
     defaultGazFees,
@@ -406,24 +422,34 @@ export async function approveTokenAmount(
   if (!erc20Contract.instance) throw erc20Contract.error;
 
   const { defaultGazFees } = getNetwork();
-  Logger.debug('Approving token amount ...', { tokenAmount, fromAddress: toAddress });
+  Logger.debug('Approving token amount...', { tokenAmount, fromAddress: toAddress });
   const tx = await erc20Contract.instance.approve(toAddress, tokenAmount.amount, defaultGazFees);
   return handleTransaction(tx, onTx);
 }
 
 export async function getBalanceOf(
-  erc20Contract: NullableContract,
-  token: TokenModel,
+  account: AccountData,
+  token: TokenModel | string,
   address: string,
-): Promise<TokenAmountModel> {
-  if (!erc20Contract.instance) throw erc20Contract.error;
-  Logger.debug('Fetching balance ...', { address, token });
-  const balance = (await erc20Contract.instance.balanceOf(address)) as BigNumber;
-  token.amount = balance.toString();
-  return {
-    token,
-    parsedAmount: fromBigNumber(balance, token.decimals),
-  };
+): Promise<TokenAmountModel | null> {
+  try {
+    let tokenModel: TokenModel;
+    if (typeof token === 'string') tokenModel = (await getTokenInfo(token)) as TokenModel;
+    else tokenModel = token;
+    if (tokenModel) {
+      const erc20Contract = getERC20Contract(tokenModel.token, account);
+      if (!erc20Contract) return null;
+      const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
+      tokenModel.amount = balance.toString();
+      return {
+        token: tokenModel,
+        parsedAmount: fromBigNumber(balance, tokenModel.decimals),
+      };
+    }
+  } catch (error) {
+    Logger.error(error);
+  }
+  return null;
 }
 
 // #endregion

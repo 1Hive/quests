@@ -20,6 +20,9 @@ const InputStyled = styled.input`
     border: 1px solid ${(props: any) => props.focusBorderColor};
     outline: none;
   }
+  &::-webkit-calendar-picker-indicator {
+    ${(props: any) => (props.isDarkTheme ? 'filter: invert();' : '')};
+  }
 `;
 
 // #endregion
@@ -80,6 +83,8 @@ export default function DateFieldInput({
       wide={wide}
       borderColor={theme.border}
       focusBorderColor={theme.accent}
+      // eslint-disable-next-line no-underscore-dangle
+      isDarkTheme={theme._name === 'dark'}
     />
   ) : (
     <span>{new Date(value).toDateString()}</span>

@@ -80,6 +80,7 @@ export const QUESTS_PAGE_SIZE = 4;
 // Enums
 
 export const ENUM_QUEST_STATE = {
+  All: 'All',
   Draft: 'Draft', // Not yet saved
   Active: 'Active', // Contract created
   // Played: 'Played', // At least one active claim

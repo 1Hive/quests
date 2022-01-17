@@ -27,6 +27,10 @@ const AmountTextInputStyled = styled(TextInput)`
   pointer-events: all;
   flex-grow: 1;
   max-width: 200px;
+
+  div {
+    pointer-events: none;
+  }
 `;
 
 const TokenBadgeStyled = styled(TokenBadge)`
@@ -36,7 +40,6 @@ const TokenBadgeStyled = styled(TokenBadge)`
 
 const AutoCompleteWrapperStyled = styled.div`
   flex-grow: 3;
-  pointer-events: all;
 `;
 
 const TokenNameStyled = styled.span`
@@ -46,6 +49,7 @@ const TokenNameStyled = styled.span`
 const LineStyled = styled.div`
   width: 100%;
   display: flex;
+  justify-content: space-between;
 `;
 
 const AmountTokenWrapperStyled = styled.div`
@@ -110,16 +114,22 @@ function AmountFieldInput({
       );
     };
 
-    if (wallet.account && isEdit && !value?.token) fetchAvailableTokens();
-  }, [wallet.account]);
+    document.addEventListener(
+      'focusin',
+      () => {
+        if (wallet.account && isEdit && !value?.token) fetchAvailableTokens();
+      },
+      true,
+    );
+  }, [wallet.account, document.activeElement]);
 
   useEffect(() => {
     if (availableTokens.length) {
       if (searchTerm && isAddress(searchTerm)) {
         setTokens([]);
         getTokenInfo(searchTerm)
-          .then((tokenInfo: TokenModel) => {
-            setTokens([tokenInfo]);
+          .then((tokenInfo) => {
+            if (typeof tokenInfo !== 'string') if (tokenInfo) setTokens([tokenInfo]);
           })
           .catch(Logger.error);
       } else {

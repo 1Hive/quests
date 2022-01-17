@@ -1,3 +1,4 @@
+import { Account } from 'ethereumjs-util';
 import { Contract } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
 import { Logger } from 'src/utils/logger';
@@ -30,8 +31,7 @@ function getContractsJson(network: any) {
 
 // account is optional
 // returns null on errors
-function getContract(contractName: string, addressOverride?: string, withSignerIfPossible = false) {
-  const account = undefined;
+function getContract(contractName: string, addressOverride?: string, signer?: Account) {
   const ethers = undefined;
   const network = getNetwork();
   contracts = getContractsJson(network);
@@ -44,8 +44,7 @@ function getContract(contractName: string, addressOverride?: string, withSignerI
     if (!contractAddress || contractAddress === ADDRESS_ZERO) {
       throw Error(`Invalid 'address' parameter '${contractAddress}'.`);
     }
-    const signerOrProvider =
-      withSignerIfPossible && ethers && account ? getProviderOrSigner(ethers, account) : undefined;
+    const signerOrProvider = ethers && signer ? getProviderOrSigner(ethers, signer) : undefined;
     return new Contract(contractAddress, contractAbi, signerOrProvider);
   } catch (error) {
     Logger.error('Failed to get contract', error);
@@ -61,6 +60,6 @@ export function getGovernQueueContract() {
   return getContract('GovernQueue');
 }
 
-export function getERC20Contract(token: TokenModel) {
-  return getContract('ERC20', token.token);
+export function getERC20Contract(token: TokenModel, signer?: Account) {
+  return getContract('ERC20', token.token, signer);
 }
