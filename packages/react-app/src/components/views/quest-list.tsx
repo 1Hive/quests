@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
-import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE, QUESTS_PAGE_SIZE } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -12,9 +12,8 @@ import { useQuestsContext } from 'src/contexts/quests.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 
-const batchSize = 3;
 const skeletonQuests: any[] = [];
-for (let i = 0; i < batchSize; i += 1) {
+for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
   skeletonQuests.push(
     <Outset gu16 key={`${i}`}>
       <Quest isLoading />
@@ -32,31 +31,21 @@ export default function QuestList() {
   const { setPage } = usePageContext();
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
-  const refresh = (_filter?: FilterModel) => {
-    if (!isLoading) {
-      setQuests([]);
-      setIsLoading(true);
-      QuestService.fetchQuestsPaging(0, batchSize, _filter ?? filter).then((res) => {
-        setIsLoading(false);
-        setQuests(res);
-        setHasMore(res.length >= batchSize);
-      });
-    }
-  };
-
-  const loadMore = () => {
-    setIsLoading(true);
-    QuestService.fetchQuestsPaging(quests.length, batchSize, filter).then((res) => {
-      setIsLoading(false);
-      setQuests(quests.concat(res));
-      setHasMore(res.length >= batchSize);
-    });
-  };
-
-  const debounceFilter = useCallback(
-    debounce((nextFilter) => refresh(nextFilter), 500),
-    [], // will be created only once initially
-  );
+  useEffect(() => {
+    // const scrollView = document.getElementById('scroll-view');
+    // const handleScroll = (e: WheelEvent) => {
+    //   scrollView!.scrollTo(scrollView!.scrollLeft, scrollView!.scrollTop + e.deltaY / 2);
+    // };
+    // const preventScroll = (e: WheelEvent) => e.preventDefault();
+    // if (!document.onwheel) {
+    //   document.addEventListener('wheel', handleScroll);
+    //   scrollView!.addEventListener('wheel', preventScroll);
+    // }
+    // return () => {
+    //   document.removeEventListener('wheel', handleScroll);
+    //   scrollView!.removeEventListener('wheel', preventScroll);
+    // };
+  }, []);
 
   useEffect(() => {
     debounceFilter(filter);
@@ -75,21 +64,31 @@ export default function QuestList() {
     }
   }, [newQuest]);
 
-  useEffect(() => {
-    const scrollView = document.getElementById('scroll-view');
-    const handleScroll = (e: WheelEvent) => {
-      scrollView!.scrollTo(scrollView!.scrollLeft, scrollView!.scrollTop + e.deltaY / 2);
-    };
-    const preventScroll = (e: WheelEvent) => e.preventDefault();
-    if (!document.onwheel) {
-      document.addEventListener('wheel', handleScroll);
-      scrollView!.addEventListener('wheel', preventScroll);
+  const refresh = (_filter?: FilterModel) => {
+    if (!isLoading) {
+      setQuests([]);
+      setIsLoading(true);
+      QuestService.fetchQuestsPaging(0, QUESTS_PAGE_SIZE, _filter ?? filter).then((res) => {
+        setIsLoading(false);
+        setQuests(res);
+        setHasMore(res.length >= QUESTS_PAGE_SIZE);
+      });
     }
-    return () => {
-      document.removeEventListener('wheel', handleScroll);
-      scrollView!.removeEventListener('wheel', preventScroll);
-    };
-  }, []);
+  };
+
+  const loadMore = () => {
+    setIsLoading(true);
+    QuestService.fetchQuestsPaging(quests.length, QUESTS_PAGE_SIZE, filter).then((res) => {
+      setIsLoading(false);
+      setQuests(quests.concat(res));
+      setHasMore(res.length >= QUESTS_PAGE_SIZE);
+    });
+  };
+
+  const debounceFilter = useCallback(
+    debounce((nextFilter) => refresh(nextFilter), 500),
+    [], // will be created only once initially
+  );
 
   return (
     <InfiniteScroll

@@ -4,7 +4,7 @@ import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { TOKENS } from './constants';
 import { NetworkModel } from './models/network.model';
 
-const networks = {
+export const networks = {
   mainnet: {
     chainId: 1,
     name: 'Mainnet',
@@ -14,6 +14,7 @@ const networks = {
     subgraph: '',
     defaultToken: TOKENS.HoneyTest,
     nativeToken: TOKENS.Ether,
+    stableToken: TOKENS.Thether,
     isTestNetwork: false,
   },
   rinkeby: {
@@ -22,7 +23,7 @@ const networks = {
     type: 'rinkeby',
     explorerBase: 'https://rinkeby.etherscan.io/tx',
     defaultEthNode: 'https://rinkeby.eth.aragon.network/',
-    questSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
     celesteSubgraph: 'https://iapi.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
@@ -47,6 +48,7 @@ const networks = {
     govern: '', // TODO : When govern will be on xDai
     defaultToken: TOKENS.Honey,
     nativeToken: TOKENS.xDAI,
+    stableToken: TOKENS.xDAI,
     isTestNetwork: false,
   },
   local: {

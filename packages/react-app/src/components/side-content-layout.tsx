@@ -5,37 +5,21 @@ import styled from 'styled-components';
 import { BREAKPOINTS } from '../styles/breakpoints';
 
 const WrapperStyled = styled.div`
-  //display: flex;
-  justify-content: space-evenly;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: repeat(2, 1fr);
   grid-template-areas:
-    'main main main sd'
-    'ft ft ft ft';
+    'm m m s'
+    'm m m s'
+    'f f f f';
+  height: calc(100vh - 64px);
+  overflow-y: auto;
 `;
 
-// display: grid;
-// grid-template-columns: repeat(2, 1fr);
-// grid-auto-rows: minmax(100px, auto);
-// grid-template-areas:
-//   'hd hd hd hd   hd   hd   hd   hd   hd'
-//   'main main main main main main sd sd sd'
-//   'ft ft ft ft   ft   ft   ft   ft   ft';
-
-const MainBlockStyled = styled.div`
-  /* width: ${({ twoCol }: any) => (twoCol ? '75' : '90')}%;
-  height: ${({ twoRow }: any) => (twoRow ? '75' : '90')}%; */
-  grid-area: main;
-  width: 90%;
-`;
 const SideBlockStyled = styled.div`
-  grid-area: sd;
-  width: 75%;
+  grid-area: s;
 `;
 
-const FooterBlockStyled = styled.div`
-  grid-area: ft;
+const FooterStyled = styled.div`
+  grid-area: f;
 `;
 
 const ScrollViewStyled = styled.div`
@@ -49,6 +33,7 @@ const ScrollViewStyled = styled.div`
   scrollbar-width: none; /* Firefox */
   height: calc(100vh - 64px);
   padding: ${GUpx(3)} 0;
+  grid-area: m;
 `;
 
 type Props = {
@@ -66,13 +51,15 @@ function SideContentLayout({ main, side, footer }: Props) {
   //   setTwoRow(vw >= BREAKPOINTS.large);
   // }, [vw]);
   return (
-    <WrapperStyled>
-      <MainBlockStyled>
+    <>
+      <WrapperStyled>
         <ScrollViewStyled id="scroll-view">{main}</ScrollViewStyled>
-      </MainBlockStyled>
-      <SideBlockStyled>{side}</SideBlockStyled>
-      <FooterBlockStyled>{footer}</FooterBlockStyled>
-    </WrapperStyled>
+        <SideBlockStyled>{side}</SideBlockStyled>
+        <FooterStyled>
+          <div style={{ height: '100px', backgroundColor: 'black' }}>footer</div>
+        </FooterStyled>
+      </WrapperStyled>
+    </>
   );
 }
 
