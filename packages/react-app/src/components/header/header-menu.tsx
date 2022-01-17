@@ -1,7 +1,5 @@
 import { GU, Link, useTheme } from '@1hive/1hive-ui';
 import styled from 'styled-components';
-import { FaBug } from 'react-icons/fa';
-import Separator from '../utils/separator';
 // #region StyledComponents
 
 const HeaderNavStyled = styled.nav`

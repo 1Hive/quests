@@ -1,8 +1,6 @@
-import { useViewport } from '@1hive/1hive-ui';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { BREAKPOINTS } from '../styles/breakpoints';
 
 const WrapperStyled = styled.div`
   display: grid;
@@ -43,21 +41,12 @@ type Props = {
 };
 
 function SideContentLayout({ main, side, footer }: Props) {
-  // const { width: vw } = useViewport();
-  // const [twoCol, setTwoCol] = useState(true);
-  // const [twoRow, setTwoRow] = useState(true);
-  // useEffect(() => {
-  //   setTwoCol(vw >= BREAKPOINTS.large);
-  //   setTwoRow(vw >= BREAKPOINTS.large);
-  // }, [vw]);
   return (
     <>
       <WrapperStyled>
         <ScrollViewStyled id="scroll-view">{main}</ScrollViewStyled>
         <SideBlockStyled>{side}</SideBlockStyled>
-        <FooterStyled>
-          <div style={{ height: '100px', backgroundColor: 'black' }}>footer</div>
-        </FooterStyled>
+        <FooterStyled>{footer}</FooterStyled>
       </WrapperStyled>
     </>
   );

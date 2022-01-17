@@ -1,13 +1,20 @@
-import { useTheme, GU } from '@1hive/1hive-ui';
-import { Link } from 'react-router-dom';
+import { useTheme, GU, Link } from '@1hive/1hive-ui';
 import styled from 'styled-components';
 
 // #region StyledComponent
 
+const FooterWrapper = styled.div`
+  display: flex;
+  background-color: #35425e;
+  column-gap: 150px;
+  justify-content: center;
+  box-shadow: rgb(0 0 0 / 5%) 3px -2px 0px;
+  position: relative;
+  padding: 40px 24px;
+`;
+
 const FooterColumn = styled.div`
-  flex: 33.33%;
   text-align: center;
-  padding-top: 75px;
 `;
 
 const FooterTitle = styled.div`
@@ -25,11 +32,6 @@ const FooterLinkStyled = styled(Link)`
   align-items: center;
   justify-content: space-between;
   text-decoration: none;
-`;
-
-const FooterWrapper = styled.div`
-  display: flex;
-  background-color: red;
 `;
 
 // #endregion
