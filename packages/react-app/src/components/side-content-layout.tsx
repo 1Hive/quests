@@ -1,19 +1,22 @@
-import React from 'react';
+import { useViewport } from '@1hive/1hive-ui';
+import React, { useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
+import { BREAKPOINTS } from '../styles/breakpoints';
 
 const WrapperStyled = styled.div`
   display: grid;
-  grid-template-areas:
-    'm m m s'
-    'm m m s'
-    'f f f f';
+  grid-template-areas: ${(props: any) =>
+    props.twoCol ? "'m m s'\n'm m s'\n'f f f'" : "'s s s'\n'm m m'\n'f f f'"};
+
   height: calc(100vh - 64px);
   overflow-y: auto;
 `;
 
 const SideBlockStyled = styled.div`
   grid-area: s;
+  padding: ${GUpx(4)} ${GUpx(6)};
+  padding-left: 0;
 `;
 
 const FooterStyled = styled.div`
@@ -30,7 +33,7 @@ const ScrollViewStyled = styled.div`
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
   height: calc(100vh - 64px);
-  padding: ${GUpx(3)} 0;
+  padding: ${GUpx(4)};
   grid-area: m;
 `;
 
@@ -41,9 +44,14 @@ type Props = {
 };
 
 function SideContentLayout({ main, side, footer }: Props) {
+  const { width: vw } = useViewport();
+  const [twoCol, setTwoCol] = useState(true);
+  useEffect(() => {
+    setTwoCol(vw >= BREAKPOINTS.large);
+  }, [vw]);
   return (
     <>
-      <WrapperStyled>
+      <WrapperStyled twoCol={twoCol}>
         <ScrollViewStyled id="scroll-view">{main}</ScrollViewStyled>
         <SideBlockStyled>{side}</SideBlockStyled>
         <FooterStyled>{footer}</FooterStyled>

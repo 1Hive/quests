@@ -13,7 +13,7 @@ import { Outset } from './utils/spacer-util';
 const BoxStyled = styled(Box)`
   width: 100%;
   min-width: fit-content;
-  margin: ${GUpx(5)} 0;
+  margin: ${GUpx(2)};
 `;
 
 // #endregion
