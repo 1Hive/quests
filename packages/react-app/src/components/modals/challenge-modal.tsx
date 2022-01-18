@@ -30,6 +30,7 @@ const FormStyled = styled(Form)`
 
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx()};
+  width: fit-content;
 `;
 
 const HeaderStyled = styled.div`

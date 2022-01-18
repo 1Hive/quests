@@ -30,6 +30,7 @@ import TextFieldInput from '../field-input/text-field-input';
 
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx()};
+  width: fit-content;
 `;
 
 const HeaderStyled = styled.div`

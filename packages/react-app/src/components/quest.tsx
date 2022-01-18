@@ -279,7 +279,6 @@ export default function Quest({
   const fetchBalanceOfQuest = (account: string, address: string, token: TokenModel | string) => {
     QuestService.getBalanceOf(account, token, address)
       .then((result) => {
-        console.log({ result });
         data.bounty = result ?? undefined;
         processQuestState(data);
         setBounty(result);

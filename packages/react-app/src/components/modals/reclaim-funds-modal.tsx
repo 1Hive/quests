@@ -18,6 +18,7 @@ import IdentityBadge from '../identity-badge';
 
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx()};
+  width: fit-content;
 `;
 
 type Props = {

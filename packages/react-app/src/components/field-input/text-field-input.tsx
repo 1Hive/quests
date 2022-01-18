@@ -94,7 +94,7 @@ export default function TextFieldInput({
       rows={rows}
     />
   ) : (
-    <div style={{ ...css, fontSize }}>
+    <div style={{ ...css, fontSize }} className="p-event-all">
       {maxLine ? (
         <div>
           <MaxHeightStyled maxLine={maxLine}>{readOnlyContent}</MaxHeightStyled>

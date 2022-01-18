@@ -27,6 +27,7 @@ const FormStyled = styled(Form)`
 
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx()};
+  width: fit-content;
 `;
 
 // #endregion
@@ -60,6 +61,7 @@ export default function ScheduleClaimModal({
   };
 
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
+    console.log({ values });
     try {
       setLoading(true);
       const { governQueueAddress } = getNetwork();
@@ -224,7 +226,7 @@ export default function ScheduleClaimModal({
                   compact
                 />
                 <AmountFieldInputFormik
-                  id="claimAmount"
+                  id="claimedAmount"
                   isEdit
                   label="Claim amount"
                   tooltip="Claim amount"

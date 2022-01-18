@@ -258,13 +258,11 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
 
   return Promise.all(
     res
-      .filter(
-        (x) =>
-          x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase() &&
-          (x.state === ENUM_CLAIM_STATE.Scheduled || x.state === ENUM_CLAIM_STATE.Challenged),
-      )
-      .map(async (x) => {
-        const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);
+      .filter((x) => x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase())
+      .map(async (container) => {
+        const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(
+          container.payload,
+        );
         let evidence: string | undefined;
         try {
           evidence = await getObjectFromIpfs(evidenceIpfsHash);
@@ -285,11 +283,17 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           evidence,
           playerAddress,
           questAddress: quest.address,
-          state: x.state,
-          executionTimeMs: +x.payload.executionTime * 1000, // Sec to MS
-          container: x,
+          state: container.state,
+          executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
+          container,
         } as ClaimModel;
       }),
+  ).then((claims) =>
+    claims.sort(
+      (a: ClaimModel, b: ClaimModel) =>
+        Object.values(ENUM_CLAIM_STATE).indexOf(a.state!) -
+        Object.values(ENUM_CLAIM_STATE).indexOf(b.state!),
+    ),
   );
 }
 
@@ -443,7 +447,6 @@ export async function getBalanceOf(
     let tokenInfo: TokenModel;
     if (typeof token === 'string') tokenInfo = (await getTokenInfo(token)) as TokenModel;
     else tokenInfo = token;
-    console.log({ isString: typeof token === 'string' });
     if (tokenInfo) {
       const erc20Contract = getERC20Contract(tokenInfo, walletAddress);
       if (!erc20Contract) return null;
@@ -523,7 +526,7 @@ export async function resolveClaimChallenge(
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
   const { defaultGazFees } = getNetwork();
-  const tx = await governQueueContract.resolveClaimChallenge(container, dispute.id, defaultGazFees);
+  const tx = await governQueueContract.resolve(container, dispute.id, defaultGazFees);
   return handleTransaction(tx, onTx);
 }
 
