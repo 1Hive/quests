@@ -28,13 +28,18 @@ function setLogLevel(level: LogLevels) {
   console.debug(`Log level set to ${Object.keys[logLevel]}`);
 }
 
-function registerAndCall(fn: Function, args: any[]) {
-  const findResult = args.find((x) => typeof x.message === 'string');
-  const arg = findResult?.message ?? JSON.stringify(args);
-  const key = `${fn.name}-${arg}`;
+function registerAndCall(_this: any, fn: Function, message: any, args: any[]) {
+  let identifier: string;
+  if (message instanceof Error) {
+    identifier = message.message;
+  } else {
+    identifier = JSON.stringify({ message, args });
+  }
+  const key = `${logLevel}-${fn.name}-${identifier}`;
   if (!callMap.has(key)) {
-    callMap.set(key, arg);
-    return fn;
+    callMap.set(key, { message, args });
+    if (args.length) return fn.call(_this, message, args);
+    return fn.call(_this, message);
   }
   return noop;
 }
@@ -47,9 +52,12 @@ export const Logger = {
   setLogLevel,
 };
 export const LoggerOnce = {
-  debug: (...args: any[]) => registerAndCall(debug, args),
-  info: (...args: any[]) => registerAndCall(info, args),
-  warn: (...args: any[]) => registerAndCall(warn, args),
-  error: (...args: any[]) => registerAndCall(error, args),
-  setLogLevel: (...args: any[]) => registerAndCall(setLogLevel, args),
+  debug: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, debug, message, optionalParams),
+  info: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, info, message, optionalParams),
+  warn: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, warn, message, optionalParams),
+  error: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, error, message, optionalParams),
 };

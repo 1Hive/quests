@@ -47,15 +47,13 @@ function getContract(
     const contractAbi = askedContract.abi ?? askedContract;
     const provider = getDefaultProvider();
 
-    if (!contractAddress)
-      throw new ContractInstanceError(contractName, `${contractName} address was not defined`);
-    if (!contractAbi)
-      throw new ContractInstanceError(contractName, `${contractName} ABI was not defined`);
+    if (!contractAddress) throw new Error(`${contractName} address was not defined`);
+    if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
 
     // Check if wallet chain is same as app
     const { chainId, name } = getNetwork();
-    if (toNumber(provider?.chainId) !== chainId) {
-      LoggerOnce.error(new Error(`Wallet not connected to ${name}`));
+    if (toNumber(provider?.provider?.chainId) !== chainId) {
+      LoggerOnce.error(`Wallet not connected to ${name}. Wait for wallet to connect`);
       return null;
     }
 
@@ -91,6 +89,7 @@ export function getERC20Contract(
 export async function getTokenInfo(tokenAddress: string) {
   try {
     const tokenContract = getContract('ERC20', tokenAddress);
+
     if (tokenContract) {
       const symbol = await tokenContract.symbol();
       const decimals = await tokenContract.decimals();

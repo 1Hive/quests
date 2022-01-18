@@ -440,17 +440,18 @@ export async function getBalanceOf(
   address: string,
 ): Promise<TokenAmountModel | null> {
   try {
-    let tokenModel: TokenModel;
-    if (typeof token === 'string') tokenModel = (await getTokenInfo(token)) as TokenModel;
-    else tokenModel = token;
-    if (tokenModel) {
-      const erc20Contract = getERC20Contract(tokenModel.token, walletAddress);
+    let tokenInfo: TokenModel;
+    if (typeof token === 'string') tokenInfo = (await getTokenInfo(token)) as TokenModel;
+    else tokenInfo = token;
+    console.log({ isString: typeof token === 'string' });
+    if (tokenInfo) {
+      const erc20Contract = getERC20Contract(tokenInfo, walletAddress);
       if (!erc20Contract) return null;
       const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
-      tokenModel.amount = balance.toString();
+      tokenInfo.amount = balance.toString();
       return {
-        token: tokenModel,
-        parsedAmount: fromBigNumber(balance, tokenModel.decimals),
+        token: tokenInfo,
+        parsedAmount: fromBigNumber(balance, tokenInfo.decimals),
       };
     }
   } catch (error) {

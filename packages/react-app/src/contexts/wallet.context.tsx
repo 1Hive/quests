@@ -43,7 +43,13 @@ function WalletAugmented({ children }: Props) {
   }, [ethereum]);
 
   const contextValue = useMemo(
-    () => ({ ...wallet, ethers, walletAddress: wallet.account }),
+    () => ({
+      ...wallet,
+      ethers,
+      walletAddress: wallet.account,
+      activateWallet: wallet.activate,
+      deactivateWallet: wallet.deactivate,
+    }),
     [wallet, ethers],
   );
 

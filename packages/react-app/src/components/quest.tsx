@@ -18,10 +18,10 @@ import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
-import { useWallet } from 'use-wallet';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { TokenModel } from 'src/models/token.model';
+import { useWallet } from 'src/contexts/wallet.context';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -137,7 +137,7 @@ export default function Quest({
   onSave = noop,
   css,
 }: Props) {
-  const { walletAddress } = useWallet();
+  const { walletAddress } = useWallet()!;
   const { defaultToken } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
@@ -173,7 +173,7 @@ export default function Quest({
     };
 
     if (!data.rewardToken) setBounty(null);
-    else if (data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
+    else if (data.address) fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
@@ -259,7 +259,7 @@ export default function Quest({
             if (!txReceiptFundQuest?.status || !createdQuestAddress)
               throw new Error('Failed to create quest');
             toast('Operation succeed');
-            fetchBalanceOfQuest(createdQuestAddress, values.bounty.token);
+            fetchBalanceOfQuest(walletAddress, createdQuestAddress, values.bounty.token);
           }
         }
       } catch (e: any) {
@@ -276,9 +276,10 @@ export default function Quest({
     }
   };
 
-  const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
-    QuestService.getBalanceOf(walletAddress, token, address)
+  const fetchBalanceOfQuest = (account: string, address: string, token: TokenModel | string) => {
+    QuestService.getBalanceOf(account, token, address)
       .then((result) => {
+        console.log({ result });
         data.bounty = result ?? undefined;
         processQuestState(data);
         setBounty(result);
@@ -297,8 +298,8 @@ export default function Quest({
 
   const onFundModalClosed = (success: boolean) => {
     setTimeout(() => {
-      if (success && data.address && data.rewardToken) {
-        fetchBalanceOfQuest(data.address, data.rewardToken);
+      if (success && data.address && data.rewardToken && walletAddress) {
+        fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
         setClaimUpdate(claimUpdated + 1);
       }
     }, 500);
@@ -455,7 +456,7 @@ export default function Quest({
                 />
               )}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
-              values.address &&
+              data.address &&
               walletAddress &&
               bounty && (
                 <QuestFooterStyled>
