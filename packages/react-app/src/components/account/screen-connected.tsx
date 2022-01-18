@@ -13,13 +13,10 @@ import { getProviderFromUseWalletId } from '../../ethereum-providers';
 import { useCopyToClipboard } from '../../hooks/use-copy-to-clipboard.hook';
 import { getNetworkName } from '../../utils/web3.utils';
 import IdentityBadge from '../identity-badge';
+import { WalletContextModel } from '../../contexts/wallet.context';
 
 type Props = {
-  wallet: {
-    account: string;
-    activated: string;
-    deactivate: Function;
-  };
+  wallet: WalletContextModel;
 };
 
 function AccountScreenConnected({ wallet }: Props) {
@@ -33,9 +30,9 @@ function AccountScreenConnected({ wallet }: Props) {
     id: undefined,
   };
 
-  const handleCopyAddress = useCallback(() => copy(wallet.account), [copy, wallet]);
+  const handleCopyAddress = useCallback(() => copy(wallet.walletAddress), [copy, wallet]);
 
-  const handleDeactivate = useCallback(() => wallet.deactivate(), [wallet]);
+  const handleDeactivate = useCallback(() => wallet.deactivateWallet(), [wallet]);
 
   return (
     <div
@@ -113,7 +110,7 @@ function AccountScreenConnected({ wallet }: Props) {
             >
               <IdentityBadge
                 // @ts-ignore
-                entity={wallet.account}
+                entity={wallet.walletAddress}
                 compact
                 badgeOnly
                 // @ts-ignore

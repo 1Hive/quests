@@ -47,32 +47,34 @@ type Props = {
 
 function AccountButton({ onClick }: Props) {
   const theme = useTheme();
-  const wallet = useWallet();
+  const { walletAddress } = useWallet()!;
   return (
-    wallet?.account && (
-      <HeaderModule
-        icon={
-          <AccountButtonContainerStyled>
-            <EthIdenticon address={wallet.account} radius={RADIUS} />
-            <AccountButtonBackgroundStyled
-              background={theme.positive}
-              borderColor={theme.surface}
-            />
-          </AccountButtonContainerStyled>
-        }
-        content={
-          <>
-            <AccountButtonContentStyled>
-              <AccountButtonContentWrapperStyled>
-                {shortenAddress(wallet.account)}
-              </AccountButtonContentWrapperStyled>
-            </AccountButtonContentStyled>
-            <ConnectedLabelStyled theme={theme}>Connected</ConnectedLabelStyled>
-          </>
-        }
-        onClick={onClick}
-      />
-    )
+    <>
+      {walletAddress && (
+        <HeaderModule
+          icon={
+            <AccountButtonContainerStyled>
+              <EthIdenticon address={walletAddress} radius={RADIUS} />
+              <AccountButtonBackgroundStyled
+                background={theme.positive}
+                borderColor={theme.surface}
+              />
+            </AccountButtonContainerStyled>
+          }
+          content={
+            <>
+              <AccountButtonContentStyled>
+                <AccountButtonContentWrapperStyled>
+                  {shortenAddress(walletAddress)}
+                </AccountButtonContentWrapperStyled>
+              </AccountButtonContentStyled>
+              <ConnectedLabelStyled theme={theme}>Connected</ConnectedLabelStyled>
+            </>
+          }
+          onClick={onClick}
+        />
+      )}
+    </>
   );
 }
 

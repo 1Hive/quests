@@ -63,7 +63,7 @@ export default function ClaimList({
   challengeDeposit,
   questTotalBounty,
 }: Props) {
-  const wallet = useWallet();
+  const { walletAddress } = useWallet()!;
   const [claims, setClaims] = useState<ClaimModel[]>();
   const [currentPlayerClaim, setCurrentPlayerClaim] = useState<ClaimModel | null>();
 
@@ -72,13 +72,13 @@ export default function ClaimList({
   }, []);
 
   useEffect(() => {
-    if (wallet.account) {
+    if (walletAddress) {
       if (claims) {
-        const result = claims.find((x) => x.playerAddress === wallet.account);
+        const result = claims.find((x) => x.playerAddress === walletAddress);
         setCurrentPlayerClaim(result ?? null);
       }
     }
-  }, [claims, wallet.account]);
+  }, [claims, walletAddress]);
 
   useEffect(() => {
     if (!claims) fetchClaims();
@@ -144,7 +144,7 @@ export default function ClaimList({
             <Accordion
               items={claims.map((x: ClaimModel) => [
                 <RowStyled>
-                  <Field label={wallet?.account === x.playerAddress ? 'You' : 'Claiming player'}>
+                  <Field label={walletAddress === x.playerAddress ? 'You' : 'Claiming player'}>
                     <AddressField address={x.playerAddress} autofocus={false} />
                   </Field>
                   <AmountFieldInput
@@ -157,7 +157,7 @@ export default function ClaimList({
                         : questTotalBounty
                     }
                   />
-                  {wallet?.account && currentPlayerClaim !== undefined && actionButton(x)}
+                  {walletAddress && currentPlayerClaim !== undefined && actionButton(x)}
                 </RowStyled>,
                 <Outset gu8>
                   <TextFieldInput

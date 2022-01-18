@@ -6,12 +6,12 @@ import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { NETWORK_TOKENS } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
-import { getTokenInfo } from 'src/hooks/use-contract.hook';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
 import { fetchRewardTokens } from 'src/services/quest.service';
 import { arrayDistinctBy } from 'src/utils/array.util';
+import { getTokenInfo } from 'src/utils/contract.util';
 import { GUpx } from 'src/utils/css.util';
 import { Logger } from 'src/utils/logger';
 import { floorNumber } from 'src/utils/math.utils';
@@ -101,7 +101,7 @@ function AmountFieldInput({
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount ?? 0);
   const [token, setToken] = useState<TokenModel>(value?.token ?? defaultToken);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
-  const wallet = useWallet();
+  const { walletAddress } = useWallet()!;
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
@@ -117,11 +117,11 @@ function AmountFieldInput({
     document.addEventListener(
       'focusin',
       () => {
-        if (wallet.account && isEdit && !value?.token) fetchAvailableTokens();
+        if (walletAddress && isEdit && !value?.token) fetchAvailableTokens();
       },
       true,
     );
-  }, [wallet.account, document.activeElement]);
+  }, [walletAddress, document.activeElement]);
 
   useEffect(() => {
     if (availableTokens.length) {

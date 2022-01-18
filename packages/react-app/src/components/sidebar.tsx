@@ -19,7 +19,7 @@ const BoxStyled = styled(Box)`
 // #endregion
 
 export default function Sidebar() {
-  const { account } = useWallet();
+  const { walletAddress } = useWallet()!;
   const { page } = usePageContext();
   return (
     <>
@@ -28,7 +28,7 @@ export default function Sidebar() {
           <Outset gu8>
             {page === ENUM_PAGES.List && (
               <>
-                {account && (
+                {walletAddress && (
                   <>
                     <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
                     <Outset gu16 />

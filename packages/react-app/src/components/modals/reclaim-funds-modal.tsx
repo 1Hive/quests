@@ -2,7 +2,6 @@ import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
-import { useQuestContract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { QuestModel } from 'src/models/quest.model';
@@ -10,6 +9,7 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
 import Skeleton from 'react-loading-skeleton';
+import { useWallet } from 'src/contexts/wallet.context';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -34,36 +34,48 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   );
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext()!;
-  const questContract = useQuestContract(questData.address, true);
+
+  const { walletAddress } = useWallet()!;
   const toast = useToast();
 
   useEffect(() => {
-    if (questContract.instance?.address && !fallbackAddress) {
-      questContract.instance.fundsRecoveryAddress().then(setFallbackAddress);
+    if (!fallbackAddress && questData.address && walletAddress) {
+      QuestService.getQuestRecoveryAddress(questData.address).then((x) => {
+        setFallbackAddress(x ?? undefined);
+      });
     }
-  }, [questContract.instance?.address]);
+  }, [walletAddress]);
 
   const reclaimFundTx = async () => {
     try {
       setLoading(true);
       const pendingMessage = 'Reclaiming unused fund...';
       toast(pendingMessage);
-      const txReceipt = await QuestService.reclaimQuestUnusedFunds(questContract!, (tx) => {
-        pushTransaction({
-          hash: tx,
-          estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
-          pendingMessage,
-          status: ENUM_TRANSACTION_STATUS.Pending,
+      const txReceipt = await QuestService.reclaimQuestUnusedFunds(
+        walletAddress,
+        questData,
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
+            pendingMessage,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          });
+        },
+      );
+      if (txReceipt) {
+        updateTransactionStatus({
+          hash: txReceipt.transactionHash,
+          status: txReceipt.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
         });
-      });
-      updateTransactionStatus({
-        hash: txReceipt.transactionHash,
-        status: txReceipt.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      });
+      } else {
+        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      }
       closeModal(true);
-      if (txReceipt.status) toast('Operation succeed');
+      if (!txReceipt?.status) throw new Error('Failed to reclaim funds');
+      toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
@@ -102,7 +114,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             icon={<IconCoin />}
             label="Reclaim funds"
             mode="strong"
-            disabled={loading || !questContract}
+            disabled={loading || !walletAddress}
           />
         }
         onClose={() => closeModal(false)}

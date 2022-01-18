@@ -1,65 +1,125 @@
-import { Account } from 'ethereumjs-util';
-import { Contract } from 'ethers';
+import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
-import { Logger } from 'src/utils/logger';
-import { ADDRESS_ZERO } from '../constants';
-import ERC20Abi from '../contracts/ERC20.json';
-import GovernQueueAbi from '../contracts/GovernQueue.json';
+// eslint-disable-next-line no-unused-vars
+import { getDefaultProvider } from 'src/utils/web3.utils';
+import { toChecksumAddress, toNumber } from 'web3-utils';
+import { ContractInstanceError } from 'src/models/contract-error';
+import { Logger, LoggerOnce } from 'src/utils/logger';
+import ERC20 from '../contracts/ERC20.json';
+import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
+import Celeste from '../contracts/Celeste.json';
 
 let contracts: any;
 
-// account is not optional
-export function getSigner(ethersProvider: any, account: any) {
-  ethersProvider.getSigner(account);
-  return ethersProvider.getSigner(account).connectUnchecked();
+// walletAddress is not optional
+export function getSigner(ethersProvider: any, walletAddress: any) {
+  ethersProvider.getSigner(walletAddress);
+  return ethersProvider.getSigner(walletAddress).connectUnchecked();
 }
 
-// account is optional
-export function getProviderOrSigner(ethersProvider: any, account: any) {
-  return account ? getSigner(ethersProvider, account) : ethersProvider;
+// walletAddress is optional
+export function getProviderOrSigner(ethersProvider: any, walletAddress?: string) {
+  return walletAddress ? getSigner(ethersProvider, walletAddress) : ethersProvider;
 }
 
-function getContractsJson(network: any) {
+function getContractsJson(network?: any) {
+  network = network ?? getNetwork();
   return {
     ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
-    GovernQueue: GovernQueueAbi,
-    ERC20: ERC20Abi,
+    GovernQueue,
+    ERC20,
+    Celeste,
   };
 }
 
-// account is optional
-// returns null on errors
-function getContract(contractName: string, addressOverride?: string, signer?: Account) {
-  const ethers = undefined;
-  const network = getNetwork();
-  contracts = getContractsJson(network);
-  const askedContract = contracts[contractName];
-  const contractAddress = addressOverride ?? askedContract.address;
-  const contractAbi = askedContract.abi ?? askedContract;
-  if (!contractAddress) Logger.warn('Address was not defined for contract ', contractName);
-  if (!contractAddress || !contractAbi) return null;
+function getContract(
+  contractName: string,
+  questAddressOverride?: string,
+  walletAddress?: string,
+): Contract | null {
   try {
-    if (!contractAddress || contractAddress === ADDRESS_ZERO) {
-      throw Error(`Invalid 'address' parameter '${contractAddress}'.`);
+    const network = getNetwork();
+    if (!contracts) contracts = getContractsJson(network);
+    const askedContract = contracts[contractName];
+    const contractAddress = questAddressOverride ?? askedContract.address;
+    const contractAbi = askedContract.abi ?? askedContract;
+    const provider = getDefaultProvider();
+
+    if (!contractAddress)
+      throw new ContractInstanceError(contractName, `${contractName} address was not defined`);
+    if (!contractAbi)
+      throw new ContractInstanceError(contractName, `${contractName} ABI was not defined`);
+
+    // Check if wallet chain is same as app
+    const { chainId, name } = getNetwork();
+    if (toNumber(provider?.chainId) !== chainId) {
+      LoggerOnce.error(new Error(`Wallet not connected to ${name}`));
+      return null;
     }
-    const signerOrProvider = ethers && signer ? getProviderOrSigner(ethers, signer) : undefined;
-    return new Contract(contractAddress, contractAbi, signerOrProvider);
+
+    return new Contract(contractAddress, contractAbi, getProviderOrSigner(provider, walletAddress));
   } catch (error) {
-    Logger.error('Failed to get contract', error);
-    return null;
+    throw new ContractInstanceError(
+      contractName,
+      `Failed to instanciate contract <${contractName}>`,
+      error,
+    );
   }
 }
 
-export function getQuestFactoryContract() {
-  return getContract('QuestFactory');
+// #region Public
+
+export function getQuestFactoryContract(walletAddress: string) {
+  return getContract('QuestFactory', undefined, walletAddress);
 }
 
-export function getGovernQueueContract() {
-  return getContract('GovernQueue');
+export function getGovernQueueContract(walletAddress: string): Contract | null {
+  const { governQueueAddress } = getNetwork();
+  return getContract('GovernQueue', governQueueAddress, walletAddress);
 }
 
-export function getERC20Contract(token: TokenModel, signer?: Account) {
-  return getContract('ERC20', token.token, signer);
+export function getERC20Contract(
+  token: TokenModel | string,
+  walletAddress?: string,
+): Contract | null {
+  const tokenAddress = typeof token === 'string' ? token : token?.token;
+  return getContract('ERC20', tokenAddress, walletAddress);
 }
+
+export async function getTokenInfo(tokenAddress: string) {
+  try {
+    const tokenContract = getContract('ERC20', tokenAddress);
+    if (tokenContract) {
+      const symbol = await tokenContract.symbol();
+      const decimals = await tokenContract.decimals();
+      const name = await tokenContract.name();
+      return {
+        symbol,
+        decimals,
+        name,
+        amount: BigNumber.from(0).toString(),
+        token: toChecksumAddress(tokenAddress),
+      } as TokenModel;
+    }
+  } catch (error) {
+    Logger.error(error);
+  }
+  return tokenAddress;
+}
+
+export function getQuestContract(questAddress: string, walletAddress?: string): Contract | null {
+  return getContract('Quest', questAddress, walletAddress);
+}
+
+export function getCelesteContract() {
+  const { celesteAddress } = getNetwork();
+  return getContract('Celeste', celesteAddress);
+}
+
+export function getQuestContractInterface() {
+  return new ethers.utils.Interface(getContractsJson().Quest.abi);
+}
+
+// #endregion

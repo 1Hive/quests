@@ -16,17 +16,3 @@ export class ContractInstanceError implements Error {
 
   args?: any[];
 }
-
-export class NullableContract {
-  constructor(input: Contract | ContractInstanceError) {
-    if (input instanceof Contract) {
-      this.instance = input;
-    } else {
-      this.error = input;
-    }
-  }
-
-  instance?: Contract;
-
-  error?: ContractInstanceError;
-}
