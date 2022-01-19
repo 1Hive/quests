@@ -17,7 +17,8 @@ import Footer from './footer';
 
 const MainViewStyled = styled.div`
   ${(props: any) =>
-    props.currentTheme === 'dark'
+    // eslint-disable-next-line no-underscore-dangle
+    props.currentTheme._appearance === 'dark'
       ? `
       background: #1a3a6d;  /* fallback for old browsers */
       background: -webkit-linear-gradient(-45deg, #1a3a6d, #373B44);  /* Chrome 10-25, Safari 5.1-6 */
@@ -48,16 +49,16 @@ type Props = {
 };
 
 function MainView({ children, toggleTheme, currentTheme }: Props) {
-  const wallet = useWallet();
+  const { activateWallet, walletAddress } = useWallet();
   useEffect(() => {
     const tryConnect = async () => {
       try {
-        if (await isConnected()) wallet.activate().catch(Logger.error);
+        if (await isConnected()) activateWallet().catch(Logger.error);
       } catch (error) {
         Logger.error(error);
       }
     };
-    if (!wallet.account) tryConnect();
+    if (!walletAddress) tryConnect();
   }, []);
 
   return (

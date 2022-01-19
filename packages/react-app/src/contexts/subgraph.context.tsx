@@ -36,6 +36,6 @@ function SubgraphProvider({ children }: Props) {
   );
 }
 
-const useSubgraph = () => React.useContext(SubgraphContext);
+const useSubgraph = () => React.useContext(SubgraphContext)!;
 
 export { SubgraphProvider, useSubgraph };

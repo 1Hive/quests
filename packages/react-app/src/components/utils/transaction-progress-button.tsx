@@ -39,7 +39,7 @@ const NotificationButtonStyled = styled(Button)`
 
 export function TransactionProgressButton() {
   const { explorerBase } = getNetwork();
-  const { newTransaction, updatedTransactionStatus } = useTransactionContext()!;
+  const { newTransaction, updatedTransactionStatus } = useTransactionContext();
   const [txOpened, setTxOpened] = useState(false);
   const [txList, setTxList] = useState<TransactionModel[]>([]);
   const [notifCount, setNotifCount] = useState(0);

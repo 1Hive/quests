@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 import { noop } from 'lodash';
+import { string } from 'prop-types';
 
 // eslint-disable-next-line no-shadow
 export enum LogLevels {
@@ -13,6 +14,7 @@ export enum LogLevels {
 }
 
 let logLevel: LogLevels = process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG;
+const callMap = new Map<string, any>();
 console.log('logLevel', logLevel);
 
 const debug =
@@ -26,10 +28,36 @@ function setLogLevel(level: LogLevels) {
   console.debug(`Log level set to ${Object.keys[logLevel]}`);
 }
 
+function registerAndCall(_this: any, fn: Function, message: any, args: any[]) {
+  let identifier: string;
+  if (message instanceof Error) {
+    identifier = message.message;
+  } else {
+    identifier = JSON.stringify({ message, args });
+  }
+  const key = `${logLevel}-${fn.name}-${identifier}`;
+  if (!callMap.has(key)) {
+    callMap.set(key, { message, args });
+    if (args.length) return fn.call(_this, message, args);
+    return fn.call(_this, message);
+  }
+  return noop;
+}
+
 export const Logger = {
   debug,
   info,
   warn,
   error,
   setLogLevel,
+};
+export const LoggerOnce = {
+  debug: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, debug, message, optionalParams),
+  info: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, info, message, optionalParams),
+  warn: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, warn, message, optionalParams),
+  error: (message?: any, ...optionalParams: any[]) =>
+    registerAndCall(this, error, message, optionalParams),
 };

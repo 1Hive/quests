@@ -114,14 +114,15 @@ export const ENUM_PAGES = {
 };
 
 export const ENUM_CLAIM_STATE = {
+  None: 'None',
+  Scheduled: 'Scheduled',
+  Challenged: 'Challenged',
+  // Final states
   Approved: 'Approved',
   Cancelled: 'Cancelled',
-  Vetoed: 'Vetoed',
-  Challenged: 'Challenged',
   Executed: 'Executed',
-  None: 'None',
+  Vetoed: 'Vetoed',
   Rejected: 'Rejected',
-  Scheduled: 'Scheduled',
 };
 
 export const ENUM_TRANSACTION_STATUS = {

@@ -19,8 +19,8 @@ import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/css.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
+import { getCelesteContract, getGovernQueueContract } from 'src/utils/contract.util';
 import ModalBase, { ModalCallback } from './modal-base';
-import { useCelesteContract, useGovernQueueContract } from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
 import { DisputeModel } from '../../models/dispute.model';
@@ -30,6 +30,7 @@ import TextFieldInput from '../field-input/text-field-input';
 
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx()};
+  width: fit-content;
 `;
 
 const HeaderStyled = styled.div`
@@ -83,6 +84,7 @@ type Props = {
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
   const toast = useToast();
+  const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
@@ -90,10 +92,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
-  const governQueueContract = useGovernQueueContract();
-  const celesteContract = useCelesteContract();
-  const wallet = useWallet();
+    useTransactionContext();
+  const governQueueContract = getGovernQueueContract(walletAddress);
+  const celesteContract = getCelesteContract();
 
   useEffect(() => {
     const fetchChallengeAndDispute = async () => {
@@ -104,7 +105,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           throw new Error(`Failed to fetch challenge with container id ${claim.container.id}`);
         setChallenge(challengeResult);
         if (challengeResult) {
-          setDispute(await QuestService.fetchChallengeDispute(celesteContract, challengeResult));
+          const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
+          setDispute(disputeModel ?? undefined);
         }
         setLoading(false);
       }
@@ -123,9 +125,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   useEffect(() => {
     if (challenge && claim)
       setIsStackholder(
-        challenge.challengerAddress === wallet.account || claim.playerAddress === wallet.account,
+        challenge.challengerAddress === walletAddress || claim.playerAddress === walletAddress,
       );
-  }, [claim, challenge, wallet.account]);
+  }, [claim, challenge, walletAddress]);
 
   const resolveChallengeTx = async () => {
     try {
@@ -134,7 +136,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       const pendingMessage = 'Resolving claim challenge...';
       toast(pendingMessage);
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
-        governQueueContract,
+        walletAddress,
         claim.container,
         dispute!,
         (tx) => {
@@ -146,13 +148,15 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           });
         },
       );
-      updateTransactionStatus({
-        hash: challengeTxReceipt.transactionHash!,
-        status: challengeTxReceipt.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      });
-      if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
+      if (challengeTxReceipt) {
+        updateTransactionStatus({
+          hash: challengeTxReceipt.transactionHash!,
+          status: challengeTxReceipt.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+        });
+      }
+      if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
       toast('Operation succeed');
       closeModal(true);
     } catch (e: any) {
@@ -177,7 +181,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     <IdentityBadge
       customLabel="Player"
       entity={claim?.playerAddress}
-      connectedAccount={claim?.playerAddress === wallet.acccount}
+      connectedAccount={claim?.playerAddress === walletAddress}
     />
   );
 
@@ -185,7 +189,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     <IdentityBadge
       customLabel="Challenger"
       entity={challenge?.challengerAddress}
-      connectedAccount={challenge?.challengerAddress === wallet.acccount}
+      connectedAccount={challenge?.challengerAddress === walletAddress}
     />
   );
 
@@ -244,7 +248,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           icon={<IconFlag />}
           label="Resolve"
           mode="positive"
-          disabled={loading || !wallet.account || !isRuled}
+          disabled={loading || !walletAddress || !isRuled}
           onClick={resolveChallengeTx}
           title={isRuled ? 'Publish dispute result' : 'Need to be ruled'}
         />,

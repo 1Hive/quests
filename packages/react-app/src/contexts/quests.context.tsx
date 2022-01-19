@@ -8,7 +8,7 @@ type QuestsContextModel = {
 };
 
 const QuestsContext = createContext<QuestsContextModel | undefined>(undefined);
-export const useQuestsContext = () => useContext(QuestsContext);
+export const useQuestsContext = () => useContext(QuestsContext)!;
 
 type Props = {
   children: React.ReactNode;

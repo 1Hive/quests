@@ -11,7 +11,6 @@ import {
   ENUM_QUEST_STATE,
   ENUM_TRANSACTION_STATUS,
 } from 'src/constants';
-import { useFactoryContract } from 'src/hooks/use-contract.hook';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
@@ -19,10 +18,10 @@ import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
-import { useWallet } from 'use-wallet';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { TokenModel } from 'src/models/token.model';
+import { useWallet } from 'src/contexts/wallet.context';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -138,18 +137,18 @@ export default function Quest({
   onSave = noop,
   css,
 }: Props) {
-  const wallet = useWallet();
+  const { walletAddress } = useWallet();
   const { defaultToken } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimUpdated, setClaimUpdate] = useState(0);
-  const { pushTransaction, updateTransactionStatus } = useTransactionContext()!;
+  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
+    useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
-  const questFactoryContract = useFactoryContract();
 
   useEffect(() => {
     setIsEdit(
@@ -174,12 +173,12 @@ export default function Quest({
     };
 
     if (!data.rewardToken) setBounty(null);
-    else if (data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
+    else if (data.address) fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
     }
-  }, [questMode, data.rewardToken, wallet.account]);
+  }, [questMode, data.rewardToken, walletAddress]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -190,12 +189,6 @@ export default function Quest({
       errors.push('Validation : Expiration have to be later than now');
     if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
     else if (values.bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
-    if (!questFactoryContract) {
-      Logger.error(
-        `Error : failed to instanciate contract <questFactoryContract>, enable verbose to see error`,
-      );
-      return;
-    }
 
     if (errors.length) {
       errors.forEach(toast);
@@ -203,22 +196,17 @@ export default function Quest({
       setLoading(true);
       let createdQuestAddress: string;
       try {
-        if (!questFactoryContract) {
-          throw new Error(
-            `Failed to instanciate contract <questFactoryContract>, enable verbose to see error`,
-          );
-        }
         // Set noon to prevent rounding form changing date
         const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
         const pendingMessage = 'Creating Quest...';
         toast(pendingMessage);
         const txReceiptSaveQuest = await QuestService.saveQuest(
-          questFactoryContract,
+          walletAddress,
           values.fallbackAddress!,
           {
             ...values,
             expireTimeMs: timeValue,
-            creatorAddress: wallet.account,
+            creatorAddress: walletAddress,
             rewardToken: values.bounty!.token ?? defaultToken,
           },
           undefined,
@@ -231,12 +219,16 @@ export default function Quest({
             });
           },
         );
-        updateTransactionStatus({
-          hash: txReceiptSaveQuest.transactionHash,
-          status: ENUM_TRANSACTION_STATUS.Confirmed,
-        });
+        if (txReceiptSaveQuest) {
+          updateTransactionStatus({
+            hash: txReceiptSaveQuest.transactionHash,
+            status: ENUM_TRANSACTION_STATUS.Confirmed,
+          });
+        } else {
+          updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+        }
         onSave((txReceiptSaveQuest?.events?.[0] as any)?.args?.[0]);
-        if (txReceiptSaveQuest.status) {
+        if (txReceiptSaveQuest?.status) {
           // If no funding needing
           if (!values.bounty?.parsedAmount) toast('Operation succeed');
           else {
@@ -244,7 +236,7 @@ export default function Quest({
             if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
             toast('Sending funds to Quest...');
             const txReceiptFundQuest = await QuestService.fundQuest(
-              wallet.account,
+              walletAddress,
               createdQuestAddress,
               values.bounty!,
               (tx) => {
@@ -256,14 +248,18 @@ export default function Quest({
                 });
               },
             );
-            updateTransactionStatus({
-              hash: txReceiptFundQuest.transactionHash,
-              status: ENUM_TRANSACTION_STATUS.Confirmed,
-            });
             if (txReceiptFundQuest) {
-              toast('Operation succeed');
-              fetchBalanceOfQuest(createdQuestAddress, values.bounty.token);
+              updateTransactionStatus({
+                hash: txReceiptFundQuest.transactionHash,
+                status: ENUM_TRANSACTION_STATUS.Confirmed,
+              });
+            } else {
+              updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
             }
+            if (!txReceiptFundQuest?.status || !createdQuestAddress)
+              throw new Error('Failed to create quest');
+            toast('Operation succeed');
+            fetchBalanceOfQuest(walletAddress, createdQuestAddress, values.bounty.token);
           }
         }
       } catch (e: any) {
@@ -280,8 +276,8 @@ export default function Quest({
     }
   };
 
-  const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
-    QuestService.getBalanceOf(wallet.account, token, address)
+  const fetchBalanceOfQuest = (account: string, address: string, token: TokenModel | string) => {
+    QuestService.getBalanceOf(account, token, address)
       .then((result) => {
         data.bounty = result ?? undefined;
         processQuestState(data);
@@ -301,8 +297,8 @@ export default function Quest({
 
   const onFundModalClosed = (success: boolean) => {
     setTimeout(() => {
-      if (success && data.address && data.rewardToken) {
-        fetchBalanceOfQuest(data.address, data.rewardToken);
+      if (success && data.address && data.rewardToken && walletAddress) {
+        fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
         setClaimUpdate(claimUpdated + 1);
       }
     }, 500);
@@ -459,8 +455,8 @@ export default function Quest({
                 />
               )}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
-              values.address &&
-              wallet.account &&
+              data.address &&
+              walletAddress &&
               bounty && (
                 <QuestFooterStyled>
                   {values.state === ENUM_QUEST_STATE.Active ? (
@@ -471,7 +467,7 @@ export default function Quest({
                           questAddress={data.address}
                           questTotalBounty={bounty}
                           claimDeposit={claimDeposit}
-                          playerAddress={wallet.account}
+                          playerAddress={walletAddress}
                           onClose={onScheduleModalClosed}
                         />
                       )}
@@ -502,7 +498,7 @@ export default function Quest({
         initialValues={
           {
             ...data,
-            fallbackAddress: data.fallbackAddress ?? wallet.account,
+            fallbackAddress: data.fallbackAddress ?? walletAddress,
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}

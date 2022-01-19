@@ -15,11 +15,6 @@ import { BigNumber } from 'ethers';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenModel } from 'src/models/token.model';
 import ModalBase, { ModalCallback } from './modal-base';
-import {
-  useCelesteContract,
-  useERC20Contract,
-  useGovernQueueContract,
-} from '../../hooks/use-contract.hook';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
@@ -35,6 +30,7 @@ const FormStyled = styled(Form)`
 
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx()};
+  width: fit-content;
 `;
 
 const HeaderStyled = styled.div`
@@ -64,23 +60,17 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [openButtonLabel, setOpenButtonLabel] = useState<string>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
-  const governQueueContract = useGovernQueueContract();
-  const erc20DepositContract = useERC20Contract(challengeDeposit.token);
-  const erc20FeeContract = useERC20Contract(challengeFee?.token);
-  const celesteContract = useCelesteContract();
-  const wallet = useWallet();
+  const { walletAddress } = useWallet();
 
   useEffect(() => {
     const fetchFee = async () => {
-      const feeAmount = await QuestService.fetchChallengeFee(celesteContract);
-      setChallengeFee(feeAmount);
+      const feeAmount = await QuestService.fetchChallengeFee();
+      if (feeAmount) setChallengeFee(feeAmount);
     };
-    if (celesteContract) {
-      fetchFee();
-    }
-  }, [celesteContract.instance?.address]);
+    fetchFee();
+  }, [walletAddress]);
 
   useEffect(() => {
     let handle: any;
@@ -132,7 +122,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           const pendingMessage = 'Approving challenge fee...';
           toast(pendingMessage);
           const approveTxReceipt = await QuestService.approveTokenAmount(
-            erc20FeeContract,
+            walletAddress,
             governQueueAddress,
             challengeFee.token,
             (tx) => {
@@ -144,13 +134,17 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               });
             },
           );
-          updateTransactionStatus({
-            hash: approveTxReceipt.transactionHash!,
-            status: approveTxReceipt.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          });
-          if (!approveTxReceipt.status) throw new Error('Failed to approve fee');
+          if (approveTxReceipt) {
+            updateTransactionStatus({
+              hash: approveTxReceipt.transactionHash!,
+              status: approveTxReceipt.status
+                ? ENUM_TRANSACTION_STATUS.Confirmed
+                : ENUM_TRANSACTION_STATUS.Failed,
+            });
+          } else {
+            updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+          }
+          if (!approveTxReceipt?.status) throw new Error('Failed to approve fee');
         }
         if (+claim.container!.config.challengeDeposit.amount) {
           let tokenToApprove: TokenModel;
@@ -169,7 +163,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           }
           toast(pendingMessage);
           const approveTxReceipt = await QuestService.approveTokenAmount(
-            erc20DepositContract,
+            walletAddress,
             governQueueAddress,
             tokenToApprove,
             (tx) => {
@@ -181,24 +175,28 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               });
             },
           );
-          updateTransactionStatus({
-            hash: approveTxReceipt.transactionHash!,
-            status: approveTxReceipt.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          });
-          if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
+          if (approveTxReceipt) {
+            updateTransactionStatus({
+              hash: approveTxReceipt.transactionHash!,
+              status: approveTxReceipt.status
+                ? ENUM_TRANSACTION_STATUS.Confirmed
+                : ENUM_TRANSACTION_STATUS.Failed,
+            });
+          } else {
+            updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+          }
+          if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
         }
 
         if (!claim.container) throw new Error('Container is not defined');
         const pendingMessage = 'Challenging Quest...';
         toast(pendingMessage);
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
-          governQueueContract,
+          walletAddress,
           {
             reason: values.reason,
             deposit: challengeDeposit,
-            challengerAddress: wallet.account,
+            challengerAddress: walletAddress,
           },
           claim.container,
           (tx) => {
@@ -210,13 +208,17 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             });
           },
         );
-        updateTransactionStatus({
-          hash: challengeTxReceipt.transactionHash!,
-          status: challengeTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-        if (!challengeTxReceipt.status) throw new Error('Failed to challenge the quest');
+        if (challengeTxReceipt) {
+          updateTransactionStatus({
+            hash: challengeTxReceipt.transactionHash!,
+            status: challengeTxReceipt.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          });
+        } else {
+          updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+        }
+        if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
         toast('Operation succeed');
         closeModal(true);
       } catch (e: any) {
@@ -253,14 +255,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               onClick={() => setOpened(true)}
               label={openButtonLabel}
               mode="negative"
-              disabled={
-                !openButtonLabel ||
-                loading ||
-                challengeTimeout ||
-                !erc20DepositContract ||
-                !erc20FeeContract ||
-                !governQueueContract
-              }
+              disabled={!openButtonLabel || loading || challengeTimeout || !walletAddress}
             />
           )}
           {!loading && challengeTimeout === false && claim.executionTimeMs && (

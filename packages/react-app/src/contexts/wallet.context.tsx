@@ -5,10 +5,18 @@ import { getDefaultChain } from '../local-settings';
 import { getNetwork } from '../networks';
 import { getUseWalletConnectors } from '../utils/web3.utils';
 
-const WalletAugmentedContext = React.createContext<any>(undefined);
+export type WalletContextModel = {
+  walletAddress: string;
+  activating: any;
+  deactivateWallet: Function;
+  activateWallet: Function;
+  activated: string;
+};
+
+const WalletAugmentedContext = React.createContext<WalletContextModel | undefined>(undefined);
 
 function useWalletAugmented() {
-  return useContext<any>(WalletAugmentedContext);
+  return useContext<WalletContextModel | undefined>(WalletAugmentedContext)!;
 }
 
 type Props = {
@@ -18,7 +26,6 @@ type Props = {
 // Adds Ethers.js to the useWallet() object
 function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
-
   const { ethereum } = wallet;
 
   const ethers = useMemo(() => {
@@ -35,7 +42,16 @@ function WalletAugmented({ children }: Props) {
     });
   }, [ethereum]);
 
-  const contextValue = useMemo(() => ({ ...wallet, ethers }), [wallet, ethers]);
+  const contextValue = useMemo(
+    () => ({
+      ...wallet,
+      ethers,
+      walletAddress: wallet.account,
+      activateWallet: wallet.activate,
+      deactivateWallet: wallet.deactivate,
+    }),
+    [wallet, ethers],
+  );
 
   return (
     <WalletAugmentedContext.Provider value={contextValue}>

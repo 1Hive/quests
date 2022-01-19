@@ -21,7 +21,6 @@ import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
-import { NullableContract } from 'src/models/contract-error';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
 import { Account, AccountData } from 'ethereumjs-util';
@@ -32,10 +31,12 @@ import { getObjectFromIpfs, pushObjectToIpfs, formatIpfsMarkdownLink } from './i
 import {
   getTokenInfo,
   getQuestContractInterface,
-  getContract,
-  getERC20Signed,
   getERC20Contract,
-} from '../hooks/use-contract.hook';
+  getQuestFactoryContract,
+  getQuestContract,
+  getGovernQueueContract,
+  getCelesteContract,
+} from '../utils/contract.util';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 
@@ -146,8 +147,9 @@ function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
 async function handleTransaction(
   tx: any,
   onTx?: (hash: string) => void,
-): Promise<ethers.ContractReceipt> {
+): Promise<ethers.ContractReceipt | null> {
   // Let the trx initiate before playing with the receipt
+  if (!tx) return null;
   try {
     onTx?.(tx.hash);
   } catch (error) {
@@ -256,13 +258,11 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
 
   return Promise.all(
     res
-      .filter(
-        (x) =>
-          x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase() &&
-          (x.state === ENUM_CLAIM_STATE.Scheduled || x.state === ENUM_CLAIM_STATE.Challenged),
-      )
-      .map(async (x) => {
-        const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(x.payload);
+      .filter((x) => x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase())
+      .map(async (container) => {
+        const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(
+          container.payload,
+        );
         let evidence: string | undefined;
         try {
           evidence = await getObjectFromIpfs(evidenceIpfsHash);
@@ -283,11 +283,17 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           evidence,
           playerAddress,
           questAddress: quest.address,
-          state: x.state,
-          executionTimeMs: +x.payload.executionTime * 1000, // Sec to MS
-          container: x,
+          state: container.state,
+          executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
+          container,
         } as ClaimModel;
       }),
+  ).then((claims) =>
+    claims.sort(
+      (a: ClaimModel, b: ClaimModel) =>
+        Object.values(ENUM_CLAIM_STATE).indexOf(a.state!) -
+        Object.values(ENUM_CLAIM_STATE).indexOf(b.state!),
+    ),
   );
 }
 
@@ -341,7 +347,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   };
 }
 
-export async function fetchRewardTokens() {
+export async function fetchRewardTokens(): Promise<TokenModel[]> {
   const { questsSubgraph } = getNetwork();
   const tokenAddresses = (
     await request(questsSubgraph, QuestRewardTokens, { first: 100 })
@@ -358,21 +364,18 @@ export async function fetchRewardTokens() {
 // #region QuestFactory
 
 export async function saveQuest(
-  questFactoryContract: NullableContract,
+  walletAddress: string,
   fallbackAddress: string,
   data: Partial<QuestModel>,
   address?: string,
   onTx?: (hash: string) => void,
-) {
-  if (!questFactoryContract.instance) throw questFactoryContract.error;
+): Promise<ethers.ContractReceipt | null> {
   if (address) throw Error('Saving existing quest is not yet implemented');
-  if (!questFactoryContract.instance?.address)
-    throw Error('ContractError : <questFactoryContract> has not been set properly');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
   const { defaultGazFees } = getNetwork();
   const ipfsHash = await pushObjectToIpfs(data.description ?? '');
   const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
-  const tx = await questFactoryContract.instance.createQuest(
+  const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
     typeof data.rewardToken === 'string' ? data.rewardToken : data.rewardToken!.token,
@@ -388,13 +391,20 @@ export async function saveQuest(
 // #region Quest
 
 export async function reclaimQuestUnusedFunds(
-  questContract: NullableContract,
+  walletAddress: string,
+  quest: QuestModel,
   onTx?: (hash: string) => void,
-) {
-  if (!questContract.instance) throw questContract.error;
-  Logger.debug('Reclaiming quest unused funds...', { quest: questContract.instance.address });
-  const tx = await questContract.instance.recoverUnclaimedFunds();
+): Promise<ethers.ContractReceipt | null> {
+  if (!quest.address) throw new Error('Quest address is not defined when reclaiming');
+  const questContract = getQuestContract(quest.address, walletAddress);
+  if (!questContract) return null;
+  Logger.debug('Reclaiming quest unused funds...', { quest });
+  const tx = await questContract.recoverUnclaimedFunds();
   return handleTransaction(tx, onTx);
+}
+
+export async function getQuestRecoveryAddress(questAddress: string): Promise<string | null> {
+  return getQuestContract(questAddress)?.fundsRecoveryAddress() ?? null;
 }
 
 // #region
@@ -402,48 +412,49 @@ export async function reclaimQuestUnusedFunds(
 // #region ERC20
 
 export async function fundQuest(
-  account: Account,
+  walletAddress: string,
   questAddress: string,
   amount: TokenAmountModel,
   onTx?: (hash: string) => void,
-) {
-  const contract = getERC20Signed(amount.token, account);
+): Promise<ethers.ContractReceipt | null> {
+  const contract = getERC20Contract(amount.token, walletAddress);
+  if (!contract) return null;
   Logger.debug('Funding quest...', { questAddress, amount });
   const tx = await contract.transfer(questAddress, toBigNumber(amount));
   return handleTransaction(tx, onTx);
 }
 
 export async function approveTokenAmount(
-  erc20Contract: NullableContract,
+  walletAddress: string,
   toAddress: string,
   tokenAmount: TokenModel,
   onTx?: (hash: string) => void,
-) {
-  if (!erc20Contract.instance) throw erc20Contract.error;
-
+): Promise<ethers.ContractReceipt | null> {
+  const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
+  if (!erc20Contract) return null;
   const { defaultGazFees } = getNetwork();
   Logger.debug('Approving token amount...', { tokenAmount, fromAddress: toAddress });
-  const tx = await erc20Contract.instance.approve(toAddress, tokenAmount.amount, defaultGazFees);
+  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, defaultGazFees);
   return handleTransaction(tx, onTx);
 }
 
 export async function getBalanceOf(
-  account: AccountData,
+  walletAddress: string,
   token: TokenModel | string,
   address: string,
 ): Promise<TokenAmountModel | null> {
   try {
-    let tokenModel: TokenModel;
-    if (typeof token === 'string') tokenModel = (await getTokenInfo(token)) as TokenModel;
-    else tokenModel = token;
-    if (tokenModel) {
-      const erc20Contract = getERC20Contract(tokenModel.token, account);
+    let tokenInfo: TokenModel;
+    if (typeof token === 'string') tokenInfo = (await getTokenInfo(token)) as TokenModel;
+    else tokenInfo = token;
+    if (tokenInfo) {
+      const erc20Contract = getERC20Contract(tokenInfo, walletAddress);
       if (!erc20Contract) return null;
       const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
-      tokenModel.amount = balance.toString();
+      tokenInfo.amount = balance.toString();
       return {
-        token: tokenModel,
-        parsedAmount: fromBigNumber(balance, tokenModel.decimals),
+        token: tokenInfo,
+        parsedAmount: fromBigNumber(balance, tokenInfo.decimals),
       };
     }
   } catch (error) {
@@ -457,30 +468,29 @@ export async function getBalanceOf(
 // #region GovernQueue
 
 export async function scheduleQuestClaim(
-  governQueueContract: NullableContract,
+  walletAddress: string,
   claimData: ClaimModel,
   onTx?: (hash: string) => void,
-) {
+): Promise<ethers.ContractReceipt | null> {
+  const governQueueContract = getGovernQueueContract(walletAddress);
+  if (!governQueueContract) return null;
   const container = await computeScheduleContainer(claimData);
-  if (!governQueueContract.instance) throw governQueueContract.error;
   const { defaultGazFees } = getNetwork();
   Logger.debug('Scheduling quest claim...', { container });
-  const tx = (await governQueueContract.instance.schedule(
-    container,
-    defaultGazFees,
-  )) as ContractTransaction;
+  const tx = (await governQueueContract.schedule(container, defaultGazFees)) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
 
 export async function executeQuestClaim(
-  governQueueContract: NullableContract,
+  walletAddress: string,
   claimData: ClaimModel,
   onTx?: (hash: string) => void,
-) {
-  if (!governQueueContract.instance) throw governQueueContract.error;
+): Promise<ethers.ContractReceipt | null> {
+  const governQueueContract = getGovernQueueContract(walletAddress);
+  if (!governQueueContract) return null;
   const { defaultGazFees } = getNetwork();
   Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
-  const tx = await governQueueContract.instance.execute(
+  const tx = await governQueueContract.execute(
     { config: claimData.container!.config, payload: claimData.container!.payload },
     defaultGazFees,
   );
@@ -488,16 +498,17 @@ export async function executeQuestClaim(
 }
 
 export async function challengeQuestClaim(
-  governQueueContract: NullableContract,
+  walletAddress: string,
   challenge: ChallengeModel,
   container: ContainerModel,
   onTx?: (hash: string) => void,
-) {
-  if (!governQueueContract.instance) throw governQueueContract.error;
+): Promise<ethers.ContractReceipt | null> {
+  const governQueueContract = getGovernQueueContract(walletAddress);
+  if (!governQueueContract) return null;
   Logger.debug('Challenging quest...', { container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
   const { defaultGazFees } = getNetwork();
-  const tx = await governQueueContract.instance.challenge(
+  const tx = await governQueueContract.challenge(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
     defaultGazFees,
@@ -506,19 +517,16 @@ export async function challengeQuestClaim(
 }
 
 export async function resolveClaimChallenge(
-  governQueueContract: NullableContract,
+  walletAddress: string,
   container: ContainerModel,
   dispute: DisputeModel,
   onTx?: (hash: string) => void,
-) {
-  if (!governQueueContract.instance) throw governQueueContract.error;
+): Promise<ethers.ContractReceipt | null> {
+  const governQueueContract = getGovernQueueContract(walletAddress);
+  if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
   const { defaultGazFees } = getNetwork();
-  const tx = await governQueueContract.instance.resolveClaimChallenge(
-    container,
-    dispute.id,
-    defaultGazFees,
-  );
+  const tx = await governQueueContract.resolve(container, dispute.id, defaultGazFees);
   return handleTransaction(tx, onTx);
 }
 
@@ -526,11 +534,10 @@ export async function resolveClaimChallenge(
 
 // #region Celeste
 
-export async function fetchChallengeFee(
-  celesteContract: NullableContract,
-): Promise<TokenAmountModel> {
-  if (!celesteContract.instance) throw celesteContract.error;
-  const [, feeToken, feeAmount] = await celesteContract.instance.getDisputeFees();
+export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
+  const celesteContract = getCelesteContract();
+  if (!celesteContract) return null;
+  const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
   return toTokenAmountModel({
     ...TOKENS.Honey,
     token: feeToken,
@@ -539,16 +546,13 @@ export async function fetchChallengeFee(
 }
 
 export async function fetchChallengeDispute(
-  celesteContract: NullableContract,
   challenge: ChallengeModel,
-): Promise<DisputeModel> {
-  if (!celesteContract.instance) throw celesteContract.error;
-
+): Promise<DisputeModel | null> {
+  const celesteContract = getCelesteContract();
+  if (!celesteContract) return null;
   if (challenge.disputeId === undefined)
     throw new Error('Dispute does not exist yet, please try again later');
-
-  const { state } = await celesteContract.instance.disputes(challenge.disputeId);
-
+  const { state } = await celesteContract.disputes(challenge.disputeId);
   return {
     id: challenge.disputeId,
     state,

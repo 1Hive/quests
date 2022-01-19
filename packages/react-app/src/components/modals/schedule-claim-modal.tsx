@@ -7,11 +7,11 @@ import { Formik, Form } from 'formik';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { useERC20Contract, useGovernQueueContract } from 'src/hooks/use-contract.hook';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
+import { useWallet } from 'src/contexts/wallet.context';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -27,6 +27,7 @@ const FormStyled = styled(Form)`
 
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx()};
+  width: fit-content;
 `;
 
 // #endregion
@@ -47,13 +48,12 @@ export default function ScheduleClaimModal({
   onClose = noop,
 }: Props) {
   const toast = useToast();
+  const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const governQueueContract = useGovernQueueContract();
-  const erc20Contract = useERC20Contract(claimDeposit!.token);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -68,7 +68,7 @@ export default function ScheduleClaimModal({
       if (scheduleDeposit.parsedAmount) {
         toast('Approving claim deposit...');
         const approveTxReceipt = await QuestService.approveTokenAmount(
-          erc20Contract,
+          walletAddress,
           governQueueAddress,
           scheduleDeposit.token,
           (tx) => {
@@ -80,17 +80,19 @@ export default function ScheduleClaimModal({
             });
           },
         );
-        updateTransactionStatus({
-          hash: approveTxReceipt.transactionHash,
-          status: approveTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-        if (!approveTxReceipt.status) throw new Error('Failed to approve deposit');
+        if (approveTxReceipt) {
+          updateTransactionStatus({
+            hash: approveTxReceipt.transactionHash,
+            status: approveTxReceipt.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          });
+        }
+        if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
       }
       toast('Scheduling claim...');
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
-        governQueueContract,
+        walletAddress,
         {
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
@@ -106,13 +108,17 @@ export default function ScheduleClaimModal({
           });
         },
       );
-      updateTransactionStatus({
-        hash: scheduleReceipt.transactionHash,
-        status: scheduleReceipt.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      });
-      if (!scheduleReceipt.status)
+      if (scheduleReceipt) {
+        updateTransactionStatus({
+          hash: scheduleReceipt.transactionHash,
+          status: scheduleReceipt.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+        });
+      } else {
+        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      }
+      if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please try again in a few seconds');
       toast('Operation succeed');
       closeModal(true);
@@ -159,7 +165,7 @@ export default function ScheduleClaimModal({
           mode="positive"
           type="submit"
           form="form-claim"
-          disabled={loading || !governQueueContract || !erc20Contract}
+          disabled={loading || !walletAddress}
         />,
       ]}
       onClose={() => closeModal(false)}
@@ -219,7 +225,7 @@ export default function ScheduleClaimModal({
                   compact
                 />
                 <AmountFieldInputFormik
-                  id="claimAmount"
+                  id="claimedAmount"
                   isEdit
                   label="Claim amount"
                   tooltip="Claim amount"

@@ -12,7 +12,7 @@ type TransactionContextModel = {
 };
 
 const TransactionContext = createContext<TransactionContextModel | undefined>(undefined);
-export const useTransactionContext = () => useContext(TransactionContext);
+export const useTransactionContext = () => useContext(TransactionContext)!;
 
 type Props = {
   children: React.ReactNode;

@@ -58,31 +58,30 @@ type Props = {
 function AccountModule({ compact = false }: Props) {
   const buttonRef = useRef<any>();
   const wallet = useWallet();
+  const { walletAddress, activating, deactivateWallet, activateWallet } = wallet;
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
   const [activationError, setActivationError] = useState();
   const popoverFocusElement = useRef<any>();
 
-  const { account, activating } = wallet;
-
   const clearError = useCallback(() => setActivationError(undefined), []);
 
   const toggle = useCallback(() => setOpened((opened) => !opened), []);
 
   const handleCancelConnection = useCallback(() => {
-    wallet.deactivate();
-  }, [wallet]);
+    deactivateWallet();
+  }, [walletAddress]);
 
   const activate = useCallback(
     async (providerId) => {
       try {
-        await wallet.activate(providerId);
+        await activateWallet(providerId);
       } catch (error: any) {
         setActivationError(error);
       }
     },
-    [wallet],
+    [walletAddress],
   );
 
   // Don’t animate the slider until the popover has opened
@@ -125,7 +124,7 @@ function AccountModule({ compact = false }: Props) {
     const screenId = (() => {
       if (activationError) return 'error';
       if (activatingDelayed) return 'connecting';
-      if (account) return 'connected';
+      if (walletAddress) return 'connected';
       return 'providers';
     })();
 
@@ -135,7 +134,7 @@ function AccountModule({ compact = false }: Props) {
     previousScreenIndex.current = screenIndex;
 
     return { direction, screenIndex };
-  }, [account, activationError, activatingDelayed]);
+  }, [walletAddress, activationError, activatingDelayed]);
 
   const screen = SCREENS[screenIndex];
   const screenId = screen.id;
@@ -188,10 +187,6 @@ function AccountModule({ compact = false }: Props) {
             config={springs.smooth}
             items={{
               screen,
-              // This is needed because use-wallet throws an error when the
-              // activation fails before React updates the state of `activating`.
-              // A future version of use-wallet might return an
-              // `activationError` object instead, making this unnecessary.
               activating: screen.id === 'error' ? null : activatingDelayed,
               wallet,
             }}

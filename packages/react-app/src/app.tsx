@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { Main } from '@1hive/1hive-ui';
 import { ErrorBoundary } from '@sentry/react';
 import { useState } from 'react';
@@ -8,20 +9,38 @@ import { defaultTheme } from './constants';
 import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
 
+const customLightTheme = {
+  _name: 'customLight',
+  _appearance: 'light',
+  surface: '#F9FAFC',
+};
+const customDarkTheme = {
+  _name: 'customDark',
+  _appearance: 'dark',
+};
+
 function App() {
-  const [currentTheme, setCurrentTheme] = useState(localStorage.getItem('theme') ?? defaultTheme);
+  const savedTheme = localStorage.getItem('theme');
+  const [currentTheme, setCurrentTheme] = useState<any>(
+    savedTheme === 'dark' ? customDarkTheme : customLightTheme,
+  );
 
   const toggleTheme = () => {
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    const newTheme = currentTheme._appearance === 'dark' ? customLightTheme : customDarkTheme;
     setCurrentTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('theme', newTheme._appearance);
   };
 
   return (
     // Trigger sentry.io
     <ErrorBoundary>
       <WalletProvider>
-        <Main assetsUrl="/aragon-ui/" layout={false} scrollView={false} theme={currentTheme}>
+        <Main
+          assetsUrl="/aragon-ui/"
+          layout={false}
+          scrollView={false}
+          theme={currentTheme ?? defaultTheme}
+        >
           <HashRouter>
             <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
               <Routes />

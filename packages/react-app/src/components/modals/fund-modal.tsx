@@ -4,7 +4,6 @@ import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
-import { useERC20Contract } from 'src/hooks/use-contract.hook';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -23,6 +22,7 @@ const FormStyled = styled(Form)`
 
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx()};
+  width: fit-content;
 `;
 
 type Props = {
@@ -31,16 +31,13 @@ type Props = {
 };
 
 export default function FundModal({ quest, onClose = noop }: Props) {
-  const wallet = useWallet();
+  const { walletAddress } = useWallet();
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
   const toast = useToast();
-  const contractERC20 = useERC20Contract(
-    typeof quest.rewardToken === 'string' ? quest.rewardToken : quest.rewardToken?.token,
-  );
 
   const closeModal = (success: boolean) => {
     setOpened(false);
@@ -53,7 +50,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       const pendingMessage = 'Sending funds to Quest...';
       toast(pendingMessage);
       const txReceipt = await QuestService.fundQuest(
-        wallet.account,
+        walletAddress,
         quest.address!,
         values.fundAmount,
         (txHash) => {
@@ -65,14 +62,19 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           });
         },
       );
-      updateTransactionStatus({
-        hash: txReceipt.transactionHash!,
-        status: txReceipt.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      });
+      if (txReceipt) {
+        updateTransactionStatus({
+          hash: txReceipt.transactionHash!,
+          status: txReceipt.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+        });
+      } else {
+        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      }
       closeModal(true);
-      if (txReceipt.status) toast('Operation succeed');
+      if (!txReceipt?.status) throw new Error('Failed to fund quest');
+      toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
@@ -105,7 +107,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           form="form-fund"
           label="Fund"
           mode="strong"
-          disabled={loading || !contractERC20}
+          disabled={loading || !walletAddress}
         />
       }
       onClose={() => closeModal(false)}
