@@ -119,7 +119,8 @@ const QuestHeaderStyled = styled.div`
 // #endregion
 
 type Props = {
-  data?: QuestModel;
+  // eslint-disable-next-line no-unused-vars
+  dataState: { questData: QuestModel; setQuestData?: (questData: QuestModel) => void };
   questMode?: string;
   isLoading?: boolean;
   // eslint-disable-next-line no-unused-vars
@@ -128,10 +129,7 @@ type Props = {
 };
 
 export default function Quest({
-  data = {
-    expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
-    state: ENUM_QUEST_STATE.Draft,
-  },
+  dataState,
   isLoading = false,
   questMode = ENUM_QUEST_VIEW_MODE.ReadDetail,
   onSave = noop,
@@ -140,6 +138,7 @@ export default function Quest({
   const { walletAddress } = useWallet();
   const { defaultToken } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
+  const { questData, setQuestData } = dataState;
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
@@ -158,7 +157,10 @@ export default function Quest({
     const getClaimDeposit = async () => {
       // Don't show deposit of expired
       if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
-        if (data.state === ENUM_QUEST_STATE.Archived || data.state === ENUM_QUEST_STATE.Expired) {
+        if (
+          questData.state === ENUM_QUEST_STATE.Archived ||
+          questData.state === ENUM_QUEST_STATE.Expired
+        ) {
           setClaimDeposit(null);
         } else {
           try {
@@ -172,13 +174,14 @@ export default function Quest({
       }
     };
 
-    if (!data.rewardToken) setBounty(null);
-    else if (data.address) fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
+    if (!questData.rewardToken) setBounty(null);
+    else if (questData.address)
+      fetchBalanceOfQuest(walletAddress, questData.address, questData.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
     }
-  }, [questMode, data.rewardToken, walletAddress]);
+  }, [questMode, questData.rewardToken, walletAddress]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -279,8 +282,8 @@ export default function Quest({
   const fetchBalanceOfQuest = (account: string, address: string, token: TokenModel | string) => {
     QuestService.getBalanceOf(account, token, address)
       .then((result) => {
-        data.bounty = result ?? undefined;
-        processQuestState(data);
+        questData.bounty = result ?? undefined;
+        processQuestState(questData);
         setBounty(result);
       })
       .catch((err) => {
@@ -297,8 +300,8 @@ export default function Quest({
 
   const onFundModalClosed = (success: boolean) => {
     setTimeout(() => {
-      if (success && data.address && data.rewardToken && walletAddress) {
-        fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
+      if (success && questData.address && questData.rewardToken && walletAddress) {
+        fetchBalanceOfQuest(walletAddress, questData.address, questData.rewardToken);
         setClaimUpdate(claimUpdated + 1);
       }
     }, 500);
@@ -376,7 +379,9 @@ export default function Quest({
                 isMarkDown
                 maxLine={questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? 10 : undefined}
                 ellipsis={
-                  <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
+                  <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData.address}`}>
+                    Read more
+                  </LinkStyled>
                 }
               />
             </FirstColStyled>
@@ -442,29 +447,29 @@ export default function Quest({
             </SecondColStyled>
           </>
         </TwoColumnStyled>
-        {!loading && !isEdit && data.address && (
+        {!loading && !isEdit && questData.address && (
           <>
             {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail &&
               challengeDeposit &&
               bounty !== null && (
                 <ClaimList
                   newClaim={claimUpdated}
-                  questData={data}
+                  questData={questData}
                   questTotalBounty={bounty}
                   challengeDeposit={challengeDeposit}
                 />
               )}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
-              data.address &&
+              questData.address &&
               walletAddress &&
               bounty && (
                 <QuestFooterStyled>
                   {values.state === ENUM_QUEST_STATE.Active ? (
                     <>
-                      <FundModal quest={data} onClose={onFundModalClosed} />
+                      <FundModal quest={questData} onClose={onFundModalClosed} />
                       {claimDeposit && (
                         <ScheduleClaimModal
-                          questAddress={data.address}
+                          questAddress={questData.address}
                           questTotalBounty={bounty}
                           claimDeposit={claimDeposit}
                           playerAddress={walletAddress}
@@ -491,14 +496,14 @@ export default function Quest({
     <CardStyled
       style={css}
       isSummary={questMode === ENUM_QUEST_VIEW_MODE.ReadSummary}
-      id={data.address}
+      id={questData.address}
     >
-      {!loading && <StateTag state={data.state} />}
+      {!loading && <StateTag state={questData.state} />}
       <Formik
         initialValues={
           {
-            ...data,
-            fallbackAddress: data.fallbackAddress ?? walletAddress,
+            ...questData,
+            fallbackAddress: questData.fallbackAddress ?? walletAddress,
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
@@ -508,7 +513,7 @@ export default function Quest({
             <FormStyled
               onSubmit={handleSubmit}
               ref={formRef}
-              id={`form-quest-form-${data.address ?? 'new'}`}
+              id={`form-quest-form-${questData.address ?? 'new'}`}
             >
               {questContent(values, handleChange)}
             </FormStyled>
