@@ -111,7 +111,6 @@ export default function ClaimList({
               tooltipDetail={`A claim includes the proof of the quest's completion.`}
             />
           </ClaimHeaderStyled>
-
           <Accordion
             items={claims.map((claim: ClaimModel) => {
               let actionButton;

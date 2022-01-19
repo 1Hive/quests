@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 // @ts-nocheck
 import { BackButton, Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useRef } from 'react';
@@ -80,8 +81,8 @@ function Header({ toggleTheme, currentTheme }: Props) {
           <Button
             ref={activityOpener}
             className="ml-8"
-            label={currentTheme === 'dark' ? 'Light' : 'Dark'}
-            icon={currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
+            label={currentTheme._appearance === 'dark' ? 'Light' : 'Dark'}
+            icon={currentTheme._appearance === 'dark' ? <FaSun /> : <FaMoon />}
             display="icon"
             onClick={toggleTheme}
           />

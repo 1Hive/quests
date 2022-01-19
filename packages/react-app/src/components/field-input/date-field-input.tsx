@@ -84,7 +84,7 @@ export default function DateFieldInput({
       borderColor={theme.border}
       focusBorderColor={theme.accent}
       // eslint-disable-next-line no-underscore-dangle
-      isDarkTheme={theme._name === 'dark'}
+      isDarkTheme={theme._appearance === 'dark'}
     />
   ) : (
     <span>{new Date(value).toDateString()}</span>

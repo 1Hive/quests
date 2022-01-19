@@ -17,7 +17,8 @@ import Footer from './footer';
 
 const MainViewStyled = styled.div`
   ${(props: any) =>
-    props.currentTheme === 'dark'
+    // eslint-disable-next-line no-underscore-dangle
+    props.currentTheme._appearance === 'dark'
       ? `
       background: #1a3a6d;  /* fallback for old browsers */
       background: -webkit-linear-gradient(-45deg, #1a3a6d, #373B44);  /* Chrome 10-25, Safari 5.1-6 */
