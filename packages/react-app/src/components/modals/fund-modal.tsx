@@ -31,12 +31,12 @@ type Props = {
 };
 
 export default function FundModal({ quest, onClose = noop }: Props) {
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
   const toast = useToast();
 
   const closeModal = (success: boolean) => {

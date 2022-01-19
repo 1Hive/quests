@@ -47,7 +47,7 @@ type Props = {
 
 function AccountButton({ onClick }: Props) {
   const theme = useTheme();
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   return (
     <>
       {walletAddress && (

@@ -31,7 +31,7 @@ export default function QuestModal({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
-  const { setNewQuest } = useQuestsContext()!;
+  const { setNewQuest } = useQuestsContext();
 
   const onOpenButtonClick = () => {
     setOpened(true);

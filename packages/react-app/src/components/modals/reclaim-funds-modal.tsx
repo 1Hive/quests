@@ -34,9 +34,9 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
     questData.fallbackAddress,
   );
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
 
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   const toast = useToast();
 
   useEffect(() => {

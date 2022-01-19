@@ -48,12 +48,12 @@ export default function ScheduleClaimModal({
   onClose = noop,
 }: Props) {
   const toast = useToast();
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
 
   const closeModal = (succeed: any) => {
     setOpened(false);

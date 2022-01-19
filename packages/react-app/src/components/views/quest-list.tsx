@@ -25,8 +25,8 @@ export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filter, refreshed } = useFilterContext()!;
-  const { newQuest } = useQuestsContext()!;
+  const { filter, refreshed } = useFilterContext();
+  const { newQuest } = useQuestsContext();
 
   const { setPage } = usePageContext();
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);

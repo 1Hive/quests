@@ -60,9 +60,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [openButtonLabel, setOpenButtonLabel] = useState<string>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
 
   useEffect(() => {
     const fetchFee = async () => {

@@ -19,7 +19,7 @@ const BoxStyled = styled(Box)`
 // #endregion
 
 export default function Sidebar() {
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   const { page } = usePageContext();
   return (
     <>

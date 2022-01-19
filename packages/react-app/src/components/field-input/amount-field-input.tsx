@@ -101,7 +101,7 @@ function AmountFieldInput({
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount ?? 0);
   const [token, setToken] = useState<TokenModel>(value?.token ?? defaultToken);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
 

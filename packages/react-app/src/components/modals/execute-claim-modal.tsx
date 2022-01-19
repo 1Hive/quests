@@ -44,9 +44,9 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
   const toast = useToast();
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   useEffect(() => {
     const launchTimeoutAsync = async (execTimeMs: number) => {
       const now = await getLastBlockDate();

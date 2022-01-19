@@ -49,7 +49,7 @@ type Props = {
 };
 
 function MainView({ children, toggleTheme, currentTheme }: Props) {
-  const { activateWallet, walletAddress } = useWallet()!;
+  const { activateWallet, walletAddress } = useWallet();
   useEffect(() => {
     const tryConnect = async () => {
       try {

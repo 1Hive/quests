@@ -57,8 +57,8 @@ type Props = {
 
 function AccountModule({ compact = false }: Props) {
   const buttonRef = useRef<any>();
-  const { walletAddress, activating, deactivateWallet, activateWallet } = useWallet()!;
-  const wallet = useWallet()!;
+  const wallet = useWallet();
+  const { walletAddress, activating, deactivateWallet, activateWallet } = wallet;
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);

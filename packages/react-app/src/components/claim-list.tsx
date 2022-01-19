@@ -68,7 +68,7 @@ export default function ClaimList({
   challengeDeposit,
   questTotalBounty,
 }: Props) {
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   const [claims, setClaims] = useState<ClaimModel[]>();
 
   useEffect(() => {

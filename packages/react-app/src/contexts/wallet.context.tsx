@@ -16,7 +16,7 @@ export type WalletContextModel = {
 const WalletAugmentedContext = React.createContext<WalletContextModel | undefined>(undefined);
 
 function useWalletAugmented() {
-  return useContext<WalletContextModel | undefined>(WalletAugmentedContext);
+  return useContext<WalletContextModel | undefined>(WalletAugmentedContext)!;
 }
 
 type Props = {

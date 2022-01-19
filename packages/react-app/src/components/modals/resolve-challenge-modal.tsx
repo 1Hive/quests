@@ -84,7 +84,7 @@ type Props = {
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
   const toast = useToast();
-  const { walletAddress } = useWallet()!;
+  const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
@@ -92,7 +92,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext()!;
+    useTransactionContext();
   const governQueueContract = getGovernQueueContract(walletAddress);
   const celesteContract = getCelesteContract();
 

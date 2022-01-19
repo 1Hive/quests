@@ -16,7 +16,7 @@ const StatusDropdownStyled = styled(DropDown)`
 `;
 
 export function Filter() {
-  const { filter, setFilter } = useFilterContext()!;
+  const { filter, setFilter } = useFilterContext();
   const theme = useTheme();
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   return (
