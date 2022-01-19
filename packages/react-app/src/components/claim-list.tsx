@@ -29,6 +29,7 @@ const WrapperStyled = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  padding: ${GUpx(2)};
 `;
 
 const RowStyled = styled.div`
@@ -102,85 +103,81 @@ export default function ClaimList({
   return (
     <WrapperStyled>
       {!!claims?.length && (
-        <Outset>
-          <>
-            <ClaimHeaderStyled>
-              <HeaderStyled>Claims</HeaderStyled>
-              <IconTooltip
-                tooltip="Claims"
-                tooltipDetail={`A claim includes the proof of the quest's completion.`}
-              />
-            </ClaimHeaderStyled>
-
-            <Accordion
-              items={claims.map((claim: ClaimModel) => {
-                let actionButton;
-                if (claim.state === ENUM_CLAIM_STATE.Scheduled) {
-                  if (walletAddress === claim.playerAddress)
-                    actionButton = (
-                      <ExecuteClaimModal
-                        claim={claim}
-                        questTotalBounty={questTotalBounty}
-                        onClose={fetchNewClaimChanges}
-                      />
-                    );
-                  else
-                    actionButton = (
-                      <ChallengeModal
-                        claim={claim}
-                        challengeDeposit={challengeDeposit}
-                        onClose={fetchNewClaimChanges}
-                      />
-                    );
-                } else if (claim.state === ENUM_CLAIM_STATE.Challenged) {
-                  actionButton = (
-                    <ResolveChallengeModal claim={claim} onClose={fetchNewClaimChanges} />
-                  );
-                } else if (!claim.state) Logger.error(`Claim doesn't have state`, { claim });
-                return [
-                  <RowStyled twoCol={!walletAddress}>
-                    <StateTag state={claim.state ?? ''} />
-                    <Field
-                      label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
-                    >
-                      <AddressField address={claim.playerAddress} autofocus={false} />
-                    </Field>
-                    <GapSpacerStyled size="200px" justify="flex-start">
-                      {claim.claimedAmount.parsedAmount ? (
-                        <AmountFieldInput
-                          id="amount"
-                          label="Claimed amount"
-                          isLoading={
-                            !claim.claimedAmount.parsedAmount && questTotalBounty === undefined
-                          }
-                          value={
-                            claim.claimedAmount.parsedAmount || !questTotalBounty
-                              ? claim.claimedAmount
-                              : questTotalBounty
-                          }
-                        />
-                      ) : (
-                        <Field label="Claimed amount">All available</Field>
-                      )}
-                    </GapSpacerStyled>
-                    <GapSpacerStyled size="250px" justify="space-around">
-                      {walletAddress && actionButton}
-                    </GapSpacerStyled>
-                  </RowStyled>,
-                  <Outset gu8>
-                    <TextFieldInput
-                      id="evidence"
-                      value={claim.evidence}
-                      isMarkDown
-                      wide
-                      label="Evidence of completion"
-                    />
-                  </Outset>,
-                ];
-              })}
+        <>
+          <ClaimHeaderStyled>
+            <HeaderStyled>Claims</HeaderStyled>
+            <IconTooltip
+              tooltip="Claims"
+              tooltipDetail={`A claim includes the proof of the quest's completion.`}
             />
-          </>
-        </Outset>
+          </ClaimHeaderStyled>
+
+          <Accordion
+            items={claims.map((claim: ClaimModel) => {
+              let actionButton;
+              if (claim.state === ENUM_CLAIM_STATE.Scheduled) {
+                if (walletAddress === claim.playerAddress)
+                  actionButton = (
+                    <ExecuteClaimModal
+                      claim={claim}
+                      questTotalBounty={questTotalBounty}
+                      onClose={fetchNewClaimChanges}
+                    />
+                  );
+                else
+                  actionButton = (
+                    <ChallengeModal
+                      claim={claim}
+                      challengeDeposit={challengeDeposit}
+                      onClose={fetchNewClaimChanges}
+                    />
+                  );
+              } else if (claim.state === ENUM_CLAIM_STATE.Challenged) {
+                actionButton = (
+                  <ResolveChallengeModal claim={claim} onClose={fetchNewClaimChanges} />
+                );
+              } else if (!claim.state) Logger.error(`Claim doesn't have state`, { claim });
+              return [
+                <RowStyled twoCol={!walletAddress}>
+                  <StateTag state={claim.state ?? ''} />
+                  <Field label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}>
+                    <AddressField address={claim.playerAddress} autofocus={false} />
+                  </Field>
+                  <GapSpacerStyled size="200px" justify="flex-start">
+                    {claim.claimedAmount.parsedAmount ? (
+                      <AmountFieldInput
+                        id="amount"
+                        label="Claimed amount"
+                        isLoading={
+                          !claim.claimedAmount.parsedAmount && questTotalBounty === undefined
+                        }
+                        value={
+                          claim.claimedAmount.parsedAmount || !questTotalBounty
+                            ? claim.claimedAmount
+                            : questTotalBounty
+                        }
+                      />
+                    ) : (
+                      <Field label="Claimed amount">All available</Field>
+                    )}
+                  </GapSpacerStyled>
+                  <GapSpacerStyled size="250px" justify="space-around">
+                    {walletAddress && actionButton}
+                  </GapSpacerStyled>
+                </RowStyled>,
+                <Outset gu8>
+                  <TextFieldInput
+                    id="evidence"
+                    value={claim.evidence}
+                    isMarkDown
+                    wide
+                    label="Evidence of completion"
+                  />
+                </Outset>,
+              ];
+            })}
+          />
+        </>
       )}
     </WrapperStyled>
   );
