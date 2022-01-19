@@ -21,7 +21,6 @@ const customDarkTheme = {
 
 function App() {
   const savedTheme = localStorage.getItem('theme');
-  console.log(savedTheme);
   const [currentTheme, setCurrentTheme] = useState<any>(
     savedTheme === 'dark' ? customDarkTheme : customLightTheme,
   );
