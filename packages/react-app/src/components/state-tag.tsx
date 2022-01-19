@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Tag, Help } from '@1hive/1hive-ui';
+import { Tag } from '@1hive/1hive-ui';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from 'src/constants';
 import { useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
@@ -40,7 +40,6 @@ export function StateTag({ state, size = 'normal', wide = false }: Props) {
   const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log({ state });
     switch (state) {
       // Quest states
       case ENUM_QUEST_STATE.Draft:

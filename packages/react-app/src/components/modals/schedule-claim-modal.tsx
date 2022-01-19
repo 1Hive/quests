@@ -61,7 +61,6 @@ export default function ScheduleClaimModal({
   };
 
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
-    console.log({ values });
     try {
       setLoading(true);
       const { governQueueAddress } = getNetwork();
