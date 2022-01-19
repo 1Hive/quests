@@ -82,7 +82,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50
-          ? 'Oops. Something went wrong.'
+          ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
     } finally {

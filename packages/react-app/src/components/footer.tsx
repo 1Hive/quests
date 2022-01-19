@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 const FooterWrapper = styled.div`
   display: flex;
-  background-color: #35425e;
+  background-color: ${(props: any) => props.background};
   column-gap: 150px;
   justify-content: center;
   box-shadow: rgb(0 0 0 / 5%) 3px -2px 0px;
@@ -39,7 +39,7 @@ const FooterLinkStyled = styled(Link)`
 export default function footer() {
   const theme = useTheme();
   return (
-    <FooterWrapper>
+    <FooterWrapper background={theme.surface}>
       <FooterColumn>
         <FooterTitle>Community</FooterTitle>
         <FooterLinkStyled color={theme.contentSecondary} href="https://discord.gg/4fm7pgB" external>

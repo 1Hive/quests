@@ -164,7 +164,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 75
-          ? 'Oops. Something went wrong.'
+          ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
     } finally {

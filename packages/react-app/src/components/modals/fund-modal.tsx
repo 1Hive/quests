@@ -80,7 +80,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       Logger.error(e);
       toast(
         e.message.includes('\n') || e.message.length > 50
-          ? 'Oops. Something went wrong.'
+          ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
     } finally {
