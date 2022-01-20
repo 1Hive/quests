@@ -15,20 +15,18 @@ import { FieldInput } from './field-input';
 const CheckboxWrapperStyled = styled.div`
   display: block;
   position: relative;
-  margin: ${GUpx()};
-  padding-left: ${GUpx(3)};
-  cursor: pointer;
+  margin: 0 ${GUpx()};
   font-size: 22px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  height: 18px;
+  width: 18px;
+  display: flex;
 
   /* Hide the browser's default checkbox */
   & input {
-    position: absolute;
-    top: 0;
-    left: 0;
     opacity: 0;
     cursor: pointer;
     height: 16px;

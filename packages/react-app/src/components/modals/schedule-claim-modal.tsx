@@ -12,7 +12,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
-import { isAddress, toChecksumAddress } from 'web3-utils';
+import { toChecksumAddress } from 'web3-utils';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -20,6 +20,7 @@ import TextFieldInput from '../field-input/text-field-input';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
+import { ShowBalanceOf } from '../show-balance-of';
 
 // #region StyledComponents
 
@@ -30,6 +31,11 @@ const FormStyled = styled(Form)`
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx()};
   width: fit-content;
+`;
+
+const LineStyled = styled.div`
+  display: flex;
+  align-content: center;
 `;
 
 // #endregion
@@ -150,6 +156,7 @@ export default function ScheduleClaimModal({
         />
       }
       buttons={[
+        <ShowBalanceOf tokens={[claimDeposit.token]} />,
         <AmountFieldInputFormik
           key="claimDeposit"
           id="claimDeposit"
@@ -216,33 +223,38 @@ export default function ScheduleClaimModal({
                   rows={5}
                   compact
                 />
-                <AmountFieldInputFormik
-                  id="questBounty"
-                  label="Available bounty"
-                  isLoading={loading}
-                  value={questTotalBounty}
-                  compact
-                />
-                <CheckboxFieldInput
-                  id="claimAll"
-                  label="Claim all bounty"
-                  onChange={handleChange}
-                  value={values.claimAll}
-                  isLoading={loading}
-                  isEdit
-                  compact
-                />
-                <AmountFieldInputFormik
-                  id="claimedAmount"
-                  isEdit
-                  label="Claim amount"
-                  tooltip="Claim amount"
-                  tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
-                  isLoading={loading}
-                  value={values.claimAll ? questTotalBounty : values.claimedAmount}
-                  disabled={values.claimAll}
-                  compact
-                />
+                <LineStyled>
+                  <Outset horizontal>
+                    <AmountFieldInputFormik
+                      id="questBounty"
+                      label="Available bounty"
+                      isLoading={loading}
+                      value={questTotalBounty}
+                    />
+                  </Outset>
+                  <Outset horizontal>
+                    <CheckboxFieldInput
+                      id="claimAll"
+                      label="Claim all"
+                      onChange={handleChange}
+                      value={values.claimAll}
+                      isLoading={loading}
+                      isEdit
+                    />
+                  </Outset>
+                  <Outset horizontal>
+                    <AmountFieldInputFormik
+                      id="claimedAmount"
+                      isEdit
+                      label="Claim amount"
+                      tooltip="Claim amount"
+                      tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
+                      isLoading={loading}
+                      value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                      disabled={values.claimAll}
+                    />
+                  </Outset>
+                </LineStyled>
                 <AddressFieldInput
                   id="playerAddress"
                   label="Player address"

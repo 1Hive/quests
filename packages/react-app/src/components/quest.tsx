@@ -103,10 +103,6 @@ const SecondColStyled = styled.div`
   flex-direction: column;
 `;
 
-const SpacerStyled = styled.div`
-  margin-top: ${GUpx(2)};
-`;
-
 const QuestHeaderStyled = styled.div`
   display: flex;
   flex-direction: row;
@@ -173,7 +169,7 @@ export default function Quest({
     };
 
     if (!data.rewardToken) setBounty(null);
-    else if (data.address) fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
+    else if (data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
@@ -259,7 +255,7 @@ export default function Quest({
             if (!txReceiptFundQuest?.status || !createdQuestAddress)
               throw new Error('Failed to create quest');
             toast('Operation succeed');
-            fetchBalanceOfQuest(walletAddress, createdQuestAddress, values.bounty.token);
+            fetchBalanceOfQuest(createdQuestAddress, values.bounty.token);
           }
         }
       } catch (e: any) {
@@ -276,8 +272,8 @@ export default function Quest({
     }
   };
 
-  const fetchBalanceOfQuest = (account: string, address: string, token: TokenModel | string) => {
-    QuestService.getBalanceOf(account, token, address)
+  const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
+    QuestService.getBalanceOf(token, address)
       .then((result) => {
         data.bounty = result ?? undefined;
         processQuestState(data);
@@ -298,7 +294,7 @@ export default function Quest({
   const onFundModalClosed = (success: boolean) => {
     setTimeout(() => {
       if (success && data.address && data.rewardToken && walletAddress) {
-        fetchBalanceOfQuest(walletAddress, data.address, data.rewardToken);
+        fetchBalanceOfQuest(data.address, data.rewardToken);
         setClaimUpdate(claimUpdated + 1);
       }
     }, 500);
@@ -411,34 +407,32 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !claimDeposit)}
                 />
               )}
-              <SpacerStyled>
-                <DateFieldInput
-                  id="expireTimeMs"
-                  label="Expire time"
-                  tooltip="Expire time"
-                  tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
-                  isEdit={isEdit}
-                  isLoading={loading}
-                  value={values.expireTimeMs}
-                  onChange={handleChange}
-                  wide
-                />
-                {isEdit && (
-                  <AddressWrapperStyled>
-                    <AddressFieldInput
-                      id="fallbackAddress"
-                      label="Funds fallback address"
-                      value={values.fallbackAddress}
-                      isLoading={loading}
-                      tooltip="Fallback Address"
-                      tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                      isEdit
-                      onChange={handleChange}
-                      wide
-                    />
-                  </AddressWrapperStyled>
-                )}
-              </SpacerStyled>
+              <DateFieldInput
+                id="expireTimeMs"
+                label="Expire time"
+                tooltip="Expire time"
+                tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
+                isEdit={isEdit}
+                isLoading={loading}
+                value={values.expireTimeMs}
+                onChange={handleChange}
+                wide
+              />
+              {isEdit && (
+                <AddressWrapperStyled>
+                  <AddressFieldInput
+                    id="fallbackAddress"
+                    label="Funds fallback address"
+                    value={values.fallbackAddress}
+                    isLoading={loading}
+                    tooltip="Fallback Address"
+                    tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                    isEdit
+                    onChange={handleChange}
+                    wide
+                  />
+                </AddressWrapperStyled>
+              )}
             </SecondColStyled>
           </>
         </TwoColumnStyled>

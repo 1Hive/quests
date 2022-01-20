@@ -15,6 +15,7 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
+import { ShowBalanceOf } from '../show-balance-of';
 
 const FormStyled = styled(Form)`
   width: 100%;
@@ -100,7 +101,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           mode="strong"
         />
       }
-      buttons={
+      buttons={[
+        <ShowBalanceOf tokens={quest.rewardToken ? [quest.rewardToken] : []} />,
         <Button
           icon={<GiTwoCoins />}
           type="submit"
@@ -108,8 +110,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           label="Fund"
           mode="strong"
           disabled={loading || !walletAddress}
-        />
-      }
+        />,
+      ]}
       onClose={() => closeModal(false)}
       isOpen={opened}
       width={500}

@@ -1,10 +1,11 @@
 import { useTheme } from '@1hive/1hive-ui';
 import React from 'react';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled.div`
-  ${({ compact }: any) => (!compact ? 'margin-bottom: 24px' : '')};
+  ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(2)}` : '')};
 `;
 
 const LabelStyled = styled.label`
@@ -14,12 +15,17 @@ const LabelStyled = styled.label`
   line-height: 1.5;
   text-transform: uppercase;
   user-select: none;
-  margin-bottom: -1px;
 `;
 
 const LineStyled = styled.div`
   display: flex;
+  align-items: top;
+`;
+
+const ContentWrapperStyled = styled.div`
+  display: flex;
   align-items: center;
+  ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
 `;
 
 type Props = {
@@ -45,7 +51,7 @@ export function FieldInput({ id, children, compact, tooltip, tooltipDetail, labe
   return (
     <FieldStyled key={id} compact={compact}>
       {labelComponent}
-      {children}
+      <ContentWrapperStyled compact={compact}>{children}</ContentWrapperStyled>
     </FieldStyled>
   );
 }

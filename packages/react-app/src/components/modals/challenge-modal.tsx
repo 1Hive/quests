@@ -21,6 +21,7 @@ import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { IconTooltip } from '../field-input/icon-tooltip';
 import { getLastBlockDate } from '../../utils/date.utils';
+import { ShowBalanceOf } from '../show-balance-of';
 
 // #region StyledComponents
 
@@ -264,6 +265,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         </OpenButtonWrapperStyled>
       }
       buttons={[
+        <ShowBalanceOf tokens={[challengeDeposit.token, challengeFee?.token]} />,
         <AmountFieldInput
           key="challengeDeposit"
           id="challengeDeposit"

@@ -439,7 +439,6 @@ export async function approveTokenAmount(
 }
 
 export async function getBalanceOf(
-  walletAddress: string,
   token: TokenModel | string,
   address: string,
 ): Promise<TokenAmountModel | null> {
@@ -448,7 +447,7 @@ export async function getBalanceOf(
     if (typeof token === 'string') tokenInfo = (await getTokenInfo(token)) as TokenModel;
     else tokenInfo = token;
     if (tokenInfo) {
-      const erc20Contract = getERC20Contract(tokenInfo, walletAddress);
+      const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
       const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
       tokenInfo.amount = balance.toString();
