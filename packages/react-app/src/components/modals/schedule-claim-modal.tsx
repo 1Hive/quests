@@ -12,12 +12,14 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
+import { isAddress, toChecksumAddress } from 'web3-utils';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
+import { AddressFieldInput } from '../field-input/address-field-input';
 
 // #region StyledComponents
 
@@ -176,6 +178,7 @@ export default function ScheduleClaimModal({
           evidence: '',
           claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
           claimAll: false,
+          playerAddress: walletAddress,
         }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
@@ -183,6 +186,11 @@ export default function ScheduleClaimModal({
           if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
             errors.push('Validation : Claim amount should not be higher than available bounty');
           if (!values.evidence) errors.push('Validation : Evidence of completion is required');
+          try {
+            values.playerAddress = toChecksumAddress(values.playerAddress);
+          } catch (error) {
+            errors.push('Validation : Player address was not set or is not valid');
+          }
           if (errors.length) {
             errors.forEach(toast);
           } else {
@@ -234,6 +242,17 @@ export default function ScheduleClaimModal({
                   value={values.claimAll ? questTotalBounty : values.claimedAmount}
                   disabled={values.claimAll}
                   compact
+                />
+                <AddressFieldInput
+                  id="playerAddress"
+                  label="Player address"
+                  value={values.playerAddress}
+                  isLoading={loading}
+                  tooltip="Player address"
+                  tooltipDetail="Most of time it may be be the connected wallet but can also be set to another wallet address"
+                  isEdit
+                  onChange={handleChange}
+                  wide
                 />
               </ChildSpacer>
             </Outset>
