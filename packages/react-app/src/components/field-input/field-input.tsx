@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled.div`
-  ${({ compact }: any) => (compact ? 'margin:0;' : '')}
+  ${({ compact }: any) => (!compact ? 'margin-bottom: 24px' : '')};
 `;
 
 const LabelStyled = styled.label`
