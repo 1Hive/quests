@@ -24,18 +24,12 @@ import { FieldInput } from './field-input';
 // #region StyledComponents
 
 const AmountTextInputStyled = styled(TextInput)`
-  pointer-events: all;
   flex-grow: 1;
   max-width: 200px;
-
-  div {
-    pointer-events: none;
-  }
 `;
 
 const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
-  pointer-events: all;
 `;
 
 const AutoCompleteWrapperStyled = styled.div`

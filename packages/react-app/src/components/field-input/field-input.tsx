@@ -1,21 +1,25 @@
-import { Field } from '@1hive/1hive-ui';
+import { useTheme } from '@1hive/1hive-ui';
 import React from 'react';
 import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
-const FieldStyled = styled(Field)`
-  ${({ compact }: any) => (compact ? 'margin:0;' : '')}
-  pointer-events: none;
+const FieldStyled = styled.div`
+  ${({ compact }: any) => (!compact ? 'margin-bottom: 24px' : '')};
 `;
 
-const ContentWrapperStyled = styled.div`
-  textarea,
-  input,
-  select,
-  button,
-  :first-child {
-    pointer-events: all !important;
-  }
+const LabelStyled = styled.label`
+  color: ${(props: any) => props.color};
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+  user-select: none;
+  margin-bottom: -1px;
+`;
+
+const LineStyled = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 type Props = {
@@ -26,19 +30,22 @@ type Props = {
   children: React.ReactNode;
   id?: string;
 };
+
 export function FieldInput({ id, children, compact, tooltip, tooltipDetail, label }: Props) {
+  const theme = useTheme();
+  const labelComponent = (
+    <LineStyled>
+      <LabelStyled color={theme.contentSecondary} htmlFor={id}>
+        {label}
+      </LabelStyled>
+      {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+    </LineStyled>
+  );
+
   return (
-    <FieldStyled
-      key={id}
-      compact={compact}
-      label={
-        <>
-          <span>{label}</span>
-          {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
-        </>
-      }
-    >
-      <ContentWrapperStyled>{children}</ContentWrapperStyled>
+    <FieldStyled key={id} compact={compact}>
+      {labelComponent}
+      {children}
     </FieldStyled>
   );
 }

@@ -135,7 +135,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 isEdit
                 label="Amount"
                 tooltip="Fund amount"
-                tooltipDetail="The amount to fund the quest."
+                tooltipDetail="The amount of given token"
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
