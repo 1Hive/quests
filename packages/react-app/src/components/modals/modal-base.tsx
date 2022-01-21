@@ -77,7 +77,7 @@ export default function ModalBase({
         <ScrollViewStyled vertical>{children}</ScrollViewStyled>
         {buttons && (
           <ModalFooterStyled>
-            <ChildSpacer justify="end" align="center">
+            <ChildSpacer justify="start" align="center" buttonEnd>
               {buttons}
             </ChildSpacer>
           </ModalFooterStyled>

@@ -14,7 +14,7 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
-import IdentityBadge from '../identity-badge';
+import { AddressFieldInput } from '../field-input/address-field-input';
 
 // #region StyledComponents
 
@@ -151,12 +151,12 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             icon={<IconCoin />}
             label="Claim"
             disabled={loading}
-            wide
             mode="positive"
           />
         }
         onClose={() => closeModal(false)}
         isOpen={opened}
+        width={500}
       >
         <Outset gu16>
           <AmountFieldInputFormik
@@ -165,9 +165,12 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             isLoading={loading}
             value={amount}
           />
-          <Field label="will be send to">
-            <IdentityBadge entity={claim.playerAddress} badgeOnly />
-          </Field>
+          <AddressFieldInput
+            id="playerAddress"
+            label="will be send to"
+            isLoading={loading}
+            value={claim.playerAddress}
+          />
         </Outset>
       </ModalBase>
     </>

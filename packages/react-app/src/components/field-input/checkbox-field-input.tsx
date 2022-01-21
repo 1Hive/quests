@@ -1,7 +1,6 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
@@ -111,7 +110,7 @@ export default function CheckboxFieldInput({
   id,
   isEdit = false,
   isLoading = false,
-  label = '',
+  label,
   value = false,
   tooltip,
   tooltipDetail,
@@ -127,23 +126,20 @@ export default function CheckboxFieldInput({
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      isLoading={isLoading}
     >
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <CheckboxWrapperStyled theme={theme}>
-          <input
-            type="checkbox"
-            id={id}
-            name={id}
-            value={id}
-            checked={value}
-            disabled={disabled || !isEdit}
-            onChange={(e) => onChange(e)}
-          />
-          <span className="checkmark" />
-        </CheckboxWrapperStyled>
-      )}
+      <CheckboxWrapperStyled theme={theme}>
+        <input
+          type="checkbox"
+          id={id}
+          name={id}
+          value={id}
+          checked={value}
+          disabled={disabled || !isEdit}
+          onChange={(e) => onChange(e)}
+        />
+        <span className="checkmark" />
+      </CheckboxWrapperStyled>
     </FieldInput>
   );
 }

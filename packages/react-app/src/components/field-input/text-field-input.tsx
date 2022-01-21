@@ -1,7 +1,6 @@
 import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
 
@@ -12,7 +11,7 @@ const MaxHeightStyled = styled.div`
   margin-bottom: 8px;
   line-height: 1.5em;
   ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.5}em;` : '')}
-
+  overflow-wrap: anywhere;
   p {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
@@ -45,7 +44,7 @@ export default function TextFieldInput({
   id,
   isEdit = false,
   isLoading = false,
-  label = '',
+  label,
   fontSize,
   placeHolder = '',
   value = '',
@@ -61,12 +60,6 @@ export default function TextFieldInput({
   tooltipDetail,
   tooltip,
 }: Props) {
-  if (isLoading)
-    return (
-      <FieldInput id={id} label={label} compact={compact}>
-        <Skeleton />
-      </FieldInput>
-    );
   const readOnlyContent = (
     <>
       {isMarkDown ? (
@@ -94,7 +87,7 @@ export default function TextFieldInput({
       rows={rows}
     />
   ) : (
-    <div style={{ ...css, fontSize }} className="p-event-all">
+    <div style={{ ...css, fontSize }}>
       {maxLine ? (
         <div>
           <MaxHeightStyled maxLine={maxLine}>{readOnlyContent}</MaxHeightStyled>
@@ -105,17 +98,16 @@ export default function TextFieldInput({
       )}
     </div>
   );
-  return label ? (
+  return (
     <FieldInput
       label={label}
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       id={id}
       compact={compact}
+      isLoading={isLoading}
     >
       {loadableContent}
     </FieldInput>
-  ) : (
-    loadableContent
   );
 }

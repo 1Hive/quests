@@ -13,40 +13,48 @@ const InfoStyled = styled(Info)`
 `;
 
 type Props = {
-  tokens: (TokenModel | string | undefined)[];
+  askedTokenAmount: TokenAmountModel;
+  // eslint-disable-next-line no-unused-vars
+  setIsEnoughBalance?: (valid: boolean) => void;
 };
 
-export function ShowBalanceOf({ tokens }: Props) {
+export function ShowBalanceOf({ askedTokenAmount, setIsEnoughBalance }: Props) {
   const { walletAddress } = useWallet();
-  const [tokenBalances, setTokenBalances] = useState<TokenAmountModel[]>([]);
+  const [tokenBalance, setTokenBalance] = useState<TokenAmountModel>();
+  const [isEnoughBalance, _setIsEnoughBalance] = useState(true);
+
   useEffect(() => {
-    const fetchBalances = async (_tokens: (TokenModel | string | undefined)[]) => {
-      setTokenBalances(
-        (
-          await Promise.all(
-            _tokens.map(async (token) => token && getBalanceOf(token, walletAddress)),
-          )
-        ).filter((x) => !!x) as TokenAmountModel[],
-      );
+    const fetchBalances = async (_token: TokenModel) => {
+      setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
     };
-    if (tokens?.length) {
-      fetchBalances(tokens);
+    if (askedTokenAmount?.token) {
+      fetchBalances(askedTokenAmount.token);
     }
-  }, [tokens]);
+  }, [askedTokenAmount]);
+
+  useEffect(() => {
+    if (tokenBalance) {
+      const isEnough = tokenBalance.parsedAmount >= askedTokenAmount.parsedAmount;
+      _setIsEnoughBalance(isEnough);
+      if (setIsEnoughBalance) setIsEnoughBalance(isEnough);
+    }
+  }, [askedTokenAmount, tokenBalance, setIsEnoughBalance]);
   return (
-    <InfoStyled>
-      {tokenBalances.map((token) => (
-        <AmountFieldInput
-          id={`balance-${token.token.symbol}`}
-          key={`balance-${token.token.token}`}
-          compact
-          label="Your balance"
-          tooltip="Balance"
-          tooltipDetail="Connected wallet's balance of the specified token"
-          value={token}
-          maxDecimals={4}
-        />
-      ))}
-    </InfoStyled>
+    <>
+      {tokenBalance && (
+        <InfoStyled mode={isEnoughBalance ? 'info' : 'warning'}>
+          <AmountFieldInput
+            id={`balance-${tokenBalance.token.symbol}`}
+            key={`balance-${tokenBalance.token.token}`}
+            compact
+            label={isEnoughBalance ? 'Wallet' : 'Not enough'}
+            tooltip="Balance"
+            tooltipDetail="Connected wallet's balance of the specified token"
+            value={tokenBalance}
+            maxDecimals={4}
+          />
+        </InfoStyled>
+      )}
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { useTheme } from '@1hive/1hive-ui';
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
@@ -15,6 +16,7 @@ const LabelStyled = styled.label`
   line-height: 1.5;
   text-transform: uppercase;
   user-select: none;
+  margin-bottom: ${GUpx(0.5)};
 `;
 
 const LineStyled = styled.div`
@@ -30,16 +32,25 @@ const ContentWrapperStyled = styled.div`
 
 type Props = {
   compact?: boolean;
-  label: React.ReactNode;
+  label?: React.ReactNode;
   tooltip?: string;
   tooltipDetail?: React.ReactNode;
   children: React.ReactNode;
   id?: string;
+  isLoading: boolean;
 };
 
-export function FieldInput({ id, children, compact, tooltip, tooltipDetail, label }: Props) {
+export function FieldInput({
+  id,
+  children,
+  compact,
+  tooltip,
+  tooltipDetail,
+  label,
+  isLoading = false,
+}: Props) {
   const theme = useTheme();
-  const labelComponent = (
+  const labelComponent = label && (
     <LineStyled>
       <LabelStyled color={theme.contentSecondary} htmlFor={id}>
         {label}
@@ -51,7 +62,11 @@ export function FieldInput({ id, children, compact, tooltip, tooltipDetail, labe
   return (
     <FieldStyled key={id} compact={compact}>
       {labelComponent}
-      <ContentWrapperStyled compact={compact}>{children}</ContentWrapperStyled>
+      {isLoading ? (
+        <Skeleton />
+      ) : (
+        <ContentWrapperStyled compact={compact}>{children}</ContentWrapperStyled>
+      )}
     </FieldStyled>
   );
 }

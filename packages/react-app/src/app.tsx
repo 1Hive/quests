@@ -6,6 +6,10 @@ import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
 import MainView from './components/main-view';
 import { DEFAULT_THEME } from './constants';
+import { FilterContextProvider } from './contexts/filter.context';
+import { PageContextProvider } from './contexts/page.context';
+import { QuestsContextProvider } from './contexts/quests.context';
+import { TransactionContextProvider } from './contexts/transaction.context';
 import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
 
@@ -38,18 +42,26 @@ function App() {
     // Trigger sentry.io
     <ErrorBoundary>
       <WalletProvider>
-        <Main
-          assetsUrl="/aragon-ui/"
-          layout={false}
-          scrollView={false}
-          theme={currentTheme ?? DEFAULT_THEME}
-        >
-          <HashRouter>
-            <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
-              <Routes />
-            </MainView>
-          </HashRouter>
-        </Main>
+        <PageContextProvider>
+          <TransactionContextProvider>
+            <QuestsContextProvider>
+              <FilterContextProvider>
+                <Main
+                  assetsUrl="/aragon-ui/"
+                  layout={false}
+                  scrollView={false}
+                  theme={currentTheme ?? DEFAULT_THEME}
+                >
+                  <HashRouter>
+                    <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
+                      <Routes />
+                    </MainView>
+                  </HashRouter>
+                </Main>
+              </FilterContextProvider>
+            </QuestsContextProvider>
+          </TransactionContextProvider>
+        </PageContextProvider>
       </WalletProvider>
     </ErrorBoundary>
   );

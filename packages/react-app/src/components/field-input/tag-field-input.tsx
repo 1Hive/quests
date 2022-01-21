@@ -3,7 +3,6 @@ import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useRef, useState } from 'react';
 import { FaHashtag } from 'react-icons/fa';
-import Skeleton from 'react-loading-skeleton';
 import { Outset } from '../utils/spacer-util';
 import { FieldInput } from './field-input';
 
@@ -25,7 +24,7 @@ type Props = {
 
 function TagFieldInput({
   id,
-  label = '',
+  label,
   placeholder = '',
   value = [],
   tagSuggestions = undefined,
@@ -71,34 +70,31 @@ function TagFieldInput({
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      isLoading={isLoading}
     >
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <>
-          {isEdit && (
-            <AutoComplete
-              items={tagSuggestions}
-              onChange={setSearchTerm}
-              onSelect={onTagAddition}
-              ref={autoCompleteRef}
-              placeholder={placeholder}
-              wide
-            />
-          )}
-          {value &&
-            value.map((x, i) => (
-              <Outset gu4 inline key={x}>
-                <Tag
-                  label={x}
-                  icon={isEdit ? <IconClose /> : <FaHashtag />}
-                  onClick={() => (isEdit ? deleteTag(i) : onTagClick(x))}
-                  className="pointer"
-                />
-              </Outset>
-            ))}
-        </>
-      )}
+      <>
+        {isEdit && (
+          <AutoComplete
+            items={tagSuggestions}
+            onChange={setSearchTerm}
+            onSelect={onTagAddition}
+            ref={autoCompleteRef}
+            placeholder={placeholder}
+            wide
+          />
+        )}
+        {value &&
+          value.map((x, i) => (
+            <Outset gu4 inline key={x}>
+              <Tag
+                label={x}
+                icon={isEdit ? <IconClose /> : <FaHashtag />}
+                onClick={() => (isEdit ? deleteTag(i) : onTagClick(x))}
+                className="pointer"
+              />
+            </Outset>
+          ))}
+      </>
     </FieldInput>
   );
 }

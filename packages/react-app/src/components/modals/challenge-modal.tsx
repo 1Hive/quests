@@ -59,6 +59,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [opened, setOpened] = useState(false);
   const [challengeTimeout, setChallengedTimeout] = useState<boolean | undefined>(undefined);
   const [openButtonLabel, setOpenButtonLabel] = useState<string>();
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext();
@@ -265,7 +266,11 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         </OpenButtonWrapperStyled>
       }
       buttons={[
-        <ShowBalanceOf tokens={[challengeDeposit.token, challengeFee?.token]} />,
+        <ShowBalanceOf
+          askedTokenAmount={challengeDeposit}
+          setIsEnoughBalance={setIsEnoughBalance}
+        />,
+        challengeFee && <ShowBalanceOf askedTokenAmount={challengeFee} />,
         <AmountFieldInput
           key="challengeDeposit"
           id="challengeDeposit"
@@ -293,7 +298,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={loading}
+          disabled={loading || !walletAddress || !isEnoughBalance}
         />,
       ]}
       onClose={() => closeModal(false)}

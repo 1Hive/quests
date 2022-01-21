@@ -1,7 +1,6 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { dateFormat } from '../../utils/date.utils';
@@ -45,7 +44,7 @@ export default function DateFieldInput({
   id,
   isEdit = false,
   isLoading = false,
-  label = '',
+  label,
   value = Date.now(),
   onChange = noop,
   css,
@@ -55,14 +54,6 @@ export default function DateFieldInput({
   wide = false,
 }: Props) {
   const theme = useTheme();
-
-  if (isLoading)
-    return (
-      <FieldInput label={label} id={id} compact={compact}>
-        <Skeleton />
-      </FieldInput>
-    );
-
   const valFormat = dateFormat(value, 'iso');
 
   const handleChange = (e: any) => {
@@ -89,17 +80,16 @@ export default function DateFieldInput({
   ) : (
     <span>{new Date(value).toDateString()}</span>
   );
-  return label ? (
+  return (
     <FieldInput
       id={id}
       label={label}
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      isLoading={isLoading}
     >
       {loadableContent}
     </FieldInput>
-  ) : (
-    loadableContent
   );
 }

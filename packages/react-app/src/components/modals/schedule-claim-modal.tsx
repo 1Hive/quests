@@ -59,6 +59,7 @@ export default function ScheduleClaimModal({
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext();
@@ -156,7 +157,7 @@ export default function ScheduleClaimModal({
         />
       }
       buttons={[
-        <ShowBalanceOf tokens={[claimDeposit.token]} />,
+        <ShowBalanceOf askedTokenAmount={claimDeposit} setIsEnoughBalance={setIsEnoughBalance} />,
         <AmountFieldInputFormik
           key="claimDeposit"
           id="claimDeposit"
@@ -174,7 +175,7 @@ export default function ScheduleClaimModal({
           mode="positive"
           type="submit"
           form="form-claim"
-          disabled={loading || !walletAddress}
+          disabled={loading || !walletAddress || !isEnoughBalance}
         />,
       ]}
       onClose={() => closeModal(false)}
