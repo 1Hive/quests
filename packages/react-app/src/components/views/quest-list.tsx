@@ -99,7 +99,7 @@ export default function QuestList() {
             <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} data={x} />
           </Outset>
         ))}
-        {skeletonQuests}
+        {isLoading && skeletonQuests}
       </div>
     </InfiniteScroll>
   );
