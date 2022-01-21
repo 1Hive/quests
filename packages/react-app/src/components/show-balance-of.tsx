@@ -30,7 +30,7 @@ export function ShowBalanceOf({ askedTokenAmount, setIsEnoughBalance }: Props) {
     if (askedTokenAmount?.token) {
       fetchBalances(askedTokenAmount.token);
     }
-  }, [askedTokenAmount]);
+  }, [askedTokenAmount, walletAddress]);
 
   useEffect(() => {
     if (tokenBalance) {
@@ -39,6 +39,7 @@ export function ShowBalanceOf({ askedTokenAmount, setIsEnoughBalance }: Props) {
       if (setIsEnoughBalance) setIsEnoughBalance(isEnough);
     }
   }, [askedTokenAmount, tokenBalance, setIsEnoughBalance]);
+
   return (
     <>
       {tokenBalance && (
