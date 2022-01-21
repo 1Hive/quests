@@ -22,6 +22,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
+import { toChecksumAddress } from 'web3-utils';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -180,7 +181,13 @@ export default function Quest({
     const errors = [];
     if (!values.description) errors.push('Validation : Description is required');
     if (!values.title) errors.push('Validation : Title is required');
-    if (!values.fallbackAddress) errors.push('Validation : Funds fallback address is required');
+    if (values.fallbackAddress) {
+      try {
+        values.fallbackAddress = toChecksumAddress(values.fallbackAddress);
+      } catch (error) {
+        errors.push('Validation : Player address is not valid');
+      }
+    }
     if (values.expireTimeMs < Date.now())
       errors.push('Validation : Expiration have to be later than now');
     if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
@@ -198,7 +205,7 @@ export default function Quest({
         toast(pendingMessage);
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,
-          values.fallbackAddress!,
+          values.fallbackAddress ?? walletAddress,
           {
             ...values,
             expireTimeMs: timeValue,
@@ -423,7 +430,7 @@ export default function Quest({
                   <AddressFieldInput
                     id="fallbackAddress"
                     label="Funds fallback address"
-                    value={values.fallbackAddress}
+                    value={values.fallbackAddress ?? walletAddress}
                     isLoading={loading}
                     tooltip="Fallback Address"
                     tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
@@ -461,7 +468,6 @@ export default function Quest({
                           questAddress={data.address}
                           questTotalBounty={bounty}
                           claimDeposit={claimDeposit}
-                          playerAddress={walletAddress}
                           onClose={onScheduleModalClosed}
                         />
                       )}
@@ -492,7 +498,6 @@ export default function Quest({
         initialValues={
           {
             ...data,
-            fallbackAddress: data.fallbackAddress ?? walletAddress,
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}

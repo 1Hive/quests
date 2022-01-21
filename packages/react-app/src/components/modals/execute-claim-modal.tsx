@@ -110,7 +110,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
-        e.message.includes('\n') || e.message.length > 50
+        e.message.includes('\n') || e.message.length > 75
           ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
@@ -149,8 +149,13 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
           <Button
             onClick={() => claimTx()}
             icon={<IconCoin />}
-            label="Claim"
-            disabled={loading}
+            label={buttonLabel}
+            disabled={
+              loading ||
+              !scheduleTimeout ||
+              claim.state === ENUM_CLAIM_STATE.Challenged ||
+              !walletAddress
+            }
             mode="positive"
           />
         }

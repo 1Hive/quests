@@ -44,7 +44,6 @@ type Props = {
   questAddress: string;
   questTotalBounty: TokenAmountModel;
   claimDeposit: TokenAmountModel;
-  playerAddress: string;
   onClose?: ModalCallback;
 };
 
@@ -52,7 +51,6 @@ export default function ScheduleClaimModal({
   questAddress,
   questTotalBounty,
   claimDeposit,
-  playerAddress,
   onClose = noop,
 }: Props) {
   const toast = useToast();
@@ -105,7 +103,7 @@ export default function ScheduleClaimModal({
         {
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
-          playerAddress,
+          playerAddress: values.playerAddress ?? walletAddress,
           questAddress,
         },
         (tx) => {
@@ -128,14 +126,14 @@ export default function ScheduleClaimModal({
         updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       }
       if (!scheduleReceipt?.status)
-        throw new Error('Failed to schedule the claim, please try again in a few seconds');
+        throw new Error('Failed to schedule the claim, please retry in a few seconds');
       toast('Operation succeed');
       closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
-        e.message.includes('\n') || e.message.length > 50
+        e.message.includes('\n') || e.message.length > 75
           ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
@@ -186,18 +184,20 @@ export default function ScheduleClaimModal({
           evidence: '',
           claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
           claimAll: false,
-          playerAddress: walletAddress,
+          playerAddress: undefined as string | undefined,
         }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
+          if (!values.evidence) errors.push('Validation : Evidence of completion is required');
           if (!values.claimedAmount) errors.push('Validation : Claim amount is required');
           if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
             errors.push('Validation : Claim amount should not be higher than available bounty');
-          if (!values.evidence) errors.push('Validation : Evidence of completion is required');
-          try {
-            values.playerAddress = toChecksumAddress(values.playerAddress);
-          } catch (error) {
-            errors.push('Validation : Player address was not set or is not valid');
+          if (values.playerAddress) {
+            try {
+              values.playerAddress = toChecksumAddress(values.playerAddress);
+            } catch (error) {
+              errors.push('Validation : Player address is not valid');
+            }
           }
           if (errors.length) {
             errors.forEach(toast);
@@ -259,7 +259,7 @@ export default function ScheduleClaimModal({
                 <AddressFieldInput
                   id="playerAddress"
                   label="Player address"
-                  value={values.playerAddress}
+                  value={values.playerAddress ?? walletAddress}
                   isLoading={loading}
                   tooltip="Player address"
                   tooltipDetail="Most of time it may be be the connected wallet but can also be set to another wallet address"

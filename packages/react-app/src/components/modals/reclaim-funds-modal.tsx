@@ -81,7 +81,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
-        e.message.includes('\n') || e.message.length > 50
+        e.message.includes('\n') || e.message.length > 75
           ? '💣️ Oops. Something went wrong.'
           : e.message,
       );

@@ -63,7 +63,7 @@ export function AddressFieldInput({
           <EthIdenticonStyled address={value} scale={1.6} />
         </>
       ) : (
-        <AddressField address={value} wide={wide} />
+        <AddressField address={value} wide={wide} autofocus={false} />
       )}
     </WrapperStyled>
   );
