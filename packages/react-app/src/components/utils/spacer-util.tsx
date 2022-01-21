@@ -1,12 +1,27 @@
-/* eslint-disable react/no-array-index-key */
 import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const ChildWrapperStyled = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: ${(props: any) => (props.vertical ? 'column' : 'row')};
-  justify-content: ${(props: any) => props.justify};
-  align-items: ${(props: any) => props.align};
+  ${(props: any) => (props.justify ? `justify-content:${props.justify};` : '')}
+  ${(props: any) => (props.align ? `align-items:${props.align};` : '')}
+
+  ${(props: any) =>
+    props.buttonEnd
+      ? `
+    & > div:last-child {
+      flex-grow: 1;
+      display: flex;
+      justify-content: flex-end;
+
+      button {
+        margin-left: auto;
+      }
+    }
+  `
+      : ''}
 `;
 
 type Props = {
@@ -147,26 +162,28 @@ type ChildSpacerProps = {
   children?: ReactNode;
   size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
   vertical?: boolean;
-  justify?: 'start' | 'middle' | 'end';
-  align?: 'start' | 'middle' | 'end';
+  justify?: 'start' | 'middle' | 'center' | 'end';
+  align?: 'start' | 'center' | 'end';
+  buttonEnd?: boolean;
 };
 
 export function ChildSpacer({
   children,
   size = 8,
   vertical = false,
-  justify = 'start',
-  align = 'middle',
+  justify,
+  align,
+  buttonEnd = false,
 }: ChildSpacerProps) {
   const childList = children as any;
-
   return (
-    <ChildWrapperStyled justify={justify} vertical={vertical} align={align}>
+    <ChildWrapperStyled justify={justify} vertical={vertical} align={align} buttonEnd={buttonEnd}>
       {React.Children.map(children, (child, i) => {
         let className = '';
         if (i !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
         if (i !== childList.length - 1) className += ` p${vertical ? 'b' : 'r'}-${size}`;
         return (
+          // eslint-disable-next-line react/no-array-index-key
           <div className={className} key={`child-${i}`}>
             {child}
           </div>

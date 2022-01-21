@@ -76,7 +76,7 @@ function AmountFieldInput({
   id,
   isEdit = false,
   isLoading = false,
-  label = '',
+  label,
   placeHolder = '',
   value,
   onChange = noop,
@@ -182,6 +182,7 @@ function AmountFieldInput({
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      isLoading={isLoading}
     >
       {isLoading ? (
         <Skeleton />

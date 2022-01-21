@@ -14,7 +14,7 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
-import IdentityBadge from '../identity-badge';
+import { AddressFieldInput } from '../field-input/address-field-input';
 
 // #region StyledComponents
 
@@ -110,7 +110,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
-        e.message.includes('\n') || e.message.length > 50
+        e.message.includes('\n') || e.message.length > 75
           ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
@@ -149,14 +149,19 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
           <Button
             onClick={() => claimTx()}
             icon={<IconCoin />}
-            label="Claim"
-            disabled={loading}
-            wide
+            label={buttonLabel}
+            disabled={
+              loading ||
+              !scheduleTimeout ||
+              claim.state === ENUM_CLAIM_STATE.Challenged ||
+              !walletAddress
+            }
             mode="positive"
           />
         }
         onClose={() => closeModal(false)}
         isOpen={opened}
+        width={500}
       >
         <Outset gu16>
           <AmountFieldInputFormik
@@ -165,9 +170,12 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             isLoading={loading}
             value={amount}
           />
-          <Field label="will be send to">
-            <IdentityBadge entity={claim.playerAddress} badgeOnly />
-          </Field>
+          <AddressFieldInput
+            id="playerAddress"
+            label="will be send to"
+            isLoading={loading}
+            value={claim.playerAddress}
+          />
         </Outset>
       </ModalBase>
     </>

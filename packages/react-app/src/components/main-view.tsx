@@ -1,13 +1,11 @@
 import { Root } from '@1hive/1hive-ui';
 import React, { useEffect } from 'react';
-import { PageContextProvider } from 'src/contexts/page.context';
-import { QuestsContextProvider } from 'src/contexts/quests.context';
-import { TransactionContextProvider } from 'src/contexts/transaction.context';
+import { usePageContext } from 'src/contexts/page.context';
 import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { FilterContextProvider } from '../contexts/filter.context';
+import { ENUM_PAGES } from 'src/constants';
 import Header from './header';
 import MainScrollWithSidebarLayout from './side-content-layout';
 import Sidebar from './sidebar';
@@ -50,6 +48,7 @@ type Props = {
 
 function MainView({ children, toggleTheme, currentTheme }: Props) {
   const { activateWallet, walletAddress } = useWallet();
+  const { page } = usePageContext();
   useEffect(() => {
     const tryConnect = async () => {
       try {
@@ -62,26 +61,18 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   }, []);
 
   return (
-    <PageContextProvider>
-      <TransactionContextProvider>
-        <QuestsContextProvider>
-          <MainViewStyled currentTheme={currentTheme}>
-            <HeaderWrapperStyled>
-              <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
-            </HeaderWrapperStyled>
-            <Root.Provider>
-              <FilterContextProvider>
-                <MainScrollWithSidebarLayout
-                  main={children}
-                  side={<Sidebar />}
-                  footer={<Footer />}
-                />
-              </FilterContextProvider>
-            </Root.Provider>
-          </MainViewStyled>
-        </QuestsContextProvider>
-      </TransactionContextProvider>
-    </PageContextProvider>
+    <MainViewStyled currentTheme={currentTheme}>
+      <HeaderWrapperStyled>
+        <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
+      </HeaderWrapperStyled>
+      <Root.Provider>
+        <MainScrollWithSidebarLayout
+          main={children}
+          side={page === ENUM_PAGES.List ? <Sidebar /> : undefined}
+          footer={<Footer />}
+        />
+      </Root.Provider>
+    </MainViewStyled>
   );
 }
 

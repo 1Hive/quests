@@ -1,7 +1,6 @@
 import { TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { FieldInput } from './field-input';
 
 type Props = {
@@ -26,7 +25,7 @@ export default function NumberFieldInput({
   id,
   isEdit = false,
   isLoading = false,
-  label = '',
+  label,
   placeHolder = '',
   value = 0,
   onChange = noop,
@@ -39,21 +38,6 @@ export default function NumberFieldInput({
   suffix = '',
   compact = false,
 }: Props) {
-  let content;
-  if (isEdit)
-    content = (
-      <TextInput
-        id={id}
-        type="number"
-        wide={wide}
-        onChange={onChange}
-        placeHolder={placeHolder}
-        max={max}
-        min={min}
-        isRequired={isRequired}
-      />
-    );
-  else content = value + suffix;
   return (
     <FieldInput
       id={id}
@@ -61,8 +45,22 @@ export default function NumberFieldInput({
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      isLoading={isLoading}
     >
-      {isLoading ? <Skeleton /> : content}
+      {isEdit ? (
+        <TextInput
+          id={id}
+          type="number"
+          wide={wide}
+          onChange={onChange}
+          placeHolder={placeHolder}
+          max={max}
+          min={min}
+          isRequired={isRequired}
+        />
+      ) : (
+        value + suffix
+      )}
     </FieldInput>
   );
 }

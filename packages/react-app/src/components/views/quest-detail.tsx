@@ -6,6 +6,7 @@ import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
 import Quest from '../quest';
+import { Outset } from '../utils/spacer-util';
 
 export default function QuestDetail() {
   const { setPage } = usePageContext();
@@ -24,14 +25,16 @@ export default function QuestDetail() {
   }, [id]);
 
   return (
-    <>
-      {quest ? (
-        <Quest data={quest} questMode={ENUM_QUEST_VIEW_MODE.ReadDetail} />
-      ) : (
-        <>
-          <Quest isLoading />
-        </>
-      )}
-    </>
+    <Outset vertical>
+      <>
+        {quest ? (
+          <Quest data={quest} questMode={ENUM_QUEST_VIEW_MODE.ReadDetail} />
+        ) : (
+          <>
+            <Quest isLoading />
+          </>
+        )}
+      </>
+    </Outset>
   );
 }

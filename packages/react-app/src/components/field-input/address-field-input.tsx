@@ -2,7 +2,6 @@ import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
 
 import { noop } from 'lodash-es';
 import React from 'react';
-import Skeleton from 'react-loading-skeleton';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
 
@@ -24,6 +23,10 @@ const WrapperStyled = styled.div`
   display: flex;
   flex-wrap: nowrap;
   ${(props: any) => (props.wide ? 'width:100%' : '')}
+
+  input {
+    cursor: default;
+  }
 `;
 
 // #endregion
@@ -44,7 +47,7 @@ export function AddressFieldInput({
   id,
   isEdit = false,
   isLoading = false,
-  label = '',
+  label,
   value = '',
   onChange = noop,
   compact = false,
@@ -52,31 +55,28 @@ export function AddressFieldInput({
   tooltip,
   wide = false,
 }: Props) {
-  if (isLoading)
-    return (
-      <FieldInput label={label} id={id} compact={compact}>
-        <Skeleton />
-      </FieldInput>
-    );
-  const loadableContent = isEdit ? (
+  const loadableContent = (
     <WrapperStyled wide={wide}>
-      <TextInputStyled id={id} value={value} onChange={onChange} />
-      <EthIdenticonStyled address={value} scale={1.6} />
+      {isEdit ? (
+        <>
+          <TextInputStyled id={id} value={value} onChange={onChange} />
+          <EthIdenticonStyled address={value} scale={1.6} />
+        </>
+      ) : (
+        <AddressField address={value} wide={wide} autofocus={false} />
+      )}
     </WrapperStyled>
-  ) : (
-    <AddressField address={value} wide={wide} />
   );
-  return label ? (
+  return (
     <FieldInput
       id={id}
       label={label}
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      isLoading={isLoading}
     >
       {loadableContent}
     </FieldInput>
-  ) : (
-    loadableContent
   );
 }

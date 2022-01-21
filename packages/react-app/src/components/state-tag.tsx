@@ -9,7 +9,6 @@ const StateTagStyled = styled(Tag)`
 `;
 
 const StateWrapperStyled = styled.div`
-  width: 100%;
   text-align: left;
   padding: ${GUpx(1)};
   display: flex;

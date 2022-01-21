@@ -21,6 +21,7 @@ import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { IconTooltip } from '../field-input/icon-tooltip';
 import { getLastBlockDate } from '../../utils/date.utils';
+import { ShowBalanceOf } from '../show-balance-of';
 
 // #region StyledComponents
 
@@ -57,7 +58,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const [challengeTimeout, setChallengedTimeout] = useState<boolean | undefined>(undefined);
-  const [openButtonLabel, setOpenButtonLabel] = useState<string>();
+  const [buttonLabel, setOpenButtonLabel] = useState<string>();
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
+  const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext();
@@ -99,6 +102,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     }
   }, [claim.state, challengeTimeout]);
 
+  useEffect(() => {
+    if (challengeFee)
+      setIsFeeDepositSameToken(
+        challengeFee.token.token.toLowerCase() === challengeDeposit.token.token.toLowerCase(),
+      );
+  }, [challengeDeposit, challengeFee]);
+
   const closeModal = (success: boolean) => {
     setOpened(false);
     onClose(success);
@@ -111,13 +121,10 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       try {
         setLoading(true);
         const { governQueueAddress } = getNetwork();
-        const feeAndDepositSameToken =
-          challengeFee?.token?.token.toLowerCase() ===
-          claim.container?.config.challengeDeposit.token.toLowerCase();
 
         if (
           challengeFee?.parsedAmount &&
-          (!feeAndDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
+          (!isFeeDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
         ) {
           const pendingMessage = 'Approving challenge fee...';
           toast(pendingMessage);
@@ -148,10 +155,10 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         }
         if (+claim.container!.config.challengeDeposit.amount) {
           let tokenToApprove: TokenModel;
-          const pendingMessage = feeAndDepositSameToken
+          const pendingMessage = isFeeDepositSameToken
             ? 'Approving challenge fee + deposit...'
             : 'Approving challenge deposit...';
-          if (feeAndDepositSameToken && challengeFee?.token?.amount) {
+          if (isFeeDepositSameToken && challengeFee?.token?.amount) {
             let approvingAmount = BigNumber.from(claim.container!.config.challengeDeposit.amount);
             approvingAmount = approvingAmount.add(BigNumber.from(challengeFee.token.amount));
             tokenToApprove = {
@@ -249,13 +256,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       }
       openButton={
         <OpenButtonWrapperStyled>
-          {openButtonLabel && (
+          {buttonLabel && (
             <OpenButtonStyled
               icon={<IconFlag />}
               onClick={() => setOpened(true)}
-              label={openButtonLabel}
+              label={buttonLabel}
               mode="negative"
-              disabled={!openButtonLabel || loading || challengeTimeout || !walletAddress}
+              disabled={!buttonLabel || loading || challengeTimeout || !walletAddress}
             />
           )}
           {!loading && challengeTimeout === false && claim.executionTimeMs && (
@@ -264,6 +271,20 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         </OpenButtonWrapperStyled>
       }
       buttons={[
+        <ShowBalanceOf
+          askedTokenAmount={
+            isFeeDepositSameToken && challengeFee
+              ? {
+                  parsedAmount: challengeDeposit.parsedAmount + challengeFee.parsedAmount,
+                  token: challengeDeposit.token,
+                }
+              : challengeDeposit
+          }
+          setIsEnoughBalance={setIsEnoughBalance}
+        />,
+        challengeFee && !isFeeDepositSameToken && (
+          <ShowBalanceOf askedTokenAmount={challengeFee} setIsEnoughBalance={setIsEnoughBalance} />
+        ),
         <AmountFieldInput
           key="challengeDeposit"
           id="challengeDeposit"
@@ -287,11 +308,11 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         <Button
           key="confirmButton"
           icon={<IconFlag />}
-          label="Challenge"
+          label={buttonLabel}
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={loading}
+          disabled={loading || !walletAddress || !isEnoughBalance || challengeTimeout}
         />,
       ]}
       onClose={() => closeModal(false)}

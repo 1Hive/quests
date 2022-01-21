@@ -45,6 +45,14 @@ export default function ModalBase({
   width,
   css,
 }: Props) {
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', escFunction, false);
+    } else document.removeEventListener('keydown', escFunction, false);
+
+    return () => document.removeEventListener('keydown', escFunction, false);
+  }, [isOpen]);
+
   const escFunction = (e: any) => {
     if (
       e.key === 'Escape' &&
@@ -53,14 +61,6 @@ export default function ModalBase({
       onClose();
     }
   };
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('keydown', escFunction, false);
-    } else document.removeEventListener('keydown', escFunction, false);
-
-    return () => document.removeEventListener('keydown', escFunction, false);
-  }, [isOpen]);
 
   return (
     <>
@@ -77,7 +77,7 @@ export default function ModalBase({
         <ScrollViewStyled vertical>{children}</ScrollViewStyled>
         {buttons && (
           <ModalFooterStyled>
-            <ChildSpacer justify="end" align="middle">
+            <ChildSpacer justify="start" align="center" buttonEnd>
               {buttons}
             </ChildSpacer>
           </ModalFooterStyled>
