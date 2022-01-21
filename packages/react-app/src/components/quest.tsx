@@ -1,8 +1,7 @@
-import { AddressField, Card, useToast } from '@1hive/1hive-ui';
+import { Card, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import {
   ENUM,
@@ -335,13 +334,7 @@ export default function Quest({
             ) : (
               titleInput
             )}
-            <AddressWrapperStyled>
-              {loading ? (
-                <Skeleton />
-              ) : (
-                <AddressField id="address" address={values.address} autofocus={false} />
-              )}
-            </AddressWrapperStyled>
+            <AddressFieldInput id="address" value={values.address} isLoading={loading} />
           </QuestHeaderStyled>
         )}
         <TwoColumnStyled isEdit={isEdit}>

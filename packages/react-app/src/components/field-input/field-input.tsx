@@ -7,6 +7,7 @@ import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled.div`
   ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(2)}` : '')};
+  ${({ isLoading }: any) => (isLoading ? `width: 100%;` : '')};
 `;
 
 const LabelStyled = styled.label`
@@ -28,6 +29,11 @@ const ContentWrapperStyled = styled.div`
   display: flex;
   align-items: center;
   ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
+`;
+
+const SkeletonWrapperStyled = styled.div`
+  width: 100%;
+  padding: 0 ${GUpx()};
 `;
 
 type Props = {
@@ -58,15 +64,18 @@ export function FieldInput({
       {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
     </LineStyled>
   );
-
   return (
-    <FieldStyled key={id} compact={compact}>
+    <FieldStyled key={id} compact={compact} isLoading={isLoading}>
       {labelComponent}
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <ContentWrapperStyled compact={compact}>{children}</ContentWrapperStyled>
-      )}
+      <>
+        {isLoading ? (
+          <SkeletonWrapperStyled>
+            <Skeleton />
+          </SkeletonWrapperStyled>
+        ) : (
+          <ContentWrapperStyled compact={compact}>{children}</ContentWrapperStyled>
+        )}
+      </>
     </FieldStyled>
   );
 }

@@ -67,7 +67,7 @@ export function AddressFieldInput({
       )}
     </WrapperStyled>
   );
-  return label ? (
+  return (
     <FieldInput
       id={id}
       label={label}
@@ -78,7 +78,5 @@ export function AddressFieldInput({
     >
       {loadableContent}
     </FieldInput>
-  ) : (
-    loadableContent
   );
 }
