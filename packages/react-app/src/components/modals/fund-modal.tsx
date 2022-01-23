@@ -16,6 +16,7 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { ShowBalanceOf } from '../show-balance-of';
+import { AddressFieldInput } from '../field-input/address-field-input';
 
 const FormStyled = styled(Form)`
   width: 100%;
@@ -136,7 +137,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           ]}
           onClose={() => closeModal(false)}
           isOpen={opened}
-          width={500}
         >
           <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
@@ -151,6 +151,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 value={values.fundAmount}
                 wide
               />
+              <AddressFieldInput id="address" value={quest.address} isLoading={loading} />
             </Outset>
           </FormStyled>
         </ModalBase>

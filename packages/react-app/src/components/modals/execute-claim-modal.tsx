@@ -161,7 +161,6 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         }
         onClose={() => closeModal(false)}
         isOpen={opened}
-        width={500}
       >
         <Outset gu16>
           <AmountFieldInputFormik
