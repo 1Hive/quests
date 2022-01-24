@@ -155,32 +155,6 @@ function AmountFieldInput({
     setToken(value?.token);
   }, [value]);
 
-  const onAmountChange = (e: any) => {
-    const newAmount = e.target.value;
-    setAmount(newAmount);
-    if (token && e.target.value !== '') {
-      const nextValue = {
-        token: {
-          ...token,
-          amount: parseUnits(newAmount.toString(), token.decimals).toString(),
-        },
-        parsedAmount: +newAmount,
-      };
-      if (formik) formik.setFieldValue(id, nextValue);
-      else onChange(nextValue);
-    }
-  };
-
-  const onTokenChange = (i: number) => {
-    const newToken = tokens[i];
-    autoCompleteRef.current.value = newToken.symbol;
-    setSearchTerm(undefined);
-    setToken(newToken);
-    const nextValue = { token: newToken, parsedAmount: amount };
-    if (formik) formik.setFieldValue(id, nextValue);
-    else onChange(nextValue);
-  };
-
   const fetchAvailableTokens = async () => {
     const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
@@ -189,9 +163,37 @@ function AmountFieldInput({
     );
   };
 
+  const onAmountChange = (e: any) => {
+    const newAmount = e.target.value;
+    setAmount(newAmount);
+    if (token && e.target.value !== '') {
+      applyChanges({
+        token: {
+          ...token,
+          amount: parseUnits(newAmount.toString(), token.decimals).toString(),
+        },
+        parsedAmount: +newAmount,
+      });
+    }
+  };
+
+  const onTokenChange = (i: number) => {
+    const newToken = tokens[i];
+    autoCompleteRef.current.value = newToken.symbol;
+    setSearchTerm(undefined);
+    applyChanges({ token: newToken, parsedAmount: amount });
+  };
+
   const onTokenEditClick = () => {
-    setToken(undefined);
     fetchAvailableTokens();
+    applyChanges({ token: undefined, parsedAmount: amount });
+  };
+
+  const applyChanges = (nextValue: Partial<TokenAmountModel>) => {
+    setToken(nextValue.token);
+    setAmount(nextValue.parsedAmount);
+    if (formik) formik.setFieldValue(id, nextValue);
+    else onChange(nextValue);
   };
 
   return (
