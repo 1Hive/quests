@@ -306,6 +306,9 @@ export default function Quest({
       }
     }, 500);
   };
+  const validate = (data: QuestModel) => {
+    setQuestData?.(data);
+  };
 
   const questContent = (values: QuestModel, handleChange = noop) => {
     const titleInput = (
@@ -401,7 +404,7 @@ export default function Quest({
                       ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
                       : "The available amount of this quest's funding pool."
                   }
-                  value={bounty ?? undefined}
+                  value={questData.bounty ?? undefined}
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                 />
@@ -507,6 +510,8 @@ export default function Quest({
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
+        validateOnBlur
+        validate={validate}
       >
         {({ values, handleChange, handleSubmit }) =>
           isEdit ? (
