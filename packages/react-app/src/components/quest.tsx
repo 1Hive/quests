@@ -171,8 +171,7 @@ export default function Quest({
     };
 
     if (!questData.rewardToken) setBounty(null);
-    else if (questData.address)
-      fetchBalanceOfQuest(walletAddress, questData.address, questData.rewardToken);
+    else if (questData.address) fetchBalanceOfQuest(questData.address, questData.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
@@ -303,7 +302,7 @@ export default function Quest({
   const onFundModalClosed = (success: boolean) => {
     setTimeout(() => {
       if (success && questData.address && questData.rewardToken && walletAddress) {
-        fetchBalanceOfQuest(walletAddress, questData.address, questData.rewardToken);
+        fetchBalanceOfQuest(questData.address, questData.rewardToken);
         setClaimUpdate(claimUpdated + 1);
       }
     }, 500);
