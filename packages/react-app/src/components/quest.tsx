@@ -399,9 +399,10 @@ export default function Quest({
                       ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
                       : "The available amount of this quest's funding pool."
                   }
-                  value={questData.bounty ?? undefined}
+                  value={questData.bounty}
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
+                  tokenEditable
                 />
               )}
               {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (

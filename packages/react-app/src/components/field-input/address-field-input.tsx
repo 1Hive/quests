@@ -9,7 +9,7 @@ import { FieldInput } from './field-input';
 
 const TextInputStyled = styled(TextInput)`
   height: 40px;
-  width: 380px;
+  width: 370px;
   border-radius: 3px 0 0 3px;
 `;
 
