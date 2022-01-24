@@ -14,7 +14,7 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
-import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
+import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';

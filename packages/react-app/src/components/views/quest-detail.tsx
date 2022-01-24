@@ -6,7 +6,6 @@ import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
 import Quest from '../quest';
-import { Outset } from '../utils/spacer-util';
 
 export default function QuestDetail() {
   const { setPage } = usePageContext();

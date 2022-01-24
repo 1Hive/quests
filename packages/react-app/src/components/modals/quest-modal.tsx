@@ -42,9 +42,7 @@ export default function QuestModal({
   const onOpenButtonClick = () => {
     setOpened(true);
   };
-  useEffect(() => {
-    console.log('BOUNTY:', questData.bounty);
-  }, [questData]);
+
   const closeModal = (success: boolean) => {
     setOpened(false);
     onClose(success);
