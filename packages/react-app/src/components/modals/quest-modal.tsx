@@ -1,11 +1,12 @@
 import { Button, IconPlus } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
-import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
+import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import Quest from '../quest';
 import ModalBase, { ModalCallback } from './modal-base';
 import { useQuestsContext } from '../../contexts/quests.context';
@@ -32,7 +33,12 @@ export default function QuestModal({
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
   const { setNewQuest } = useQuestsContext();
-
+  const [questData, setQuestData] = useState(
+    data ?? {
+      expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
+      state: ENUM_QUEST_STATE.Draft,
+    },
+  );
   const onOpenButtonClick = () => {
     setOpened(true);
   };
@@ -99,7 +105,11 @@ export default function QuestModal({
       isOpen={opened}
       onClose={() => closeModal(false)}
     >
-      <Quest questMode={questMode} data={data} onSave={(x) => fetchNewQuest(x)} />
+      <Quest
+        questMode={questMode}
+        dataState={{ questData, setQuestData }}
+        onSave={(x) => fetchNewQuest(x)}
+      />
     </ModalBase>
   );
 }

@@ -14,7 +14,7 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
-import { IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from 'src/utils/date.utils';
+import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -51,6 +51,7 @@ const AddressWrapperStyled = styled.div`
 
 const CardStyled = styled(Card)`
   justify-content: flex-start;
+  align-items: flex-start;
   width: 100%;
   height: fit-content;
   border: none;
@@ -86,18 +87,17 @@ const TwoColumnStyled = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  margin: ${(props: any) => (props.isEdit ? 0 : GUpx())};
 `;
 
 const FirstColStyled = styled.div`
-  margin: ${GUpx(3)};
+  margin: 0 ${GUpx(3)};
   flex-grow: 1;
   max-width: 80%;
   overflow-wrap: break-word;
 `;
 
 const SecondColStyled = styled.div`
-  margin: ${GUpx(3)};
+  margin: 0 ${GUpx(3)};
   flex-grow: 0;
   display: flex;
   flex-direction: column;
@@ -115,7 +115,8 @@ const QuestHeaderStyled = styled.div`
 // #endregion
 
 type Props = {
-  data?: QuestModel;
+  // eslint-disable-next-line no-unused-vars
+  dataState: { questData: QuestModel; setQuestData?: (questData: QuestModel) => void };
   questMode?: string;
   isLoading?: boolean;
   // eslint-disable-next-line no-unused-vars
@@ -124,10 +125,7 @@ type Props = {
 };
 
 export default function Quest({
-  data = {
-    expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
-    state: ENUM_QUEST_STATE.Draft,
-  },
+  dataState,
   isLoading = false,
   questMode = ENUM_QUEST_VIEW_MODE.ReadDetail,
   onSave = noop,
@@ -136,6 +134,7 @@ export default function Quest({
   const { walletAddress } = useWallet();
   const { defaultToken } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
+  const { questData, setQuestData } = dataState;
   const [loading, setLoading] = useState(isLoading);
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
@@ -154,7 +153,10 @@ export default function Quest({
     const getClaimDeposit = async () => {
       // Don't show deposit of expired
       if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
-        if (data.state === ENUM_QUEST_STATE.Archived || data.state === ENUM_QUEST_STATE.Expired) {
+        if (
+          questData.state === ENUM_QUEST_STATE.Archived ||
+          questData.state === ENUM_QUEST_STATE.Expired
+        ) {
           setClaimDeposit(null);
         } else {
           try {
@@ -168,13 +170,13 @@ export default function Quest({
       }
     };
 
-    if (!data.rewardToken) setBounty(null);
-    else if (data.address) fetchBalanceOfQuest(data.address, data.rewardToken);
+    if (!questData.rewardToken) setBounty(null);
+    else if (questData.address) fetchBalanceOfQuest(questData.address, questData.rewardToken);
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
     }
-  }, [questMode, data.rewardToken, walletAddress]);
+  }, [questMode, questData.rewardToken, walletAddress]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = [];
@@ -281,8 +283,8 @@ export default function Quest({
   const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
     QuestService.getBalanceOf(token, address)
       .then((result) => {
-        data.bounty = result ?? undefined;
-        processQuestState(data);
+        questData.bounty = result ?? undefined;
+        processQuestState(questData);
         setBounty(result);
       })
       .catch((err) => {
@@ -299,11 +301,14 @@ export default function Quest({
 
   const onFundModalClosed = (success: boolean) => {
     setTimeout(() => {
-      if (success && data.address && data.rewardToken && walletAddress) {
-        fetchBalanceOfQuest(data.address, data.rewardToken);
+      if (success && questData.address && questData.rewardToken && walletAddress) {
+        fetchBalanceOfQuest(questData.address, questData.rewardToken);
         setClaimUpdate(claimUpdated + 1);
       }
     }, 500);
+  };
+  const validate = (data: QuestModel) => {
+    setQuestData?.(data);
   };
 
   const questContent = (values: QuestModel, handleChange = noop) => {
@@ -372,7 +377,9 @@ export default function Quest({
                 isMarkDown
                 maxLine={questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? 10 : undefined}
                 ellipsis={
-                  <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${data.address}`}>Read more</LinkStyled>
+                  <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData.address}`}>
+                    Read more
+                  </LinkStyled>
                 }
               />
             </FirstColStyled>
@@ -392,9 +399,10 @@ export default function Quest({
                       ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
                       : "The available amount of this quest's funding pool."
                   }
-                  value={bounty ?? undefined}
+                  value={questData.bounty}
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
+                  tokenEditable
                 />
               )}
               {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
@@ -436,29 +444,29 @@ export default function Quest({
             </SecondColStyled>
           </>
         </TwoColumnStyled>
-        {!loading && !isEdit && data.address && (
+        {!loading && !isEdit && questData.address && (
           <>
             {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail &&
               challengeDeposit &&
               bounty !== null && (
                 <ClaimList
                   newClaim={claimUpdated}
-                  questData={data}
+                  questData={questData}
                   questTotalBounty={bounty}
                   challengeDeposit={challengeDeposit}
                 />
               )}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
-              data.address &&
+              questData.address &&
               walletAddress &&
               bounty && (
                 <QuestFooterStyled>
                   {values.state === ENUM_QUEST_STATE.Active ? (
                     <>
-                      <FundModal quest={data} onClose={onFundModalClosed} />
+                      <FundModal quest={questData} onClose={onFundModalClosed} />
                       {claimDeposit && (
                         <ScheduleClaimModal
-                          questAddress={data.address}
+                          questAddress={questData.address}
                           questTotalBounty={bounty}
                           claimDeposit={claimDeposit}
                           onClose={onScheduleModalClosed}
@@ -484,23 +492,26 @@ export default function Quest({
     <CardStyled
       style={css}
       isSummary={questMode === ENUM_QUEST_VIEW_MODE.ReadSummary}
-      id={data.address}
+      id={questData.address}
     >
-      {!loading && <StateTag state={data.state} />}
+      {!loading && <StateTag state={questData.state} />}
       <Formik
         initialValues={
           {
-            ...data,
+            ...questData,
+            fallbackAddress: questData.fallbackAddress ?? walletAddress,
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
+        validateOnBlur
+        validate={validate}
       >
         {({ values, handleChange, handleSubmit }) =>
           isEdit ? (
             <FormStyled
               onSubmit={handleSubmit}
               ref={formRef}
-              id={`form-quest-form-${data.address ?? 'new'}`}
+              id={`form-quest-form-${questData.address ?? 'new'}`}
             >
               {questContent(values, handleChange)}
             </FormStyled>

@@ -15,6 +15,7 @@ const InputStyled = styled.input`
   background-color: ${({ background }: any) => background};
   height: 40px;
   padding: ${GUpx()};
+  font-size: 14px;
   &:focus-visible {
     border: 1px solid ${(props: any) => props.focusBorderColor};
     outline: none;

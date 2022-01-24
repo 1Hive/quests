@@ -1,4 +1,10 @@
-import { TextInput, TokenBadge, _AutoComplete as AutoComplete, Tag } from '@1hive/1hive-ui';
+import {
+  TextInput,
+  TokenBadge,
+  _AutoComplete as AutoComplete,
+  Tag,
+  IconEdit,
+} from '@1hive/1hive-ui';
 import { parseUnits } from 'ethers/lib/utils';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
@@ -53,6 +59,11 @@ const AmountTokenWrapperStyled = styled.div`
   ${(props: any) => (props.wide ? 'width:100%;' : '')}
 `;
 
+const IconEditStyled = styled(IconEdit)`
+  cursor: pointer;
+  padding-left: ${GUpx()};
+`;
+
 // #endregion
 
 type Props = {
@@ -70,6 +81,7 @@ type Props = {
   maxDecimals?: number;
   disabled?: boolean;
   wide?: boolean;
+  tokenEditable?: boolean;
 };
 
 function AmountFieldInput({
@@ -87,35 +99,29 @@ function AmountFieldInput({
   maxDecimals,
   disabled = false,
   wide = false,
+  tokenEditable = false,
 }: Props) {
-  const { defaultToken, type } = getNetwork();
+  const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount ?? 0);
-  const [token, setToken] = useState<TokenModel>(value?.token ?? defaultToken);
+  const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const { walletAddress } = useWallet();
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
   useEffect(() => {
-    const fetchAvailableTokens = async () => {
-      const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
-      const questsUsedTokens = await fetchRewardTokens();
-      setAvailableTokens(
-        arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
+    if (!token)
+      document.addEventListener(
+        'focusin',
+        () => {
+          if (walletAddress && isEdit && tokenEditable) fetchAvailableTokens();
+        },
+        true,
       );
-    };
-
-    document.addEventListener(
-      'focusin',
-      () => {
-        if (walletAddress && isEdit && !value?.token) fetchAvailableTokens();
-      },
-      true,
-    );
-  }, [walletAddress, document.activeElement]);
+  }, [walletAddress, isEdit, tokenEditable, token]);
 
   useEffect(() => {
     if (availableTokens.length) {
@@ -146,22 +152,28 @@ function AmountFieldInput({
 
   useEffect(() => {
     setAmount(value?.parsedAmount ?? 0);
-    setToken(value?.token ?? defaultToken);
+    setToken(value?.token);
   }, [value]);
+
+  const fetchAvailableTokens = async () => {
+    const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
+    const questsUsedTokens = await fetchRewardTokens();
+    setAvailableTokens(
+      arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
+    );
+  };
 
   const onAmountChange = (e: any) => {
     const newAmount = e.target.value;
     setAmount(newAmount);
     if (token && e.target.value !== '') {
-      const nextValue = {
+      applyChanges({
         token: {
           ...token,
           amount: parseUnits(newAmount.toString(), token.decimals).toString(),
         },
         parsedAmount: +newAmount,
-      };
-      if (formik) formik.setFieldValue(id, nextValue);
-      else onChange(nextValue);
+      });
     }
   };
 
@@ -169,8 +181,17 @@ function AmountFieldInput({
     const newToken = tokens[i];
     autoCompleteRef.current.value = newToken.symbol;
     setSearchTerm(undefined);
-    setToken(newToken);
-    const nextValue = { token: newToken, parsedAmount: amount };
+    applyChanges({ token: newToken, parsedAmount: amount });
+  };
+
+  const onTokenEditClick = () => {
+    fetchAvailableTokens();
+    applyChanges({ token: undefined, parsedAmount: amount });
+  };
+
+  const applyChanges = (nextValue: Partial<TokenAmountModel>) => {
+    setToken(nextValue.token);
+    setAmount(nextValue.parsedAmount);
     if (formik) formik.setFieldValue(id, nextValue);
     else onChange(nextValue);
   };
@@ -205,12 +226,8 @@ function AmountFieldInput({
               )}
             </Outset>
           )}
-          {value?.token.token ? (
-            <TokenBadgeStyled
-              symbol={value.token.symbol}
-              address={value.token.token}
-              networkType="private"
-            />
+          {token?.token ? (
+            <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
           ) : (
             <AutoCompleteWrapperStyled>
               <AutoComplete
@@ -231,6 +248,9 @@ function AmountFieldInput({
                 )}
               />
             </AutoCompleteWrapperStyled>
+          )}
+          {tokenEditable && isEdit && token && (
+            <IconEditStyled onClick={onTokenEditClick} size="medium" />
           )}
         </AmountTokenWrapperStyled>
       )}
