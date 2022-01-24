@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { Logger } from 'src/utils/logger';
 import ChallengeModal from './modals/challenge-modal';
 import ResolveChallengeModal from './modals/resolve-challenge-modal';
-import { Outset } from './utils/spacer-util';
+import { ChildSpacer, Outset } from './utils/spacer-util';
 import AmountFieldInput from './field-input/amount-field-input';
 import { IconTooltip } from './field-input/icon-tooltip';
 import TextFieldInput from './field-input/text-field-input';
@@ -30,22 +30,6 @@ const WrapperStyled = styled.div`
   display: flex;
   flex-direction: column;
   padding: ${GUpx(2)};
-`;
-
-const RowStyled = styled.div`
-  width: 100%;
-  display: grid;
-  grid-gap: 10px;
-  grid-template-areas: ${(props: any) => (props.twoCol ? "'a a a'" : "'a a a a'")};
-  margin: 8px;
-  justify-content: space-around;
-  align-items: center;
-`;
-
-const GapSpacerStyled = styled.div`
-  min-width: ${(props: any) => props.size};
-  display: flex;
-  justify-content: ${(props: any) => props.justify};
 `;
 
 const HeaderStyled = styled.h1`
@@ -137,33 +121,35 @@ export default function ClaimList({
                 );
               } else if (!claim.state) Logger.error(`Claim doesn't have state`, { claim });
               return [
-                <RowStyled twoCol={!walletAddress}>
-                  <StateTag state={claim.state ?? ''} />
-                  <Field label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}>
-                    <AddressField address={claim.playerAddress} autofocus={false} />
-                  </Field>
-                  <GapSpacerStyled size="200px" justify="flex-start">
-                    {claim.claimedAmount.parsedAmount ? (
-                      <AmountFieldInput
-                        id="amount"
-                        label="Claimed amount"
-                        isLoading={
-                          !claim.claimedAmount.parsedAmount && questTotalBounty === undefined
-                        }
-                        value={
-                          claim.claimedAmount.parsedAmount || !questTotalBounty
-                            ? claim.claimedAmount
-                            : questTotalBounty
-                        }
-                      />
-                    ) : (
-                      <Field label="Claimed amount">All available</Field>
-                    )}
-                  </GapSpacerStyled>
-                  <GapSpacerStyled size="250px" justify="space-around">
-                    {walletAddress && actionButton}
-                  </GapSpacerStyled>
-                </RowStyled>,
+                <div className="wide">
+                  <Outset>
+                    <ChildSpacer size={16} justify="start" align="center" buttonEnd>
+                      <StateTag state={claim.state ?? ''} />
+                      <Field
+                        label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
+                      >
+                        <AddressField address={claim.playerAddress} autofocus={false} />
+                      </Field>
+                      {claim.claimedAmount.parsedAmount ? (
+                        <AmountFieldInput
+                          id="amount"
+                          label="Claimed amount"
+                          isLoading={
+                            !claim.claimedAmount.parsedAmount && questTotalBounty === undefined
+                          }
+                          value={
+                            claim.claimedAmount.parsedAmount || !questTotalBounty
+                              ? claim.claimedAmount
+                              : questTotalBounty
+                          }
+                        />
+                      ) : (
+                        <Field label="Claimed amount">All available</Field>
+                      )}
+                      {walletAddress && actionButton}
+                    </ChildSpacer>
+                  </Outset>
+                </div>,
                 <Outset gu8>
                   <TextFieldInput
                     id="evidence"

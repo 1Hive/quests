@@ -28,6 +28,7 @@ export default class ErrorBoundary extends React.Component<Props> {
     return { hasError: true };
   }
 
+  // eslint-disable-next-line no-unused-vars
   componentDidCatch(error: Error) {
     // TODO : Restore when https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/issues/1hive/quests/108
     // Sentry.captureException(error, {

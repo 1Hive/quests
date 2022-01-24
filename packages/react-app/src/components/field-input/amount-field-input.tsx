@@ -24,18 +24,12 @@ import { FieldInput } from './field-input';
 // #region StyledComponents
 
 const AmountTextInputStyled = styled(TextInput)`
-  pointer-events: all;
   flex-grow: 1;
   max-width: 200px;
-
-  div {
-    pointer-events: none;
-  }
 `;
 
 const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
-  pointer-events: all;
 `;
 
 const AutoCompleteWrapperStyled = styled.div`
@@ -82,7 +76,7 @@ function AmountFieldInput({
   id,
   isEdit = false,
   isLoading = false,
-  label = '',
+  label,
   placeHolder = '',
   value,
   onChange = noop,
@@ -188,6 +182,7 @@ function AmountFieldInput({
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      isLoading={isLoading}
     >
       {isLoading ? (
         <Skeleton />

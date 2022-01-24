@@ -29,7 +29,6 @@ const TooltipWrapperStyled = styled.div`
 `;
 
 const HelpWrapperStyled = styled.div`
-  pointer-events: all;
   width: 16px;
 `;
 
@@ -45,8 +44,8 @@ type Props = {
 export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) => {
   const theme = useTheme();
   return (
-    <Outset>
-      <HelpWrapperStyled className="no-margin">
+    <Outset horizontal>
+      <HelpWrapperStyled className="btn-no-margin">
         {tooltipDetail || children ? (
           <Help hint={tooltip}>
             <TooltipWrapperStyled color={theme.accentContent}>

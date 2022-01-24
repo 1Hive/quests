@@ -12,12 +12,15 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
+import { toChecksumAddress } from 'web3-utils';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
+import { AddressFieldInput } from '../field-input/address-field-input';
+import { ShowBalanceOf } from '../show-balance-of';
 
 // #region StyledComponents
 
@@ -30,13 +33,17 @@ const OpenButtonStyled = styled(Button)`
   width: fit-content;
 `;
 
+const LineStyled = styled.div`
+  display: flex;
+  align-content: center;
+`;
+
 // #endregion
 
 type Props = {
   questAddress: string;
   questTotalBounty: TokenAmountModel;
   claimDeposit: TokenAmountModel;
-  playerAddress: string;
   onClose?: ModalCallback;
 };
 
@@ -44,13 +51,13 @@ export default function ScheduleClaimModal({
   questAddress,
   questTotalBounty,
   claimDeposit,
-  playerAddress,
   onClose = noop,
 }: Props) {
   const toast = useToast();
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext();
@@ -96,7 +103,7 @@ export default function ScheduleClaimModal({
         {
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
-          playerAddress,
+          playerAddress: values.playerAddress ?? walletAddress,
           questAddress,
         },
         (tx) => {
@@ -119,14 +126,14 @@ export default function ScheduleClaimModal({
         updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       }
       if (!scheduleReceipt?.status)
-        throw new Error('Failed to schedule the claim, please try again in a few seconds');
+        throw new Error('Failed to schedule the claim, please retry in a few seconds');
       toast('Operation succeed');
       closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
-        e.message.includes('\n') || e.message.length > 50
+        e.message.includes('\n') || e.message.length > 75
           ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
@@ -148,6 +155,7 @@ export default function ScheduleClaimModal({
         />
       }
       buttons={[
+        <ShowBalanceOf askedTokenAmount={claimDeposit} setIsEnoughBalance={setIsEnoughBalance} />,
         <AmountFieldInputFormik
           key="claimDeposit"
           id="claimDeposit"
@@ -165,7 +173,7 @@ export default function ScheduleClaimModal({
           mode="positive"
           type="submit"
           form="form-claim"
-          disabled={loading || !walletAddress}
+          disabled={loading || !walletAddress || !isEnoughBalance}
         />,
       ]}
       onClose={() => closeModal(false)}
@@ -176,13 +184,21 @@ export default function ScheduleClaimModal({
           evidence: '',
           claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
           claimAll: false,
+          playerAddress: undefined as string | undefined,
         }}
         onSubmit={(values, { setSubmitting }) => {
           const errors = [];
+          if (!values.evidence) errors.push('Validation : Evidence of completion is required');
           if (!values.claimedAmount) errors.push('Validation : Claim amount is required');
           if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
-            errors.push('Validation : Claim amount should not be hight than available bounty');
-          if (!values.evidence) errors.push('Validation : Evidence of completion is required');
+            errors.push('Validation : Claim amount should not be higher than available bounty');
+          if (values.playerAddress) {
+            try {
+              values.playerAddress = toChecksumAddress(values.playerAddress);
+            } catch (error) {
+              errors.push('Validation : Player address is not valid');
+            }
+          }
           if (errors.length) {
             errors.forEach(toast);
           } else {
@@ -208,32 +224,48 @@ export default function ScheduleClaimModal({
                   rows={5}
                   compact
                 />
-                <AmountFieldInputFormik
-                  id="questBounty"
-                  label="Available bounty"
+                <LineStyled>
+                  <Outset horizontal>
+                    <AmountFieldInputFormik
+                      id="questBounty"
+                      label="Available bounty"
+                      isLoading={loading}
+                      value={questTotalBounty}
+                    />
+                  </Outset>
+                  <Outset horizontal>
+                    <CheckboxFieldInput
+                      id="claimAll"
+                      label="Claim all"
+                      onChange={handleChange}
+                      value={values.claimAll}
+                      isLoading={loading}
+                      isEdit
+                    />
+                  </Outset>
+                  <Outset horizontal>
+                    <AmountFieldInputFormik
+                      id="claimedAmount"
+                      isEdit
+                      label="Claim amount"
+                      tooltip="Claim amount"
+                      tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
+                      isLoading={loading}
+                      value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                      disabled={values.claimAll}
+                    />
+                  </Outset>
+                </LineStyled>
+                <AddressFieldInput
+                  id="playerAddress"
+                  label="Player address"
+                  value={values.playerAddress ?? walletAddress}
                   isLoading={loading}
-                  value={questTotalBounty}
-                  compact
-                />
-                <CheckboxFieldInput
-                  id="claimAll"
-                  label="Claim all bounty"
+                  tooltip="Player address"
+                  tooltipDetail="Most of time it may be be the connected wallet but can also be set to another wallet address"
+                  isEdit
                   onChange={handleChange}
-                  value={values.claimAll}
-                  isLoading={loading}
-                  isEdit
-                  compact
-                />
-                <AmountFieldInputFormik
-                  id="claimedAmount"
-                  isEdit
-                  label="Claim amount"
-                  tooltip="Claim amount"
-                  tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
-                  isLoading={loading}
-                  value={values.claimAll ? questTotalBounty : values.claimedAmount}
-                  disabled={values.claimAll}
-                  compact
+                  wide
                 />
               </ChildSpacer>
             </Outset>

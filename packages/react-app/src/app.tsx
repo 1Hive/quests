@@ -1,11 +1,15 @@
 /* eslint-disable no-underscore-dangle */
 import { Main } from '@1hive/1hive-ui';
 import { ErrorBoundary } from '@sentry/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
 import MainView from './components/main-view';
-import { defaultTheme } from './constants';
+import { DEFAULT_THEME } from './constants';
+import { FilterContextProvider } from './contexts/filter.context';
+import { PageContextProvider } from './contexts/page.context';
+import { QuestsContextProvider } from './contexts/quests.context';
+import { TransactionContextProvider } from './contexts/transaction.context';
 import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
 
@@ -20,10 +24,13 @@ const customDarkTheme = {
 };
 
 function App() {
-  const savedTheme = localStorage.getItem('theme');
-  const [currentTheme, setCurrentTheme] = useState<any>(
-    savedTheme === 'dark' ? customDarkTheme : customLightTheme,
-  );
+  const [currentTheme, setCurrentTheme] = useState<any>(undefined);
+
+  useEffect(() => {
+    let themeName = localStorage.getItem('theme');
+    if (!themeName) themeName = DEFAULT_THEME;
+    setCurrentTheme(themeName === 'dark' ? customDarkTheme : customLightTheme);
+  }, []);
 
   const toggleTheme = () => {
     const newTheme = currentTheme._appearance === 'dark' ? customLightTheme : customDarkTheme;
@@ -35,18 +42,26 @@ function App() {
     // Trigger sentry.io
     <ErrorBoundary>
       <WalletProvider>
-        <Main
-          assetsUrl="/aragon-ui/"
-          layout={false}
-          scrollView={false}
-          theme={currentTheme ?? defaultTheme}
-        >
-          <HashRouter>
-            <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
-              <Routes />
-            </MainView>
-          </HashRouter>
-        </Main>
+        <PageContextProvider>
+          <TransactionContextProvider>
+            <QuestsContextProvider>
+              <FilterContextProvider>
+                <Main
+                  assetsUrl="/aragon-ui/"
+                  layout={false}
+                  scrollView={false}
+                  theme={currentTheme ?? DEFAULT_THEME}
+                >
+                  <HashRouter>
+                    <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
+                      <Routes />
+                    </MainView>
+                  </HashRouter>
+                </Main>
+              </FilterContextProvider>
+            </QuestsContextProvider>
+          </TransactionContextProvider>
+        </PageContextProvider>
       </WalletProvider>
     </ErrorBoundary>
   );

@@ -15,7 +15,7 @@ import {
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
 } from 'src/queries/govern-queue-entity.query';
-import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers';
+import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
@@ -164,6 +164,42 @@ async function handleTransaction(
   return receipt;
 }
 
+async function generateScheduleContainer(
+  walletAddress: string,
+  claimData: ClaimModel,
+  extraDelaySec?: number,
+): Promise<ContainerModel> {
+  const { governAddress } = getNetwork();
+  const governQueueResult = await fetchGovernQueue();
+  const erc3000Config = governQueueResult.config;
+  const lastBlockTimestamp = await getLastBlockTimestamp();
+
+  // A bit more than the execution delay
+  const executionTime = lastBlockTimestamp + erc3000Config.executionDelay + (extraDelaySec || 60); // Add 1 minute by default
+
+  const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
+  const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
+
+  return {
+    config: erc3000Config,
+    payload: {
+      nonce: governQueueResult.nonce + 1, // Increment nonce for each schedule
+      executionTime,
+      submitter: walletAddress,
+      executor: governAddress,
+      actions: [
+        {
+          to: claimData.questAddress,
+          value: 0,
+          data: claimCall,
+        },
+      ],
+      allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      proof: evidenceIpfsHash,
+    },
+  } as ContainerModel;
+}
+
 // #endregion
 
 // #region Subgraph Queries
@@ -216,41 +252,6 @@ export async function fetchQuest(questAddress: string) {
   ).questEntity;
   const newQuest = mapQuest(queryResult);
   return newQuest;
-}
-
-export async function computeScheduleContainer(
-  claimData: ClaimModel,
-  extraDelaySec?: number,
-): Promise<ContainerModel> {
-  const { governAddress } = getNetwork();
-  const governQueueResult = await fetchGovernQueue();
-  const erc3000Config = governQueueResult.config;
-  const lastBlockTimestamp = await getLastBlockTimestamp();
-
-  // A bit more than the execution delay
-  const executionTime = lastBlockTimestamp + erc3000Config.executionDelay + (extraDelaySec || 60); // Add 1 minute by default
-
-  const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
-  const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
-
-  return {
-    config: erc3000Config,
-    payload: {
-      nonce: governQueueResult.nonce + 1, // Increment nonce for each schedule
-      executionTime,
-      submitter: claimData.playerAddress,
-      executor: governAddress,
-      actions: [
-        {
-          to: claimData.questAddress,
-          value: 0,
-          data: claimCall,
-        },
-      ],
-      allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
-      proof: evidenceIpfsHash,
-    },
-  } as ContainerModel;
 }
 
 export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
@@ -439,7 +440,6 @@ export async function approveTokenAmount(
 }
 
 export async function getBalanceOf(
-  walletAddress: string,
   token: TokenModel | string,
   address: string,
 ): Promise<TokenAmountModel | null> {
@@ -448,7 +448,7 @@ export async function getBalanceOf(
     if (typeof token === 'string') tokenInfo = (await getTokenInfo(token)) as TokenModel;
     else tokenInfo = token;
     if (tokenInfo) {
-      const erc20Contract = getERC20Contract(tokenInfo, walletAddress);
+      const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
       const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
       tokenInfo.amount = balance.toString();
@@ -474,7 +474,7 @@ export async function scheduleQuestClaim(
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
-  const container = await computeScheduleContainer(claimData);
+  const container = await generateScheduleContainer(walletAddress, claimData);
   const { defaultGazFees } = getNetwork();
   Logger.debug('Scheduling quest claim...', { container });
   const tx = (await governQueueContract.schedule(container, defaultGazFees)) as ContractTransaction;

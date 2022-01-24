@@ -10,11 +10,12 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
-import { TokenModel } from 'src/models/token.model';
+import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
+import { ShowBalanceOf } from '../show-balance-of';
 
 const FormStyled = styled(Form)`
   width: 100%;
@@ -37,6 +38,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
     useTransactionContext();
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const toast = useToast();
 
   const closeModal = (success: boolean) => {
@@ -79,7 +81,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
       Logger.error(e);
       toast(
-        e.message.includes('\n') || e.message.length > 50
+        e.message.includes('\n') || e.message.length > 75
           ? '💣️ Oops. Something went wrong.'
           : e.message,
       );
@@ -90,50 +92,60 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   };
 
   return (
-    <ModalBase
-      title="Fund quest"
-      openButton={
-        <OpenButtonStyled
-          icon={<GiTwoCoins />}
-          onClick={() => setOpened(true)}
-          label="Fund"
-          mode="strong"
-        />
-      }
-      buttons={
-        <Button
-          icon={<GiTwoCoins />}
-          type="submit"
-          form="form-fund"
-          label="Fund"
-          mode="strong"
-          disabled={loading || !walletAddress}
-        />
-      }
-      onClose={() => closeModal(false)}
-      isOpen={opened}
-      width={500}
+    <Formik
+      initialValues={{
+        fundAmount: { parsedAmount: 0, token: quest.rewardToken } as TokenAmountModel,
+      }}
+      onSubmit={(values, { setSubmitting }) => {
+        const errors = [];
+        if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
+          errors.push('Validation : Amount invalid');
+        if (errors.length) {
+          errors.forEach(toast);
+        } else {
+          fundModalTx(values, setSubmitting);
+        }
+      }}
     >
-      <Formik
-        initialValues={{ fundAmount: { parsedAmount: 0, token: quest.rewardToken as TokenModel } }}
-        onSubmit={(values, { setSubmitting }) => {
-          const errors = [];
-          if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
-            errors.push('Validation : Amount invalid');
-          if (errors.length) {
-            errors.forEach(toast);
-          } else {
-            fundModalTx(values, setSubmitting);
+      {({ values, handleSubmit, handleChange }) => (
+        <ModalBase
+          title="Fund quest"
+          openButton={
+            <OpenButtonStyled
+              icon={<GiTwoCoins />}
+              onClick={() => setOpened(true)}
+              label="Fund"
+              mode="strong"
+            />
           }
-        }}
-      >
-        {({ values, handleSubmit, handleChange }) => (
+          buttons={[
+            quest.rewardToken && (
+              <ShowBalanceOf
+                askedTokenAmount={values.fundAmount}
+                setIsEnoughBalance={setIsEnoughBalance}
+              />
+            ),
+            <Button
+              icon={<GiTwoCoins />}
+              type="submit"
+              form="form-fund"
+              label="Fund"
+              mode="strong"
+              disabled={loading || !walletAddress || !isEnoughBalance}
+            />,
+          ]}
+          onClose={() => closeModal(false)}
+          isOpen={opened}
+          width={500}
+        >
           <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
               <AmountFieldInputFormik
                 id="fundAmount"
                 isEdit
                 label="Amount"
+                tooltip="Fund amount"
+                tooltipDetail="The amount of given token"
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
@@ -141,8 +153,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               />
             </Outset>
           </FormStyled>
-        )}
-      </Formik>
-    </ModalBase>
+        </ModalBase>
+      )}
+    </Formik>
   );
 }
