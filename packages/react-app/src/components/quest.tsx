@@ -51,6 +51,7 @@ const AddressWrapperStyled = styled.div`
 
 const CardStyled = styled(Card)`
   justify-content: flex-start;
+  align-items: flex-start;
   width: 100%;
   height: fit-content;
   border: none;
@@ -86,18 +87,17 @@ const TwoColumnStyled = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  margin: ${(props: any) => (props.isEdit ? 0 : GUpx())};
 `;
 
 const FirstColStyled = styled.div`
-  margin: ${GUpx(3)};
+  margin: 0 ${GUpx(3)};
   flex-grow: 1;
   max-width: 80%;
   overflow-wrap: break-word;
 `;
 
 const SecondColStyled = styled.div`
-  margin: ${GUpx(3)};
+  margin: 0 ${GUpx(3)};
   flex-grow: 0;
   display: flex;
   flex-direction: column;
