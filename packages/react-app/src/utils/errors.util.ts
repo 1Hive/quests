@@ -6,7 +6,7 @@ export function wrapError(message: String, obj: any) {
 }
 
 export function computeTransactionErrorMessage(error: any) {
-  Logger.exception(new Error(error), 'An error occured during the transaction');
+  Logger.exception(error, 'An error occured during the transaction');
   if (METAMASK_POSSIBLE_ERRORS[error.code.toString()])
     return METAMASK_POSSIBLE_ERRORS[error.code.toString()].message;
   return '💣️ Oops. Something went wrong with the transaction';

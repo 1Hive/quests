@@ -64,7 +64,6 @@ function sentry(_this: any, err: Error, message?: string) {
     if (err.message) err.message = `${message}:\n${err.message}`;
     else err.message = message;
   }
-  console.log(err);
 
   Sentry.captureException(err);
   return error.call(_this, err);
