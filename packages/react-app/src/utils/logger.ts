@@ -2,17 +2,22 @@
 /* eslint-disable no-unused-vars */
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
-import { CaptureContext, Extra } from '@sentry/types';
 import { noop } from 'lodash';
 import env from 'src/environment';
+import { getNetwork } from 'src/networks';
+
+const { name } = getNetwork();
 
 Sentry.init({
+  environment: `${process.env.NODE_ENV}-${name}`,
   dsn: env('SENTRY_DSN_URI'),
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
   tracesSampleRate: 0,
   integrations: [new Integrations.BrowserTracing()],
+  release: 'v0.1.0-alpha',
+  autoSessionTracking: false, // default: true
 });
 
 Sentry.configureScope((scope) => {
