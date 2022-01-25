@@ -68,8 +68,8 @@ function sentry(_this: any, err: Error, message?: string) {
   }
 
   Sentry.captureException(err.message, {
-    extra: { error: err } as Extra,
-  } as CaptureContext);
+    extra: { error: err },
+  });
   return error.call(_this, err);
 }
 
