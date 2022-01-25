@@ -24,7 +24,7 @@ export function getWeb3(): Web3 {
     if (!ethereum.isConnected()) {
       ethereum.enable().catch((error: Error) => {
         // User denied account access
-        Logger.error(error);
+        Logger.exception(error);
       });
     }
   }
@@ -39,7 +39,7 @@ export async function isConnected() {
       getWeb3().eth.getAccounts((err: Error, accounts: any[]) => {
         if (accounts.length !== 0) res(true);
         else {
-          if (err != null) Logger.error(`An error occurred: ${err}`);
+          if (err != null) Logger.exception(err, `An error occurred when connecting wallet`);
           res(false);
         }
       });
@@ -102,7 +102,7 @@ export async function getCurrentAccount(): Promise<string | undefined> {
   return new Promise((res) => {
     getWeb3()?.eth.getAccounts((error: Error, result: any[]) => {
       if (error) {
-        if (IS_DEV) Logger.error(error);
+        if (IS_DEV) Logger.exception(error);
         res(undefined);
       }
       res(result.length ? result[0] : undefined);

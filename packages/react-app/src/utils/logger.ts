@@ -1,8 +1,28 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
-
+import * as Sentry from '@sentry/react';
+import { Integrations } from '@sentry/tracing';
 import { noop } from 'lodash';
-import { string } from 'prop-types';
+import env from 'src/environment';
+
+const { version } = require('../../package.json');
+
+Sentry.init({
+  environment: `${process.env.NODE_ENV}-chain${env('CHAIN_ID')}`,
+  dsn: env('SENTRY_DSN_URI'),
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 0,
+  integrations: [new Integrations.BrowserTracing()],
+  release: version,
+  autoSessionTracking: false, // default: true
+});
+
+Sentry.configureScope((scope) => {
+  if (process.env.NODE_ENV === 'production') scope.setLevel(Sentry.Severity.Error);
+  else scope.setLevel(Sentry.Severity.Warning);
+});
 
 // eslint-disable-next-line no-shadow
 export enum LogLevels {
@@ -44,11 +64,24 @@ function registerAndCall(_this: any, fn: Function, message: any, args: any[]) {
   return noop;
 }
 
+function sentry(_this: any, err: Error, message?: string) {
+  if (message) {
+    if (err.message) err.message = `${message}:\n${err.message}`;
+    else err.message = message;
+  }
+
+  Sentry.captureException(new Error(err.message), {
+    extra: { error: err },
+  });
+  return error.call(_this, err);
+}
+
 export const Logger = {
   debug,
   info,
   warn,
   error,
+  exception: (err: any, message?: string) => sentry(this, err, message), // Only log exception (most of the time unhandled)
   setLogLevel,
 };
 export const LoggerOnce = {
