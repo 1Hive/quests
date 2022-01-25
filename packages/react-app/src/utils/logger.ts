@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
+import { CaptureContext, Extra } from '@sentry/types';
 import { noop } from 'lodash';
 import env from 'src/environment';
 
@@ -66,7 +67,9 @@ function sentry(_this: any, err: Error, message?: string) {
     else err.message = message;
   }
 
-  Sentry.captureException(err);
+  Sentry.captureException(err.message, {
+    extra: { error: err } as Extra,
+  } as CaptureContext);
   return error.call(_this, err);
 }
 
