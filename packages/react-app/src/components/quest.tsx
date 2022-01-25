@@ -22,6 +22,7 @@ import { GUpx } from 'src/utils/css.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
+import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -164,7 +165,7 @@ export default function Quest({
             setClaimDeposit(claim);
             setChallengeDeposit(challenge);
           } catch (error) {
-            Logger.error(error);
+            Logger.exception(error);
           }
         }
       }
@@ -267,12 +268,7 @@ export default function Quest({
           }
         }
       } catch (e: any) {
-        Logger.error(e);
-        toast(
-          !e?.message || e.message.includes('\n') || e.message.length > 75
-            ? '💣️ Oops. Something went wrong'
-            : e.message,
-        );
+        toast(computeTransactionErrorMessage(e));
       } finally {
         setSubmitting(false);
         setLoading(false);
@@ -288,7 +284,7 @@ export default function Quest({
         setBounty(result);
       })
       .catch((err) => {
-        Logger.error(err);
+        Logger.exception(err);
         setBounty(undefined);
       });
   };

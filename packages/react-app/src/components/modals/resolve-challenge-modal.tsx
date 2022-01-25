@@ -11,7 +11,6 @@ import {
 import { noop } from 'lodash-es';
 import { useState, useEffect, Fragment } from 'react';
 import styled from 'styled-components';
-import { Logger } from 'src/utils/logger';
 import { ClaimModel } from 'src/models/claim.model';
 import { ENUM, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -20,6 +19,7 @@ import { GUpx } from 'src/utils/css.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
 import { getCelesteContract, getGovernQueueContract } from 'src/utils/contract.util';
+import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -161,12 +161,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      Logger.error(e);
-      toast(
-        e.message.includes('\n') || e.message.length > 75
-          ? '💣️ Oops. Something went wrong.'
-          : e.message,
-      );
+      toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
     }

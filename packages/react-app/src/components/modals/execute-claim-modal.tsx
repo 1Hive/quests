@@ -2,7 +2,6 @@ import { Button, useToast, IconCoin, Field, Timer } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
-import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
@@ -10,6 +9,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getLastBlockDate } from 'src/utils/date.utils';
 import { useWallet } from 'src/contexts/wallet.context';
+import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -108,12 +108,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
       toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      Logger.error(e);
-      toast(
-        e.message.includes('\n') || e.message.length > 75
-          ? '💣️ Oops. Something went wrong.'
-          : e.message,
-      );
+      toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
     }

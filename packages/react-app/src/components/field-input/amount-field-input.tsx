@@ -131,7 +131,7 @@ function AmountFieldInput({
           .then((tokenInfo) => {
             if (typeof tokenInfo !== 'string') if (tokenInfo) setTokens([tokenInfo]);
           })
-          .catch(Logger.error);
+          .catch(Logger.exception);
       } else {
         setTokens(
           availableTokens.filter(

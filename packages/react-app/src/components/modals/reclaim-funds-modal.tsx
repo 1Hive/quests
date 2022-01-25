@@ -2,7 +2,6 @@ import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
-import { Logger } from 'src/utils/logger';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -10,6 +9,7 @@ import styled from 'styled-components';
 import { GUpx } from 'src/utils/css.util';
 import Skeleton from 'react-loading-skeleton';
 import { useWallet } from 'src/contexts/wallet.context';
+import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -79,12 +79,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      Logger.error(e);
-      toast(
-        e.message.includes('\n') || e.message.length > 75
-          ? '💣️ Oops. Something went wrong.'
-          : e.message,
-      );
+      toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
     }

@@ -11,5 +11,6 @@ const ENV_VARS = {
 
 export default function env(name: string) {
   const envVar = ENV_VARS[name];
-  return typeof envVar === 'function' ? envVar() : null;
+  if (!envVar) return process.env[`REACT_APP_${name}`];
+  return typeof envVar === 'function' ? envVar() : envVar;
 }
