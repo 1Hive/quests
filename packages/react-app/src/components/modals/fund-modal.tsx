@@ -151,7 +151,12 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 value={values.fundAmount}
                 wide
               />
-              <AddressFieldInput id="address" value={quest.address} isLoading={loading} />
+              <AddressFieldInput
+                id="address"
+                label="Quest address"
+                value={quest.address}
+                isLoading={loading}
+              />
             </Outset>
           </FormStyled>
         </ModalBase>
