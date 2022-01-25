@@ -62,12 +62,11 @@ function registerAndCall(_this: any, fn: Function, message: any, args: any[]) {
 
 function sentry(_this: any, err: Error, message?: string) {
   if (message) {
-    console.log({ errmessage: err.message });
     if (err.message) err.message = `${message}:\n${err.message}`;
     else err.message = message;
   }
 
-  Sentry.captureException(err.message, {
+  Sentry.captureException(new Error(err.message), {
     extra: { error: err },
   });
   return error.call(_this, err);
