@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 import env from 'src/environment';
 
 Sentry.init({
-  dsn: env('SENTRY_DSN_URI_SECRET'),
+  dsn: env('SENTRY_DSN_URI'),
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
