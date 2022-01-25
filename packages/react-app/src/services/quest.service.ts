@@ -268,10 +268,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         try {
           evidence = await getObjectFromIpfs(evidenceIpfsHash);
         } catch (error: any) {
-          Logger.exception({
-            ...error,
-            message: 'Failed to get IPFS object when fetching claims : ',
-          });
+          Logger.exception(error, 'Failed to get IPFS object when fetching claims');
         }
         // If failed to fetch ipfs evidence
         if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
