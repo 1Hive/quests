@@ -1,16 +1,17 @@
-import { TextInput, Markdown } from '@1hive/1hive-ui';
+import { TextInput, Markdown, IconDown, IconUp, Button, IconCopy } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
+import { useCopyToClipboard } from '../../hooks/use-copy-to-clipboard.hook';
 
 // #region Styled
 
 const MaxLineStyled = styled.div`
   margin-bottom: ${GUpx()};
   display: -webkit-box;
-  -webkit-line-clamp: 10;
+  -webkit-line-clamp: ${(props: any) => props.maxLine};
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
@@ -20,7 +21,73 @@ const MaxLineStyled = styled.div`
   }
 `;
 
+const IconColumnStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-right: ${GUpx()};
+`;
+
+const CollapseButtonStyled = styled.a`
+  display: flex;
+  cursor: pointer;
+  text-decoration: none !important;
+  user-select: none;
+  flex-grow: 1;
+`;
+
+const CopyButtonStyled = styled(Button)`
+  border-color: #2c3a584d;
+`;
+
+const LineStyled = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
 // #endregion
+
+const CodeBlock = ({ children }: any) => {
+  const [visible, setVisible] = useState(false);
+  const copyCode = useCopyToClipboard();
+  return (
+    <div>
+      <div className="content">
+        <pre>
+          <LineStyled>
+            <CollapseButtonStyled onClick={() => setVisible(!visible)}>
+              <IconColumnStyled>
+                {visible ? (
+                  <>
+                    <IconDown size="tiny" />
+                    <IconUp size="tiny" />
+                  </>
+                ) : (
+                  <>
+                    <IconUp size="tiny" />
+                    <IconDown size="tiny" />
+                  </>
+                )}
+              </IconColumnStyled>
+              Code block
+            </CollapseButtonStyled>
+            {visible && (
+              <CopyButtonStyled
+                onClick={() => copyCode(children.props.children)}
+                icon={<IconCopy />}
+                size="small"
+                label="Copy"
+                display="icon"
+              />
+            )}
+          </LineStyled>
+          {visible ? children : <></>}
+        </pre>
+      </div>
+    </div>
+  );
+};
 
 type Props = {
   id: string;
@@ -62,7 +129,26 @@ export default function TextFieldInput({
   tooltipDetail,
   tooltip,
 }: Props) {
-  const readOnlyContent = <>{isMarkDown ? <Markdown normalized content={value} /> : value}</>;
+  const readOnlyContent = (
+    <>
+      {isMarkDown ? (
+        <Markdown
+          normalized
+          content={value}
+          markdownToJsxOptions={(o: any) => ({
+            ...o,
+            overrides: {
+              pre: {
+                component: CodeBlock,
+              },
+            },
+          })}
+        />
+      ) : (
+        value
+      )}
+    </>
+  );
   const loadableContent = isEdit ? (
     <TextInput
       id={id}

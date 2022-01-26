@@ -31,7 +31,8 @@ const ScrollViewStyled = styled.div`
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
   height: calc(100vh - 64px);
-  padding: ${GUpx(2)} ${GUpx(4)};
+
+  ${(props: any) => (props.twoCol ? `padding: ${GUpx(2)} ${GUpx(4)};` : `padding: ${GUpx(2)} 0;`)};
   grid-area: m;
 `;
 

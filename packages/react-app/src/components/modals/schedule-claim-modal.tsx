@@ -72,31 +72,29 @@ export default function ScheduleClaimModal({
       setLoading(true);
       const { governQueueAddress } = getNetwork();
       const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
-      if (scheduleDeposit.parsedAmount) {
-        toast('Approving claim deposit...');
-        const approveTxReceipt = await QuestService.approveTokenAmount(
-          walletAddress,
-          governQueueAddress,
-          scheduleDeposit.token,
-          (tx) => {
-            pushTransaction({
-              hash: tx,
-              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-              pendingMessage: 'Approving claim deposit...',
-              status: ENUM_TRANSACTION_STATUS.Pending,
-            });
-          },
-        );
-        if (approveTxReceipt) {
-          updateTransactionStatus({
-            hash: approveTxReceipt.transactionHash,
-            status: approveTxReceipt.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
+      toast('Approving claim deposit...');
+      const approveTxReceipt = await QuestService.approveTokenAmount(
+        walletAddress,
+        governQueueAddress,
+        scheduleDeposit.token,
+        (tx) => {
+          pushTransaction({
+            hash: tx,
+            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+            pendingMessage: 'Approving claim deposit...',
+            status: ENUM_TRANSACTION_STATUS.Pending,
           });
-        }
-        if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
+        },
+      );
+      if (approveTxReceipt) {
+        updateTransactionStatus({
+          hash: approveTxReceipt.transactionHash,
+          status: approveTxReceipt.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+        });
       }
+      if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
       toast('Scheduling claim...');
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
@@ -185,7 +183,10 @@ export default function ScheduleClaimModal({
           const errors = [];
           if (!values.evidence) errors.push('Validation : Evidence of completion is required');
           if (!values.claimedAmount) errors.push('Validation : Claim amount is required');
-          if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
+          if (values.claimAll) {
+            values.claimedAmount.parsedAmount = 0;
+            values.claimedAmount.token.amount = '0';
+          } else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
             errors.push('Validation : Claim amount should not be higher than available bounty');
           if (values.playerAddress) {
             try {

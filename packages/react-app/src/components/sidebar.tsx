@@ -18,22 +18,20 @@ const BoxStyled = styled(Box)`
 export default function Sidebar() {
   const { walletAddress } = useWallet();
   return (
-    <>
-      <Outset gu32>
-        <BoxStyled>
-          <Outset>
-            <>
-              {walletAddress && (
-                <>
-                  <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
-                  <Outset gu16 />
-                </>
-              )}
-              <Filter />
-            </>
-          </Outset>
-        </BoxStyled>
-      </Outset>
-    </>
+    <Outset gu16 className="pb-0">
+      <BoxStyled>
+        <Outset>
+          <>
+            {walletAddress && (
+              <>
+                <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
+                <Outset gu16 />
+              </>
+            )}
+            <Filter />
+          </>
+        </Outset>
+      </BoxStyled>
+    </Outset>
   );
 }

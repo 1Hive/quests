@@ -109,6 +109,7 @@ const SecondColStyled = styled.div`
 const QuestHeaderStyled = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap-reverse;
   justify-content: space-between;
   padding: ${GUpx(3)};
   padding-bottom: ${GUpx()};
