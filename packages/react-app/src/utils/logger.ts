@@ -8,7 +8,7 @@ import env from 'src/environment';
 const { version } = require('../../package.json');
 
 Sentry.init({
-  environment: `${process.env.NODE_ENV}-chain${env('CHAIN_ID')}`,
+  environment: `${process.env.NODE_ENV}-chain-${env('CHAIN_ID')}`,
   dsn: env('SENTRY_DSN_URI'),
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
