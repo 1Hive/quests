@@ -46,6 +46,10 @@ const LineStyled = styled.div`
   width: 100%;
 `;
 
+const ContentWrapperStyled = styled.div`
+  padding-top: ${GUpx()};
+`;
+
 // #endregion
 
 const CodeBlock = ({ children }: any) => {
@@ -82,7 +86,7 @@ const CodeBlock = ({ children }: any) => {
               />
             )}
           </LineStyled>
-          {visible ? children : <></>}
+          {visible ? <ContentWrapperStyled>{children}</ContentWrapperStyled> : <></>}
         </pre>
       </div>
     </div>
