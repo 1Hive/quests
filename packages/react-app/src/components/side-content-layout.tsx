@@ -51,7 +51,7 @@ function SideContentLayout({ main, side, footer }: Props) {
 
   return (
     <>
-      <WrapperStyled twoCol={twoCol && side} vw={vw}>
+      <WrapperStyled twoCol={twoCol && side}>
         <ScrollViewStyled id="scroll-view">{main}</ScrollViewStyled>
         {side && <SideBlockStyled>{side}</SideBlockStyled>}
         <FooterStyled>{footer}</FooterStyled>
