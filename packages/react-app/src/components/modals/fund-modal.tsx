@@ -4,13 +4,13 @@ import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
-import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -80,12 +80,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       toast('Operation succeed');
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      Logger.error(e);
-      toast(
-        e.message.includes('\n') || e.message.length > 75
-          ? '💣️ Oops. Something went wrong.'
-          : e.message,
-      );
+      toast(computeTransactionErrorMessage(e));
     } finally {
       setSubmitting(false);
       setLoading(false);

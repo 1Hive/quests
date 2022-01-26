@@ -1,10 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import { Main } from '@1hive/1hive-ui';
-import { ErrorBoundary } from '@sentry/react';
 import { useEffect, useState } from 'react';
 import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
 import MainView from './components/main-view';
+import ErrorBoundary from './components/utils/error-boundary';
 import { DEFAULT_THEME } from './constants';
 import { FilterContextProvider } from './contexts/filter.context';
 import { PageContextProvider } from './contexts/page.context';

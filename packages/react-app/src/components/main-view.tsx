@@ -52,9 +52,9 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   useEffect(() => {
     const tryConnect = async () => {
       try {
-        if (await isConnected()) activateWallet().catch(Logger.error);
+        if (await isConnected()) activateWallet().catch(Logger.exception);
       } catch (error) {
-        Logger.error(error);
+        Logger.exception(error);
       }
     };
     if (!walletAddress) tryConnect();

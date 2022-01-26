@@ -61,7 +61,7 @@ async function mapQuest(questEntity: any) {
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
     return quest;
   } catch (error) {
-    Logger.error('Failed to map quest : ', { questDate: questEntity, error });
+    Logger.exception(error, `Failed to map quest :\n${JSON.stringify(questEntity)}`);
     return undefined;
   }
 }
@@ -153,7 +153,7 @@ async function handleTransaction(
   try {
     onTx?.(tx.hash);
   } catch (error) {
-    Logger.error(error);
+    Logger.exception(error);
   }
   Logger.info('Tx hash', tx.hash);
   const receipt = (await tx.wait()) as ethers.ContractReceipt;
@@ -267,8 +267,8 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         let evidence: string | undefined;
         try {
           evidence = await getObjectFromIpfs(evidenceIpfsHash);
-        } catch (error) {
-          Logger.error('Failed to get IPFS object when fetching claims', error);
+        } catch (error: any) {
+          Logger.exception(error, 'Failed to get IPFS object when fetching claims');
         }
         // If failed to fetch ipfs evidence
         if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
@@ -333,7 +333,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   try {
     fetchedReason = await getObjectFromIpfs(reason);
   } catch (error) {
-    Logger.error('Failed to get IPFS object when fetching challenge', error);
+    Logger.exception(error, 'Failed to get IPFS object when fetching challenge');
   }
   return {
     deposit: {
@@ -458,7 +458,7 @@ export async function getBalanceOf(
       };
     }
   } catch (error) {
-    Logger.error(error);
+    Logger.exception(error);
   }
   return null;
 }

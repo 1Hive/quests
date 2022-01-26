@@ -11,6 +11,10 @@ const FooterWrapper = styled.div`
   box-shadow: rgb(0 0 0 / 5%) 3px -2px 0px;
   position: relative;
   padding: 40px 24px;
+
+  a {
+    color: ${({ color }: any) => color} !important;
+  }
 `;
 
 const FooterColumn = styled.div`
@@ -26,7 +30,6 @@ const FooterTitle = styled.div`
 `;
 
 const FooterLinkStyled = styled(Link)`
-  color: ${({ color }: any) => color} !important;
   margin-right: ${3 * GU}px;
   display: flex;
   align-items: center;
@@ -39,44 +42,41 @@ const FooterLinkStyled = styled(Link)`
 export default function footer() {
   const theme = useTheme();
   return (
-    <FooterWrapper background={theme.surface}>
+    <FooterWrapper background={theme.surface} color={theme.contentSecondary}>
       <FooterColumn>
         <FooterTitle>Community</FooterTitle>
-        <FooterLinkStyled color={theme.contentSecondary} href="https://discord.gg/4fm7pgB" external>
+        <FooterLinkStyled href="https://discord.gg/4fm7pgB" external>
           Discord
         </FooterLinkStyled>
-        <FooterLinkStyled color={theme.contentSecondary} href="https://github.com/1Hive" external>
+        <FooterLinkStyled href="https://github.com/1Hive" external>
           Github
         </FooterLinkStyled>
-        <FooterLinkStyled
-          color={theme.contentSecondary}
-          href="https://twitter.com/1HiveOrg"
-          external
-        >
+        <FooterLinkStyled href="https://twitter.com/1HiveOrg" external>
           Twitter
         </FooterLinkStyled>
-        <FooterLinkStyled color={theme.contentSecondary} href="https://t.me/honeyswapdex" external>
+        <FooterLinkStyled href="https://t.me/honeyswapdex" external>
           Telegram
         </FooterLinkStyled>
-        <FooterLinkStyled color={theme.contentSecondary} href="https://forum.1hive.org/" external>
+        <FooterLinkStyled href="https://forum.1hive.org/" external>
           Forum
         </FooterLinkStyled>
       </FooterColumn>
       <FooterColumn>
         <FooterTitle>Documentation</FooterTitle>
-        <FooterLinkStyled
-          color={theme.contentSecondary}
-          href="https://wiki.1hive.org/projects/quests"
-          external
-        >
+        <FooterLinkStyled href="https://wiki.1hive.org/projects/quests" external>
           Wiki
         </FooterLinkStyled>
       </FooterColumn>
       <FooterColumn>
         <FooterTitle>Feedback</FooterTitle>
         <FooterLinkStyled
-          color={theme.contentSecondary}
-          href="https://github.com/1Hive/quests/issues/new?assignees=&labels=&template=bug----bug_title-.md&title="
+          href="https://github.com/1Hive/quests/issues/new?assignees=&labels=Feature&template=feature----feature_title-.md"
+          external
+        >
+          Submit an idea
+        </FooterLinkStyled>
+        <FooterLinkStyled
+          href="https://github.com/1Hive/quests/issues/new?assignees=&labels=&template=bug----bug_title-.md"
           external
         >
           Report a bug

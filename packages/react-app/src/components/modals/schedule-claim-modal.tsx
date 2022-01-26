@@ -5,7 +5,6 @@ import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
-import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -13,6 +12,7 @@ import { GUpx } from 'src/utils/css.util';
 import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
+import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -131,12 +131,7 @@ export default function ScheduleClaimModal({
       closeModal(true);
     } catch (e: any) {
       updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      Logger.error(e);
-      toast(
-        e.message.includes('\n') || e.message.length > 75
-          ? '💣️ Oops. Something went wrong.'
-          : e.message,
-      );
+      toast(computeTransactionErrorMessage(e));
     } finally {
       setSubmitting(false);
       setLoading(false);

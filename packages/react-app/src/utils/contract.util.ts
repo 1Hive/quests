@@ -103,7 +103,7 @@ export async function getTokenInfo(tokenAddress: string) {
       } as TokenModel;
     }
   } catch (error) {
-    Logger.error(error);
+    Logger.exception(error);
   }
   return tokenAddress;
 }

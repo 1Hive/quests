@@ -1,7 +1,7 @@
 {
   "proxy": "https://cors-anywhere.herokuapp.com/",
   "name": "@1hive/quests-react-app",
-  "version": "1.0.0",
+  "version": "0.1.0-alpha",
   "license": "MIT",
   "homepage": ".",
   "browserslist": {
@@ -22,6 +22,7 @@
     "@hot-loader/react-dom": "^16.13.0",
     "@sentry/react": "^6.3.5",
     "@sentry/tracing": "^6.3.5",
+    "@sentry/types": "^6.17.2",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.0",
     "@types/react": "^17.0.30",
