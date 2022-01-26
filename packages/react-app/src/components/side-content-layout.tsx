@@ -32,7 +32,7 @@ const ScrollViewStyled = styled.div`
   scrollbar-width: none; /* Firefox */
   height: calc(100vh - 64px);
 
-  ${(props: any) => (props.twoCol ? `padding: ${GUpx(2)} ${GUpx(4)};` : `padding: ${GUpx(2)} 0;`)};
+  ${(props: any) => (props.twoCol ? `padding: ${GUpx(1)} ${GUpx(4)};` : `padding: ${GUpx(1)}`)};
   grid-area: m;
 `;
 
@@ -51,7 +51,7 @@ function SideContentLayout({ main, side, footer }: Props) {
 
   return (
     <>
-      <WrapperStyled twoCol={twoCol && side}>
+      <WrapperStyled twoCol={twoCol && side} vw={vw}>
         <ScrollViewStyled id="scroll-view">{main}</ScrollViewStyled>
         {side && <SideBlockStyled>{side}</SideBlockStyled>}
         <FooterStyled>{footer}</FooterStyled>

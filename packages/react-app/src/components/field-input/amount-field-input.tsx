@@ -56,7 +56,7 @@ const AmountTokenWrapperStyled = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: ${(props: any) => (props.wide && props.isEdit ? '100%' : 'fit-content')};
+  ${(props: any) => (props.wide ? 'width:100%' : '')};
 
   ul[role='listbox'] {
     max-height: 200px;

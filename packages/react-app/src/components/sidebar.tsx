@@ -18,7 +18,7 @@ const BoxStyled = styled(Box)`
 export default function Sidebar() {
   const { walletAddress } = useWallet();
   return (
-    <Outset gu16 className="pb-0">
+    <Outset horizontal gu16 className="pb-0 pt-24">
       <BoxStyled>
         <Outset>
           <>
