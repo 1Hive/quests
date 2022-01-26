@@ -75,7 +75,14 @@ export default function TextFieldInput({
               pre: {
                 component: CodeBlock,
                 props: {
-                  label: 'Code block',
+                  label: 'block',
+                  visible: !maxLine,
+                },
+              },
+              code: {
+                component: CodeBlock,
+                props: {
+                  label: 'code block',
                   visible: !maxLine,
                 },
               },

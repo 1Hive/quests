@@ -1,5 +1,5 @@
 import { Button, IconDown, IconUp, IconCopy } from '@1hive/1hive-ui';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useCopyToClipboard } from './hooks/use-copy-to-clipboard.hook';
 import { GUpx } from './utils/css.util';
@@ -47,46 +47,51 @@ type Props = {
   visible?: boolean;
 };
 
-export function CodeBlock({ children, label = 'Block', visible = false }: Props) {
+export function CodeBlock({ children, visible = false, label = '' }: Props) {
   const [isVisible, setVisible] = useState(visible);
   const copyCode = useCopyToClipboard();
 
   useEffect(() => setVisible(visible), [visible]);
 
+  const [content, setContent] = useState<ReactNode | undefined>();
+
+  useEffect(() => {
+    setContent(children.props?.children ? children.props.children : children);
+  }, [children]);
+
   return (
-    <div>
-      <div className="content">
-        <pre>
-          <LineStyled>
-            <CollapseButtonStyled onClick={() => setVisible(!isVisible)}>
-              <IconColumnStyled>
-                {isVisible ? (
-                  <>
-                    <IconDown size="tiny" />
-                    <IconUp size="tiny" />
-                  </>
-                ) : (
-                  <>
-                    <IconUp size="tiny" />
-                    <IconDown size="tiny" />
-                  </>
-                )}
-              </IconColumnStyled>
-              <LabelStyled>{label}</LabelStyled>
-            </CollapseButtonStyled>
-            {isVisible && (
-              <CopyButtonStyled
-                onClick={() => copyCode(children.props.children)}
-                icon={<IconCopy />}
-                size="small"
-                label="Copy"
-                display="icon"
-              />
+    <pre>
+      <LineStyled>
+        <CollapseButtonStyled onClick={() => setVisible(!isVisible)}>
+          <IconColumnStyled>
+            {isVisible ? (
+              <>
+                <IconDown size="tiny" />
+                <IconUp size="tiny" />
+              </>
+            ) : (
+              <>
+                <IconUp size="tiny" />
+                <IconDown size="tiny" />
+              </>
             )}
-          </LineStyled>
-          {visible ? <ContentWrapperStyled>{children}</ContentWrapperStyled> : <></>}
-        </pre>
-      </div>
-    </div>
+          </IconColumnStyled>
+          <LabelStyled>
+            {isVisible ? 'Hide ' : 'Show '}
+            {label}
+          </LabelStyled>
+        </CollapseButtonStyled>
+        {isVisible && (
+          <CopyButtonStyled
+            onClick={() => copyCode(content)}
+            icon={<IconCopy />}
+            size="small"
+            label="Copy"
+            display="icon"
+          />
+        )}
+      </LineStyled>
+      {isVisible && content ? <ContentWrapperStyled>{content}</ContentWrapperStyled> : <></>}
+    </pre>
   );
 }
