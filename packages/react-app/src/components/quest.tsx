@@ -1,4 +1,4 @@
-import { Card, useToast } from '@1hive/1hive-ui';
+import { Card, useToast, useViewport } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useEffect, useRef, useState } from 'react';
@@ -33,6 +33,7 @@ import ClaimList from './claim-list';
 import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
+import { BREAKPOINTS } from '../styles/breakpoints';
 
 // #region StyledComponents
 
@@ -88,6 +89,7 @@ const TwoColumnStyled = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  ${(props: any) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
 `;
 
 const FirstColStyled = styled.div`
@@ -132,6 +134,7 @@ export default function Quest({
   onSave = noop,
   css,
 }: Props) {
+  const { width: vw } = useViewport();
   const { walletAddress } = useWallet();
   const { defaultToken } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
@@ -145,6 +148,10 @@ export default function Quest({
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
+  const [twoCol, setTwoCol] = useState(true);
+  useEffect(() => {
+    setTwoCol(vw >= BREAKPOINTS.large);
+  }, [vw]);
 
   useEffect(() => {
     setIsEdit(
@@ -338,7 +345,7 @@ export default function Quest({
             <AddressFieldInput id="address" value={values.address} isLoading={loading} />
           </QuestHeaderStyled>
         )}
-        <TwoColumnStyled isEdit={isEdit}>
+        <TwoColumnStyled isEdit={isEdit} twoCol={twoCol}>
           <>
             <FirstColStyled gu16 className="pb-0">
               {isEdit && titleInput}
