@@ -20,7 +20,7 @@ import TextFieldInput from '../field-input/text-field-input';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
-import { ShowBalanceOf } from '../show-balance-of';
+import { WalletBallance } from '../wallet-balance';
 
 // #region StyledComponents
 
@@ -150,7 +150,7 @@ export default function ScheduleClaimModal({
         />
       }
       buttons={[
-        <ShowBalanceOf askedTokenAmount={claimDeposit} setIsEnoughBalance={setIsEnoughBalance} />,
+        <WalletBallance askedTokenAmount={claimDeposit} setIsEnoughBalance={setIsEnoughBalance} />,
         <AmountFieldInputFormik
           key="claimDeposit"
           id="claimDeposit"

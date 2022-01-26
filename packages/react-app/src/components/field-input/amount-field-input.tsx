@@ -57,6 +57,11 @@ const AmountTokenWrapperStyled = styled.div`
   justify-content: flex-start;
   align-items: center;
   ${(props: any) => (props.wide ? 'width:100%;' : '')}
+
+  ul[role=listbox] {
+    max-height: 200px;
+    overflow-y: auto;
+  }
 `;
 
 const IconEditStyled = styled(IconEdit)`
