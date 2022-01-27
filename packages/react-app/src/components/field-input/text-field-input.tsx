@@ -1,16 +1,19 @@
 import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
+import { CollapsableBlock } from 'src/collapsable-block';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
 
 // #region Styled
 
-const MaxHeightStyled = styled.div`
+const MaxLineStyled = styled.div`
+  margin-bottom: ${GUpx()};
+  display: -webkit-box;
+  -webkit-line-clamp: ${(props: any) => props.maxLine};
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 8px;
-  line-height: 1.5em;
-  ${({ maxLine }: any) => (maxLine ? `max-height: ${maxLine * 1.5}em;` : '')}
   overflow-wrap: anywhere;
   p {
     margin-top: 0 !important;
@@ -65,10 +68,35 @@ export default function TextFieldInput({
       {isMarkDown ? (
         <Markdown
           normalized
+          content={value}
           markdownToJsxOptions={(o: any) => ({
             ...o,
+            overrides: {
+              pre: {
+                component: CollapsableBlock,
+                props: {
+                  label: 'block',
+                  visible: !maxLine,
+                },
+              },
+              code: {
+                component: CollapsableBlock,
+                props: {
+                  label: 'code block',
+                  type: 'code',
+                  visible: !maxLine,
+                },
+              },
+              img: {
+                component: CollapsableBlock,
+                props: {
+                  label: 'image',
+                  type: 'image',
+                  visible: !maxLine,
+                },
+              },
+            },
           })}
-          content={value}
         />
       ) : (
         value
@@ -90,7 +118,7 @@ export default function TextFieldInput({
     <div style={{ ...css, fontSize }}>
       {maxLine ? (
         <div>
-          <MaxHeightStyled maxLine={maxLine}>{readOnlyContent}</MaxHeightStyled>
+          <MaxLineStyled maxLine={maxLine}>{readOnlyContent}</MaxLineStyled>
           {ellipsis}
         </div>
       ) : (

@@ -40,12 +40,13 @@ export default function QuestList() {
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
   useEffect(() => {
-    debounceFilter(filter);
-    return () => debounceFilter.cancel();
+    debounceRefresh(filter);
+    return () => debounceRefresh.cancel();
   }, [filter]);
 
   useEffect(() => {
-    refresh();
+    debounceRefresh();
+    return () => debounceRefresh.cancel();
   }, [refreshed]);
 
   useEffect(() => {
@@ -77,8 +78,8 @@ export default function QuestList() {
     });
   };
 
-  const debounceFilter = useCallback(
-    debounce((nextFilter) => refresh(nextFilter), 500),
+  const debounceRefresh = useCallback(
+    debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),
     [], // will be created only once initially
   );
 

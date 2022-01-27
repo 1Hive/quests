@@ -56,7 +56,12 @@ const AmountTokenWrapperStyled = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  ${(props: any) => (props.wide ? 'width:100%;' : '')}
+  ${(props: any) => (props.wide ? 'width:100%' : '')};
+
+  ul[role='listbox'] {
+    max-height: 200px;
+    overflow-y: auto;
+  }
 `;
 
 const IconEditStyled = styled(IconEdit)`
@@ -208,7 +213,7 @@ function AmountFieldInput({
       {isLoading ? (
         <Skeleton />
       ) : (
-        <AmountTokenWrapperStyled wide={wide}>
+        <AmountTokenWrapperStyled wide={wide} isEdit={isEdit}>
           {amount !== undefined && (
             <Outset horizontal>
               {isEdit ? (
