@@ -1,7 +1,7 @@
 import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
-import { CodeBlock } from 'src/code-block';
+import { CollapsableBlock } from 'src/collapsable-block';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
@@ -73,16 +73,25 @@ export default function TextFieldInput({
             ...o,
             overrides: {
               pre: {
-                component: CodeBlock,
+                component: CollapsableBlock,
                 props: {
                   label: 'block',
                   visible: !maxLine,
                 },
               },
               code: {
-                component: CodeBlock,
+                component: CollapsableBlock,
                 props: {
                   label: 'code block',
+                  type: 'code',
+                  visible: !maxLine,
+                },
+              },
+              img: {
+                component: CollapsableBlock,
+                props: {
+                  label: 'image',
+                  type: 'image',
                   visible: !maxLine,
                 },
               },
