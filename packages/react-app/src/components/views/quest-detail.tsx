@@ -5,8 +5,14 @@ import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
+import styled from 'styled-components';
+import { GUpx } from 'src/utils/css.util';
 import Quest from '../quest';
-import { Outset } from '../utils/spacer-util';
+
+const QuestDetailWrapperrStyled = styled.div`
+  padding: ${GUpx()};
+  min-height: calc(100vh - 64px);
+`;
 
 export default function QuestDetail() {
   const { setPage } = usePageContext();
@@ -25,7 +31,7 @@ export default function QuestDetail() {
   }, [id]);
 
   return (
-    <Outset>
+    <QuestDetailWrapperrStyled>
       <>
         {quest ? (
           <Quest dataState={{ questData: quest }} questMode={ENUM_QUEST_VIEW_MODE.ReadDetail} />
@@ -38,6 +44,6 @@ export default function QuestDetail() {
           </>
         )}
       </>
-    </Outset>
+    </QuestDetailWrapperrStyled>
   );
 }

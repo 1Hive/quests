@@ -24,7 +24,6 @@ import { floorNumber } from 'src/utils/math.utils';
 import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { Outset } from '../utils/spacer-util';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
@@ -57,7 +56,6 @@ const AmountTokenWrapperStyled = styled.div`
   justify-content: flex-start;
   align-items: center;
   ${(props: any) => (props.wide ? 'width:100%' : '')};
-
   ul[role='listbox'] {
     max-height: 200px;
     overflow-y: auto;
@@ -67,6 +65,10 @@ const AmountTokenWrapperStyled = styled.div`
 const IconEditStyled = styled(IconEdit)`
   cursor: pointer;
   padding-left: ${GUpx()};
+`;
+
+const SpacerStyled = styled.div`
+  padding-right: ${GUpx()};
 `;
 
 // #endregion
@@ -215,7 +217,7 @@ function AmountFieldInput({
       ) : (
         <AmountTokenWrapperStyled wide={wide} isEdit={isEdit}>
           {amount !== undefined && (
-            <Outset horizontal>
+            <SpacerStyled>
               {isEdit ? (
                 <AmountTextInputStyled
                   id={id}
@@ -229,7 +231,7 @@ function AmountFieldInput({
               ) : (
                 floorNumber(amount, decimalsCount)
               )}
-            </Outset>
+            </SpacerStyled>
           )}
           {token?.token ? (
             <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />

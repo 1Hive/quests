@@ -25,6 +25,7 @@ import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
 import { DisputeModel } from '../../models/dispute.model';
 import TextFieldInput from '../field-input/text-field-input';
+import { IconTooltip } from '../field-input/icon-tooltip';
 
 // #region StyledComponents
 
@@ -65,7 +66,7 @@ const RulingInfoStyled = styled(Info)`
   width: 100%;
 `;
 
-const OnlySHWarn = styled(Info)`
+const OnlyStackholderWarn = styled(Info)`
   padding: ${GUpx()};
   display: flex;
   align-items: center;
@@ -198,9 +199,22 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             ) : (
               <>
                 Ruling in progress, please come back later...
-                <LinkStyled href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>
-                  See dispute
-                </LinkStyled>
+                {process.env.NODE_ENV === 'production' ? (
+                  <LinkStyled
+                    external
+                    href={
+                      process.env.NODE_ENV === 'production' &&
+                      `https://celeste.1hive.org/#/disputes/${dispute.id}`
+                    }
+                  >
+                    See dispute
+                  </LinkStyled>
+                ) : (
+                  <IconTooltip
+                    tooltipDetail={`This is a mocked celeste dispute with id ${dispute.id}`}
+                    key={dispute.id}
+                  />
+                )}
               </>
             )}
           </FinalRulingStyled>
@@ -232,10 +246,10 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       buttons={[
         <Fragment key="warnMessage">
           {isRuled && !isStackholder && (
-            <OnlySHWarn mode="warning">
+            <OnlyStackholderWarn mode="warning">
               <IconCaution />
               <span> Only a stackholder of this challenge may resolve it</span>
-            </OnlySHWarn>
+            </OnlyStackholderWarn>
           )}
         </Fragment>,
         <Button

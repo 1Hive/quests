@@ -33,7 +33,7 @@ const OpenButtonWrapperStyled = styled.div`
 
 type Props = {
   claim: ClaimModel;
-  questTotalBounty?: TokenAmountModel;
+  questTotalBounty?: TokenAmountModel | null;
   onClose?: ModalCallback;
 };
 
@@ -134,6 +134,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                   loading ||
                   !scheduleTimeout ||
                   claim.state === ENUM_CLAIM_STATE.Challenged ||
+                  questTotalBounty ||
                   !walletAddress
                 }
               />

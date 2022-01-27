@@ -10,6 +10,7 @@ export const QuestEntityQuery = gql`
       questExpireTimeSec
       questDetailsRef
       questRewardTokenAddress
+      creationTimestamp
     }
   }
 `;
@@ -45,6 +46,7 @@ export const QuestEntitiesQuery = gql`
       questExpireTimeSec
       questDetailsRef
       questRewardTokenAddress
+      creationTimestamp
     }
   }
 `;
@@ -59,6 +61,7 @@ export const QuestSearchQuery = gql`
       questExpireTimeSec
       questDetailsRef
       questRewardTokenAddress
+      creationTimestamp
     }
   }
 `;

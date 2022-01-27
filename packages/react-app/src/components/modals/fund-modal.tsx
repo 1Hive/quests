@@ -136,6 +136,12 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         >
           <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
+              <AddressFieldInput
+                id="address"
+                label="Quest address"
+                value={quest.address}
+                isLoading={loading}
+              />
               <AmountFieldInputFormik
                 id="fundAmount"
                 isEdit
@@ -146,12 +152,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 isLoading={loading}
                 value={values.fundAmount}
                 wide
-              />
-              <AddressFieldInput
-                id="address"
-                label="Quest address"
-                value={quest.address}
-                isLoading={loading}
               />
             </Outset>
           </FormStyled>

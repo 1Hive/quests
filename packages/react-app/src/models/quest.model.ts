@@ -9,6 +9,7 @@ export type QuestModel = {
   fallbackAddress?: string;
 
   // Computed
+  creationTime?: number;
   address?: string;
   bounty?: TokenAmountModel;
   rewardToken?: TokenModel | string;

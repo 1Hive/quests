@@ -360,7 +360,7 @@ export default function Quest({
                 tooltip="Quest Description"
                 tooltipDetail={
                   <>
-                    <u>The quest description should include:</u>
+                    <b>The quest description should include:</b>
                     <ul>
                       <li>Details about what the quest entails.</li>
                       <li>
@@ -409,15 +409,26 @@ export default function Quest({
                   tokenEditable
                 />
               )}
-              {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
-                <AmountFieldInput
-                  id="claimDeposit"
-                  label="Claim deposit"
-                  tooltip="Claim deposit"
-                  tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
-                  value={claimDeposit}
-                  isLoading={loading || (!isEdit && !claimDeposit)}
-                />
+              {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && (
+                <>
+                  {claimDeposit !== null && (
+                    <AmountFieldInput
+                      id="claimDeposit"
+                      label="Claim deposit"
+                      tooltip="Claim deposit"
+                      tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
+                      value={claimDeposit}
+                      isLoading={loading || (!isEdit && !claimDeposit)}
+                    />
+                  )}
+                  <DateFieldInput
+                    id="creationTime"
+                    label="Creation time"
+                    isLoading={loading}
+                    value={values.creationTime}
+                    wide
+                  />
+                </>
               )}
               <DateFieldInput
                 id="expireTimeMs"
@@ -426,7 +437,7 @@ export default function Quest({
                 tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
                 isEdit={isEdit}
                 isLoading={loading}
-                value={values.expireTimeMs}
+                value={questData.expireTimeMs}
                 onChange={handleChange}
                 wide
               />
@@ -450,16 +461,14 @@ export default function Quest({
         </TwoColumnStyled>
         {!loading && !isEdit && questData.address && (
           <>
-            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail &&
-              challengeDeposit &&
-              bounty !== null && (
-                <ClaimList
-                  newClaim={claimUpdated}
-                  questData={questData}
-                  questTotalBounty={bounty}
-                  challengeDeposit={challengeDeposit}
-                />
-              )}
+            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
+              <ClaimList
+                newClaim={claimUpdated}
+                questData={questData}
+                questTotalBounty={bounty}
+                challengeDeposit={challengeDeposit}
+              />
+            )}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
               questData.address &&
               walletAddress &&

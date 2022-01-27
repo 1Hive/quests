@@ -29,8 +29,9 @@ const LineStyled = styled.div`
 const ContentWrapperStyled = styled.div`
   display: flex;
   align-items: center;
-  ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
-  div {
+  ${(props: any) => (!props.compact ? 'min-height: 40px;' : '')}
+  padding-left: ${GUpx()};
+  & > div {
     max-width: 100%;
   }
 `;
