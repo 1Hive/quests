@@ -7,7 +7,7 @@ import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled.div`
   ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(2)}` : '')};
-  ${({ isLoading }: any) => (isLoading ? `width: 100%;` : '')};
+  ${({ isLoading }: any) => (isLoading ? `width: 100%;` : 'max-width: 100%;')};
 `;
 
 const LabelStyled = styled.label`
@@ -23,12 +23,16 @@ const LabelStyled = styled.label`
 const LineStyled = styled.div`
   display: flex;
   align-items: top;
+  max-width: 100%;
 `;
 
 const ContentWrapperStyled = styled.div`
   display: flex;
   align-items: center;
   ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
+  div {
+    max-width: 100%;
+  }
 `;
 
 const SkeletonWrapperStyled = styled.div`
