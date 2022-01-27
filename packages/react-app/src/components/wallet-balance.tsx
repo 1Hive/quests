@@ -18,7 +18,7 @@ type Props = {
   setIsEnoughBalance?: (valid: boolean) => void;
 };
 
-export function ShowBalanceOf({ askedTokenAmount, setIsEnoughBalance }: Props) {
+export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) {
   const { walletAddress } = useWallet();
   const [tokenBalance, setTokenBalance] = useState<TokenAmountModel>();
   const [isEnoughBalance, _setIsEnoughBalance] = useState(true);
@@ -48,7 +48,7 @@ export function ShowBalanceOf({ askedTokenAmount, setIsEnoughBalance }: Props) {
             id={`balance-${tokenBalance.token.symbol}`}
             key={`balance-${tokenBalance.token.token}`}
             compact
-            label={isEnoughBalance ? 'Wallet' : 'Not enough'}
+            label={isEnoughBalance ? 'Wallet balance' : 'Not enough'}
             tooltip="Balance"
             tooltipDetail="Connected wallet's balance of the specified token"
             value={tokenBalance}

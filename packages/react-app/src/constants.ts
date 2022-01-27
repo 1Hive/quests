@@ -3,7 +3,7 @@ import { TokenModel } from './models/token.model';
 
 export const PCT_BASE = BigInt(1e18);
 
-export const APP_TITLE = 'Quest';
+export const APP_TITLE = 'Quests';
 
 // Env
 export const IS_DEV = process.env?.NODE_ENV === 'development';

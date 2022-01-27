@@ -40,30 +40,30 @@ function App() {
 
   return (
     // Trigger sentry.io
-    <ErrorBoundary>
-      <WalletProvider>
-        <PageContextProvider>
-          <TransactionContextProvider>
-            <QuestsContextProvider>
-              <FilterContextProvider>
-                <Main
-                  assetsUrl="/aragon-ui/"
-                  layout={false}
-                  scrollView={false}
-                  theme={currentTheme ?? DEFAULT_THEME}
-                >
-                  <HashRouter>
+    <WalletProvider>
+      <PageContextProvider>
+        <TransactionContextProvider>
+          <QuestsContextProvider>
+            <FilterContextProvider>
+              <Main
+                assetsUrl="/aragon-ui/"
+                layout={false}
+                scrollView={false}
+                theme={currentTheme ?? DEFAULT_THEME}
+              >
+                <HashRouter>
+                  <ErrorBoundary>
                     <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
                       <Routes />
                     </MainView>
-                  </HashRouter>
-                </Main>
-              </FilterContextProvider>
-            </QuestsContextProvider>
-          </TransactionContextProvider>
-        </PageContextProvider>
-      </WalletProvider>
-    </ErrorBoundary>
+                  </ErrorBoundary>
+                </HashRouter>
+              </Main>
+            </FilterContextProvider>
+          </QuestsContextProvider>
+        </TransactionContextProvider>
+      </PageContextProvider>
+    </WalletProvider>
   );
 }
 export default process.env.NODE_ENV === 'development' ? hot(App) : App;

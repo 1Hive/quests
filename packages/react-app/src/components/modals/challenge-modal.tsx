@@ -21,7 +21,7 @@ import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { IconTooltip } from '../field-input/icon-tooltip';
 import { getLastBlockDate } from '../../utils/date.utils';
-import { ShowBalanceOf } from '../show-balance-of';
+import { WalletBallance } from '../wallet-balance';
 
 // #region StyledComponents
 
@@ -266,7 +266,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         </OpenButtonWrapperStyled>
       }
       buttons={[
-        <ShowBalanceOf
+        <WalletBallance
           askedTokenAmount={
             isFeeDepositSameToken && challengeFee
               ? {
@@ -278,7 +278,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           setIsEnoughBalance={setIsEnoughBalance}
         />,
         challengeFee && !isFeeDepositSameToken && (
-          <ShowBalanceOf askedTokenAmount={challengeFee} setIsEnoughBalance={setIsEnoughBalance} />
+          <WalletBallance askedTokenAmount={challengeFee} setIsEnoughBalance={setIsEnoughBalance} />
         ),
         <AmountFieldInput
           key="challengeDeposit"
