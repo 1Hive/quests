@@ -15,6 +15,7 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
+import { AddressFieldInput } from '../field-input/address-field-input';
 import { WalletBallance } from '../wallet-balance';
 
 const FormStyled = styled(Form)`
@@ -131,7 +132,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           ]}
           onClose={() => closeModal(false)}
           isOpen={opened}
-          width={500}
+          size="small"
         >
           <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
@@ -145,6 +146,12 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 isLoading={loading}
                 value={values.fundAmount}
                 wide
+              />
+              <AddressFieldInput
+                id="address"
+                label="Quest address"
+                value={quest.address}
+                isLoading={loading}
               />
             </Outset>
           </FormStyled>
