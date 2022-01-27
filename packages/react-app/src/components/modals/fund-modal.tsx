@@ -132,7 +132,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           ]}
           onClose={() => closeModal(false)}
           isOpen={opened}
-          width={500}
+          size="small"
         >
           <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
