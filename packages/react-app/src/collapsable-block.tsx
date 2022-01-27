@@ -86,7 +86,6 @@ export function CollapsableBlock(props: Props) {
             <LabelStyled>
               {isVisible ? 'Hide ' : 'Show '}
               {props.label}
-              {props.alt ? ` (${props.alt})` : ''}
             </LabelStyled>
           </CollapseButtonStyled>
           {isVisible && (
