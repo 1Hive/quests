@@ -21,14 +21,6 @@ export function Filter() {
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   return (
     <>
-      <Field label="Contract address">
-        <SearchInput
-          id="filterAddress"
-          value={filter.address}
-          onChange={(x: string) => setFilter({ ...filter, address: x })}
-          wide
-        />
-      </Field>
       <Field label="Title">
         <SearchInput
           id="filterTitle"
