@@ -1,5 +1,5 @@
 import { useViewport } from '@1hive/1hive-ui';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { BREAKPOINTS } from '../styles/breakpoints';
@@ -11,6 +11,7 @@ const WrapperStyled = styled.div`
   height: calc(100vh - 64px);
   overflow-y: auto;
   grid-template-columns: 1fr auto;
+  scroll-behavior: smooth;
 `;
 
 const SideBlockStyled = styled.div`
@@ -19,7 +20,6 @@ const SideBlockStyled = styled.div`
 
 const FooterStyled = styled.div`
   grid-area: f;
-  max-height: 250px;
 `;
 
 const ScrollViewStyled = styled.div`
@@ -49,19 +49,39 @@ type Props = {
 
 function SideContentLayout({ main, side, footer, mainScrollable = true }: Props) {
   const { width: vw } = useViewport();
+  const scrollRef = useRef<HTMLDivElement>();
+  const footerRef = useRef<HTMLDivElement>();
   const [twoCol, setTwoCol] = useState(true);
+
+  useEffect(() => {
+    if (scrollRef.current && footerRef.current) {
+      scrollRef.current?.addEventListener('wheel', (e: WheelEvent) => {
+        const scrollElement = scrollRef.current as HTMLElement;
+        const wrapperElement = document.getElementById('main-scroll');
+        const footerElement = footerRef.current as HTMLElement;
+        // scroll is bottom
+        if (wrapperElement && scrollElement) {
+          if (Math.round(wrapperElement.scrollTop) >= footerElement.clientHeight && e.deltaY < 0) {
+            e.preventDefault();
+            wrapperElement.scroll({ top: e.deltaY, behavior: 'smooth' });
+          }
+        }
+      });
+    }
+  }, [scrollRef.current, footerRef.current]);
+
   useEffect(() => {
     setTwoCol(vw >= BREAKPOINTS.large);
   }, [vw]);
 
   return (
     <>
-      <WrapperStyled twoCol={twoCol && side}>
-        <ScrollViewStyled scrollable={mainScrollable} id="scroll-view">
+      <WrapperStyled twoCol={twoCol && side} id="main-scroll">
+        <ScrollViewStyled scrollable={mainScrollable} id="scroll-view" ref={scrollRef}>
           {main}
         </ScrollViewStyled>
         {side && <SideBlockStyled>{side}</SideBlockStyled>}
-        <FooterStyled>{footer}</FooterStyled>
+        <FooterStyled ref={footerRef}>{footer}</FooterStyled>
       </WrapperStyled>
     </>
   );

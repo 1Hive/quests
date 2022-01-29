@@ -31,7 +31,8 @@ const TooltipWrapperStyled = styled.div`
 const HelpWrapperStyled = styled.div`
   width: 16px;
   display: inline-block;
-  padding-left: ${GUpx()};
+  margin-left: ${GUpx()};
+  margin-right: ${GUpx(0.5)};
 `;
 
 // #endregion
