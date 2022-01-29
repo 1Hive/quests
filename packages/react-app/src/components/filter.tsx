@@ -1,15 +1,8 @@
-import {
-  Button,
-  DateRangePicker,
-  Field,
-  IconClose,
-  SearchInput,
-  DropDown,
-  useTheme,
-} from '@1hive/1hive-ui';
+import { Button, Field, IconClose, SearchInput, DropDown, useTheme } from '@1hive/1hive-ui';
 import { useFilterContext } from 'src/contexts/filter.context';
 import styled from 'styled-components';
 import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
+import DateFieldInput from './field-input/date-field-input';
 
 const StatusDropdownStyled = styled(DropDown)`
   border: 1px solid ${(props: any) => props.borderColor};
@@ -38,21 +31,29 @@ export function Filter() {
         />
       </Field>
       <Field label="Expire time">
-        <DateRangePicker
-          startDate={filter.expire?.start}
-          endDate={filter.expire?.end}
-          onChange={(val: any) => setFilter({ ...filter, expire: val })}
+        <DateFieldInput
+          id="expireTime"
+          value={filter.expireTime}
+          onChange={(val: any) => {
+            setFilter({
+              ...filter,
+              expireTime: val.currentTarget.value
+                ? new Date(val.currentTarget.value).getTime()
+                : undefined,
+            });
+          }}
+          isEdit
+          wide
         />
       </Field>
-      <Field label="Show status">
+      <Field label="Status">
         <StatusDropdownStyled
           id="filterStatus"
           items={states}
           borderColor={theme.border}
-          selected={filter.expire.start ? 0 : states.indexOf(filter.status)}
+          selected={states.indexOf(filter.status)}
           onChange={(i: number) => setFilter({ ...filter, status: states[i] })}
           wide
-          disabled={filter.expire.start}
         />
       </Field>
       {

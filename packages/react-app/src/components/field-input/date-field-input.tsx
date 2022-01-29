@@ -33,7 +33,7 @@ type Props = {
   isLoading?: boolean;
   label?: string;
   onChange?: Function;
-  value?: number;
+  value?: number | null;
   css?: CSSProperties;
   tooltip?: string;
   tooltipDetail?: ReactNode;
@@ -79,8 +79,9 @@ export default function DateFieldInput({
       isDarkTheme={theme._appearance === 'dark'}
     />
   ) : (
-    <span>{new Date(value).toDateString()}</span>
+    <span>{value ? new Date(value).toDateString() : 'Not set'}</span>
   );
+
   return (
     <FieldInput
       id={id}

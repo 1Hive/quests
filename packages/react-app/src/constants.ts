@@ -73,7 +73,7 @@ export const NETWORK_TOKENS = {
 
 // Constants
 
-export const GQL_MAX_INT = 2 ** 31 - 1;
+export const GQL_MAX_INT_MS = (2 ** 31 - 1) * 1000;
 
 export const QUESTS_PAGE_SIZE = 4;
 
@@ -171,7 +171,7 @@ export const DEFAULT_FILTER = {
   address: '',
   title: '',
   description: '',
-  expire: { start: undefined, end: undefined },
+  expireTime: null,
   bounty: undefined,
   status: ENUM_QUEST_STATE.Active,
 } as FilterModel;
