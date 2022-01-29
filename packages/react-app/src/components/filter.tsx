@@ -30,22 +30,23 @@ export function Filter() {
           wide
         />
       </Field>
-      <Field label="Expire time">
-        <DateFieldInput
-          id="expireTime"
-          value={filter.expireTime}
-          onChange={(val: any) => {
-            setFilter({
-              ...filter,
-              expireTime: val.currentTarget.value
-                ? new Date(val.currentTarget.value).getTime()
-                : undefined,
-            });
-          }}
-          isEdit
-          wide
-        />
-      </Field>
+      <DateFieldInput
+        id="expireTime"
+        value={filter.expireTime}
+        label="Expire time"
+        tooltip="Minimum expire time"
+        tooltipDetail="Will show all quests that expire after this date"
+        onChange={(val: any) => {
+          setFilter({
+            ...filter,
+            expireTime: val.currentTarget.value
+              ? new Date(val.currentTarget.value).getTime()
+              : undefined,
+          });
+        }}
+        isEdit
+        wide
+      />
       <Field label="Status">
         <StatusDropdownStyled
           id="filterStatus"

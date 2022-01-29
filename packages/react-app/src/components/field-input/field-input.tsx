@@ -62,7 +62,7 @@ export function FieldInput({
   const theme = useTheme();
   const labelComponent = label && (
     <LineStyled>
-      <LabelStyled color={theme.contentSecondary} htmlFor={id}>
+      <LabelStyled color={theme.contentSecondary} htmlFor={id} title={tooltip}>
         {label}
       </LabelStyled>
       {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
