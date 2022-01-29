@@ -66,7 +66,7 @@ const RulingInfoStyled = styled(Info)`
   width: 100%;
 `;
 
-const OnlyStackholderWarn = styled(Info)`
+const OnlyStackholderWarnStyled = styled(Info)`
   padding: ${GUpx()};
   display: flex;
   align-items: center;
@@ -246,10 +246,10 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       buttons={[
         <Fragment key="warnMessage">
           {isRuled && !isStackholder && (
-            <OnlyStackholderWarn mode="warning">
+            <OnlyStackholderWarnStyled mode="warning">
               <IconCaution />
               <span> Only a stackholder of this challenge may resolve it</span>
-            </OnlyStackholderWarn>
+            </OnlyStackholderWarnStyled>
           )}
         </Fragment>,
         <Button
