@@ -9,7 +9,6 @@ import { parseUnits } from 'ethers/lib/utils';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { NETWORK_TOKENS } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -24,7 +23,6 @@ import { floorNumber } from 'src/utils/math.utils';
 import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { Outset } from '../utils/spacer-util';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
@@ -40,6 +38,9 @@ const TokenBadgeStyled = styled(TokenBadge)`
 
 const AutoCompleteWrapperStyled = styled.div`
   flex-grow: 3;
+  input + div {
+    justify-content: end;
+  }
 `;
 
 const TokenNameStyled = styled.span`
@@ -56,7 +57,6 @@ const AmountTokenWrapperStyled = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  ${(props: any) => (props.wide ? 'width:100%' : '')};
 
   ul[role='listbox'] {
     max-height: 200px;
@@ -207,58 +207,56 @@ function AmountFieldInput({
       label={label}
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
+      isLoading={false}
+      wide={wide}
       compact={compact}
-      isLoading={isLoading}
     >
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <AmountTokenWrapperStyled wide={wide} isEdit={isEdit}>
-          {amount !== undefined && (
-            <Outset horizontal>
-              {isEdit ? (
-                <AmountTextInputStyled
-                  id={id}
-                  onChange={onAmountChange}
-                  placeHolder={placeHolder}
-                  type="number"
-                  value={amount}
-                  disabled={disabled}
-                  wide={wide}
-                />
-              ) : (
-                floorNumber(amount, decimalsCount)
-              )}
-            </Outset>
-          )}
-          {token?.token ? (
-            <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
-          ) : (
-            <AutoCompleteWrapperStyled>
-              <AutoComplete
-                items={tokens.map((x, index: number) => index)}
-                onChange={setSearchTerm}
-                onSelect={onTokenChange}
-                ref={autoCompleteRef}
-                placeholder="search name or address"
+      <FieldInput label="Amount" isLoading={isLoading} wide={wide} compact={compact}>
+        <AmountTokenWrapperStyled isEdit={isEdit}>
+          {amount !== undefined &&
+            (isEdit ? (
+              <AmountTextInputStyled
+                id={id}
+                onChange={onAmountChange}
+                placeHolder={placeHolder}
+                type="number"
+                value={amount}
+                disabled={disabled}
                 wide={wide}
-                renderSelected={(i: number) => (
-                  <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
-                )}
-                renderItem={(i: number) => (
-                  <LineStyled key={tokens[i].symbol}>
-                    <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
-                    <Tag>{tokens[i].symbol}</Tag>
-                  </LineStyled>
-                )}
               />
-            </AutoCompleteWrapperStyled>
-          )}
-          {tokenEditable && isEdit && token && (
-            <IconEditStyled onClick={onTokenEditClick} size="medium" />
-          )}
+            ) : (
+              floorNumber(amount, decimalsCount)
+            ))}
         </AmountTokenWrapperStyled>
-      )}
+      </FieldInput>
+      <FieldInput label="Token" isLoading={isLoading} wide={wide} compact={compact}>
+        {token?.token ? (
+          <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
+        ) : (
+          <AutoCompleteWrapperStyled wide={wide}>
+            <AutoComplete
+              items={tokens.map((x, index: number) => index)}
+              onChange={setSearchTerm}
+              onSelect={onTokenChange}
+              ref={autoCompleteRef}
+              placeholder="Search name or paste address"
+              wide={wide}
+              renderSelected={(i: number) => (
+                <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
+              )}
+              renderItem={(i: number) => (
+                <LineStyled key={tokens[i].symbol}>
+                  <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
+                  <Tag>{tokens[i].symbol}</Tag>
+                </LineStyled>
+              )}
+            />
+          </AutoCompleteWrapperStyled>
+        )}
+        {tokenEditable && isEdit && token && (
+          <IconEditStyled onClick={onTokenEditClick} size="medium" />
+        )}
+      </FieldInput>
     </FieldInput>
   );
 }

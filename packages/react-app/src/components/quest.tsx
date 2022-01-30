@@ -407,6 +407,7 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                   tokenEditable
+                  wide
                 />
               )}
               {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
