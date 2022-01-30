@@ -36,7 +36,7 @@ const ContentWrapperStyled = styled.div`
       ${({ wide }: any) => (wide ? `max-width:none;` : '')}
     }
   }
-  flex-direction: ${({ wide }: any) => (wide ? `column` : 'row')};
+  flex-direction: ${({ direction }: any) => direction};
 `;
 
 const SkeletonWrapperStyled = styled.div`
@@ -53,6 +53,7 @@ type Props = {
   id?: string;
   isLoading: boolean;
   wide?: boolean;
+  direction?: 'row' | 'column';
 };
 
 export function FieldInput({
@@ -64,6 +65,7 @@ export function FieldInput({
   label,
   isLoading = false,
   wide = false,
+  direction = 'row',
 }: Props) {
   const theme = useTheme();
   const labelComponent = label && (
@@ -83,7 +85,7 @@ export function FieldInput({
             <Skeleton />
           </SkeletonWrapperStyled>
         ) : (
-          <ContentWrapperStyled compact={compact} wide={wide}>
+          <ContentWrapperStyled compact={compact} wide={wide} direction={direction}>
             {children}
           </ContentWrapperStyled>
         )}

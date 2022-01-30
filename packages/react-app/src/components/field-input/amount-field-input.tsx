@@ -29,7 +29,7 @@ import { FieldInput } from './field-input';
 
 const AmountTextInputStyled = styled(TextInput)`
   flex-grow: 1;
-  max-width: 200px;
+  ${({ wide }: any) => (wide ? '' : `max-width: 200px;`)}
 `;
 
 const TokenBadgeStyled = styled(TokenBadge)`
@@ -38,8 +38,15 @@ const TokenBadgeStyled = styled(TokenBadge)`
 
 const AutoCompleteWrapperStyled = styled.div`
   flex-grow: 3;
-  input + div {
-    justify-content: end;
+  input {
+    & + div {
+      pointer-events: none;
+      ${({ wide }: any) => (wide ? 'justify-content: end;' : '')}
+    }
+  }
+  ul[role='listbox'] {
+    max-height: 200px;
+    overflow-y: auto;
   }
 `;
 
@@ -57,11 +64,7 @@ const AmountTokenWrapperStyled = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-
-  ul[role='listbox'] {
-    max-height: 200px;
-    overflow-y: auto;
-  }
+  ${({ wide }: any) => (wide ? '' : `padding-right:${GUpx()};`)}
 `;
 
 const IconEditStyled = styled(IconEdit)`
@@ -87,6 +90,7 @@ type Props = {
   disabled?: boolean;
   wide?: boolean;
   tokenEditable?: boolean;
+  isTwoFields?: boolean;
 };
 
 function AmountFieldInput({
@@ -105,6 +109,7 @@ function AmountFieldInput({
   disabled = false,
   wide = false,
   tokenEditable = false,
+  isTwoFields = false,
 }: Props) {
   const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
@@ -210,9 +215,15 @@ function AmountFieldInput({
       isLoading={false}
       wide={wide}
       compact={compact}
+      direction={isTwoFields ? 'column' : 'row'}
     >
-      <FieldInput label="Amount" isLoading={isLoading} wide={wide} compact={compact}>
-        <AmountTokenWrapperStyled isEdit={isEdit}>
+      <FieldInput
+        label={isTwoFields ? 'Amount' : undefined}
+        isLoading={isLoading}
+        wide={wide}
+        compact={compact}
+      >
+        <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
           {amount !== undefined &&
             (isEdit ? (
               <AmountTextInputStyled
@@ -229,7 +240,12 @@ function AmountFieldInput({
             ))}
         </AmountTokenWrapperStyled>
       </FieldInput>
-      <FieldInput label="Token" isLoading={isLoading} wide={wide} compact={compact}>
+      <FieldInput
+        label={isTwoFields ? 'Token' : undefined}
+        isLoading={isLoading}
+        wide={wide}
+        compact={compact}
+      >
         {token?.token ? (
           <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
         ) : (

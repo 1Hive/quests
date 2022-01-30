@@ -407,6 +407,7 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                   tokenEditable
+                  isTwoFields={isEdit}
                   wide
                 />
               )}
