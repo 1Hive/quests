@@ -1,6 +1,6 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { dateFormat } from '../../utils/date.utils';
@@ -55,7 +55,6 @@ export default function DateFieldInput({
   wide = false,
 }: Props) {
   const theme = useTheme();
-  const valFormat = dateFormat(value, 'iso');
 
   const handleChange = (e: any) => {
     e.preventDefault();
@@ -68,7 +67,7 @@ export default function DateFieldInput({
     <InputStyled
       id={id}
       type="date"
-      defaultValue={valFormat}
+      value={value ? dateFormat(value, 'iso') : ''}
       onChange={handleChange}
       style={css}
       background={theme.surface}

@@ -41,7 +41,7 @@ export function Filter() {
             ...filter,
             expireTime: val.currentTarget.value
               ? new Date(val.currentTarget.value).getTime()
-              : undefined,
+              : null,
           });
         }}
         isEdit
