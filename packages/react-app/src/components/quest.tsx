@@ -391,6 +391,7 @@ export default function Quest({
               {(bounty !== null || isEdit) && (
                 <AmountFieldInputFormik
                   id="bounty"
+                  label={questMode === ENUM_QUEST_VIEW_MODE.Create ? undefined : 'Available bounty'}
                   isEdit={isEdit}
                   tooltip="Bounty"
                   tooltipDetail={
@@ -402,8 +403,8 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                   tokenEditable
-                  tokenLabel="Funding token"
-                  amountLabel="Funding amount"
+                  tokenLabel={isEdit ? 'Funding token' : undefined}
+                  amountLabel={isEdit ? 'Funding amount' : undefined}
                   wide
                 />
               )}
