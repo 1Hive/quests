@@ -62,9 +62,9 @@ const LineStyled = styled.div`
 
 const AmountTokenWrapperStyled = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
-  ${({ wide }: any) => (wide ? '' : `padding-right:${GUpx()};`)}
+  ${({ wide, isEdit }: any) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
 `;
 
 const IconEditStyled = styled(IconEdit)`
@@ -79,6 +79,8 @@ type Props = {
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
+  amountLabel?: string;
+  tokenLabel?: string;
   placeHolder?: string;
   value?: TokenAmountModel;
   onChange?: Function;
@@ -90,7 +92,6 @@ type Props = {
   disabled?: boolean;
   wide?: boolean;
   tokenEditable?: boolean;
-  isTwoFields?: boolean;
 };
 
 function AmountFieldInput({
@@ -98,6 +99,8 @@ function AmountFieldInput({
   isEdit = false,
   isLoading = false,
   label,
+  amountLabel,
+  tokenLabel,
   placeHolder = '',
   value,
   onChange = noop,
@@ -109,13 +112,12 @@ function AmountFieldInput({
   disabled = false,
   wide = false,
   tokenEditable = false,
-  isTwoFields = false,
 }: Props) {
   const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
-  const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount ?? 0);
+  const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount);
   const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const { walletAddress } = useWallet();
@@ -214,15 +216,10 @@ function AmountFieldInput({
       tooltipDetail={tooltipDetail}
       isLoading={false}
       wide={wide}
-      compact={compact}
-      direction={isTwoFields ? 'column' : 'row'}
+      compact
+      direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
     >
-      <FieldInput
-        label={isTwoFields ? 'Amount' : undefined}
-        isLoading={isLoading}
-        wide={wide}
-        compact={compact}
-      >
+      <FieldInput label={amountLabel} isLoading={isLoading} wide={wide} compact={compact}>
         <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
           {amount !== undefined &&
             (isEdit ? (
@@ -241,10 +238,12 @@ function AmountFieldInput({
         </AmountTokenWrapperStyled>
       </FieldInput>
       <FieldInput
-        label={isTwoFields ? 'Token' : undefined}
+        label={tokenLabel}
         isLoading={isLoading}
         wide={wide}
         compact={compact}
+        tooltip="Token"
+        tooltipDetail="Select a token between the list or paste the token address"
       >
         {token?.token ? (
           <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />

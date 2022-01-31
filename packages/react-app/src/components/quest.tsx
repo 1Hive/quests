@@ -391,11 +391,6 @@ export default function Quest({
               {(bounty !== null || isEdit) && (
                 <AmountFieldInputFormik
                   id="bounty"
-                  label={
-                    questMode === ENUM_QUEST_VIEW_MODE.Create
-                      ? 'Initial bounty'
-                      : 'Available bounty'
-                  }
                   isEdit={isEdit}
                   tooltip="Bounty"
                   tooltipDetail={
@@ -407,7 +402,8 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                   tokenEditable
-                  isTwoFields={isEdit}
+                  tokenLabel="Funding token"
+                  amountLabel="Funding amount"
                   wide
                 />
               )}
@@ -419,6 +415,7 @@ export default function Quest({
                   tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
                   value={claimDeposit}
                   isLoading={loading || (!isEdit && !claimDeposit)}
+                  wide
                 />
               )}
               <DateFieldInput
