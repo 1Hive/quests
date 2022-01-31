@@ -1,6 +1,6 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { CSSProperties, ReactNode, useEffect, useState } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { dateFormat } from '../../utils/date.utils';
