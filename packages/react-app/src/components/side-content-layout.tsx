@@ -54,20 +54,25 @@ function SideContentLayout({ main, side, footer, mainScrollable = true }: Props)
   const [twoCol, setTwoCol] = useState(true);
 
   useEffect(() => {
-    if (scrollRef.current && footerRef.current) {
-      scrollRef.current?.addEventListener('wheel', (e: WheelEvent) => {
-        const scrollElement = scrollRef.current as HTMLElement;
-        const wrapperElement = document.getElementById('main-scroll');
-        const footerElement = footerRef.current as HTMLElement;
-        // scroll is bottom
-        if (wrapperElement && scrollElement) {
-          if (Math.round(wrapperElement.scrollTop) >= footerElement.clientHeight && e.deltaY < 0) {
-            e.preventDefault();
-            wrapperElement.scroll({ top: e.deltaY, behavior: 'smooth' });
-          }
+    const handleWheelOnMain = (e: WheelEvent) => {
+      const scrollElement = scrollRef.current as HTMLElement;
+      const wrapperElement = document.getElementById('main-scroll');
+      const footerElement = footerRef.current as HTMLElement;
+      // scroll is bottom
+      if (wrapperElement && scrollElement) {
+        if (Math.round(wrapperElement.scrollTop) >= footerElement.clientHeight && e.deltaY < 0) {
+          e.preventDefault();
+          wrapperElement.scroll({ top: e.deltaY, behavior: 'smooth' });
         }
-      });
+      }
+    };
+
+    if (scrollRef.current && footerRef.current && side) {
+      scrollRef.current?.addEventListener('wheel', handleWheelOnMain);
+    } else {
+      scrollRef.current?.removeEventListener('wheel', handleWheelOnMain);
     }
+    return () => scrollRef.current?.removeEventListener('wheel', handleWheelOnMain);
   }, [scrollRef.current, footerRef.current]);
 
   useEffect(() => {
