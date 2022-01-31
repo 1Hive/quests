@@ -35,7 +35,7 @@ export function Filter() {
         value={filter.expireTime}
         label="Expire time"
         tooltip="Minimum expire time"
-        tooltipDetail="Will show all quests that expire after this date"
+        tooltipDetail="Will show all quests that are not expired this date"
         onChange={(val: any) => {
           setFilter({
             ...filter,
