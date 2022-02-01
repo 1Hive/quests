@@ -151,7 +151,7 @@ function AmountFieldInput({
   useEffect(() => {
     if (!isEdit) {
       if (value?.parsedAmount && (!maxDecimals || maxDecimals > 0))
-        setDecimalsCount(maxDecimals ?? Math.floor(Math.log10(value.parsedAmount)) * -1);
+        setDecimalsCount(maxDecimals ?? 5);
     }
   }, [maxDecimals, isEdit, value?.parsedAmount]);
 
@@ -223,7 +223,7 @@ function AmountFieldInput({
                   placeHolder={placeHolder}
                   type="number"
                   value={amount}
-                  disabled={disabled}
+                  disabled={!token ? true : disabled}
                   wide={wide}
                 />
               ) : (

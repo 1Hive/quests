@@ -1,8 +1,10 @@
 import { Card, useToast, useViewport } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { debounce } from 'lodash';
+
 import {
   ENUM,
   ENUM_PAGES,
@@ -311,8 +313,20 @@ export default function Quest({
       }
     }, 500);
   };
+  const refresh = (data?: QuestModel) => {
+    if (data) {
+      setQuestData?.(data);
+    }
+    // Remove after confirming debouncer for amount bug PR
+    // Had to comment it so the build doesnt fail
+    // console.log('debounced test');
+  };
+  const debounceSave = useCallback(
+    debounce((data?: QuestModel) => refresh(data), 500),
+    [], // will be created only once initially
+  );
   const validate = (data: QuestModel) => {
-    setQuestData?.(data);
+    debounceSave(data);
   };
 
   const questContent = (values: QuestModel, handleChange = noop) => {

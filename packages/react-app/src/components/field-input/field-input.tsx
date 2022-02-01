@@ -15,6 +15,7 @@ const LabelStyled = styled.label`
   font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
+  white-space: nowrap;
   text-transform: uppercase;
   user-select: none;
   margin-bottom: ${GUpx(0.5)};
