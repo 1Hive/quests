@@ -197,8 +197,6 @@ export default function Quest({
         errors.push('Validation : Player address is not valid');
       }
     }
-    console.log({ expireTime: values.expireTime });
-
     if (values.expireTime.getTime() < Date.now())
       errors.push('Validation : Expiration have to be later than now');
     if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
