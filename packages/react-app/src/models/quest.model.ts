@@ -5,7 +5,7 @@ export type QuestModel = {
   // User defined
   title?: string;
   description?: string;
-  expireTimeMs: number;
+  expireTime: Date;
   fallbackAddress?: string;
 
   // Computed

@@ -52,7 +52,7 @@ async function mapQuest(questEntity: any) {
       description: questEntity.questDescription || undefined, // if '' -> undefined
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
-      expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
+      expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
     } as QuestModel;
     quest = processQuestState(quest);
     if (!quest.detailsRefIpfs) quest.description = '[No description]';
@@ -215,12 +215,12 @@ export async function fetchQuestsPaging(
   let expireTimeUpperMs = GQL_MAX_INT_MS;
 
   if (filter.status === ENUM_QUEST_STATE.Active) {
-    expireTimeLowerMs = Math.max(filter.expireTime ?? 0, Date.now());
+    expireTimeLowerMs = Math.max(filter.minExpireTime?.getTime() ?? 0, Date.now());
   } else if (filter.status === ENUM_QUEST_STATE.Expired) {
-    expireTimeLowerMs = Math.min(filter.expireTime ?? 0, Date.now());
+    expireTimeLowerMs = Math.min(filter.minExpireTime?.getTime() ?? 0, Date.now());
     expireTimeUpperMs = Date.now();
   } else {
-    expireTimeLowerMs = filter.expireTime ?? 0;
+    expireTimeLowerMs = filter.minExpireTime?.getTime() ?? 0;
   }
 
   const queryResult = (
@@ -371,11 +371,11 @@ export async function saveQuest(
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
   const { defaultGazFees } = getNetwork();
   const ipfsHash = await pushObjectToIpfs(data.description ?? '');
-  const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
+  const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
   const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    typeof data.rewardToken === 'string' ? data.rewardToken : data.rewardToken!.token,
+    typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
     defaultGazFees,

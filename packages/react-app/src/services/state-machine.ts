@@ -3,7 +3,7 @@ import { QuestModel } from 'src/models/quest.model';
 
 export function processQuestState(quest: QuestModel) {
   quest.state = ENUM_QUEST_STATE.Active;
-  if (quest.expireTimeMs <= Date.now()) {
+  if (quest.expireTime.getTime() <= Date.now()) {
     quest.state = quest.bounty?.parsedAmount ? ENUM_QUEST_STATE.Expired : ENUM_QUEST_STATE.Archived;
   }
   return quest;

@@ -1,9 +1,10 @@
 import { useTheme } from '@1hive/1hive-ui';
+import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { dateFormat } from '../../utils/date.utils';
+import { addTime, dateFormat, ONE_HOUR_IN_MS } from '../../utils/date.utils';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
@@ -33,33 +34,40 @@ type Props = {
   isLoading?: boolean;
   label?: string;
   onChange?: Function;
-  value?: number | null;
+  value?: Date | null;
   css?: CSSProperties;
   tooltip?: string;
   tooltipDetail?: ReactNode;
   compact?: boolean;
   wide?: boolean;
+  formik?: any;
 };
 
-export default function DateFieldInput({
+function DateFieldInput({
   id,
   isEdit = false,
   isLoading = false,
   label,
-  value = Date.now(),
+  value = new Date(Date.now()),
   onChange = noop,
   css,
   tooltip,
   tooltipDetail,
   compact = false,
   wide = false,
+  formik,
 }: Props) {
   const theme = useTheme();
 
   const handleChange = (e: any) => {
     e.preventDefault();
     if (e.currentTarget) {
-      onChange(e);
+      const newValue = e.currentTarget.value
+        ? // Set noon to prevent rounding form changing date
+          addTime(new Date(e.currentTarget.value), 12 * ONE_HOUR_IN_MS)
+        : null;
+      if (formik) formik.setFieldValue(id, newValue);
+      else onChange({ ...e, currentTarget: { ...e.currentTarget, value: newValue } });
     }
   };
 
@@ -67,7 +75,7 @@ export default function DateFieldInput({
     <InputStyled
       id={id}
       type="date"
-      value={value ? dateFormat(value, 'iso') : ''}
+      value={value ? dateFormat(value, 'ISO') : ''}
       onChange={handleChange}
       style={css}
       background={theme.surface}
@@ -94,3 +102,7 @@ export default function DateFieldInput({
     </FieldInput>
   );
 }
+
+const DateFieldInputFormik = connect(DateFieldInput);
+export default DateFieldInput;
+export { DateFieldInputFormik };

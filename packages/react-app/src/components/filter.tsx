@@ -12,6 +12,7 @@ export function Filter() {
   const { filter, setFilter } = useFilterContext();
   const theme = useTheme();
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
+
   return (
     <>
       <Field label="Title">
@@ -31,17 +32,15 @@ export function Filter() {
         />
       </Field>
       <DateFieldInput
-        id="expireTime"
-        value={filter.expireTime}
+        id="minExpireTime"
+        value={filter.minExpireTime}
         label="Expire time"
         tooltip="Minimum expire time"
         tooltipDetail="Will show all quests that are not expired this date"
-        onChange={(val: any) => {
+        onChange={(e: any) => {
           setFilter({
             ...filter,
-            expireTime: val.currentTarget.value
-              ? new Date(val.currentTarget.value).getTime()
-              : null,
+            minExpireTime: e.currentTarget.value,
           });
         }}
         isEdit

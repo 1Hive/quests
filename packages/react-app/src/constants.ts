@@ -171,7 +171,7 @@ export const DEFAULT_FILTER = {
   address: '',
   title: '',
   description: '',
-  expireTime: null,
+  minExpireTime: null,
   bounty: undefined,
   status: ENUM_QUEST_STATE.Active,
 } as FilterModel;

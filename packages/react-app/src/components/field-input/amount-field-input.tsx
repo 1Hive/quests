@@ -263,8 +263,6 @@ function AmountFieldInput({
   );
 }
 
-// @ts-ignore
 const AmountFieldInputFormik = connect(AmountFieldInput);
-
 export default AmountFieldInput;
 export { AmountFieldInputFormik };
