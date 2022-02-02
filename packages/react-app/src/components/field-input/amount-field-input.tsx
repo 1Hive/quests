@@ -74,10 +74,6 @@ const IconEditStyled = styled(IconEdit)`
   padding-left: ${GUpx()};
 `;
 
-const SpacerStyled = styled.div`
-  padding-right: ${GUpx()};
-`;
-
 // #endregion
 
 type Props = {
