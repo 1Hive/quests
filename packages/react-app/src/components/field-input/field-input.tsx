@@ -1,4 +1,4 @@
-import { useTheme, Link } from '@1hive/1hive-ui';
+import { useTheme } from '@1hive/1hive-ui';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/css.util';
