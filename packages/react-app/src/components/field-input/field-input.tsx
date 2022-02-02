@@ -15,6 +15,7 @@ const LabelStyled = styled.label`
   font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
+  white-space: nowrap;
   text-transform: uppercase;
   user-select: none;
   margin-bottom: ${GUpx(0.5)};
@@ -24,14 +25,14 @@ const LineStyled = styled.div`
   display: flex;
   align-items: top;
   max-width: 100%;
+  margin-top: ${GUpx(0.5)};
 `;
 
 const ContentWrapperStyled = styled.div`
   display: flex;
   align-items: center;
   ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
-  div {
-    ${({ wide }: any) => (wide ? `width:100%;` : 'max-width:100%;')}
+  & > div {
     input {
       ${({ wide }: any) => (wide ? `max-width:none;` : '')}
     }

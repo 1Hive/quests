@@ -52,7 +52,6 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
             tooltip="Balance"
             tooltipDetail="Connected wallet's balance of the specified token"
             value={tokenBalance}
-            maxDecimals={2}
           />
         </InfoStyled>
       )}
