@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { request } from 'graphql-request';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
@@ -23,7 +22,6 @@ import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
-import { Account, AccountData } from 'ethereumjs-util';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT_MS, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -41,6 +39,9 @@ import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 
 let questList: QuestModel[] = [];
+
+// eslint-disable-next-line no-unused-vars
+type onTxCallback = (hash: string) => void;
 
 // #region Private
 async function mapQuest(questEntity: any) {
@@ -147,7 +148,7 @@ function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
 
 async function handleTransaction(
   tx: any,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   // Let the trx initiate before playing with the receipt
   if (!tx) return null;
@@ -365,7 +366,7 @@ export async function saveQuest(
   fallbackAddress: string,
   data: Partial<QuestModel>,
   address?: string,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   if (address) throw Error('Saving existing quest is not yet implemented');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
@@ -390,7 +391,7 @@ export async function saveQuest(
 export async function reclaimQuestUnusedFunds(
   walletAddress: string,
   quest: QuestModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   if (!quest.address) throw new Error('Quest address is not defined when reclaiming');
   const questContract = getQuestContract(quest.address, walletAddress);
@@ -412,7 +413,7 @@ export async function fundQuest(
   walletAddress: string,
   questAddress: string,
   amount: TokenAmountModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const contract = getERC20Contract(amount.token, walletAddress);
   if (!contract) return null;
@@ -425,7 +426,7 @@ export async function approveTokenAmount(
   walletAddress: string,
   toAddress: string,
   tokenAmount: TokenModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
   if (!erc20Contract) return null;
@@ -466,7 +467,7 @@ export async function getBalanceOf(
 export async function scheduleQuestClaim(
   walletAddress: string,
   claimData: ClaimModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
@@ -480,7 +481,7 @@ export async function scheduleQuestClaim(
 export async function executeQuestClaim(
   walletAddress: string,
   claimData: ClaimModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
@@ -497,7 +498,7 @@ export async function challengeQuestClaim(
   walletAddress: string,
   challenge: ChallengeModel,
   container: ContainerModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
@@ -516,7 +517,7 @@ export async function resolveClaimChallenge(
   walletAddress: string,
   container: ContainerModel,
   dispute: DisputeModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
