@@ -1,4 +1,4 @@
-import { Button, Field, IconClose, SearchInput, DropDown, useTheme } from '@1hive/1hive-ui';
+import { Button, Field, SearchInput, DropDown, useTheme } from '@1hive/1hive-ui';
 import { useFilterContext } from 'src/contexts/filter.context';
 import styled from 'styled-components';
 import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
@@ -75,7 +75,7 @@ export function Filter() {
             value={filter.tags}
             onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
           /> TODO : Restore after MVP */}
-      <Button icon={<IconClose />} label="clear" wide onClick={() => setFilter(DEFAULT_FILTER)} />
+      <Button label="Reset filter" wide onClick={() => setFilter(DEFAULT_FILTER)} />
     </>
   );
 }

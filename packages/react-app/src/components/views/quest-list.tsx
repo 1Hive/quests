@@ -110,7 +110,7 @@ export default function QuestList() {
           <Outset gu64 className="flex-center wide">
             <EmptyStateCardStyled
               text="No quests found"
-              action={<Button onClick={() => setFilter(DEFAULT_FILTER)}>Reset filter</Button>}
+              action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
             />
           </Outset>
         )
