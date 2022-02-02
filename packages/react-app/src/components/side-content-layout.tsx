@@ -67,13 +67,13 @@ function SideContentLayout({ main, side, footer, mainScrollable = true }: Props)
       }
     };
 
-    if (scrollRef.current && footerRef.current && side && mainScrollable) {
+    if (scrollRef.current && footerRef.current && side) {
       scrollRef.current?.addEventListener('wheel', handleWheelOnMain);
     } else {
       scrollRef.current?.removeEventListener('wheel', handleWheelOnMain);
     }
     return () => scrollRef.current?.removeEventListener('wheel', handleWheelOnMain);
-  }, [scrollRef.current, footerRef.current]);
+  }, [scrollRef.current, footerRef.current, side]);
 
   useEffect(() => {
     setTwoCol(vw >= BREAKPOINTS.large);
