@@ -145,7 +145,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
-                wide
               />
               <AddressFieldInput
                 id="address"

@@ -7,7 +7,7 @@ import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled.div`
   ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(2)}` : '')};
-  ${({ isLoading }: any) => (isLoading ? `width: 100%;` : 'max-width: 100%;')};
+  ${({ isLoading, wide }: any) => (isLoading || wide ? `width: 100%;` : 'max-width: 100%;')};
 `;
 
 const LabelStyled = styled.label`
@@ -32,8 +32,12 @@ const ContentWrapperStyled = styled.div`
   align-items: center;
   ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
   div {
-    max-width: 100%;
+    ${({ wide }: any) => (wide ? `width:100%;` : 'max-width:100%;')}
+    input {
+      ${({ wide }: any) => (wide ? `max-width:none;` : '')}
+    }
   }
+  flex-direction: ${({ direction }: any) => direction};
 `;
 
 const SkeletonWrapperStyled = styled.div`
@@ -49,6 +53,8 @@ type Props = {
   children: React.ReactNode;
   id?: string;
   isLoading: boolean;
+  wide?: boolean;
+  direction?: 'row' | 'column';
 };
 
 export function FieldInput({
@@ -59,6 +65,8 @@ export function FieldInput({
   tooltipDetail,
   label,
   isLoading = false,
+  wide = false,
+  direction = 'row',
 }: Props) {
   const theme = useTheme();
   const labelComponent = label && (
@@ -70,7 +78,7 @@ export function FieldInput({
     </LineStyled>
   );
   return (
-    <FieldStyled key={id} compact={compact} isLoading={isLoading}>
+    <FieldStyled key={id} compact={compact} isLoading={isLoading} wide={wide}>
       {labelComponent}
       <>
         {isLoading ? (
@@ -78,7 +86,9 @@ export function FieldInput({
             <Skeleton />
           </SkeletonWrapperStyled>
         ) : (
-          <ContentWrapperStyled compact={compact}>{children}</ContentWrapperStyled>
+          <ContentWrapperStyled compact={compact} wide={wide} direction={direction}>
+            {children}
+          </ContentWrapperStyled>
         )}
       </>
     </FieldStyled>
