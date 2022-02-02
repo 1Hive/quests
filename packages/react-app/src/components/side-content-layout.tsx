@@ -67,7 +67,7 @@ function SideContentLayout({ main, side, footer, mainScrollable = true }: Props)
       }
     };
 
-    if (scrollRef.current && footerRef.current && side) {
+    if (scrollRef.current && footerRef.current && side && mainScrollable) {
       scrollRef.current?.addEventListener('wheel', handleWheelOnMain);
     } else {
       scrollRef.current?.removeEventListener('wheel', handleWheelOnMain);
