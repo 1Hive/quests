@@ -31,7 +31,6 @@ export const QuestEntitiesQuery = gql`
       where: {
         questExpireTimeSec_gte: $expireTimeLower
         questExpireTimeSec_lte: $expireTimeUpper
-        questAddress_contains: $address
         questTitle_contains: $title
         questDescription_contains: $description
       }

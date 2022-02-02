@@ -4,12 +4,12 @@ import {
   _AutoComplete as AutoComplete,
   Tag,
   IconEdit,
+  Button,
 } from '@1hive/1hive-ui';
 import { parseUnits } from 'ethers/lib/utils';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { NETWORK_TOKENS } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -30,7 +30,7 @@ import { FieldInput } from './field-input';
 
 const AmountTextInputStyled = styled(TextInput)`
   flex-grow: 1;
-  max-width: 200px;
+  ${({ wide }: any) => (wide ? '' : `max-width: 200px;`)}
 `;
 
 const TokenBadgeStyled = styled(TokenBadge)`
@@ -39,6 +39,16 @@ const TokenBadgeStyled = styled(TokenBadge)`
 
 const AutoCompleteWrapperStyled = styled.div`
   flex-grow: 3;
+  input {
+    & + div {
+      pointer-events: none;
+      ${({ wide }: any) => (wide ? 'justify-content: end;' : '')}
+    }
+  }
+  ul[role='listbox'] {
+    max-height: 200px;
+    overflow-y: auto;
+  }
 `;
 
 const TokenNameStyled = styled.span`
@@ -53,13 +63,10 @@ const LineStyled = styled.div`
 
 const AmountTokenWrapperStyled = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
-  ${(props: any) => (props.wide ? 'width:100%' : '')};
-  ul[role='listbox'] {
-    max-height: 200px;
-    overflow-y: auto;
-  }
+  ${({ wide, isEdit }: any) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
+  ${({ wide }: any) => (wide ? `width:100%;` : 'max-width:100%;')}
 `;
 
 const IconEditStyled = styled(IconEdit)`
@@ -78,6 +85,8 @@ type Props = {
   isEdit?: boolean;
   isLoading?: boolean;
   label?: string;
+  amountLabel?: string;
+  tokenLabel?: string;
   placeHolder?: string;
   value?: TokenAmountModel;
   onChange?: Function;
@@ -89,6 +98,7 @@ type Props = {
   disabled?: boolean;
   wide?: boolean;
   tokenEditable?: boolean;
+  reversed?: boolean;
 };
 
 function AmountFieldInput({
@@ -96,6 +106,8 @@ function AmountFieldInput({
   isEdit = false,
   isLoading = false,
   label,
+  amountLabel,
+  tokenLabel,
   placeHolder = '',
   value,
   onChange = noop,
@@ -107,15 +119,18 @@ function AmountFieldInput({
   disabled = false,
   wide = false,
   tokenEditable = false,
+  reversed = false,
 }: Props) {
   const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
-  const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount ?? 0);
+  const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount);
   const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const { walletAddress } = useWallet();
+  const tokenInputId = `token-${id}`;
+  const amountInputId = `amount-${id}`;
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
@@ -124,7 +139,13 @@ function AmountFieldInput({
       document.addEventListener(
         'focusin',
         () => {
-          if (walletAddress && isEdit && tokenEditable) fetchAvailableTokens();
+          if (
+            document.activeElement === autoCompleteRef.current &&
+            walletAddress &&
+            isEdit &&
+            tokenEditable
+          )
+            fetchAvailableTokens();
         },
         true,
       );
@@ -153,7 +174,7 @@ function AmountFieldInput({
   useEffect(() => {
     if (!isEdit) {
       if (value?.parsedAmount && (!maxDecimals || maxDecimals > 0))
-        setDecimalsCount(maxDecimals ?? Math.floor(Math.log10(value.parsedAmount)) * -1);
+        setDecimalsCount(maxDecimals ?? 4);
     }
   }, [maxDecimals, isEdit, value?.parsedAmount]);
 
@@ -203,70 +224,87 @@ function AmountFieldInput({
     else onChange(nextValue);
   };
 
+  const amountField = (
+    <FieldInput label={amountLabel} isLoading={isLoading} wide={wide} compact={compact}>
+      <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
+        {amount !== undefined &&
+          (isEdit ? (
+            <AmountTextInputStyled
+              id={amountInputId}
+              title={!token ? 'Set token first' : undefined}
+              onChange={onAmountChange}
+              placeHolder={placeHolder}
+              type="number"
+              value={amount}
+              wide={wide}
+              disabled={!token ? true : disabled}
+            />
+          ) : (
+            floorNumber(amount, decimalsCount)
+          ))}
+      </AmountTokenWrapperStyled>
+    </FieldInput>
+  );
+
+  const tokenField = (
+    <FieldInput
+      label={tokenLabel}
+      isLoading={isLoading}
+      wide={wide}
+      compact={compact}
+      tooltip="Token"
+      tooltipDetail="Select a token between the list or paste the token address"
+    >
+      {token?.token ? (
+        <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
+      ) : (
+        <AutoCompleteWrapperStyled wide={wide} id={tokenInputId}>
+          <AutoComplete
+            items={tokens.map((x, index: number) => index)}
+            onChange={setSearchTerm}
+            onSelect={onTokenChange}
+            ref={autoCompleteRef}
+            placeholder="Search name or paste address"
+            wide={wide}
+            renderSelected={(i: number) => (
+              <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
+            )}
+            renderItem={(i: number) => (
+              <LineStyled key={tokens[i].symbol}>
+                <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
+                <Tag>{tokens[i].symbol}</Tag>
+              </LineStyled>
+            )}
+            tabindex="-1"
+          />
+        </AutoCompleteWrapperStyled>
+      )}
+      {tokenEditable && isEdit && token && (
+        <div className="btn-link">
+          <Button size="mini" onClick={onTokenEditClick} tabindex="-2">
+            <IconEditStyled size="medium" />
+          </Button>
+        </div>
+      )}
+    </FieldInput>
+  );
+
   return (
     <FieldInput
       id={id}
       label={label}
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
-      compact={compact}
-      isLoading={isLoading}
+      isLoading={false}
+      wide={wide}
+      compact
+      direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
     >
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <AmountTokenWrapperStyled wide={wide} isEdit={isEdit}>
-          {amount !== undefined && (
-            <SpacerStyled>
-              {isEdit ? (
-                <AmountTextInputStyled
-                  id={id}
-                  onChange={onAmountChange}
-                  placeHolder={placeHolder}
-                  type="number"
-                  value={amount}
-                  disabled={disabled}
-                  wide={wide}
-                />
-              ) : (
-                floorNumber(amount, decimalsCount)
-              )}
-            </SpacerStyled>
-          )}
-          {token?.token ? (
-            <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
-          ) : (
-            <AutoCompleteWrapperStyled>
-              <AutoComplete
-                items={tokens.map((x, index: number) => index)}
-                onChange={setSearchTerm}
-                onSelect={onTokenChange}
-                ref={autoCompleteRef}
-                placeholder="search name or address"
-                wide={wide}
-                renderSelected={(i: number) => (
-                  <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
-                )}
-                renderItem={(i: number) => (
-                  <LineStyled key={tokens[i].symbol}>
-                    <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
-                    <Tag>{tokens[i].symbol}</Tag>
-                  </LineStyled>
-                )}
-              />
-            </AutoCompleteWrapperStyled>
-          )}
-          {tokenEditable && isEdit && token && (
-            <IconEditStyled onClick={onTokenEditClick} size="medium" />
-          )}
-        </AmountTokenWrapperStyled>
-      )}
+      {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>
   );
 }
 
-// @ts-ignore
 const AmountFieldInputFormik = connect(AmountFieldInput);
-
 export default AmountFieldInput;
 export { AmountFieldInputFormik };

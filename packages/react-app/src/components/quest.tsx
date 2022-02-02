@@ -1,8 +1,10 @@
 import { Card, useToast, useViewport } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { debounce } from 'lodash';
+
 import {
   ENUM,
   ENUM_PAGES,
@@ -14,7 +16,6 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
-import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -26,7 +27,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
-import DateFieldInput from './field-input/date-field-input';
+import DateFieldInput, { DateFieldInputFormik } from './field-input/date-field-input';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
@@ -198,7 +199,7 @@ export default function Quest({
         errors.push('Validation : Player address is not valid');
       }
     }
-    if (values.expireTimeMs < Date.now())
+    if (values.expireTime.getTime() < Date.now())
       errors.push('Validation : Expiration have to be later than now');
     if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
     else if (values.bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
@@ -209,8 +210,6 @@ export default function Quest({
       setLoading(true);
       let createdQuestAddress: string;
       try {
-        // Set noon to prevent rounding form changing date
-        const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
         const pendingMessage = 'Creating Quest...';
         toast(pendingMessage);
         const txReceiptSaveQuest = await QuestService.saveQuest(
@@ -218,7 +217,7 @@ export default function Quest({
           values.fallbackAddress ?? walletAddress,
           {
             ...values,
-            expireTimeMs: timeValue,
+            expireTime: values.expireTime,
             creatorAddress: walletAddress,
             rewardToken: values.bounty!.token ?? defaultToken,
           },
@@ -311,8 +310,17 @@ export default function Quest({
       }
     }, 500);
   };
+  const refresh = (data?: QuestModel) => {
+    if (data) {
+      setQuestData?.(data);
+    }
+  };
+  const debounceSave = useCallback(
+    debounce((data?: QuestModel) => refresh(data), 500),
+    [], // will be created only once initially
+  );
   const validate = (data: QuestModel) => {
-    setQuestData?.(data);
+    debounceSave(data);
   };
 
   const questContent = (values: QuestModel, handleChange = noop) => {
@@ -391,11 +399,7 @@ export default function Quest({
               {(bounty !== null || isEdit) && (
                 <AmountFieldInputFormik
                   id="bounty"
-                  label={
-                    questMode === ENUM_QUEST_VIEW_MODE.Create
-                      ? 'Initial bounty'
-                      : 'Available bounty'
-                  }
+                  label={questMode === ENUM_QUEST_VIEW_MODE.Create ? undefined : 'Available bounty'}
                   isEdit={isEdit}
                   tooltip="Bounty"
                   tooltipDetail={
@@ -407,6 +411,10 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                   tokenEditable
+                  tokenLabel={isEdit ? 'Funding token' : undefined}
+                  amountLabel={isEdit ? 'Initial funding amount' : undefined}
+                  reversed={isEdit}
+                  wide
                 />
               )}
               {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && (
@@ -419,6 +427,7 @@ export default function Quest({
                       tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
                       value={claimDeposit}
                       isLoading={loading || (!isEdit && !claimDeposit)}
+                      wide
                     />
                   )}
                   <DateFieldInput
@@ -430,16 +439,16 @@ export default function Quest({
                   />
                 </>
               )}
-              <DateFieldInput
-                id="expireTimeMs"
+              <DateFieldInputFormik
+                id="expireTime"
                 label="Expire time"
                 tooltip="Expire time"
                 tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
                 isEdit={isEdit}
                 isLoading={loading}
-                value={questData.expireTimeMs}
-                onChange={handleChange}
+                value={values.expireTime}
                 wide
+                formik={formRef}
               />
               {isEdit && (
                 <AddressWrapperStyled>

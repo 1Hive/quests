@@ -227,6 +227,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
 
   return (
     <ModalBase
+      id="resolve-challenge-modal"
       title={
         <HeaderStyled>
           <h1>Resolve claim challenge</h1>

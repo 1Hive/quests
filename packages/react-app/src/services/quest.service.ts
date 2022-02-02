@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { request } from 'graphql-request';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
@@ -23,8 +22,7 @@ import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
-import { Account, AccountData } from 'ethereumjs-util';
-import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT, TOKENS } from '../constants';
+import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT_MS, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import { getObjectFromIpfs, pushObjectToIpfs, formatIpfsMarkdownLink } from './ipfs.service';
@@ -42,6 +40,9 @@ import { getLastBlockTimestamp } from '../utils/date.utils';
 
 let questList: QuestModel[] = [];
 
+// eslint-disable-next-line no-unused-vars
+type onTxCallback = (hash: string) => void;
+
 // #region Private
 async function mapQuest(questEntity: any) {
   if (!questEntity) return undefined;
@@ -52,8 +53,8 @@ async function mapQuest(questEntity: any) {
       description: questEntity.questDescription || undefined, // if '' -> undefined
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
-      expireTimeMs: questEntity.questExpireTimeSec * 1000, // sec to Ms
-      creationTime: questEntity.creationTimestamp * 1000, // sec to Ms
+      expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
+      creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
     } as QuestModel;
     quest = processQuestState(quest);
     if (!quest.detailsRefIpfs) quest.description = '[No description]';
@@ -99,6 +100,7 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
   const result = await request(governSubgraph, GovernQueueEntityContainersQuery, {
     ID: governQueueAddress.toLowerCase(),
   });
+
   if (!result?.governQueue)
     throw new Error(`GovernQueue does not exist at this address : ${governQueueAddress}`);
 
@@ -147,7 +149,7 @@ function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
 
 async function handleTransaction(
   tx: any,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   // Let the trx initiate before playing with the receipt
   if (!tx) return null;
@@ -211,29 +213,24 @@ export async function fetchQuestsPaging(
   filter: FilterModel,
 ): Promise<QuestModel[]> {
   const { questsSubgraph: questSubgraph } = getNetwork();
-  const now = Math.round(Date.now() / 1000);
-  let expireTimeLower;
-  let expireTimeUpper;
-  if (filter.expire?.start) expireTimeLower = Math.round(filter.expire.start.getTime() / 1000);
-  else
-    expireTimeLower =
-      filter.status === ENUM_QUEST_STATE.Expired || filter.status === ENUM_QUEST_STATE.All
-        ? 0
-        : now;
-  if (filter.expire?.end) expireTimeUpper = Math.round(filter.expire.end.getTime() / 1000);
-  // TODO : Change to a later time when supported by grapql-request
-  else
-    expireTimeUpper =
-      filter.status === ENUM_QUEST_STATE.Expired && filter.status !== ENUM_QUEST_STATE.All
-        ? now
-        : GQL_MAX_INT; // January 18, 2038 10:14:07 PM
+  let expireTimeLowerMs = 0;
+  let expireTimeUpperMs = GQL_MAX_INT_MS;
+
+  if (filter.status === ENUM_QUEST_STATE.Active) {
+    expireTimeLowerMs = Math.max(filter.minExpireTime?.getTime() ?? 0, Date.now());
+  } else if (filter.status === ENUM_QUEST_STATE.Expired) {
+    expireTimeLowerMs = Math.min(filter.minExpireTime?.getTime() ?? 0, Date.now());
+    expireTimeUpperMs = Date.now();
+  } else {
+    expireTimeLowerMs = filter.minExpireTime?.getTime() ?? 0;
+  }
+
   const queryResult = (
     await request(questSubgraph, QuestEntitiesQuery, {
       skip: currentIndex,
       first: count,
-      expireTimeLower,
-      expireTimeUpper,
-      address: filter.address.toLowerCase(), // Quest address was not indexed with mixed-case
+      expireTimeLower: Math.round(expireTimeLowerMs / 1000),
+      expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
       title: filter.title,
       description: filter.description,
     })
@@ -370,17 +367,17 @@ export async function saveQuest(
   fallbackAddress: string,
   data: Partial<QuestModel>,
   address?: string,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   if (address) throw Error('Saving existing quest is not yet implemented');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
   const { defaultGazFees } = getNetwork();
   const ipfsHash = await pushObjectToIpfs(data.description ?? '');
-  const questExpireTimeUtcSec = Math.round(data.expireTimeMs! / 1000); // Ms to UTC timestamp
+  const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
   const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    typeof data.rewardToken === 'string' ? data.rewardToken : data.rewardToken!.token,
+    typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
     defaultGazFees,
@@ -395,7 +392,7 @@ export async function saveQuest(
 export async function reclaimQuestUnusedFunds(
   walletAddress: string,
   quest: QuestModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   if (!quest.address) throw new Error('Quest address is not defined when reclaiming');
   const questContract = getQuestContract(quest.address, walletAddress);
@@ -417,7 +414,7 @@ export async function fundQuest(
   walletAddress: string,
   questAddress: string,
   amount: TokenAmountModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const contract = getERC20Contract(amount.token, walletAddress);
   if (!contract) return null;
@@ -430,7 +427,7 @@ export async function approveTokenAmount(
   walletAddress: string,
   toAddress: string,
   tokenAmount: TokenModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
   if (!erc20Contract) return null;
@@ -471,7 +468,7 @@ export async function getBalanceOf(
 export async function scheduleQuestClaim(
   walletAddress: string,
   claimData: ClaimModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
@@ -485,7 +482,7 @@ export async function scheduleQuestClaim(
 export async function executeQuestClaim(
   walletAddress: string,
   claimData: ClaimModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
@@ -502,7 +499,7 @@ export async function challengeQuestClaim(
   walletAddress: string,
   challenge: ChallengeModel,
   container: ContainerModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
@@ -521,7 +518,7 @@ export async function resolveClaimChallenge(
   walletAddress: string,
   container: ContainerModel,
   dispute: DisputeModel,
-  onTx?: (hash: string) => void,
+  onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;

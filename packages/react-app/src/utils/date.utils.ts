@@ -6,7 +6,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { ethers } from 'ethers';
 
 const KNOWN_FORMATS = {
-  onlyDate: 'DD/MM/YYYY',
+  onlydate: 'DD/MM/YYYY',
   iso: 'YYYY-MM-DD',
   custom: 'DD MMMM HH:mm',
 };
@@ -17,8 +17,8 @@ dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
 dayjs.extend(advancedFormat);
 
-function dateFormat(date: any, format = 'onlyDate') {
-  return dayjs(date).format(KNOWN_FORMATS[format] || format);
+function dateFormat(date: any, format = 'onlydate') {
+  return dayjs(date).format(KNOWN_FORMATS[format.toLowerCase()] || format);
 }
 
 function durationTime(ms: number) {
@@ -40,6 +40,10 @@ export async function getLastBlockTimestamp(): Promise<number> {
 }
 export async function getLastBlockDate(): Promise<number> {
   return (await getLastBlockTimestamp()) * 1000;
+}
+
+export function addTime(date: Date, ms: number): Date {
+  return new Date(date.getTime() + ms);
 }
 
 export const ONE_HOUR_IN_MS = 1000 * 60 * 60;

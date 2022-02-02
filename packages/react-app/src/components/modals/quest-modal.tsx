@@ -35,7 +35,7 @@ export default function QuestModal({
   const { setNewQuest } = useQuestsContext();
   const [questData, setQuestData] = useState(
     data ?? {
-      expireTimeMs: IN_A_WEEK_IN_MS + 24 * 36000,
+      expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
       state: ENUM_QUEST_STATE.Draft,
     },
   );
@@ -80,6 +80,7 @@ export default function QuestModal({
 
   return (
     <ModalBase
+      id="create-quest-modal"
       title="Create quest"
       openButton={
         <Button

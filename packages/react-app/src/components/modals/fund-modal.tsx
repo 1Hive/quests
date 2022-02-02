@@ -105,6 +105,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
     >
       {({ values, handleSubmit, handleChange }) => (
         <ModalBase
+          id="fund-modal"
           title="Fund quest"
           openButton={
             <OpenButtonStyled
@@ -151,7 +152,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
-                wide
               />
             </Outset>
           </FormStyled>
