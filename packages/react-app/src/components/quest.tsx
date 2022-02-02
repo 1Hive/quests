@@ -317,9 +317,6 @@ export default function Quest({
     if (data) {
       setQuestData?.(data);
     }
-    // Remove after confirming debouncer for amount bug PR
-    // Had to comment it so the build doesnt fail
-    // console.log('debounced test');
   };
   const debounceSave = useCallback(
     debounce((data?: QuestModel) => refresh(data), 500),

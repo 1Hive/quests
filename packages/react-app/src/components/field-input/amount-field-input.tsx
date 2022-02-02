@@ -225,6 +225,7 @@ function AmountFieldInput({
                   value={amount}
                   disabled={!token ? true : disabled}
                   wide={wide}
+                  title={!token ? 'Set token first' : undefined}
                 />
               ) : (
                 floorNumber(amount, decimalsCount)
