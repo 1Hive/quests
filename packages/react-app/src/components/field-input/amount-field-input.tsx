@@ -4,6 +4,7 @@ import {
   _AutoComplete as AutoComplete,
   Tag,
   IconEdit,
+  Button,
 } from '@1hive/1hive-ui';
 import { parseUnits } from 'ethers/lib/utils';
 import { connect } from 'formik';
@@ -65,6 +66,7 @@ const AmountTokenWrapperStyled = styled.div`
   justify-content: flex-end;
   align-items: center;
   ${({ wide, isEdit }: any) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
+  ${({ wide }: any) => (wide ? `width:100%;` : 'max-width:100%;')}
 `;
 
 const IconEditStyled = styled(IconEdit)`
@@ -210,6 +212,71 @@ function AmountFieldInput({
     else onChange(nextValue);
   };
 
+  const amountField = (
+    <FieldInput label={amountLabel} isLoading={isLoading} wide={wide} compact={compact}>
+      <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
+        {amount !== undefined &&
+          (isEdit ? (
+            <AmountTextInputStyled
+              id={id}
+              title={!token ? 'Set token first' : undefined}
+              onChange={onAmountChange}
+              placeHolder={placeHolder}
+              type="number"
+              value={amount}
+              wide={wide}
+              disabled={!token ? true : disabled}
+            />
+          ) : (
+            floorNumber(amount, decimalsCount)
+          ))}
+      </AmountTokenWrapperStyled>
+    </FieldInput>
+  );
+
+  const tokenField = (
+    <FieldInput
+      label={tokenLabel}
+      isLoading={isLoading}
+      wide={wide}
+      compact={compact}
+      tooltip="Token"
+      tooltipDetail="Select a token between the list or paste the token address"
+    >
+      {token?.token ? (
+        <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
+      ) : (
+        <AutoCompleteWrapperStyled wide={wide}>
+          <AutoComplete
+            items={tokens.map((x, index: number) => index)}
+            onChange={setSearchTerm}
+            onSelect={onTokenChange}
+            ref={autoCompleteRef}
+            placeholder="Search name or paste address"
+            wide={wide}
+            renderSelected={(i: number) => (
+              <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
+            )}
+            renderItem={(i: number) => (
+              <LineStyled key={tokens[i].symbol}>
+                <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
+                <Tag>{tokens[i].symbol}</Tag>
+              </LineStyled>
+            )}
+            tabindex="-1"
+          />
+        </AutoCompleteWrapperStyled>
+      )}
+      {tokenEditable && isEdit && token && (
+        <div className="btn-link">
+          <Button size="mini" onClick={onTokenEditClick} tabindex="-2">
+            <IconEditStyled size="medium" />
+          </Button>
+        </div>
+      )}
+    </FieldInput>
+  );
+
   return (
     <FieldInput
       id={id}
@@ -220,62 +287,8 @@ function AmountFieldInput({
       wide={wide}
       compact
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
-      reversed={reversed}
     >
-      <FieldInput label={amountLabel} isLoading={isLoading} wide={wide} compact={compact}>
-        <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
-          {amount !== undefined &&
-            (isEdit ? (
-              <AmountTextInputStyled
-                id={id}
-                title={!token ? 'Set token first' : undefined}
-                onChange={onAmountChange}
-                placeHolder={placeHolder}
-                type="number"
-                value={amount}
-                wide={wide}
-                disabled={!token ? true : disabled}
-              />
-            ) : (
-              floorNumber(amount, decimalsCount)
-            ))}
-        </AmountTokenWrapperStyled>
-      </FieldInput>
-      <FieldInput
-        label={tokenLabel}
-        isLoading={isLoading}
-        wide={wide}
-        compact={compact}
-        tooltip="Token"
-        tooltipDetail="Select a token between the list or paste the token address"
-      >
-        {token?.token ? (
-          <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
-        ) : (
-          <AutoCompleteWrapperStyled wide={wide}>
-            <AutoComplete
-              items={tokens.map((x, index: number) => index)}
-              onChange={setSearchTerm}
-              onSelect={onTokenChange}
-              ref={autoCompleteRef}
-              placeholder="Search name or paste address"
-              wide={wide}
-              renderSelected={(i: number) => (
-                <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
-              )}
-              renderItem={(i: number) => (
-                <LineStyled key={tokens[i].symbol}>
-                  <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
-                  <Tag>{tokens[i].symbol}</Tag>
-                </LineStyled>
-              )}
-            />
-          </AutoCompleteWrapperStyled>
-        )}
-        {tokenEditable && isEdit && token && (
-          <IconEditStyled onClick={onTokenEditClick} size="medium" />
-        )}
-      </FieldInput>
+      {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>
   );
 }

@@ -1,4 +1,4 @@
-import { useTheme } from '@1hive/1hive-ui';
+import { useTheme, Link } from '@1hive/1hive-ui';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/css.util';
@@ -31,14 +31,12 @@ const ContentWrapperStyled = styled.div`
   display: flex;
   align-items: center;
   ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
-  div {
-    ${({ wide }: any) => (wide ? `width:100%;` : 'max-width:100%;')}
+  & > div {
     input {
       ${({ wide }: any) => (wide ? `max-width:none;` : '')}
     }
   }
   flex-direction: ${({ direction }: any) => direction};
-  flex-flow: ${({ reversed }: any) => (reversed ? 'wrap-reverse' : 'wrap;')};
 `;
 
 const SkeletonWrapperStyled = styled.div`
@@ -56,7 +54,6 @@ type Props = {
   isLoading: boolean;
   wide?: boolean;
   direction?: 'row' | 'column';
-  reversed?: boolean;
 };
 
 export function FieldInput({
@@ -69,7 +66,6 @@ export function FieldInput({
   isLoading = false,
   wide = false,
   direction = 'row',
-  reversed = false,
 }: Props) {
   const theme = useTheme();
   const labelComponent = label && (
@@ -89,12 +85,7 @@ export function FieldInput({
             <Skeleton />
           </SkeletonWrapperStyled>
         ) : (
-          <ContentWrapperStyled
-            compact={compact}
-            wide={wide}
-            direction={direction}
-            reversed={reversed}
-          >
+          <ContentWrapperStyled compact={compact} wide={wide} direction={direction}>
             {children}
           </ContentWrapperStyled>
         )}
