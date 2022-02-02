@@ -80,6 +80,7 @@ export default function QuestModal({
 
   return (
     <ModalBase
+      id="create-quest-modal"
       title="Create quest"
       openButton={
         <Button

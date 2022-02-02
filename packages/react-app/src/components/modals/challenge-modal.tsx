@@ -240,6 +240,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
 
   return (
     <ModalBase
+      id="challenge-modal"
       title={
         <HeaderStyled>
           <h1>Challenge quests</h1>

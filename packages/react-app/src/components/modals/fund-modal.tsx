@@ -105,6 +105,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
     >
       {({ values, handleSubmit, handleChange }) => (
         <ModalBase
+          id="fund-modal"
           title="Fund quest"
           openButton={
             <OpenButtonStyled

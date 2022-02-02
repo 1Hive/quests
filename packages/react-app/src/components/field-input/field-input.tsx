@@ -25,6 +25,7 @@ const LineStyled = styled.div`
   display: flex;
   align-items: top;
   max-width: 100%;
+  margin-top: ${GUpx(0.5)};
 `;
 
 const ContentWrapperStyled = styled.div`
