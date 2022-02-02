@@ -38,6 +38,7 @@ const ContentWrapperStyled = styled.div`
     }
   }
   flex-direction: ${({ direction }: any) => direction};
+  flex-flow: ${({ reversed }: any) => (reversed ? 'wrap-reverse' : 'wrap;')};
 `;
 
 const SkeletonWrapperStyled = styled.div`
@@ -55,6 +56,7 @@ type Props = {
   isLoading: boolean;
   wide?: boolean;
   direction?: 'row' | 'column';
+  reversed?: boolean;
 };
 
 export function FieldInput({
@@ -67,6 +69,7 @@ export function FieldInput({
   isLoading = false,
   wide = false,
   direction = 'row',
+  reversed = false,
 }: Props) {
   const theme = useTheme();
   const labelComponent = label && (
@@ -86,7 +89,12 @@ export function FieldInput({
             <Skeleton />
           </SkeletonWrapperStyled>
         ) : (
-          <ContentWrapperStyled compact={compact} wide={wide} direction={direction}>
+          <ContentWrapperStyled
+            compact={compact}
+            wide={wide}
+            direction={direction}
+            reversed={reversed}
+          >
             {children}
           </ContentWrapperStyled>
         )}

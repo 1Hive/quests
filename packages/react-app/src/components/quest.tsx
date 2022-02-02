@@ -415,7 +415,8 @@ export default function Quest({
                   formik={formRef}
                   tokenEditable
                   tokenLabel={isEdit ? 'Funding token' : undefined}
-                  amountLabel={isEdit ? 'Funding amount' : undefined}
+                  amountLabel={isEdit ? 'Initial funding amount' : undefined}
+                  reversed={isEdit}
                   wide
                 />
               )}
