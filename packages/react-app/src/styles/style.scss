@@ -32,6 +32,13 @@ span[class^='Switch_'] {
   z-index: 0 !important;
 }
 
+button {
+  border-radius: 10px;
+  &::after {
+    border-radius: 10px !important;
+  }
+}
+
 // CLASS HELPERS
 
 .center {

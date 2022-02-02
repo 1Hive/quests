@@ -1,3 +1,4 @@
+import { EmptyStateCard, Button } from '@1hive/1hive-ui';
 import { debounce } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -8,21 +9,32 @@ import {
   ENUM_QUEST_STATE,
   ENUM_QUEST_VIEW_MODE,
   QUESTS_PAGE_SIZE,
+  DEFAULT_FILTER,
 } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
 import { useQuestsContext } from 'src/contexts/quests.context';
+import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
+
+const EmptyStateCardStyled = styled(EmptyStateCard)`
+  width: 100%;
+
+  button {
+    width: fit-content;
+    margin: auto;
+  }
+`;
 
 const skeletonQuests: any[] = [];
 for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
   skeletonQuests.push(
     <Outset gu16 key={`${i}`}>
       <Quest
-        dataState={{ questData: { expireTimeMs: 0, state: ENUM_QUEST_STATE.Draft } }}
+        dataState={{ questData: { expireTime: new Date(), state: ENUM_QUEST_STATE.Draft } }}
         isLoading
       />
     </Outset>,
@@ -33,7 +45,7 @@ export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filter, refreshed } = useFilterContext();
+  const { filter, refreshed, setFilter } = useFilterContext();
   const { newQuest } = useQuestsContext();
 
   const { setPage } = usePageContext();
@@ -90,9 +102,18 @@ export default function QuestList() {
       next={loadMore}
       hasMore={hasMore}
       endMessage={
-        <p className="center">
-          <b>No more quests found</b>
-        </p>
+        quests.length ? (
+          <Outset gu16 className="center">
+            <b>No more quests found</b>
+          </Outset>
+        ) : (
+          <Outset gu64 className="flex-center wide">
+            <EmptyStateCardStyled
+              text="No quests found"
+              action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
+            />
+          </Outset>
+        )
       }
       refreshFunction={refresh}
       pullDownToRefresh={isMobile}

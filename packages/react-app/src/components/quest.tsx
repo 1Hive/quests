@@ -16,7 +16,6 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
-import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -28,7 +27,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
-import DateFieldInput from './field-input/date-field-input';
+import { DateFieldInputFormik } from './field-input/date-field-input';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
@@ -200,7 +199,7 @@ export default function Quest({
         errors.push('Validation : Player address is not valid');
       }
     }
-    if (values.expireTimeMs < Date.now())
+    if (values.expireTime.getTime() < Date.now())
       errors.push('Validation : Expiration have to be later than now');
     if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
     else if (values.bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
@@ -211,8 +210,6 @@ export default function Quest({
       setLoading(true);
       let createdQuestAddress: string;
       try {
-        // Set noon to prevent rounding form changing date
-        const timeValue = new Date(values.expireTimeMs ?? 0).getTime() + 12 * ONE_HOUR_IN_MS;
         const pendingMessage = 'Creating Quest...';
         toast(pendingMessage);
         const txReceiptSaveQuest = await QuestService.saveQuest(
@@ -220,7 +217,7 @@ export default function Quest({
           values.fallbackAddress ?? walletAddress,
           {
             ...values,
-            expireTimeMs: timeValue,
+            expireTime: values.expireTime,
             creatorAddress: walletAddress,
             rewardToken: values.bounty!.token ?? defaultToken,
           },
@@ -431,16 +428,16 @@ export default function Quest({
                   wide
                 />
               )}
-              <DateFieldInput
-                id="expireTimeMs"
+              <DateFieldInputFormik
+                id="expireTime"
                 label="Expire time"
                 tooltip="Expire time"
                 tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
                 isEdit={isEdit}
                 isLoading={loading}
-                value={values.expireTimeMs}
-                onChange={handleChange}
+                value={values.expireTime}
                 wide
+                formik={formRef}
               />
               {isEdit && (
                 <AddressWrapperStyled>

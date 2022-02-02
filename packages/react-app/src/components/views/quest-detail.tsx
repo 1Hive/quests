@@ -32,7 +32,7 @@ export default function QuestDetail() {
         ) : (
           <>
             <Quest
-              dataState={{ questData: { expireTimeMs: 0, state: ENUM_QUEST_STATE.Draft } }}
+              dataState={{ questData: { expireTime: new Date(), state: ENUM_QUEST_STATE.Draft } }}
               isLoading
             />
           </>

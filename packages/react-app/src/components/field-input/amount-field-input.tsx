@@ -125,6 +125,8 @@ function AmountFieldInput({
   const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const { walletAddress } = useWallet();
+  const tokenInputId = `token-${id}`;
+  const amountInputId = `amount-${id}`;
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
@@ -133,7 +135,13 @@ function AmountFieldInput({
       document.addEventListener(
         'focusin',
         () => {
-          if (walletAddress && isEdit && tokenEditable) fetchAvailableTokens();
+          if (
+            document.activeElement === autoCompleteRef.current &&
+            walletAddress &&
+            isEdit &&
+            tokenEditable
+          )
+            fetchAvailableTokens();
         },
         true,
       );
@@ -162,7 +170,7 @@ function AmountFieldInput({
   useEffect(() => {
     if (!isEdit) {
       if (value?.parsedAmount && (!maxDecimals || maxDecimals > 0))
-        setDecimalsCount(maxDecimals ?? 5);
+        setDecimalsCount(maxDecimals ?? 4);
     }
   }, [maxDecimals, isEdit, value?.parsedAmount]);
 
@@ -218,7 +226,7 @@ function AmountFieldInput({
         {amount !== undefined &&
           (isEdit ? (
             <AmountTextInputStyled
-              id={id}
+              id={amountInputId}
               title={!token ? 'Set token first' : undefined}
               onChange={onAmountChange}
               placeHolder={placeHolder}
@@ -246,7 +254,7 @@ function AmountFieldInput({
       {token?.token ? (
         <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
       ) : (
-        <AutoCompleteWrapperStyled wide={wide}>
+        <AutoCompleteWrapperStyled wide={wide} id={tokenInputId}>
           <AutoComplete
             items={tokens.map((x, index: number) => index)}
             onChange={setSearchTerm}
@@ -293,8 +301,6 @@ function AmountFieldInput({
   );
 }
 
-// @ts-ignore
 const AmountFieldInputFormik = connect(AmountFieldInput);
-
 export default AmountFieldInput;
 export { AmountFieldInputFormik };
