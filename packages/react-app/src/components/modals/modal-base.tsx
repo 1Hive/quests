@@ -25,6 +25,7 @@ const ScrollViewStyled = styled(ScrollView)`
 `;
 
 type Props = {
+  id: string;
   children?: React.ReactNode;
   title?: React.ReactNode | string;
   openButton: React.ReactNode;
@@ -36,6 +37,7 @@ type Props = {
 };
 
 export default function ModalBase({
+  id,
   children,
   title,
   openButton,
@@ -45,8 +47,15 @@ export default function ModalBase({
   size = 'normal',
   css,
 }: Props) {
+  const openButtonId = `open-${id}`;
+
   useEffect(() => {
     if (isOpen) {
+      // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
+      setTimeout(() => {
+        (document.getElementById(id) as HTMLElement)?.focus();
+      }, 0);
+
       document.addEventListener('keydown', escFunction, false);
     } else document.removeEventListener('keydown', escFunction, false);
 
@@ -54,9 +63,12 @@ export default function ModalBase({
   }, [isOpen]);
 
   const escFunction = (e: any) => {
+    const modalDom = document.getElementById(id) as HTMLElement;
     if (
       e.key === 'Escape' &&
-      (e.target.tagName.toUpperCase() === 'BODY' || e.target.type?.toLowerCase() === 'button')
+      (e.target.parentElement.id === openButtonId ||
+        e.target === modalDom ||
+        modalDom.contains(e.target))
     ) {
       onClose();
     }
@@ -64,7 +76,7 @@ export default function ModalBase({
 
   return (
     <>
-      {openButton}
+      <div id={openButtonId}>{openButton}</div>
       <ModalStyled
         visible={isOpen}
         onClose={(e: any) => e && onClose()}
@@ -72,6 +84,8 @@ export default function ModalBase({
           Math.min(viewport.width - 16, size === 'small' ? 500 : 1200)
         }
         style={css}
+        id={id}
+        tabindex="-1"
       >
         <Outset gu8>
           <TitleStyled>{title}</TitleStyled>

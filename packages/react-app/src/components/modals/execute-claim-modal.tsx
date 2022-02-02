@@ -117,6 +117,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   return (
     <>
       <ModalBase
+        id="execute-claim-modal"
         title="Claim quest bounty"
         openButton={
           <OpenButtonWrapperStyled>

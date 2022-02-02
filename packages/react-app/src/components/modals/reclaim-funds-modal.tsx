@@ -93,6 +93,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   return (
     <>
       <ModalBase
+        id="reclaim-funds-modal"
         title="Reclaim unused quest funds"
         openButton={
           <OpenButtonStyled

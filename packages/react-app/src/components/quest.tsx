@@ -1,8 +1,10 @@
 import { Card, useToast, useViewport } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { debounce } from 'lodash';
+
 import {
   ENUM,
   ENUM_PAGES,
@@ -308,8 +310,17 @@ export default function Quest({
       }
     }, 500);
   };
+  const refresh = (data?: QuestModel) => {
+    if (data) {
+      setQuestData?.(data);
+    }
+  };
+  const debounceSave = useCallback(
+    debounce((data?: QuestModel) => refresh(data), 500),
+    [], // will be created only once initially
+  );
   const validate = (data: QuestModel) => {
-    setQuestData?.(data);
+    debounceSave(data);
   };
 
   const questContent = (values: QuestModel, handleChange = noop) => {
@@ -388,11 +399,7 @@ export default function Quest({
               {(bounty !== null || isEdit) && (
                 <AmountFieldInputFormik
                   id="bounty"
-                  label={
-                    questMode === ENUM_QUEST_VIEW_MODE.Create
-                      ? 'Initial bounty'
-                      : 'Available bounty'
-                  }
+                  label={questMode === ENUM_QUEST_VIEW_MODE.Create ? undefined : 'Available bounty'}
                   isEdit={isEdit}
                   tooltip="Bounty"
                   tooltipDetail={
@@ -404,6 +411,10 @@ export default function Quest({
                   isLoading={loading || (!isEdit && !bounty)}
                   formik={formRef}
                   tokenEditable
+                  tokenLabel={isEdit ? 'Funding token' : undefined}
+                  amountLabel={isEdit ? 'Initial funding amount' : undefined}
+                  reversed={isEdit}
+                  wide
                 />
               )}
               {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
@@ -414,6 +425,7 @@ export default function Quest({
                   tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
                   value={claimDeposit}
                   isLoading={loading || (!isEdit && !claimDeposit)}
+                  wide
                 />
               )}
               <DateFieldInputFormik

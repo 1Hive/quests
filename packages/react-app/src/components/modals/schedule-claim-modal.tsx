@@ -138,6 +138,7 @@ export default function ScheduleClaimModal({
 
   return (
     <ModalBase
+      id="schedule-claim-modal"
       title="Claim quest"
       openButton={
         <OpenButtonStyled
