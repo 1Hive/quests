@@ -43,7 +43,7 @@ type Props = {
   questData: QuestModel;
   newClaim: number;
   challengeDeposit: TokenAmountModel;
-  questTotalBounty?: TokenAmountModel;
+  questTotalBounty?: TokenAmountModel | null;
 };
 
 export default function ClaimList({
@@ -134,14 +134,7 @@ export default function ClaimList({
                         <AmountFieldInput
                           id="amount"
                           label="Claimed amount"
-                          isLoading={
-                            !claim.claimedAmount.parsedAmount && questTotalBounty === undefined
-                          }
-                          value={
-                            claim.claimedAmount.parsedAmount || !questTotalBounty
-                              ? claim.claimedAmount
-                              : questTotalBounty
-                          }
+                          value={claim.claimedAmount}
                         />
                       ) : (
                         <Field label="Claimed amount">All available</Field>

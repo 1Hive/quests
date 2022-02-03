@@ -54,6 +54,7 @@ async function mapQuest(questEntity: any) {
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
+      creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
     } as QuestModel;
     quest = processQuestState(quest);
     if (!quest.detailsRefIpfs) quest.description = '[No description]';

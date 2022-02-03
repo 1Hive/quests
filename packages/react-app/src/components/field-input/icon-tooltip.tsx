@@ -1,7 +1,7 @@
 import { Help, IconQuestion, useTheme } from '@1hive/1hive-ui';
 import { ReactNode } from 'react';
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
-import { Outset } from '../utils/spacer-util';
 
 // #region Styled
 
@@ -30,12 +30,15 @@ const TooltipWrapperStyled = styled.div`
 
 const HelpWrapperStyled = styled.div`
   width: 16px;
+  display: inline-block;
+  margin-left: ${GUpx()};
+  margin-right: ${GUpx(0.5)};
 `;
 
 // #endregion
 
 type Props = {
-  tooltip: string;
+  tooltip?: string;
   tooltipDetail?: ReactNode;
   icon?: ReactNode;
   children?: ReactNode;
@@ -44,18 +47,16 @@ type Props = {
 export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) => {
   const theme = useTheme();
   return (
-    <Outset horizontal>
-      <HelpWrapperStyled className="btn-no-margin">
-        {tooltipDetail || children ? (
-          <Help hint={tooltip}>
-            <TooltipWrapperStyled color={theme.accentContent}>
-              {tooltipDetail ?? children}
-            </TooltipWrapperStyled>
-          </Help>
-        ) : (
-          <IconSpanStyled title={tooltip}>{icon ?? <IconQuestion size="tiny" />}</IconSpanStyled>
-        )}
-      </HelpWrapperStyled>
-    </Outset>
+    <HelpWrapperStyled className="btn-no-margin">
+      {tooltipDetail || children ? (
+        <Help hint={tooltip ?? tooltipDetail}>
+          <TooltipWrapperStyled color={theme.accentContent}>
+            {tooltipDetail ?? children}
+          </TooltipWrapperStyled>
+        </Help>
+      ) : (
+        <IconSpanStyled title={tooltip}>{icon ?? <IconQuestion size="tiny" />}</IconSpanStyled>
+      )}
+    </HelpWrapperStyled>
   );
 };

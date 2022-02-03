@@ -27,7 +27,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
-import { DateFieldInputFormik } from './field-input/date-field-input';
+import DateFieldInput, { DateFieldInputFormik } from './field-input/date-field-input';
 import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
@@ -368,7 +368,7 @@ export default function Quest({
                 tooltip="Quest Description"
                 tooltipDetail={
                   <>
-                    <u>The quest description should include:</u>
+                    <b>The quest description should include:</b>
                     <ul>
                       <li>Details about what the quest entails.</li>
                       <li>
@@ -417,16 +417,27 @@ export default function Quest({
                   wide
                 />
               )}
-              {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && claimDeposit !== null && (
-                <AmountFieldInput
-                  id="claimDeposit"
-                  label="Claim deposit"
-                  tooltip="Claim deposit"
-                  tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
-                  value={claimDeposit}
-                  isLoading={loading || (!isEdit && !claimDeposit)}
-                  wide
-                />
+              {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && (
+                <>
+                  {claimDeposit !== null && (
+                    <AmountFieldInput
+                      id="claimDeposit"
+                      label="Claim deposit"
+                      tooltip="Claim deposit"
+                      tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
+                      value={claimDeposit}
+                      isLoading={loading || (!isEdit && !claimDeposit)}
+                      wide
+                    />
+                  )}
+                  <DateFieldInput
+                    id="creationTime"
+                    label="Creation time"
+                    isLoading={loading}
+                    value={values.creationTime}
+                    wide
+                  />
+                </>
               )}
               <DateFieldInputFormik
                 id="expireTime"
@@ -459,16 +470,14 @@ export default function Quest({
         </TwoColumnStyled>
         {!loading && !isEdit && questData.address && (
           <>
-            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail &&
-              challengeDeposit &&
-              bounty !== null && (
-                <ClaimList
-                  newClaim={claimUpdated}
-                  questData={questData}
-                  questTotalBounty={bounty}
-                  challengeDeposit={challengeDeposit}
-                />
-              )}
+            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
+              <ClaimList
+                newClaim={claimUpdated}
+                questData={questData}
+                questTotalBounty={bounty}
+                challengeDeposit={challengeDeposit}
+              />
+            )}
             {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
               questData.address &&
               walletAddress &&
@@ -516,7 +525,6 @@ export default function Quest({
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
-        validateOnBlur
         validate={validate}
       >
         {({ values, handleChange, handleSubmit }) =>

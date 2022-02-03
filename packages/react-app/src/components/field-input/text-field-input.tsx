@@ -71,7 +71,12 @@ export default function TextFieldInput({
           content={value}
           markdownToJsxOptions={(o: any) => ({
             ...o,
+            wrapper: 'div',
+
             overrides: {
+              p: {
+                component: 'div',
+              },
               pre: {
                 component: CollapsableBlock,
                 props: {

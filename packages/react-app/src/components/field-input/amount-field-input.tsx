@@ -221,7 +221,7 @@ function AmountFieldInput({
   };
 
   const amountField = (
-    <FieldInput label={amountLabel} isLoading={isLoading} wide={wide} compact={compact}>
+    <FieldInput label={amountLabel} wide={wide} compact={compact}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
         {amount !== undefined &&
           (isEdit ? (
@@ -245,7 +245,6 @@ function AmountFieldInput({
   const tokenField = (
     <FieldInput
       label={tokenLabel}
-      isLoading={isLoading}
       wide={wide}
       compact={compact}
       tooltip="Token"
@@ -291,7 +290,7 @@ function AmountFieldInput({
       label={label}
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
-      isLoading={false}
+      isLoading={isLoading}
       wide={wide}
       compact
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}

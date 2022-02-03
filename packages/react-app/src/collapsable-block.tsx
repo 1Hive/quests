@@ -66,40 +66,38 @@ export function CollapsableBlock(props: Props) {
   }, [props, props.children]);
 
   return (
-    <div>
-      <pre>
-        <LineStyled>
-          <CollapseButtonStyled onClick={() => setVisible(!isVisible)}>
-            <IconColumnStyled>
-              {isVisible ? (
-                <>
-                  <IconDown size="tiny" />
-                  <IconUp size="tiny" />
-                </>
-              ) : (
-                <>
-                  <IconUp size="tiny" />
-                  <IconDown size="tiny" />
-                </>
-              )}
-            </IconColumnStyled>
-            <LabelStyled>
-              {isVisible ? 'Hide ' : 'Show '}
-              {props.label}
-            </LabelStyled>
-          </CollapseButtonStyled>
-          {isVisible && (
-            <CopyButtonStyled
-              onClick={() => copyCode(content)}
-              icon={<IconCopy />}
-              size="small"
-              label="Copy"
-              display="icon"
-            />
-          )}
-        </LineStyled>
-        {isVisible && content ? <ContentWrapperStyled>{content}</ContentWrapperStyled> : <></>}
-      </pre>
-    </div>
+    <pre>
+      <LineStyled>
+        <CollapseButtonStyled onClick={() => setVisible(!isVisible)}>
+          <IconColumnStyled>
+            {isVisible ? (
+              <>
+                <IconDown size="tiny" />
+                <IconUp size="tiny" />
+              </>
+            ) : (
+              <>
+                <IconUp size="tiny" />
+                <IconDown size="tiny" />
+              </>
+            )}
+          </IconColumnStyled>
+          <LabelStyled>
+            {isVisible ? 'Hide ' : 'Show '}
+            {props.label}
+          </LabelStyled>
+        </CollapseButtonStyled>
+        {isVisible && (
+          <CopyButtonStyled
+            onClick={() => copyCode(content)}
+            icon={<IconCopy />}
+            size="small"
+            label="Copy"
+            display="icon"
+          />
+        )}
+      </LineStyled>
+      {isVisible && content ? <ContentWrapperStyled>{content}</ContentWrapperStyled> : <></>}
+    </pre>
   );
 }
