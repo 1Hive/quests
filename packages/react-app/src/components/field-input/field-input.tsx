@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled.div`
-  ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(2)}` : '')};
+  ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(1)}` : '')};
   ${({ isLoading, wide }: any) => (isLoading || wide ? `width: 100%;` : 'max-width: 100%;')};
 `;
 
@@ -38,6 +38,7 @@ const ContentWrapperStyled = styled.div`
     }
   }
   flex-direction: ${({ direction }: any) => direction};
+  padding-left: ${GUpx(0.5)};
 `;
 
 const SkeletonWrapperStyled = styled.div`
@@ -52,7 +53,7 @@ type Props = {
   tooltipDetail?: React.ReactNode;
   children: React.ReactNode;
   id?: string;
-  isLoading: boolean;
+  isLoading?: boolean;
   wide?: boolean;
   direction?: 'row' | 'column';
   align?: 'center' | 'baseline' | 'flex-start' | 'flex-end' | 'unset';

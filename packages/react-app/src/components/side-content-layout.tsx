@@ -1,17 +1,21 @@
 import { useViewport } from '@1hive/1hive-ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { BREAKPOINTS } from '../styles/breakpoints';
 
 const WrapperStyled = styled.div`
   display: grid;
   grid-template-areas: ${(props: any) =>
-    props.twoCol ? "'m m s'\n'm m s'\n'f f f'" : "'s s s'\n'm m m'\n'f f f'"};
+    props.isOneCol ? "'s s s'\n'm m m'\n'f f f'" : "'m m s'\n'm m s'\n'f f f'"};
   height: calc(100vh - 64px);
   overflow-y: auto;
   grid-template-columns: 1fr auto;
   scroll-behavior: smooth;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 const SideBlockStyled = styled.div`
@@ -20,6 +24,7 @@ const SideBlockStyled = styled.div`
 
 const FooterStyled = styled.div`
   grid-area: f;
+  transition: all 5s linear;
 `;
 
 const ScrollViewStyled = styled.div`
@@ -36,7 +41,6 @@ const ScrollViewStyled = styled.div`
       `
       : ''}
 
-  ${(props: any) => (props.twoCol ? `padding: ${GUpx(1)} ${GUpx(4)};` : `padding: ${GUpx(1)}`)};
   grid-area: m;
 `;
 
@@ -44,45 +48,64 @@ type Props = {
   main: React.ReactNode;
   side?: React.ReactNode;
   footer: React.ReactNode;
-  mainScrollable?: boolean;
 };
 
-function SideContentLayout({ main, side, footer, mainScrollable = true }: Props) {
+function SideContentLayout({ main, side, footer }: Props) {
   const { width: vw } = useViewport();
+  const wrapperElement = document.getElementById('main-scroll');
   const scrollRef = useRef<HTMLDivElement>();
   const footerRef = useRef<HTMLDivElement>();
-  const [twoCol, setTwoCol] = useState(true);
+  const [isOneCol, setIsOneCol] = useState(false);
 
   useEffect(() => {
     const handleWheelOnMain = (e: WheelEvent) => {
       const scrollElement = scrollRef.current as HTMLElement;
-      const wrapperElement = document.getElementById('main-scroll');
-      const footerElement = footerRef.current as HTMLElement;
-      // scroll is bottom
-      if (wrapperElement && scrollElement) {
-        if (Math.round(wrapperElement.scrollTop) >= footerElement.clientHeight && e.deltaY < 0) {
-          e.preventDefault();
-          wrapperElement.scroll({ top: e.deltaY, behavior: 'smooth' });
+      if (scrollElement && wrapperElement) {
+        if (
+          Math.round(scrollElement.scrollHeight - scrollElement.scrollTop) >=
+            Math.round(scrollElement.clientHeight) &&
+          e.deltaY < 0
+        ) {
+          requestAnimationFrame(() =>
+            wrapperElement.scroll({
+              top: -footerRef.current!.clientHeight,
+              left: 0,
+              behavior: 'auto',
+            }),
+          );
+        }
+        if (
+          Math.round(scrollElement.scrollHeight - scrollElement.scrollTop) ===
+            Math.round(scrollElement.clientHeight) &&
+          wrapperElement.scrollTop - scrollElement.scrollTop <= 0 &&
+          e.deltaY > 0
+        ) {
+          requestAnimationFrame(() =>
+            wrapperElement.scroll({
+              top: footerRef.current!.clientHeight,
+              left: 0,
+              behavior: 'auto',
+            }),
+          );
         }
       }
     };
-
-    if (scrollRef.current && footerRef.current && side) {
+    if (scrollRef.current && footerRef.current && !isOneCol) {
       scrollRef.current?.addEventListener('wheel', handleWheelOnMain);
     } else {
       scrollRef.current?.removeEventListener('wheel', handleWheelOnMain);
     }
     return () => scrollRef.current?.removeEventListener('wheel', handleWheelOnMain);
-  }, [scrollRef.current, footerRef.current, side]);
+  }, [scrollRef.current, footerRef.current, isOneCol]);
 
   useEffect(() => {
-    setTwoCol(vw >= BREAKPOINTS.large);
-  }, [vw]);
+    setIsOneCol(!side || vw < BREAKPOINTS.large);
+  }, [vw, side]);
 
   return (
     <>
-      <WrapperStyled twoCol={twoCol && side} id="main-scroll">
-        <ScrollViewStyled scrollable={mainScrollable} id="scroll-view" ref={scrollRef}>
+      <WrapperStyled isOneCol={isOneCol} id="main-scroll">
+        <ScrollViewStyled scrollable={!isOneCol} id="scroll-view" ref={scrollRef}>
           {main}
         </ScrollViewStyled>
         {side && <SideBlockStyled>{side}</SideBlockStyled>}

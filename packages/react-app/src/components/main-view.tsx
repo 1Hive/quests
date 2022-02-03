@@ -70,7 +70,6 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
           main={children}
           side={page === ENUM_PAGES.List ? <Sidebar /> : undefined}
           footer={<Footer />}
-          mainScrollable={page === ENUM_PAGES.List}
         />
       </Root.Provider>
     </MainViewStyled>
