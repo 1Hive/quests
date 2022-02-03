@@ -525,7 +525,6 @@ export default function Quest({
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
-        validateOnBlur
         validate={validate}
       >
         {({ values, handleChange, handleSubmit }) =>

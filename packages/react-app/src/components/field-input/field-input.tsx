@@ -30,7 +30,7 @@ const LineStyled = styled.div`
 
 const ContentWrapperStyled = styled.div`
   display: flex;
-  align-items: center;
+  align-items: ${({ align }: any) => align};
   ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
   & > div {
     input {
@@ -55,6 +55,7 @@ type Props = {
   isLoading: boolean;
   wide?: boolean;
   direction?: 'row' | 'column';
+  align?: 'center' | 'baseline' | 'flex-start' | 'flex-end' | 'unset';
 };
 
 export function FieldInput({
@@ -67,6 +68,7 @@ export function FieldInput({
   isLoading = false,
   wide = false,
   direction = 'row',
+  align = 'center',
 }: Props) {
   const theme = useTheme();
   const labelComponent = label && (
@@ -86,7 +88,7 @@ export function FieldInput({
             <Skeleton />
           </SkeletonWrapperStyled>
         ) : (
-          <ContentWrapperStyled compact={compact} wide={wide} direction={direction}>
+          <ContentWrapperStyled compact={compact} wide={wide} direction={direction} align={align}>
             {children}
           </ContentWrapperStyled>
         )}
