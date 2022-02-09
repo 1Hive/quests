@@ -14,8 +14,7 @@ const InfoStyled = styled(Info)`
 
 type Props = {
   askedTokenAmount: TokenAmountModel;
-  // eslint-disable-next-line no-unused-vars
-  setIsEnoughBalance?: (valid: boolean) => void;
+  setIsEnoughBalance?: (_valid: boolean) => void;
 };
 
 export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) {

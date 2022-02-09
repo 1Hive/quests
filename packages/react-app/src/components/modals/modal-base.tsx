@@ -103,5 +103,4 @@ export default function ModalBase({
   );
 }
 
-// eslint-disable-next-line no-unused-vars
-export type ModalCallback = (success: boolean) => void;
+export type ModalCallback = (_success: boolean) => void;

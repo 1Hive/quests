@@ -39,10 +39,10 @@
     "no-unused-expressions": "off",
     "react/react-in-jsx-scope": "off",
     "class-methods-use-this": "off",
-    "no-unused-vars": "warn",
     "react/no-unused-prop-types": "warn",
     "jsx-props-no-spreading": "off",
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
   },
   "settings": {
     "import/resolver": {

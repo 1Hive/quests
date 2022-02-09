@@ -40,8 +40,7 @@ import { getLastBlockTimestamp } from '../utils/date.utils';
 
 let questList: QuestModel[] = [];
 
-// eslint-disable-next-line no-unused-vars
-type onTxCallback = (hash: string) => void;
+type onTxCallback = (_hash: string) => void;
 
 // #region Private
 async function mapQuest(questEntity: any) {

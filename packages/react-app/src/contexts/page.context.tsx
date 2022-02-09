@@ -3,8 +3,7 @@ import { DEFAULT_PAGE } from 'src/constants';
 
 export type PageContextModel = {
   page: string;
-  // eslint-disable-next-line no-unused-vars
-  setPage: (page: string) => void;
+  setPage: (_page: string) => void;
 };
 
 const PageContext = createContext<PageContextModel | undefined>(undefined);

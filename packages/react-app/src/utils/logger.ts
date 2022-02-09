@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 import { noop } from 'lodash';
@@ -24,7 +23,6 @@ Sentry.configureScope((scope) => {
   else scope.setLevel(Sentry.Severity.Warning);
 });
 
-// eslint-disable-next-line no-shadow
 export enum LogLevels {
   DEBUG = 0,
   INFO = 1,

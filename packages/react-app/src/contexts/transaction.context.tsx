@@ -1,14 +1,12 @@
-/* eslint-disable no-unused-vars */
 import React, { createContext, useContext, useState } from 'react';
-import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TransactionModel } from 'src/models/transaction.model';
 
 type TransactionContextModel = {
   newTransaction: TransactionModel | undefined;
-  pushTransaction: (tx: TransactionModel) => void;
+  pushTransaction: (_tx: TransactionModel) => void;
   updatedTransactionStatus: TransactionModel | undefined;
-  updateTransactionStatus: (tx: TransactionModel) => void;
-  updateLastTransactionStatus: (status: string) => void;
+  updateTransactionStatus: (_tx: TransactionModel) => void;
+  updateLastTransactionStatus: (_status: string) => void;
 };
 
 const TransactionContext = createContext<TransactionContextModel | undefined>(undefined);

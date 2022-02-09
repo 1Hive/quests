@@ -120,12 +120,10 @@ const QuestHeaderStyled = styled.div`
 // #endregion
 
 type Props = {
-  // eslint-disable-next-line no-unused-vars
-  dataState: { questData: QuestModel; setQuestData?: (questData: QuestModel) => void };
+  dataState: { questData: QuestModel; setQuestData?: (_questData: QuestModel) => void };
   questMode?: string;
   isLoading?: boolean;
-  // eslint-disable-next-line no-unused-vars
-  onSave?: (questAddress: string) => void;
+  onSave?: (_questAddress: string) => void;
   css?: any;
 };
 

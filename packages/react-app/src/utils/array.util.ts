@@ -5,8 +5,7 @@ export function arrayDistinct<TItem>(arr: TItem[]): TItem[] {
 /**
  * Src : https://codeburst.io/javascript-array-distinct-5edc93501dc4
  */
-// eslint-disable-next-line no-unused-vars
-export function arrayDistinctBy<TItem>(arr: TItem[], predicateId: (item: TItem) => any): TItem[] {
+export function arrayDistinctBy<TItem>(arr: TItem[], predicateId: (_item: TItem) => any): TItem[] {
   const result: TItem[] = [];
   const map = new Map();
   arr.forEach((item) => {

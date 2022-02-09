@@ -1,11 +1,10 @@
-/* eslint-disable no-unused-vars */
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { FilterModel } from 'src/models/filter.model';
 import { DEFAULT_FILTER } from '../constants';
 
 type FilterContextModel = {
   filter: FilterModel;
-  setFilter: (filter: FilterModel) => void;
+  setFilter: (_filter: FilterModel) => void;
   refreshed: number;
   triggerRefresh: () => void;
 };

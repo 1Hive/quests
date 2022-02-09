@@ -1,6 +1,5 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
-// eslint-disable-next-line no-unused-vars
 import { getDefaultProvider } from 'src/utils/web3.utils';
 import { toChecksumAddress, toNumber } from 'web3-utils';
 import { ContractInstanceError } from 'src/models/contract-error';
