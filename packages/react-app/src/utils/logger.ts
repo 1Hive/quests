@@ -23,23 +23,16 @@ Sentry.configureScope((scope) => {
   else scope.setLevel(Sentry.Severity.Warning);
 });
 
-export enum LogLevels {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
-  NONE = 4,
-}
+export type LogLevels = 'debug' | 'info' | 'warn' | 'error';
 
-let logLevel: LogLevels = process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG;
+let logLevel: LogLevels = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
 const callMap = new Map<string, any>();
 console.log('logLevel', logLevel);
 
-const debug =
-  process.env.NODE_ENV !== 'production' && logLevel <= LogLevels.DEBUG ? console.debug : noop;
-const info = logLevel <= LogLevels.INFO ? console.info : noop;
-const warn = logLevel <= LogLevels.WARN ? console.warn : noop;
-const error = logLevel <= LogLevels.ERROR ? console.error : noop;
+const debug = process.env.NODE_ENV !== 'production' && logLevel <= 'debug' ? console.debug : noop;
+const info = logLevel <= 'info' ? console.info : noop;
+const warn = logLevel <= 'warn' ? console.warn : noop;
+const error = logLevel <= 'error' ? console.error : noop;
 
 function setLogLevel(level: LogLevels) {
   logLevel = level;
@@ -82,6 +75,7 @@ export const Logger = {
   exception: (err: any, message?: string) => sentry(this, err, message), // Only log exception (most of the time unhandled)
   setLogLevel,
 };
+
 export const LoggerOnce = {
   debug: (message?: any, ...optionalParams: any[]) =>
     registerAndCall(this, debug, message, optionalParams),
