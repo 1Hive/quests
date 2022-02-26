@@ -57,6 +57,7 @@ const CardStyled = styled(Card)`
   align-items: flex-start;
   width: 100%;
   height: fit-content;
+  min-height: 250px;
   border: none;
 
   & > div:first-child {
