@@ -1,6 +1,6 @@
 import { Button, useToast } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -37,8 +37,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const toast = useToast();
 
@@ -49,37 +48,42 @@ export default function FundModal({ quest, onClose = noop }: Props) {
 
   const fundModalTx = async (values: any, setSubmitting: Function) => {
     try {
+      const id = uniqueId();
       setLoading(true);
       const pendingMessage = 'Sending funds to Quest...';
       toast(pendingMessage);
+      setTransaction({
+        id,
+        estimatedEnd: Date.now() + ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
+        pendingMessage,
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
       const txReceipt = await QuestService.fundQuest(
         walletAddress,
         quest.address!,
         values.fundAmount,
         (txHash) => {
-          pushTransaction({
-            hash: txHash,
-            estimatedEnd: Date.now() + ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
-            pendingMessage,
+          setTransaction({
+            ...transaction,
             status: ENUM_TRANSACTION_STATUS.Pending,
-          });
+          } as TransactionModel);
         },
       );
-      if (txReceipt) {
-        updateTransactionStatus({
-          hash: txReceipt.transactionHash!,
-          status: txReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      } else {
-        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      }
+      setTransaction({
+        id,
+        hash: txReceipt?.transactionHash,
+        status: txReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      });
       closeModal(true);
       if (!txReceipt?.status) throw new Error('Failed to fund quest');
       toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      setTransaction({
+        ...transaction,
+        status: ENUM_TRANSACTION_STATUS.Failed,
+      } as TransactionModel);
       toast(computeTransactionErrorMessage(e));
     } finally {
       setSubmitting(false);

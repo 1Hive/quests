@@ -1,5 +1,5 @@
 import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
@@ -14,6 +14,7 @@ import { BigNumber } from 'ethers';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenModel } from 'src/models/token.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { TransactionModel } from 'src/models/transaction.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -62,8 +63,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
 
@@ -115,6 +115,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   };
 
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
+    const id = uniqueId();
     if (!values.reason) {
       toast('Validation : Reason is required');
     } else {
@@ -133,7 +134,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             governQueueAddress,
             challengeFee.token,
             (tx) => {
-              pushTransaction({
+              setTransaction({
+                id,
                 hash: tx,
                 estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
                 pendingMessage,
@@ -142,14 +144,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             },
           );
           if (approveTxReceipt) {
-            updateTransactionStatus({
+            setTransaction({
+              ...transaction,
               hash: approveTxReceipt.transactionHash!,
               status: approveTxReceipt.status
                 ? ENUM_TRANSACTION_STATUS.Confirmed
                 : ENUM_TRANSACTION_STATUS.Failed,
-            });
-          } else {
-            updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+            } as TransactionModel);
           }
           if (!approveTxReceipt?.status) throw new Error('Failed to approve fee');
         }
@@ -174,24 +175,19 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             governQueueAddress,
             tokenToApprove,
             (tx) => {
-              pushTransaction({
-                hash: tx,
-                estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-                pendingMessage,
+              setTransaction({
+                ...transaction,
                 status: ENUM_TRANSACTION_STATUS.Pending,
               });
             },
           );
-          if (approveTxReceipt) {
-            updateTransactionStatus({
-              hash: approveTxReceipt.transactionHash!,
-              status: approveTxReceipt.status
-                ? ENUM_TRANSACTION_STATUS.Confirmed
-                : ENUM_TRANSACTION_STATUS.Failed,
-            });
-          } else {
-            updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-          }
+          setTransaction({
+            id,
+            hash: approveTxReceipt?.transactionHash,
+            status: approveTxReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          } as TransactionModel);
           if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
         }
 
@@ -207,29 +203,26 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           },
           claim.container,
           (tx) => {
-            pushTransaction({
-              hash: tx,
-              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
-              pendingMessage,
+            setTransaction({
+              ...transaction,
               status: ENUM_TRANSACTION_STATUS.Pending,
-            });
+            } as TransactionModel);
           },
         );
-        if (challengeTxReceipt) {
-          updateTransactionStatus({
-            hash: challengeTxReceipt.transactionHash!,
-            status: challengeTxReceipt.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          });
-        } else {
-          updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-        }
+        setTransaction({
+          ...transaction,
+          status: challengeTxReceipt?.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+        } as TransactionModel);
         if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
         toast('Operation succeed');
         closeModal(true);
       } catch (e: any) {
-        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+        setTransaction({
+          ...transaction,
+          status: ENUM_TRANSACTION_STATUS.Failed,
+        } as TransactionModel);
         toast(computeTransactionErrorMessage(e));
       } finally {
         setSubmitting(false);

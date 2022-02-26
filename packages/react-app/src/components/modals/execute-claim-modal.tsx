@@ -1,5 +1,5 @@
 import { Button, useToast, IconCoin, Field, Timer } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -10,6 +10,7 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getLastBlockDate } from 'src/utils/date.utils';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { TransactionModel } from 'src/models/transaction.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -43,8 +44,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [amount, setAmount] = useState<TokenAmountModel>();
   const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const toast = useToast();
   const { walletAddress } = useWallet();
   useEffect(() => {
@@ -85,29 +85,30 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
       setLoading(true);
       const pendingMessage = 'Sending claimed amount to your wallet...';
       toast(pendingMessage);
+      const id = uniqueId();
       const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (tx) =>
-        pushTransaction({
-          hash: tx,
-          estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
-          pendingMessage,
+        setTransaction({
+          ...transaction,
           status: ENUM_TRANSACTION_STATUS.Pending,
-        }),
+        } as TransactionModel),
       );
-      if (txReceipt) {
-        updateTransactionStatus({
-          hash: txReceipt.transactionHash,
-          status: txReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      } else {
-        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      }
+      setTransaction({
+        id,
+        hash: txReceipt?.transactionHash,
+        estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
+        pendingMessage,
+        status: txReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      } as TransactionModel);
       closeModal(true);
       if (!txReceipt?.status) throw new Error('Failed to execute claim');
       toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      setTransaction({
+        ...transaction,
+        status: ENUM_TRANSACTION_STATUS.Failed,
+      } as TransactionModel);
       toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);

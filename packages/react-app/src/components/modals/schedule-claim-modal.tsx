@@ -1,5 +1,5 @@
 import { Button, useToast } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
@@ -59,8 +59,7 @@ export default function ScheduleClaimModal({
   const [opened, setOpened] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction } = useTransactionContext();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -73,12 +72,14 @@ export default function ScheduleClaimModal({
       const { governQueueAddress } = getNetwork();
       const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
       toast('Approving claim deposit...');
+      const id = uniqueId();
       const approveTxReceipt = await QuestService.approveTokenAmount(
         walletAddress,
         governQueueAddress,
         scheduleDeposit.token,
         (tx) => {
-          pushTransaction({
+          setTransaction({
+            id,
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
             pendingMessage: 'Approving claim deposit...',
@@ -88,6 +89,7 @@ export default function ScheduleClaimModal({
       );
       if (approveTxReceipt) {
         updateTransactionStatus({
+          id,
           hash: approveTxReceipt.transactionHash,
           status: approveTxReceipt.status
             ? ENUM_TRANSACTION_STATUS.Confirmed
@@ -105,7 +107,8 @@ export default function ScheduleClaimModal({
           questAddress,
         },
         (tx) => {
-          pushTransaction({
+          setTransaction({
+            id,
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
             pendingMessage: 'Scheduling claim...',
@@ -115,6 +118,7 @@ export default function ScheduleClaimModal({
       );
       if (scheduleReceipt) {
         updateTransactionStatus({
+          id,
           hash: scheduleReceipt.transactionHash,
           status: scheduleReceipt.status
             ? ENUM_TRANSACTION_STATUS.Confirmed

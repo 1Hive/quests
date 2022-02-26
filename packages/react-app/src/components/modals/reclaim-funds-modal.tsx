@@ -1,5 +1,5 @@
 import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -33,8 +33,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const [fallbackAddress, setFallbackAddress] = useState<string | undefined>(
     questData.fallbackAddress,
   );
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction } = useTransactionContext();
 
   const { walletAddress } = useWallet();
   const toast = useToast();
@@ -52,11 +51,13 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       setLoading(true);
       const pendingMessage = 'Reclaiming unused fund...';
       toast(pendingMessage);
+      const id = uniqueId();
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(
         walletAddress,
         questData,
         (tx) => {
-          pushTransaction({
+          setTransaction({
+            id,
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
             pendingMessage,
@@ -66,6 +67,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       );
       if (txReceipt) {
         updateTransactionStatus({
+          id,
           hash: txReceipt.transactionHash,
           status: txReceipt.status
             ? ENUM_TRANSACTION_STATUS.Confirmed

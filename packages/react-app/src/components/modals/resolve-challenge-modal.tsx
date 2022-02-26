@@ -8,7 +8,7 @@ import {
   Link,
   IconCaution,
 } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { useState, useEffect, Fragment } from 'react';
 import styled from 'styled-components';
 import { ClaimModel } from 'src/models/claim.model';
@@ -92,8 +92,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const governQueueContract = getGovernQueueContract(walletAddress);
   const celesteContract = getCelesteContract();
 
@@ -136,12 +135,14 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       if (!claim.container) throw new Error('Container is not defined');
       const pendingMessage = 'Resolving claim challenge...';
       toast(pendingMessage);
+      const id = uniqueId();
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,
         claim.container,
         dispute!,
         (tx) => {
-          pushTransaction({
+          setTransaction({
+            id,
             hash: tx,
             estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
             pendingMessage,
@@ -151,6 +152,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       );
       if (challengeTxReceipt) {
         updateTransactionStatus({
+          id,
           hash: challengeTxReceipt.transactionHash!,
           status: challengeTxReceipt.status
             ? ENUM_TRANSACTION_STATUS.Confirmed

@@ -23,6 +23,7 @@ Sentry.configureScope((scope) => {
   else scope.setLevel(Sentry.Severity.Warning);
 });
 
+// eslint-disable-next-line no-shadow
 export enum LogLevels {
   DEBUG = 0,
   INFO = 1,

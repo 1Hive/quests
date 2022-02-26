@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { debounce } from 'lodash';
+import { debounce, uniqueId } from 'lodash';
 
 import {
   ENUM,
@@ -143,8 +143,7 @@ export default function Quest({
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimUpdated, setClaimUpdate] = useState(0);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
@@ -210,6 +209,13 @@ export default function Quest({
       try {
         const pendingMessage = 'Creating Quest...';
         toast(pendingMessage);
+        const id = uniqueId();
+        setTransaction({
+          id,
+          estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
+          pendingMessage: 'Waiting for signature...',
+          status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        });
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,
           values.fallbackAddress ?? walletAddress,
@@ -221,7 +227,8 @@ export default function Quest({
           },
           undefined,
           (tx) => {
-            pushTransaction({
+            updateTransactionStatus({
+              id,
               hash: tx,
               estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
               pendingMessage,
@@ -231,6 +238,7 @@ export default function Quest({
         );
         if (txReceiptSaveQuest) {
           updateTransactionStatus({
+            id,
             hash: txReceiptSaveQuest.transactionHash,
             status: ENUM_TRANSACTION_STATUS.Confirmed,
           });
@@ -245,12 +253,19 @@ export default function Quest({
             createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
             if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
             toast('Sending funds to Quest...');
+            setTransaction({
+              id,
+              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
+              pendingMessage: 'Waiting for signature...',
+              status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+            });
             const txReceiptFundQuest = await QuestService.fundQuest(
               walletAddress,
               createdQuestAddress,
               values.bounty!,
               (tx) => {
-                pushTransaction({
+                updateTransactionStatus({
+                  id,
                   hash: tx,
                   estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
                   pendingMessage: 'Quest funding...',
@@ -260,6 +275,7 @@ export default function Quest({
             );
             if (txReceiptFundQuest) {
               updateTransactionStatus({
+                id,
                 hash: txReceiptFundQuest.transactionHash,
                 status: ENUM_TRANSACTION_STATUS.Confirmed,
               });

@@ -1,5 +1,7 @@
 export class TransactionModel {
-  hash!: string;
+  hash?: string;
+
+  id!: string;
 
   pendingMessage?: string;
 

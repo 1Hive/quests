@@ -2,11 +2,8 @@ import React, { createContext, useContext, useState } from 'react';
 import { TransactionModel } from 'src/models/transaction.model';
 
 type TransactionContextModel = {
-  newTransaction: TransactionModel | undefined;
-  pushTransaction: (_tx: TransactionModel) => void;
-  updatedTransactionStatus: TransactionModel | undefined;
-  updateTransactionStatus: (_tx: TransactionModel) => void;
-  updateLastTransactionStatus: (_status: string) => void;
+  transaction: TransactionModel | undefined;
+  setTransaction: (_tx: TransactionModel | undefined) => void;
 };
 
 const TransactionContext = createContext<TransactionContextModel | undefined>(undefined);
@@ -16,20 +13,13 @@ type Props = {
   children: React.ReactNode;
 };
 export const TransactionContextProvider = ({ children }: Props) => {
-  const [newTransaction, pushTransaction] = useState<TransactionModel>();
-  const [updatedTransactionStatus, updateTransactionStatus] = useState<TransactionModel>();
-  const updateLastTransactionStatus = (status: string) => {
-    if (newTransaction) newTransaction.status = status;
-    updateTransactionStatus(newTransaction);
-  };
+  const [transaction, setTransaction] = useState<TransactionModel>();
+
   return (
     <TransactionContext.Provider
       value={{
-        newTransaction,
-        pushTransaction,
-        updatedTransactionStatus,
-        updateTransactionStatus,
-        updateLastTransactionStatus,
+        transaction,
+        setTransaction,
       }}
     >
       {children}

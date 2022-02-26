@@ -1,9 +1,11 @@
 import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
+import { TransactionProgressComponent } from '../utils/transaction-progress-component';
 
 const ModalFooterStyled = styled.div`
   width: 100%;
@@ -48,7 +50,7 @@ export default function ModalBase({
   css,
 }: Props) {
   const openButtonId = `open-${id}`;
-
+  const { transaction } = useTransactionContext();
   useEffect(() => {
     if (isOpen) {
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
@@ -90,11 +92,13 @@ export default function ModalBase({
         <Outset gu8>
           <TitleStyled>{title}</TitleStyled>
         </Outset>
-        <ScrollViewStyled vertical>{children}</ScrollViewStyled>
+        <ScrollViewStyled vertical>
+          {transaction ? <TransactionProgressComponent /> : children}
+        </ScrollViewStyled>
         {buttons && (
           <ModalFooterStyled>
             <ChildSpacer justify="start" align="center" buttonEnd>
-              {buttons}
+              {transaction && buttons}
             </ChildSpacer>
           </ModalFooterStyled>
         )}
