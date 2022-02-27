@@ -3,7 +3,7 @@ import { TransactionModel } from 'src/models/transaction.model';
 
 type TransactionContextModel = {
   transaction: TransactionModel | undefined;
-  setTransaction: (_tx: TransactionModel | undefined) => void;
+  setTransaction: React.Dispatch<React.SetStateAction<TransactionModel | undefined>>;
 };
 
 const TransactionContext = createContext<TransactionContextModel | undefined>(undefined);
@@ -13,7 +13,7 @@ type Props = {
   children: React.ReactNode;
 };
 export const TransactionContextProvider = ({ children }: Props) => {
-  const [transaction, setTransaction] = useState<TransactionModel>();
+  const [transaction, setTransaction] = useState<TransactionModel | undefined>();
 
   return (
     <TransactionContext.Provider

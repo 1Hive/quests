@@ -98,7 +98,7 @@ export default function ModalBase({
         {buttons && (
           <ModalFooterStyled>
             <ChildSpacer justify="start" align="center" buttonEnd>
-              {transaction && buttons}
+              {buttons}
             </ChildSpacer>
           </ModalFooterStyled>
         )}

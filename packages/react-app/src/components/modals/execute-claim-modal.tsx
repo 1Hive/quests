@@ -10,7 +10,6 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getLastBlockDate } from 'src/utils/date.utils';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
-import { TransactionModel } from 'src/models/transaction.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -44,7 +43,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [amount, setAmount] = useState<TokenAmountModel>();
   const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const toast = useToast();
   const { walletAddress } = useWallet();
   useEffect(() => {
@@ -85,33 +84,47 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
       setLoading(true);
       const pendingMessage = 'Sending claimed amount to your wallet...';
       toast(pendingMessage);
-      const id = uniqueId();
-      const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (tx) =>
-        setTransaction({
-          ...transaction,
-          status: ENUM_TRANSACTION_STATUS.Pending,
-        } as TransactionModel),
-      );
       setTransaction({
-        id,
-        hash: txReceipt?.transactionHash,
-        estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
+        id: uniqueId(),
+        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
         pendingMessage,
-        status: txReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      } as TransactionModel);
-      closeModal(true);
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
+      const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              hash: txHash,
+              status: ENUM_TRANSACTION_STATUS.Pending,
+            },
+        );
+      });
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: txReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       if (!txReceipt?.status) throw new Error('Failed to execute claim');
-      toast('Operation succeed');
     } catch (e: any) {
-      setTransaction({
-        ...transaction,
-        status: ENUM_TRANSACTION_STATUS.Failed,
-      } as TransactionModel);
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        closeModal(true);
+        setTransaction(undefined);
+      }, 2000);
     }
   };
 

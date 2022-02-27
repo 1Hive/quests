@@ -51,39 +51,51 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       setLoading(true);
       const pendingMessage = 'Reclaiming unused fund...';
       toast(pendingMessage);
-      const id = uniqueId();
+      setTransaction({
+        id: uniqueId(),
+        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
+        pendingMessage,
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(
         walletAddress,
         questData,
-        (tx) => {
-          setTransaction({
-            id,
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming, // 10 sec
-            pendingMessage,
-            status: ENUM_TRANSACTION_STATUS.Pending,
-          });
+        (txHash) => {
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                hash: txHash,
+                status: ENUM_TRANSACTION_STATUS.Pending,
+              },
+          );
         },
       );
-      if (txReceipt) {
-        updateTransactionStatus({
-          id,
-          hash: txReceipt.transactionHash,
-          status: txReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      } else {
-        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      }
-      closeModal(true);
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: txReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       if (!txReceipt?.status) throw new Error('Failed to reclaim funds');
-      toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        closeModal(true);
+        setTransaction(undefined);
+      }, 2000);
     }
   };
 

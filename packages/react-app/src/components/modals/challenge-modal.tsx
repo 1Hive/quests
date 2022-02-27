@@ -63,7 +63,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
 
@@ -115,7 +115,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   };
 
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
-    const id = uniqueId();
     if (!values.reason) {
       toast('Validation : Reason is required');
     } else {
@@ -129,29 +128,36 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         ) {
           const pendingMessage = 'Approving challenge fee...';
           toast(pendingMessage);
+          setTransaction({
+            id: uniqueId(),
+            estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+            pendingMessage,
+            status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          });
           const approveTxReceipt = await QuestService.approveTokenAmount(
             walletAddress,
             governQueueAddress,
             challengeFee.token,
-            (tx) => {
-              setTransaction({
-                id,
-                hash: tx,
-                estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-                pendingMessage,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              });
-            },
+            (txHash) =>
+              setTransaction(
+                (oldTx) =>
+                  oldTx && {
+                    ...oldTx,
+                    hash: txHash,
+                    status: ENUM_TRANSACTION_STATUS.Pending,
+                  },
+              ),
           );
-          if (approveTxReceipt) {
-            setTransaction({
-              ...transaction,
-              hash: approveTxReceipt.transactionHash!,
-              status: approveTxReceipt.status
-                ? ENUM_TRANSACTION_STATUS.Confirmed
-                : ENUM_TRANSACTION_STATUS.Failed,
-            } as TransactionModel);
-          }
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                hash: approveTxReceipt?.transactionHash!,
+                status: approveTxReceipt?.status
+                  ? ENUM_TRANSACTION_STATUS.Confirmed
+                  : ENUM_TRANSACTION_STATUS.Failed,
+              },
+          );
           if (!approveTxReceipt?.status) throw new Error('Failed to approve fee');
         }
         if (+claim.container!.config.challengeDeposit.amount) {
@@ -170,24 +176,36 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             tokenToApprove = claim.container!.config.challengeDeposit;
           }
           toast(pendingMessage);
+          setTransaction({
+            id: uniqueId(),
+            estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
+            pendingMessage,
+            status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          });
           const approveTxReceipt = await QuestService.approveTokenAmount(
             walletAddress,
             governQueueAddress,
             tokenToApprove,
-            (tx) => {
-              setTransaction({
-                ...transaction,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              });
+            (txHash) => {
+              setTransaction(
+                (oldTx) =>
+                  oldTx && {
+                    ...oldTx,
+                    hash: txHash,
+                    status: ENUM_TRANSACTION_STATUS.Pending,
+                  },
+              );
             },
           );
-          setTransaction({
-            id,
-            hash: approveTxReceipt?.transactionHash,
-            status: approveTxReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          } as TransactionModel);
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                status: approveTxReceipt?.status
+                  ? ENUM_TRANSACTION_STATUS.Confirmed
+                  : ENUM_TRANSACTION_STATUS.Failed,
+              },
+          );
           if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
         }
 
@@ -202,31 +220,43 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             challengerAddress: walletAddress,
           },
           claim.container,
-          (tx) => {
-            setTransaction({
-              ...transaction,
-              status: ENUM_TRANSACTION_STATUS.Pending,
-            } as TransactionModel);
+          (txHash) => {
+            setTransaction(
+              (oldTx) =>
+                oldTx && {
+                  ...oldTx,
+                  hash: txHash,
+                  status: ENUM_TRANSACTION_STATUS.Pending,
+                },
+            );
           },
         );
-        setTransaction({
-          ...transaction,
-          status: challengeTxReceipt?.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        } as TransactionModel);
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              status: challengeTxReceipt?.status
+                ? ENUM_TRANSACTION_STATUS.Confirmed
+                : ENUM_TRANSACTION_STATUS.Failed,
+            },
+        );
         if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
-        toast('Operation succeed');
-        closeModal(true);
       } catch (e: any) {
-        setTransaction({
-          ...transaction,
-          status: ENUM_TRANSACTION_STATUS.Failed,
-        } as TransactionModel);
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              status: ENUM_TRANSACTION_STATUS.Failed,
+            },
+        );
         toast(computeTransactionErrorMessage(e));
       } finally {
         setSubmitting(false);
         setLoading(false);
+        setTimeout(() => {
+          closeModal(true);
+          setTransaction(undefined);
+        }, 2000);
       }
     }
   };

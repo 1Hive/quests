@@ -5,7 +5,7 @@ export class TransactionModel {
 
   pendingMessage?: string;
 
-  estimatedEnd?: number;
+  estimatedDuration?: number;
 
   status?: string;
 

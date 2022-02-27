@@ -135,38 +135,52 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       if (!claim.container) throw new Error('Container is not defined');
       const pendingMessage = 'Resolving claim challenge...';
       toast(pendingMessage);
-      const id = uniqueId();
+      setTransaction({
+        id: uniqueId(),
+        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
+        pendingMessage,
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,
         claim.container,
         dispute!,
-        (tx) => {
-          setTransaction({
-            id,
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
-            pendingMessage,
-            status: ENUM_TRANSACTION_STATUS.Pending,
-          });
+        (txHash) => {
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                hash: txHash,
+                status: ENUM_TRANSACTION_STATUS.Pending,
+              },
+          );
         },
       );
-      if (challengeTxReceipt) {
-        updateTransactionStatus({
-          id,
-          hash: challengeTxReceipt.transactionHash!,
-          status: challengeTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      }
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: challengeTxReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
-      toast('Operation succeed');
-      closeModal(true);
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        closeModal(true);
+        setTransaction(undefined);
+      }, 2000);
     }
   };
 

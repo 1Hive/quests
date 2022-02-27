@@ -37,7 +37,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const toast = useToast();
 
@@ -48,13 +48,12 @@ export default function FundModal({ quest, onClose = noop }: Props) {
 
   const fundModalTx = async (values: any, setSubmitting: Function) => {
     try {
-      const id = uniqueId();
       setLoading(true);
       const pendingMessage = 'Sending funds to Quest...';
       toast(pendingMessage);
       setTransaction({
-        id,
-        estimatedEnd: Date.now() + ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
+        id: uniqueId(),
+        estimatedDuration: ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
         pendingMessage,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       });
@@ -63,31 +62,42 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         quest.address!,
         values.fundAmount,
         (txHash) => {
-          setTransaction({
-            ...transaction,
-            status: ENUM_TRANSACTION_STATUS.Pending,
-          } as TransactionModel);
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                hash: txHash,
+                status: ENUM_TRANSACTION_STATUS.Pending,
+              },
+          );
         },
       );
-      setTransaction({
-        id,
-        hash: txReceipt?.transactionHash,
-        status: txReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      });
-      closeModal(true);
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: txReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       if (!txReceipt?.status) throw new Error('Failed to fund quest');
-      toast('Operation succeed');
     } catch (e: any) {
-      setTransaction({
-        ...transaction,
-        status: ENUM_TRANSACTION_STATUS.Failed,
-      } as TransactionModel);
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       toast(computeTransactionErrorMessage(e));
     } finally {
       setSubmitting(false);
       setLoading(false);
+      setTimeout(() => {
+        closeModal(true);
+        setTransaction(undefined);
+      }, 2000);
     }
   };
 
