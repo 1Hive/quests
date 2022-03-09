@@ -49,12 +49,12 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const fundModalTx = async (values: any, setSubmitting: Function) => {
     try {
       setLoading(true);
-      const pendingMessage = 'Sending funds to Quest...';
-      toast(pendingMessage);
+      const message = 'Sending funds to Quest';
+      toast(message);
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
-        pendingMessage,
+        message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       });
       const txReceipt = await QuestService.fundQuest(
@@ -88,16 +88,12 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           oldTx && {
             ...oldTx,
             status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
           },
       );
-      toast(computeTransactionErrorMessage(e));
     } finally {
       setSubmitting(false);
       setLoading(false);
-      setTimeout(() => {
-        closeModal(true);
-        setTransaction(undefined);
-      }, 2000);
     }
   };
 

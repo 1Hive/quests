@@ -82,12 +82,10 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const claimTx = async () => {
     try {
       setLoading(true);
-      const pendingMessage = 'Sending claimed amount to your wallet...';
-      toast(pendingMessage);
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
-        pendingMessage,
+        message: 'Sending claimed amount to your wallet',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       });
       const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
@@ -116,15 +114,11 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
           oldTx && {
             ...oldTx,
             status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
           },
       );
-      toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
-      setTimeout(() => {
-        closeModal(true);
-        setTransaction(undefined);
-      }, 2000);
     }
   };
 

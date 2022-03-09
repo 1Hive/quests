@@ -3,7 +3,7 @@ export class TransactionModel {
 
   id!: string;
 
-  pendingMessage?: string;
+  message?: string;
 
   estimatedDuration?: number;
 

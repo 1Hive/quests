@@ -133,12 +133,11 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     try {
       setLoading(true);
       if (!claim.container) throw new Error('Container is not defined');
-      const pendingMessage = 'Resolving claim challenge...';
-      toast(pendingMessage);
+      const message = 'Resolving claim challenge';
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
-        pendingMessage,
+        message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       });
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
@@ -172,15 +171,11 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           oldTx && {
             ...oldTx,
             status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
           },
       );
-      toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
-      setTimeout(() => {
-        closeModal(true);
-        setTransaction(undefined);
-      }, 2000);
     }
   };
 

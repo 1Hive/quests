@@ -49,12 +49,10 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const reclaimFundTx = async () => {
     try {
       setLoading(true);
-      const pendingMessage = 'Reclaiming unused fund...';
-      toast(pendingMessage);
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
-        pendingMessage,
+        message: 'Reclaiming unused fund',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       });
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(
@@ -87,15 +85,11 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           oldTx && {
             ...oldTx,
             status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
           },
       );
-      toast(computeTransactionErrorMessage(e));
     } finally {
       setLoading(false);
-      setTimeout(() => {
-        closeModal(true);
-        setTransaction(undefined);
-      }, 2000);
     }
   };
 

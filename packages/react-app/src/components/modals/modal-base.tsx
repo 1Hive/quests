@@ -1,6 +1,7 @@
 import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
+import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
@@ -51,7 +52,7 @@ export default function ModalBase({
   css,
 }: Props) {
   const openButtonId = `open-${id}`;
-  const { transaction } = useTransactionContext();
+  const { transaction, setTransaction } = useTransactionContext();
   useEffect(() => {
     if (isOpen) {
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
@@ -73,7 +74,21 @@ export default function ModalBase({
         e.target === modalDom ||
         modalDom.contains(e.target))
     ) {
+      handleOnClose(e);
+    }
+  };
+
+  const handleOnClose = (e: any) => {
+    if (e) {
       onClose();
+      if (
+        transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
+        transaction?.status === ENUM_TRANSACTION_STATUS.Failed
+      ) {
+        setTimeout(() => {
+          setTransaction(undefined);
+        }, 750);
+      }
     }
   };
 
@@ -82,7 +97,7 @@ export default function ModalBase({
       <div id={openButtonId}>{openButton}</div>
       <ModalStyled
         visible={isOpen}
-        onClose={(e: any) => e && onClose()}
+        onClose={(e: any) => handleOnClose(e)}
         width={(viewport: VisualViewport) =>
           Math.min(viewport.width - 16, size === 'small' ? 500 : 1200)
         }

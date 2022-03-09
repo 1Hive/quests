@@ -209,15 +209,12 @@ export default function Quest({
       setLoading(true);
       let createdQuestAddress: string;
       try {
-        let pendingMessage = 'Creating Quest...';
-        toast(pendingMessage);
-        const tx = {
+        setTransaction({
           id: uniqueId(),
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
-          pendingMessage,
+          message: 'Creating Quest...',
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        };
-        setTransaction(tx);
+        });
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,
           values.fallbackAddress ?? walletAddress,
@@ -253,12 +250,10 @@ export default function Quest({
           if (values.bounty?.parsedAmount) {
             createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
             if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
-            pendingMessage = 'Sending funds to Quest...';
-            toast(pendingMessage);
             setTransaction({
               id: uniqueId(),
               estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
-              pendingMessage,
+              message: 'Sending funds to Quest',
               status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
             });
             const txReceiptFundQuest = await QuestService.fundQuest(
@@ -291,14 +286,17 @@ export default function Quest({
           }
         }
       } catch (e: any) {
-        toast(computeTransactionErrorMessage(e));
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              status: ENUM_TRANSACTION_STATUS.Failed,
+              message: computeTransactionErrorMessage(e),
+            },
+        );
       } finally {
         setSubmitting(false);
         setLoading(false);
-        setTimeout(() => {
-          if (createdQuestAddress) onSave(createdQuestAddress);
-          setTransaction(undefined);
-        }, 2000);
       }
     }
   };

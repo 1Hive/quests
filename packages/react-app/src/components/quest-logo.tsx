@@ -1,10 +1,12 @@
+import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 
 type Props = {
-  color: string;
+  color?: string;
 };
+
 const DivStyled = styled.div`
-  margin-bottom: 8px;
+  margin-bottom: ${GUpx()};
 `;
 
 export default function QuestLogo({ color }: Props) {

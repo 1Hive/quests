@@ -126,12 +126,10 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           challengeFee?.parsedAmount &&
           (!isFeeDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
         ) {
-          const pendingMessage = 'Approving challenge fee...';
-          toast(pendingMessage);
           setTransaction({
             id: uniqueId(),
             estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-            pendingMessage,
+            message: 'Approving challenge fee',
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
@@ -162,9 +160,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         }
         if (+claim.container!.config.challengeDeposit.amount) {
           let tokenToApprove: TokenModel;
-          const pendingMessage = isFeeDepositSameToken
-            ? 'Approving challenge fee + deposit...'
-            : 'Approving challenge deposit...';
           if (isFeeDepositSameToken && challengeFee?.token?.amount) {
             let approvingAmount = BigNumber.from(claim.container!.config.challengeDeposit.amount);
             approvingAmount = approvingAmount.add(BigNumber.from(challengeFee.token.amount));
@@ -175,11 +170,12 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           } else {
             tokenToApprove = claim.container!.config.challengeDeposit;
           }
-          toast(pendingMessage);
           setTransaction({
             id: uniqueId(),
             estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
-            pendingMessage,
+            message: isFeeDepositSameToken
+              ? 'Approving challenge fee + deposit'
+              : 'Approving challenge deposit',
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
@@ -210,8 +206,12 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         }
 
         if (!claim.container) throw new Error('Container is not defined');
-        const pendingMessage = 'Challenging Quest...';
-        toast(pendingMessage);
+        setTransaction({
+          id: uniqueId(),
+          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+          message: 'Challenging Quest',
+          status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        });
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
           {
@@ -253,10 +253,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       } finally {
         setSubmitting(false);
         setLoading(false);
-        setTimeout(() => {
-          closeModal(true);
-          setTransaction(undefined);
-        }, 2000);
       }
     }
   };

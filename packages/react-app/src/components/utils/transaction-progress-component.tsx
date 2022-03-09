@@ -1,42 +1,53 @@
-/* eslint-disable react/no-array-index-key */
+import { TransactionBadge, useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
-import { TransactionBadge } from '@1hive/1hive-ui';
 import { getNetwork } from 'src/networks';
+import { GUpx } from 'src/utils/css.util';
 import QuestLogo from '../quest-logo';
 import { Outset } from './spacer-util';
 
-const DivStyled = styled.div`
+const WrapperStyled = styled.div`
   justify-content: center;
   display: flex;
   align-items: center;
   flex-direction: column;
 `;
 
+const MessageStyled = styled.div`
+  color: ${({ messageColor }: any) => messageColor};
+  margin-bottom: ${GUpx()};
+`;
+
+const TransactionTitleStyled = styled.div`
+  margin: ${GUpx()};
+  ${textStyle('title3')};
+`;
+
 export function TransactionProgressComponent() {
   const network = getNetwork();
-  const { transaction, setTransaction } = useTransactionContext();
-  const [logoColor, setLogoColor] = useState('red');
+  const { transaction } = useTransactionContext();
+  const [logoColor, setLogoColor] = useState<string>();
   const [message, setMessage] = useState<string | undefined>();
+  const { warningSurface, positiveSurface, negativeSurface, content } = useTheme();
   useEffect(() => {
     switch (transaction?.status) {
       case ENUM_TRANSACTION_STATUS.WaitingForSignature:
         setMessage('Waiting for your signature...');
-        setLogoColor('white');
+        setLogoColor(content);
         break;
       case ENUM_TRANSACTION_STATUS.Pending:
         setMessage('Transaction is pending...');
-        setLogoColor('yellow');
+        setLogoColor(warningSurface);
         break;
       case ENUM_TRANSACTION_STATUS.Confirmed:
         setMessage('Transaction is confirmed!');
-        setLogoColor('green');
+        setLogoColor(positiveSurface);
         break;
       case ENUM_TRANSACTION_STATUS.Failed:
         setMessage('Transaction failed!');
-        setLogoColor('red');
+        setLogoColor(negativeSurface);
         break;
       default:
     }
@@ -44,14 +55,10 @@ export function TransactionProgressComponent() {
 
   return (
     <Outset horizontal>
-      <DivStyled>
-        {/* {updatedTransactionStatus?.status
-        ? updatedTransactionStatus.pendingMessage
-        : transaction?.pendingMessage} */}
-        <QuestLogo color="#FFFFFF" />
-        <div>{message}</div>
-        {/* {currentTxStatus && currentTxStatus} */}
-
+      <WrapperStyled>
+        <QuestLogo color={logoColor} />
+        <TransactionTitleStyled>{transaction?.message}</TransactionTitleStyled>
+        <MessageStyled messageColor={logoColor}>{message}</MessageStyled>
         {transaction?.hash && (
           <TransactionBadge
             transaction={transaction.hash}
@@ -59,7 +66,7 @@ export function TransactionProgressComponent() {
             networkType={network.type}
           />
         )}
-      </DivStyled>
+      </WrapperStyled>
     </Outset>
   );
 }

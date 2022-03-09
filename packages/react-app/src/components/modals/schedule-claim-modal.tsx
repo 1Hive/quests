@@ -71,12 +71,12 @@ export default function ScheduleClaimModal({
       setLoading(true);
       const { governQueueAddress } = getNetwork();
       const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
-      let pendingMessage = 'Approving claim deposit...';
-      toast(pendingMessage);
+      let message = 'Approving claim deposit';
+      toast(message);
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-        pendingMessage,
+        message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       });
       const approveTxReceipt = await QuestService.approveTokenAmount(
@@ -104,12 +104,11 @@ export default function ScheduleClaimModal({
           },
       );
       if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
-      pendingMessage = 'Scheduling claim...';
-      toast(pendingMessage);
+      message = 'Scheduling claim';
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
-        pendingMessage,
+        message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       });
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
@@ -148,16 +147,12 @@ export default function ScheduleClaimModal({
           oldTx && {
             ...oldTx,
             status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
           },
       );
-      toast(computeTransactionErrorMessage(e));
     } finally {
       setSubmitting(false);
       setLoading(false);
-      setTimeout(() => {
-        closeModal(true);
-        setTransaction(undefined);
-      }, 2000);
     }
   };
 
