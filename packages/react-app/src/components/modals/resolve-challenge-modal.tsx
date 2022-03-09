@@ -1,6 +1,5 @@
 import {
   Button,
-  useToast,
   IconFlag,
   Accordion,
   IdentityBadge,
@@ -84,7 +83,6 @@ type Props = {
 };
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
-  const toast = useToast();
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);

@@ -1,4 +1,4 @@
-import { Button, useToast, IconCoin, Field, Timer } from '@1hive/1hive-ui';
+import { Button, IconCoin, Field, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -44,7 +44,6 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
   const { setTransaction } = useTransactionContext();
-  const toast = useToast();
   const { walletAddress } = useWallet();
   useEffect(() => {
     const launchTimeoutAsync = async (execTimeMs: number) => {

@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { debounce, set, uniqueId } from 'lodash';
+import { debounce, uniqueId } from 'lodash';
 
 import {
   ENUM,
@@ -24,7 +24,6 @@ import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
-import { GiConsoleController } from 'react-icons/gi';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -282,6 +281,7 @@ export default function Quest({
             );
             if (!txReceiptFundQuest?.status || !createdQuestAddress)
               throw new Error('Failed to create quest');
+            else onSave(createdQuestAddress);
             fetchBalanceOfQuest(createdQuestAddress, values.bounty.token);
           }
         }

@@ -12,9 +12,6 @@ const BoxStyled = styled(Box)`
   width: 100%;
   min-width: fit-content;
 `;
-const DivStyled = styled.div`
-  background-color: red;
-`;
 
 // #endregion
 

@@ -1,4 +1,4 @@
-import { Button, useToast, IconCoin, Field } from '@1hive/1hive-ui';
+import { Button, IconCoin, Field } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
@@ -36,7 +36,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const { setTransaction } = useTransactionContext();
 
   const { walletAddress } = useWallet();
-  const toast = useToast();
 
   useEffect(() => {
     if (!fallbackAddress && questData.address && walletAddress) {
