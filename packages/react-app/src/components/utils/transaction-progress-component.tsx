@@ -29,25 +29,30 @@ export function TransactionProgressComponent() {
   const network = getNetwork();
   const { transaction } = useTransactionContext();
   const [logoColor, setLogoColor] = useState<string>();
+  const [messageColor, setMessageColor] = useState<string>();
   const [message, setMessage] = useState<string | undefined>();
-  const { warningSurface, positiveSurface, negativeSurface, content } = useTheme();
+  const { warning, warningSurface, positive, positiveSurface, negative, negativeSurface, content } =
+    useTheme();
   useEffect(() => {
     switch (transaction?.status) {
       case ENUM_TRANSACTION_STATUS.WaitingForSignature:
-        setMessage('Waiting for your signature...');
+        setMessage('Waiting for your signature');
         setLogoColor(content);
         break;
       case ENUM_TRANSACTION_STATUS.Pending:
-        setMessage('Transaction is pending...');
+        setMessage('Transaction is pending');
         setLogoColor(warningSurface);
+        setMessageColor(warning);
         break;
       case ENUM_TRANSACTION_STATUS.Confirmed:
-        setMessage('Transaction is confirmed!');
+        setMessage('Transaction is confirmed');
         setLogoColor(positiveSurface);
+        setMessageColor(positive);
         break;
       case ENUM_TRANSACTION_STATUS.Failed:
-        setMessage('Transaction failed!');
+        setMessage('Transaction failed');
         setLogoColor(negativeSurface);
+        setMessageColor(negative);
         break;
       default:
     }
@@ -58,7 +63,7 @@ export function TransactionProgressComponent() {
       <WrapperStyled>
         <QuestLogo color={logoColor} />
         <TransactionTitleStyled>{transaction?.message}</TransactionTitleStyled>
-        <MessageStyled messageColor={logoColor}>{message}</MessageStyled>
+        <MessageStyled messageColor={messageColor}>{message}</MessageStyled>
         {transaction?.hash && (
           <TransactionBadge
             transaction={transaction.hash}

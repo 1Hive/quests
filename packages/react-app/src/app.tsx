@@ -15,19 +15,22 @@ import Routes from './Routes';
 
 const sharedTheme = {
   positiveSurface: '#2cc68f',
-  negativeSurface: '#ff6969',
   warningSurface: '#ffe443',
 };
 const customLightTheme = {
   ...sharedTheme,
   _name: 'customLight',
   _appearance: 'light',
+  negativeSurface: '#ce2828',
+  negative: '#ce2828',
   surface: '#F9FAFC',
 };
 const customDarkTheme = {
   ...sharedTheme,
   _name: 'customDark',
   _appearance: 'dark',
+  negativeSurface: '#ff6969',
+  negative: '#ff6969',
 };
 
 function App() {
