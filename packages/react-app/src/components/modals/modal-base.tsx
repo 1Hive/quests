@@ -23,6 +23,7 @@ const ModalStyled = styled(Modal)`
 
 const ScrollViewStyled = styled(ScrollView)`
   overflow: auto;
+  justify-content: center;
   max-height: calc(60vh) !important;
 `;
 
@@ -98,7 +99,7 @@ export default function ModalBase({
         {buttons && (
           <ModalFooterStyled>
             <ChildSpacer justify="start" align="center" buttonEnd>
-              {buttons}
+              {!transaction && buttons}
             </ChildSpacer>
           </ModalFooterStyled>
         )}
