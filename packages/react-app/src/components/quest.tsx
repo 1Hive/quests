@@ -19,7 +19,7 @@ import * as QuestService from 'src/services/quest.service';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import { GUpx, isDarkTheme } from 'src/utils/style.util';
+import { GUpx } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';

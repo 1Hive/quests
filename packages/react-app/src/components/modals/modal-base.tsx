@@ -2,6 +2,7 @@ import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
+import { useModalContext } from 'src/contexts/modal-context';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -53,15 +54,22 @@ export default function ModalBase({
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
+  const { setIsOpen } = useModalContext();
   useEffect(() => {
     if (isOpen) {
+      setIsOpen(isOpen);
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
       setTimeout(() => {
         (document.getElementById(id) as HTMLElement)?.focus();
       }, 0);
 
       document.addEventListener('keydown', escFunction, false);
-    } else document.removeEventListener('keydown', escFunction, false);
+    } else {
+      setTimeout(() => {
+        setIsOpen(isOpen);
+      }, 550);
+      document.removeEventListener('keydown', escFunction, false);
+    }
 
     return () => document.removeEventListener('keydown', escFunction, false);
   }, [isOpen]);

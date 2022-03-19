@@ -20,7 +20,6 @@ import AmountFieldInput from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { IconTooltip } from '../field-input/icon-tooltip';
-import { getLastBlockDate } from '../../utils/date.utils';
 import { WalletBallance } from '../wallet-balance';
 
 // #region StyledComponents
@@ -77,7 +76,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   useEffect(() => {
     let handle: any;
     const launchSetTimeoutAsync = async (execTimeMs: number) => {
-      const now = await getLastBlockDate();
+      const now = Date.now();
       if (now > execTimeMs) setChallengedTimeout(true);
       else {
         setChallengedTimeout(false);
@@ -276,6 +275,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               onClick={() => setOpened(true)}
               label={buttonLabel}
               mode="negative"
+              title="This claim can't be challenged anymore"
               disabled={!buttonLabel || loading || challengeTimeout || !walletAddress}
             />
           )}

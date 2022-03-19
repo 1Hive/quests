@@ -40,10 +40,10 @@ function MainView({ children, toggleTheme }: Props) {
 
   return (
     <>
-      <HeaderWrapperStyled>
-        <Header toggleTheme={toggleTheme} />
-      </HeaderWrapperStyled>
       <Root.Provider>
+        <HeaderWrapperStyled>
+          <Header toggleTheme={toggleTheme} />
+        </HeaderWrapperStyled>
         <MainScrollWithSidebarLayout
           main={children}
           side={page === ENUM_PAGES.List ? <Sidebar /> : undefined}

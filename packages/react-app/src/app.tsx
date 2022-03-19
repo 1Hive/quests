@@ -18,16 +18,12 @@ import backgroundMotif from './assets/background-motif.svg';
 import { customDarkTheme } from './styles/dark-theme';
 import { customLightTheme } from './styles/light-theme';
 import { isDarkTheme } from './utils/style.util';
+import { ModalContextProvider } from './contexts/modal-context';
 
 // #region StyledComponents
 
 const AppStyled = styled.div`
-  ${({ theme }: any) =>
-    isDarkTheme(theme)
-      ? `background-image: url(${background});`
-      : `
-
-  `};
+  ${({ theme }: any) => isDarkTheme(theme) && `background-image: url(${background});`};
   &::after {
     content: '';
     background: url(${backgroundMotif}) no-repeat center center;
@@ -62,26 +58,28 @@ function App() {
     <AppStyled theme={currentTheme}>
       <WalletProvider>
         <PageContextProvider>
-          <TransactionContextProvider>
-            <QuestsContextProvider>
-              <FilterContextProvider>
-                <Main
-                  assetsUrl="/aragon-ui/"
-                  layout={false}
-                  scrollView={false}
-                  theme={currentTheme ?? DEFAULT_THEME}
-                >
-                  <HashRouter>
-                    <ErrorBoundary>
-                      <MainView toggleTheme={toggleTheme}>
-                        <Routes />
-                      </MainView>
-                    </ErrorBoundary>
-                  </HashRouter>
-                </Main>
-              </FilterContextProvider>
-            </QuestsContextProvider>
-          </TransactionContextProvider>
+          <ModalContextProvider>
+            <TransactionContextProvider>
+              <QuestsContextProvider>
+                <FilterContextProvider>
+                  <Main
+                    assetsUrl="/aragon-ui/"
+                    layout={false}
+                    scrollView={false}
+                    theme={currentTheme ?? DEFAULT_THEME}
+                  >
+                    <HashRouter>
+                      <ErrorBoundary>
+                        <MainView toggleTheme={toggleTheme}>
+                          <Routes />
+                        </MainView>
+                      </ErrorBoundary>
+                    </HashRouter>
+                  </Main>
+                </FilterContextProvider>
+              </QuestsContextProvider>
+            </TransactionContextProvider>
+          </ModalContextProvider>
         </PageContextProvider>
       </WalletProvider>
     </AppStyled>

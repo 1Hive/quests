@@ -1,4 +1,4 @@
-import { ButtonBase, GU, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import { ButtonBase, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import React from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -8,7 +8,6 @@ import styled from 'styled-components';
 const HeaderAccountButtonStyled = styled(ButtonBase)`
   height: 100%;
   padding: ${GUpx()};
-  background: ${({ background }: any) => background};
   &:active {
     background: ${({ backgroundActive }: any) => backgroundActive};
   }

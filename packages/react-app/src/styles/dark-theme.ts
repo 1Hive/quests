@@ -56,9 +56,9 @@ export const customDarkTheme = {
   // Use this color to communicate negative information (e.g. error, an action to vote no).
   negative: '#ff6969',
   // To be used for text and outline content over negative.
-  negativeContent: '#242424',
+  negativeContent: '#691212',
   // A softer negative, to be used when a large amount of information needs to be communicated. For instance, the Info component uses it as a background color in error mode.
-  negativeSurface: '#fbfbe9',
+  negativeSurface: '#ff6969',
   // To be used for text and outline content over negativeSurfaceContent.
   negativeSurfaceContent: '#242424',
 
@@ -112,5 +112,19 @@ export const customDarkTheme = {
   badge: '#d6d9b6',
   badgeContent: '#242424',
 
-  
+  //  -- INFO --
+  // This info color is generally stronger than infoSurface. It should be used for icons, borders, etc.
+  info: '#0d5587',
+  // The surface info color, generally softer than info. It should be used for background colors.
+  infoSurface: '#363c48',
+  // To be used for text and outline content over infoSurface.
+  infoSurfaceContent: '#5fbdff',
+
+  //  -- WARNING --
+  // This warning color is generally stronger than warningSurface. It should be used for icons, borders, etc.
+  warning: '#cdbb62',
+  // The surface warning color, generally softer than warning. It should be used for background colors.
+  warningSurface: '#fae95d',
+  // To be used for text and outline content over warningSurface.
+  warningSurfaceContent: '#bfa736',
 };

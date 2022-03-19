@@ -1,4 +1,4 @@
-import { GU, Link, useTheme } from '@1hive/1hive-ui';
+import { GU, Link, useTheme, IconExternal } from '@1hive/1hive-ui';
 import styled from 'styled-components';
 // #region StyledComponents
 
@@ -15,6 +15,7 @@ const HeaderNavItemStyled = styled(Link)`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  text-decoration: none;
 `;
 
 // #endregion
@@ -34,14 +35,16 @@ export default function HeaderMenu({ below }: Props) {
           href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"
           external
         >
-          Get Honey
+          <span>Get Honey</span>
+          <IconExternal />
         </HeaderNavItemStyled>
         <HeaderNavItemStyled
           href="https://wiki.1hive.org/projects/quests"
           external
           color={theme.contentSecondary}
         >
-          Wiki
+          <span>Wiki</span>
+          <IconExternal />
         </HeaderNavItemStyled>
       </HeaderNavStyled>
     )

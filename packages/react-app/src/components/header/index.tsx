@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES } from 'src/constants';
+import { useModalContext } from 'src/contexts/modal-context';
 import { usePageContext } from 'src/contexts/page.context';
 import { isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -13,12 +14,15 @@ import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
 
 // #region StyledComponents
-const HeaderWraper = styled.header`
+const HeaderWraperStyled = styled.header`
   ${({ theme }: any) => !isDarkTheme(theme) && `background: ${theme.background};`}
   position: relative;
   z-index: 3;
   box-shadow: rgba(0, 0, 0, 0.05) 0 2px 3px;
   align-items: center;
+  & > div {
+    ${({ isModalOpen }: any) => isModalOpen && 'opacity:0.3;'}
+  }
 `;
 
 const HeaderLayoutContent = styled.div`
@@ -42,10 +46,16 @@ const HeaderRightPanel = styled.div`
 const BackButtonStyled = styled(BackButton)`
   padding-right: 16px;
   border-radius: 0;
+  background: none;
 `;
 
 const BackButtonSpacerStyled = styled.span`
   width: 69px;
+`;
+
+const ThemeButtonStyled = styled(Button)`
+  background: none;
+  border: none;
 `;
 
 // #endregion
@@ -62,8 +72,10 @@ function Header({ toggleTheme }: Props) {
   const layoutSmall = below('medium');
   const activityOpener = useRef<any>();
 
+  const { isOpen } = useModalContext();
+
   return (
-    <HeaderWraper theme={theme}>
+    <HeaderWraperStyled theme={theme} isModalOpen={isOpen}>
       <HeaderLayoutContent>
         <HeaderLayoutContentFlex>
           {page !== ENUM_PAGES.List ? (
@@ -77,7 +89,7 @@ function Header({ toggleTheme }: Props) {
         <HeaderRightPanel>
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
-          <Button
+          <ThemeButtonStyled
             ref={activityOpener}
             className="ml-8"
             label={isDarkTheme(theme) ? 'Light' : 'Dark'}
@@ -87,7 +99,7 @@ function Header({ toggleTheme }: Props) {
           />
         </HeaderRightPanel>
       </HeaderLayoutContent>
-    </HeaderWraper>
+    </HeaderWraperStyled>
   );
 }
 
