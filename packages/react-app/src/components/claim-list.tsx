@@ -60,7 +60,8 @@ export default function ClaimList({
   }, []);
 
   useEffect(() => {
-    if (newClaim) {
+    if (newClaim !== 0) {
+      console.log('useEffect in claimList triggered');
       if (!claims) fetchClaims();
       else fetchNewClaimChanges(true);
     }

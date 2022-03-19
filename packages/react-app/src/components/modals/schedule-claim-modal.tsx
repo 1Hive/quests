@@ -190,7 +190,7 @@ export default function ScheduleClaimModal({
           disabled={loading || !walletAddress || !isEnoughBalance}
         />,
       ]}
-      onClose={() => closeModal(false)}
+      onClose={closeModal}
       isOpen={opened}
     >
       <Formik

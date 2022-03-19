@@ -61,7 +61,10 @@ export function TransactionProgressComponent() {
   return (
     <Outset horizontal>
       <WrapperStyled>
-        <QuestLogo color={logoColor} />
+        <QuestLogo
+          animated={transaction?.status === ENUM_TRANSACTION_STATUS.Pending}
+          color={logoColor}
+        />
         <TransactionTitleStyled>{transaction?.message}</TransactionTitleStyled>
         <MessageStyled messageColor={messageColor}>{message}</MessageStyled>
         {transaction?.hash && (

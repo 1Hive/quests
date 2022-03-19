@@ -329,7 +329,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           disabled={loading || !walletAddress || !isEnoughBalance || challengeTimeout}
         />,
       ]}
-      onClose={() => closeModal(false)}
+      onClose={closeModal}
       isOpen={opened}
     >
       <Formik

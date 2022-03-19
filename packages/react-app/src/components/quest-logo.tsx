@@ -3,15 +3,28 @@ import styled from 'styled-components';
 
 type Props = {
   color?: string;
+  animated?: boolean;
 };
 
 const DivStyled = styled.div`
+  @keyframes textScale1 {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  ${({ animated }: any) => animated && `animation: textScale1 1.15s infinite;`}
   margin-bottom: ${GUpx()};
 `;
 
-export default function QuestLogo({ color }: Props) {
+export default function QuestLogo({ color, animated }: Props) {
   return (
-    <DivStyled>
+    <DivStyled animated={animated}>
       <svg
         width="150"
         height="206"

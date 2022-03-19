@@ -121,7 +121,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             disabled={loading || !walletAddress}
           />
         }
-        onClose={() => closeModal(false)}
+        onClose={closeModal}
         isOpen={opened}
       >
         <Outset gu16>

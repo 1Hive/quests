@@ -142,7 +142,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                   loading ||
                   !scheduleTimeout ||
                   claim.state === ENUM_CLAIM_STATE.Challenged ||
-                  questTotalBounty ||
+                  !questTotalBounty ||
                   !walletAddress
                 }
               />
@@ -163,7 +163,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             mode="positive"
           />
         }
-        onClose={() => closeModal(false)}
+        onClose={closeModal}
         isOpen={opened}
         size="small"
       >
@@ -176,7 +176,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
           />
           <AddressFieldInput
             id="playerAddress"
-            label="will be send to"
+            label="will be sent to"
             isLoading={loading}
             value={claim.playerAddress}
           />

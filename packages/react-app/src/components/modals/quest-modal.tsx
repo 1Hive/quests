@@ -104,7 +104,7 @@ export default function QuestModal({
         ),
       ]}
       isOpen={opened}
-      onClose={() => closeModal(false)}
+      onClose={closeModal}
     >
       <Quest
         questMode={questMode}
