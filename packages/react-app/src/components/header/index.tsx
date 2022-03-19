@@ -15,7 +15,6 @@ import HeaderTitle from './header-title';
 const HeaderWraper = styled.header`
   position: relative;
   z-index: 3;
-  background: ${({ background }) => background};
   box-shadow: rgba(0, 0, 0, 0.05) 0 2px 3px;
 `;
 

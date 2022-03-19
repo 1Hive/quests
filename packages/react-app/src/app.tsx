@@ -3,6 +3,7 @@ import { Main } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
+import styled from 'styled-components';
 import MainView from './components/main-view';
 import ErrorBoundary from './components/utils/error-boundary';
 import { DEFAULT_THEME } from './constants';
@@ -12,26 +13,29 @@ import { QuestsContextProvider } from './contexts/quests.context';
 import { TransactionContextProvider } from './contexts/transaction.context';
 import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
+import background from './assets/background.svg';
+import backgroundMotif from './assets/background-motif.svg';
+import { customDarkTheme } from './styles/dark-theme';
+import { customLightTheme } from './styles/light-theme';
 
-const sharedTheme = {
-  positiveSurface: '#2cc68f',
-  warningSurface: '#ffe443',
-};
-const customLightTheme = {
-  ...sharedTheme,
-  _name: 'customLight',
-  _appearance: 'light',
-  negativeSurface: '#ce2828',
-  negative: '#ce2828',
-  surface: '#F9FAFC',
-};
-const customDarkTheme = {
-  ...sharedTheme,
-  _name: 'customDark',
-  _appearance: 'dark',
-  negativeSurface: '#ff6969',
-  negative: '#ff6969',
-};
+// #region StyledComponents
+
+const AppStyled = styled.div`
+  ${({ theme }: any) => theme._appearance === 'dark' && `background-image: url(${background});`};
+  &::after {
+    content: '';
+    background: url(${backgroundMotif}) no-repeat center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0.02;
+    z-index: -1;
+  }
+`;
+
+// #endregion
 
 function App() {
   const [currentTheme, setCurrentTheme] = useState<any>(undefined);
@@ -49,31 +53,32 @@ function App() {
   };
 
   return (
-    // Trigger sentry.io
-    <WalletProvider>
-      <PageContextProvider>
-        <TransactionContextProvider>
-          <QuestsContextProvider>
-            <FilterContextProvider>
-              <Main
-                assetsUrl="/aragon-ui/"
-                layout={false}
-                scrollView={false}
-                theme={currentTheme ?? DEFAULT_THEME}
-              >
-                <HashRouter>
-                  <ErrorBoundary>
-                    <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
-                      <Routes />
-                    </MainView>
-                  </ErrorBoundary>
-                </HashRouter>
-              </Main>
-            </FilterContextProvider>
-          </QuestsContextProvider>
-        </TransactionContextProvider>
-      </PageContextProvider>
-    </WalletProvider>
+    <AppStyled theme={currentTheme}>
+      <WalletProvider>
+        <PageContextProvider>
+          <TransactionContextProvider>
+            <QuestsContextProvider>
+              <FilterContextProvider>
+                <Main
+                  assetsUrl="/aragon-ui/"
+                  layout={false}
+                  scrollView={false}
+                  theme={currentTheme ?? DEFAULT_THEME}
+                >
+                  <HashRouter>
+                    <ErrorBoundary>
+                      <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
+                        <Routes />
+                      </MainView>
+                    </ErrorBoundary>
+                  </HashRouter>
+                </Main>
+              </FilterContextProvider>
+            </QuestsContextProvider>
+          </TransactionContextProvider>
+        </PageContextProvider>
+      </WalletProvider>
+    </AppStyled>
   );
 }
 export default process.env.NODE_ENV === 'development' ? hot(App) : App;
