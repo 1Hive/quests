@@ -272,7 +272,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           title={isRuled ? 'Publish dispute result' : 'Need to be ruled'}
         />,
       ]}
-      onClose={() => closeModal(false)}
+      onClose={closeModal}
       isOpen={opened}
     >
       <Outset gu16>

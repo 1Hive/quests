@@ -141,7 +141,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               disabled={loading || !walletAddress || !isEnoughBalance}
             />,
           ]}
-          onClose={() => closeModal(false)}
+          onClose={closeModal}
           isOpen={opened}
           size="small"
         >

@@ -34,7 +34,7 @@ type Props = {
   title?: React.ReactNode | string;
   openButton: React.ReactNode;
   buttons?: React.ReactNode;
-  onClose?: Function;
+  onClose?: (_success: boolean) => void;
   isOpen: boolean;
   css?: React.CSSProperties;
   size?: 'small' | 'normal';
@@ -80,7 +80,7 @@ export default function ModalBase({
 
   const handleOnClose = (e: any) => {
     if (e) {
-      onClose();
+      onClose(transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed);
       if (
         transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
         transaction?.status === ENUM_TRANSACTION_STATUS.Failed
