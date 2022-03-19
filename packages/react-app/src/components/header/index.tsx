@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
-import { TransactionProgressButton } from '../utils/transaction-progress-button';
 
 // #region StyledComponents
 const HeaderWraper = styled.header`
@@ -86,7 +85,6 @@ function Header({ toggleTheme, currentTheme }: Props) {
             display="icon"
             onClick={toggleTheme}
           />
-          <TransactionProgressButton />
         </HeaderRightPanel>
       </HeaderLayoutContent>
     </HeaderWraper>

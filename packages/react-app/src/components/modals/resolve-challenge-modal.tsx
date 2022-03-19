@@ -1,6 +1,5 @@
 import {
   Button,
-  useToast,
   IconFlag,
   Accordion,
   IdentityBadge,
@@ -8,7 +7,7 @@ import {
   Link,
   IconCaution,
 } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { useState, useEffect, Fragment } from 'react';
 import styled from 'styled-components';
 import { ClaimModel } from 'src/models/claim.model';
@@ -84,7 +83,6 @@ type Props = {
 };
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
-  const toast = useToast();
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
@@ -92,8 +90,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const governQueueContract = getGovernQueueContract(walletAddress);
   const celesteContract = getCelesteContract();
 
@@ -134,35 +131,47 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     try {
       setLoading(true);
       if (!claim.container) throw new Error('Container is not defined');
-      const pendingMessage = 'Resolving claim challenge...';
-      toast(pendingMessage);
+      const message = 'Resolving claim challenge';
+      setTransaction({
+        id: uniqueId(),
+        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
+        message,
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,
         claim.container,
         dispute!,
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
-            pendingMessage,
-            status: ENUM_TRANSACTION_STATUS.Pending,
-          });
+        (txHash) => {
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                hash: txHash,
+                status: ENUM_TRANSACTION_STATUS.Pending,
+              },
+          );
         },
       );
-      if (challengeTxReceipt) {
-        updateTransactionStatus({
-          hash: challengeTxReceipt.transactionHash!,
-          status: challengeTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      }
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: challengeTxReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
-      toast('Operation succeed');
-      closeModal(true);
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      toast(computeTransactionErrorMessage(e));
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
+          },
+      );
     } finally {
       setLoading(false);
     }

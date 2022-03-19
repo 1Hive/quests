@@ -1,5 +1,5 @@
 import { Button, useToast } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
@@ -59,8 +59,7 @@ export default function ScheduleClaimModal({
   const [opened, setOpened] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction } = useTransactionContext();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -72,30 +71,46 @@ export default function ScheduleClaimModal({
       setLoading(true);
       const { governQueueAddress } = getNetwork();
       const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
-      toast('Approving claim deposit...');
+      let message = 'Approving claim deposit';
+      toast(message);
+      setTransaction({
+        id: uniqueId(),
+        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+        message,
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
       const approveTxReceipt = await QuestService.approveTokenAmount(
         walletAddress,
         governQueueAddress,
         scheduleDeposit.token,
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-            pendingMessage: 'Approving claim deposit...',
-            status: ENUM_TRANSACTION_STATUS.Pending,
-          });
+        (txHash) => {
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                hash: txHash,
+                status: ENUM_TRANSACTION_STATUS.Pending,
+              },
+          );
         },
       );
-      if (approveTxReceipt) {
-        updateTransactionStatus({
-          hash: approveTxReceipt.transactionHash,
-          status: approveTxReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      }
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: approveTxReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
-      toast('Scheduling claim...');
+      message = 'Scheduling claim';
+      setTransaction({
+        id: uniqueId(),
+        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
+        message,
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
         {
@@ -104,32 +119,37 @@ export default function ScheduleClaimModal({
           playerAddress: values.playerAddress ?? walletAddress,
           questAddress,
         },
-        (tx) => {
-          pushTransaction({
-            hash: tx,
-            estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
-            pendingMessage: 'Scheduling claim...',
-            status: ENUM_TRANSACTION_STATUS.Pending,
-          });
+        (txHash) => {
+          setTransaction(
+            (oldTx) =>
+              oldTx && {
+                ...oldTx,
+                hash: txHash,
+                status: ENUM_TRANSACTION_STATUS.Pending,
+              },
+          );
         },
       );
-      if (scheduleReceipt) {
-        updateTransactionStatus({
-          hash: scheduleReceipt.transactionHash,
-          status: scheduleReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      } else {
-        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      }
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: scheduleReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
-      toast('Operation succeed');
-      closeModal(true);
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      toast(computeTransactionErrorMessage(e));
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
+          },
+      );
     } finally {
       setSubmitting(false);
       setLoading(false);

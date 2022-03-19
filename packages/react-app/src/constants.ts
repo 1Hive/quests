@@ -131,6 +131,7 @@ export const ENUM_TRANSACTION_STATUS = {
   Pending: 'TX_STATUS_PENDING',
   SignatureFailed: 'TX_STATUS_SIGNATURE_FAILED',
   Signed: 'TX_STATUS_SIGNED',
+  WaitingForSignature: 'TX_WAITING_FOR_SIGNATURE',
 };
 
 export const ENUM_ESTIMATED_TX_TIME_MS = {
