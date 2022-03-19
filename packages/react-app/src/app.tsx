@@ -17,11 +17,17 @@ import background from './assets/background.svg';
 import backgroundMotif from './assets/background-motif.svg';
 import { customDarkTheme } from './styles/dark-theme';
 import { customLightTheme } from './styles/light-theme';
+import { isDarkTheme } from './utils/style.util';
 
 // #region StyledComponents
 
 const AppStyled = styled.div`
-  ${({ theme }: any) => theme._appearance === 'dark' && `background-image: url(${background});`};
+  ${({ theme }: any) =>
+    isDarkTheme(theme)
+      ? `background-image: url(${background});`
+      : `
+
+  `};
   &::after {
     content: '';
     background: url(${backgroundMotif}) no-repeat center center;
@@ -67,7 +73,7 @@ function App() {
                 >
                   <HashRouter>
                     <ErrorBoundary>
-                      <MainView toggleTheme={toggleTheme} currentTheme={currentTheme}>
+                      <MainView toggleTheme={toggleTheme}>
                         <Routes />
                       </MainView>
                     </ErrorBoundary>

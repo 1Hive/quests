@@ -19,7 +19,7 @@ import * as QuestService from 'src/services/quest.service';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
@@ -44,8 +44,6 @@ const TitleLinkStyled = styled(Link)`
 
 const LinkStyled = styled(Link)`
   font-weight: 100;
-  color: dodgerblue;
-  text-decoration: none;
 `;
 
 const AddressWrapperStyled = styled.div`
@@ -58,7 +56,8 @@ const CardStyled = styled(Card)`
   width: 100%;
   height: fit-content;
   min-height: 250px;
-  border: none;
+
+  ${({ isEdit }: any) => isEdit && 'border:none;'}
 
   & > div:first-child {
     padding-bottom: 0;
@@ -533,6 +532,7 @@ export default function Quest({
       style={css}
       isSummary={questMode === ENUM_QUEST_VIEW_MODE.ReadSummary}
       id={questData.address}
+      isEdit={isEdit}
     >
       {!loading && <StateTag state={questData.state} />}
       <Formik

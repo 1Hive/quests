@@ -6,7 +6,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import styled from 'styled-components';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import Skeleton from 'react-loading-skeleton';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';

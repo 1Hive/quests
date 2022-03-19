@@ -4,7 +4,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getBalanceOf } from 'src/services/quest.service';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import AmountFieldInput from './field-input/amount-field-input';
 

@@ -163,6 +163,7 @@ function AccountModule({ compact = false }: Props) {
         <AccountButton onClick={toggle} />
       ) : (
         <Button
+          mode="strong"
           icon={<IconConnect />}
           label="Enable account"
           onClick={toggle}

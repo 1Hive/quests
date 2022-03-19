@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import styled from 'styled-components';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { ClaimModel } from 'src/models/claim.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getLastBlockDate } from 'src/utils/date.utils';

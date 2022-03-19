@@ -75,7 +75,7 @@ export function Filter() {
             value={filter.tags}
             onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
           /> TODO : Restore after MVP */}
-      <Button label="Reset filter" wide onClick={() => setFilter(DEFAULT_FILTER)} />
+      <Button mode="strong" label="Reset filter" wide onClick={() => setFilter(DEFAULT_FILTER)} />
     </>
   );
 }

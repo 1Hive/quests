@@ -2,7 +2,7 @@ import { useTheme } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { CSSProperties, ReactNode } from 'react';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { addTime, dateFormat, ONE_HOUR_IN_MS } from '../../utils/date.utils';
 import { FieldInput } from './field-input';
@@ -83,7 +83,7 @@ function DateFieldInput({
       borderColor={theme.border}
       focusBorderColor={theme.accent}
       // eslint-disable-next-line no-underscore-dangle
-      isDarkTheme={theme._appearance === 'dark'}
+      isDarkTheme={isDarkTheme(theme)}
     />
   ) : (
     <span>{value ? new Date(value).toDateString() : 'Not set'}</span>

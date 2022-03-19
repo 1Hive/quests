@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
 import { EthIdenticon, RADIUS, shortenAddress, textStyle, useTheme } from '@1hive/1hive-ui';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import HeaderModule from '../header/header-module';

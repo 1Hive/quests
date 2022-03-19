@@ -1,9 +1,9 @@
 /* eslint-disable react/destructuring-assignment */
-import { Button, IconDown, IconUp, IconCopy } from '@1hive/1hive-ui';
+import { Button, IconDown, IconUp, IconCopy, useTheme } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useCopyToClipboard } from './hooks/use-copy-to-clipboard.hook';
-import { GUpx } from './utils/css.util';
+import { GUpx } from './utils/style.util';
 
 // #region StyledComponents
 
@@ -38,6 +38,11 @@ const ContentWrapperStyled = styled.div`
 
 const LabelStyled = styled.span`
   height: 100%;
+  color: ${({ theme }: any) => theme.link} !important;
+`;
+
+const WrapperStyled = styled.pre`
+  background: ${({ theme }: any) => theme.surfaceUnder} !important;
 `;
 
 // #endregion
@@ -51,6 +56,7 @@ type Props = {
 };
 
 export function CollapsableBlock(props: Props) {
+  const theme = useTheme();
   const [isVisible, setVisible] = useState(props.visible);
   const copyCode = useCopyToClipboard();
 
@@ -66,7 +72,7 @@ export function CollapsableBlock(props: Props) {
   }, [props, props.children]);
 
   return (
-    <pre>
+    <WrapperStyled theme={theme}>
       <LineStyled>
         <CollapseButtonStyled onClick={() => setVisible(!isVisible)}>
           <IconColumnStyled>
@@ -82,7 +88,7 @@ export function CollapsableBlock(props: Props) {
               </>
             )}
           </IconColumnStyled>
-          <LabelStyled>
+          <LabelStyled theme={theme}>
             {isVisible ? 'Hide ' : 'Show '}
             {props.label}
           </LabelStyled>
@@ -98,6 +104,6 @@ export function CollapsableBlock(props: Props) {
         )}
       </LineStyled>
       {isVisible && content ? <ContentWrapperStyled>{content}</ContentWrapperStyled> : <></>}
-    </pre>
+    </WrapperStyled>
   );
 }

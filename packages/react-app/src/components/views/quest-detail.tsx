@@ -6,11 +6,12 @@ import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
 import styled from 'styled-components';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import Quest from '../quest';
 
 const QuestDetailWrapperrStyled = styled.div`
-  padding: ${GUpx()};
+  padding: ${GUpx(6)};
+  padding-top: ${GUpx(4)};
   min-height: calc(100vh - 64px);
 `;
 

@@ -8,7 +8,7 @@ import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';

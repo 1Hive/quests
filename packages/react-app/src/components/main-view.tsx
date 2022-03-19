@@ -22,10 +22,9 @@ const HeaderWrapperStyled = styled.div`
 type Props = {
   children: React.ReactNode;
   toggleTheme: Function;
-  currentTheme: any;
 };
 
-function MainView({ children, toggleTheme, currentTheme }: Props) {
+function MainView({ children, toggleTheme }: Props) {
   const { activateWallet, walletAddress } = useWallet();
   const { page } = usePageContext();
   useEffect(() => {
@@ -42,7 +41,7 @@ function MainView({ children, toggleTheme, currentTheme }: Props) {
   return (
     <>
       <HeaderWrapperStyled>
-        <Header toggleTheme={toggleTheme} currentTheme={currentTheme} />
+        <Header toggleTheme={toggleTheme} />
       </HeaderWrapperStyled>
       <Root.Provider>
         <MainScrollWithSidebarLayout

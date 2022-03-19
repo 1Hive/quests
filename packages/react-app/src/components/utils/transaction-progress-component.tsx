@@ -4,7 +4,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
 import { getNetwork } from 'src/networks';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import QuestLogo from '../quest-logo';
 import { Outset } from './spacer-util';
 
@@ -45,7 +45,7 @@ export function TransactionProgressComponent() {
         setMessageColor(warning);
         break;
       case ENUM_TRANSACTION_STATUS.Confirmed:
-        setMessage('Transaction is confirmed');
+        setMessage('Transaction is confirmed. You can close this window.');
         setLogoColor(positiveSurface);
         setMessageColor(positive);
         break;

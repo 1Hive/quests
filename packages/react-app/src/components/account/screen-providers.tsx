@@ -1,6 +1,6 @@
 import { ButtonBase, GU, Link, RADIUS, textStyle, useTheme } from '@1hive/1hive-ui';
 import { useCallback } from 'react';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { getProviderFromUseWalletId } from '../../ethereum-providers';
 import { getUseWalletProviders } from '../../utils/web3.utils';
 

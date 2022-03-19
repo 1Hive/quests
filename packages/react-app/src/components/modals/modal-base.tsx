@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import { TransactionProgressComponent } from '../utils/transaction-progress-component';

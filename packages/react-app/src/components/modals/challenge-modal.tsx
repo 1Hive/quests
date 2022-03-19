@@ -7,7 +7,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { getNetwork } from 'src/networks';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { BigNumber } from 'ethers';
