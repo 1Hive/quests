@@ -316,7 +316,6 @@ export default function Quest({
 
   const onScheduleModalClosed = (success: boolean) => {
     if (success) {
-      console.log('Schedule modal closed with success');
       setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
     }
   };
