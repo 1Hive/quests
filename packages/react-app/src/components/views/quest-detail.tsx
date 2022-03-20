@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { GUpx } from 'src/utils/style.util';
 import Quest from '../quest';
 
-const QuestDetailWrapperrStyled = styled.div`
+const QuestDetailWrapperStyled = styled.div`
   padding: ${GUpx(6)};
   padding-top: ${GUpx(4)};
   min-height: calc(100vh - 64px);
@@ -32,19 +32,17 @@ export default function QuestDetail() {
   }, [id]);
 
   return (
-    <QuestDetailWrapperrStyled>
-      <>
-        {quest ? (
-          <Quest dataState={{ questData: quest }} questMode={ENUM_QUEST_VIEW_MODE.ReadDetail} />
-        ) : (
-          <>
-            <Quest
-              dataState={{ questData: { expireTime: new Date(), state: ENUM_QUEST_STATE.Draft } }}
-              isLoading
-            />
-          </>
-        )}
-      </>
-    </QuestDetailWrapperrStyled>
+    <QuestDetailWrapperStyled>
+      {quest ? (
+        <Quest dataState={{ questData: quest }} questMode={ENUM_QUEST_VIEW_MODE.ReadDetail} />
+      ) : (
+        <>
+          <Quest
+            dataState={{ questData: { expireTime: new Date(), state: ENUM_QUEST_STATE.Draft } }}
+            isLoading
+          />
+        </>
+      )}
+    </QuestDetailWrapperStyled>
   );
 }

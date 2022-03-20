@@ -92,10 +92,12 @@ function Header({ toggleTheme }: Props) {
           <ThemeButtonStyled
             ref={activityOpener}
             className="ml-8"
-            label={isDarkTheme(theme) ? 'Light' : 'Dark'}
+            // label={isDarkTheme(theme) ? 'Light' : 'Dark'}
             icon={isDarkTheme(theme) ? <FaSun /> : <FaMoon />}
             display="icon"
             onClick={toggleTheme}
+            disabled
+            label="Coming soon"
           />
         </HeaderRightPanel>
       </HeaderLayoutContent>

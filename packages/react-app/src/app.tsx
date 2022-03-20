@@ -43,7 +43,7 @@ function App() {
   const [currentTheme, setCurrentTheme] = useState<any>(undefined);
 
   useEffect(() => {
-    let themeName = localStorage.getItem('theme');
+    let themeName = localStorage.getItem('forcetheme');
     if (!themeName) themeName = DEFAULT_THEME;
     setCurrentTheme(themeName === 'dark' ? customDarkTheme : customLightTheme);
   }, []);
