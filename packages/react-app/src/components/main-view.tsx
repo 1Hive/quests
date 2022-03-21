@@ -48,13 +48,6 @@ function MainView({ children, toggleTheme }: Props) {
   const { page } = usePageContext();
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, false);
-    return () => {
-      window.removeEventListener('scroll', handleScroll, false);
-    };
-  }, []);
-
-  useEffect(() => {
     const tryConnect = async () => {
       try {
         if (await isConnected()) activateWallet().catch(Logger.exception);
