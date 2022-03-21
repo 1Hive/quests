@@ -1,4 +1,5 @@
 import { GU, Link, useTheme, IconExternal } from '@1hive/1hive-ui';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 // #region StyledComponents
 
@@ -6,7 +7,7 @@ const HeaderNavStyled = styled.nav`
   display: flex;
   align-items: center;
   height: 100%;
-  margin-left: ${6.5 * GU}px;
+  margin-left: ${GUpx(2)};
 `;
 
 const HeaderNavItemStyled = styled(Link)`

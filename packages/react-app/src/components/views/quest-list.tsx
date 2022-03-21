@@ -19,7 +19,6 @@ import { useQuestsContext } from 'src/contexts/quests.context';
 import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
-import { Filter } from '../filter';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
   width: 100%;
@@ -98,7 +97,6 @@ export default function QuestList() {
 
   return (
     <Outset gu64 horizontal>
-      <Filter />
       <InfiniteScroll
         loader={<></>}
         dataLength={quests.length}
@@ -124,7 +122,7 @@ export default function QuestList() {
         pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
         releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
         scrollableTarget="scroll-view"
-        scrollThreshold={0.5}
+        scrollThreshold="120px"
       >
         <div>
           {quests.map((x: QuestModel) => (

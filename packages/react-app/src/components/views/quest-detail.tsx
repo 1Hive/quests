@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ENUM_PAGES, ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useQuery } from 'src/hooks/use-query-params';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -19,29 +19,28 @@ export default function QuestDetail() {
   const { setPage } = usePageContext();
   const id = useQuery().get('id');
   const toast = useToast();
-  const [quest, setQuest] = useState<QuestModel>();
+  const [quest, setQuest] = useState<QuestModel | undefined>(undefined);
+  const [a, setA] = useState<boolean>();
 
   useEffect(() => {
     setPage(ENUM_PAGES.Detail);
     const fetchQuestAsync = async (questAddress: string) => {
-      const q = await fetchQuest(questAddress);
-      if (!q) toast('Failed to get quest, verify address');
-      else setQuest(q);
+      const questResult = await fetchQuest(questAddress);
+      if (!questResult) toast('Failed to get quest, verify address');
+      else setQuest(questResult);
+      setA(true);
     };
     if (id) fetchQuestAsync(id);
   }, [id]);
 
   return (
     <QuestDetailWrapperStyled>
-      {quest ? (
-        <Quest dataState={{ questData: quest }} questMode={ENUM_QUEST_VIEW_MODE.ReadDetail} />
-      ) : (
-        <>
-          <Quest
-            dataState={{ questData: { expireTime: new Date(), state: ENUM_QUEST_STATE.Draft } }}
-            isLoading
-          />
-        </>
+      {a && (
+        <Quest
+          dataState={{ questData: quest }}
+          questMode={ENUM_QUEST_VIEW_MODE.ReadDetail}
+          isLoading={!quest}
+        />
       )}
     </QuestDetailWrapperStyled>
   );

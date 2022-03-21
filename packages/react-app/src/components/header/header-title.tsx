@@ -1,4 +1,3 @@
-import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash';
 import { Link } from 'react-router-dom';
 import { GUpx } from 'src/utils/style.util';
@@ -11,7 +10,6 @@ import { LogoTitle } from './logo-title';
 const TitleLinkStyled = styled(Link)`
   height: 100%;
   text-decoration: none;
-  color: ${({ theme }: any) => theme.content};
 `;
 
 const TitleLinkWrapperStyled = styled.div`
@@ -28,10 +26,8 @@ type Props = {
 };
 
 export default function HeaderTitle({ onClick = noop }: Props) {
-  const theme = useTheme();
-
   return (
-    <TitleLinkStyled onClick={onClick} to={ENUM_PAGES.List} color={theme.accent}>
+    <TitleLinkStyled onClick={onClick} to={ENUM_PAGES.List}>
       <TitleLinkWrapperStyled>
         <LogoTitle />
       </TitleLinkWrapperStyled>

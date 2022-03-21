@@ -1,8 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 // @ts-nocheck
-import { BackButton, Button, GU, useTheme, useViewport } from '@1hive/1hive-ui';
-import { useRef } from 'react';
-import { FaMoon, FaSun } from 'react-icons/fa';
+import { BackButton, GU, useTheme, useViewport } from '@1hive/1hive-ui';
+import { ReactNode } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES } from 'src/constants';
 import { useModalContext } from 'src/contexts/modal-context';
@@ -25,19 +24,19 @@ const HeaderWraperStyled = styled.header`
   }
 `;
 
-const HeaderLayoutContent = styled.div`
+const HeaderLayoutContentStyled = styled.div`
   height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 `;
 
-const HeaderLayoutContentFlex = styled.div`
+const HeaderLayoutContentFlexStyled = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const HeaderRightPanel = styled.div`
+const HeaderRightPanelStyled = styled.div`
   display: flex;
   align-items: center;
   margin-right: ${6 * GU}px;
@@ -53,54 +52,57 @@ const BackButtonSpacerStyled = styled.span`
   width: 69px;
 `;
 
-const ThemeButtonStyled = styled(Button)`
-  background: none;
-  border: none;
+const HeaderContentStyled = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  flex-grow: 1;
 `;
 
 // #endregion
 
 type Props = {
   toggleTheme: Function;
+  children: ReactNode;
 };
 
-function Header({ toggleTheme }: Props) {
+// eslint-disable-next-line no-unused-vars
+function Header({ toggleTheme, children }: Props) {
   const theme = useTheme();
   const history = useHistory();
   const { page } = usePageContext();
   const { below } = useViewport();
-  const layoutSmall = below('medium');
-  const activityOpener = useRef<any>();
-
   const { isOpen } = useModalContext();
+  const layoutSmall = below('medium');
 
   return (
     <HeaderWraperStyled theme={theme} isModalOpen={isOpen}>
-      <HeaderLayoutContent>
-        <HeaderLayoutContentFlex>
+      <HeaderLayoutContentStyled>
+        <HeaderLayoutContentFlexStyled>
           {page !== ENUM_PAGES.List ? (
             <BackButtonStyled onClick={() => history.push(ENUM_PAGES.List)} label="" />
           ) : (
             <BackButtonSpacerStyled />
           )}
           <HeaderTitle external={false} />
-        </HeaderLayoutContentFlex>
-
-        <HeaderRightPanel>
+        </HeaderLayoutContentFlexStyled>
+        <HeaderContentStyled>{children}</HeaderContentStyled>
+        <HeaderRightPanelStyled>
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
-          <ThemeButtonStyled
+          {
+            // TODO : Restore when toggle theme is implemented
+            /* <ThemeButtonStyled
             ref={activityOpener}
             className="ml-8"
-            // label={isDarkTheme(theme) ? 'Light' : 'Dark'}
+            label={isDarkTheme(theme) ? 'Light' : 'Dark'}
             icon={isDarkTheme(theme) ? <FaSun /> : <FaMoon />}
             display="icon"
             onClick={toggleTheme}
-            disabled
-            label="Coming soon"
-          />
-        </HeaderRightPanel>
-      </HeaderLayoutContent>
+          /> */
+          }
+        </HeaderRightPanelStyled>
+      </HeaderLayoutContentStyled>
     </HeaderWraperStyled>
   );
 }
