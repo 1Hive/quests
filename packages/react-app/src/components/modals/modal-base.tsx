@@ -55,6 +55,13 @@ export default function ModalBase({
   const { transaction, setTransaction } = useTransactionContext();
   useEffect(() => {
     if (isOpen) {
+      // Clear tx if a tx is still there and already completed
+      if (
+        transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
+        transaction?.status === ENUM_TRANSACTION_STATUS.Failed ||
+        transaction?.id
+      )
+        setTransaction(undefined);
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
       setTimeout(() => {
         (document.getElementById(id) as HTMLElement)?.focus();
@@ -103,7 +110,7 @@ export default function ModalBase({
         }
         style={css}
         id={id}
-        tabindex="-1"
+        tabIndex="-1"
       >
         <Outset gu8>
           <TitleStyled>{title}</TitleStyled>

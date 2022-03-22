@@ -36,11 +36,12 @@ export function TransactionProgressComponent() {
   useEffect(() => {
     switch (transaction?.status) {
       case ENUM_TRANSACTION_STATUS.WaitingForSignature:
-        setMessage('Waiting for your signature');
+        setMessage('Waiting for your signature...');
         setLogoColor(content);
+        setMessageColor(content);
         break;
       case ENUM_TRANSACTION_STATUS.Pending:
-        setMessage('Transaction is pending');
+        setMessage('Transaction is pending...');
         setLogoColor(warningSurface);
         setMessageColor(warning);
         break;

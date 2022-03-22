@@ -149,7 +149,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             (oldTx) =>
               oldTx && {
                 ...oldTx,
-                hash: approveTxReceipt?.transactionHash!,
                 status: approveTxReceipt?.status
                   ? ENUM_TRANSACTION_STATUS.Confirmed
                   : ENUM_TRANSACTION_STATUS.Failed,
@@ -245,6 +244,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           (oldTx) =>
             oldTx && {
               ...oldTx,
+              message: computeTransactionErrorMessage(e),
               status: ENUM_TRANSACTION_STATUS.Failed,
             },
         );

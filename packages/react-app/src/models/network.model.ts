@@ -3,7 +3,7 @@ import { TokenModel } from './token.model';
 export type NetworkModel = {
   chainId: number;
   name: string;
-  type: string;
+  type: 'mainnet' | 'rinkeby' | 'xdai' | 'private';
   explorerBase: string;
   defaultEthNode: string;
   questsSubgraph: string;
