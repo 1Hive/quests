@@ -65,6 +65,7 @@ export default function ClaimList({
   }, []);
 
   useEffect(() => {
+    // When a claim has been scheduled, newClaim will be increment by 1
     if (newClaim !== 0) {
       if (!claims) fetchClaims();
       else fetchNewClaimChanges(true);

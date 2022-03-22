@@ -9,7 +9,7 @@ export function computeTransactionErrorMessage(error: any) {
   Logger.exception(error, 'An error occured during the transaction');
   if (METAMASK_POSSIBLE_ERRORS[error.code?.toString()])
     return METAMASK_POSSIBLE_ERRORS[error.code?.toString()].message;
-  return '💣️ Oops. Something went wrong with the transaction';
+  return 'Something went wrong with the transaction. Please try again we never know.';
 }
 
 /**
