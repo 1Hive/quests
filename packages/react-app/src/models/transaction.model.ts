@@ -1,9 +1,11 @@
 export class TransactionModel {
-  hash!: string;
+  hash?: string;
 
-  pendingMessage?: string;
+  id!: string;
 
-  estimatedEnd?: number;
+  message?: string;
+
+  estimatedDuration?: number;
 
   status?: string;
 

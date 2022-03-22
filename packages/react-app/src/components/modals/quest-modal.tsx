@@ -1,12 +1,13 @@
 import { Button, IconPlus } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
-import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE, TOKENS } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { GUpx } from 'src/utils/css.util';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { getNetwork } from 'src/networks';
 import Quest from '../quest';
 import ModalBase, { ModalCallback } from './modal-base';
 import { useQuestsContext } from '../../contexts/quests.context';
@@ -39,25 +40,24 @@ export default function QuestModal({
       state: ENUM_QUEST_STATE.Draft,
     },
   );
-  const onOpenButtonClick = () => {
-    setOpened(true);
-  };
 
-  const closeModal = (success: boolean) => {
-    setOpened(false);
-    onClose(success);
-  };
-
-  const fetchNewQuest = async (questAddress: string) => {
-    setInterval(async () => {
-      const newQuest = await QuestService.fetchQuest(questAddress);
-      if (newQuest) {
-        setNewQuest(newQuest);
-        clearInterval();
-      }
-    }, 1000); // Pull each seconds until the new quest is fetched
-    closeModal(true);
-  };
+  useEffect(() => {
+    const { type } = getNetwork();
+    if (type === 'rinkeby' && localStorage.getItem('FLAG_DUMMY') === 'true') {
+      // Load dummy data only for rinkeby testing and flag activated
+      const feedDummy = async () => {
+        const resp = await fetch('https://jaspervdj.be/lorem-markdownum/markdown.txt');
+        const dummyData = await resp.text();
+        setQuestData({
+          ...questData,
+          title: dummyData.substring(1, dummyData.indexOf('\n')),
+          description: dummyData.slice(dummyData.indexOf('\n') + 1),
+          rewardToken: TOKENS.RinkebyHoney,
+        });
+      };
+      feedDummy();
+    }
+  }, []);
 
   useEffect(() => {
     switch (questMode) {
@@ -77,6 +77,26 @@ export default function QuestModal({
         break;
     }
   }, [questMode]);
+
+  const onOpenButtonClick = () => {
+    setOpened(true);
+  };
+
+  const closeModal = (success: boolean) => {
+    setOpened(false);
+    onClose(success);
+  };
+
+  const fetchNewQuest = async (questAddress: string) => {
+    setInterval(async () => {
+      const newQuest = await QuestService.fetchQuest(questAddress);
+      if (newQuest) {
+        setNewQuest(newQuest);
+        clearInterval();
+      }
+    }, 1000); // Pull each seconds until the new quest is fetched
+    closeModal(true);
+  };
 
   return (
     <ModalBase
@@ -104,7 +124,7 @@ export default function QuestModal({
         ),
       ]}
       isOpen={opened}
-      onClose={() => closeModal(false)}
+      onClose={closeModal}
     >
       <Quest
         questMode={questMode}
