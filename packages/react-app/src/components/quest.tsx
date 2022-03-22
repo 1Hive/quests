@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { debounce } from 'lodash';
+import { debounce, uniqueId } from 'lodash';
 
 import {
   ENUM,
@@ -144,8 +144,7 @@ export default function Quest({
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimUpdated, setClaimUpdate] = useState(0);
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const toast = useToast();
@@ -209,8 +208,12 @@ export default function Quest({
       setLoading(true);
       let createdQuestAddress: string;
       try {
-        const pendingMessage = 'Creating Quest...';
-        toast(pendingMessage);
+        setTransaction({
+          id: uniqueId(),
+          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
+          message: 'Creating Quest...',
+          status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        });
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,
           values.fallbackAddress ?? walletAddress,
@@ -221,60 +224,76 @@ export default function Quest({
             rewardToken: values.bounty!.token ?? defaultToken,
           },
           undefined,
-          (tx) => {
-            pushTransaction({
-              hash: tx,
-              estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
-              pendingMessage,
-              status: ENUM_TRANSACTION_STATUS.Pending,
-            });
+          (txHash) => {
+            setTransaction(
+              (oldTx) =>
+                oldTx && {
+                  ...oldTx,
+                  hash: txHash,
+                  status: ENUM_TRANSACTION_STATUS.Pending,
+                },
+            );
           },
         );
-        if (txReceiptSaveQuest) {
-          updateTransactionStatus({
-            hash: txReceiptSaveQuest.transactionHash,
-            status: ENUM_TRANSACTION_STATUS.Confirmed,
-          });
-        } else {
-          updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-        }
-        onSave((txReceiptSaveQuest?.events?.[0] as any)?.args?.[0]);
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              status: txReceiptSaveQuest?.status
+                ? ENUM_TRANSACTION_STATUS.Confirmed
+                : ENUM_TRANSACTION_STATUS.Failed,
+            },
+        );
+
         if (txReceiptSaveQuest?.status) {
-          // If no funding needing
-          if (!values.bounty?.parsedAmount) toast('Operation succeed');
-          else {
+          if (values.bounty?.parsedAmount) {
             createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
             if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
-            toast('Sending funds to Quest...');
+            setTransaction({
+              id: uniqueId(),
+              estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
+              message: 'Sending funds to Quest',
+              status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+            });
             const txReceiptFundQuest = await QuestService.fundQuest(
               walletAddress,
               createdQuestAddress,
               values.bounty!,
-              (tx) => {
-                pushTransaction({
-                  hash: tx,
-                  estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
-                  pendingMessage: 'Quest funding...',
-                  status: ENUM_TRANSACTION_STATUS.Pending,
-                });
+              (txHash) => {
+                setTransaction(
+                  (oldTx) =>
+                    oldTx && {
+                      ...oldTx,
+                      hash: txHash,
+                      status: ENUM_TRANSACTION_STATUS.Pending,
+                    },
+                );
               },
             );
-            if (txReceiptFundQuest) {
-              updateTransactionStatus({
-                hash: txReceiptFundQuest.transactionHash,
-                status: ENUM_TRANSACTION_STATUS.Confirmed,
-              });
-            } else {
-              updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-            }
+            setTransaction(
+              (oldTx) =>
+                oldTx && {
+                  ...oldTx,
+                  status: txReceiptSaveQuest?.status
+                    ? ENUM_TRANSACTION_STATUS.Confirmed
+                    : ENUM_TRANSACTION_STATUS.Failed,
+                },
+            );
             if (!txReceiptFundQuest?.status || !createdQuestAddress)
               throw new Error('Failed to create quest');
-            toast('Operation succeed');
+            else onSave(createdQuestAddress);
             fetchBalanceOfQuest(createdQuestAddress, values.bounty.token);
           }
         }
       } catch (e: any) {
-        toast(computeTransactionErrorMessage(e));
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              status: ENUM_TRANSACTION_STATUS.Failed,
+              message: computeTransactionErrorMessage(e),
+            },
+        );
       } finally {
         setSubmitting(false);
         setLoading(false);

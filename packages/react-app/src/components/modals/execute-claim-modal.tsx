@@ -1,5 +1,5 @@
-import { Button, useToast, IconCoin, Field, Timer } from '@1hive/1hive-ui';
-import { noop } from 'lodash-es';
+import { Button, IconCoin, Field, Timer } from '@1hive/1hive-ui';
+import { noop, uniqueId } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -43,9 +43,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [amount, setAmount] = useState<TokenAmountModel>();
   const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
-  const { pushTransaction, updateTransactionStatus, updateLastTransactionStatus } =
-    useTransactionContext();
-  const toast = useToast();
+  const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   useEffect(() => {
     const launchTimeoutAsync = async (execTimeMs: number) => {
@@ -83,32 +81,41 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const claimTx = async () => {
     try {
       setLoading(true);
-      const pendingMessage = 'Sending claimed amount to your wallet...';
-      toast(pendingMessage);
-      const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (tx) =>
-        pushTransaction({
-          hash: tx,
-          estimatedEnd: Date.now() + ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
-          pendingMessage,
-          status: ENUM_TRANSACTION_STATUS.Pending,
-        }),
+      setTransaction({
+        id: uniqueId(),
+        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
+        message: 'Sending claimed amount to your wallet',
+        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      });
+      const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              hash: txHash,
+              status: ENUM_TRANSACTION_STATUS.Pending,
+            },
+        );
+      });
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: txReceipt?.status
+              ? ENUM_TRANSACTION_STATUS.Confirmed
+              : ENUM_TRANSACTION_STATUS.Failed,
+          },
       );
-      if (txReceipt) {
-        updateTransactionStatus({
-          hash: txReceipt.transactionHash,
-          status: txReceipt.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
-        });
-      } else {
-        updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      }
-      closeModal(true);
       if (!txReceipt?.status) throw new Error('Failed to execute claim');
-      toast('Operation succeed');
     } catch (e: any) {
-      updateLastTransactionStatus(ENUM_TRANSACTION_STATUS.Failed);
-      toast(computeTransactionErrorMessage(e));
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+            message: computeTransactionErrorMessage(e),
+          },
+      );
     } finally {
       setLoading(false);
     }
@@ -135,7 +142,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                   loading ||
                   !scheduleTimeout ||
                   claim.state === ENUM_CLAIM_STATE.Challenged ||
-                  questTotalBounty ||
+                  !questTotalBounty ||
                   !walletAddress
                 }
               />
@@ -156,7 +163,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             mode="positive"
           />
         }
-        onClose={() => closeModal(false)}
+        onClose={closeModal}
         isOpen={opened}
         size="small"
       >
@@ -169,7 +176,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
           />
           <AddressFieldInput
             id="playerAddress"
-            label="will be send to"
+            label="will be sent to"
             isLoading={loading}
             value={claim.playerAddress}
           />
