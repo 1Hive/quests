@@ -177,8 +177,8 @@ async function generateScheduleContainer(
   const lastBlockTimestamp = await getLastBlockTimestamp();
 
   // A bit more than the execution delay
-  const executionTime = lastBlockTimestamp + erc3000Config.executionDelay + (extraDelaySec || 60); // Add 1 minute by default
-
+  const executionTime =
+    lastBlockTimestamp + erc3000Config.executionDelay + (extraDelaySec || 60 * 15); // Add 15 minutes by default
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
 
