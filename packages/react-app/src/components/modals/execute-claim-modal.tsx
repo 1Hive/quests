@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { GUpx } from 'src/utils/style.util';
 import { ClaimModel } from 'src/models/claim.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { getLastBlockDate } from 'src/utils/date.utils';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import * as QuestService from '../../services/quest.service';
