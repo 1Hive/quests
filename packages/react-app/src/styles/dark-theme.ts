@@ -48,7 +48,7 @@ export const customDarkTheme = {
   // Indicates that a surface, or a part of it, is being selected. This is the color DataView is using to indicate that an entire row is selected.
   surfaceSelected: '#242424',
   // Indicates that a surface, or a part of it, is being highlighted. This color could be used to reflect a hover or focused state.
-  surfaceHighlight: '#f5f9cf',
+  surfaceHighlight: '#787863',
   // Indicates that a surface, or a part of it, is being pressed − either by a pointer or a touch event.
   surfacePressed: '#5c5d52',
 
@@ -124,7 +124,7 @@ export const customDarkTheme = {
   // This warning color is generally stronger than warningSurface. It should be used for icons, borders, etc.
   warning: '#cdbb62',
   // The surface warning color, generally softer than warning. It should be used for background colors.
-  warningSurface: '#fae95d',
+  warningSurface: '#3e3c2d',
   // To be used for text and outline content over warningSurface.
   warningSurfaceContent: '#bfa736',
 };

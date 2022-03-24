@@ -46,18 +46,22 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   useEffect(() => {
+    let handle: number;
     const launchTimeoutAsync = async (execTimeMs: number) => {
-      const now = await getLastBlockDate();
+      const now = Date.now();
       if (now >= execTimeMs) setScheduleTimeout(true);
       else {
         setScheduleTimeout(false);
-        setTimeout(() => {
+        handle = window.setTimeout(() => {
           setScheduleTimeout(true);
         }, execTimeMs - now); // To ms
       }
       setLoading(false);
     };
     if (claim.executionTimeMs) launchTimeoutAsync(claim.executionTimeMs);
+    return () => {
+      if (handle) clearTimeout(handle);
+    };
   }, []);
 
   useEffect(() => {

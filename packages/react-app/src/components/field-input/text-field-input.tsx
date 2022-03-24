@@ -100,6 +100,12 @@ export default function TextFieldInput({
                   visible: !maxLine,
                 },
               },
+              a: {
+                component: 'a',
+                props: {
+                  target: '_blank',
+                },
+              },
             },
           })}
         />

@@ -98,7 +98,7 @@ export default function ClaimList({
             <HeaderStyled>Claims</HeaderStyled>
             <IconTooltip
               tooltip="Claims"
-              tooltipDetail={`A claim includes the proof of the quest's completion.`}
+              tooltipDetail="A claim includes the proof of the quest's completion."
             />
           </ClaimHeaderStyled>
           <Accordion
