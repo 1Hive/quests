@@ -14,7 +14,6 @@ import { BigNumber } from 'ethers';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenModel } from 'src/models/token.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
-import { getLastBlockDate } from 'src/utils/date.utils';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
