@@ -2,8 +2,9 @@ import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
+import { useModalContext } from 'src/contexts/modal-context';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import { TransactionProgressComponent } from '../utils/transaction-progress-component';
@@ -53,8 +54,10 @@ export default function ModalBase({
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
+  const { setIsOpen } = useModalContext();
   useEffect(() => {
     if (isOpen) {
+      setIsOpen(isOpen);
       // Clear tx if a tx is still there and already completed
       if (
         transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
@@ -68,7 +71,12 @@ export default function ModalBase({
       }, 0);
 
       document.addEventListener('keydown', escFunction, false);
-    } else document.removeEventListener('keydown', escFunction, false);
+    } else {
+      setTimeout(() => {
+        setIsOpen(isOpen);
+      }, 550);
+      document.removeEventListener('keydown', escFunction, false);
+    }
 
     return () => document.removeEventListener('keydown', escFunction, false);
   }, [isOpen]);

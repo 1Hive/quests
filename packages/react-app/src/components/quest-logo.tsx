@@ -1,4 +1,4 @@
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
 type Props = {

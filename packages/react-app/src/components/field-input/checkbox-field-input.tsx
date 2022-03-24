@@ -1,7 +1,7 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode } from 'react';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
 

@@ -1,4 +1,4 @@
-import ipfsAPI, { Options } from 'ipfs-http-client';
+import ipfsAPI, { IPFSHTTPClient, Options } from 'ipfs-http-client';
 import { Logger } from 'src/utils/logger';
 import { hexToAscii, toAscii, toHex } from 'web3-utils';
 
@@ -12,8 +12,8 @@ const configTheGraph = {
   url: 'https://api.thegraph.com/ipfs/api/v0',
 };
 
-const ipfsInfura = ipfsAPI.create(configInfura);
-const ipfsTheGraph = ipfsAPI.create(configTheGraph);
+export const ipfsInfura = ipfsAPI.create(configInfura);
+export const ipfsTheGraph = ipfsAPI.create(configTheGraph);
 
 export const getIpfsBaseUri = () => `${configTheGraph.url}/cat?arg=`;
 
@@ -31,9 +31,9 @@ export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
   return toHex(cid);
 };
 
-export const getObjectFromIpfs = async (objHasHex: string) => {
+export const getObjectFromIpfs = async (objHasHex: string, configOverride?: IPFSHTTPClient) => {
   // eslint-disable-next-line no-restricted-syntax
-  for await (const value of ipfsInfura.get(toAscii(objHasHex))) {
+  for await (const value of (configOverride ?? ipfsInfura).cat(toAscii(objHasHex))) {
     const decodedSplit = new TextDecoder('utf-8')
       .decode(value)
       .trim()

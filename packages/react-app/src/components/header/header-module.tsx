@@ -1,6 +1,6 @@
-import { ButtonBase, GU, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import { ButtonBase, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import React from 'react';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
 // #region StyledComponents
@@ -8,7 +8,6 @@ import styled from 'styled-components';
 const HeaderAccountButtonStyled = styled(ButtonBase)`
   height: 100%;
   padding: ${GUpx()};
-  background: ${({ background }: any) => background};
   &:active {
     background: ${({ backgroundActive }: any) => backgroundActive};
   }
@@ -50,7 +49,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
                 // @ts-ignore
                 css={`
                   padding-left: ${GUpx()};
-                  padding-right: ${0.5 * GU}px;
+                  padding-right: ${GUpx(0.5)};
                 `}
               >
                 {content}

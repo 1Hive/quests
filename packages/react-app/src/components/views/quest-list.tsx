@@ -96,41 +96,43 @@ export default function QuestList() {
   );
 
   return (
-    <InfiniteScroll
-      loader={<></>}
-      dataLength={quests.length}
-      next={loadMore}
-      hasMore={hasMore}
-      endMessage={
-        quests.length ? (
-          <Outset gu16 className="center">
-            <b>No more quests found</b>
-          </Outset>
-        ) : (
-          <Outset gu64 className="flex-center wide">
-            <EmptyStateCardStyled
-              text="No quests found"
-              action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
-            />
-          </Outset>
-        )
-      }
-      refreshFunction={refresh}
-      pullDownToRefresh={isMobile}
-      pullDownToRefreshThreshold={50}
-      pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
-      releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
-      scrollableTarget="scroll-view"
-      scrollThreshold={0.5}
-    >
-      <div>
-        {quests.map((x: QuestModel) => (
-          <Outset gu16 key={x.address}>
-            <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
-          </Outset>
-        ))}
-        {isLoading && skeletonQuests}
-      </div>
-    </InfiniteScroll>
+    <Outset gu64 horizontal>
+      <InfiniteScroll
+        loader={<></>}
+        dataLength={quests.length}
+        next={loadMore}
+        hasMore={hasMore}
+        endMessage={
+          quests.length ? (
+            <Outset gu16 className="center">
+              <b>No more quests found</b>
+            </Outset>
+          ) : (
+            <Outset gu64 className="flex-center wide">
+              <EmptyStateCardStyled
+                text="No quests found"
+                action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
+              />
+            </Outset>
+          )
+        }
+        refreshFunction={refresh}
+        pullDownToRefresh={isMobile}
+        pullDownToRefreshThreshold={50}
+        pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
+        releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
+        scrollableTarget="scroll-view"
+        scrollThreshold="120px"
+      >
+        <div>
+          {quests.map((x: QuestModel) => (
+            <Outset gu16 key={x.address}>
+              <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
+            </Outset>
+          ))}
+          {isLoading && skeletonQuests}
+        </div>
+      </InfiniteScroll>
+    </Outset>
   );
 }

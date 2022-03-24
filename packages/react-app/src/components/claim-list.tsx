@@ -1,8 +1,8 @@
-import { AddressField, Field, Accordion } from '@1hive/1hive-ui';
+import { AddressField, Field, Accordion, useTheme } from '@1hive/1hive-ui';
 import { ClaimModel } from 'src/models/claim.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import styled from 'styled-components';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { ENUM_CLAIM_STATE } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { QuestModel } from 'src/models/quest.model';
@@ -19,6 +19,10 @@ import ExecuteClaimModal from './modals/execute-claim-modal';
 import { StateTag } from './state-tag';
 
 // #region StyledComponents
+
+const FieldStyled = styled(Field)`
+  color: ${({ color }: any) => color};
+`;
 
 const ClaimHeaderStyled = styled.div`
   display: flex;
@@ -53,6 +57,7 @@ export default function ClaimList({
   questTotalBounty,
 }: Props) {
   const { walletAddress } = useWallet();
+  const theme = useTheme();
   const [claims, setClaims] = useState<ClaimModel[]>();
 
   useEffect(() => {
@@ -93,7 +98,7 @@ export default function ClaimList({
             <HeaderStyled>Claims</HeaderStyled>
             <IconTooltip
               tooltip="Claims"
-              tooltipDetail={`A claim includes the proof of the quest's completion.`}
+              tooltipDetail="A claim includes the proof of the quest's completion."
             />
           </ClaimHeaderStyled>
           <Accordion
@@ -126,11 +131,12 @@ export default function ClaimList({
                   <Outset>
                     <ChildSpacer size={16} justify="start" align="center" buttonEnd>
                       <StateTag state={claim.state ?? ''} />
-                      <Field
+                      <FieldStyled
+                        color={theme.content}
                         label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
                       >
                         <AddressField address={claim.playerAddress} autofocus={false} />
-                      </Field>
+                      </FieldStyled>
                       {claim.claimedAmount.parsedAmount ? (
                         <AmountFieldInput
                           id="amount"
@@ -138,7 +144,9 @@ export default function ClaimList({
                           value={claim.claimedAmount}
                         />
                       ) : (
-                        <Field label="Claimed amount">All available</Field>
+                        <FieldStyled color={theme.content} label="Claimed amount">
+                          All available
+                        </FieldStyled>
                       )}
                       {walletAddress && actionButton}
                     </ChildSpacer>

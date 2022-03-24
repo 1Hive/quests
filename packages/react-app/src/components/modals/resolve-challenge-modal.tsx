@@ -14,7 +14,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { ENUM, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
 import { getCelesteContract, getGovernQueueContract } from 'src/utils/contract.util';

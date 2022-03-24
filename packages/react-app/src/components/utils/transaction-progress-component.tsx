@@ -4,7 +4,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
 import { getNetwork } from 'src/networks';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import QuestLogo from '../quest-logo';
 import { Outset } from './spacer-util';
 
@@ -31,8 +31,15 @@ export function TransactionProgressComponent() {
   const [logoColor, setLogoColor] = useState<string>();
   const [messageColor, setMessageColor] = useState<string>();
   const [message, setMessage] = useState<string | undefined>();
-  const { warning, warningSurface, positive, positiveSurface, negative, negativeSurface, content } =
-    useTheme();
+  const {
+    warning,
+    warningSurfaceContent,
+    positive,
+    positiveSurface,
+    negative,
+    negativeSurface,
+    content,
+  } = useTheme();
   useEffect(() => {
     switch (transaction?.status) {
       case ENUM_TRANSACTION_STATUS.WaitingForSignature:
@@ -42,11 +49,11 @@ export function TransactionProgressComponent() {
         break;
       case ENUM_TRANSACTION_STATUS.Pending:
         setMessage('Transaction is pending...');
-        setLogoColor(warningSurface);
-        setMessageColor(warning);
+        setLogoColor(warning);
+        setMessageColor(warningSurfaceContent);
         break;
       case ENUM_TRANSACTION_STATUS.Confirmed:
-        setMessage('Transaction is confirmed');
+        setMessage('Transaction is confirmed. You can close this window.');
         setLogoColor(positiveSurface);
         setMessageColor(positive);
         break;

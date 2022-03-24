@@ -1,10 +1,9 @@
-import { textStyle, useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash';
 import { Link } from 'react-router-dom';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
-import { APP_TITLE, ENUM_PAGES } from '../../constants';
-import logo from './assets/logo.svg';
+import { ENUM_PAGES } from '../../constants';
+import { LogoTitle } from './logo-title';
 
 // #region StyledComponents
 
@@ -20,14 +19,6 @@ const TitleLinkWrapperStyled = styled.div`
   margin-left: ${GUpx()};
 `;
 
-const TitleTextStyled = styled.span`
-  height: 100%;
-  display: inline-flex;
-  align-items: center;
-  ${textStyle('title3')};
-  color: ${({ color }: any) => color};
-`;
-
 // #endregion
 
 type Props = {
@@ -35,13 +26,10 @@ type Props = {
 };
 
 export default function HeaderTitle({ onClick = noop }: Props) {
-  const theme = useTheme();
-
   return (
-    <TitleLinkStyled onClick={onClick} to={ENUM_PAGES.List} color={theme.accent}>
+    <TitleLinkStyled onClick={onClick} to={ENUM_PAGES.List}>
       <TitleLinkWrapperStyled>
-        <img src={logo} alt="" />
-        <TitleTextStyled color={theme.accent}>{APP_TITLE}</TitleTextStyled>
+        <LogoTitle />
       </TitleLinkWrapperStyled>
     </TitleLinkStyled>
   );

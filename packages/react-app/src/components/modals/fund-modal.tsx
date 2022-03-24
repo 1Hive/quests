@@ -6,7 +6,7 @@ import { GiTwoCoins } from 'react-icons/gi';
 import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';

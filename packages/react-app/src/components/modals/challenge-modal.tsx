@@ -7,20 +7,20 @@ import { ClaimModel } from 'src/models/claim.model';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { getNetwork } from 'src/networks';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { BigNumber } from 'ethers';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TokenModel } from 'src/models/token.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { getLastBlockDate } from 'src/utils/date.utils';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { IconTooltip } from '../field-input/icon-tooltip';
-import { getLastBlockDate } from '../../utils/date.utils';
 import { WalletBallance } from '../wallet-balance';
 
 // #region StyledComponents
@@ -75,13 +75,14 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   }, [walletAddress]);
 
   useEffect(() => {
-    let handle: any;
+    let handle: number;
     const launchSetTimeoutAsync = async (execTimeMs: number) => {
-      const now = await getLastBlockDate();
+      const now = Date.now();
+
       if (now > execTimeMs) setChallengedTimeout(true);
       else {
         setChallengedTimeout(false);
-        setTimeout(() => {
+        handle = window.setTimeout(() => {
           setChallengedTimeout(true);
         }, execTimeMs - now); // To ms
       }
@@ -276,6 +277,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               onClick={() => setOpened(true)}
               label={buttonLabel}
               mode="negative"
+              title="This claim can't be challenged anymore"
               disabled={!buttonLabel || loading || challengeTimeout || !walletAddress}
             />
           )}

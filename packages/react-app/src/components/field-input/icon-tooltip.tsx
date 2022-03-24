@@ -1,6 +1,6 @@
 import { Help, IconQuestion, useTheme } from '@1hive/1hive-ui';
 import { ReactNode } from 'react';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
 // #region Styled
@@ -33,6 +33,9 @@ const HelpWrapperStyled = styled.div`
   display: inline-block;
   margin-left: ${GUpx()};
   margin-right: ${GUpx(0.5)};
+  svg {
+    color: ${({ theme }: any) => theme.hint}!important;
+  }
 `;
 
 // #endregion
@@ -47,7 +50,7 @@ type Props = {
 export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) => {
   const theme = useTheme();
   return (
-    <HelpWrapperStyled className="btn-no-margin">
+    <HelpWrapperStyled className="btn-no-margin" theme={theme}>
       {tooltipDetail || children ? (
         <Help hint={tooltip ?? tooltipDetail}>
           <TooltipWrapperStyled color={theme.accentContent}>

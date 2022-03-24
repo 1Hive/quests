@@ -25,7 +25,12 @@ import { arrayDistinct } from 'src/utils/array.util';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT_MS, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
-import { getObjectFromIpfs, pushObjectToIpfs, formatIpfsMarkdownLink } from './ipfs.service';
+import {
+  getObjectFromIpfs,
+  pushObjectToIpfs,
+  formatIpfsMarkdownLink,
+  ipfsTheGraph,
+} from './ipfs.service';
 import {
   getTokenInfo,
   getQuestContractInterface,
@@ -265,6 +270,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         try {
           evidence = await getObjectFromIpfs(evidenceIpfsHash);
         } catch (error: any) {
+          evidence = await getObjectFromIpfs(evidenceIpfsHash, ipfsTheGraph);
           Logger.exception(error, 'Failed to get IPFS object when fetching claims');
         }
         // If failed to fetch ipfs evidence
@@ -330,6 +336,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   try {
     fetchedReason = await getObjectFromIpfs(reason);
   } catch (error) {
+    fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph); // try with thegraph ipfs node
     Logger.exception(error, 'Failed to get IPFS object when fetching challenge');
   }
   return {

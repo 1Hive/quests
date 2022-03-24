@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Tag } from '@1hive/1hive-ui';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from 'src/constants';
 import { useEffect, useState } from 'react';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 
 const StateTagStyled = styled(Tag)`
   width: ${(props: any) => (props.wide ? '100%' : 'fit-content')};
@@ -46,7 +46,7 @@ export function StateTag({ state, size = 'normal', wide = false }: Props) {
         setTooltip('Not yet saved');
         break;
       case ENUM_QUEST_STATE.Active:
-        setMode('activity');
+        setMode('identifier');
         setTooltip('Active');
         break;
       case ENUM_QUEST_STATE.Expired:
@@ -54,12 +54,12 @@ export function StateTag({ state, size = 'normal', wide = false }: Props) {
         setTooltip('Expire time has reached');
         break;
       case ENUM_QUEST_STATE.Archived:
-        setMode('identifier');
+        setMode('activity');
         setTooltip('Expired and no funds');
         break;
       // Claim states
       case ENUM_CLAIM_STATE.Scheduled:
-        setMode('activity');
+        setMode('identifier');
         setTooltip('The claim is active and may pass when delay is over');
         break;
       case ENUM_CLAIM_STATE.Challenged:
@@ -69,7 +69,7 @@ export function StateTag({ state, size = 'normal', wide = false }: Props) {
       case ENUM_CLAIM_STATE.Cancelled:
       case ENUM_CLAIM_STATE.Rejected:
       case ENUM_CLAIM_STATE.Vetoed:
-        setMode('identifier');
+        setMode('activity');
         setTooltip('The claim has been denied');
         break;
       case ENUM_CLAIM_STATE.Executed:
@@ -84,6 +84,10 @@ export function StateTag({ state, size = 'normal', wide = false }: Props) {
   }, [state]);
   return (
     <>
+      {/* <Tag mode="indicator">indicator</Tag>
+      <Tag mode="identifier">identifier</Tag>
+      <Tag mode="new">new</Tag>
+      <Tag mode="activity">activity</Tag> */}
       {visible && (
         <StateWrapperStyled>
           <StateTagStyled wide={wide} title={tooltip} label={state} mode={mode} size={size} />

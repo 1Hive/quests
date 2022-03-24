@@ -162,7 +162,7 @@ type ChildSpacerProps = {
   children?: ReactNode;
   size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
   vertical?: boolean;
-  justify?: 'start' | 'middle' | 'center' | 'end';
+  justify?: 'start' | 'middle' | 'center' | 'end' | 'space-between' | 'space-around';
   align?: 'start' | 'center' | 'end';
   buttonEnd?: boolean;
 };

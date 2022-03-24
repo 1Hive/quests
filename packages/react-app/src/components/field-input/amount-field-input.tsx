@@ -18,7 +18,7 @@ import { getNetwork } from 'src/networks';
 import { fetchRewardTokens } from 'src/services/quest.service';
 import { arrayDistinctBy } from 'src/utils/array.util';
 import { getTokenInfo } from 'src/utils/contract.util';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { Logger } from 'src/utils/logger';
 import { floorNumber } from 'src/utils/math.utils';
 import { includesCaseInsensitive } from 'src/utils/string.util';
@@ -267,7 +267,7 @@ function AmountFieldInput({
             renderItem={(i: number) => (
               <LineStyled key={tokens[i].symbol}>
                 <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
-                <Tag>{tokens[i].symbol}</Tag>
+                <Tag mode="identifier">{tokens[i].symbol}</Tag>
               </LineStyled>
             )}
             tabindex="-1"

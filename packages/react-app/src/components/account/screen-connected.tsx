@@ -8,7 +8,7 @@ import {
   useTheme,
 } from '@1hive/1hive-ui';
 import { useCallback } from 'react';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { getProviderFromUseWalletId } from '../../ethereum-providers';
 import { useCopyToClipboard } from '../../hooks/use-copy-to-clipboard.hook';
 import { getNetworkName } from '../../utils/web3.utils';

@@ -1,7 +1,7 @@
 import { useTheme } from '@1hive/1hive-ui';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 

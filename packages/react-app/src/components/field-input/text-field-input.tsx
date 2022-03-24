@@ -2,7 +2,7 @@ import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { ReactNode } from 'react';
 import { CollapsableBlock } from 'src/collapsable-block';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
 
@@ -98,6 +98,12 @@ export default function TextFieldInput({
                   label: 'image',
                   type: 'image',
                   visible: !maxLine,
+                },
+              },
+              a: {
+                component: 'a',
+                props: {
+                  target: '_blank',
                 },
               },
             },

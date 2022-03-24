@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import styled from 'styled-components';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import { ClaimModel } from 'src/models/claim.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getLastBlockDate } from 'src/utils/date.utils';
@@ -46,18 +46,22 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   useEffect(() => {
+    let handle: number;
     const launchTimeoutAsync = async (execTimeMs: number) => {
-      const now = await getLastBlockDate();
+      const now = Date.now();
       if (now >= execTimeMs) setScheduleTimeout(true);
       else {
         setScheduleTimeout(false);
-        setTimeout(() => {
+        handle = window.setTimeout(() => {
           setScheduleTimeout(true);
         }, execTimeMs - now); // To ms
       }
       setLoading(false);
     };
     if (claim.executionTimeMs) launchTimeoutAsync(claim.executionTimeMs);
+    return () => {
+      if (handle) clearTimeout(handle);
+    };
   }, []);
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE, TOKENS } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';

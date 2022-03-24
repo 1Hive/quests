@@ -1,12 +1,11 @@
 import { useTheme, GU, Link } from '@1hive/1hive-ui';
-import { GUpx } from 'src/utils/css.util';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
 // #region StyledComponent
 
 const FooterContainerStyled = styled.div`
   margin: auto;
-  background-color: ${(props: any) => props.background};
   box-shadow: rgb(0 0 0 / 5%) 3px -2px 0px;
   display: flex;
   flex-wrap: wrap;
