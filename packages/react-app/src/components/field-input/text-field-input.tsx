@@ -1,6 +1,6 @@
-import { TextInput, Markdown } from '@1hive/1hive-ui';
+import { TextInput, Markdown, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { CollapsableBlock } from 'src/collapsable-block';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -19,6 +19,10 @@ const MaxLineStyled = styled.div`
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
+`;
+
+const BlockStyled = styled.div`
+  width: 100%;
 `;
 
 // #endregion
@@ -63,6 +67,16 @@ export default function TextFieldInput({
   tooltipDetail,
   tooltip,
 }: Props) {
+  const [isEditState, setIsEdit] = useState(isEdit);
+
+  const handlePreview = () => {
+    setIsEdit(!isEditState);
+  };
+
+  useEffect(() => {
+    setIsEdit(isEdit);
+  }, [isEdit]);
+
   const readOnlyContent = (
     <>
       {isMarkDown ? (
@@ -114,28 +128,34 @@ export default function TextFieldInput({
       )}
     </>
   );
-  const loadableContent = isEdit ? (
-    <TextInput
-      id={id}
-      value={value ?? ''}
-      wide={wide}
-      onChange={onChange}
-      placeHolder={placeHolder}
-      multiline={multiline}
-      style={css}
-      rows={rows}
-    />
+  const loadableContent = isEditState ? (
+    <BlockStyled>
+      <TextInput
+        id={id}
+        value={value ?? ''}
+        wide={wide}
+        onChange={onChange}
+        placeHolder={placeHolder}
+        multiline={multiline}
+        style={css}
+        rows={rows}
+      />
+      {isMarkDown && isEdit && <Button size="mini" label="Preview" onClick={handlePreview} />}
+    </BlockStyled>
   ) : (
-    <div style={{ ...css, fontSize }}>
-      {maxLine ? (
-        <div>
-          <MaxLineStyled maxLine={maxLine}>{readOnlyContent}</MaxLineStyled>
-          {ellipsis}
-        </div>
-      ) : (
-        readOnlyContent
-      )}
-    </div>
+    <BlockStyled>
+      <div style={{ ...css, fontSize }}>
+        {maxLine ? (
+          <div>
+            <MaxLineStyled maxLine={maxLine}>{readOnlyContent}</MaxLineStyled>
+            {ellipsis}
+          </div>
+        ) : (
+          readOnlyContent
+        )}
+      </div>
+      {isMarkDown && isEdit && <Button size="mini" label="Edit" onClick={handlePreview} />}
+    </BlockStyled>
   );
   return (
     <FieldInput

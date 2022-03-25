@@ -359,6 +359,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 onChange={handleChange}
                 multiline
                 wide
+                isMarkDown
               />
             </Outset>
           </FormStyled>

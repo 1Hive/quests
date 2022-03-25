@@ -240,6 +240,7 @@ export default function ScheduleClaimModal({
                   wide
                   rows={5}
                   compact
+                  isMarkDown
                 />
                 <LineStyled>
                   <Outset horizontal>
