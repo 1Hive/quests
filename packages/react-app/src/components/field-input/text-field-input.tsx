@@ -22,7 +22,7 @@ const MaxLineStyled = styled.div`
 `;
 
 const BlockStyled = styled.div`
-  width: 100%;
+  ${({ wide }: any) => wide && 'width: 100%;'}
 `;
 
 // #endregion
@@ -69,13 +69,13 @@ export default function TextFieldInput({
 }: Props) {
   const [isEditState, setIsEdit] = useState(isEdit);
 
-  const handlePreview = () => {
-    setIsEdit(!isEditState);
-  };
-
   useEffect(() => {
     setIsEdit(isEdit);
   }, [isEdit]);
+
+  const handlePreview = () => {
+    setIsEdit(!isEditState);
+  };
 
   const readOnlyContent = (
     <>
@@ -129,7 +129,7 @@ export default function TextFieldInput({
     </>
   );
   const loadableContent = isEditState ? (
-    <BlockStyled>
+    <BlockStyled wide={wide}>
       <TextInput
         id={id}
         value={value ?? ''}
