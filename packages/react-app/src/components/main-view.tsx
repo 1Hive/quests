@@ -4,12 +4,14 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
+import Piggy from 'src/assets/piggy';
+import { GUpx } from 'src/utils/style.util';
 import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
-import QuestModal from './modals/quest-modal';
+import Dashboard from './dashboard';
 
 // #region StyledComponents
 
@@ -20,18 +22,23 @@ const HeaderWrapperStyled = styled.div`
   width: 100%;
 `;
 
-const ContentWrapperStyled = styled.div`
-  margin-top: 102px;
-  min-height: calc(100vh - 102px);
-`;
+const ContentWrapperStyled = styled.div``;
 
 const ScrollViewStyled = styled.div`
-  overflow-y: auto;
   margin-top: 80px;
+  overflow-y: auto;
   height: calc(100vh - 80px);
 `;
 
 const FilterWrapperStyled = styled.div``;
+
+const LineStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 200px;
+  margin: ${GUpx(2)} ${GUpx(10)};
+  align-items: flex-end;
+`;
 
 // #endregion
 
@@ -59,9 +66,16 @@ function MainView({ children, toggleTheme }: Props) {
   }, []);
 
   const handleScroll = () => {
-    const stickyOffset = filterRef.current?.offsetTop;
-    const scrollTop = scrollViewRef.current?.scrollTop;
-    setSticky(scrollTop !== undefined && stickyOffset !== undefined && scrollTop > stickyOffset);
+    if (scrollViewRef?.current && filterRef?.current) {
+      const filterHeight = filterRef.current.clientHeight;
+      const stickyOffset = filterRef.current.offsetTop;
+      const { scrollTop } = scrollViewRef.current;
+      setSticky(
+        scrollTop !== undefined &&
+          stickyOffset !== undefined &&
+          scrollTop - stickyOffset > filterHeight,
+      );
+    }
   };
 
   return (
@@ -74,19 +88,21 @@ function MainView({ children, toggleTheme }: Props) {
       >
         <HeaderWrapperStyled>
           <Header toggleTheme={toggleTheme}>
-            {page === ENUM_PAGES.List &&
-              (sticky ? (
-                <Filter compact />
-              ) : (
-                walletAddress && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
-              ))}
+            {page === ENUM_PAGES.List && sticky && <Filter compact />}
           </Header>
-          <FilterWrapperStyled ref={filterRef}>
-            {!sticky && page === ENUM_PAGES.List && <Filter />}
-          </FilterWrapperStyled>
         </HeaderWrapperStyled>
+
         {page === ENUM_PAGES.List ? (
-          <ContentWrapperStyled>{children}</ContentWrapperStyled>
+          <ContentWrapperStyled>
+            <LineStyled>
+              <Dashboard />
+              <Piggy />
+            </LineStyled>
+            <FilterWrapperStyled ref={filterRef}>
+              {!sticky && page === ENUM_PAGES.List && <Filter />}
+            </FilterWrapperStyled>
+            {children}
+          </ContentWrapperStyled>
         ) : (
           children
         )}

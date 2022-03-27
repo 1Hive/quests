@@ -72,3 +72,11 @@ export const QuestRewardTokens = gql`
     }
   }
 `;
+
+export const QuestEntitiesLight = gql`
+  query questEntities($expireTimeLower: Int) {
+    questEntities(where: { questExpireTimeSec_gt: $expireTimeLower }) {
+      id
+    }
+  }
+`;

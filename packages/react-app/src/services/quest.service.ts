@@ -7,6 +7,7 @@ import {
   QuestEntityQuery,
   QuestEntitiesQuery,
   QuestRewardTokens,
+  QuestEntitiesLight,
 } from 'src/queries/quest-entity.query';
 import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
@@ -41,7 +42,7 @@ import {
   getCelesteContract,
 } from '../utils/contract.util';
 import { processQuestState } from './state-machine';
-import { getLastBlockTimestamp } from '../utils/date.utils';
+import { getLastBlockTimestamp, msToSec } from '../utils/date.utils';
 
 let questList: QuestModel[] = [];
 
@@ -362,6 +363,14 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
       .map(getTokenInfo)
       .filter((x) => !!x),
   ) as Promise<TokenModel[]>;
+}
+
+export async function getQuestCount(): Promise<number> {
+  const { questsSubgraph } = getNetwork();
+  const result = await request(questsSubgraph, QuestEntitiesLight, {
+    expireTimeLower: msToSec(Date.now()),
+  });
+  return result.questEntities.length;
 }
 
 // #endregion
