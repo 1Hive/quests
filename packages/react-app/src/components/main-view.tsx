@@ -12,7 +12,6 @@ import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
 import Dashboard from './dashboard';
-import QuestModal from './modals/quest-modal';
 import { BackToTop } from './back-to-top';
 
 // #region StyledComponents
