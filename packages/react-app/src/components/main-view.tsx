@@ -12,6 +12,8 @@ import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
 import Dashboard from './dashboard';
+import QuestModal from './modals/quest-modal';
+import { BackToTop } from './back-to-top';
 
 // #region StyledComponents
 
@@ -50,6 +52,7 @@ type Props = {
 function MainView({ children, toggleTheme }: Props) {
   const { activateWallet, walletAddress } = useWallet();
   const [sticky, setSticky] = useState(false);
+  const [scrollTopState, setScrollTop] = useState(0);
   const filterRef = useRef<HTMLDivElement>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const { page } = usePageContext();
@@ -108,6 +111,7 @@ function MainView({ children, toggleTheme }: Props) {
         )}
         <Footer />
       </ScrollViewStyled>
+      {scrollTopState > 0 && <BackToTop />}
     </Root.Provider>
   );
 }
