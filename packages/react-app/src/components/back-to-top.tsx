@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Button } from '@1hive/1hive-ui';
+import { Button, IconUp } from '@1hive/1hive-ui';
 import { GUpx } from 'src/utils/style.util';
 
 const TopRightCornerStyled = styled.div`
@@ -15,7 +15,7 @@ export function BackToTop() {
 
   return (
     <TopRightCornerStyled>
-      <Button size="mini" label="Back to Top" onClick={scrollToTop} />
+      <Button label="Back to Top" icon={<IconUp />} display="icon" onClick={scrollToTop} />
     </TopRightCornerStyled>
   );
 }
