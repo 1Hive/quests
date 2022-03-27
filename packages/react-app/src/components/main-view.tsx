@@ -30,6 +30,25 @@ const ScrollViewStyled = styled.div`
   margin-top: 80px;
   overflow-y: auto;
   height: calc(100vh - 80px);
+  /* custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 20px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #4a4a4a;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #a8bbbf;
+  }
 `;
 
 const FilterWrapperStyled = styled.div``;
@@ -73,6 +92,7 @@ function MainView({ children, toggleTheme }: Props) {
       const filterHeight = filterRef.current.clientHeight;
       const stickyOffset = filterRef.current.offsetTop;
       const { scrollTop } = scrollViewRef.current;
+      setScrollTop(scrollTop);
       setSticky(
         scrollTop !== undefined &&
           stickyOffset !== undefined &&
