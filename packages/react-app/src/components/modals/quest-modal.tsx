@@ -1,4 +1,4 @@
-import { Button, IconPlus } from '@1hive/1hive-ui';
+import { Button, IconPlus, useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE, TOKENS } from 'src/constants';
@@ -18,19 +18,30 @@ const QuestActionButtonStyled = styled(Button)`
   margin: ${GUpx()};
 `;
 
+const ButtonLinkStyled = styled(Button)`
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  height: fit-content;
+  color: ${({ theme }: any) => theme.contentSecondary};
+`;
+
 // #endregion
 
 type Props = {
   data?: QuestModel;
   onClose?: ModalCallback;
   questMode: string;
+  isLink?: boolean;
 };
 
 export default function QuestModal({
   data = undefined,
   onClose = noop,
   questMode = ENUM_QUEST_VIEW_MODE.ReadSummary,
+  isLink = false,
 }: Props) {
+  const theme = useTheme();
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
   const { setNewQuest } = useQuestsContext();
@@ -103,13 +114,19 @@ export default function QuestModal({
       id="create-quest-modal"
       title="Create quest"
       openButton={
-        <Button
-          icon={<IconPlus />}
-          label={buttonLabel}
-          wide
-          mode="strong"
-          onClick={onOpenButtonClick}
-        />
+        isLink ? (
+          <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick}>
+            {buttonLabel}
+          </ButtonLinkStyled>
+        ) : (
+          <Button
+            icon={<IconPlus />}
+            label={buttonLabel}
+            wide
+            mode="strong"
+            onClick={onOpenButtonClick}
+          />
+        )
       }
       buttons={[
         (questMode === ENUM_QUEST_VIEW_MODE.Create ||
