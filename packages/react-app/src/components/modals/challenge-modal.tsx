@@ -21,6 +21,7 @@ import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { IconTooltip } from '../field-input/icon-tooltip';
 import { WalletBallance } from '../wallet-balance';
+import { FormError } from '../field-input/field-input';
 
 // #region StyledComponents
 
@@ -255,6 +256,11 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       }
     }
   };
+  const validate = (values: ChallengeModel) => {
+    const errors = {} as FormError<ChallengeModel>;
+    if (!values.reason) errors.reason = 'Validation : Challenge reason is required';
+    return errors;
+  };
 
   return (
     <ModalBase
@@ -334,7 +340,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       isOpen={opened}
     >
       <Formik
-        initialValues={{ reason: '' }}
+        initialValues={{ reason: '' } as any}
         onSubmit={(values, { setSubmitting }) => {
           challengeTx(
             {
@@ -344,8 +350,10 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             setSubmitting,
           );
         }}
+        validateOnBlur
+        validate={validate}
       >
-        {({ values, handleSubmit, handleChange }) => (
+        {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (
           <FormStyled id="form-challenge" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
               <TextFieldInput
@@ -358,6 +366,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 value={values.reason}
                 onChange={handleChange}
                 multiline
+                error={touched.reason && errors.reason}
+                onBlur={handleBlur}
                 wide
                 isMarkDown
               />

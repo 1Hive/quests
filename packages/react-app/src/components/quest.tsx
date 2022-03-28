@@ -1,4 +1,4 @@
-import { Card, useToast, useViewport } from '@1hive/1hive-ui';
+import { Card, useViewport } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -35,6 +35,7 @@ import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { BREAKPOINTS } from '../styles/breakpoints';
+import { FormError, FormTouched } from './field-input/field-input';
 
 // #region StyledComponents
 
@@ -146,8 +147,9 @@ export default function Quest({
   const { setTransaction } = useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
-  const toast = useToast();
+
   const [twoCol, setTwoCol] = useState(true);
+
   useEffect(() => {
     setTwoCol(vw >= BREAKPOINTS.large);
   }, [vw]);
@@ -187,25 +189,14 @@ export default function Quest({
     }
   }, [questMode, questData, walletAddress]);
 
-  const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
-    const errors = [];
-    if (!values.description) errors.push('Validation : Description is required');
-    if (!values.title) errors.push('Validation : Title is required');
-    if (values.fallbackAddress) {
-      try {
-        values.fallbackAddress = toChecksumAddress(values.fallbackAddress);
-      } catch (error) {
-        errors.push('Validation : Player address is not valid');
-      }
-    }
-    if (values.expireTime.getTime() < Date.now())
-      errors.push('Validation : Expiration have to be later than now');
-    if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
-    else if (values.bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
+  const onQuestSubmit = async (
+    values: QuestModel,
+    setSubmitting: Function,
 
-    if (errors.length) {
-      errors.forEach(toast);
-    } else {
+    // isValid: boolean,
+  ) => {
+    const errors = validate(values);
+    if (!Object.keys(errors).length) {
       setLoading(true);
       let createdQuestAddress: string;
       try {
@@ -301,7 +292,6 @@ export default function Quest({
       }
     }
   };
-
   const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
     if (!questData) return;
     QuestService.getBalanceOf(token, address)
@@ -340,11 +330,57 @@ export default function Quest({
     debounce((data?: QuestModel) => refresh(data), 500),
     [], // will be created only once initially
   );
+  // if (!values.description) errors.push('Validation : Description is required');
+  //   if (!values.title) errors.push('Validation : Title is required');
+  //   if (values.fallbackAddress) {
+  //     try {
+  //       values.fallbackAddress = toChecksumAddress(values.fallbackAddress);
+  //     } catch (error) {
+  //       errors.push('Validation : Player address is not valid');
+  //     }
+  //   }
+  //   if (values.expireTime.getTime() < Date.now())
+  //     errors.push('Validation : Expiration have to be later than now');
+  //   if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
+  //   else if (values.bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
+
   const validate = (data: QuestModel) => {
+    const errors = {} as FormError<QuestModel>;
+    if (!data.title) {
+      errors.title = 'Validation : Title is required';
+    }
+    if (!data.description) {
+      errors.description = 'Validation : Description is required';
+    }
+
+    if (data.fallbackAddress) {
+      try {
+        data.fallbackAddress = toChecksumAddress(data.fallbackAddress);
+      } catch (error) {
+        errors.fallbackAddress = 'Validation : Player address is not valid';
+      }
+    }
+    if (data.expireTime.getTime() < Date.now())
+      errors.expireTime = 'Validation : Expiration have to be later than now';
+    if (!data.bounty?.token || data.bounty.parsedAmount < 0)
+      errors.bounty = {
+        token: !data.bounty?.token && 'Validation : Bounty token is required',
+        amount:
+          (!data.bounty || data.bounty.parsedAmount < 0) && 'Validation : Invalid initial bounty',
+      };
+
     debounceSave(data);
+
+    return errors;
   };
 
-  const questContent = (values: QuestModel, handleChange = noop) => {
+  const questContent = (
+    values: QuestModel,
+    handleChange = noop,
+    errors: FormError<QuestModel>,
+    touched: FormTouched<QuestModel>,
+    handleBlur = noop,
+  ) => {
     const titleInput = (
       <TextFieldInput
         id="title"
@@ -354,10 +390,12 @@ export default function Quest({
         placeHolder="Quest title"
         value={values.title}
         onChange={handleChange}
+        onBlur={handleBlur}
         fontSize="24px"
         tooltip="Title of your quest"
         tooltipDetail="Title should resume the quest"
         wide
+        error={touched.title && errors.title}
       />
     );
 
@@ -409,6 +447,8 @@ export default function Quest({
                   </>
                 }
                 onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.description && errors.description}
                 wide
                 multiline
                 isMarkDown
@@ -435,11 +475,15 @@ export default function Quest({
                   value={questData?.bounty}
                   isLoading={loading || (!isEdit && !bounty) || !questData}
                   formik={formRef}
+                  onBlur={handleBlur}
+                  amountError={touched.bounty?.amount && errors.bounty?.amount}
+                  tokenError={touched.bounty?.token && errors.bounty?.token}
                   tokenEditable
                   tokenLabel={isEdit ? 'Funding token' : undefined}
                   amountLabel={isEdit ? 'Initial funding amount' : undefined}
                   reversed={isEdit}
                   wide
+                  // isError={isErrorBounty}
                 />
               )}
               {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && (
@@ -473,6 +517,8 @@ export default function Quest({
                 isLoading={loading || !questData}
                 value={values.expireTime}
                 wide
+                onBlur={handleBlur}
+                error={touched.expireTime && errors.expireTime}
                 formik={formRef}
               />
               {isEdit && (
@@ -485,6 +531,8 @@ export default function Quest({
                     tooltip="Fallback Address"
                     tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
                     isEdit
+                    onBlur={handleBlur}
+                    error={touched.fallbackAddress && errors.fallbackAddress}
                     onChange={handleChange}
                     wide
                   />
@@ -552,18 +600,31 @@ export default function Quest({
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
         validate={validate}
+        validateOnBlur
+        validateOnChange={false}
       >
-        {({ values, handleChange, handleSubmit }) =>
+        {({ values, handleChange, handleBlur, handleSubmit, errors, touched }) =>
           isEdit && questData ? (
             <FormStyled
               onSubmit={handleSubmit}
               ref={formRef}
               id={`form-quest-form-${questData.address ?? 'new'}`}
             >
-              {questContent(values, handleChange)}
+              {questContent(
+                values,
+                handleChange,
+                errors as FormError<QuestModel>,
+                touched as FormTouched<QuestModel>,
+                handleBlur,
+              )}
             </FormStyled>
           ) : (
-            questContent(values, handleChange)
+            questContent(
+              values,
+              handleChange,
+              errors as FormError<QuestModel>,
+              touched as FormTouched<QuestModel>,
+            )
           )
         }
       </Formik>

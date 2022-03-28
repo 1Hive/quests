@@ -41,6 +41,8 @@ type Props = {
   compact?: boolean;
   wide?: boolean;
   formik?: any;
+  onBlur?: Function;
+  error?: string | false;
 };
 
 function DateFieldInput({
@@ -56,6 +58,8 @@ function DateFieldInput({
   compact = false,
   wide = false,
   formik,
+  onBlur = noop,
+  error,
 }: Props) {
   const theme = useTheme();
 
@@ -77,6 +81,7 @@ function DateFieldInput({
       type="date"
       value={value ? dateFormat(value, 'ISO') : ''}
       onChange={handleChange}
+      onBlur={onBlur}
       style={css}
       background={theme.surface}
       wide={wide}
@@ -97,6 +102,7 @@ function DateFieldInput({
       tooltipDetail={tooltipDetail}
       compact={compact}
       isLoading={isLoading}
+      error={error}
     >
       {loadableContent}
     </FieldInput>

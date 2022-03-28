@@ -95,6 +95,9 @@ type Props = {
   wide?: boolean;
   tokenEditable?: boolean;
   reversed?: boolean;
+  amountError?: string | false;
+  tokenError?: string | false;
+  onBlur?: Function;
 };
 
 function AmountFieldInput({
@@ -116,9 +119,13 @@ function AmountFieldInput({
   wide = false,
   tokenEditable = false,
   reversed = false,
+  onBlur = noop,
+  amountError,
+  tokenError,
 }: Props) {
   const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
+  // const [hasFocused, setHasFocused] = useState(false);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount);
@@ -129,22 +136,22 @@ function AmountFieldInput({
   const amountInputId = `amount-${id}`;
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
-
+  const handleFocusIn = () => {
+    if (
+      document.activeElement === autoCompleteRef.current &&
+      walletAddress &&
+      isEdit &&
+      tokenEditable
+    ) {
+      // setHasFocused(true);
+      fetchAvailableTokens();
+    }
+    // else if (document.activeElement !== autoCompleteRef.current && hasFocused) {
+    // }
+  };
   useEffect(() => {
-    if (!token)
-      document.addEventListener(
-        'focusin',
-        () => {
-          if (
-            document.activeElement === autoCompleteRef.current &&
-            walletAddress &&
-            isEdit &&
-            tokenEditable
-          )
-            fetchAvailableTokens();
-        },
-        true,
-      );
+    if (!token) document.addEventListener('focusin', handleFocusIn, true);
+    return () => document.removeEventListener('focusin', handleFocusIn);
   }, [walletAddress, isEdit, tokenEditable, token]);
 
   useEffect(() => {
@@ -221,7 +228,7 @@ function AmountFieldInput({
   };
 
   const amountField = (
-    <FieldInput label={amountLabel} wide={wide} compact={compact}>
+    <FieldInput label={amountLabel} wide={wide} compact={compact} error={amountError}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
         {amount !== undefined &&
           (isEdit ? (
@@ -230,6 +237,7 @@ function AmountFieldInput({
               title={!token ? 'Set token first' : undefined}
               onChange={onAmountChange}
               placeHolder={placeHolder}
+              onBlur={onBlur}
               type="number"
               value={amount}
               wide={wide}
@@ -246,6 +254,7 @@ function AmountFieldInput({
     <FieldInput
       label={tokenLabel}
       wide={wide}
+      error={tokenError}
       compact={compact}
       tooltip="Token"
       tooltipDetail="Select a token between the list or paste the token address"
@@ -259,6 +268,7 @@ function AmountFieldInput({
             onChange={setSearchTerm}
             onSelect={onTokenChange}
             ref={autoCompleteRef}
+            // onBlur={onBlur}
             placeholder="Search name or paste address"
             wide={wide}
             renderSelected={(i: number) => (

@@ -46,6 +46,9 @@ type Props = {
   ellipsis?: ReactNode;
   tooltip?: string;
   tooltipDetail?: React.ReactNode;
+
+  onBlur?: Function;
+  error?: string | false;
 };
 export default function TextFieldInput({
   id,
@@ -66,6 +69,9 @@ export default function TextFieldInput({
   ellipsis,
   tooltipDetail,
   tooltip,
+
+  onBlur = noop,
+  error,
 }: Props) {
   const [isEditState, setIsEdit] = useState(isEdit);
 
@@ -135,6 +141,7 @@ export default function TextFieldInput({
         value={value ?? ''}
         wide={wide}
         onChange={onChange}
+        onBlur={onBlur}
         placeHolder={placeHolder}
         multiline={multiline}
         style={css}
@@ -158,15 +165,18 @@ export default function TextFieldInput({
     </BlockStyled>
   );
   return (
-    <FieldInput
-      label={label}
-      tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
-      id={id}
-      compact={compact}
-      isLoading={isLoading}
-    >
-      {loadableContent}
-    </FieldInput>
+    <>
+      <FieldInput
+        label={label}
+        tooltip={tooltip}
+        tooltipDetail={tooltipDetail}
+        id={id}
+        error={error}
+        compact={compact}
+        isLoading={isLoading}
+      >
+        {loadableContent}
+      </FieldInput>
+    </>
   );
 }
