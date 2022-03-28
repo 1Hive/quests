@@ -81,7 +81,7 @@ function MainView({ children, toggleTheme }: Props) {
               (sticky ? (
                 <Filter compact />
               ) : (
-                walletAddress && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
+                walletAddress && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} isLink />
               ))}
           </Header>
           <FilterWrapperStyled ref={filterRef}>
