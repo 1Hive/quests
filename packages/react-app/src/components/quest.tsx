@@ -147,7 +147,6 @@ export default function Quest({
   const { setTransaction } = useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
-
   const [twoCol, setTwoCol] = useState(true);
 
   useEffect(() => {
@@ -189,12 +188,7 @@ export default function Quest({
     }
   }, [questMode, questData, walletAddress]);
 
-  const onQuestSubmit = async (
-    values: QuestModel,
-    setSubmitting: Function,
-
-    // isValid: boolean,
-  ) => {
+  const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = validate(values);
     if (!Object.keys(errors).length) {
       setLoading(true);
@@ -330,43 +324,29 @@ export default function Quest({
     debounce((data?: QuestModel) => refresh(data), 500),
     [], // will be created only once initially
   );
-  // if (!values.description) errors.push('Validation : Description is required');
-  //   if (!values.title) errors.push('Validation : Title is required');
-  //   if (values.fallbackAddress) {
-  //     try {
-  //       values.fallbackAddress = toChecksumAddress(values.fallbackAddress);
-  //     } catch (error) {
-  //       errors.push('Validation : Player address is not valid');
-  //     }
-  //   }
-  //   if (values.expireTime.getTime() < Date.now())
-  //     errors.push('Validation : Expiration have to be later than now');
-  //   if (!values.bounty?.token) errors.push('Validation : Bounty token is required');
-  //   else if (values.bounty.parsedAmount < 0) errors.push('Validation : Invalid initial bounty');
 
   const validate = (data: QuestModel) => {
     const errors = {} as FormError<QuestModel>;
     if (!data.title) {
-      errors.title = 'Validation : Title is required';
+      errors.title = 'Title is required';
     }
     if (!data.description) {
-      errors.description = 'Validation : Description is required';
+      errors.description = 'Description is required';
     }
 
     if (data.fallbackAddress) {
       try {
         data.fallbackAddress = toChecksumAddress(data.fallbackAddress);
       } catch (error) {
-        errors.fallbackAddress = 'Validation : Player address is not valid';
+        errors.fallbackAddress = 'Player address is not valid';
       }
     }
     if (data.expireTime.getTime() < Date.now())
-      errors.expireTime = 'Validation : Expiration have to be later than now';
+      errors.expireTime = 'Expiration have to be later than now';
     if (!data.bounty?.token || data.bounty.parsedAmount < 0)
       errors.bounty = {
-        token: !data.bounty?.token && 'Validation : Bounty token is required',
-        amount:
-          (!data.bounty || data.bounty.parsedAmount < 0) && 'Validation : Invalid initial bounty',
+        token: !data.bounty?.token && 'Bounty token is required',
+        amount: (!data.bounty || data.bounty.parsedAmount < 0) && 'Invalid initial bounty',
       };
 
     debounceSave(data);

@@ -16,6 +16,7 @@ const FieldStyled = styled.div`
 const ErrorStyled = styled.span`
   color: ${(props: any) => props.theme.negative};
   font-size: small;
+  margin-left: ${GUpx(1)};
 `;
 const LabelStyled = styled.label`
   color: ${(props: any) => props.color};
