@@ -1,10 +1,10 @@
 import { useTheme, GU, Link, IconExternal } from '@1hive/1hive-ui';
-import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { ENUM_PAGES } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { LogoTitle } from './header/logo-title';
+import QuestModal from './modals/quest-modal';
 
 // #region StyledComponent
 
@@ -76,12 +76,8 @@ const TitleLinkWrapperStyled = styled.div`
 // #endregion
 
 export default function footer() {
-  const [opened, setOpened] = useState(false);
   const history = useHistory();
   const theme = useTheme();
-  const onOpenButtonClick = () => {
-    setOpened(true);
-  };
   return (
     <FooterContainerStyled background={theme.surface} color={theme.contentSecondary}>
       <FooterContainerStyledSide>
@@ -104,9 +100,7 @@ export default function footer() {
           <FooterLinkStyled href="#" external={false}>
             Quest List
           </FooterLinkStyled>
-          <FooterLinkStyled onClick={onOpenButtonClick} external={false} isOpen={opened}>
-            Create Quest
-          </FooterLinkStyled>
+          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} isLink />
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>
