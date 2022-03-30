@@ -1,7 +1,8 @@
 import { GU, useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
-import { getQuestCount } from 'src/services/quest.service';
+import { DashboardModel } from 'src/models/dashboard.model';
+import { getDashboardInfo } from 'src/services/quest.service';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input/field-input';
@@ -38,9 +39,9 @@ const LabelStyled = styled.div`
 
 export default function Dashboard() {
   const theme = useTheme();
-  const [questCount, setQuestCount] = useState<number>();
+  const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
   useEffect(() => {
-    getQuestCount().then(setQuestCount);
+    getDashboardInfo().then(setDashboardModel);
   }, []);
 
   return (
@@ -50,15 +51,17 @@ export default function Dashboard() {
           label={<LabelStyled>Bounty Pool</LabelStyled>}
           tooltip="Not yet implemented"
           tooltipDetail="Total of the quest bounties converted into USD"
+          isLoading={!dashboardModel}
         >
-          <TextStyled theme={theme}>$27.4K</TextStyled>
+          <TextStyled theme={theme}>$ {dashboardModel?.totalFunds}</TextStyled>
         </FieldInput>
         <FieldInput
           label={<LabelStyled>Open Quests</LabelStyled>}
           tooltip="Number of active Quests"
           tooltipDetail="All the quests that are currently not expired or closed"
+          isLoading={!dashboardModel}
         >
-          <TextStyled theme={theme}>{questCount}</TextStyled>
+          <TextStyled theme={theme}>{dashboardModel?.questCount}</TextStyled>
         </FieldInput>
         <SpacerStyled>
           <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />

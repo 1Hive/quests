@@ -23,6 +23,7 @@ import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
+import { DashboardModel } from 'src/models/dashboard.model';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT_MS, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -365,12 +366,28 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
   ) as Promise<TokenModel[]>;
 }
 
-export async function getQuestCount(): Promise<number> {
+export async function getDashboardInfo(): Promise<DashboardModel> {
   const { questsSubgraph } = getNetwork();
   const result = await request(questsSubgraph, QuestEntitiesLight, {
     expireTimeLower: msToSec(Date.now()),
   });
-  return result.questEntities.length;
+  const quests = result.questEntities as { id: string; questRewardTokenAddress: string }[];
+  const funds = (
+    await Promise.all(
+      quests.map(async (quest) => getBalanceOf(quest.questRewardTokenAddress, quest.id)),
+    )
+  ).filter((x) => !!x) as TokenAmountModel[];
+  // TODO : COMPUTE THE TOTAL FUNDS HERE
+  const tokenPrice = {
+    HNY: 2000,
+    HNY2: 2000,
+    HNY3: 2000,
+    HNY4: 2000,
+  };
+  return {
+    questCount: result.questEntities.length,
+    totalFunds: funds.map((x) => tokenPrice[x.token.symbol]).reduce((a, b) => (a ?? 0) + b) ?? 0,
+  };
 }
 
 // #endregion

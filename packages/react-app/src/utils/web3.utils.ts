@@ -1,6 +1,5 @@
 import { BigNumber, ethers, ethers as ethersUtil } from 'ethers';
 import { noop } from 'lodash-es';
-import { getProvider } from 'src/ethereum-providers';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
@@ -158,12 +157,14 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | 
 }
 
 export function getDefaultProvider() {
-  const ethOrWeb = (window as any).ethereum ?? (window as any).web3;
-  if (!ethOrWeb)
-    Logger.error(
-      "Can't load provider, no provider connected ... (Try to install metamask)",
-      getProvider('unknown')?.link?.default,
+  let ethOrWeb = (window as any).ethereum ?? (window as any).web3;
+  if (!ethOrWeb) {
+    ethOrWeb = new Web3.providers.HttpProvider(
+      // TODO : Find a way to not have the api key in the source code
+      `https://rinkeby.infura.io/v3/${env('INFURA_API_KEY')}`,
     );
+  }
+
   return ethOrWeb && new ethersUtil.providers.Web3Provider(ethOrWeb);
 }
 
