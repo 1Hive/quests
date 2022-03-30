@@ -13,6 +13,7 @@ export type NetworkModel = {
   governAddress: string;
   governQueueAddress: string;
   celesteAddress: string;
+  priceOracleAddress: string;
   defaultToken: TokenModel;
   nativeToken: TokenModel;
   stableToken: TokenModel;

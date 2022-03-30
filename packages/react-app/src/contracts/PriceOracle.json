@@ -1,0 +1,7 @@
+{
+  "abi": [
+    "function canUpdate (address _tokenA, address _tokenB) view returns (bool)",
+    "function update (address _tokenA, address _tokenB)",
+    "function consult(address tokenIn, uint amountIn, address tokenOut) external view returns (uint amountOut)"
+  ]
+}
