@@ -82,15 +82,11 @@ export default function footer() {
   const theme = useTheme();
   const year = new Date().getFullYear();
 
-  const logoHomePage = () => {
-    window.location.href = '#';
-  };
-
   return (
     <FooterContainerStyled background={theme.surface} color={theme.contentSecondary}>
       <FooterContainerStyledSide>
         <FooterColumnStyled>
-          <TitleLinkStyled onClick={logoHomePage}>
+          <TitleLinkStyled href="#" external={false}>
             <TitleLinkWrapperStyled>
               <LogoTitle />
             </TitleLinkWrapperStyled>
