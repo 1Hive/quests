@@ -3,6 +3,8 @@ import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from './header/logo-title';
 import QuestModal from './modals/quest-modal';
 
@@ -43,7 +45,6 @@ const FooterLinkStyled = styled(Link)`
   margin-right: ${3 * GU}px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   text-decoration: none;
 `;
 
@@ -71,6 +72,10 @@ const TitleLinkWrapperStyled = styled.div`
   display: flex;
   justify-content: center;
   margin-left: ${GUpx()};
+`;
+
+const IconStyled = styled.div`
+  width: 32px;
 `;
 
 // #endregion
@@ -105,9 +110,15 @@ export default function footer() {
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>
           <FooterLinkStyled href="https://twitter.com/1HiveOrg" external>
+            <IconStyled>
+              <FontAwesomeIcon icon={faTwitter} />
+            </IconStyled>
             Follow Twitter
           </FooterLinkStyled>
           <FooterLinkStyled href="https://discord.gg/4fm7pgB" external>
+            <IconStyled>
+              <FontAwesomeIcon icon={faDiscord} />
+            </IconStyled>
             Join Discord
           </FooterLinkStyled>
         </FooterColumnStyled>
