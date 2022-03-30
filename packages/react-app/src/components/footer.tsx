@@ -1,6 +1,5 @@
 import { useTheme, GU, Link, IconExternal } from '@1hive/1hive-ui';
-import { useHistory } from 'react-router-dom';
-import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -56,7 +55,6 @@ const LineStyled = styled.div`
 `;
 
 const FooterNavItemStyled = styled(Link)`
-  color: #F7F7CE !important
   margin-right: ${3 * GU}px;
   display: flex;
   align-items: center;
@@ -81,13 +79,18 @@ const IconStyled = styled.div`
 // #endregion
 
 export default function footer() {
-  const history = useHistory();
   const theme = useTheme();
+  const year = new Date().getFullYear();
+
+  const logoHomePage = () => {
+    window.location.href = '#';
+  };
+
   return (
     <FooterContainerStyled background={theme.surface} color={theme.contentSecondary}>
       <FooterContainerStyledSide>
         <FooterColumnStyled>
-          <TitleLinkStyled onClick={() => history.push(ENUM_PAGES.List)} to={ENUM_PAGES.List}>
+          <TitleLinkStyled onClick={logoHomePage}>
             <TitleLinkWrapperStyled>
               <LogoTitle />
             </TitleLinkWrapperStyled>
@@ -95,7 +98,7 @@ export default function footer() {
           <LineStyled>
             Bounty board platform built on xDai <br /> and linked to the 1Hive project
           </LineStyled>
-          <LineStyled>© 2022 Quests</LineStyled>
+          <LineStyled>© {year} Quests</LineStyled>
           <LineStyled>All Rights Reserved</LineStyled>
         </FooterColumnStyled>
       </FooterContainerStyledSide>
@@ -123,6 +126,7 @@ export default function footer() {
           </FooterLinkStyled>
         </FooterColumnStyled>
         <FooterColumnStyled>
+          <FooterTitleStyled>Links</FooterTitleStyled>
           <FooterNavItemStyled
             href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"
             external
@@ -131,7 +135,11 @@ export default function footer() {
             <IconExternal size="small" />
           </FooterNavItemStyled>
           <FooterNavItemStyled href="https://forum.1hive.org/" external>
-            <span>1Hive</span>
+            <span>1Hive Forum</span>
+            <IconExternal size="small" />
+          </FooterNavItemStyled>
+          <FooterNavItemStyled href="https://wiki.1hive.org/projects/quests" external>
+            <span>Quest Wiki</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
         </FooterColumnStyled>
