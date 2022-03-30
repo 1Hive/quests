@@ -1,9 +1,9 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
 import { getDefaultProvider } from 'src/utils/web3.utils';
-import { toChecksumAddress, toNumber } from 'web3-utils';
+import { toChecksumAddress } from 'web3-utils';
 import { ContractInstanceError } from 'src/models/contract-error';
-import { Logger, LoggerOnce } from 'src/utils/logger';
+import { Logger } from 'src/utils/logger';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';
@@ -52,12 +52,6 @@ function getContract(
     if (!contractAddress) throw new Error(`${contractName} address was not defined`);
     if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
 
-    // Check if wallet chain is same as app
-    const { chainId, name } = getNetwork();
-    if (toNumber(provider?.provider?.chainId) !== chainId) {
-      LoggerOnce.error(`Wallet not connected to ${name}. Wait for wallet to connect`);
-      return null;
-    }
     return new Contract(contractAddress, contractAbi, getProviderOrSigner(provider, walletAddress));
   } catch (error) {
     throw new ContractInstanceError(
@@ -90,7 +84,6 @@ export function getERC20Contract(
 export async function getTokenInfo(tokenAddress: string) {
   try {
     const tokenContract = getContract('ERC20', tokenAddress);
-
     if (tokenContract) {
       const symbol = await tokenContract.symbol();
       const decimals = await tokenContract.decimals();
@@ -127,7 +120,7 @@ export async function getPriceOfToken(
   tokenAddressBase: string,
   walletAddress: string,
 ): Promise<TokenAmountModel> {
-  // const tokenA = '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'.toLowerCase(); //fallback address on rinkeby
+  // const tokenA = '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'.toLowerCase(); //fallback address on rinkeby TOKENS.HoneyTest
   // const tokenB = '0x531eab8bB6A2359Fe52CA5d308D85776549a0af9'.toLowerCase(); //fallback address on rinkeby
   const tokenA = tokenAddressPrice.toLowerCase();
   const tokenB = tokenAddressBase.toLowerCase();
@@ -162,5 +155,8 @@ export async function getPriceOfToken(
   }
   return defaultRet;
 }
+// export function getBalanceCheckerContract() {
+//   return new ethers.utils.Interface(getContractsJson().Quest.abi);
+// }
 
 // #endregion

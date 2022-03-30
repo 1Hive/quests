@@ -31,6 +31,7 @@ export const networks = {
     governQueueAddress: '0x19B918802eA9C71c500Ca481917F383f3992cDB0',
     celesteAddress: '0xdd58ebed3c36460939285a92807f90e3d3a26789',
     priceOracleAddress: '0xa87f58dbbe3a4d01d7f776e02b4dd3237f598095',
+    httpProvider: 'https://rinkeby.infura.io/v3/',
     defaultToken: TOKENS.HoneyTest,
     nativeToken: TOKENS.Ether,
     isTestNetwork: true,
@@ -47,6 +48,7 @@ export const networks = {
     defaultEthNode: 'https://xdai.poanetwork.dev/',
     questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai
+    httpProvider: 'https://xdai.poanetwork.dev/',
     defaultToken: TOKENS.Honey,
     nativeToken: TOKENS.xDAI,
     stableToken: TOKENS.xDAI,

@@ -28,7 +28,7 @@ export const customDarkTheme = {
   // To be used for text and outline content over accent.
   accentContent: '#242424',
   // The backgorund color for help buttons.
-  help: '#f7f7ce',
+  help: '#ebebd1',
 
   // -- SURFACES --
   // The background color used for surfaces.
