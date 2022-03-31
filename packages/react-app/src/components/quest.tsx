@@ -144,6 +144,7 @@ export default function Quest({
   const [isEdit, setIsEdit] = useState(false);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimUpdated, setClaimUpdate] = useState(0);
+  const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
@@ -189,9 +190,8 @@ export default function Quest({
   }, [questMode, questData, walletAddress]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
-    const errors = validate(values);
-    // IsValid check
-    if (!Object.keys(errors).length) {
+    validate(values); // Validate one last time before submitting
+    if (isFormValid) {
       setLoading(true);
       let createdQuestAddress: string;
       try {
@@ -352,6 +352,7 @@ export default function Quest({
 
     debounceSave(data);
 
+    setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
 

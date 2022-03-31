@@ -37,6 +37,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
@@ -102,6 +103,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
     const errors = {} as FormErrors<FundModel>;
     if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
       errors.fundAmount = 'Amount invalid';
+
+    setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
 
@@ -113,13 +116,13 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         } as FundModel
       }
       onSubmit={(values, { setSubmitting }) => {
-        const errors = validate(values);
-        // IsValid check
-        if (!Object.keys(errors).length) {
+        validate(values); // validate one last time before submiting
+        if (isFormValid) {
           fundModalTx(values, setSubmitting);
         }
       }}
       validate={validate}
+      validateOnBlur
     >
       {({ values, handleSubmit, handleChange, touched, errors }) => (
         <ModalBase
@@ -146,7 +149,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               form="form-fund"
               label="Fund"
               mode="strong"
-              disabled={loading || !walletAddress || !isEnoughBalance}
+              disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
             />,
           ]}
           onClose={closeModal}

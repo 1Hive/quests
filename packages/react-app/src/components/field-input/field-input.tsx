@@ -13,6 +13,7 @@ const ErrorStyled = styled.span`
   color: ${(props: any) => props.theme.negative};
   font-size: small;
   margin-left: ${GUpx(2)};
+  font-style: italic;
 `;
 const LabelStyled = styled.label`
   color: ${(props: any) => props.color};

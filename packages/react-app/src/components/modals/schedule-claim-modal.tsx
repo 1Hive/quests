@@ -59,6 +59,7 @@ export default function ScheduleClaimModal({
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
@@ -69,22 +70,28 @@ export default function ScheduleClaimModal({
   };
   const validate = (values: ClaimModel & { claimAll: boolean }) => {
     const errors = {} as FormErrors<ClaimModel>;
-    if (!values.evidence) errors.evidence = 'Validation : Evidence of completion is required';
-    if (!values.claimedAmount) errors.claimedAmount = 'Validation : Claim amount is required';
-    if (!values.claimAll && values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
-      errors.claimedAmount = 'Validation : Claim amount should not be higher than available bounty';
+    if (!values.evidence) errors.evidence = 'Evidence of completion is required';
+    if (!values.claimAll) {
+      if (!values.claimedAmount?.parsedAmount) errors.claimedAmount = 'Claim amount is required';
+      else if (values.claimedAmount.parsedAmount < 0)
+        errors.claimedAmount = 'Claim amount is invalid';
+      else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
+        errors.claimedAmount = 'Claim amount should not be higher than available bounty';
+    }
+
     if (values.playerAddress) {
       try {
         values.playerAddress = toChecksumAddress(values.playerAddress);
       } catch (error) {
-        errors.playerAddress = 'Validation : Player address is not valid';
+        errors.playerAddress = 'Player address is not valid';
       }
     }
+    setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
   const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }, setSubmitting: Function) => {
-    const errors = validate(values);
-    if (!Object.keys(errors).length) {
+    validate(values); // Validate one last time before submitting
+    if (isFormValid) {
       if (values.claimAll) {
         values.claimedAmount.parsedAmount = 0;
         values.claimedAmount.token.amount = '0';
@@ -214,7 +221,7 @@ export default function ScheduleClaimModal({
           mode="positive"
           type="submit"
           form="form-claim"
-          disabled={loading || !walletAddress || !isEnoughBalance}
+          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
         />,
       ]}
       onClose={closeModal}

@@ -62,6 +62,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
+  const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
@@ -116,7 +117,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
 
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
     if (!values.reason) {
-      toast('Validation : Reason is required');
+      toast('Reason is required');
     } else {
       try {
         setLoading(true);
@@ -258,7 +259,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   };
   const validate = (values: ChallengeModel) => {
     const errors = {} as FormikErrors<ChallengeModel>;
-    if (!values.reason) errors.reason = 'Validation : Challenge reason is required';
+    if (!values.reason) errors.reason = 'Challenge reason is required';
+
+    setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
 
@@ -333,7 +336,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={loading || !walletAddress || !isEnoughBalance || challengeTimeout}
+          disabled={
+            loading || !walletAddress || !isEnoughBalance || challengeTimeout || !isFormValid
+          }
         />,
       ]}
       onClose={closeModal}
@@ -342,16 +347,19 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       <Formik
         initialValues={{ reason: '' } as any}
         onSubmit={(values, { setSubmitting }) => {
-          challengeTx(
-            {
-              reason: values.reason,
-              deposit: challengeDeposit,
-            },
-            setSubmitting,
-          );
+          validate(values); // validate one last time before submiting
+          if (isFormValid) {
+            challengeTx(
+              {
+                reason: values.reason,
+                deposit: challengeDeposit,
+              },
+              setSubmitting,
+            );
+          }
         }}
-        validateOnBlur
         validate={validate}
+        validateOnBlur
       >
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (
           <FormStyled id="form-challenge" onSubmit={handleSubmit} ref={formRef}>

@@ -133,24 +133,25 @@ function AmountFieldInput({
 
   // Needed since the access of state in event handlers is not working
   const hasFocusedRef = React.useRef(_hasFocused);
-  const setHasFocues = (data: boolean) => {
+  const setHasFocused = (data: boolean) => {
     hasFocusedRef.current = data;
     _setHasFocused(data);
   };
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
-  const handleFocusIn = () => {
+  const handleFocusIn = (e: FocusEvent) => {
     if (
       document.activeElement === autoCompleteRef.current &&
       walletAddress &&
       isEdit &&
       tokenEditable
     ) {
-      setHasFocues(true);
+      setHasFocused(true);
       fetchAvailableTokens();
     } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
       formik?.setFieldTouched(id, true);
-      setHasFocues(false);
+      formik?.handleBlur(e);
+      setHasFocused(false);
     }
   };
   useEffect(() => {
@@ -241,7 +242,10 @@ function AmountFieldInput({
               title={!token ? 'Set token first' : undefined}
               onChange={onAmountChange}
               placeHolder={placeHolder}
-              onBlur={() => formik?.setFieldTouched(id, true)}
+              onBlur={(e: React.FocusEvent) => {
+                formik?.setFieldTouched(id, true);
+                formik?.handleBlur(e);
+              }}
               type="number"
               value={amount}
               wide={wide}
@@ -271,7 +275,7 @@ function AmountFieldInput({
             onChange={setSearchTerm}
             onSelect={onTokenChange}
             ref={autoCompleteRef}
-            onBlur={() => formik?.setFieldTouched(id, true)}
+            onBlur={(e: FocusEvent) => formik?.handleBlur(e)}
             placeholder="Search name or paste address"
             wide={wide}
             renderSelected={(i: number) => (
