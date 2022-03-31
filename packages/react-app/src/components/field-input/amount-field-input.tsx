@@ -221,7 +221,7 @@ function AmountFieldInput({
   };
 
   const amountField = (
-    <FieldInput label={amountLabel} wide={wide} compact={compact}>
+    <FieldInput key={`amountField${amountLabel}`} label={amountLabel} wide={wide} compact={compact}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
         {amount !== undefined &&
           (isEdit ? (
@@ -244,6 +244,7 @@ function AmountFieldInput({
 
   const tokenField = (
     <FieldInput
+      key={`tokenLabel${tokenLabel}`}
       label={tokenLabel}
       wide={wide}
       compact={compact}
