@@ -9,8 +9,9 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
-import { TokenAmountModel } from 'src/models/token-amount.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { FundModel } from 'src/models/fund.model';
+import { FormErrors } from 'src/models/form-errors';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -36,6 +37,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
@@ -97,23 +99,32 @@ export default function FundModal({ quest, onClose = noop }: Props) {
     }
   };
 
+  const validate = (values: FundModel) => {
+    const errors = {} as FormErrors<FundModel>;
+    if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
+      errors.fundAmount = 'Amount invalid';
+
+    setIsFormValid(Object.keys(errors).length === 0);
+    return errors;
+  };
+
   return (
     <Formik
-      initialValues={{
-        fundAmount: { parsedAmount: 0, token: quest.rewardToken } as TokenAmountModel,
-      }}
+      initialValues={
+        {
+          fundAmount: { parsedAmount: 0, token: quest.rewardToken },
+        } as FundModel
+      }
       onSubmit={(values, { setSubmitting }) => {
-        const errors = [];
-        if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
-          errors.push('Validation : Amount invalid');
-        if (errors.length) {
-          errors.forEach(toast);
-        } else {
+        validate(values); // validate one last time before submiting
+        if (isFormValid) {
           fundModalTx(values, setSubmitting);
         }
       }}
+      validate={validate}
+      validateOnBlur
     >
-      {({ values, handleSubmit, handleChange }) => (
+      {({ values, handleSubmit, handleChange, touched, errors }) => (
         <ModalBase
           id="fund-modal"
           title="Fund quest"
@@ -138,7 +149,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               form="form-fund"
               label="Fund"
               mode="strong"
-              disabled={loading || !walletAddress || !isEnoughBalance}
+              disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
             />,
           ]}
           onClose={closeModal}
@@ -162,6 +173,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
+                error={touched.fundAmount && (errors.fundAmount as string)}
               />
             </Outset>
           </FormStyled>

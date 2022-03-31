@@ -19,6 +19,8 @@ type Props = {
   tooltipDetail?: ReactNode;
   suffix?: string;
   compact?: boolean;
+  onBlur?: Function;
+  error?: string | false;
 };
 
 export default function NumberFieldInput({
@@ -37,6 +39,8 @@ export default function NumberFieldInput({
   tooltipDetail,
   suffix = '',
   compact = false,
+  onBlur = noop,
+  error,
 }: Props) {
   return (
     <FieldInput
@@ -46,6 +50,7 @@ export default function NumberFieldInput({
       tooltipDetail={tooltipDetail}
       compact={compact}
       isLoading={isLoading}
+      error={error}
     >
       {isEdit ? (
         <TextInput
@@ -54,6 +59,7 @@ export default function NumberFieldInput({
           wide={wide}
           onChange={onChange}
           placeHolder={placeHolder}
+          onBlur={onBlur}
           max={max}
           min={min}
           isRequired={isRequired}

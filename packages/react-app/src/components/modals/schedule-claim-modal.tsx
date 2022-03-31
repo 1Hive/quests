@@ -13,6 +13,8 @@ import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+
+import { FormErrors } from 'src/models/form-errors';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -57,6 +59,7 @@ export default function ScheduleClaimModal({
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
@@ -64,6 +67,37 @@ export default function ScheduleClaimModal({
   const closeModal = (succeed: any) => {
     setOpened(false);
     onClose(succeed);
+  };
+  const validate = (values: ClaimModel & { claimAll: boolean }) => {
+    const errors = {} as FormErrors<ClaimModel>;
+    if (!values.evidence) errors.evidence = 'Evidence of completion is required';
+    if (!values.claimAll) {
+      if (!values.claimedAmount?.parsedAmount) errors.claimedAmount = 'Claim amount is required';
+      else if (values.claimedAmount.parsedAmount < 0)
+        errors.claimedAmount = 'Claim amount is invalid';
+      else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
+        errors.claimedAmount = 'Claim amount should not be higher than available bounty';
+    }
+
+    if (values.playerAddress) {
+      try {
+        values.playerAddress = toChecksumAddress(values.playerAddress);
+      } catch (error) {
+        errors.playerAddress = 'Player address is not valid';
+      }
+    }
+    setIsFormValid(Object.keys(errors).length === 0);
+    return errors;
+  };
+  const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }, setSubmitting: Function) => {
+    validate(values); // Validate one last time before submitting
+    if (isFormValid) {
+      if (values.claimAll) {
+        values.claimedAmount.parsedAmount = 0;
+        values.claimedAmount.token.amount = '0';
+      }
+      scheduleClaimTx(values, setSubmitting);
+    }
   };
 
   const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
@@ -187,43 +221,28 @@ export default function ScheduleClaimModal({
           mode="positive"
           type="submit"
           form="form-claim"
-          disabled={loading || !walletAddress || !isEnoughBalance}
+          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
         />,
       ]}
       onClose={closeModal}
       isOpen={opened}
     >
       <Formik
-        initialValues={{
-          evidence: '',
-          claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
-          claimAll: false,
-          playerAddress: undefined as string | undefined,
-        }}
+        initialValues={
+          {
+            evidence: '',
+            claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
+            claimAll: false,
+            playerAddress: undefined,
+          } as any
+        }
         onSubmit={(values, { setSubmitting }) => {
-          const errors = [];
-          if (!values.evidence) errors.push('Validation : Evidence of completion is required');
-          if (!values.claimedAmount) errors.push('Validation : Claim amount is required');
-          if (values.claimAll) {
-            values.claimedAmount.parsedAmount = 0;
-            values.claimedAmount.token.amount = '0';
-          } else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
-            errors.push('Validation : Claim amount should not be higher than available bounty');
-          if (values.playerAddress) {
-            try {
-              values.playerAddress = toChecksumAddress(values.playerAddress);
-            } catch (error) {
-              errors.push('Validation : Player address is not valid');
-            }
-          }
-          if (errors.length) {
-            errors.forEach(toast);
-          } else {
-            scheduleClaimTx(values, setSubmitting);
-          }
+          onClaimSubmit(values, setSubmitting);
         }}
+        validateOnBlur
+        validate={validate}
       >
-        {({ values, handleSubmit, handleChange }) => (
+        {({ values, handleSubmit, handleChange, handleBlur, errors, touched }) => (
           <FormStyled id="form-claim" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
               <ChildSpacer size={16} justify="start" vertical>
@@ -236,6 +255,8 @@ export default function ScheduleClaimModal({
                   isLoading={loading}
                   value={values.evidence}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.evidence && errors.evidence}
                   multiline
                   wide
                   rows={5}
@@ -270,6 +291,7 @@ export default function ScheduleClaimModal({
                       tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
                       isLoading={loading}
                       value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                      error={touched.claimedAmount && (errors.claimedAmount as string)}
                       disabled={values.claimAll}
                     />
                   </Outset>
@@ -280,7 +302,9 @@ export default function ScheduleClaimModal({
                   value={values.playerAddress ?? walletAddress}
                   isLoading={loading}
                   tooltip="Player address"
-                  tooltipDetail="Most of time it may be be the connected wallet but can also be set to another wallet address"
+                  error={touched.playerAddress && errors.playerAddress}
+                  onBlur={handleBlur}
+                  tooltipDetail="Most of time it may be the connected wallet but can also be set to another wallet address"
                   isEdit
                   onChange={handleChange}
                   wide

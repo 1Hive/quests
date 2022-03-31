@@ -1,8 +1,9 @@
+/* eslint-disable no-undef */
 import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { Formik, Form } from 'formik';
+import { Formik, Form, FormikErrors } from 'formik';
 import { ClaimModel } from 'src/models/claim.model';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -61,6 +62,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
+  const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
@@ -115,7 +117,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
 
   const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
     if (!values.reason) {
-      toast('Validation : Reason is required');
+      toast('Reason is required');
     } else {
       try {
         setLoading(true);
@@ -255,6 +257,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       }
     }
   };
+  const validate = (values: ChallengeModel) => {
+    const errors = {} as FormikErrors<ChallengeModel>;
+    if (!values.reason) errors.reason = 'Challenge reason is required';
+
+    setIsFormValid(Object.keys(errors).length === 0);
+    return errors;
+  };
 
   return (
     <ModalBase
@@ -327,25 +336,32 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={loading || !walletAddress || !isEnoughBalance || challengeTimeout}
+          disabled={
+            loading || !walletAddress || !isEnoughBalance || challengeTimeout || !isFormValid
+          }
         />,
       ]}
       onClose={closeModal}
       isOpen={opened}
     >
       <Formik
-        initialValues={{ reason: '' }}
+        initialValues={{ reason: '' } as any}
         onSubmit={(values, { setSubmitting }) => {
-          challengeTx(
-            {
-              reason: values.reason,
-              deposit: challengeDeposit,
-            },
-            setSubmitting,
-          );
+          validate(values); // validate one last time before submiting
+          if (isFormValid) {
+            challengeTx(
+              {
+                reason: values.reason,
+                deposit: challengeDeposit,
+              },
+              setSubmitting,
+            );
+          }
         }}
+        validate={validate}
+        validateOnBlur
       >
-        {({ values, handleSubmit, handleChange }) => (
+        {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (
           <FormStyled id="form-challenge" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
               <TextFieldInput
@@ -358,6 +374,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 value={values.reason}
                 onChange={handleChange}
                 multiline
+                error={touched.reason && errors.reason}
+                onBlur={handleBlur}
                 wide
                 isMarkDown
               />
