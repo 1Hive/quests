@@ -38,7 +38,7 @@ export async function computeTotalFunds(funds: FundModel[]) {
   const { stableToken } = getNetwork();
 
   if (!funds?.length) return { parsedAmount: 0, token: stableToken } as TokenAmountModel;
-  const usdFunds = await Promise.all(funds.map((x) => convertTo(x.amount, stableToken)));
+  const usdFunds = await Promise.all(funds.map((x) => convertTo(x.fundAmount, stableToken)));
   const amount = usdFunds.reduce((total, x) => ({
     parsedAmount: total.parsedAmount + x.parsedAmount,
     token: total.token,

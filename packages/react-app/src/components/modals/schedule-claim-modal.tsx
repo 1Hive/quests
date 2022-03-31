@@ -14,6 +14,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 
+import { FormErrors } from 'src/models/form-errors';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -22,7 +23,6 @@ import { ChildSpacer, Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { WalletBallance } from '../wallet-balance';
-import { FormError } from '../field-input/field-input';
 
 // #region StyledComponents
 
@@ -68,13 +68,10 @@ export default function ScheduleClaimModal({
     onClose(succeed);
   };
   const validate = (values: ClaimModel & { claimAll: boolean }) => {
-    const errors = {} as FormError<ClaimModel>;
+    const errors = {} as FormErrors<ClaimModel>;
     if (!values.evidence) errors.evidence = 'Validation : Evidence of completion is required';
     if (!values.claimedAmount) errors.claimedAmount = 'Validation : Claim amount is required';
-    if (values.claimAll) {
-      values.claimedAmount.parsedAmount = 0;
-      values.claimedAmount.token.amount = '0';
-    } else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
+    if (!values.claimAll && values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
       errors.claimedAmount = 'Validation : Claim amount should not be higher than available bounty';
     if (values.playerAddress) {
       try {
@@ -88,6 +85,10 @@ export default function ScheduleClaimModal({
   const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }, setSubmitting: Function) => {
     const errors = validate(values);
     if (!Object.keys(errors).length) {
+      if (values.claimAll) {
+        values.claimedAmount.parsedAmount = 0;
+        values.claimedAmount.token.amount = '0';
+      }
       scheduleClaimTx(values, setSubmitting);
     }
   };
@@ -283,6 +284,7 @@ export default function ScheduleClaimModal({
                       tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
                       isLoading={loading}
                       value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                      error={touched.claimedAmount && (errors.claimedAmount as string)}
                       disabled={values.claimAll}
                     />
                   </Outset>
@@ -295,7 +297,7 @@ export default function ScheduleClaimModal({
                   tooltip="Player address"
                   error={touched.playerAddress && errors.playerAddress}
                   onBlur={handleBlur}
-                  tooltipDetail="Most of time it may be be the connected wallet but can also be set to another wallet address"
+                  tooltipDetail="Most of time it may be the connected wallet but can also be set to another wallet address"
                   isEdit
                   onChange={handleChange}
                   wide

@@ -7,7 +7,7 @@ import {
   Button,
 } from '@1hive/1hive-ui';
 import { parseUnits } from 'ethers/lib/utils';
-import { connect } from 'formik';
+import { connect, FormikContextType } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
 import { NETWORK_TOKENS } from 'src/constants';
@@ -86,7 +86,7 @@ type Props = {
   placeHolder?: string;
   value?: TokenAmountModel;
   onChange?: Function;
-  formik?: any;
+  formik?: FormikContextType<any>;
   compact?: boolean;
   tooltip?: string;
   tooltipDetail?: ReactNode;
@@ -95,9 +95,7 @@ type Props = {
   wide?: boolean;
   tokenEditable?: boolean;
   reversed?: boolean;
-  amountError?: string | false;
-  tokenError?: string | false;
-  onBlur?: Function;
+  error?: string | false;
 };
 
 function AmountFieldInput({
@@ -119,21 +117,26 @@ function AmountFieldInput({
   wide = false,
   tokenEditable = false,
   reversed = false,
-  onBlur = noop,
-  amountError,
-  tokenError,
+  error,
 }: Props) {
   const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
-  // const [hasFocused, setHasFocused] = useState(false);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount);
   const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
+  const [_hasFocused, _setHasFocused] = useState<boolean>();
   const { walletAddress } = useWallet();
   const tokenInputId = `token-${id}`;
   const amountInputId = `amount-${id}`;
+
+  // Needed since the access of state in event handlers is not working
+  const hasFocusedRef = React.useRef(_hasFocused);
+  const setHasFocues = (data: boolean) => {
+    hasFocusedRef.current = data;
+    _setHasFocused(data);
+  };
 
   const autoCompleteRef: React.Ref<any> = useRef(null);
   const handleFocusIn = () => {
@@ -143,14 +146,15 @@ function AmountFieldInput({
       isEdit &&
       tokenEditable
     ) {
-      // setHasFocused(true);
+      setHasFocues(true);
       fetchAvailableTokens();
+    } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
+      formik?.setFieldTouched(id, true);
+      setHasFocues(false);
     }
-    // else if (document.activeElement !== autoCompleteRef.current && hasFocused) {
-    // }
   };
   useEffect(() => {
-    if (!token) document.addEventListener('focusin', handleFocusIn, true);
+    if (!token) document.addEventListener('focusin', handleFocusIn);
     return () => document.removeEventListener('focusin', handleFocusIn);
   }, [walletAddress, isEdit, tokenEditable, token]);
 
@@ -228,7 +232,7 @@ function AmountFieldInput({
   };
 
   const amountField = (
-    <FieldInput label={amountLabel} wide={wide} compact={compact} error={amountError}>
+    <FieldInput label={amountLabel} wide={wide} compact={compact}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
         {amount !== undefined &&
           (isEdit ? (
@@ -237,7 +241,7 @@ function AmountFieldInput({
               title={!token ? 'Set token first' : undefined}
               onChange={onAmountChange}
               placeHolder={placeHolder}
-              onBlur={onBlur}
+              onBlur={() => formik?.setFieldTouched(id, true)}
               type="number"
               value={amount}
               wide={wide}
@@ -254,7 +258,6 @@ function AmountFieldInput({
     <FieldInput
       label={tokenLabel}
       wide={wide}
-      error={tokenError}
       compact={compact}
       tooltip="Token"
       tooltipDetail="Select a token between the list or paste the token address"
@@ -268,7 +271,7 @@ function AmountFieldInput({
             onChange={setSearchTerm}
             onSelect={onTokenChange}
             ref={autoCompleteRef}
-            // onBlur={onBlur}
+            onBlur={() => formik?.setFieldTouched(id, true)}
             placeholder="Search name or paste address"
             wide={wide}
             renderSelected={(i: number) => (
@@ -304,6 +307,7 @@ function AmountFieldInput({
       wide={wide}
       compact
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
+      error={error}
     >
       {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>

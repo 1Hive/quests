@@ -5,10 +5,6 @@ import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
-// eslint-disable-next-line no-unused-vars
-export type FormError<TModel> = { [_key in keyof TModel]: any | false };
-// eslint-disable-next-line no-unused-vars
-export type FormTouched<TModel> = { [_key in keyof TModel]: any | false };
 const FieldStyled = styled.div`
   ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(1)}` : '')};
   ${({ isLoading, wide }: any) => (isLoading || wide ? `width: 100%;` : 'max-width: 100%;')};
@@ -16,7 +12,7 @@ const FieldStyled = styled.div`
 const ErrorStyled = styled.span`
   color: ${(props: any) => props.theme.negative};
   font-size: small;
-  margin-left: ${GUpx(1)};
+  margin-left: ${GUpx(2)};
 `;
 const LabelStyled = styled.label`
   color: ${(props: any) => props.color};

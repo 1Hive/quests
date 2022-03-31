@@ -9,8 +9,9 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
-import { TokenAmountModel } from 'src/models/token-amount.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { FundModel } from 'src/models/fund.model';
+import { FormErrors } from 'src/models/form-errors';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -97,23 +98,30 @@ export default function FundModal({ quest, onClose = noop }: Props) {
     }
   };
 
+  const validate = (values: FundModel) => {
+    const errors = {} as FormErrors<FundModel>;
+    if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
+      errors.fundAmount = 'Amount invalid';
+    return errors;
+  };
+
   return (
     <Formik
-      initialValues={{
-        fundAmount: { parsedAmount: 0, token: quest.rewardToken } as TokenAmountModel,
-      }}
+      initialValues={
+        {
+          fundAmount: { parsedAmount: 0, token: quest.rewardToken },
+        } as FundModel
+      }
       onSubmit={(values, { setSubmitting }) => {
-        const errors = [];
-        if (!values.fundAmount?.parsedAmount || values.fundAmount.parsedAmount <= 0)
-          errors.push('Validation : Amount invalid');
-        if (errors.length) {
-          errors.forEach(toast);
-        } else {
+        const errors = validate(values);
+        // IsValid check
+        if (!Object.keys(errors).length) {
           fundModalTx(values, setSubmitting);
         }
       }}
+      validate={validate}
     >
-      {({ values, handleSubmit, handleChange }) => (
+      {({ values, handleSubmit, handleChange, touched, errors }) => (
         <ModalBase
           id="fund-modal"
           title="Fund quest"
@@ -162,6 +170,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 onChange={handleChange}
                 isLoading={loading}
                 value={values.fundAmount}
+                error={touched.fundAmount && (errors.fundAmount as string)}
               />
             </Outset>
           </FormStyled>

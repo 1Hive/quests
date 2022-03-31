@@ -1,8 +1,9 @@
+/* eslint-disable no-undef */
 import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { Formik, Form } from 'formik';
+import { Formik, Form, FormikErrors } from 'formik';
 import { ClaimModel } from 'src/models/claim.model';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -21,7 +22,6 @@ import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { IconTooltip } from '../field-input/icon-tooltip';
 import { WalletBallance } from '../wallet-balance';
-import { FormError } from '../field-input/field-input';
 
 // #region StyledComponents
 
@@ -257,7 +257,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     }
   };
   const validate = (values: ChallengeModel) => {
-    const errors = {} as FormError<ChallengeModel>;
+    const errors = {} as FormikErrors<ChallengeModel>;
     if (!values.reason) errors.reason = 'Validation : Challenge reason is required';
     return errors;
   };

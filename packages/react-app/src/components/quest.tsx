@@ -1,5 +1,5 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -24,6 +24,7 @@ import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { FormErrors } from 'src/models/form-errors';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -35,7 +36,6 @@ import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { BREAKPOINTS } from '../styles/breakpoints';
-import { FormError, FormTouched } from './field-input/field-input';
 
 // #region StyledComponents
 
@@ -190,6 +190,7 @@ export default function Quest({
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     const errors = validate(values);
+    // IsValid check
     if (!Object.keys(errors).length) {
       setLoading(true);
       let createdQuestAddress: string;
@@ -326,7 +327,7 @@ export default function Quest({
   );
 
   const validate = (data: QuestModel) => {
-    const errors = {} as FormError<QuestModel>;
+    const errors = {} as FormikErrors<QuestModel>;
     if (!data.title) {
       errors.title = 'Title is required';
     }
@@ -341,13 +342,13 @@ export default function Quest({
         errors.fallbackAddress = 'Player address is not valid';
       }
     }
+
+    // If bounty is not set then amount can't be invalid because disabled
+    if (!data.bounty?.token) errors.bounty = 'Bounty token is required';
+    else if (data.bounty.parsedAmount < 0) errors.bounty = ' Invalid initial bounty';
+
     if (data.expireTime.getTime() < Date.now())
       errors.expireTime = 'Expiration have to be later than now';
-    if (!data.bounty?.token || data.bounty.parsedAmount < 0)
-      errors.bounty = {
-        token: !data.bounty?.token && 'Bounty token is required',
-        amount: (!data.bounty || data.bounty.parsedAmount < 0) && 'Invalid initial bounty',
-      };
 
     debounceSave(data);
 
@@ -357,8 +358,8 @@ export default function Quest({
   const questContent = (
     values: QuestModel,
     handleChange = noop,
-    errors: FormError<QuestModel>,
-    touched: FormTouched<QuestModel>,
+    errors: FormErrors<QuestModel>,
+    touched: FormikTouched<QuestModel>,
     handleBlur = noop,
   ) => {
     const titleInput = (
@@ -397,7 +398,7 @@ export default function Quest({
             />
           </QuestHeaderStyled>
         )}
-        <TwoColumnStyled isEdit={isEdit} twoCol={twoCol}>
+        <TwoColumnStyled twoCol={twoCol}>
           <>
             <FirstColStyled gu16 className="pb-0">
               {isEdit && titleInput}
@@ -454,16 +455,12 @@ export default function Quest({
                   }
                   value={questData?.bounty}
                   isLoading={loading || (!isEdit && !bounty) || !questData}
-                  formik={formRef}
-                  onBlur={handleBlur}
-                  amountError={touched.bounty?.amount && errors.bounty?.amount}
-                  tokenError={touched.bounty?.token && errors.bounty?.token}
+                  error={touched.bounty && errors.bounty}
                   tokenEditable
                   tokenLabel={isEdit ? 'Funding token' : undefined}
                   amountLabel={isEdit ? 'Initial funding amount' : undefined}
                   reversed={isEdit}
                   wide
-                  // isError={isErrorBounty}
                 />
               )}
               {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && (
@@ -593,18 +590,13 @@ export default function Quest({
               {questContent(
                 values,
                 handleChange,
-                errors as FormError<QuestModel>,
-                touched as FormTouched<QuestModel>,
+                errors as FormErrors<QuestModel>,
+                touched,
                 handleBlur,
               )}
             </FormStyled>
           ) : (
-            questContent(
-              values,
-              handleChange,
-              errors as FormError<QuestModel>,
-              touched as FormTouched<QuestModel>,
-            )
+            questContent(values, handleChange, errors as FormErrors<QuestModel>, touched)
           )
         }
       </Formik>
