@@ -116,41 +116,43 @@ export function getQuestContractInterface() {
 }
 
 export async function getPriceOfToken(
-  tokenAddressPrice: string,
+  tokenAddressPriceModel: TokenAmountModel,
   tokenAddressBase: string,
-  walletAddress: string,
+  // walletAddress: string,
 ): Promise<TokenAmountModel> {
   // const tokenA = '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'.toLowerCase(); //fallback address on rinkeby TOKENS.HoneyTest
   // const tokenB = '0x531eab8bB6A2359Fe52CA5d308D85776549a0af9'.toLowerCase(); //fallback address on rinkeby
+  const {
+    token: { token: tokenAddressPrice },
+  } = tokenAddressPriceModel;
+
   const tokenA = tokenAddressPrice.toLowerCase();
   const tokenB = tokenAddressBase.toLowerCase();
 
   const defaultRet = {
-    parsedAmount: -1,
-    token: { token: tokenA, decimals: 18, symbol: 'USDT', name: 'USDT' },
+    ...tokenAddressPriceModel,
+    parsedAmountStable: undefined,
   } as TokenAmountModel;
   try {
     const { priceOracleAddress } = getNetwork();
 
-    console.log(`PriceOracle contract addresss is ${priceOracleAddress}`);
+    Logger.debug(`PriceOracle contract addresss is ${priceOracleAddress}`);
     // const tokenContract = new Contract(priceOracleAddress, abi, getSigner(provider, walletAddress));
-    const tokenContract = getContract('PriceOracle', priceOracleAddress, walletAddress);
+    const tokenContract = getContract('PriceOracle', priceOracleAddress);
 
     if (tokenContract) {
       const amountIn = BigNumber.from('1000000000000000000');
       const amountOut = await tokenContract.consult(tokenA, amountIn, tokenB);
       const parsedAmount = ethers.utils.formatEther(amountOut);
-      console.log(
+      Logger.debug(
         `- Oracle Consult ${tokenA} ${ethers.utils.formatEther(amountIn)}-${parsedAmount}`,
       );
       return {
-        parsedAmount: amountOut,
-        token: { token: tokenA, decimals: 18, symbol: 'USDT', name: 'USDT' },
+        ...tokenAddressPriceModel,
+        parsedAmountStable: amountOut,
       } as TokenAmountModel;
     }
   } catch (error) {
-    console.log(error);
-
     Logger.exception(error);
   }
   return defaultRet;

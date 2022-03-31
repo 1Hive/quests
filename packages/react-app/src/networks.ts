@@ -26,6 +26,8 @@ export const networks = {
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
     celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
+    uniswapRinkebySubgraph:
+      'https://api.thegraph.com/subgraphs/name/luckywebdev/uniswap-v2-subgraph-rinkeby',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     governAddress: '0xa0F5e6759d49063040eAB18c1B0E684C45a4B4cA',
     governQueueAddress: '0x19B918802eA9C71c500Ca481917F383f3992cDB0',

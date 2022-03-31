@@ -41,6 +41,7 @@ import {
   getQuestContract,
   getGovernQueueContract,
   getCelesteContract,
+  getPriceOfToken,
 } from '../utils/contract.util';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp, msToSec } from '../utils/date.utils';
@@ -377,16 +378,36 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
       quests.map(async (quest) => getBalanceOf(quest.questRewardTokenAddress, quest.id)),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
-  // TODO : COMPUTE THE TOTAL FUNDS HERE
-  const tokenPrice = {
-    HNY: 2000,
-    HNY2: 2000,
-    HNY3: 2000,
-    HNY4: 2000,
-  };
+  // Take uniques tokens, avoid duplicates to fetch the prices.
+  // FIX ME Maybe use arrayDistinctBy()
+  const arrUniq = (arrTokenAmount: TokenAmountModel[]) => [
+    ...new Map(
+      arrTokenAmount.map((tokenAmount) => [tokenAmount.token.token, tokenAmount]),
+    ).values(),
+  ];
+  const fundsUniqueToken = arrUniq(funds);
+  // Fetch prices here, some may not have liquidity
+  const priceTokenXDAI = (
+    await Promise.all(
+      fundsUniqueToken.map(async (tokenAmount) =>
+        // getPriceOfToken(tokenAmount, '0x531eab8bB6A2359Fe52CA5d308D85776549a0af9'),
+        getPriceOfToken(tokenAmount, TOKENS.RinkebyTheter.token),
+      ),
+    )
+  ).map((tokenAmoutModel) => [
+    { [`${tokenAmoutModel.token.token}`]: toBigNumber(tokenAmoutModel) },
+  ]);
+
+  Logger.debug('funds', funds);
+  Logger.debug('fundsUnique', fundsUniqueToken);
+  Logger.debug('priceTokenXDAI', priceTokenXDAI);
+  const totalFunds =
+    funds.map((x) => priceTokenXDAI[x.token.token]).reduce((a, b) => a.add(b), []) ?? 0;
+
+  Logger.debug('Total funds...', { totalFunds });
   return {
     questCount: result.questEntities.length,
-    totalFunds: funds.map((x) => tokenPrice[x.token.symbol]).reduce((a, b) => (a ?? 0) + b) ?? 0,
+    totalFunds,
   };
 }
 
