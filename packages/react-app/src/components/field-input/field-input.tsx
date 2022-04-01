@@ -9,7 +9,12 @@ const FieldStyled = styled.div`
   ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(1)}` : '')};
   ${({ isLoading, wide }: any) => (isLoading || wide ? `width: 100%;` : 'max-width: 100%;')};
 `;
-
+const ErrorStyled = styled.span`
+  color: ${(props: any) => props.theme.negative};
+  font-size: small;
+  margin-left: ${GUpx(2)};
+  font-style: italic;
+`;
 const LabelStyled = styled.label`
   color: ${(props: any) => props.color};
   font-size: 12px;
@@ -54,6 +59,7 @@ type Props = {
   children: React.ReactNode;
   id?: string;
   isLoading?: boolean;
+  error?: string | false;
   wide?: boolean;
   direction?: 'row' | 'column';
   align?: 'center' | 'baseline' | 'flex-start' | 'flex-end' | 'unset';
@@ -70,6 +76,7 @@ export function FieldInput({
   wide = false,
   direction = 'row',
   align = 'center',
+  error,
 }: Props) {
   const theme = useTheme();
   const labelComponent = label && (
@@ -89,9 +96,12 @@ export function FieldInput({
             <Skeleton />
           </SkeletonWrapperStyled>
         ) : (
-          <ContentWrapperStyled compact={compact} wide={wide} direction={direction} align={align}>
-            {children}
-          </ContentWrapperStyled>
+          <>
+            <ContentWrapperStyled compact={compact} wide={wide} direction={direction} align={align}>
+              {children}
+            </ContentWrapperStyled>
+            {error && <ErrorStyled theme={theme}>{error}</ErrorStyled>}
+          </>
         )}
       </>
     </FieldStyled>

@@ -42,6 +42,8 @@ type Props = {
   tooltip?: string;
   tooltipDetail?: React.ReactNode;
   wide?: boolean;
+  onBlur?: Function;
+  error?: string | false;
 };
 export function AddressFieldInput({
   id,
@@ -54,12 +56,14 @@ export function AddressFieldInput({
   tooltipDetail,
   tooltip,
   wide = false,
+  onBlur = noop,
+  error,
 }: Props) {
   const loadableContent = (
     <WrapperStyled wide={wide}>
       {isEdit ? (
         <>
-          <TextInputStyled id={id} value={value} onChange={onChange} />
+          <TextInputStyled id={id} value={value} onChange={onChange} onBlur={onBlur} />
           <EthIdenticonStyled address={value} scale={1.6} />
         </>
       ) : (
@@ -74,6 +78,7 @@ export function AddressFieldInput({
       tooltip={tooltip}
       tooltipDetail={tooltipDetail}
       compact={compact}
+      error={error}
       isLoading={isLoading}
     >
       {loadableContent}
