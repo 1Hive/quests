@@ -1,4 +1,4 @@
-import { GU, Link, useTheme, IconExternal, useViewport } from '@1hive/1hive-ui';
+import { GU, Link, useTheme, IconExternal } from '@1hive/1hive-ui';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
 import { GUpx } from 'src/utils/style.util';
