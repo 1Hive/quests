@@ -118,13 +118,7 @@ export default function QuestModal({
             {buttonLabel}
           </ButtonLinkStyled>
         ) : (
-          <Button
-            icon={<IconPlus />}
-            label={buttonLabel}
-            wide
-            mode="strong"
-            onClick={onOpenButtonClick}
-          />
+          <Button icon={<IconPlus />} label={buttonLabel} wide onClick={onOpenButtonClick} />
         )
       }
       buttons={[
