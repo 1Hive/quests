@@ -26,20 +26,24 @@ const ButtonLinkStyled = styled(Button)`
   color: ${({ theme }: any) => theme.contentSecondary};
 `;
 
+const ButtonStyled = styled(Button)`
+  min-width: 48px;
+`;
+
 // #endregion
 
 type Props = {
   data?: QuestModel;
   onClose?: ModalCallback;
   questMode: string;
-  isLink?: boolean;
+  buttonMode?: 'link' | 'strong' | 'normal' | 'icon';
 };
 
 export default function QuestModal({
   data = undefined,
   onClose = noop,
   questMode = ENUM_QUEST_VIEW_MODE.ReadSummary,
-  isLink = false,
+  buttonMode = 'normal',
 }: Props) {
   const theme = useTheme();
   const [opened, setOpened] = useState(false);
@@ -114,16 +118,17 @@ export default function QuestModal({
       id="create-quest-modal"
       title="Create quest"
       openButton={
-        isLink ? (
+        buttonMode === 'link' ? (
           <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick}>
             {buttonLabel}
           </ButtonLinkStyled>
         ) : (
-          <Button
+          <ButtonStyled
             icon={<IconPlus />}
             label={buttonLabel}
             wide
-            mode="strong"
+            mode={buttonMode}
+            display={buttonMode === 'icon' ? 'icon' : 'label'}
             onClick={onOpenButtonClick}
           />
         )

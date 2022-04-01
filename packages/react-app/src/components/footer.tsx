@@ -104,7 +104,7 @@ export default function footer() {
           <FooterLinkStyled href="#" external={false}>
             Quest List
           </FooterLinkStyled>
-          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} isLink />
+          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>

@@ -1,15 +1,15 @@
-import { Root } from '@1hive/1hive-ui';
+import { Root, useViewport } from '@1hive/1hive-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
+import { BREAKPOINTS } from 'src/styles/breakpoints';
 import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
-import QuestModal from './modals/quest-modal';
 import { BackToTop } from './back-to-top';
 
 // #region StyledComponents
@@ -48,6 +48,7 @@ function MainView({ children, toggleTheme }: Props) {
   const filterRef = useRef<HTMLDivElement>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const { page } = usePageContext();
+  const { width: vw } = useViewport();
 
   useEffect(() => {
     const tryConnect = async () => {
@@ -77,12 +78,7 @@ function MainView({ children, toggleTheme }: Props) {
       >
         <HeaderWrapperStyled>
           <Header toggleTheme={toggleTheme}>
-            {page === ENUM_PAGES.List &&
-              (sticky ? (
-                <Filter compact />
-              ) : (
-                walletAddress && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
-              ))}
+            {page === ENUM_PAGES.List && sticky && vw > BREAKPOINTS.large && <Filter compact />}
           </Header>
           <FilterWrapperStyled ref={filterRef}>
             {!sticky && page === ENUM_PAGES.List && <Filter />}
