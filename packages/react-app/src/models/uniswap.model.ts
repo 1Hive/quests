@@ -1,7 +1,7 @@
+import { TokenModel } from './token.model';
+
 export type PairModel = {
   // User defined
-  token0?: string;
-  token1?: string;
-
-  // Computed
+  token0?: TokenModel;
+  token1?: TokenModel;
 };

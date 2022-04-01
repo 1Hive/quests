@@ -5,12 +5,12 @@ export const UniswapPairsEntityQuery = gql`
     pairs(where: { token0: $tokenA, token1_in: $tokenBArray }, subgraphError: allow) {
       id
       token0 {
-        id
+        token: id
         symbol
       }
       token0Price
       token1 {
-        id
+        token: id
         symbol
       }
       token1Price

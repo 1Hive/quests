@@ -4,7 +4,6 @@ import { getDefaultProvider } from 'src/utils/web3.utils';
 import { toChecksumAddress } from 'web3-utils';
 import { ContractInstanceError } from 'src/models/contract-error';
 import { Logger } from 'src/utils/logger';
-import { TokenAmountModel } from 'src/models/token-amount.model';
 import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
@@ -115,48 +114,6 @@ export function getQuestContractInterface() {
   return new ethers.utils.Interface(getContractsJson().Quest.abi);
 }
 
-export async function getPriceOfToken(
-  tokenAddressPriceModel: TokenAmountModel,
-  tokenAddressBase: string,
-  // walletAddress: string,
-): Promise<TokenAmountModel> {
-  // const tokenA = '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'.toLowerCase(); //fallback address on rinkeby TOKENS.HoneyTest
-  // const tokenB = '0x531eab8bB6A2359Fe52CA5d308D85776549a0af9'.toLowerCase(); //fallback address on rinkeby
-  const {
-    token: { token: tokenAddressPrice },
-  } = tokenAddressPriceModel;
-
-  const tokenA = tokenAddressPrice.toLowerCase();
-  const tokenB = tokenAddressBase.toLowerCase();
-
-  const defaultRet = {
-    ...tokenAddressPriceModel,
-    parsedAmountStable: undefined,
-  } as TokenAmountModel;
-  try {
-    const { priceOracleAddress } = getNetwork();
-
-    Logger.debug(`PriceOracle contract addresss is ${priceOracleAddress}`);
-    // const tokenContract = new Contract(priceOracleAddress, abi, getSigner(provider, walletAddress));
-    const tokenContract = getContract('PriceOracle', priceOracleAddress);
-
-    if (tokenContract) {
-      const amountIn = BigNumber.from('1000000000000000000');
-      const amountOut = await tokenContract.consult(tokenA, amountIn, tokenB);
-      const parsedAmount = ethers.utils.formatEther(amountOut);
-      Logger.debug(
-        `- Oracle Consult ${tokenA} ${ethers.utils.formatEther(amountIn)}-${parsedAmount}`,
-      );
-      return {
-        ...tokenAddressPriceModel,
-        parsedAmountStable: amountOut,
-      } as TokenAmountModel;
-    }
-  } catch (error) {
-    Logger.exception(error);
-  }
-  return defaultRet;
-}
 // export function getBalanceCheckerContract() {
 //   return new ethers.utils.Interface(getContractsJson().Quest.abi);
 // }

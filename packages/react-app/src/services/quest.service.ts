@@ -41,10 +41,10 @@ import {
   getQuestContract,
   getGovernQueueContract,
   getCelesteContract,
-  getPriceOfToken,
 } from '../utils/contract.util';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp, msToSec } from '../utils/date.utils';
+import { fetchRoutePairWithStable } from './uniswap.service';
 
 let questList: QuestModel[] = [];
 
@@ -387,27 +387,35 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   ];
   const fundsUniqueToken = arrUniq(funds);
   // Fetch prices here, some may not have liquidity
-  const priceTokenXDAI = (
-    await Promise.all(
-      fundsUniqueToken.map(async (tokenAmount) =>
-        // getPriceOfToken(tokenAmount, '0x531eab8bB6A2359Fe52CA5d308D85776549a0af9'),
-        getPriceOfToken(tokenAmount, TOKENS.RinkebyTheter.token),
-      ),
-    )
-  ).map((tokenAmoutModel) => [
-    { [`${tokenAmoutModel.token.token}`]: toBigNumber(tokenAmoutModel) },
-  ]);
+  const priceTokenXDAI = new Map(
+    (
+      await Promise.all(
+        fundsUniqueToken.map(async (tokenAmount) => {
+          const { price } = await fetchRoutePairWithStable(tokenAmount.token.token);
+          const defaultRet = {
+            ...tokenAmount,
+            parsedAmount: tokenAmount.parsedAmount * BigNumber.from(price).toNumber(), // TODO maybe create new object to manipulate that
+          } as TokenAmountModel;
+
+          return defaultRet;
+        }),
+      )
+    ).map((tokenAmoutModel) => [tokenAmoutModel.token.token, toBigNumber(tokenAmoutModel)]),
+  );
 
   Logger.debug('funds', funds);
   Logger.debug('fundsUnique', fundsUniqueToken);
   Logger.debug('priceTokenXDAI', priceTokenXDAI);
-  const totalFunds =
-    funds.map((x) => priceTokenXDAI[x.token.token]).reduce((a, b) => a.add(b), []) ?? 0;
+  const totalFunds = funds
+    .map((x) => priceTokenXDAI.get(x.token.token))
+    .filter((x) => x !== undefined) as BigNumber[];
 
-  Logger.debug('Total funds...', { totalFunds });
+  const totalFundsSummed = totalFunds.reduce((a, b) => a.add(b));
+
+  Logger.debug('totalFundsSummed...', { totalFundsSummed });
   return {
     questCount: result.questEntities.length,
-    totalFunds,
+    totalFunds: fromBigNumber(totalFundsSummed, undefined),
   };
 }
 
