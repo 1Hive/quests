@@ -160,7 +160,6 @@ export function getDefaultProvider() {
   let ethOrWeb = (window as any).ethereum ?? (window as any).web3;
   if (!ethOrWeb) {
     ethOrWeb = new Web3.providers.HttpProvider(
-      // TODO : Find a way to not have the api key in the source code
       `https://rinkeby.infura.io/v3/${env('INFURA_API_KEY')}`,
     );
   }

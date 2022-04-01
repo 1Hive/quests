@@ -5,7 +5,6 @@ import { UniswapPairsEntityQuery } from 'src/queries/uniswap-pairs-entity.query'
 import { TOKENS } from 'src/constants';
 import { arrayDistinct } from 'src/utils/array.util';
 import { ChainId, Fetcher, Route } from '@uniswap/sdk';
-import { TokenModel } from 'src/models/token.model';
 import Web3 from 'web3';
 import { Logger } from '../utils/logger';
 
