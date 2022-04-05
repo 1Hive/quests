@@ -410,7 +410,9 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
     .map((x) => priceTokenXDAI.get(x.token.token))
     .filter((x) => x !== undefined) as BigNumber[];
 
-  const totalFundsSummed = totalFunds.reduce((a, b) => a.add(b));
+  const totalFundsSummed = totalFunds.length
+    ? totalFunds.reduce((a, b) => a.add(b))
+    : BigNumber.from(0);
 
   Logger.debug('totalFundsSummed...', { totalFundsSummed });
   return {
