@@ -1,6 +1,7 @@
 import { BigNumber, ethers, ethers as ethersUtil } from 'ethers';
 import { noop } from 'lodash-es';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 import { IS_DEV } from '../constants';
@@ -157,11 +158,10 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | 
 }
 
 export function getDefaultProvider() {
+  const { httpProvider } = getNetwork();
   let ethOrWeb = (window as any).ethereum ?? (window as any).web3;
   if (!ethOrWeb) {
-    ethOrWeb = new Web3.providers.HttpProvider(
-      `https://rinkeby.infura.io/v3/${env('INFURA_API_KEY')}`,
-    );
+    ethOrWeb = new Web3.providers.HttpProvider(`${httpProvider}/${env('INFURA_API_KEY')}`);
   }
 
   return ethOrWeb && new ethersUtil.providers.Web3Provider(ethOrWeb);

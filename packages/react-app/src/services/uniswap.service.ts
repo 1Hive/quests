@@ -4,7 +4,7 @@ import { getNetwork } from 'src/networks';
 import { UniswapPairsEntityQuery } from 'src/queries/uniswap-pairs-entity.query';
 import { TOKENS } from 'src/constants';
 import { arrayDistinct } from 'src/utils/array.util';
-import { ChainId, Fetcher, Route } from '@uniswap/sdk';
+import { Fetcher, Route } from '@uniswap/sdk';
 import Web3 from 'web3';
 import { Logger } from '../utils/logger';
 
@@ -52,7 +52,7 @@ export async function fetchPairWithStables(tokenA: string): Promise<PairModel[] 
 }
 
 export async function fetchRoutePairWithStable(tokenA: string) {
-  const chainId = ChainId.RINKEBY; // TODO We need get the current chain here
+  const { chainId, isTestNetwork } = getNetwork();
 
   tokenA = Web3.utils.toChecksumAddress(tokenA, chainId);
 
@@ -72,7 +72,7 @@ export async function fetchRoutePairWithStable(tokenA: string) {
 
   if (!pairsWithStables || pairsWithStables.length === 0) {
     // throw new Error('Token dont have pair with stables knowed');
-    return { price: 0, priceInverted: 0 };
+    return { price: isTestNetwork ? 1 : 0, priceInverted: 0 }; // Fallback to 1 for dev or 0 for production
   }
 
   const commonStable = pairsWithStables[0].token1?.token;

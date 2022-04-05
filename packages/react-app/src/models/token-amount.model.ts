@@ -2,6 +2,6 @@ import { TokenModel } from './token.model';
 
 export type TokenAmountModel = {
   parsedAmount: number;
-  parsedAmountStable?: number; // maybe create new type to handle it or use with PairModel
+  usdValue?: number; // Only set when fetching from getBalanceOf
   token: TokenModel;
 };

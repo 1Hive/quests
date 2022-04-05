@@ -112,8 +112,4 @@ export function getQuestContractInterface() {
   return new ethers.utils.Interface(getContractsJson().Quest.abi);
 }
 
-// export function getBalanceCheckerContract() {
-//   return new ethers.utils.Interface(getContractsJson().Quest.abi);
-// }
-
 // #endregion

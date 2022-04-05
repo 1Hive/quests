@@ -512,10 +512,11 @@ export async function getBalanceOf(
       const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
       tokenInfo.amount = balance.toString();
       const { price } = await fetchRoutePairWithStable(tokenInfo.token);
+      const parsedAmount = fromBigNumber(balance, tokenInfo.decimals);
       return {
         token: tokenInfo,
-        parsedAmount: fromBigNumber(balance, tokenInfo.decimals),
-        parsedAmountStable: +price,
+        parsedAmount,
+        usdValue: +price * parsedAmount,
       };
     }
   } catch (error) {
