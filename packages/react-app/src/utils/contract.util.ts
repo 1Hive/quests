@@ -9,7 +9,6 @@ import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
 import Celeste from '../contracts/Celeste.json';
-import PriceOracle from '../contracts/PriceOracle.json';
 
 let contracts: any;
 
@@ -31,7 +30,6 @@ function getContractsJson(network?: any) {
     GovernQueue,
     ERC20,
     Celeste,
-    PriceOracle,
   };
 }
 
