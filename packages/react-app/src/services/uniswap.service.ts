@@ -29,10 +29,10 @@ function mapPairList(pairs: any[]): Promise<PairModel[]> {
 // #region Subgraph Queries
 
 export async function fetchPairWithStables(tokenA: string): Promise<PairModel[] | undefined> {
-  const { uniswapRinkebySubgraph } = getNetwork();
-  if (!uniswapRinkebySubgraph) return undefined;
+  const { uniswapSubgraph } = getNetwork();
+  if (!uniswapSubgraph) return undefined;
 
-  const queryResult = await request(uniswapRinkebySubgraph, UniswapPairsEntityQuery, {
+  const queryResult = await request(uniswapSubgraph, UniswapPairsEntityQuery, {
     tokenA: tokenA.toLowerCase(), // Subgraph address are stored lowercase
     tokenBArray: arrayDistinct([
       // Some stables address should be here
