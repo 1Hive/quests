@@ -1,9 +1,9 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
 import { getDefaultProvider } from 'src/utils/web3.utils';
-import { toChecksumAddress, toNumber } from 'web3-utils';
+import { toChecksumAddress } from 'web3-utils';
 import { ContractInstanceError } from 'src/models/contract-error';
-import { Logger, LoggerOnce } from 'src/utils/logger';
+import { Logger } from 'src/utils/logger';
 import ERC20 from '../contracts/ERC20.json';
 import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
@@ -49,13 +49,6 @@ function getContract(
     if (!contractAddress) throw new Error(`${contractName} address was not defined`);
     if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
 
-    // Check if wallet chain is same as app
-    const { chainId, name } = getNetwork();
-    if (toNumber(provider?.provider?.chainId) !== chainId) {
-      LoggerOnce.error(`Wallet not connected to ${name}. Wait for wallet to connect`);
-      return null;
-    }
-
     return new Contract(contractAddress, contractAbi, getProviderOrSigner(provider, walletAddress));
   } catch (error) {
     throw new ContractInstanceError(
@@ -88,7 +81,6 @@ export function getERC20Contract(
 export async function getTokenInfo(tokenAddress: string) {
   try {
     const tokenContract = getContract('ERC20', tokenAddress);
-
     if (tokenContract) {
       const symbol = await tokenContract.symbol();
       const decimals = await tokenContract.decimals();

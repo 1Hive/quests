@@ -34,6 +34,7 @@
     "@types/react-dom": "^17.0.9",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "@uniswap/sdk": "^3.0.3",
     "@urql/devtools": "^2.0.2",
     "chalk": "^4.1.2",
     "clipboard-polyfill": "^3.0.0-pre5",
@@ -47,7 +48,7 @@
     "eslint-plugin-react": "7.23.1",
     "eslint-plugin-react-hooks": "4",
     "ethereumjs-util": "^7.0.8",
-    "ethers": "^5.3.1",
+    "ethers": "^5.5.1",
     "formik": "^2.2.6",
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
@@ -92,6 +93,7 @@
     "@babel/preset-env": "^7.7.4",
     "@babel/preset-react": "^7.7.4",
     "@sentry/webpack-plugin": "^1.15.1",
+    "@testing-library/react-hooks": "^7.0.2",
     "@types/lodash-es": "^4.17.5",
     "@types/react-router-dom": "^5.3.1",
     "@types/styled-components": "^5.1.15",
@@ -107,6 +109,7 @@
     "react-app-polyfill": "^1.0.6",
     "react-app-rewired": "^2.1.8",
     "react-dev-utils": "^11.0.4",
+    "react-test-renderer": "^16.9.0",
     "rimraf": "^2.6.2",
     "sass": "^1.39.0",
     "sass-loader": "^11.0.1",
@@ -126,15 +129,22 @@
     "sync-assets": "copy-aragon-ui-assets ./public",
     "eject": "react-scripts eject",
     "prestart": "node ./scripts/create_contracts.js",
-    "test": "react-scripts test",
+    "test": "react-app-rewired test --env=jsdom",
     "ipfs": "node ./scripts/ipfs.js",
     "surge": "cp build/index.html build/200.html && surge ./build",
     "s3": "node ./scripts/s3.js",
     "ship": "yarn surge",
     "theme": "npx gulp less",
-    "watch": "node ./scripts/watch.js"
+    "watch": "node ./scripts/watch.js",
+    "ci": "yarn install --pure-lockfile"
   },
   "resolutions": {
     "styled-components": "^5"
+  },
+  "jest": {
+    "verbose": true,
+    "moduleNameMapper": {
+      "^lodash-es$": "lodash"
+    }
   }
 }

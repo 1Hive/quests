@@ -7,6 +7,7 @@ import {
   QuestEntityQuery,
   QuestEntitiesQuery,
   QuestRewardTokens,
+  QuestEntitiesLight,
 } from 'src/queries/quest-entity.query';
 import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
@@ -22,6 +23,7 @@ import { TokenModel } from 'src/models/token.model';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
+import { DashboardModel } from 'src/models/dashboard.model';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT_MS, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -41,7 +43,8 @@ import {
   getCelesteContract,
 } from '../utils/contract.util';
 import { processQuestState } from './state-machine';
-import { getLastBlockTimestamp } from '../utils/date.utils';
+import { getLastBlockTimestamp, msToSec } from '../utils/date.utils';
+import { fetchRoutePairWithStable } from './uniswap.service';
 
 let questList: QuestModel[] = [];
 
@@ -364,6 +367,58 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
   ) as Promise<TokenModel[]>;
 }
 
+export async function getDashboardInfo(): Promise<DashboardModel> {
+  const { questsSubgraph } = getNetwork();
+  const result = await request(questsSubgraph, QuestEntitiesLight, {
+    expireTimeLower: msToSec(Date.now()),
+  });
+  const quests = result.questEntities as { id: string; questRewardTokenAddress: string }[];
+  const funds = (
+    await Promise.all(
+      quests.map(async (quest) => getBalanceOf(quest.questRewardTokenAddress, quest.id)),
+    )
+  ).filter((x) => !!x) as TokenAmountModel[];
+  // Take uniques tokens, avoid duplicates to fetch the prices.
+  // FIX ME Maybe use arrayDistinctBy()
+  const arrUniq = (arrTokenAmount: TokenAmountModel[]) => [
+    ...new Map(
+      arrTokenAmount.map((tokenAmount) => [tokenAmount.token.token, tokenAmount]),
+    ).values(),
+  ];
+  const fundsUniqueToken = arrUniq(funds);
+  // Fetch prices here, some may not have liquidity
+  const priceTokenXDAI = new Map(
+    (
+      await Promise.all(
+        fundsUniqueToken.map(async (tokenAmount) => {
+          const { price } = await fetchRoutePairWithStable(tokenAmount.token.token);
+          const defaultRet = {
+            ...tokenAmount,
+            parsedAmount: tokenAmount.parsedAmount * BigNumber.from(price).toNumber(), // TODO maybe create new object to manipulate that
+          } as TokenAmountModel;
+
+          return defaultRet;
+        }),
+      )
+    ).map((tokenAmoutModel) => [tokenAmoutModel.token.token, toBigNumber(tokenAmoutModel)]),
+  );
+
+  Logger.debug('funds', funds);
+  Logger.debug('fundsUnique', fundsUniqueToken);
+  Logger.debug('priceTokenXDAI', priceTokenXDAI);
+  const totalFunds = funds
+    .map((x) => priceTokenXDAI.get(x.token.token))
+    .filter((x) => x !== undefined) as BigNumber[];
+
+  const totalFundsSummed = totalFunds.reduce((a, b) => a.add(b));
+
+  Logger.debug('totalFundsSummed...', { totalFundsSummed });
+  return {
+    questCount: result.questEntities.length,
+    totalFunds: fromBigNumber(totalFundsSummed, undefined),
+  };
+}
+
 // #endregion
 
 // #region QuestFactory
@@ -456,9 +511,12 @@ export async function getBalanceOf(
       if (!erc20Contract) return null;
       const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
       tokenInfo.amount = balance.toString();
+      const { price } = await fetchRoutePairWithStable(tokenInfo.token);
+      const parsedAmount = fromBigNumber(balance, tokenInfo.decimals);
       return {
         token: tokenInfo,
-        parsedAmount: fromBigNumber(balance, tokenInfo.decimals),
+        parsedAmount,
+        usdValue: +price * parsedAmount,
       };
     }
   } catch (error) {

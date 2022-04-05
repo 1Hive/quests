@@ -9,10 +9,12 @@ export type NetworkModel = {
   questsSubgraph: string;
   governSubgraph: string;
   celesteSubgraph: string;
+  uniswapSubgraph?: string;
   questFactoryAddress: string;
   governAddress: string;
   governQueueAddress: string;
   celesteAddress: string;
+  httpProvider: string;
   defaultToken: TokenModel;
   nativeToken: TokenModel;
   stableToken: TokenModel;
