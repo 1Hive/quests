@@ -6,10 +6,12 @@ import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
-import { BREAKPOINTS } from 'src/styles/breakpoints';
+import Piggy from 'src/assets/piggy';
+import { GUpx } from 'src/utils/style.util';
 import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
+import Dashboard from './dashboard';
 import { BackToTop } from './back-to-top';
 
 // #region StyledComponents
@@ -21,18 +23,42 @@ const HeaderWrapperStyled = styled.div`
   width: 100%;
 `;
 
-const ContentWrapperStyled = styled.div`
-  margin-top: 102px;
-  min-height: calc(100vh - 102px);
-`;
+const ContentWrapperStyled = styled.div``;
 
 const ScrollViewStyled = styled.div`
-  overflow-y: auto;
   margin-top: 80px;
+  overflow-y: auto;
   height: calc(100vh - 80px);
+  /* custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 20px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #4a4a4a;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #a8bbbf;
+  }
 `;
 
 const FilterWrapperStyled = styled.div``;
+
+const LineStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 200px;
+  margin: ${GUpx(2)} ${GUpx(10)};
+  align-items: flex-end;
+`;
 
 // #endregion
 
@@ -62,10 +88,17 @@ function MainView({ children, toggleTheme }: Props) {
   }, []);
 
   const handleScroll = () => {
-    const stickyOffset = filterRef.current?.offsetTop;
-    const scrollTop = scrollViewRef.current?.scrollTop;
-    setSticky(scrollTop !== undefined && stickyOffset !== undefined && scrollTop > stickyOffset);
-    setScrollTop(scrollTop ?? 0);
+    if (scrollViewRef?.current && filterRef?.current) {
+      const filterHeight = filterRef.current.clientHeight;
+      const stickyOffset = filterRef.current.offsetTop;
+      const { scrollTop } = scrollViewRef.current;
+      setScrollTop(scrollTop);
+      setSticky(
+        scrollTop !== undefined &&
+          stickyOffset !== undefined &&
+          scrollTop - stickyOffset > filterHeight,
+      );
+    }
   };
 
   return (
@@ -80,12 +113,19 @@ function MainView({ children, toggleTheme }: Props) {
           <Header toggleTheme={toggleTheme}>
             {page === ENUM_PAGES.List && sticky && vw > BREAKPOINTS.large && <Filter compact />}
           </Header>
-          <FilterWrapperStyled ref={filterRef}>
-            {!sticky && page === ENUM_PAGES.List && <Filter />}
-          </FilterWrapperStyled>
         </HeaderWrapperStyled>
+
         {page === ENUM_PAGES.List ? (
-          <ContentWrapperStyled>{children}</ContentWrapperStyled>
+          <ContentWrapperStyled>
+            <LineStyled>
+              <Dashboard />
+              <Piggy />
+            </LineStyled>
+            <FilterWrapperStyled ref={filterRef}>
+              {!sticky && page === ENUM_PAGES.List && <Filter />}
+            </FilterWrapperStyled>
+            {children}
+          </ContentWrapperStyled>
         ) : (
           children
         )}

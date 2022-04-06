@@ -4,7 +4,7 @@ import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
-import { LogoTitle } from './header/logo-title';
+import { LogoTitle } from 'src/assets/logo-title';
 import QuestModal from './modals/quest-modal';
 
 // #region StyledComponent

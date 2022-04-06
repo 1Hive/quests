@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { ENUM_PAGES } from '../../constants';
-import { LogoTitle } from './logo-title';
+import { LogoTitle } from '../../assets/logo-title';
 
 // #region StyledComponents
 

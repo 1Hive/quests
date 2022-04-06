@@ -52,4 +52,6 @@ export const ONE_WEEK_IN_MS = ONE_HOUR_IN_MS * 24 * 7;
 export const ONE_YEAR_IN_MS = ONE_WEEK_IN_MS * 52;
 export const IN_A_WEEK_IN_MS = Date.now() + ONE_WEEK_IN_MS;
 
+export const msToSec = (ms: number) => Math.round(ms / 1000);
+
 export { dayjs, dateFormat, durationTime, toMs, getRelativeTime };

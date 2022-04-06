@@ -165,7 +165,7 @@ function AccountModule({ compact = false }: Props) {
         <Button
           mode="strong"
           icon={<IconConnect />}
-          label="Enable account"
+          label="Connect Wallet"
           onClick={toggle}
           display={compact ? 'icon' : 'all'}
         />

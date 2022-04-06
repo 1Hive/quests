@@ -5,7 +5,7 @@ import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
 import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/style.util';
-import QuestLogo from '../quest-logo';
+import QuestLogo from '../../assets/quest-logo';
 import { Outset } from './spacer-util';
 
 const WrapperStyled = styled.div`

@@ -1,7 +1,7 @@
 import { Button, IconPlus, useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
-import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE, TOKENS } from 'src/constants';
+import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -58,7 +58,7 @@ export default function QuestModal({
 
   useEffect(() => {
     const { type } = getNetwork();
-    if (type === 'rinkeby' && localStorage.getItem('FLAG_DUMMY') === 'true') {
+    if (type === 'rinkeby' && localStorage.getItem('FLAG_DUMMY')?.toLowerCase() === 'true') {
       // Load dummy data only for rinkeby testing and flag activated
       const feedDummy = async () => {
         const resp = await fetch('https://jaspervdj.be/lorem-markdownum/markdown.txt');
@@ -67,7 +67,6 @@ export default function QuestModal({
           ...questData,
           title: dummyData.substring(1, dummyData.indexOf('\n')),
           description: dummyData.slice(dummyData.indexOf('\n') + 1),
-          rewardToken: TOKENS.RinkebyHoney,
         });
       };
       feedDummy();
