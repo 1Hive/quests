@@ -11,6 +11,8 @@ import { wrapError } from './errors.util';
 import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
+const ethOrWeb = (window as any).ethereum ?? (window as any).web3?.currentProvider;
+ethOrWeb?.on('chainChanged', (_chainId: string) => window.location.reload());
 
 export function getWeb3(): Web3 {
   let ethereum: any = null;
@@ -158,13 +160,18 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | 
 }
 
 export function getDefaultProvider() {
-  const { httpProvider } = getNetwork();
-  let ethOrWeb = (window as any).ethereum ?? (window as any).web3;
-  if (!ethOrWeb) {
-    ethOrWeb = new Web3.providers.HttpProvider(`${httpProvider}/${env('INFURA_API_KEY')}`);
+  const { httpProvider, chainId: expectedChainId } = getNetwork();
+  let provider = ethOrWeb;
+  if (!provider || +provider.chainId !== +expectedChainId) {
+    const infuraId = env('INFURA_API_KEY');
+    if (infuraId) {
+      provider = new Web3.providers.HttpProvider(`${httpProvider}/${infuraId}`);
+    } else {
+      throw new Error(`No http provider key provided in env`);
+    }
   }
 
-  return ethOrWeb && new ethersUtil.providers.Web3Provider(ethOrWeb);
+  return provider && new ethersUtil.providers.Web3Provider(provider);
 }
 
 // Re-export some web3-utils functions
