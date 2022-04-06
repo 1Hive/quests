@@ -32,7 +32,7 @@ export const networks = {
     governAddress: '0xa0F5e6759d49063040eAB18c1B0E684C45a4B4cA',
     governQueueAddress: '0x19B918802eA9C71c500Ca481917F383f3992cDB0',
     celesteAddress: '0xdd58ebed3c36460939285a92807f90e3d3a26789',
-    httpProvider: 'https://rinkeby.infura.io/v3/',
+    httpProvider: 'https://rinkeby.infura.io/v3',
     defaultToken: TOKENS.HoneyTest,
     nativeToken: TOKENS.Ether,
     isTestNetwork: true,
@@ -49,7 +49,7 @@ export const networks = {
     defaultEthNode: 'https://xdai.poanetwork.dev/',
     questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     govern: '', // TODO : When govern will be on xDai
-    httpProvider: 'https://xdai.poanetwork.dev/',
+    httpProvider: 'https://xdai.poanetwork.dev',
     defaultToken: TOKENS.Honey,
     nativeToken: TOKENS.xDAI,
     stableToken: TOKENS.xDAI,
