@@ -163,7 +163,7 @@ export function getDefaultProvider() {
   const { httpProvider, chainId: expectedChainId } = getNetwork();
   let provider = ethOrWeb;
   if (!provider || +provider.chainId !== +expectedChainId) {
-    provider = new Web3.providers.HttpProvider(`${httpProvider}/${env('INFURA_ID')}`);
+    provider = new Web3.providers.HttpProvider(`${httpProvider}/${env('INFURA_API_KEY')}`);
   }
 
   return provider && new ethersUtil.providers.Web3Provider(provider);
