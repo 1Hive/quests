@@ -8,6 +8,7 @@ import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
+import { BREAKPOINTS } from 'src/styles/breakpoints';
 import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
