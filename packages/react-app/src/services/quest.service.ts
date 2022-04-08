@@ -24,7 +24,13 @@ import { toTokenAmountModel } from 'src/utils/data.utils';
 import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
 import { DashboardModel } from 'src/models/dashboard.model';
-import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE, GQL_MAX_INT_MS, TOKENS } from '../constants';
+import {
+  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
+  ENUM_CLAIM_STATE,
+  ENUM_QUEST_STATE,
+  GQL_MAX_INT_MS,
+  TOKENS,
+} from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -186,7 +192,9 @@ async function generateScheduleContainer(
 
   // A bit more than the execution delay
   const executionTime =
-    lastBlockTimestamp + erc3000Config.executionDelay + (extraDelaySec || 60 * 15); // Add 15 minutes by default
+    lastBlockTimestamp +
+    erc3000Config.executionDelay +
+    (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
   const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
 
