@@ -20,7 +20,7 @@ const FooterContainerStyled = styled.div`
     color: ${({ color }: any) => color} !important;
   }
 
-  padding: ${GUpx(2)} ${GUpx(20)} ${GUpx(2)} ${GUpx(20)};
+  padding: ${GUpx(8)};
 `;
 
 const FooterContainerStyledSide = styled.div`

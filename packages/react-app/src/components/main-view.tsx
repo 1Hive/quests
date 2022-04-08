@@ -1,4 +1,4 @@
-import { Root, useViewport } from '@1hive/1hive-ui';
+import { Root, useViewport, GU } from '@1hive/1hive-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
@@ -24,7 +24,10 @@ const HeaderWrapperStyled = styled.div`
   width: 100%;
 `;
 
-const ContentWrapperStyled = styled.div``;
+const ContentWrapperStyled = styled.div`
+  margin-top: ${({ top }: any) => top}px;
+  min-height: calc(100vh - ${({ top }: any) => top}px);
+`;
 
 const ScrollViewStyled = styled.div`
   margin-top: 80px;
@@ -51,7 +54,9 @@ const ScrollViewStyled = styled.div`
   }
 `;
 
-const FilterWrapperStyled = styled.div``;
+const FilterWrapperStyled = styled.div`
+  margin: 0 ${({ margin }: any) => margin}px;
+`;
 
 const LineStyled = styled.div`
   display: flex;
@@ -75,7 +80,7 @@ function MainView({ children, toggleTheme }: Props) {
   const filterRef = useRef<HTMLDivElement>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const { page } = usePageContext();
-  const { width: vw } = useViewport();
+  const { below } = useViewport();
 
   useEffect(() => {
     const tryConnect = async () => {
@@ -112,21 +117,15 @@ function MainView({ children, toggleTheme }: Props) {
       >
         <HeaderWrapperStyled>
           <Header toggleTheme={toggleTheme}>
-            {page === ENUM_PAGES.List && sticky && vw > BREAKPOINTS.large && <Filter compact />}
+            {page === ENUM_PAGES.List && sticky && !below('large') && <Filter compact />}
           </Header>
+          <FilterWrapperStyled ref={filterRef} margin={below('medium') ? 2 * GU : 8 * GU}>
+            {!sticky && page === ENUM_PAGES.List && <Filter />}
+          </FilterWrapperStyled>
         </HeaderWrapperStyled>
 
         {page === ENUM_PAGES.List ? (
-          <ContentWrapperStyled>
-            <LineStyled>
-              <Dashboard />
-              <Piggy />
-            </LineStyled>
-            <FilterWrapperStyled ref={filterRef}>
-              {!sticky && page === ENUM_PAGES.List && <Filter />}
-            </FilterWrapperStyled>
-            {children}
-          </ContentWrapperStyled>
+          <ContentWrapperStyled>{children}</ContentWrapperStyled>
         ) : (
           children
         )}

@@ -47,10 +47,6 @@ const LinkStyled = styled(Link)`
   font-weight: 100;
 `;
 
-const AddressWrapperStyled = styled.div`
-  width: 390px;
-`;
-
 const CardStyled = styled(Card)`
   justify-content: flex-start;
   align-items: flex-start;
@@ -95,14 +91,15 @@ const TwoColumnStyled = styled.div`
 `;
 
 const FirstColStyled = styled.div`
-  margin: 0 ${GUpx(3)};
+  margin: 0 ${GUpx()};
+  max-width: 90%;
   flex-grow: 1;
-  max-width: 80%;
   overflow-wrap: break-word;
 `;
 
 const SecondColStyled = styled.div`
-  margin: 0 ${GUpx(3)};
+  margin: 0 ${GUpx()};
+  max-width: 90%;
   flex-grow: 0;
   display: flex;
   flex-direction: column;
@@ -500,21 +497,19 @@ export default function Quest({
                 formik={formRef}
               />
               {isEdit && (
-                <AddressWrapperStyled>
-                  <AddressFieldInput
-                    id="fallbackAddress"
-                    label="Funds fallback address"
-                    value={values.fallbackAddress ?? walletAddress}
-                    isLoading={loading || !questData}
-                    tooltip="Fallback Address"
-                    tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                    isEdit
-                    onBlur={handleBlur}
-                    error={touched.fallbackAddress && errors.fallbackAddress}
-                    onChange={handleChange}
-                    wide
-                  />
-                </AddressWrapperStyled>
+                <AddressFieldInput
+                  id="fallbackAddress"
+                  label="Funds fallback address"
+                  value={values.fallbackAddress ?? walletAddress}
+                  isLoading={loading || !questData}
+                  tooltip="Fallback Address"
+                  tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                  isEdit
+                  onBlur={handleBlur}
+                  error={touched.fallbackAddress && errors.fallbackAddress}
+                  onChange={handleChange}
+                  wide
+                />
               )}
             </SecondColStyled>
           </>

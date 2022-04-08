@@ -1,4 +1,4 @@
-import { EmptyStateCard, Button } from '@1hive/1hive-ui';
+import { EmptyStateCard, Button, useViewport } from '@1hive/1hive-ui';
 import { debounce } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -47,6 +47,7 @@ export default function QuestList() {
   const [hasMore, setHasMore] = useState(true);
   const { filter, refreshed, setFilter } = useFilterContext();
   const { newQuest } = useQuestsContext();
+  const { below } = useViewport();
 
   const { setPage } = usePageContext();
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
@@ -96,7 +97,7 @@ export default function QuestList() {
   );
 
   return (
-    <Outset gu64 horizontal>
+    <Outset gu64={!below('large')} horizontal>
       <InfiniteScroll
         loader={<></>}
         dataLength={quests.length}
