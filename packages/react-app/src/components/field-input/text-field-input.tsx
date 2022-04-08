@@ -124,6 +124,7 @@ export default function TextFieldInput({
                 component: 'a',
                 props: {
                   target: '_blank',
+                  tabindex: '-1',
                 },
               },
             },
