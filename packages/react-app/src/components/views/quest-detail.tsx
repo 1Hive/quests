@@ -23,14 +23,21 @@ export default function QuestDetail() {
   const [a, setA] = useState<boolean>();
 
   useEffect(() => {
+    let isSubscribed = true;
+
     setPage(ENUM_PAGES.Detail);
     const fetchQuestAsync = async (questAddress: string) => {
       const questResult = await fetchQuest(questAddress);
-      if (!questResult) toast('Failed to get quest, verify address');
-      else setQuest(questResult);
-      setA(true);
+      if (isSubscribed) {
+        if (!questResult) toast('Failed to get quest, verify address');
+        else setQuest(questResult);
+        setA(true);
+      }
     };
     if (id) fetchQuestAsync(id);
+    return () => {
+      isSubscribed = false;
+    };
   }, [id]);
 
   return (

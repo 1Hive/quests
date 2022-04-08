@@ -41,7 +41,15 @@ export default function Dashboard() {
   const theme = useTheme();
   const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
   useEffect(() => {
-    getDashboardInfo().then(setDashboardModel);
+    let isSubscribed = true;
+    getDashboardInfo().then((innerDashboardModel) => {
+      if (isSubscribed) {
+        setDashboardModel(innerDashboardModel);
+      }
+    });
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
 
   return (

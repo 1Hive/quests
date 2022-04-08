@@ -139,11 +139,13 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           buttons={[
             quest.rewardToken && (
               <WalletBallance
+                key="fundAmount"
                 askedTokenAmount={values.fundAmount}
                 setIsEnoughBalance={setIsEnoughBalance}
               />
             ),
             <Button
+              key="buttonFund"
               icon={<GiTwoCoins />}
               type="submit"
               form="form-fund"
