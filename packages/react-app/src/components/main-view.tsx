@@ -4,7 +4,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { ENUM_PAGES } from 'src/constants';
+import { DEFAULT_PAGE, ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
@@ -79,11 +79,15 @@ function MainView({ children, toggleTheme }: Props) {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname && pathname.length > 1) {
-      // FIXME Hack solution until we refactor the routes.
+    Logger.debug(pathname);
+    if (pathname) {
+      // TODO Hack solution until we refactor the routes.
       const currentRoute = pathname.substring(1, pathname.length);
+      Logger.debug(currentRoute);
       if (currentRoute === ENUM_PAGES.Detail) {
-        setPage(currentRoute);
+        setPage(ENUM_PAGES.Detail);
+      } else if (currentRoute === '' || currentRoute === 'home') {
+        setPage(DEFAULT_PAGE);
       }
     }
 
@@ -124,9 +128,7 @@ function MainView({ children, toggleTheme }: Props) {
             {page === ENUM_PAGES.List && sticky && <Filter compact />}
           </Header>
         </HeaderWrapperStyled>
-
-        {page === undefined && <Skeleton />}
-
+        {page === undefined && <Skeleton /> /* TODO Put some spinner here}  */}
         {page === ENUM_PAGES.List && (
           <ContentWrapperStyled>
             <LineStyled>
@@ -139,9 +141,7 @@ function MainView({ children, toggleTheme }: Props) {
             {children}
           </ContentWrapperStyled>
         )}
-
         {page === ENUM_PAGES.Detail && children}
-
         <Footer />
       </ScrollViewStyled>
       {scrollTopState > 0 && <BackToTop />}

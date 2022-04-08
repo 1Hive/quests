@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState } from 'react';
-import { DEFAULT_PAGE } from 'src/constants';
 
 export type PageContextModel = {
   page: string | undefined;
@@ -13,7 +12,7 @@ type Props = {
   children: React.ReactNode;
 };
 export const PageContextProvider = ({ children }: Props) => {
-  const [page, setPage] = useState<string | undefined>(DEFAULT_PAGE);
+  const [page, setPage] = useState<string | undefined>(undefined);
 
   return <PageContext.Provider value={{ page, setPage }}>{children}</PageContext.Provider>;
 };

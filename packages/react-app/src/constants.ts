@@ -166,7 +166,7 @@ export const ENUM = {
 
 // Default values
 
-export const DEFAULT_PAGE = undefined; // FIXME Hack fix to prevent load Dashboard
+export const DEFAULT_PAGE = ENUM_PAGES.List;
 
 export const DEFAULT_FILTER = {
   address: '',
