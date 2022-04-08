@@ -4,7 +4,6 @@ import { customDarkTheme } from 'src/styles/dark-theme';
 import { customLightTheme } from 'src/styles/light-theme';
 
 export const useToggleTheme = () => {
-  // const { currentTheme, setCurrentTheme } = useThemeContext();
   const [currentTheme, setCurrentTheme] = useState<any | undefined>(undefined);
 
   useEffect(() => {
