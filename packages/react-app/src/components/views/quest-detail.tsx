@@ -7,7 +7,10 @@ import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/style.util';
+import { Logger } from 'src/utils/logger';
+import { useToggleTheme } from 'src/hooks/use-toggle-theme';
 import Quest from '../quest';
+import MainView from '../main-view';
 
 const QuestDetailWrapperStyled = styled.div`
   padding: ${GUpx(6)};
@@ -21,27 +24,37 @@ export default function QuestDetail() {
   const toast = useToast();
   const [quest, setQuest] = useState<QuestModel | undefined>(undefined);
   const [a, setA] = useState<boolean>();
+  const { toggleTheme } = useToggleTheme();
 
   useEffect(() => {
+    let isSubscribed = true;
+    Logger.debug('quest detail');
     setPage(ENUM_PAGES.Detail);
     const fetchQuestAsync = async (questAddress: string) => {
       const questResult = await fetchQuest(questAddress);
-      if (!questResult) toast('Failed to get quest, verify address');
-      else setQuest(questResult);
-      setA(true);
+      if (isSubscribed) {
+        if (!questResult) toast('Failed to get quest, verify address');
+        else setQuest(questResult);
+        setA(true);
+      }
     };
     if (id) fetchQuestAsync(id);
+    return () => {
+      isSubscribed = false;
+    };
   }, [id]);
 
   return (
-    <QuestDetailWrapperStyled>
-      {a && (
-        <Quest
-          dataState={{ questData: quest }}
-          questMode={ENUM_QUEST_VIEW_MODE.ReadDetail}
-          isLoading={!quest}
-        />
-      )}
-    </QuestDetailWrapperStyled>
+    <MainView toggleTheme={toggleTheme}>
+      <QuestDetailWrapperStyled>
+        {a && (
+          <Quest
+            dataState={{ questData: quest }}
+            questMode={ENUM_QUEST_VIEW_MODE.ReadDetail}
+            isLoading={!quest}
+          />
+        )}
+      </QuestDetailWrapperStyled>
+    </MainView>
   );
 }

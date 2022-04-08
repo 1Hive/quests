@@ -150,6 +150,8 @@ export default function Quest({
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const [twoCol, setTwoCol] = useState(true);
 
+  let isSubscribed = true;
+
   useEffect(() => {
     setTwoCol(vw >= BREAKPOINTS.large);
   }, [vw]);
@@ -181,12 +183,20 @@ export default function Quest({
       }
     };
 
-    if (!questData.rewardToken) setBounty(null);
-    else if (questData.address) fetchBalanceOfQuest(questData.address, questData.rewardToken);
+    if (!questData.rewardToken) {
+      setBounty(null);
+    } else if (questData.address) {
+      fetchBalanceOfQuest(questData.address, questData.rewardToken);
+    }
 
     if (questMode === ENUM_QUEST_VIEW_MODE.ReadDetail) {
       getClaimDeposit();
     }
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      isSubscribed = false;
+    };
   }, [questMode, questData, walletAddress]);
 
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
@@ -266,9 +276,11 @@ export default function Quest({
                     : ENUM_TRANSACTION_STATUS.Failed,
                 },
             );
-            if (!txReceiptFundQuest?.status || !createdQuestAddress)
+            if (!txReceiptFundQuest?.status || !createdQuestAddress) {
               throw new Error('Failed to create quest');
-            else onSave(createdQuestAddress);
+            } else {
+              onSave(createdQuestAddress);
+            }
             fetchBalanceOfQuest(createdQuestAddress, values.bounty.token);
           }
         }
@@ -291,9 +303,11 @@ export default function Quest({
     if (!questData) return;
     QuestService.getBalanceOf(token, address)
       .then((result) => {
-        questData.bounty = result ?? undefined;
-        processQuestState(questData);
-        setBounty(result);
+        if (isSubscribed) {
+          questData.bounty = result ?? undefined;
+          processQuestState(questData);
+          setBounty(result);
+        }
       })
       .catch((err) => {
         Logger.exception(err);
@@ -316,6 +330,7 @@ export default function Quest({
       }
     }, 500);
   };
+
   const refresh = (data?: QuestModel) => {
     if (data) {
       setQuestData?.(data);

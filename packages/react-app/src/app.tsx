@@ -1,10 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import { Main } from '@1hive/1hive-ui';
-import { useEffect, useState } from 'react';
 import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
 import styled from 'styled-components';
-import MainView from './components/main-view';
 import ErrorBoundary from './components/utils/error-boundary';
 import { DEFAULT_THEME } from './constants';
 import { FilterContextProvider } from './contexts/filter.context';
@@ -15,10 +13,9 @@ import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
 import background from './assets/background.svg';
 import backgroundMotif from './assets/background-motif.svg';
-import { customDarkTheme } from './styles/dark-theme';
-import { customLightTheme } from './styles/light-theme';
 import { isDarkTheme } from './utils/style.util';
 import { ModalContextProvider } from './contexts/modal-context';
+import { useThemeContext } from './contexts/theme.context';
 
 // #region StyledComponents
 
@@ -40,19 +37,7 @@ const AppStyled = styled.div`
 // #endregion
 
 function App() {
-  const [currentTheme, setCurrentTheme] = useState<any>(undefined);
-
-  useEffect(() => {
-    let themeName = localStorage.getItem('forcetheme');
-    if (!themeName) themeName = DEFAULT_THEME;
-    setCurrentTheme(themeName === 'dark' ? customDarkTheme : customLightTheme);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = currentTheme._appearance === 'dark' ? customLightTheme : customDarkTheme;
-    setCurrentTheme(newTheme);
-    localStorage.setItem('theme', newTheme._appearance);
-  };
+  const { currentTheme } = useThemeContext();
 
   return (
     <AppStyled theme={currentTheme}>
@@ -70,9 +55,7 @@ function App() {
                   >
                     <HashRouter>
                       <ErrorBoundary>
-                        <MainView toggleTheme={toggleTheme}>
-                          <Routes />
-                        </MainView>
+                        <Routes />
                       </ErrorBoundary>
                     </HashRouter>
                   </Main>

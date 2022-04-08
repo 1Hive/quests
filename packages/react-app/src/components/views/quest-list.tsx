@@ -17,8 +17,10 @@ import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
 import { useQuestsContext } from 'src/contexts/quests.context';
 import styled from 'styled-components';
+import { useToggleTheme } from 'src/hooks/use-toggle-theme';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
+import MainView from '../main-view';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
   width: 100%;
@@ -47,8 +49,10 @@ export default function QuestList() {
   const [hasMore, setHasMore] = useState(true);
   const { filter, refreshed, setFilter } = useFilterContext();
   const { newQuest } = useQuestsContext();
+  const { toggleTheme } = useToggleTheme();
 
   const { setPage } = usePageContext();
+
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
   useEffect(() => {
@@ -96,43 +100,45 @@ export default function QuestList() {
   );
 
   return (
-    <Outset gu64 horizontal>
-      <InfiniteScroll
-        loader={<></>}
-        dataLength={quests.length}
-        next={loadMore}
-        hasMore={hasMore}
-        endMessage={
-          quests.length ? (
-            <Outset gu16 className="center">
-              <b>No more quests found</b>
-            </Outset>
-          ) : (
-            <Outset gu64 className="flex-center wide">
-              <EmptyStateCardStyled
-                text="No quests found"
-                action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
-              />
-            </Outset>
-          )
-        }
-        refreshFunction={refresh}
-        pullDownToRefresh={isMobile}
-        pullDownToRefreshThreshold={50}
-        pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
-        releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
-        scrollableTarget="scroll-view"
-        scrollThreshold="120px"
-      >
-        <div>
-          {quests.map((x: QuestModel) => (
-            <Outset gu16 key={x.address}>
-              <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
-            </Outset>
-          ))}
-          {isLoading && skeletonQuests}
-        </div>
-      </InfiniteScroll>
-    </Outset>
+    <MainView toggleTheme={toggleTheme}>
+      <Outset gu64 horizontal>
+        <InfiniteScroll
+          loader={<></>}
+          dataLength={quests.length}
+          next={loadMore}
+          hasMore={hasMore}
+          endMessage={
+            quests.length ? (
+              <Outset gu16 className="center">
+                <b>No more quests found</b>
+              </Outset>
+            ) : (
+              <Outset gu64 className="flex-center wide">
+                <EmptyStateCardStyled
+                  text="No quests found"
+                  action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
+                />
+              </Outset>
+            )
+          }
+          refreshFunction={refresh}
+          pullDownToRefresh={isMobile}
+          pullDownToRefreshThreshold={50}
+          pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
+          releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
+          scrollableTarget="scroll-view"
+          scrollThreshold="120px"
+        >
+          <div>
+            {quests.map((x: QuestModel) => (
+              <Outset gu16 key={x.address}>
+                <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
+              </Outset>
+            ))}
+            {isLoading && skeletonQuests}
+          </div>
+        </InfiniteScroll>
+      </Outset>
+    </MainView>
   );
 }

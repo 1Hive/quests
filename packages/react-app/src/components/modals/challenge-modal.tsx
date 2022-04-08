@@ -296,6 +296,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       }
       buttons={[
         <WalletBallance
+          key="WalletBallance-1"
           askedTokenAmount={
             isFeeDepositSameToken && challengeFee
               ? {
@@ -307,7 +308,11 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           setIsEnoughBalance={setIsEnoughBalance}
         />,
         challengeFee && !isFeeDepositSameToken && (
-          <WalletBallance askedTokenAmount={challengeFee} setIsEnoughBalance={setIsEnoughBalance} />
+          <WalletBallance
+            key="WalletBallance-2"
+            askedTokenAmount={challengeFee}
+            setIsEnoughBalance={setIsEnoughBalance}
+          />
         ),
         <AmountFieldInput
           key="challengeDeposit"
