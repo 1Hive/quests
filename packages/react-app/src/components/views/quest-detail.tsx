@@ -7,6 +7,7 @@ import { fetchQuest } from 'src/services/quest.service';
 import { useToast } from '@1hive/1hive-ui';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/style.util';
+import { Logger } from 'src/utils/logger';
 import Quest from '../quest';
 
 const QuestDetailWrapperStyled = styled.div`
@@ -24,7 +25,7 @@ export default function QuestDetail() {
 
   useEffect(() => {
     let isSubscribed = true;
-
+    Logger.debug('quest detail');
     setPage(ENUM_PAGES.Detail);
     const fetchQuestAsync = async (questAddress: string) => {
       const questResult = await fetchQuest(questAddress);

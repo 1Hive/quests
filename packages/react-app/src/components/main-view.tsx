@@ -8,6 +8,8 @@ import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
+import Skeleton from 'react-loading-skeleton';
+import { useLocation } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
@@ -73,9 +75,18 @@ function MainView({ children, toggleTheme }: Props) {
   const [scrollTopState, setScrollTop] = useState(0);
   const filterRef = useRef<HTMLDivElement>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
-  const { page } = usePageContext();
+  const { page, setPage } = usePageContext();
+  const { pathname } = useLocation();
 
   useEffect(() => {
+    if (pathname && pathname.length > 1) {
+      // FIXME Hack solution until we refactor the routes.
+      const currentRoute = pathname.substring(1, pathname.length);
+      if (currentRoute === ENUM_PAGES.Detail) {
+        setPage(currentRoute);
+      }
+    }
+
     const tryConnect = async () => {
       try {
         if (await isConnected()) activateWallet().catch(Logger.exception);
@@ -114,7 +125,9 @@ function MainView({ children, toggleTheme }: Props) {
           </Header>
         </HeaderWrapperStyled>
 
-        {page === ENUM_PAGES.List ? (
+        {page === undefined && <Skeleton />}
+
+        {page === ENUM_PAGES.List && (
           <ContentWrapperStyled>
             <LineStyled>
               <Dashboard />
@@ -125,9 +138,10 @@ function MainView({ children, toggleTheme }: Props) {
             </FilterWrapperStyled>
             {children}
           </ContentWrapperStyled>
-        ) : (
-          children
         )}
+
+        {page === ENUM_PAGES.Detail && children}
+
         <Footer />
       </ScrollViewStyled>
       {scrollTopState > 0 && <BackToTop />}

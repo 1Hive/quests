@@ -166,7 +166,7 @@ export const ENUM = {
 
 // Default values
 
-export const DEFAULT_PAGE = ENUM_PAGES.List;
+export const DEFAULT_PAGE = undefined; // FIXME Hack fix to prevent load Dashboard
 
 export const DEFAULT_FILTER = {
   address: '',
@@ -176,11 +176,3 @@ export const DEFAULT_FILTER = {
   bounty: undefined,
   status: ENUM_QUEST_STATE.Active,
 } as FilterModel;
-
-export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
-
-export const DEFAULTS = {
-  DEFAULT_PAGE,
-  DEFAULT_FILTER,
-  DEAULT_CLAIM_EXECUTION_DELAY_MS,
-};
