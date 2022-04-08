@@ -6,10 +6,10 @@ import { ENUM_PAGES } from './constants';
 export default function Routes() {
   return (
     <Switch>
-      <Redirect exact from="/" to="/home" />
       <Redirect exact from={`/${ENUM_PAGES.List}`} to="/home" />
       <Route path="/home" component={QuestList} />
       <Route path={`/${ENUM_PAGES.Detail}`} component={QuestDetail} />
+      <Redirect to="/home" />
     </Switch>
   );
 }

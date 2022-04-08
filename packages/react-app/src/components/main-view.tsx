@@ -4,12 +4,11 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { DEFAULT_PAGE, ENUM_PAGES } from 'src/constants';
+import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
 import Skeleton from 'react-loading-skeleton';
-import { useLocation } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
 import { Filter } from './filter';
@@ -75,22 +74,9 @@ function MainView({ children, toggleTheme }: Props) {
   const [scrollTopState, setScrollTop] = useState(0);
   const filterRef = useRef<HTMLDivElement>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
-  const { page, setPage } = usePageContext();
-  const { pathname } = useLocation();
+  const { page } = usePageContext();
 
   useEffect(() => {
-    Logger.debug(pathname);
-    if (pathname) {
-      // TODO Hack solution until we refactor the routes.
-      const currentRoute = pathname.substring(1, pathname.length);
-      Logger.debug(currentRoute);
-      if (currentRoute === ENUM_PAGES.Detail) {
-        setPage(ENUM_PAGES.Detail);
-      } else if (currentRoute === '' || currentRoute === 'home') {
-        setPage(DEFAULT_PAGE);
-      }
-    }
-
     const tryConnect = async () => {
       try {
         if (await isConnected()) activateWallet().catch(Logger.exception);
