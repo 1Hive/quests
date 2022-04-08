@@ -177,10 +177,4 @@ export const DEFAULT_FILTER = {
   status: ENUM_QUEST_STATE.Active,
 } as FilterModel;
 
-export const DEAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 1000;
-
-export const DEFAULTS = {
-  DEFAULT_PAGE,
-  DEFAULT_FILTER,
-  DEAULT_CLAIM_EXECUTION_DELAY_MS,
-};
+export const DEFAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 15 * 1000; // Add 15 minutes by default

@@ -203,7 +203,11 @@ export default function ScheduleClaimModal({
         />
       }
       buttons={[
-        <WalletBallance askedTokenAmount={claimDeposit} setIsEnoughBalance={setIsEnoughBalance} />,
+        <WalletBallance
+          key="WalletBallance-claimDeposit"
+          askedTokenAmount={claimDeposit}
+          setIsEnoughBalance={setIsEnoughBalance}
+        />,
         <AmountFieldInputFormik
           key="claimDeposit"
           id="claimDeposit"

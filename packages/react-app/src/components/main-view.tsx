@@ -1,18 +1,13 @@
-import { Root, useViewport, GU } from '@1hive/1hive-ui';
+import { Root, useViewport } from '@1hive/1hive-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
-import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
-import Piggy from 'src/assets/piggy';
-import { GUpx } from 'src/utils/style.util';
-import { BREAKPOINTS } from 'src/styles/breakpoints';
+import Skeleton from 'react-loading-skeleton';
 import Header from './header';
 import Footer from './footer';
-import { Filter } from './filter';
-import Dashboard from './dashboard';
 import { BackToTop } from './back-to-top';
 
 // #region StyledComponents
@@ -27,6 +22,7 @@ const HeaderWrapperStyled = styled.div`
 const ContentWrapperStyled = styled.div`
   margin-top: ${({ top }: any) => top}px;
   min-height: calc(100vh - ${({ top }: any) => top}px);
+  padding: ${({ isSmallResolution }: any) => (isSmallResolution ? '0' : '0 0 0 0')};
 `;
 
 const ScrollViewStyled = styled.div`
@@ -52,18 +48,6 @@ const ScrollViewStyled = styled.div`
   &::-webkit-scrollbar-thumb:hover {
     background-color: #a8bbbf;
   }
-`;
-
-const FilterWrapperStyled = styled.div`
-  margin: 0 ${({ margin }: any) => margin}px;
-`;
-
-const LineStyled = styled.div`
-  display: flex;
-  flex-direction: row;
-  height: 200px;
-  margin: ${GUpx(2)} ${GUpx(10)};
-  align-items: flex-end;
 `;
 
 // #endregion
@@ -116,19 +100,11 @@ function MainView({ children, toggleTheme }: Props) {
         id="scroll-view"
       >
         <HeaderWrapperStyled>
-          <Header toggleTheme={toggleTheme}>
-            {page === ENUM_PAGES.List && sticky && !below('large') && <Filter compact />}
-          </Header>
-          <FilterWrapperStyled ref={filterRef} margin={below('medium') ? 2 * GU : 8 * GU}>
-            {!sticky && page === ENUM_PAGES.List && <Filter />}
-          </FilterWrapperStyled>
+          <Header toggleTheme={toggleTheme} />
         </HeaderWrapperStyled>
-
-        {page === ENUM_PAGES.List ? (
-          <ContentWrapperStyled>{children}</ContentWrapperStyled>
-        ) : (
-          children
-        )}
+        <ContentWrapperStyled isSmallResolution={below('medium')}>
+          {page ? children : <Skeleton /> /* TODO Put some spinner here}  */}
+        </ContentWrapperStyled>
         <Footer />
       </ScrollViewStyled>
       {scrollTopState > 0 && <BackToTop />}
