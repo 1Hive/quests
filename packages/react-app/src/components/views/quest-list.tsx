@@ -1,4 +1,4 @@
-import { EmptyStateCard, Button } from '@1hive/1hive-ui';
+import { EmptyStateCard, Button, useViewport } from '@1hive/1hive-ui';
 import { debounce } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -17,10 +17,15 @@ import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
 import { useQuestsContext } from 'src/contexts/quests.context';
 import styled from 'styled-components';
-import { useToggleTheme } from 'src/hooks/use-toggle-theme';
+import Piggy from 'src/assets/piggy';
+import { GUpx } from 'src/utils/style.util';
+import { useThemeContext } from 'src/contexts/theme.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
+import Dashboard from '../dashboard';
+import { Filter } from '../filter';
+import backgroundMotif from '../../assets/background-motif.svg';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
   width: 100%;
@@ -29,6 +34,33 @@ const EmptyStateCardStyled = styled(EmptyStateCard)`
     width: fit-content;
     margin: auto;
   }
+`;
+
+const FilterWrapperStyled = styled.div`
+  margin: 0 ${({ margin }: any) => margin}px;
+  position: sticky;
+  top: 0;
+  width: calc(100% + 20px); // Size of scrollbar
+  z-index: 999;
+  background: ${({ theme }: any) => theme.background};
+  &::after {
+    content: '';
+    background: url(${backgroundMotif}) no-repeat center -156px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0.02;
+    z-index: -1;
+  }
+`;
+
+const LineStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin: ${GUpx(2)};
+  align-items: flex-end;
 `;
 
 const skeletonQuests: any[] = [];
@@ -49,7 +81,8 @@ export default function QuestList() {
   const [hasMore, setHasMore] = useState(true);
   const { filter, refreshed, setFilter } = useFilterContext();
   const { newQuest } = useQuestsContext();
-  const { toggleTheme } = useToggleTheme();
+  const { currentTheme } = useThemeContext();
+  const { below } = useViewport();
 
   const { setPage } = usePageContext();
 
@@ -99,53 +132,65 @@ export default function QuestList() {
     [], // will be created only once initially
   );
 
+  // const handleScroll = () => {
+  //   const scrollView = document.getElementById('scroll-view');
+  //   if (scrollView && filterRef.current) {
+  //     const filterHeight = filterRef.current.clientHeight;
+  //     const filterOffset = filterRef.current.offsetTop;
+  //     setScrollTop(scrollView.scrollTop);
+  //     setSticky(
+  //       scrollView.scrollTop !== undefined &&
+  //         filterOffset !== undefined &&
+  //         scrollView.scrollTop - filterOffset > filterHeight,
+  //     );
+  //   }
+  // };
+
   return (
-    <MainView toggleTheme={toggleTheme}>
+    <MainView>
       <LineStyled>
         <Dashboard />
-        <Piggy />
+        {!below('medium') && <Piggy />}
       </LineStyled>
-      <FilterWrapperStyled ref={filterRef}>
-        {!sticky && page === ENUM_PAGES.List && <Filter />}
+      <FilterWrapperStyled theme={currentTheme} isSmallResolution={below('medium')}>
+        <Filter />
       </FilterWrapperStyled>
-      <Outset gu64 horizontal>
-        <InfiniteScroll
-          loader={<></>}
-          dataLength={quests.length}
-          next={loadMore}
-          hasMore={hasMore}
-          endMessage={
-            quests.length ? (
-              <Outset gu16 className="center">
-                <b>No more quests found</b>
-              </Outset>
-            ) : (
-              <Outset gu64 className="flex-center wide">
-                <EmptyStateCardStyled
-                  text="No quests found"
-                  action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
-                />
-              </Outset>
-            )
-          }
-          refreshFunction={refresh}
-          pullDownToRefresh={isMobile}
-          pullDownToRefreshThreshold={50}
-          pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
-          releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
-          scrollableTarget="scroll-view"
-          scrollThreshold="120px"
-        >
-          <div>
-            {quests.map((x: QuestModel) => (
-              <Outset gu16 key={x.address}>
-                <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
-              </Outset>
-            ))}
-            {isLoading && skeletonQuests}
-          </div>
-        </InfiniteScroll>
-      </Outset>
+      <InfiniteScroll
+        loader={<></>}
+        dataLength={quests.length}
+        next={loadMore}
+        hasMore={hasMore}
+        endMessage={
+          quests.length ? (
+            <Outset gu16 className="center">
+              <b>No more quests found</b>
+            </Outset>
+          ) : (
+            <Outset gu64 className="flex-center wide">
+              <EmptyStateCardStyled
+                text="No quests found"
+                action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
+              />
+            </Outset>
+          )
+        }
+        refreshFunction={refresh}
+        pullDownToRefresh={isMobile}
+        pullDownToRefreshThreshold={50}
+        pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
+        releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
+        scrollableTarget="scroll-view"
+        scrollThreshold="120px"
+      >
+        <div>
+          {quests.map((x: QuestModel) => (
+            <Outset gu16 key={x.address}>
+              <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
+            </Outset>
+          ))}
+          {isLoading && skeletonQuests}
+        </div>
+      </InfiniteScroll>
     </MainView>
   );
 }

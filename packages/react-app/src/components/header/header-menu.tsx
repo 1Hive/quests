@@ -10,7 +10,7 @@ const HeaderNavStyled = styled.nav`
   display: flex;
   align-items: center;
   height: 100%;
-  margin-left: ${GUpx(2)};
+  margin: ${GUpx(2)};
 `;
 
 const HeaderNavItemStyled = styled(Link)`
@@ -52,16 +52,12 @@ export default function HeaderMenu({ below }: Props) {
             <span>Wiki</span>
             <IconExternal />
           </HeaderNavItemStyled>
+
+          {walletAddress && (
+            <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="normal" />
+          )}
         </>
       )}
-      <HeaderNavItemStyled>
-        {walletAddress && (
-          <QuestModal
-            questMode={ENUM_QUEST_VIEW_MODE.Create}
-            buttonMode={below('large') ? 'icon' : 'normal'}
-          />
-        )}
-      </HeaderNavItemStyled>
     </HeaderNavStyled>
   );
 }

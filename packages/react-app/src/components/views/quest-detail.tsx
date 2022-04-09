@@ -6,7 +6,6 @@ import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
 import { Logger } from 'src/utils/logger';
-import { useToggleTheme } from 'src/hooks/use-toggle-theme';
 import Quest from '../quest';
 import MainView from '../main-view';
 
@@ -16,7 +15,6 @@ export default function QuestDetail() {
   const toast = useToast();
   const [quest, setQuest] = useState<QuestModel | undefined>(undefined);
   const [a, setA] = useState<boolean>();
-  const { toggleTheme } = useToggleTheme();
 
   useEffect(() => {
     let isSubscribed = true;
@@ -37,7 +35,7 @@ export default function QuestDetail() {
   }, [id]);
 
   return (
-    <MainView toggleTheme={toggleTheme}>
+    <MainView>
       {a && (
         <Quest
           dataState={{ questData: quest }}

@@ -1,11 +1,14 @@
-import { Root, useViewport } from '@1hive/1hive-ui';
-import React, { useEffect, useRef, useState } from 'react';
+import { Root, useViewport, Button, IconFilter } from '@1hive/1hive-ui';
+import React, { useEffect, useRef } from 'react';
 import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { usePageContext } from 'src/contexts/page.context';
 import Skeleton from 'react-loading-skeleton';
+import { useThemeContext } from 'src/contexts/theme.context';
+import { GUpx } from 'src/utils/style.util';
+import { useFilterContext } from 'src/contexts/filter.context';
 import Header from './header';
 import Footer from './footer';
 import { BackToTop } from './back-to-top';
@@ -14,28 +17,25 @@ import { BackToTop } from './back-to-top';
 
 const HeaderWrapperStyled = styled.div`
   flex-shrink: 0;
-  position: fixed;
+  position: sticky;
   top: 0;
   width: 100%;
 `;
 
 const ContentWrapperStyled = styled.div`
-  margin-top: ${({ top }: any) => top}px;
-  min-height: calc(100vh - ${({ top }: any) => top}px);
-  padding: ${({ isSmallResolution }: any) => (isSmallResolution ? '0' : '0 0 0 0')};
+  padding: ${({ isSmallResolution }: any) => (isSmallResolution ? GUpx() : GUpx(4))};
 `;
 
 const ScrollViewStyled = styled.div`
-  margin-top: 80px;
+  height: calc(100vh - 80px); // Minus header height
   overflow-y: auto;
-  height: calc(100vh - 80px);
   /* custom scrollbar */
   &::-webkit-scrollbar {
     width: 20px;
   }
 
   &::-webkit-scrollbar-track {
-    background-color: transparent;
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
@@ -54,17 +54,15 @@ const ScrollViewStyled = styled.div`
 
 type Props = {
   children: React.ReactNode;
-  toggleTheme: Function;
 };
 
-function MainView({ children, toggleTheme }: Props) {
+function MainView({ children }: Props) {
   const { activateWallet, walletAddress } = useWallet();
-  const [sticky, setSticky] = useState(false);
-  const [scrollTopState, setScrollTop] = useState(0);
-  const filterRef = useRef<HTMLDivElement>(null);
-  const scrollViewRef = useRef<HTMLDivElement>(null);
   const { page } = usePageContext();
   const { below } = useViewport();
+  const headerRef = useRef<HTMLDivElement>(null);
+  const { currentTheme } = useThemeContext();
+  const { toggleFilter } = useFilterContext();
 
   useEffect(() => {
     const tryConnect = async () => {
@@ -77,37 +75,30 @@ function MainView({ children, toggleTheme }: Props) {
     if (!walletAddress) tryConnect();
   }, []);
 
-  const handleScroll = () => {
-    if (scrollViewRef?.current && filterRef?.current) {
-      const filterHeight = filterRef.current.clientHeight;
-      const stickyOffset = filterRef.current.offsetTop;
-      const { scrollTop } = scrollViewRef.current;
-      setScrollTop(scrollTop);
-      setSticky(
-        scrollTop !== undefined &&
-          stickyOffset !== undefined &&
-          scrollTop - stickyOffset > filterHeight,
-      );
-    }
-  };
-
   return (
     <Root.Provider>
-      <ScrollViewStyled
-        ref={scrollViewRef}
-        sticky={sticky}
-        onScroll={handleScroll}
-        id="scroll-view"
-      >
-        <HeaderWrapperStyled>
-          <Header toggleTheme={toggleTheme} />
-        </HeaderWrapperStyled>
-        <ContentWrapperStyled isSmallResolution={below('medium')}>
-          {page ? children : <Skeleton /> /* TODO Put some spinner here}  */}
+      <HeaderWrapperStyled theme={currentTheme}>
+        <Header>
+          {below('medium') && (
+            <Button
+              icon={<IconFilter />}
+              display="icon"
+              onClick={() => toggleFilter()}
+              label="Show filter"
+            />
+          )}
+        </Header>
+      </HeaderWrapperStyled>
+      <ScrollViewStyled id="scroll-view" theme={currentTheme} isSmallResolution={below('medium')}>
+        <ContentWrapperStyled
+          isSmallResolution={below('medium')}
+          top={headerRef.current?.clientHeight}
+        >
+          {page ? children : <Skeleton /> /* TODO Put some spinner here */}
         </ContentWrapperStyled>
         <Footer />
       </ScrollViewStyled>
-      {scrollTopState > 0 && <BackToTop />}
+      <BackToTop />
     </Root.Provider>
   );
 }

@@ -109,8 +109,8 @@ export const customDarkTheme = {
   tagActivityContent: '#242424',
 
   // -- BADGES --
-  badge: '#d6d9b6',
-  badgeContent: '#242424',
+  badge: '#242424',
+  badgeContent: '#d6d9b6',
 
   //  -- INFO --
   // This info color is generally stronger than infoSurface. It should be used for icons, borders, etc.

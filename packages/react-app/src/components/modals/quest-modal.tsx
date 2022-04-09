@@ -26,17 +26,13 @@ const ButtonLinkStyled = styled(Button)`
   color: ${({ theme }: any) => theme.contentSecondary};
 `;
 
-const ButtonStyled = styled(Button)`
-  min-width: 48px;
-`;
-
 // #endregion
 
 type Props = {
   data?: QuestModel;
   onClose?: ModalCallback;
   questMode: string;
-  buttonMode?: 'link' | 'strong' | 'normal' | 'icon';
+  buttonMode?: 'link' | 'strong' | 'normal' | 'icon' | 'label';
 };
 
 export default function QuestModal({
@@ -122,11 +118,11 @@ export default function QuestModal({
             {buttonLabel}
           </ButtonLinkStyled>
         ) : (
-          <ButtonStyled
+          <Button
             icon={<IconPlus />}
             label={buttonLabel}
             wide
-            mode={buttonMode}
+            mode={buttonMode === 'strong' ? 'strong' : 'normal'}
             display={buttonMode === 'icon' ? 'icon' : 'label'}
             onClick={onOpenButtonClick}
           />

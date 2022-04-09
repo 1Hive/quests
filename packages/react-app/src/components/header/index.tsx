@@ -1,13 +1,11 @@
-/* eslint-disable no-underscore-dangle */
-// @ts-nocheck
 import { BackButton, GU, useTheme, useViewport } from '@1hive/1hive-ui';
-import { ReactNode } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES } from 'src/constants';
 import { useModalContext } from 'src/contexts/modal-context';
 import { usePageContext } from 'src/contexts/page.context';
-import { isDarkTheme } from 'src/utils/style.util';
+import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
+import React from 'react';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
@@ -53,21 +51,19 @@ const BackButtonSpacerStyled = styled.span`
 `;
 
 const HeaderContentStyled = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: end;
   flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  margin-left: ${GUpx(2)};
 `;
 
 // #endregion
 
 type Props = {
-  toggleTheme: Function;
-  children: ReactNode;
+  children?: React.ReactNode;
 };
 
-// eslint-disable-next-line no-unused-vars
-function Header({ toggleTheme, children }: Props) {
+function Header({ children }: Props) {
   const theme = useTheme();
   const history = useHistory();
   const { page } = usePageContext();
@@ -84,7 +80,7 @@ function Header({ toggleTheme, children }: Props) {
           ) : (
             <BackButtonSpacerStyled />
           )}
-          <HeaderTitle external={false} />
+          <HeaderTitle />
         </HeaderLayoutContentFlexStyled>
         <HeaderContentStyled>{children}</HeaderContentStyled>
         <HeaderRightPanelStyled>

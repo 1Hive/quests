@@ -288,13 +288,13 @@ function AmountFieldInput({
                 <Tag mode="identifier">{tokens[i].symbol}</Tag>
               </LineStyled>
             )}
-            tabindex="-1"
+            tabIndex="-1"
           />
         </AutoCompleteWrapperStyled>
       )}
       {tokenEditable && isEdit && token && (
         <div className="btn-link">
-          <Button size="mini" onClick={onTokenEditClick} tabindex="-2">
+          <Button size="mini" onClick={onTokenEditClick} tabIndex="-1">
             <IconEditStyled size="medium" />
           </Button>
         </div>
