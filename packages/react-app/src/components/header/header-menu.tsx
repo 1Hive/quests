@@ -34,7 +34,7 @@ export default function HeaderMenu({ below }: Props) {
 
   return (
     <HeaderNavStyled>
-      {!below('large') && (
+      {!below('medium') && (
         <>
           <HeaderNavItemStyled
             color={theme.contentSecondary}
