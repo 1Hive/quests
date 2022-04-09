@@ -21,7 +21,6 @@ import { useThemeContext } from './contexts/theme.context';
 
 const AppStyled = styled.div`
   ${({ theme }: any) => isDarkTheme(theme) && `background-image: url(${background});`};
-  background-image: var(--bg);
 
   &::after {
     content: '';

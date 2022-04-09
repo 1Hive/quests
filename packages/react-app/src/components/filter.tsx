@@ -14,15 +14,20 @@ const StatusDropdownStyled = styled(DropDown)`
 
 const FilterWrapperStyled = styled.div`
   display: flex;
-  flex-direction: 'row';
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   flex-wrap: ${({ colDisplay }: any) => (colDisplay ? 'wrap' : 'no-wrap')};
-  margin-bottom: ${GUpx()};
-
-  ${({ isSmallResolution }: any) => isSmallResolution && 'margin-right: 20px;'}
+  padding: 0 ${GUpx(2)};
+  ${({ isSmallResolution }: any) =>
+    isSmallResolution &&
+    `
+    margin-right: 20px;
+    padding-bottom: ${GUpx(2)};
+    `} // Size of scrollbar because parent is 100% + 20px
+  // Each filter having a sibling
   & > div + div {
-    ${({ isSmallResolution }: any) => !isSmallResolution && `margin-left: ${GUpx()}`}
+    ${({ isSmallResolution }: any) => !isSmallResolution && `margin-left: ${GUpx()};`}
   }
 `;
 

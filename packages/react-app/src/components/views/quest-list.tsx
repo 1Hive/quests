@@ -26,6 +26,7 @@ import MainView from '../main-view';
 import Dashboard from '../dashboard';
 import { Filter } from '../filter';
 import backgroundMotif from '../../assets/background-motif.svg';
+import background from '../../assets/background.svg';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
   width: 100%;
@@ -37,15 +38,15 @@ const EmptyStateCardStyled = styled(EmptyStateCard)`
 `;
 
 const FilterWrapperStyled = styled.div`
-  margin: 0 ${({ margin }: any) => margin}px;
   position: sticky;
   top: 0;
   width: calc(100% + 20px); // Size of scrollbar
   z-index: 999;
-  background: ${({ theme }: any) => theme.background};
+  background-image: url(${background});
+  background-color: ${({ theme }: any) => theme.background};
   &::after {
     content: '';
-    background: url(${backgroundMotif}) no-repeat center -156px;
+    background: url(${backgroundMotif}) no-repeat center -113px;
     position: absolute;
     top: 0;
     left: 0;
@@ -131,20 +132,6 @@ export default function QuestList() {
     debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),
     [], // will be created only once initially
   );
-
-  // const handleScroll = () => {
-  //   const scrollView = document.getElementById('scroll-view');
-  //   if (scrollView && filterRef.current) {
-  //     const filterHeight = filterRef.current.clientHeight;
-  //     const filterOffset = filterRef.current.offsetTop;
-  //     setScrollTop(scrollView.scrollTop);
-  //     setSticky(
-  //       scrollView.scrollTop !== undefined &&
-  //         filterOffset !== undefined &&
-  //         scrollView.scrollTop - filterOffset > filterHeight,
-  //     );
-  //   }
-  // };
 
   return (
     <MainView>

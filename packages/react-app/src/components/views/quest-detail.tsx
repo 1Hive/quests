@@ -14,7 +14,6 @@ export default function QuestDetail() {
   const id = useQuery().get('id');
   const toast = useToast();
   const [quest, setQuest] = useState<QuestModel | undefined>(undefined);
-  const [a, setA] = useState<boolean>();
 
   useEffect(() => {
     let isSubscribed = true;
@@ -25,7 +24,6 @@ export default function QuestDetail() {
       if (isSubscribed) {
         if (!questResult) toast('Failed to get quest, verify address');
         else setQuest(questResult);
-        setA(true);
       }
     };
     if (id) fetchQuestAsync(id);
@@ -36,13 +34,11 @@ export default function QuestDetail() {
 
   return (
     <MainView>
-      {a && (
-        <Quest
-          dataState={{ questData: quest }}
-          questMode={ENUM_QUEST_VIEW_MODE.ReadDetail}
-          isLoading={!quest}
-        />
-      )}
+      <Quest
+        dataState={{ questData: quest }}
+        questMode={ENUM_QUEST_VIEW_MODE.ReadDetail}
+        isLoading={!quest}
+      />
     </MainView>
   );
 }
