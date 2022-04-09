@@ -303,7 +303,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         } as ClaimModel;
       }),
   ).then((claims) =>
-    claims.sort((a: ClaimModel, b: ClaimModel) => a.executionTimeMs! - b.executionTimeMs!),
+    claims.sort((a: ClaimModel, b: ClaimModel) => b.executionTimeMs! - a.executionTimeMs!),
   );
 }
 
