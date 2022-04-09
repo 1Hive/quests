@@ -26,7 +26,6 @@ import { arrayDistinct } from 'src/utils/array.util';
 import { DashboardModel } from 'src/models/dashboard.model';
 import {
   DEFAULT_CLAIM_EXECUTION_DELAY_MS,
-  ENUM_CLAIM_STATE,
   ENUM_QUEST_STATE,
   GQL_MAX_INT_MS,
   TOKENS,
@@ -304,11 +303,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         } as ClaimModel;
       }),
   ).then((claims) =>
-    claims.sort(
-      (a: ClaimModel, b: ClaimModel) =>
-        Object.values(ENUM_CLAIM_STATE).indexOf(a.state!) -
-        Object.values(ENUM_CLAIM_STATE).indexOf(b.state!),
-    ),
+    claims.sort((a: ClaimModel, b: ClaimModel) => a.executionTimeMs! - b.executionTimeMs!),
   );
 }
 

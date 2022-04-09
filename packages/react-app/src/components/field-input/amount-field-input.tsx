@@ -128,8 +128,8 @@ function AmountFieldInput({
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const [_hasFocused, _setHasFocused] = useState<boolean>();
   const { walletAddress } = useWallet();
-  const tokenInputId = `token-${id}`;
-  const amountInputId = `amount-${id}`;
+  const tokenInputId = tokenEditable ? id : `token-${id}`; // Handle label for
+  const amountInputId = !tokenEditable ? id : `amount-${id}`; // Handle label for
 
   // Needed since the access of state in event handlers is not working
   const hasFocusedRef = React.useRef(_hasFocused);

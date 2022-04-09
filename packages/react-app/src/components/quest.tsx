@@ -47,10 +47,6 @@ const LinkStyled = styled(Link)`
   font-weight: 100;
 `;
 
-const AddressWrapperStyled = styled.div`
-  width: 390px;
-`;
-
 const CardStyled = styled(Card)`
   justify-content: flex-start;
   align-items: flex-start;
@@ -515,21 +511,19 @@ export default function Quest({
                 formik={formRef}
               />
               {isEdit && (
-                <AddressWrapperStyled>
-                  <AddressFieldInput
-                    id="fallbackAddress"
-                    label="Funds fallback address"
-                    value={values.fallbackAddress ?? walletAddress}
-                    isLoading={loading || !questData}
-                    tooltip="Fallback Address"
-                    tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
-                    isEdit
-                    onBlur={handleBlur}
-                    error={touched.fallbackAddress && errors.fallbackAddress}
-                    onChange={handleChange}
-                    wide
-                  />
-                </AddressWrapperStyled>
+                <AddressFieldInput
+                  id="fallbackAddress"
+                  label="Funds fallback address"
+                  value={values.fallbackAddress ?? walletAddress}
+                  isLoading={loading || !questData}
+                  tooltip="Fallback Address"
+                  tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                  isEdit
+                  onBlur={handleBlur}
+                  error={touched.fallbackAddress && errors.fallbackAddress}
+                  onChange={handleChange}
+                  wide
+                />
               )}
             </SecondColStyled>
           </>
