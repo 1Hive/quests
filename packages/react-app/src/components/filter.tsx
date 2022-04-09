@@ -20,11 +20,12 @@ const FilterWrapperStyled = styled.div`
   flex-wrap: ${({ colDisplay }: any) => (colDisplay ? 'wrap' : 'no-wrap')};
   padding: 0 ${GUpx(2)};
   ${({ isSmallResolution }: any) =>
-    isSmallResolution &&
-    `
+    isSmallResolution
+      ? `
     margin-right: 20px;
     padding-bottom: ${GUpx(2)};
-    `} // Size of scrollbar because parent is 100% + 20px
+    `
+      : 'height:80px;'} // Size of scrollbar because parent is 100% + 20px
   // Each filter having a sibling
   & > div + div {
     ${({ isSmallResolution }: any) => !isSmallResolution && `margin-left: ${GUpx()};`}
