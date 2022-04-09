@@ -10,14 +10,19 @@ import { FieldInput } from './field-input';
 const TextInputStyled = styled(TextInput)`
   border-radius: 8px;
   padding-right: 42px;
-  max-width: 400px;
-  ${({ wide }: any) => wide && 'width:100%;'}
-  cursor: ${({ isEdit }: any) => (isEdit ? 'text' : 'default')};
 `;
 
 const EthIdenticonStyled = styled(EthIdenticon)`
   border-radius: 0 8px 8px 0;
   padding: 0;
+`;
+
+const AddressWrapperStyled = styled.div`
+  max-width: 400px;
+  ${({ wide }: any) => wide && 'width:100%;'}
+  input {
+    cursor: ${({ isEdit }: any) => (isEdit ? 'text' : 'default')};
+  }
 `;
 
 // #endregion
@@ -51,7 +56,7 @@ export function AddressFieldInput({
   error,
 }: Props) {
   const loadableContent = (
-    <>
+    <AddressWrapperStyled isEdit={isEdit} wide={wide}>
       {isEdit ? (
         <TextInputStyled
           wide={wide}
@@ -66,7 +71,7 @@ export function AddressFieldInput({
       ) : (
         <AddressField address={value} wide={wide} autofocus={false} />
       )}
-    </>
+    </AddressWrapperStyled>
   );
   return (
     <FieldInput
