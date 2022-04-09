@@ -1,5 +1,7 @@
+/* eslint-disable react/button-has-type */
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import { Help, IconQuestion, useTheme } from '@1hive/1hive-ui';
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
@@ -49,17 +51,35 @@ type Props = {
 
 export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) => {
   const theme = useTheme();
+  const wrapperRef = useRef<HTMLElement>(null);
+
+  const handleEnter = () => {
+    const btn = wrapperRef.current?.getElementsByTagName('button')[0];
+    btn?.click();
+  };
+  const handleLeave = () => {
+    document.dispatchEvent(new KeyboardEvent('keydown', { keyCode: 27 }));
+  };
+
   return (
-    <HelpWrapperStyled className="btn-no-margin" theme={theme}>
-      {tooltipDetail || children ? (
-        <Help hint={tooltip ?? tooltipDetail}>
-          <TooltipWrapperStyled color={theme.accentContent}>
-            {tooltipDetail ?? children}
-          </TooltipWrapperStyled>
-        </Help>
-      ) : (
-        <IconSpanStyled title={tooltip}>{icon ?? <IconQuestion size="tiny" />}</IconSpanStyled>
-      )}
-    </HelpWrapperStyled>
+    <>
+      <HelpWrapperStyled
+        className="btn-no-margin"
+        theme={theme}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        ref={wrapperRef}
+      >
+        {tooltipDetail || children ? (
+          <Help hint={tooltip ?? tooltipDetail} className="test">
+            <TooltipWrapperStyled color={theme.accentContent}>
+              {tooltipDetail ?? children}
+            </TooltipWrapperStyled>
+          </Help>
+        ) : (
+          <IconSpanStyled title={tooltip}>{icon ?? <IconQuestion size="tiny" />}</IconSpanStyled>
+        )}
+      </HelpWrapperStyled>
+    </>
   );
 };
