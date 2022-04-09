@@ -183,7 +183,6 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | 
 export function getDefaultProvider() {
   const { chainId: expectedChainId } = getNetwork();
   let provider = ethOrWeb;
-  console.log(provider);
   // Logger.debug('expectedChainId', +expectedChainId);
   // Logger.debug('+provider.chainId', +provider.chainId);
   if (!provider || +provider.chainId !== +expectedChainId) {
