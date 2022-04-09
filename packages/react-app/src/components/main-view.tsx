@@ -76,16 +76,16 @@ function MainView({ children, toggleTheme }: Props) {
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const { page } = usePageContext();
 
-  // useEffect(() => {
-  // const tryConnect = async () => {
-  //   try {
-  //     if (await isConnected()) activateWallet().catch(Logger.exception);
-  //   } catch (error) {
-  //     Logger.exception(error);
-  //   }
-  // };
-  // if (!walletAddress) tryConnect();
-  // }, []);
+  useEffect(() => {
+    const tryConnect = async () => {
+      try {
+        if (await isConnected()) activateWallet().catch(Logger.exception);
+      } catch (error) {
+        Logger.exception(error);
+      }
+    };
+    if (!walletAddress) tryConnect();
+  }, []);
 
   const handleScroll = () => {
     if (scrollViewRef?.current && filterRef?.current) {

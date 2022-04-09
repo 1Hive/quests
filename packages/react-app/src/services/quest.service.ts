@@ -530,7 +530,7 @@ export async function getBalanceOf(
       return {
         token: tokenInfo,
         parsedAmount,
-        usdValue: ethers.utils.parseEther(price).mul(parsedAmount),
+        usdValue: ethers.utils.parseEther(price).mul(balance),
       };
     }
   } catch (error) {
