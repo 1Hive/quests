@@ -2,7 +2,6 @@ import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
-import { useModalContext } from 'src/contexts/modal-context';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -21,6 +20,7 @@ const TitleStyled = styled.div`
 
 const ModalStyled = styled(Modal)`
   padding: ${GUpx()};
+  z-index: 9999;
 `;
 
 const ScrollViewStyled = styled(ScrollView)`
@@ -54,10 +54,8 @@ export default function ModalBase({
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
-  const { setIsOpen } = useModalContext();
   useEffect(() => {
     if (isOpen) {
-      setIsOpen(isOpen);
       // Clear tx if a tx is still there and already completed
       if (
         transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
@@ -72,9 +70,6 @@ export default function ModalBase({
 
       document.addEventListener('keydown', escFunction, false);
     } else {
-      setTimeout(() => {
-        setIsOpen(isOpen);
-      }, 550);
       document.removeEventListener('keydown', escFunction, false);
     }
 

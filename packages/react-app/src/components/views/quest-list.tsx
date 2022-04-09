@@ -41,7 +41,7 @@ const FilterWrapperStyled = styled.div`
   position: sticky;
   top: 0;
   width: calc(100% + 20px); // Size of scrollbar
-  z-index: 999;
+  z-index: 1;
   background-image: url(${background});
   background-color: ${({ theme }: any) => theme.background};
   &::after {

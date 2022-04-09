@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Main } from '@1hive/1hive-ui';
 import { hot } from 'react-hot-loader/root';
 import { HashRouter } from 'react-router-dom';
@@ -14,7 +13,6 @@ import Routes from './Routes';
 import background from './assets/background.svg';
 import backgroundMotif from './assets/background-motif.svg';
 import { isDarkTheme } from './utils/style.util';
-import { ModalContextProvider } from './contexts/modal-context';
 import { useThemeContext } from './contexts/theme.context';
 
 // #region StyledComponents
@@ -44,26 +42,24 @@ function App() {
     <AppStyled theme={currentTheme}>
       <WalletProvider>
         <PageContextProvider>
-          <ModalContextProvider>
-            <TransactionContextProvider>
-              <QuestsContextProvider>
-                <FilterContextProvider>
-                  <Main
-                    assetsUrl="/aragon-ui/"
-                    layout={false}
-                    scrollView={false}
-                    theme={currentTheme ?? DEFAULT_THEME}
-                  >
-                    <HashRouter>
-                      <ErrorBoundary>
-                        <Routes />
-                      </ErrorBoundary>
-                    </HashRouter>
-                  </Main>
-                </FilterContextProvider>
-              </QuestsContextProvider>
-            </TransactionContextProvider>
-          </ModalContextProvider>
+          <TransactionContextProvider>
+            <QuestsContextProvider>
+              <FilterContextProvider>
+                <Main
+                  assetsUrl="/aragon-ui/"
+                  layout={false}
+                  scrollView={false}
+                  theme={currentTheme ?? DEFAULT_THEME}
+                >
+                  <HashRouter>
+                    <ErrorBoundary>
+                      <Routes />
+                    </ErrorBoundary>
+                  </HashRouter>
+                </Main>
+              </FilterContextProvider>
+            </QuestsContextProvider>
+          </TransactionContextProvider>
         </PageContextProvider>
       </WalletProvider>
     </AppStyled>

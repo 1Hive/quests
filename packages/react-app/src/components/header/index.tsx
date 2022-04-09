@@ -1,7 +1,6 @@
 import { BackButton, GU, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES } from 'src/constants';
-import { useModalContext } from 'src/contexts/modal-context';
 import { usePageContext } from 'src/contexts/page.context';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -17,9 +16,6 @@ const HeaderWraperStyled = styled.header`
   z-index: 3;
   box-shadow: rgba(0, 0, 0, 0.05) 0 2px 3px;
   align-items: center;
-  & > div {
-    ${({ isModalOpen }: any) => isModalOpen && 'opacity:0.3;'}
-  }
 `;
 
 const HeaderLayoutContentStyled = styled.div`
@@ -68,11 +64,10 @@ function Header({ children }: Props) {
   const history = useHistory();
   const { page } = usePageContext();
   const { below } = useViewport();
-  const { isOpen } = useModalContext();
   const layoutSmall = below('medium');
 
   return (
-    <HeaderWraperStyled theme={theme} isModalOpen={isOpen}>
+    <HeaderWraperStyled theme={theme}>
       <HeaderLayoutContentStyled>
         <HeaderLayoutContentFlexStyled>
           {page !== ENUM_PAGES.List ? (
