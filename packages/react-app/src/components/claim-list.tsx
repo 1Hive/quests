@@ -1,4 +1,4 @@
-import { Accordion, useTheme } from '@1hive/1hive-ui';
+import { Accordion } from '@1hive/1hive-ui';
 import { ClaimModel } from 'src/models/claim.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import styled from 'styled-components';
