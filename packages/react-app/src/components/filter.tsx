@@ -12,12 +12,10 @@ const StatusDropdownStyled = styled(DropDown)`
   border: 1px solid ${(props: any) => props.borderColor};
 `;
 
-interface FilterWrapperProps {
+const FilterWrapperStyled = styled.div<{
   colDisplay?: boolean;
   isSmallResolution?: boolean;
-}
-
-const FilterWrapperStyled = styled.div<FilterWrapperProps>`
+}>`
   display: flex;
   flex-direction: row;
   align-items: center;

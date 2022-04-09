@@ -37,13 +37,15 @@ const EmptyStateCardStyled = styled(EmptyStateCard)`
   }
 `;
 
-const FilterWrapperStyled = styled.div`
+const FilterWrapperStyled = styled.div<{
+  backgroundMotif?: any; // TODO Check if it still used
+}>`
   position: sticky;
   top: 0;
   width: calc(100% + 20px); // Size of scrollbar
   z-index: 1;
   background-image: url(${background});
-  background-color: ${({ theme }: any) => theme.background};
+  background-color: ${({ theme }) => theme.background};
   &::after {
     content: '';
     background: url(${backgroundMotif}) no-repeat center -113px;
@@ -139,7 +141,7 @@ export default function QuestList() {
         <Dashboard />
         {!below('medium') && <Piggy />}
       </LineStyled>
-      <FilterWrapperStyled theme={currentTheme} isSmallResolution={below('medium')}>
+      <FilterWrapperStyled theme={currentTheme}>
         <Filter />
       </FilterWrapperStyled>
       <InfiniteScroll
