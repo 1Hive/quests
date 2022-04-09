@@ -37,12 +37,12 @@ const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
 `;
 
-const AutoCompleteWrapperStyled = styled.div`
+const AutoCompleteWrapperStyled = styled.div<{ wide?: boolean }>`
   flex-grow: 3;
   input {
     & + div {
       pointer-events: none;
-      ${({ wide }: any) => (wide ? 'justify-content: end;' : '')}
+      ${({ wide }) => (wide ? 'justify-content: end;' : '')}
     }
   }
   ul[role='listbox'] {
@@ -60,13 +60,16 @@ const LineStyled = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-
-const AmountTokenWrapperStyled = styled.div`
+interface AmountTokenWrapperStyledProps {
+  isEdit?: boolean;
+  wide?: boolean;
+}
+const AmountTokenWrapperStyled = styled.div<AmountTokenWrapperStyledProps>`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  ${({ wide, isEdit }: any) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
-  ${({ wide }: any) => (wide ? `width:100%;` : 'max-width:100%;')}
+  ${({ wide, isEdit }) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
+  ${({ wide }) => (wide ? `width:100%;` : 'max-width:100%;')}
 `;
 
 const IconEditStyled = styled(IconEdit)`

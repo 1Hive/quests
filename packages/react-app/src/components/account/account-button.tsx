@@ -7,14 +7,19 @@ import HeaderModule from '../header/header-module';
 
 // #region StyledComponents
 
-const AccountButtonBackgroundStyled = styled.div`
+interface AccountButtonBackgroundStyledProps {
+  background: any;
+  borderColor: any;
+}
+
+const AccountButtonBackgroundStyled = styled.div<AccountButtonBackgroundStyledProps>`
   position: absolute;
   bottom: -3px;
   right: -3px;
   width: 10px;
   height: 10px;
-  background: ${({ background }: any) => background};
-  border: 2px solid ${({ borderColor }: any) => borderColor};
+  background: ${({ background }) => background};
+  border: 2px solid ${({ borderColor }) => borderColor};
   border-radius: 50%;
 `;
 

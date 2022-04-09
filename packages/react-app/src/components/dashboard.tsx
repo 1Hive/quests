@@ -1,4 +1,4 @@
-import { GU, useTheme, textStyle } from '@1hive/1hive-ui';
+import { useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { DashboardModel } from 'src/models/dashboard.model';
@@ -52,7 +52,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <BoxStyled padding={2 * GU} theme={theme}>
+    <BoxStyled theme={theme}>
       <ChildSpacer justify="space-around" align="center">
         <FieldInput
           label={<LabelStyled>Bounty Pool</LabelStyled>}
