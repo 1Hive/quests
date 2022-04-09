@@ -288,7 +288,7 @@ function AmountFieldInput({
                 <Tag mode="identifier">{tokens[i].symbol}</Tag>
               </LineStyled>
             )}
-            tabindex="-1"
+            tabIndex="-1"
           />
         </AutoCompleteWrapperStyled>
       )}

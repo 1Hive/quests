@@ -7,11 +7,13 @@ export const UniswapPairsEntityQuery = gql`
       token0 {
         token: id
         symbol
+        decimals
       }
       token0Price
       token1 {
         token: id
         symbol
+        decimals
       }
       token1Price
       totalSupply
