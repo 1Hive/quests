@@ -38,6 +38,9 @@ const HelpWrapperStyled = styled.div`
   svg {
     color: ${({ theme }: any) => theme.hint}!important;
   }
+  button:focus::after {
+    border: none;
+  }
 `;
 
 // #endregion
