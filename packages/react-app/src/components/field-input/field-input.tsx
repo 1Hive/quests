@@ -2,7 +2,7 @@ import { useTheme } from '@1hive/1hive-ui';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/style.util';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
 const FieldStyled = styled.div<{
@@ -10,8 +10,19 @@ const FieldStyled = styled.div<{
   isLoading?: boolean;
   wide?: boolean;
 }>`
-  ${({ compact }) => (!compact ? `margin-bottom:${GUpx(1)}` : '')};
-  ${({ isLoading, wide }) => (isLoading || wide ? `width: 100%;` : 'max-width: 100%;')};
+  ${({ compact }) =>
+    !compact &&
+    css`
+      margin-bottom: ${GUpx(1)};
+    `};
+  ${({ isLoading, wide }) =>
+    isLoading || wide
+      ? css`
+          width: 100%;
+        `
+      : css`
+          max-width: 100%;
+        `};
 `;
 
 const ErrorStyled = styled.span`
