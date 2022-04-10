@@ -15,8 +15,7 @@ type Props = {
   placeHolder?: string;
   value?: number;
   wide?: boolean;
-  tooltip?: string;
-  tooltipDetail?: ReactNode;
+  tooltip?: ReactNode;
   suffix?: string;
   compact?: boolean;
   onBlur?: Function;
@@ -36,7 +35,6 @@ export default function NumberFieldInput({
   min,
   isRequired = false,
   tooltip,
-  tooltipDetail,
   suffix = '',
   compact = false,
   onBlur = noop,
@@ -47,7 +45,6 @@ export default function NumberFieldInput({
       id={id}
       label={label}
       tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
       compact={compact}
       isLoading={isLoading}
       error={error}

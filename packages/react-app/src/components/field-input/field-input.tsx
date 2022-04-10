@@ -54,8 +54,7 @@ const SkeletonWrapperStyled = styled.div`
 type Props = {
   compact?: boolean;
   label?: React.ReactNode;
-  tooltip?: string;
-  tooltipDetail?: React.ReactNode;
+  tooltip?: React.ReactNode;
   children: React.ReactNode;
   id?: string;
   isLoading?: boolean;
@@ -70,7 +69,6 @@ export function FieldInput({
   children,
   compact,
   tooltip,
-  tooltipDetail,
   label,
   isLoading = false,
   wide = false,
@@ -84,7 +82,7 @@ export function FieldInput({
       <LabelStyled color={theme.contentSecondary} htmlFor={id} title={tooltip}>
         {label}
       </LabelStyled>
-      {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+      {tooltip && <IconTooltip tooltip={tooltip} />}
     </LineStyled>
   );
   return (

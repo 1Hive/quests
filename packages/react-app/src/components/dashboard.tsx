@@ -57,16 +57,14 @@ export default function Dashboard() {
       <ChildSpacer justify="space-around" align="center">
         <FieldInput
           label={<LabelStyled>Bounty Pool</LabelStyled>}
-          tooltip="Not yet implemented"
-          tooltipDetail="Total of the quest bounties converted into USD"
+          tooltip="Total of the quest bounties converted into USD"
           isLoading={!dashboardModel}
         >
           <TextStyled theme={theme}>$ {dashboardModel?.totalFunds}</TextStyled>
         </FieldInput>
         <FieldInput
           label={<LabelStyled>Open Quests</LabelStyled>}
-          tooltip="Number of active Quests"
-          tooltipDetail="All the quests that are currently not expired or closed"
+          tooltip="All the quests that are currently not expired or closed"
           isLoading={!dashboardModel}
         >
           <TextStyled theme={theme}>{dashboardModel?.questCount}</TextStyled>

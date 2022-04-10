@@ -271,10 +271,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       title={
         <HeaderStyled>
           <h1>Challenge quests</h1>
-          <IconTooltip
-            tooltip="What is a challenge?"
-            tooltipDetail="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge."
-          />
+          <IconTooltip tooltip="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge." />
         </HeaderStyled>
       }
       openButton={
@@ -318,8 +315,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           key="challengeDeposit"
           id="challengeDeposit"
           label="Challenge Deposit"
-          tooltip="Challenge Deposit"
-          tooltipDetail="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
+          tooltip="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
           isLoading={loading}
           value={challengeDeposit}
           compact
@@ -328,8 +324,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           key="challengeFee"
           id="challengeFee"
           label="Challenge fee"
-          tooltip="Challenge fee"
-          tooltipDetail="This is the challenge cost defined by Celeste."
+          tooltip="This is the challenge cost defined by Celeste."
           isLoading={loading || challengeFee === undefined}
           value={challengeFee}
           compact
@@ -373,8 +368,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 id="reason"
                 isEdit
                 label="Challenge reason"
-                tooltip="Challenge reason"
-                tooltipDetail="Reason why this claim should be challenged."
+                tooltip="Reason why this claim should be challenged."
                 isLoading={loading}
                 value={values.reason}
                 onChange={handleChange}

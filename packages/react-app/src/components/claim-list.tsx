@@ -96,10 +96,7 @@ export default function ClaimList({
         <>
           <ClaimHeaderStyled>
             <HeaderStyled>Claims</HeaderStyled>
-            <IconTooltip
-              tooltip="Claims"
-              tooltipDetail="A claim includes the proof of the quest's completion."
-            />
+            <IconTooltip tooltip="A claim includes the proof of the quest's completion." />
           </ClaimHeaderStyled>
           <Accordion
             items={claims.map((claim: ClaimModel) => {

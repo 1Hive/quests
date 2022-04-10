@@ -220,7 +220,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
                   </LinkStyled>
                 ) : (
                   <IconTooltip
-                    tooltipDetail={`This is a mocked celeste dispute with id ${dispute.id}`}
+                    tooltip={`This is a mocked celeste dispute with id ${dispute.id}`}
                     key={dispute.id}
                   />
                 )}

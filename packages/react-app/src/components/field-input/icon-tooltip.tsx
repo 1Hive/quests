@@ -46,13 +46,12 @@ const HelpWrapperStyled = styled.div`
 // #endregion
 
 type Props = {
-  tooltip?: string;
-  tooltipDetail?: ReactNode;
+  tooltip?: ReactNode;
   icon?: ReactNode;
   children?: ReactNode;
 };
 
-export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) => {
+export const IconTooltip = ({ tooltip, icon, children }: Props) => {
   const theme = useTheme();
   const wrapperRef = useRef<HTMLElement>(null);
 
@@ -73,10 +72,10 @@ export const IconTooltip = ({ tooltip, tooltipDetail, icon, children }: Props) =
         onMouseLeave={handleLeave}
         ref={wrapperRef}
       >
-        {tooltipDetail || children ? (
-          <Help hint={tooltip ?? tooltipDetail} className="test">
+        {tooltip || children ? (
+          <Help hint={tooltip}>
             <TooltipWrapperStyled color={theme.accentContent}>
-              {tooltipDetail ?? children}
+              {children ?? tooltip}
             </TooltipWrapperStyled>
           </Help>
         ) : (
