@@ -19,10 +19,9 @@ const EthIdenticonStyled = styled(EthIdenticon)`
   height: 38.4px;
 `;
 
-interface WrapperStyledProps {
+const WrapperStyled = styled.div<{
   wide?: boolean;
-}
-const WrapperStyled = styled.div<WrapperStyledProps>`
+}>`
   display: flex;
   flex-wrap: nowrap;
   ${(props) =>
