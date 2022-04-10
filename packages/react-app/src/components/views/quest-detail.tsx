@@ -26,7 +26,6 @@ export default function QuestDetail() {
         if (!questResult) toast('Failed to get quest, verify address');
         else setQuest(questResult);
         setLoading(false);
-        console.log(questResult);
       }
     };
     if (id) fetchQuestAsync(id);
