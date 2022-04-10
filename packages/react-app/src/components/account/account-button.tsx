@@ -7,12 +7,10 @@ import HeaderModule from '../header/header-module';
 
 // #region StyledComponents
 
-interface AccountButtonBackgroundStyledProps {
-  background: any;
-  borderColor: any;
-}
-
-const AccountButtonBackgroundStyled = styled.div<AccountButtonBackgroundStyledProps>`
+const AccountButtonBackgroundStyled = styled.div<{
+  background: string;
+  borderColor: string;
+}>`
   position: absolute;
   bottom: -3px;
   right: -3px;
