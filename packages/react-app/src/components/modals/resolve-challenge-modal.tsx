@@ -24,7 +24,7 @@ import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
 import { DisputeModel } from '../../models/dispute.model';
 import TextFieldInput from '../field-input/text-field-input';
-import { IconTooltip } from '../field-input/icon-tooltip';
+import { HelpTooltip } from '../field-input/help-tooltip';
 
 // #region StyledComponents
 
@@ -219,7 +219,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
                     See dispute
                   </LinkStyled>
                 ) : (
-                  <IconTooltip
+                  <HelpTooltip
                     tooltip={`This is a mocked celeste dispute with id ${dispute.id}`}
                     key={dispute.id}
                   />

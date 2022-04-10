@@ -3,7 +3,7 @@ import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
-import { IconTooltip } from './icon-tooltip';
+import { HelpTooltip } from './help-tooltip';
 
 const FieldStyled = styled.div`
   ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(1)}` : '')};
@@ -82,7 +82,7 @@ export function FieldInput({
       <LabelStyled color={theme.contentSecondary} htmlFor={id} title={tooltip}>
         {label}
       </LabelStyled>
-      {tooltip && <IconTooltip tooltip={tooltip} />}
+      {tooltip && <HelpTooltip tooltip={tooltip} />}
     </LineStyled>
   );
   return (

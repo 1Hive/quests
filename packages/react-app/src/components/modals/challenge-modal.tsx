@@ -20,7 +20,7 @@ import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
-import { IconTooltip } from '../field-input/icon-tooltip';
+import { HelpTooltip } from '../field-input/help-tooltip';
 import { WalletBallance } from '../wallet-balance';
 
 // #region StyledComponents
@@ -271,7 +271,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       title={
         <HeaderStyled>
           <h1>Challenge quests</h1>
-          <IconTooltip tooltip="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge." />
+          <HelpTooltip tooltip="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge." />
         </HeaderStyled>
       }
       openButton={
