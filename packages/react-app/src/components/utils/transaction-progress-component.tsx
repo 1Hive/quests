@@ -15,8 +15,8 @@ const WrapperStyled = styled.div`
   flex-direction: column;
 `;
 
-const MessageStyled = styled.div`
-  color: ${({ messageColor }: any) => messageColor};
+const MessageStyled = styled.div<{ messageColor?: string }>`
+  color: ${({ messageColor }) => messageColor};
   margin-bottom: ${GUpx()};
 `;
 

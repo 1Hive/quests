@@ -1,28 +1,42 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties, FocusEventHandler, ReactNode } from 'react';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
-import styled from 'styled-components';
+import styled, { css as _css } from 'styled-components';
 import { addTime, dateFormat, ONE_HOUR_IN_MS } from '../../utils/date.utils';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
 
-const InputStyled = styled.input`
-  ${(props: any) => (props.wide ? 'width:100%;' : '')}
-  border: 1px solid ${(props: any) => props.borderColor};
+const InputStyled = styled.input<{
+  borderColor?: string;
+  focusBorderColor?: string;
+  background?: string;
+  wide?: boolean;
+  isDarkTheme?: boolean;
+}>`
+  ${(props: any) =>
+    props.wide &&
+    _css`
+      width: 100%;
+    `}
+  border: 1px solid ${(props) => props.borderColor};
   border-radius: 12px;
-  background-color: ${({ background }: any) => background};
+  background-color: ${({ background }) => background};
   height: 40px;
   padding: ${GUpx()};
   font-size: 14px;
   &:focus-visible {
-    border: 1px solid ${(props: any) => props.focusBorderColor};
+    border: 1px solid ${(props) => props.focusBorderColor};
     outline: none;
   }
   &::-webkit-calendar-picker-indicator {
-    ${(props: any) => (props.isDarkTheme ? 'filter: invert();' : '')};
+    ${(props) =>
+      props.isDarkTheme &&
+      _css`
+        filter: invert();
+      `};
   }
 `;
 
@@ -41,7 +55,7 @@ type Props = {
   compact?: boolean;
   wide?: boolean;
   formik?: any;
-  onBlur?: Function;
+  onBlur?: FocusEventHandler<HTMLInputElement> & Function;
   error?: string | false;
 };
 

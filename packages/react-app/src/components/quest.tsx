@@ -82,12 +82,12 @@ const FormStyled = styled(Form)`
   }
 `;
 
-const TwoColumnStyled = styled.div`
+const TwoColumnStyled = styled.div<{ twoCol?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  ${(props: any) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
+  ${(props) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
 `;
 
 const FirstColStyled = styled.div`
@@ -413,7 +413,7 @@ export default function Quest({
         )}
         <TwoColumnStyled twoCol={twoCol}>
           <>
-            <FirstColStyled gu16 className="pb-0">
+            <FirstColStyled className="pb-0">
               {isEdit && titleInput}
               <TextFieldInput
                 id="description"
@@ -454,7 +454,7 @@ export default function Quest({
                 }
               />
             </FirstColStyled>
-            <SecondColStyled wide={isEdit}>
+            <SecondColStyled>
               {(bounty !== null || isEdit) && (
                 <AmountFieldInputFormik
                   id="bounty"

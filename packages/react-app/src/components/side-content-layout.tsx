@@ -1,6 +1,6 @@
 import { useViewport } from '@1hive/1hive-ui';
 import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { BREAKPOINTS } from '../styles/breakpoints';
 
 const WrapperStyled = styled.div`
@@ -24,10 +24,10 @@ const FooterStyled = styled.div`
   transition: all 5s linear;
 `;
 
-const ScrollViewStyled = styled.div`
-  ${(props: any) =>
-    props.scrollable
-      ? `
+const ScrollViewStyled = styled.div<{ scrollable?: boolean }>`
+  ${(props) =>
+    props.scrollable &&
+    css`
       overflow-x: auto;
       ::-webkit-scrollbar {
         display: none;
@@ -35,8 +35,7 @@ const ScrollViewStyled = styled.div`
       -ms-overflow-style: none;
       scrollbar-width: none;
       height: calc(100vh - 64px);
-      `
-      : ''}
+    `}
 
   grid-area: m;
 `;
@@ -50,8 +49,8 @@ type Props = {
 function SideContentLayout({ main, side, footer }: Props) {
   const { width: vw } = useViewport();
   const wrapperElement = document.getElementById('main-scroll');
-  const scrollRef = useRef<HTMLDivElement>();
-  const footerRef = useRef<HTMLDivElement>();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
   const [isOneCol, setIsOneCol] = useState(false);
 
   useEffect(() => {
@@ -101,7 +100,7 @@ function SideContentLayout({ main, side, footer }: Props) {
 
   return (
     <>
-      <WrapperStyled isOneCol={isOneCol} id="main-scroll">
+      <WrapperStyled id="main-scroll">
         {side && <SideBlockStyled>{side}</SideBlockStyled>}
         <ScrollViewStyled scrollable={!isOneCol} id="scroll-view" ref={scrollRef}>
           {main}

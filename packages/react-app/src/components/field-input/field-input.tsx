@@ -5,16 +5,22 @@ import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { IconTooltip } from './icon-tooltip';
 
-const FieldStyled = styled.div`
-  ${({ compact }: any) => (!compact ? `margin-bottom:${GUpx(1)}` : '')};
-  ${({ isLoading, wide }: any) => (isLoading || wide ? `width: 100%;` : 'max-width: 100%;')};
+const FieldStyled = styled.div<{
+  compact?: boolean;
+  isLoading?: boolean;
+  wide?: boolean;
+}>`
+  ${({ compact }) => (!compact ? `margin-bottom:${GUpx(1)}` : '')};
+  ${({ isLoading, wide }) => (isLoading || wide ? `width: 100%;` : 'max-width: 100%;')};
 `;
+
 const ErrorStyled = styled.span`
   color: ${(props: any) => props.theme.negative};
   font-size: small;
   margin-left: ${GUpx(2)};
   font-style: italic;
 `;
+
 const LabelStyled = styled.label`
   color: ${(props: any) => props.color};
   font-size: 12px;
@@ -33,16 +39,21 @@ const LineStyled = styled.div`
   margin-top: ${GUpx(0.5)};
 `;
 
-const ContentWrapperStyled = styled.div`
+const ContentWrapperStyled = styled.div<{
+  compact?: boolean;
+  wide?: boolean;
+  align: string;
+  direction: string;
+}>`
   display: flex;
-  align-items: ${({ align }: any) => align};
-  ${(props: any) => (!props.compact ? 'min-height: 45px;' : '')}
+  align-items: ${({ align }) => align};
+  ${(props) => (!props.compact ? 'min-height: 45px;' : '')}
   & > div {
     input {
-      ${({ wide }: any) => (wide ? `max-width:none;` : '')}
+      ${({ wide }) => (wide ? `max-width:none;` : '')}
     }
   }
-  flex-direction: ${({ direction }: any) => direction};
+  flex-direction: ${({ direction }) => direction};
   padding-left: ${GUpx(0.5)};
 `;
 

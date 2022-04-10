@@ -22,8 +22,11 @@ const HeaderWrapperStyled = styled.div`
   width: 100%;
 `;
 
-const ContentWrapperStyled = styled.div`
-  padding: ${({ isSmallResolution }: any) => (isSmallResolution ? GUpx() : GUpx(4))};
+const ContentWrapperStyled = styled.div<{
+  isSmallResolution?: boolean;
+  top?: number;
+}>`
+  padding: ${({ isSmallResolution }) => (isSmallResolution ? GUpx() : GUpx(4))};
 `;
 
 const ScrollViewStyled = styled.div`
@@ -89,7 +92,7 @@ function MainView({ children }: Props) {
           )}
         </Header>
       </HeaderWrapperStyled>
-      <ScrollViewStyled id="scroll-view" theme={currentTheme} isSmallResolution={below('medium')}>
+      <ScrollViewStyled id="scroll-view" theme={currentTheme}>
         <ContentWrapperStyled
           isSmallResolution={below('medium')}
           top={headerRef.current?.clientHeight}

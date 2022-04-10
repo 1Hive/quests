@@ -6,11 +6,9 @@ type Props = {
   animated?: boolean;
 };
 
-interface DivStyledProps {
+const DivStyled = styled.div<{
   animated?: boolean;
-}
-
-const DivStyled = styled.div<DivStyledProps>`
+}>`
   @keyframes textScale1 {
     0% {
       transform: scale(1);
