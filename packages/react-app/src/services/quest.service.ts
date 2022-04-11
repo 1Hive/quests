@@ -51,7 +51,7 @@ import {
 } from '../utils/contract.util';
 import { processQuestState } from './state-machine';
 import { getLastBlockTimestamp, msToSec } from '../utils/date.utils';
-import { fetchRoutePairWithStable } from './uniswap.service';
+import { cacheFetchTokenPrice } from './cache.service';
 
 let questList: QuestModel[] = [];
 
@@ -400,10 +400,10 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
     (
       await Promise.all(
         fundsUniqueToken.map(async (tokenAmount) => {
-          const { price } = await fetchRoutePairWithStable(tokenAmount.token.token);
+          const price = await cacheFetchTokenPrice(tokenAmount.token);
           const defaultRet = {
             ...tokenAmount,
-            usdValue: ethers.utils.parseEther(price),
+            usdValue: price,
           } as TokenAmountModel;
 
           return defaultRet;
@@ -525,12 +525,12 @@ export async function getBalanceOf(
       if (!erc20Contract) return null;
       const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
       tokenInfo.amount = balance.toString();
-      const { price } = await fetchRoutePairWithStable(tokenInfo.token);
+      const price = await cacheFetchTokenPrice(tokenInfo);
       const parsedAmount = fromBigNumber(balance, tokenInfo.decimals);
       return {
         token: tokenInfo,
         parsedAmount,
-        usdValue: ethers.utils.parseEther(price).mul(balance),
+        usdValue: price.mul(balance),
       };
     }
   } catch (error) {
