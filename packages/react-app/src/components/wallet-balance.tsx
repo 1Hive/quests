@@ -48,7 +48,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
             key={`balance-${tokenBalance.token.token}`}
             compact
             label={isEnoughBalance ? 'Wallet balance' : 'Not enough'}
-            tooltip="Connected wallet's balance of the specified token"
+            tooltip="The balance of the funding token for the connected wallet."
             value={tokenBalance}
           />
         </InfoStyled>

@@ -212,7 +212,7 @@ export default function ScheduleClaimModal({
           key="claimDeposit"
           id="claimDeposit"
           label="Claim Deposit"
-          tooltip="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
+          tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
           isLoading={loading}
           value={claimDeposit}
           compact
@@ -289,7 +289,7 @@ export default function ScheduleClaimModal({
                       id="claimedAmount"
                       isEdit
                       label="Claim amount"
-                      tooltip="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
+                      tooltip="The expected amount to claim considering the Quest agreement. Check all bounty if you want to claim all available bounty at the moment the claim is executed."
                       isLoading={loading}
                       value={values.claimAll ? questTotalBounty : values.claimedAmount}
                       error={touched.claimedAmount && (errors.claimedAmount as string)}
@@ -304,7 +304,7 @@ export default function ScheduleClaimModal({
                   isLoading={loading}
                   error={touched.playerAddress && errors.playerAddress}
                   onBlur={handleBlur}
-                  tooltip="Most of time it may be the connected wallet but can also be set to another wallet address"
+                  tooltip="Most of time it will be the connected wallet but it can also be set to another address."
                   isEdit
                   onChange={handleChange}
                   wide
