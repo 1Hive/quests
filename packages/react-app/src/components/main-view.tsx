@@ -27,6 +27,7 @@ const ContentWrapperStyled = styled.div<{
   top?: number;
 }>`
   padding: ${({ isSmallResolution }) => (isSmallResolution ? GUpx() : GUpx(4))};
+  min-height: calc(100vh - 80px);
 `;
 
 const ScrollViewStyled = styled.div`
