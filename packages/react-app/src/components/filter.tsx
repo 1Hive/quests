@@ -58,7 +58,7 @@ export function Filter({ compact }: Props) {
               id="filterTitle"
               placeholder="Search by title"
               value={filter.title}
-              onChange={(x: string) => setFilter({ ...filter, title: x })}
+              onChange={(title: string) => setFilter({ ...filter, title })}
               wide
               compact={compact}
             />
@@ -72,7 +72,7 @@ export function Filter({ compact }: Props) {
               id="filterDescription"
               placeholder="Search by description"
               value={filter.description}
-              onChange={(x: string) => setFilter({ ...filter, description: x })}
+              onChange={(description: string) => setFilter({ ...filter, description })}
               wide
               compact={compact}
             />
