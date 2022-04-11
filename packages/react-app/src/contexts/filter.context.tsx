@@ -7,6 +7,8 @@ type FilterContextModel = {
   setFilter: (_filter: FilterModel) => void;
   refreshed: number;
   triggerRefresh: () => void;
+  isFilterShown: boolean;
+  toggleFilter: (_shown?: boolean) => void;
 };
 
 const FilterContext = createContext<FilterContextModel | undefined>(undefined);
@@ -18,6 +20,11 @@ type Props = {
 export const FilterContextProvider = ({ children }: Props) => {
   const [filter, setFilter] = useState<FilterModel>(DEFAULT_FILTER);
   const [refreshCounter, setRefreshCounter] = useState(0);
+  const [isFilterShown, setIsFilterShown] = useState(false); // Only for mobile view
+
+  const toggleFilter = (shown?: boolean) => {
+    setIsFilterShown(shown ?? !isFilterShown);
+  };
 
   const triggerRefresh = () => {
     setRefreshCounter(refreshCounter + 1);
@@ -25,7 +32,14 @@ export const FilterContextProvider = ({ children }: Props) => {
 
   return (
     <FilterContext.Provider
-      value={{ filter, setFilter, triggerRefresh, refreshed: refreshCounter }}
+      value={{
+        filter,
+        setFilter,
+        triggerRefresh,
+        refreshed: refreshCounter,
+        isFilterShown,
+        toggleFilter,
+      }}
     >
       {children}
     </FilterContext.Provider>

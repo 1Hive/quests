@@ -22,8 +22,8 @@ const EthIdenticonStyled = styled(EthIdenticon)`
 const WrapperStyled = styled.div`
   display: flex;
   flex-wrap: nowrap;
-  ${(props: any) => (props.wide ? 'width:100%' : '')}
-
+  ${(props: any) => (props.wide ? 'width:100%;' : '')}
+  max-width: 100%;
   input {
     cursor: default;
   }

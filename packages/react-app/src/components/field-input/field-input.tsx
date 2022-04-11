@@ -63,6 +63,7 @@ type Props = {
   wide?: boolean;
   direction?: 'row' | 'column';
   align?: 'center' | 'baseline' | 'flex-start' | 'flex-end' | 'unset';
+  className?: string;
 };
 
 export function FieldInput({
@@ -77,6 +78,7 @@ export function FieldInput({
   direction = 'row',
   align = 'center',
   error,
+  className = '',
 }: Props) {
   const theme = useTheme();
   const labelComponent = label && (
@@ -88,7 +90,7 @@ export function FieldInput({
     </LineStyled>
   );
   return (
-    <FieldStyled key={id} compact={compact} isLoading={isLoading} wide={wide}>
+    <FieldStyled key={id} compact={compact} isLoading={isLoading} wide={wide} className={className}>
       {labelComponent}
       <>
         {isLoading ? (

@@ -1,30 +1,20 @@
+import { useToast } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useQuery } from 'src/hooks/use-query-params';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
-import { useToast } from '@1hive/1hive-ui';
-import styled from 'styled-components';
-import { GUpx } from 'src/utils/style.util';
 import { Logger } from 'src/utils/logger';
-import { useToggleTheme } from 'src/hooks/use-toggle-theme';
 import Quest from '../quest';
 import MainView from '../main-view';
-
-const QuestDetailWrapperStyled = styled.div`
-  padding: ${GUpx(6)};
-  padding-top: ${GUpx(4)};
-  min-height: calc(100vh - 64px);
-`;
 
 export default function QuestDetail() {
   const { setPage } = usePageContext();
   const id = useQuery().get('id');
   const toast = useToast();
   const [quest, setQuest] = useState<QuestModel | undefined>(undefined);
-  const [a, setA] = useState<boolean>();
-  const { toggleTheme } = useToggleTheme();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -35,7 +25,7 @@ export default function QuestDetail() {
       if (isSubscribed) {
         if (!questResult) toast('Failed to get quest, verify address');
         else setQuest(questResult);
-        setA(true);
+        setLoading(false);
       }
     };
     if (id) fetchQuestAsync(id);
@@ -45,16 +35,25 @@ export default function QuestDetail() {
   }, [id]);
 
   return (
-    <MainView toggleTheme={toggleTheme}>
-      <QuestDetailWrapperStyled>
-        {a && (
+    <MainView>
+      <>
+        {loading && (
+          <Quest
+            isLoading
+            dataState={{
+              questData: undefined,
+              setQuestData: undefined,
+            }}
+          />
+        )}
+        {!loading && (
           <Quest
             dataState={{ questData: quest }}
             questMode={ENUM_QUEST_VIEW_MODE.ReadDetail}
-            isLoading={!quest}
+            isLoading={loading}
           />
         )}
-      </QuestDetailWrapperStyled>
+      </>
     </MainView>
   );
 }
