@@ -22,7 +22,9 @@ export function BackToTop() {
 
   const handleScroll = (e: Event) => {
     const scrollView = e.currentTarget as HTMLElement;
-    if (scrollView) setScrolled(scrollView.scrollTop > 0);
+    if (scrollView) {
+      setScrolled(scrollView.scrollTop > 0);
+    }
   };
 
   const scrollToTop = () => {
