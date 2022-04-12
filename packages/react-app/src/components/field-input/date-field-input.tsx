@@ -36,8 +36,7 @@ type Props = {
   onChange?: Function;
   value?: Date | null;
   css?: CSSProperties;
-  tooltip?: string;
-  tooltipDetail?: ReactNode;
+  tooltip?: ReactNode;
   compact?: boolean;
   wide?: boolean;
   formik?: any;
@@ -54,7 +53,6 @@ function DateFieldInput({
   onChange = noop,
   css,
   tooltip,
-  tooltipDetail,
   compact = false,
   wide = false,
   formik,
@@ -99,7 +97,6 @@ function DateFieldInput({
       id={id}
       label={label}
       tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
       compact={compact}
       isLoading={isLoading}
       error={error}
