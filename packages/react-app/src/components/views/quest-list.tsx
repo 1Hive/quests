@@ -16,10 +16,11 @@ import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
 import { useQuestsContext } from 'src/contexts/quests.context';
-import styled, { ThemeInterface } from 'styled-components';
+import styled from 'styled-components';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
 import { useThemeContext } from 'src/contexts/theme.context';
+import { ThemeInterface } from 'src/styles/theme';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -45,7 +46,7 @@ const FilterWrapperStyled = styled.div<{
   width: calc(100% + 20px); // Size of scrollbar
   z-index: 1;
   background-image: url(${background});
-  background-color: ${({ theme }) => theme.background};
+  background-color: ${({ theme }: any) => theme.badd};
   &::after {
     content: '';
     background: url(${backgroundMotif}) no-repeat center -113px;

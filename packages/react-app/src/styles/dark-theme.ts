@@ -1,4 +1,4 @@
-import { ThemeInterface } from 'styled-components';
+import { ThemeInterface } from './theme';
 import { commonTheme } from './common-theme';
 
 export const customDarkTheme = {

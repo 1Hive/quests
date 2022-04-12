@@ -2,6 +2,7 @@ import { useTheme } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
 import { CSSProperties, FocusEventHandler, ReactNode } from 'react';
+import { ThemeInterface } from 'src/styles/theme';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled, { css as _css } from 'styled-components';
 import { addTime, dateFormat, ONE_HOUR_IN_MS } from '../../utils/date.utils';
@@ -10,9 +11,7 @@ import { FieldInput } from './field-input';
 // #region StyledComponents
 
 const InputStyled = styled.input<{
-  borderColor?: string;
-  focusBorderColor?: string;
-  background?: string;
+  theme: ThemeInterface;
   wide?: boolean;
   isDarkTheme?: boolean;
 }>`
@@ -21,14 +20,14 @@ const InputStyled = styled.input<{
     _css`
       width: 100%;
     `}
-  border: 1px solid ${(props) => props.borderColor};
+  border: 1px solid ${({ theme }: any) => theme.border};
   border-radius: 12px;
-  background-color: ${({ background }) => background};
+  background-color: ${({ theme }: any) => theme.surface};
   height: 40px;
   padding: ${GUpx()};
   font-size: 14px;
   &:focus-visible {
-    border: 1px solid ${(props) => props.focusBorderColor};
+    border: 1px solid ${({ theme }: any) => theme.accent};
     outline: none;
   }
   &::-webkit-calendar-picker-indicator {
@@ -97,10 +96,8 @@ function DateFieldInput({
       onChange={handleChange}
       onBlur={onBlur}
       style={css}
-      background={theme.surface}
       wide={wide}
-      borderColor={theme.border}
-      focusBorderColor={theme.accent}
+      theme={theme}
       // eslint-disable-next-line no-underscore-dangle
       isDarkTheme={isDarkTheme(theme)}
     />

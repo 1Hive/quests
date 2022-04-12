@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DEFAULT_THEME } from 'src/constants';
 import { customDarkTheme } from 'src/styles/dark-theme';
 import { customLightTheme } from 'src/styles/light-theme';
-import { ThemeInterface } from 'styled-components';
+import { ThemeInterface } from '../styles/theme';
 
 export const useToggleTheme = () => {
   const [currentTheme, setCurrentTheme] = useState<ThemeInterface>();

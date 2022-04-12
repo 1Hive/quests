@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { useToggleTheme } from 'src/hooks/use-toggle-theme';
-import { ThemeInterface } from 'styled-components';
+import { ThemeInterface } from '../styles/theme';
 
 export type ThemeContextModel = {
   currentTheme: ThemeInterface | undefined;

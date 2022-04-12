@@ -1,5 +1,5 @@
-import { ThemeInterface } from 'styled-components';
 import { commonTheme } from './common-theme';
+import { ThemeInterface } from './theme';
 
 export const customLightTheme = {
   ...commonTheme,
