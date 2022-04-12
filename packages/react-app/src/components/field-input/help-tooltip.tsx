@@ -29,7 +29,7 @@ type Props = {
 
 export const HelpTooltip = ({ tooltip, children }: Props) => {
   const theme = useTheme();
-  const wrapperRef = useRef<HTMLElement>(null);
+  const wrapperRef = useRef<any>(null);
 
   const handleEnter = () => {
     // Simulate help button click
