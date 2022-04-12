@@ -386,8 +386,7 @@ export default function Quest({
         onChange={handleChange}
         onBlur={handleBlur}
         fontSize="24px"
-        tooltip="Title of your quest"
-        tooltipDetail="Title should resume the quest"
+        tooltip="Title should resume the Quest and be short and clear."
         wide
         error={touched.title && errors.title}
       />
@@ -422,22 +421,15 @@ export default function Quest({
                 isEdit={isEdit}
                 isLoading={loading || !questData}
                 placeHolder="Quest description"
-                tooltip="Quest Description"
-                tooltipDetail={
+                tooltip={
                   <>
                     <b>The quest description should include:</b>
-                    <ul>
-                      <li>Details about what the quest entails.</li>
-                      <li>
-                        What evidence must be submitted by users claiming a reward for completing
-                        the quest.
-                      </li>
-                      <li>
-                        The payout amount. This could be a constant amount for quests that payout
-                        multiple times, a range with reference to what determines what amount, the
-                        contracts balance at time of claim.
-                      </li>
-                    </ul>
+                    <br />- Details about what the quest entails. <br />- What evidence must be
+                    submitted by users claiming a reward for completing the quest. <br />- The
+                    payout amount. This could be a constant amount for quests that payout multiple
+                    times, a range with reference to what determines what amount, the contracts
+                    balance at time of claim. <br />
+                    ⚠️<i>The description should not include any sensitive information.</i>
                   </>
                 }
                 onChange={handleChange}
@@ -460,8 +452,7 @@ export default function Quest({
                   id="bounty"
                   label={questMode === ENUM_QUEST_VIEW_MODE.Create ? undefined : 'Available bounty'}
                   isEdit={isEdit}
-                  tooltip="Bounty"
-                  tooltipDetail={
+                  tooltip={
                     isEdit
                       ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
                       : "The available amount of this quest's funding pool."
@@ -482,8 +473,7 @@ export default function Quest({
                     <AmountFieldInput
                       id="claimDeposit"
                       label="Claim deposit"
-                      tooltip="Claim deposit"
-                      tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
+                      tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
                       value={claimDeposit}
                       isLoading={loading || (!isEdit && !claimDeposit) || !questData}
                       wide
@@ -501,8 +491,7 @@ export default function Quest({
               <DateFieldInputFormik
                 id="expireTime"
                 label="Expire time"
-                tooltip="Expire time"
-                tooltipDetail="The expiry time for the quest completion. Funds will return to the fallback address when the expiry time is reached."
+                tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
                 isEdit={isEdit}
                 isLoading={loading || !questData}
                 value={values.expireTime}
@@ -517,8 +506,7 @@ export default function Quest({
                   label="Funds fallback address"
                   value={values.fallbackAddress ?? walletAddress}
                   isLoading={loading || !questData}
-                  tooltip="Fallback Address"
-                  tooltipDetail="Unused funds at the specified expiry time can be returned to this address"
+                  tooltip="Unused funds at the specified expiry time can be returned to this address."
                   isEdit
                   onBlur={handleBlur}
                   error={touched.fallbackAddress && errors.fallbackAddress}

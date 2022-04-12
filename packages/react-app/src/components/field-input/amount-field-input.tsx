@@ -91,8 +91,7 @@ type Props = {
   onChange?: Function;
   formik?: FormikContextType<any>;
   compact?: boolean;
-  tooltip?: string;
-  tooltipDetail?: ReactNode;
+  tooltip?: ReactNode;
   maxDecimals?: number;
   disabled?: boolean;
   wide?: boolean;
@@ -113,7 +112,6 @@ function AmountFieldInput({
   onChange = noop,
   formik,
   tooltip,
-  tooltipDetail,
   compact = false,
   maxDecimals,
   disabled = false,
@@ -267,8 +265,7 @@ function AmountFieldInput({
       label={tokenLabel}
       wide={wide}
       compact={compact}
-      tooltip="Token"
-      tooltipDetail="Select a token between the list or paste the token address"
+      tooltip="Select a token between the list or paste the token address"
     >
       {token?.token ? (
         <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
@@ -310,7 +307,6 @@ function AmountFieldInput({
       id={id}
       label={label}
       tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
       isLoading={isLoading}
       wide={wide}
       compact

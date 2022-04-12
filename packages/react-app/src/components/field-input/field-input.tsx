@@ -3,7 +3,7 @@ import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
-import { IconTooltip } from './icon-tooltip';
+import { HelpTooltip } from './help-tooltip';
 
 const FieldStyled = styled.div<{
   compact?: boolean;
@@ -76,8 +76,7 @@ const SkeletonWrapperStyled = styled.div`
 type Props = {
   compact?: boolean;
   label?: React.ReactNode;
-  tooltip?: string;
-  tooltipDetail?: React.ReactNode;
+  tooltip?: React.ReactNode;
   children: React.ReactNode;
   id?: string;
   isLoading?: boolean;
@@ -93,7 +92,6 @@ export function FieldInput({
   children,
   compact,
   tooltip,
-  tooltipDetail,
   label,
   isLoading = false,
   wide = false,
@@ -105,10 +103,10 @@ export function FieldInput({
   const theme = useTheme();
   const labelComponent = label && (
     <LineStyled>
-      <LabelStyled color={theme.contentSecondary} htmlFor={id} title={tooltip}>
+      <LabelStyled color={theme.contentSecondary} htmlFor={id}>
         {label}
       </LabelStyled>
-      {tooltip && <IconTooltip tooltip={tooltip} tooltipDetail={tooltipDetail} />}
+      {tooltip && <HelpTooltip tooltip={tooltip} />}
     </LineStyled>
   );
   return (

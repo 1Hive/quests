@@ -94,8 +94,7 @@ export function Filter({ compact }: Props) {
             id="minExpireTime"
             value={filter.minExpireTime}
             label={!compact ? 'Expire time' : ''}
-            tooltip="Minimum expire time"
-            tooltipDetail="Will show all quests that are not expired this date"
+            tooltip="Will show all quests that are not expired this date"
             onChange={(e: any) => {
               setFilter({
                 ...filter,

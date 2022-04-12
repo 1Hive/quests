@@ -46,8 +46,7 @@ type Props = {
   onChange?: Function;
   value?: string;
   compact?: boolean;
-  tooltip?: string;
-  tooltipDetail?: React.ReactNode;
+  tooltip?: React.ReactNode;
   wide?: boolean;
   onBlur?: Function;
   error?: string | false;
@@ -60,7 +59,6 @@ export function AddressFieldInput({
   value = '',
   onChange = noop,
   compact = false,
-  tooltipDetail,
   tooltip,
   wide = false,
   onBlur = noop,
@@ -83,7 +81,6 @@ export function AddressFieldInput({
       id={id}
       label={label}
       tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
       compact={compact}
       error={error}
       isLoading={isLoading}

@@ -44,8 +44,7 @@ type Props = {
   maxLine?: number;
   isMarkDown?: boolean;
   ellipsis?: ReactNode;
-  tooltip?: string;
-  tooltipDetail?: React.ReactNode;
+  tooltip?: React.ReactNode;
 
   onBlur?: Function;
   error?: string | false;
@@ -67,9 +66,7 @@ export default function TextFieldInput({
   maxLine,
   isMarkDown = false,
   ellipsis,
-  tooltipDetail,
   tooltip,
-
   onBlur = noop,
   error,
 }: Props) {
@@ -170,7 +167,6 @@ export default function TextFieldInput({
       <FieldInput
         label={label}
         tooltip={tooltip}
-        tooltipDetail={tooltipDetail}
         id={id}
         error={error}
         compact={compact}
