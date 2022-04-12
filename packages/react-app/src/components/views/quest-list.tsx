@@ -16,7 +16,7 @@ import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
 import { useQuestsContext } from 'src/contexts/quests.context';
-import styled from 'styled-components';
+import styled, { ThemeInterface } from 'styled-components';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
 import { useThemeContext } from 'src/contexts/theme.context';
@@ -38,7 +38,7 @@ const EmptyStateCardStyled = styled(EmptyStateCard)`
 `;
 
 const FilterWrapperStyled = styled.div<{
-  backgroundMotif?: any; // TODO Check if it still used
+  theme: ThemeInterface;
 }>`
   position: sticky;
   top: 0;

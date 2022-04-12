@@ -1,3 +1,4 @@
+import { ThemeInterface } from 'styled-components';
 import { commonTheme } from './common-theme';
 
 export const customLightTheme = {
@@ -9,4 +10,4 @@ export const customLightTheme = {
   background: '#eeeff1',
   content: '#164a25',
   surface: '#F9FAFC',
-};
+} as ThemeInterface;
