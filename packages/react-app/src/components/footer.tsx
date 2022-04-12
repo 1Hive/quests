@@ -20,7 +20,7 @@ const FooterContainerStyled = styled.div`
     color: ${({ color }: any) => color} !important;
   }
 
-  padding: ${GUpx(2)} ${GUpx(20)} ${GUpx(2)} ${GUpx(20)};
+  padding: ${GUpx(8)};
 `;
 
 const FooterContainerStyledSide = styled.div`
@@ -104,7 +104,7 @@ export default function footer() {
           <FooterLinkStyled href="#" external={false}>
             Quest List
           </FooterLinkStyled>
-          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} isLink />
+          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>

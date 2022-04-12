@@ -100,6 +100,7 @@ function DateFieldInput({
       compact={compact}
       isLoading={isLoading}
       error={error}
+      wide={wide}
     >
       {loadableContent}
     </FieldInput>

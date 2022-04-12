@@ -15,7 +15,6 @@ const BoxStyled = styled.div`
   background: ${({ theme }: any) => theme.accent};
   border-radius: 8px;
   width: 100%;
-  margin-right: ${GUpx(4)};
   padding: ${GUpx(2)};
 `;
 

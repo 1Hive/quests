@@ -1,4 +1,4 @@
-import { Button, SearchInput, DropDown, useTheme } from '@1hive/1hive-ui';
+import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -17,7 +17,23 @@ const FilterWrapperStyled = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: ${GUpx(2)} ${GUpx(10)};
+  flex-wrap: ${({ colDisplay }: any) => (colDisplay ? 'wrap' : 'no-wrap')};
+  padding: 0 ${GUpx(2)};
+  ${({ isSmallResolution }: any) =>
+    isSmallResolution
+      ? `
+    margin-right: 20px;
+    padding-bottom: ${GUpx(2)};
+    `
+      : 'height:80px;'} // Size of scrollbar because parent is 100% + 20px
+  // Each filter having a sibling
+  & > div + div {
+    ${({ isSmallResolution }: any) => !isSmallResolution && `margin-left: ${GUpx()};`}
+  }
+`;
+
+const ResetButtonStyled = styled(Button)`
+  margin: ${GUpx(2)} ${GUpx(3)} 0 ${GUpx(3)};
 `;
 
 // #endregion
@@ -29,88 +45,92 @@ type Props = {
 export function Filter({ compact }: Props) {
   const { filter, setFilter } = useFilterContext();
   const theme = useTheme();
+  const { below } = useViewport();
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
+  const { isFilterShown } = useFilterContext();
 
   return (
-    <FilterWrapperStyled>
-      <div className="pr-16 flex-grow">
-        <FieldInput label={!compact ? 'Title' : ''} wide>
-          <SearchInput
-            id="filterTitle"
-            placeholder="Search by title"
-            value={filter.title}
-            onChange={(x: string) => setFilter({ ...filter, title: x })}
-            wide
+    <>
+      {(isFilterShown || !below('medium')) && (
+        <FilterWrapperStyled colDisplay={below('medium')} isSmallResolution={below('medium')}>
+          <FieldInput className="flex-grow" label={!compact ? 'Title' : ''} wide={below('medium')}>
+            <SearchInput
+              id="filterTitle"
+              placeholder="Search by title"
+              value={filter.title}
+              onChange={(title: string) => setFilter({ ...filter, title })}
+              wide
+              compact={compact}
+            />
+          </FieldInput>
+          <FieldInput
+            className="flex-grow"
+            label={!compact ? 'Description' : ''}
+            wide={below('medium')}
+          >
+            <SearchInput
+              id="filterDescription"
+              placeholder="Search by description"
+              value={filter.description}
+              onChange={(description: string) => setFilter({ ...filter, description })}
+              wide
+              compact={compact}
+            />
+          </FieldInput>
+          <DateFieldInput
+            id="minExpireTime"
+            value={filter.minExpireTime}
+            label={!compact ? 'Expire time' : ''}
+            tooltip="Will show all quests that are not expired this date"
+            onChange={(e: any) => {
+              setFilter({
+                ...filter,
+                minExpireTime: e.currentTarget.value,
+              });
+            }}
+            isEdit
+            wide={below('medium')}
             compact={compact}
           />
-        </FieldInput>
-      </div>
-      <div className="pl-16 pr-16 flex-grow">
-        <FieldInput label={!compact ? 'Description' : ''} wide>
-          <SearchInput
-            id="filterDescription"
-            placeholder="Search by description"
-            value={filter.description}
-            onChange={(x: string) => setFilter({ ...filter, description: x })}
-            wide
-            compact={compact}
-          />
-        </FieldInput>
-      </div>
-      <div className={!compact ? 'pl-16 pr-16' : 'pb-8'}>
-        <DateFieldInput
-          id="minExpireTime"
-          value={filter.minExpireTime}
-          label={!compact ? 'Expire time' : ''}
-          tooltip="Will show all quests that are not expired this date"
-          onChange={(e: any) => {
-            setFilter({
-              ...filter,
-              minExpireTime: e.currentTarget.value,
-            });
-          }}
-          isEdit
-          wide
-          compact={compact}
-        />
-      </div>
-      <div className="pl-16 pr-16">
-        <FieldInput label={!compact ? 'Status' : ''} wide>
-          <StatusDropdownStyled
-            id="filterStatus"
-            items={states}
-            borderColor={theme.border}
-            selected={states.indexOf(filter.status)}
-            onChange={(i: number) => setFilter({ ...filter, status: states[i] })}
-            wide
-            compact={compact}
-          />
-        </FieldInput>
-      </div>
-      <div className="pl-16 pr-16">
-        {
-          // TODO : We don't have this information available in subgraph
-          /* <AmountFieldInput
+          <FieldInput label={!compact ? 'Status' : ''} wide={below('medium')}>
+            <StatusDropdownStyled
+              id="filterStatus"
+              items={states}
+              borderColor={theme.border}
+              selected={states.indexOf(filter.status)}
+              onChange={(i: number) => setFilter({ ...filter, status: states[i] })}
+              wide
+              compact={compact}
+            />
+          </FieldInput>
+          {
+            // TODO : We don't have this information available in subgraph
+            /* <AmountFieldInput
           id="filterBounty"
           label="Min available bounty"
           value={filter.bounty}
           onChange={(x: any) => setFilter({ ...filter, bounty: x }, true)}
-          wide
+          wide={!below('medium')}
         /> */
-        }
+          }
 
-        {/* <TagFieldInput
-            id="filterTags"
-            label="Tags"
-            isEdit
-            placeholder="Search"
-            value={filter.tags}
-            onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
-          /> TODO : Restore after MVP */}
-      </div>
-      <div className={!compact ? 'pl-16 pt-16 pr-16' : 'pb-8'}>
-        <Button label="Reset" mode="strong" wide onClick={() => setFilter(DEFAULT_FILTER)} />
-      </div>
-    </FilterWrapperStyled>
+          {/* <TagFieldInput
+          id="filterTags"
+          label="Tags"
+          isEdit
+        wide={!below('medium')}
+          placeholder="Search"
+          value={filter.tags}
+          onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
+        /> TODO : Restore after MVP */}
+          <ResetButtonStyled
+            label="Reset"
+            mode="strong"
+            wide={below('medium')}
+            onClick={() => setFilter(DEFAULT_FILTER)}
+          />
+        </FilterWrapperStyled>
+      )}
+    </>
   );
 }

@@ -32,14 +32,14 @@ type Props = {
   data?: QuestModel;
   onClose?: ModalCallback;
   questMode: string;
-  isLink?: boolean;
+  buttonMode?: 'link' | 'strong' | 'normal' | 'icon' | 'label';
 };
 
 export default function QuestModal({
   data = undefined,
   onClose = noop,
   questMode = ENUM_QUEST_VIEW_MODE.ReadSummary,
-  isLink = false,
+  buttonMode = 'normal',
 }: Props) {
   const theme = useTheme();
   const [opened, setOpened] = useState(false);
@@ -113,12 +113,19 @@ export default function QuestModal({
       id="create-quest-modal"
       title="Create quest"
       openButton={
-        isLink ? (
+        buttonMode === 'link' ? (
           <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick}>
             {buttonLabel}
           </ButtonLinkStyled>
         ) : (
-          <Button icon={<IconPlus />} label={buttonLabel} wide onClick={onOpenButtonClick} />
+          <Button
+            icon={<IconPlus />}
+            label={buttonLabel}
+            wide
+            mode={buttonMode === 'strong' ? 'strong' : 'normal'}
+            display={buttonMode === 'icon' ? 'icon' : 'label'}
+            onClick={onOpenButtonClick}
+          />
         )
       }
       buttons={[
