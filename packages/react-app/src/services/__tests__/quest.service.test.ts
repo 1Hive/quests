@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import { TokenModel } from 'src/models/token.model';
 import { getDashboardInfo } from '../quest.service';
 
 const token1 = '0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd';
@@ -96,7 +95,7 @@ describe('QuestService', () => {
       // Act
       const res = await getDashboardInfo();
       // Assert
-      expect(res.questCount === 0);
+      expect(res.questCount === quests.length);
     });
     it('should return dashboard correct total', async () => {
       // Arrange

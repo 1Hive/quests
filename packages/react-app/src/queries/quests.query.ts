@@ -118,10 +118,10 @@ export const fetchQuestEntities = (currentIndex: number, count: number, filter: 
 
 export const fetchQuestRewardTokens = () =>
   request(questsSubgraph, QuestRewardTokens, { first: 100 }).then((res) =>
-    res.map((quest: any) => quest.questRewardTokenAddress),
+    res.questEntities.map((quest: any) => quest.questRewardTokenAddress),
   );
 
-export const fetchQuestEntitiesLight = () =>
+export const fetchActiveQuestEntitiesLight = () =>
   request(questsSubgraph, QuestEntitiesLight, {
     expireTimeLower: msToSec(Date.now()),
   });

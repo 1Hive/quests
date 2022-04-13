@@ -365,11 +365,7 @@ export default function Quest({
     if (data.expireTime.getTime() < Date.now())
       errors.expireTime = 'Expiration have to be later than now';
 
-    if (skipDebounce) {
-      debounceSave(data);
-    } else {
-      setQuestData?.(data);
-    }
+    debounceSave(data);
 
     setIsFormValid(Object.keys(errors).length === 0);
     return errors;

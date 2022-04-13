@@ -21,7 +21,7 @@ import { DashboardModel } from 'src/models/dashboard.model';
 import {
   fetchQuestEnity,
   fetchQuestEntities,
-  fetchQuestEntitiesLight,
+  fetchActiveQuestEntitiesLight,
   fetchQuestRewardTokens,
 } from 'src/queries/quests.query';
 import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE, IS_DEV, TOKENS } from '../constants';
@@ -228,7 +228,7 @@ export async function fetchQuestsPaging(
 }
 
 export async function fetchQuest(questAddress: string) {
-  const queryResult = fetchQuestEnity(questAddress);
+  const queryResult = await fetchQuestEnity(questAddress);
   const newQuest = mapQuest(queryResult);
   return newQuest;
 }
@@ -339,7 +339,7 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
-  const result = await fetchQuestEntitiesLight();
+  const result = await fetchActiveQuestEntitiesLight();
   const quests = result.questEntities as { id: string; questRewardTokenAddress: string }[];
   const funds = (
     await Promise.all(
@@ -347,7 +347,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
     )
   ).filter((x) => !!x) as TokenAmountModel[];
 
-  const totalFunds = funds.map((x) => x.usdValue).filter((x) => x !== undefined) as BigNumber[];
+  const totalFunds = funds.map((x) => x.usdValue).filter((x) => x !== undefined) as number[];
 
   if (IS_DEV) {
     BigNumber.prototype.toJSON = function toJSON() {
@@ -355,13 +355,12 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
     };
     Logger.debug('totalFunds', JSON.stringify(totalFunds, null, 4));
   }
-  const totalFundsSummed = totalFunds.length
-    ? totalFunds.reduce((a, b) => a.add(b))
-    : BigNumber.from(0);
+
+  const totalFundsSummed = totalFunds.length ? totalFunds.reduce((a, b) => a + b) : 0;
 
   return {
     questCount: result.questEntities.length,
-    totalFunds: fromBigNumber(totalFundsSummed, undefined),
+    totalFunds: totalFundsSummed,
   };
 }
 
@@ -462,7 +461,7 @@ export async function getBalanceOf(
       return {
         token: tokenInfo,
         parsedAmount,
-        usdValue: price.mul(balance),
+        usdValue: parsedAmount * fromBigNumber(price, tokenInfo.decimals),
       };
     }
   } catch (error) {
