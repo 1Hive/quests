@@ -3,12 +3,6 @@ import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
-import {
-  QuestEntityQuery,
-  QuestEntitiesQuery,
-  QuestRewardTokens,
-  QuestEntitiesLight,
-} from 'src/queries/quest-entity.query';
 import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueChallengesQuery,
@@ -25,13 +19,12 @@ import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
 import { DashboardModel } from 'src/models/dashboard.model';
 import {
-  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
-  ENUM_CLAIM_STATE,
-  ENUM_QUEST_STATE,
-  GQL_MAX_INT_MS,
-  IS_DEV,
-  TOKENS,
-} from '../constants';
+  fetchQuestEnity,
+  fetchQuestEntities,
+  fetchQuestEntitiesLight,
+  fetchQuestRewardTokens,
+} from 'src/queries/quests.query';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE, IS_DEV, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -50,7 +43,7 @@ import {
   getCelesteContract,
 } from '../utils/contract.util';
 import { processQuestState } from './state-machine';
-import { getLastBlockTimestamp, msToSec } from '../utils/date.utils';
+import { getLastBlockTimestamp } from '../utils/date.utils';
 import { cacheFetchTokenPrice } from './cache.service';
 
 let questList: QuestModel[] = [];
@@ -228,42 +221,14 @@ export async function fetchQuestsPaging(
   count: number,
   filter: FilterModel,
 ): Promise<QuestModel[]> {
-  const { questsSubgraph: questSubgraph } = getNetwork();
-  let expireTimeLowerMs = 0;
-  let expireTimeUpperMs = GQL_MAX_INT_MS;
-
-  if (filter.status === ENUM_QUEST_STATE.Active) {
-    expireTimeLowerMs = Math.max(filter.minExpireTime?.getTime() ?? 0, Date.now());
-  } else if (filter.status === ENUM_QUEST_STATE.Expired) {
-    expireTimeLowerMs = Math.min(filter.minExpireTime?.getTime() ?? 0, Date.now());
-    expireTimeUpperMs = Date.now();
-  } else {
-    expireTimeLowerMs = filter.minExpireTime?.getTime() ?? 0;
-  }
-
-  const queryResult = (
-    await request(questSubgraph, QuestEntitiesQuery, {
-      skip: currentIndex,
-      first: count,
-      expireTimeLower: Math.round(expireTimeLowerMs / 1000),
-      expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
-      title: filter.title,
-      description: filter.description,
-    })
-  ).questEntities;
-
+  const queryResult = await fetchQuestEntities(currentIndex, count, filter);
   const newQuests = await mapQuestList(queryResult);
   questList = questList.concat(newQuests);
   return newQuests;
 }
 
 export async function fetchQuest(questAddress: string) {
-  const { questsSubgraph: questSubgraph } = getNetwork();
-  const queryResult = (
-    await request(questSubgraph, QuestEntityQuery, {
-      ID: questAddress.toLowerCase(), // Subgraph address are stored lowercase
-    })
-  ).questEntity;
+  const queryResult = fetchQuestEnity(questAddress);
   const newQuest = mapQuest(queryResult);
   return newQuest;
 }
@@ -365,10 +330,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
 }
 
 export async function fetchRewardTokens(): Promise<TokenModel[]> {
-  const { questsSubgraph } = getNetwork();
-  const tokenAddresses = (
-    await request(questsSubgraph, QuestRewardTokens, { first: 100 })
-  ).questEntities.map((x: any) => x.questRewardTokenAddress);
+  const tokenAddresses = await fetchQuestRewardTokens();
   return Promise.all(
     arrayDistinct<string>(tokenAddresses)
       .map(getTokenInfo)
@@ -377,45 +339,15 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
-  const { questsSubgraph } = getNetwork();
-  const result = await request(questsSubgraph, QuestEntitiesLight, {
-    expireTimeLower: msToSec(Date.now()),
-  });
+  const result = await fetchQuestEntitiesLight();
   const quests = result.questEntities as { id: string; questRewardTokenAddress: string }[];
   const funds = (
     await Promise.all(
       quests.map(async (quest) => getBalanceOf(quest.questRewardTokenAddress, quest.id)),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
-  // Take uniques tokens, avoid duplicates to fetch the prices.
-  // FIX ME Maybe use arrayDistinctBy()
-  const arrUniq = (arrTokenAmount: TokenAmountModel[]) => [
-    ...new Map(
-      arrTokenAmount.map((tokenAmount) => [tokenAmount.token.token, tokenAmount]),
-    ).values(),
-  ];
-  const fundsUniqueToken = arrUniq(funds);
-  // Fetch prices here, some may not have liquidity
-  const priceTokenXDAI = new Map(
-    (
-      await Promise.all(
-        fundsUniqueToken.map(async (tokenAmount) => {
-          const price = await cacheFetchTokenPrice(tokenAmount.token);
-          const defaultRet = {
-            ...tokenAmount,
-            usdValue: price,
-          } as TokenAmountModel;
 
-          return defaultRet;
-        }),
-      )
-    ).map((tokenAmoutModel) => [tokenAmoutModel.token.token, tokenAmoutModel.usdValue]),
-  );
-
-  Logger.debug('funds', funds);
-  const totalFunds = funds
-    .map((x) => priceTokenXDAI.get(x.token.token))
-    .filter((x) => x !== undefined) as BigNumber[];
+  const totalFunds = funds.map((x) => x.usdValue).filter((x) => x !== undefined) as BigNumber[];
 
   if (IS_DEV) {
     BigNumber.prototype.toJSON = function toJSON() {
