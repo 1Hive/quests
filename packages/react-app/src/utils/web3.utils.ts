@@ -1,16 +1,14 @@
-import { BigNumber, ethers, ethers as ethersUtil } from 'ethers';
+import { BigNumber, ethers, providers as Providers } from 'ethers';
 import { noop } from 'lodash-es';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
-import { toWei } from 'web3-utils';
-import { IS_DEV } from '../constants';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
-import { wrapError } from './errors.util';
 import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = 'private';
+
 const ethOrWeb = (window as any).ethereum ?? (window as any).web3?.currentProvider;
 ethOrWeb?.on('chainChanged', (_chainId: string) => window.location.reload());
 
@@ -96,22 +94,6 @@ export function getNetworkName(chainId = getDefaultChain()) {
   return 'unknown';
 }
 
-export function createContractAccount() {
-  return getWeb3()?.eth.accounts.create();
-}
-
-export async function getCurrentAccount(): Promise<string | undefined> {
-  return new Promise((res) => {
-    getWeb3()?.eth.getAccounts((error: Error, result: any[]) => {
-      if (error) {
-        if (IS_DEV) Logger.exception(error);
-        res(undefined);
-      }
-      res(result.length ? result[0] : undefined);
-    });
-  });
-}
-
 export const addressPattern = '(0x)?[0-9a-fA-F]{40}';
 const ETH_ADDRESS_SPLIT_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
 const ETH_ADDRESS_TEST_REGEX = /(0x[a-fA-F0-9]{40}(?:\b|\.|,|\?|!|;))/g;
@@ -130,26 +112,6 @@ export function addressesEqualNoSum(first: string, second: string) {
   return first === second;
 }
 
-export async function sendTransaction(to: string, amount: TokenAmountModel, onCompleted: any) {
-  const from = await getCurrentAccount();
-  if (!from)
-    return Promise.reject(
-      wrapError('User account not connected when trying to send a transaction!', { to, amount }),
-    );
-  return new Promise((res, rej) =>
-    getWeb3()
-      ?.eth.sendTransaction({
-        from,
-        to,
-        value: toWei(amount.parsedAmount.toString(), 'ether'),
-        chain: getNetworkType(),
-      })
-      .on('transactionHash', res)
-      .on('receipt', onCompleted)
-      .catch(rej),
-  );
-}
-
 export function toBigNumber(amount: TokenAmountModel) {
   return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
@@ -160,18 +122,19 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | 
 }
 
 export function getDefaultProvider() {
-  const { httpProvider, chainId: expectedChainId } = getNetwork();
+  const { chainId: expectedChainId } = getNetwork();
   let provider = ethOrWeb;
+
   if (!provider || +provider.chainId !== +expectedChainId) {
-    const infuraId = env('INFURA_API_KEY');
-    if (infuraId) {
-      provider = new Web3.providers.HttpProvider(`${httpProvider}/${infuraId}`);
+    const alchemyId = env('ALCHEMY_API_KEY');
+    if (alchemyId) {
+      provider = new Providers.AlchemyProvider('rinkeby', alchemyId);
     } else {
       throw new Error(`No http provider key provided in env`);
     }
   }
 
-  return provider && new ethersUtil.providers.Web3Provider(provider);
+  return provider && new ethers.providers.Web3Provider(provider);
 }
 
 // Re-export some web3-utils functions

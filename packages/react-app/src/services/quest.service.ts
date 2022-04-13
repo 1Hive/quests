@@ -29,6 +29,7 @@ import {
   ENUM_CLAIM_STATE,
   ENUM_QUEST_STATE,
   GQL_MAX_INT_MS,
+  IS_DEV,
   TOKENS,
 } from '../constants';
 import { Logger } from '../utils/logger';
@@ -402,27 +403,30 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
           const { price } = await fetchRoutePairWithStable(tokenAmount.token.token);
           const defaultRet = {
             ...tokenAmount,
-            parsedAmount: tokenAmount.parsedAmount * BigNumber.from(price).toNumber(), // TODO maybe create new object to manipulate that
+            usdValue: ethers.utils.parseEther(price),
           } as TokenAmountModel;
 
           return defaultRet;
         }),
       )
-    ).map((tokenAmoutModel) => [tokenAmoutModel.token.token, toBigNumber(tokenAmoutModel)]),
+    ).map((tokenAmoutModel) => [tokenAmoutModel.token.token, tokenAmoutModel.usdValue]),
   );
 
   Logger.debug('funds', funds);
-  Logger.debug('fundsUnique', fundsUniqueToken);
-  Logger.debug('priceTokenXDAI', priceTokenXDAI);
   const totalFunds = funds
     .map((x) => priceTokenXDAI.get(x.token.token))
     .filter((x) => x !== undefined) as BigNumber[];
 
+  if (IS_DEV) {
+    BigNumber.prototype.toJSON = function toJSON() {
+      return fromBigNumber(this, 18);
+    };
+    Logger.debug('totalFunds', JSON.stringify(totalFunds, null, 4));
+  }
   const totalFundsSummed = totalFunds.length
     ? totalFunds.reduce((a, b) => a.add(b))
     : BigNumber.from(0);
 
-  Logger.debug('totalFundsSummed...', { totalFundsSummed });
   return {
     questCount: result.questEntities.length,
     totalFunds: fromBigNumber(totalFundsSummed, undefined),
@@ -526,7 +530,7 @@ export async function getBalanceOf(
       return {
         token: tokenInfo,
         parsedAmount,
-        usdValue: +price * parsedAmount,
+        usdValue: ethers.utils.parseEther(price).mul(balance),
       };
     }
   } catch (error) {
