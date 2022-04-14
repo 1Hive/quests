@@ -12,9 +12,8 @@
     "@babel/preset-typescript"
   ],
   "plugins": [
-    ["babel-plugin-styled-components", { "displayName": true }],
-    "@babel/plugin-transform-react-jsx-source",
-    "@babel/plugin-proposal-class-properties"
+    ["styled-components", { "displayName": true }],
+    "@babel/plugin-transform-react-jsx-source"
   ],
   "env": {
     "test": {
