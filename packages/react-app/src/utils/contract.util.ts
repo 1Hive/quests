@@ -80,7 +80,7 @@ export function getERC20Contract(
 
 export async function getTokenInfo(tokenAddress: string) {
   try {
-    const tokenContract = getContract('ERC20', tokenAddress);
+    const tokenContract = getERC20Contract(tokenAddress);
     if (tokenContract) {
       const symbol = await tokenContract.symbol();
       const decimals = await tokenContract.decimals();
