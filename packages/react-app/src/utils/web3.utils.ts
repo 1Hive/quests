@@ -116,9 +116,9 @@ export function toBigNumber(amount: TokenAmountModel) {
   return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
 
-export function fromBigNumber(bigNumber: BigNumber | string, decimals: number | undefined): number {
+export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 18): number {
   if (typeof bigNumber === 'string') bigNumber = BigNumber.from(bigNumber);
-  return +ethers.utils.formatUnits(bigNumber, decimals ?? 18);
+  return +ethers.utils.formatUnits(bigNumber, decimals);
 }
 
 export function getDefaultProvider() {
