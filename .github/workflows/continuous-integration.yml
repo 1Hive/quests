@@ -15,7 +15,7 @@ jobs:
       - name: Case Sensitivity Checker
         uses: credfeto/action-case-checker@v1.1
       - name: Install
-        run: yarn ci
+        run: yarn install
       - name: Lint
         run: yarn lint
       - name: Build
@@ -48,7 +48,7 @@ jobs:
           key: ${{ runner.os }}-contracts-v${{ secrets.CONTRACTS_CACHE_VERSION }}-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
       - name: Install dependencies
-        run: yarn ci
+        run: yarn install
 
       - name: Build contracts
         run: yarn compile
