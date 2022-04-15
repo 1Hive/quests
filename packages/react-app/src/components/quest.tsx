@@ -92,14 +92,13 @@ const TwoColumnStyled = styled.div`
 
 const FirstColStyled = styled.div`
   margin: 0 ${GUpx(3)};
-  flex-grow: 0.7;
+  flex-grow: 1;
   max-width: 80%;
   overflow-wrap: break-word;
 `;
 
 const SecondColStyled = styled.div`
   margin: 0 ${GUpx(3)};
-  flex-grow: 0.3;
   display: flex;
   flex-direction: column;
 `;
