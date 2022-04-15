@@ -12,7 +12,7 @@ import ChallengeModal from './modals/challenge-modal';
 import ResolveChallengeModal from './modals/resolve-challenge-modal';
 import { ChildSpacer, Outset } from './utils/spacer-util';
 import AmountFieldInput from './field-input/amount-field-input';
-import { IconTooltip } from './field-input/icon-tooltip';
+import { HelpTooltip } from './field-input/help-tooltip';
 import TextFieldInput from './field-input/text-field-input';
 import * as QuestService from '../services/quest.service';
 import ExecuteClaimModal from './modals/execute-claim-modal';
@@ -93,10 +93,7 @@ export default function ClaimList({
         <>
           <ClaimHeaderStyled>
             <HeaderStyled>Claims</HeaderStyled>
-            <IconTooltip
-              tooltip="Claims"
-              tooltipDetail="A claim includes the proof of the quest's completion."
-            />
+            <HelpTooltip tooltip="A claim includes the proof of the quest's completion." />
           </ClaimHeaderStyled>
           <Accordion
             items={claims.map((claim: ClaimModel) => {

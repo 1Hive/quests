@@ -109,12 +109,11 @@ function AccountScreenConnected({ wallet }: Props) {
               `}
             >
               <IdentityBadge
-                // @ts-ignore
                 entity={wallet.walletAddress}
                 compact
                 badgeOnly
                 // @ts-ignore
-                css="cursor: pointer"
+                css={{ cursor: 'pointer', color: theme.badge }} // Little hack, but the whole file will needs to be styled correctly anyway
               />
               <IconCopy
                 // @ts-ignore

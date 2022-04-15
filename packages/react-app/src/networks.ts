@@ -4,7 +4,7 @@ import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { TOKENS } from './constants';
 import { NetworkModel } from './models/network.model';
 
-export const networks = {
+export const networks = Object.freeze({
   mainnet: {
     chainId: 1,
     name: 'Mainnet',
@@ -22,7 +22,7 @@ export const networks = {
     name: 'Rinkeby',
     type: 'rinkeby',
     explorerBase: 'etherscan',
-    defaultEthNode: 'https://rinkeby.eth.aragon.network/',
+    // defaultEthNode: 'https://rinkeby.eth.aragon.network/',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
     celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
@@ -32,7 +32,6 @@ export const networks = {
     governAddress: '0xa0F5e6759d49063040eAB18c1B0E684C45a4B4cA',
     governQueueAddress: '0x19B918802eA9C71c500Ca481917F383f3992cDB0',
     celesteAddress: '0xdd58ebed3c36460939285a92807f90e3d3a26789',
-    httpProvider: 'https://rinkeby.infura.io/v3',
     defaultToken: TOKENS.HoneyTest,
     nativeToken: TOKENS.Ether,
     isTestNetwork: true,
@@ -65,7 +64,7 @@ export const networks = {
     govern: 0,
     isTestNetwork: true,
   },
-};
+});
 
 function getNetworkInternalName(chainId = getDefaultChain()) {
   return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkType(chainId);

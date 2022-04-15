@@ -15,8 +15,8 @@ const WrapperStyled = styled.div`
   flex-direction: column;
 `;
 
-const MessageStyled = styled.div`
-  color: ${({ messageColor }: any) => messageColor};
+const MessageStyled = styled.div<{ messageColor: string }>`
+  color: ${({ messageColor }) => messageColor};
   margin-bottom: ${GUpx()};
 `;
 
@@ -28,8 +28,6 @@ const TransactionTitleStyled = styled.div`
 export function TransactionProgressComponent() {
   const network = getNetwork();
   const { transaction } = useTransactionContext();
-  const [logoColor, setLogoColor] = useState<string>();
-  const [messageColor, setMessageColor] = useState<string>();
   const [message, setMessage] = useState<string | undefined>();
   const {
     warning,
@@ -40,15 +38,17 @@ export function TransactionProgressComponent() {
     negativeSurface,
     content,
   } = useTheme();
+  const [logoColor, setLogoColor] = useState<string>(content);
+  const [messageColor, setMessageColor] = useState<string>(content);
   useEffect(() => {
     switch (transaction?.status) {
       case ENUM_TRANSACTION_STATUS.WaitingForSignature:
-        setMessage('Waiting for your signature...');
+        setMessage('Waiting for your signature');
         setLogoColor(content);
         setMessageColor(content);
         break;
       case ENUM_TRANSACTION_STATUS.Pending:
-        setMessage('Transaction is pending...');
+        setMessage('Transaction is pending');
         setLogoColor(warning);
         setMessageColor(warningSurfaceContent);
         break;

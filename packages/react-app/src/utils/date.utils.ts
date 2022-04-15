@@ -3,7 +3,7 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { ethers } from 'ethers';
+import { getDefaultProvider } from './web3.utils';
 
 const KNOWN_FORMATS = {
   onlydate: 'DD/MM/YYYY',
@@ -36,7 +36,7 @@ function getRelativeTime(from: Date, to: Date) {
 }
 
 export async function getLastBlockTimestamp(): Promise<number> {
-  return +(await ethers.getDefaultProvider().getBlock('latest')).timestamp;
+  return +(await getDefaultProvider().getBlock('latest')).timestamp;
 }
 export async function getLastBlockDate(): Promise<number> {
   return (await getLastBlockTimestamp()) * 1000;

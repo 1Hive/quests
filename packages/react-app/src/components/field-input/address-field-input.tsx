@@ -1,9 +1,9 @@
-import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
+import { value TextInput, value EthIdenticon, value AddressField } from '@1hive/1hive-ui';
 
-import { noop } from 'lodash-es';
+import { value noop } from 'lodash-es';
 import React from 'react';
-import styled from 'styled-components';
-import { FieldInput } from './field-input';
+import styled, { value css } from 'styled-components';
+import { value FieldInput } from './field-input';
 
 // #region Styled
 
@@ -17,9 +17,18 @@ const EthIdenticonStyled = styled(EthIdenticon)`
   padding: 0;
 `;
 
-const AddressWrapperStyled = styled.div`
+const WrapperStyled = styled.div<{
+  wide?: boolean;
+}>`
+  display: flex;
+  flex-wrap: nowrap;
   max-width: 400px;
-  ${({ wide }: any) => wide && 'width:100%;'}
+  ${(props) =>
+    props.wide &&
+    css`
+      width: 100%;
+    `}
+
   input {
     cursor: ${({ isEdit }: any) => (isEdit ? 'text' : 'default')};
   }
@@ -35,8 +44,7 @@ type Props = {
   onChange?: Function;
   value?: string;
   compact?: boolean;
-  tooltip?: string;
-  tooltipDetail?: React.ReactNode;
+  tooltip?: React.ReactNode;
   wide?: boolean;
   onBlur?: Function;
   error?: string | false;
@@ -49,7 +57,6 @@ export function AddressFieldInput({
   value = '',
   onChange = noop,
   compact = false,
-  tooltipDetail,
   tooltip,
   wide = false,
   onBlur = noop,
@@ -78,7 +85,6 @@ export function AddressFieldInput({
       id={id}
       label={label}
       tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
       compact={compact}
       error={error}
       isLoading={isLoading}

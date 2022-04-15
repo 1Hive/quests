@@ -1,4 +1,4 @@
-import { GU, useTheme, textStyle } from '@1hive/1hive-ui';
+import { useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { DashboardModel } from 'src/models/dashboard.model';
@@ -15,7 +15,6 @@ const BoxStyled = styled.div`
   background: ${({ theme }: any) => theme.accent};
   border-radius: 8px;
   width: 100%;
-  margin-right: ${GUpx(4)};
   padding: ${GUpx(2)};
 `;
 
@@ -53,20 +52,18 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <BoxStyled padding={2 * GU} theme={theme}>
+    <BoxStyled theme={theme}>
       <ChildSpacer justify="space-around" align="center">
         <FieldInput
           label={<LabelStyled>Bounty Pool</LabelStyled>}
-          tooltip="Not yet implemented"
-          tooltipDetail="Total of the quest bounties converted into USD"
+          tooltip="Total of the quest bounties converted into USD"
           isLoading={!dashboardModel}
         >
           <TextStyled theme={theme}>$ {dashboardModel?.totalFunds}</TextStyled>
         </FieldInput>
         <FieldInput
           label={<LabelStyled>Open Quests</LabelStyled>}
-          tooltip="Number of active Quests"
-          tooltipDetail="All the quests that are currently not expired or closed"
+          tooltip="All the quests that are currently not expired or closed"
           isLoading={!dashboardModel}
         >
           <TextStyled theme={theme}>{dashboardModel?.questCount}</TextStyled>

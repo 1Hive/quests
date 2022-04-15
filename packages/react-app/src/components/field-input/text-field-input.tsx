@@ -8,10 +8,10 @@ import { FieldInput } from './field-input';
 
 // #region Styled
 
-const MaxLineStyled = styled.div`
+const MaxLineStyled = styled.div<{ maxLine: number }>`
   margin-bottom: ${GUpx()};
   display: -webkit-box;
-  -webkit-line-clamp: ${(props: any) => props.maxLine};
+  -webkit-line-clamp: ${(props) => props.maxLine};
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
@@ -21,8 +21,8 @@ const MaxLineStyled = styled.div`
   }
 `;
 
-const BlockStyled = styled.div`
-  ${({ wide }: any) => wide && 'width: 100%;'}
+const BlockStyled = styled.div<{ wide?: boolean }>`
+  ${({ wide }) => wide && 'width: 100%;'}
 `;
 
 // #endregion
@@ -44,8 +44,7 @@ type Props = {
   maxLine?: number;
   isMarkDown?: boolean;
   ellipsis?: ReactNode;
-  tooltip?: string;
-  tooltipDetail?: React.ReactNode;
+  tooltip?: React.ReactNode;
 
   onBlur?: Function;
   error?: string | false;
@@ -67,9 +66,7 @@ export default function TextFieldInput({
   maxLine,
   isMarkDown = false,
   ellipsis,
-  tooltipDetail,
   tooltip,
-
   onBlur = noop,
   error,
 }: Props) {
@@ -124,7 +121,7 @@ export default function TextFieldInput({
                 component: 'a',
                 props: {
                   target: '_blank',
-                  tabindex: '-1',
+                  tabIndex: '-1',
                 },
               },
             },
@@ -170,7 +167,6 @@ export default function TextFieldInput({
       <FieldInput
         label={label}
         tooltip={tooltip}
-        tooltipDetail={tooltipDetail}
         id={id}
         error={error}
         compact={compact}

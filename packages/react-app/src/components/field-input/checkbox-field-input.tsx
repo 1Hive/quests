@@ -100,8 +100,7 @@ type Props = {
   label?: string;
   onChange?: Function;
   value?: boolean;
-  tooltip?: string;
-  tooltipDetail?: ReactNode;
+  tooltip?: ReactNode;
   compact?: boolean;
   disabled?: boolean;
 };
@@ -113,21 +112,13 @@ export default function CheckboxFieldInput({
   label,
   value = false,
   tooltip,
-  tooltipDetail,
   compact = false,
   onChange = noop,
   disabled = false,
 }: Props) {
   const theme = useTheme();
   return (
-    <FieldInput
-      id={id}
-      label={label}
-      tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
-      compact={compact}
-      isLoading={isLoading}
-    >
+    <FieldInput id={id} label={label} tooltip={tooltip} compact={compact} isLoading={isLoading}>
       <CheckboxWrapperStyled theme={theme}>
         <input
           type="checkbox"

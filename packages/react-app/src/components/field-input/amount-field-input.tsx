@@ -37,12 +37,12 @@ const TokenBadgeStyled = styled(TokenBadge)`
   width: fit-content;
 `;
 
-const AutoCompleteWrapperStyled = styled.div`
+const AutoCompleteWrapperStyled = styled.div<{ wide?: boolean }>`
   flex-grow: 3;
   input {
     & + div {
       pointer-events: none;
-      ${({ wide }: any) => (wide ? 'justify-content: end;' : '')}
+      ${({ wide }) => (wide ? 'justify-content: end;' : '')}
     }
   }
   ul[role='listbox'] {
@@ -60,13 +60,16 @@ const LineStyled = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-
-const AmountTokenWrapperStyled = styled.div`
+interface AmountTokenWrapperStyledProps {
+  isEdit?: boolean;
+  wide?: boolean;
+}
+const AmountTokenWrapperStyled = styled.div<AmountTokenWrapperStyledProps>`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  ${({ wide, isEdit }: any) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
-  ${({ wide }: any) => (wide ? `width:100%;` : 'max-width:100%;')}
+  ${({ wide, isEdit }) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
+  ${({ wide }) => (wide ? `width:100%;` : 'max-width:100%;')}
 `;
 
 const IconEditStyled = styled(IconEdit)`
@@ -88,8 +91,7 @@ type Props = {
   onChange?: Function;
   formik?: FormikContextType<any>;
   compact?: boolean;
-  tooltip?: string;
-  tooltipDetail?: ReactNode;
+  tooltip?: ReactNode;
   maxDecimals?: number;
   disabled?: boolean;
   wide?: boolean;
@@ -110,7 +112,6 @@ function AmountFieldInput({
   onChange = noop,
   formik,
   tooltip,
-  tooltipDetail,
   compact = false,
   maxDecimals,
   disabled = false,
@@ -264,8 +265,7 @@ function AmountFieldInput({
       label={tokenLabel}
       wide={wide}
       compact={compact}
-      tooltip="Token"
-      tooltipDetail="Select a token between the list or paste the token address"
+      tooltip="Select a token between the list or paste the token address"
     >
       {token?.token ? (
         <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
@@ -288,13 +288,13 @@ function AmountFieldInput({
                 <Tag mode="identifier">{tokens[i].symbol}</Tag>
               </LineStyled>
             )}
-            tabindex="-1"
+            tabIndex="-1"
           />
         </AutoCompleteWrapperStyled>
       )}
       {tokenEditable && isEdit && token && (
         <div className="btn-link">
-          <Button size="mini" onClick={onTokenEditClick} tabindex="-2">
+          <Button size="mini" onClick={onTokenEditClick} tabIndex="-1">
             <IconEditStyled size="medium" />
           </Button>
         </div>
@@ -307,7 +307,6 @@ function AmountFieldInput({
       id={id}
       label={label}
       tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
       isLoading={isLoading}
       wide={wide}
       compact

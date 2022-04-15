@@ -1,8 +1,10 @@
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
 // #region StyledComponents
 const WrapperStyled = styled.div`
   height: 100%;
+  margin-left: ${GUpx(4)};
 `;
 // #endregion
 

@@ -9,7 +9,7 @@ import QuestModal from './modals/quest-modal';
 
 // #region StyledComponent
 
-const FooterContainerStyled = styled.div`
+const FooterContainerStyled = styled.div<{ color: string }>`
   margin: auto;
   box-shadow: rgb(0 0 0 / 5%) 3px -2px 0px;
   display: flex;
@@ -17,10 +17,10 @@ const FooterContainerStyled = styled.div`
   justify-content: space-between;
 
   a {
-    color: ${({ color }: any) => color} !important;
+    color: ${({ color }) => color} !important;
   }
 
-  padding: ${GUpx(2)} ${GUpx(20)} ${GUpx(2)} ${GUpx(20)};
+  padding: ${GUpx(8)};
 `;
 
 const FooterContainerStyledSide = styled.div`
@@ -83,7 +83,7 @@ export default function footer() {
   const year = new Date().getFullYear();
 
   return (
-    <FooterContainerStyled background={theme.surface} color={theme.contentSecondary}>
+    <FooterContainerStyled color={theme.contentSecondary}>
       <FooterContainerStyledSide>
         <FooterColumnStyled>
           <TitleLinkStyled href="#" external={false}>
@@ -104,7 +104,7 @@ export default function footer() {
           <FooterLinkStyled href="#" external={false}>
             Quest List
           </FooterLinkStyled>
-          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} isLink />
+          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>
