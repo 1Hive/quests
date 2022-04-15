@@ -3,7 +3,6 @@ import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_STATE, ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
-import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
@@ -13,10 +12,6 @@ import ModalBase, { ModalCallback } from './modal-base';
 import { useQuestsContext } from '../../contexts/quests.context';
 
 // #region StyledComponents
-
-const QuestActionButtonStyled = styled(Button)`
-  margin: ${GUpx()};
-`;
 
 const ButtonLinkStyled = styled(Button)`
   border: none;
@@ -128,18 +123,18 @@ export default function QuestModal({
           />
         )
       }
-      buttons={[
-        (questMode === ENUM_QUEST_VIEW_MODE.Create ||
-          questMode === ENUM_QUEST_VIEW_MODE.Update) && (
-          <QuestActionButtonStyled
-            key="btn-save"
-            label="Create"
-            mode="positive"
-            type="submit"
-            form={`form-quest-form-${data?.address ?? 'new'}`}
-          />
-        ),
-      ]}
+      // buttons={[
+      //   (questMode === ENUM_QUEST_VIEW_MODE.Create ||
+      //     questMode === ENUM_QUEST_VIEW_MODE.Update) && (
+      //     <QuestActionButtonStyled
+      //       key="btn-save"
+      //       label="Create"
+      //       mode="positive"
+      //       type="submit"
+      //       form={`form-quest-form-${data?.address ?? 'new'}`}
+      //     />
+      //   ),
+      // ]}
       isOpen={opened}
       onClose={closeModal}
     >

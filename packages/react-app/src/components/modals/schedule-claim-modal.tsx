@@ -23,6 +23,7 @@ import { ChildSpacer, Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { WalletBallance } from '../wallet-balance';
+import Stepper from '../utils/stepper';
 
 // #region StyledComponents
 
@@ -61,6 +62,7 @@ export default function ScheduleClaimModal({
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
+  const [isSubmitStep, setIsSubmitStep] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
 
@@ -218,15 +220,17 @@ export default function ScheduleClaimModal({
           value={claimDeposit}
           compact
         />,
-        <Button
-          key="confirmButton"
-          icon={<GiBroadsword />}
-          label="Schedule claim"
-          mode="positive"
-          type="submit"
-          form="form-claim"
-          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
-        />,
+        isSubmitStep && (
+          <Button
+            key="confirmButton"
+            icon={<GiBroadsword />}
+            label="Schedule claim"
+            mode="positive"
+            type="submit"
+            form="form-claim"
+            disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+          />
+        ),
       ]}
       onClose={closeModal}
       isOpen={opened}
@@ -243,75 +247,98 @@ export default function ScheduleClaimModal({
         onSubmit={(values, { setSubmitting }) => {
           onClaimSubmit(values, setSubmitting);
         }}
-        validateOnBlur
+        // validateOnBlur
+        validateOnChange
         validate={validate}
       >
-        {({ values, handleSubmit, handleChange, handleBlur, errors, touched }) => (
+        {({ values, handleSubmit, handleChange, handleBlur, errors, touched, setTouched }) => (
           <FormStyled id="form-claim" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
               <ChildSpacer size={16} justify="start" vertical>
-                <TextFieldInput
-                  id="evidence"
-                  isEdit
-                  label="Evidence of completion"
-                  tooltip="Evidence of completion"
-                  tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
-                  isLoading={loading}
-                  value={values.evidence}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.evidence && errors.evidence}
-                  multiline
-                  wide
-                  rows={5}
-                  compact
-                  isMarkDown
-                />
-                <LineStyled>
-                  <Outset horizontal>
-                    <AmountFieldInputFormik
-                      id="questBounty"
-                      label="Available bounty"
+                <Stepper
+                  showButton
+                  onBack={() => {
+                    setIsSubmitStep(false);
+                  }}
+                  onNext={(currentStep: number, _isSubmitStep: boolean) => {
+                    const stepErrors = validate(values);
+                    setIsSubmitStep(_isSubmitStep);
+
+                    if (currentStep === 0) {
+                      setTouched({ evidence: true });
+                      return !stepErrors.evidence;
+                    }
+                    if (currentStep === 1) {
+                      return !(stepErrors.claimedAmount || stepErrors.playerAddress);
+                    }
+                    return true;
+                  }}
+                  steps={[
+                    <TextFieldInput
+                      id="evidence"
+                      isEdit
+                      label="Evidence of completion"
+                      tooltip="Evidence of completion"
+                      tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
                       isLoading={loading}
-                      value={questTotalBounty}
-                    />
-                  </Outset>
-                  <Outset horizontal>
-                    <CheckboxFieldInput
-                      id="claimAll"
-                      label="Claim all"
+                      value={values.evidence}
                       onChange={handleChange}
-                      value={values.claimAll}
-                      isLoading={loading}
-                      isEdit
-                    />
-                  </Outset>
-                  <Outset horizontal>
-                    <AmountFieldInputFormik
-                      id="claimedAmount"
-                      isEdit
-                      label="Claim amount"
-                      tooltip="Claim amount"
-                      tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
-                      isLoading={loading}
-                      value={values.claimAll ? questTotalBounty : values.claimedAmount}
-                      error={touched.claimedAmount && (errors.claimedAmount as string)}
-                      disabled={values.claimAll}
-                    />
-                  </Outset>
-                </LineStyled>
-                <AddressFieldInput
-                  id="playerAddress"
-                  label="Player address"
-                  value={values.playerAddress ?? walletAddress}
-                  isLoading={loading}
-                  tooltip="Player address"
-                  error={touched.playerAddress && errors.playerAddress}
-                  onBlur={handleBlur}
-                  tooltipDetail="Most of time it may be the connected wallet but can also be set to another wallet address"
-                  isEdit
-                  onChange={handleChange}
-                  wide
+                      onBlur={handleBlur}
+                      error={touched.evidence && errors.evidence}
+                      multiline
+                      wide
+                      rows={10}
+                      compact
+                      isMarkDown
+                    />,
+                    <LineStyled>
+                      <Outset horizontal>
+                        <AmountFieldInputFormik
+                          id="questBounty"
+                          label="Available bounty"
+                          isLoading={loading}
+                          value={questTotalBounty}
+                        />
+                      </Outset>
+                      <Outset horizontal>
+                        <CheckboxFieldInput
+                          id="claimAll"
+                          label="Claim all"
+                          onChange={handleChange}
+                          handleBlur={handleBlur}
+                          value={values.claimAll}
+                          isLoading={loading}
+                          isEdit
+                        />
+                      </Outset>
+                      <Outset horizontal>
+                        <AmountFieldInputFormik
+                          id="claimedAmount"
+                          isEdit
+                          label="Claim amount"
+                          tooltip="Claim amount"
+                          tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
+                          isLoading={loading}
+                          value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                          error={touched.claimedAmount && (errors.claimedAmount as string)}
+                          disabled={values.claimAll}
+                        />
+                      </Outset>
+                      <AddressFieldInput
+                        id="playerAddress"
+                        label="Player address"
+                        value={values.playerAddress ?? walletAddress}
+                        isLoading={loading}
+                        tooltip="Player address"
+                        error={touched.playerAddress && errors.playerAddress}
+                        onBlur={handleBlur}
+                        tooltipDetail="Most of time it may be the connected wallet but can also be set to another wallet address"
+                        isEdit
+                        onChange={handleChange}
+                        wide
+                      />
+                    </LineStyled>,
+                  ]}
                 />
               </ChildSpacer>
             </Outset>

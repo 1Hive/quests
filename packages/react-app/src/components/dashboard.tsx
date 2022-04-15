@@ -20,8 +20,8 @@ const BoxStyled = styled.div`
 
 const TextStyled = styled.span`
   color: ${({ theme }: any) => theme.positive};
-  font-weight: bold !important;
-  ${textStyle('title3')};
+  font-weight: normal !important;
+  ${textStyle('title2')};
 `;
 
 const SpacerStyled = styled.div`
@@ -60,7 +60,7 @@ export default function Dashboard() {
           tooltipDetail="Total of the quest bounties converted into USD"
           isLoading={!dashboardModel}
         >
-          <TextStyled theme={theme}>$ {dashboardModel?.totalFunds}</TextStyled>
+          <TextStyled theme={theme}>$ {dashboardModel?.totalFunds.toLocaleString()}</TextStyled>
         </FieldInput>
         <FieldInput
           label={<LabelStyled>Open Quests</LabelStyled>}
@@ -68,7 +68,7 @@ export default function Dashboard() {
           tooltipDetail="All the quests that are currently not expired or closed"
           isLoading={!dashboardModel}
         >
-          <TextStyled theme={theme}>{dashboardModel?.questCount}</TextStyled>
+          <TextStyled theme={theme}>{dashboardModel?.questCount.toLocaleString()}</TextStyled>
         </FieldInput>
         <SpacerStyled>
           <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
