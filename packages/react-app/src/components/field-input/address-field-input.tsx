@@ -1,9 +1,8 @@
-import { value TextInput, value EthIdenticon, value AddressField } from '@1hive/1hive-ui';
-
-import { value noop } from 'lodash-es';
+import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
+import { noop } from 'lodash-es';
 import React from 'react';
-import styled, { value css } from 'styled-components';
-import { value FieldInput } from './field-input';
+import styled, { css } from 'styled-components';
+import { FieldInput } from './field-input';
 
 // #region Styled
 
@@ -17,8 +16,9 @@ const EthIdenticonStyled = styled(EthIdenticon)`
   padding: 0;
 `;
 
-const WrapperStyled = styled.div<{
-  wide?: boolean;
+const AddressWrapperStyled = styled.div<{
+  wide: boolean;
+  isEdit: boolean;
 }>`
   display: flex;
   flex-wrap: nowrap;
