@@ -214,8 +214,7 @@ export default function ScheduleClaimModal({
           key="claimDeposit"
           id="claimDeposit"
           label="Claim Deposit"
-          tooltip="Claim deposit"
-          tooltipDetail="This amount will be staked when claiming a bounty. If the claim is successfully challenged, you will lose this deposit."
+          tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
           isLoading={loading}
           value={claimDeposit}
           compact
@@ -279,7 +278,7 @@ export default function ScheduleClaimModal({
                       isEdit
                       label="Evidence of completion"
                       tooltip="Evidence of completion"
-                      tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                      // tooltipDetail="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
                       isLoading={loading}
                       value={values.evidence}
                       onChange={handleChange}
@@ -317,7 +316,7 @@ export default function ScheduleClaimModal({
                           isEdit
                           label="Claim amount"
                           tooltip="Claim amount"
-                          tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
+                          // tooltipDetail="The expected amount to claim considering the quest agreement. Set it to 0 if you want to claim the whole bounty."
                           isLoading={loading}
                           value={values.claimAll ? questTotalBounty : values.claimedAmount}
                           error={touched.claimedAmount && (errors.claimedAmount as string)}
@@ -332,7 +331,7 @@ export default function ScheduleClaimModal({
                         tooltip="Player address"
                         error={touched.playerAddress && errors.playerAddress}
                         onBlur={handleBlur}
-                        tooltipDetail="Most of time it may be the connected wallet but can also be set to another wallet address"
+                        // tooltipDetail="Most of time it may be the connected wallet but can also be set to another wallet address"
                         isEdit
                         onChange={handleChange}
                         wide

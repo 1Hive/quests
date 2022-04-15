@@ -17,8 +17,7 @@ type Props = {
   tagSuggestions?: string[];
   value?: string[];
   formik?: any;
-  tooltip?: string;
-  tooltipDetail?: ReactNode;
+  tooltip?: ReactNode;
   compact?: boolean;
 };
 
@@ -34,7 +33,6 @@ function TagFieldInput({
   isLoading = false,
   formik,
   tooltip,
-  tooltipDetail,
   compact = false,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState<string>();
@@ -64,14 +62,7 @@ function TagFieldInput({
   };
 
   return (
-    <FieldInput
-      id={id}
-      label={label}
-      tooltip={tooltip}
-      tooltipDetail={tooltipDetail}
-      compact={compact}
-      isLoading={isLoading}
-    >
+    <FieldInput id={id} label={label} tooltip={tooltip} compact={compact} isLoading={isLoading}>
       <>
         {isEdit && (
           <AutoComplete
