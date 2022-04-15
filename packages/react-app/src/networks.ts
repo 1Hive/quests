@@ -4,7 +4,7 @@ import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { TOKENS } from './constants';
 import { NetworkModel } from './models/network.model';
 
-export const networks = {
+export const networks = Object.freeze({
   mainnet: {
     chainId: 1,
     name: 'Mainnet',
@@ -64,7 +64,7 @@ export const networks = {
     govern: 0,
     isTestNetwork: true,
   },
-};
+});
 
 function getNetworkInternalName(chainId = getDefaultChain()) {
   return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkType(chainId);

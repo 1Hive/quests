@@ -2,7 +2,7 @@ import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
 
 import { noop } from 'lodash-es';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { FieldInput } from './field-input';
 
 // #region Styled
@@ -19,10 +19,17 @@ const EthIdenticonStyled = styled(EthIdenticon)`
   height: 38.4px;
 `;
 
-const WrapperStyled = styled.div`
+const WrapperStyled = styled.div<{
+  wide?: boolean;
+}>`
   display: flex;
   flex-wrap: nowrap;
-  ${(props: any) => (props.wide ? 'width:100%;' : '')}
+  ${(props) =>
+    props.wide &&
+    css`
+      width: 100%;
+    `}
+
   max-width: 100%;
   input {
     cursor: default;

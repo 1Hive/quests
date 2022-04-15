@@ -9,7 +9,7 @@ import QuestModal from './modals/quest-modal';
 
 // #region StyledComponent
 
-const FooterContainerStyled = styled.div`
+const FooterContainerStyled = styled.div<{ color: string }>`
   margin: auto;
   box-shadow: rgb(0 0 0 / 5%) 3px -2px 0px;
   display: flex;
@@ -17,7 +17,7 @@ const FooterContainerStyled = styled.div`
   justify-content: space-between;
 
   a {
-    color: ${({ color }: any) => color} !important;
+    color: ${({ color }) => color} !important;
   }
 
   padding: ${GUpx(8)};
@@ -83,7 +83,7 @@ export default function footer() {
   const year = new Date().getFullYear();
 
   return (
-    <FooterContainerStyled background={theme.surface} color={theme.contentSecondary}>
+    <FooterContainerStyled color={theme.contentSecondary}>
       <FooterContainerStyledSide>
         <FooterColumnStyled>
           <TitleLinkStyled href="#" external={false}>
