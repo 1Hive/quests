@@ -122,16 +122,10 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 
 }
 
 export function getDefaultProvider() {
-  const { chainId: expectedChainId } = getNetwork();
+  const { httpProvider, chainId: expectedChainId } = getNetwork();
   let provider = ethOrWeb;
-
   if (!provider || +provider.chainId !== +expectedChainId) {
-    const alchemyId = env('ALCHEMY_API_KEY');
-    if (alchemyId) {
-      provider = new Providers.AlchemyProvider('rinkeby', alchemyId);
-    } else {
-      throw new Error(`No http provider key provided in env`);
-    }
+    provider = new Web3.providers.HttpProvider(`${httpProvider}/${env('INFURA_API_KEY')}`);
   }
 
   return provider && new ethers.providers.Web3Provider(provider);
