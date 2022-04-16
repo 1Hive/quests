@@ -1,15 +1,16 @@
 import { Button } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useState } from 'react';
-
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
-const QuestActionButtonStyled = styled(Button)`
-  width: 40px;
-  height: 30px;
+const QuestActionButtonStyled = styled(Button)<{ visible: boolean }>`
+  visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
 `;
-const ButtonWrapperStyled = styled(Button)`
-  justify-content: ${(props: any) => props.content};
-  border: none;
+const ButtonWrapperStyled = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: ${GUpx()};
+  margin-top: ${GUpx(3)};
 `;
 const WrapperStyled = styled.div`
   display: flex;
@@ -20,18 +21,10 @@ const WrapperStyled = styled.div`
 type Props = {
   steps?: ReactNode[];
   submitButton?: ReactNode;
-  showButton?: boolean;
   onNext?: (_currentStep: number, _isSubmitStep: boolean) => boolean;
   onBack?: (_currentStep: number) => void;
 };
-export default function Stepper({
-  steps,
-  submitButton,
-
-  showButton = false,
-  onNext,
-  onBack,
-}: Props) {
+export default function Stepper({ steps, submitButton, onNext, onBack }: Props) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitStep, setIsSubmitStep] = useState(false);
   const [isFirstStep, setIsFirstStep] = useState(true);
@@ -69,14 +62,17 @@ export default function Stepper({
   return (
     <WrapperStyled>
       {steps && steps[currentStep]}
-      <ButtonWrapperStyled content={isFirstStep ? 'end' : 'space-between'}>
-        {!isFirstStep && (
-          <QuestActionButtonStyled label="Back" mode="normal" size="mini" onClick={previousStep} />
-        )}
-        {!isSubmitStep && showButton ? (
-          <QuestActionButtonStyled label="Next" mode="positive" size="mini" onClick={nextStep} />
+      <ButtonWrapperStyled>
+        <QuestActionButtonStyled
+          visible={!isFirstStep}
+          label="Back"
+          mode="normal"
+          onClick={previousStep}
+        />
+        {!isSubmitStep ? (
+          <QuestActionButtonStyled visible label="Next" mode="positive" onClick={nextStep} />
         ) : (
-          showButton && submitButton
+          submitButton
         )}
       </ButtonWrapperStyled>
     </WrapperStyled>

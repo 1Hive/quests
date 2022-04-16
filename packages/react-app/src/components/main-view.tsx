@@ -31,25 +31,6 @@ const ContentWrapperStyled = styled.div<{
 const ScrollViewStyled = styled.div`
   height: calc(100vh - 80px); // Minus header height
   overflow-y: auto;
-  /* custom scrollbar */
-  &::-webkit-scrollbar {
-    width: 20px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #4a4a4a;
-    border-radius: 20px;
-    border: 6px solid transparent;
-    background-clip: content-box;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: #a8bbbf;
-  }
 `;
 
 // #endregion

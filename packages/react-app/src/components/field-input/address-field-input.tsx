@@ -7,12 +7,12 @@ import { FieldInput } from './field-input';
 // #region Styled
 
 const TextInputStyled = styled(TextInput)`
-  border-radius: 8px;
+  border-radius: 12px;
   padding-right: 42px;
 `;
 
 const EthIdenticonStyled = styled(EthIdenticon)`
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 12px 12px 0;
   padding: 0;
 `;
 

@@ -16,7 +16,7 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
 import { Logger } from 'src/utils/logger';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
@@ -89,7 +89,6 @@ const WrapperStyled = styled.div<{ twoCol?: boolean }>`
   justify-content: space-between;
   width: 100%;
   ${(props) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
-  padding: ${GUpx(3)};
 `;
 
 const FirstColStyled = styled.div`
@@ -105,13 +104,17 @@ const SecondColStyled = styled.div<{ wide?: boolean }>`
   ${(props) => props.wide && 'width: 100%;'}
 `;
 
-const QuestHeaderStyled = styled.div`
+const QuestHeaderStyled = styled.div<{ isEdit: boolean }>`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap-reverse;
   justify-content: space-between;
-  padding: ${GUpx(3)};
-  padding-bottom: ${GUpx()};
+  ${(props) =>
+    !props.isEdit &&
+    css`
+      padding: ${GUpx(3)};
+      padding-bottom: ${GUpx()};
+    `}
   width: 100%;
 `;
 
@@ -122,7 +125,6 @@ type Props = {
   questMode?: string;
   isLoading?: boolean;
   onSave?: (_questAddress: string) => void;
-  css?: any;
 };
 
 export default function Quest({
@@ -130,7 +132,6 @@ export default function Quest({
   isLoading = false,
   questMode = ENUM_QUEST_VIEW_MODE.ReadDetail,
   onSave = noop,
-  css,
 }: Props) {
   const { walletAddress } = useWallet();
   const { defaultToken } = getNetwork();
@@ -554,7 +555,7 @@ export default function Quest({
       <WrapperStyled>
         {!isEdit && (
           <>
-            <QuestHeaderStyled>
+            <QuestHeaderStyled isEdit={isEdit}>
               {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
                 <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
                   {titleInput}
@@ -575,7 +576,6 @@ export default function Quest({
         )}
         {isEdit && (
           <Stepper
-            showButton
             submitButton={
               <QuestActionButtonStyled
                 key="btn-save"

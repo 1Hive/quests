@@ -1,6 +1,6 @@
 import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
@@ -38,7 +38,7 @@ type Props = {
   onClose?: (_success: boolean) => void;
   isOpen: boolean;
   css?: React.CSSProperties;
-  size?: 'small' | 'normal';
+  size?: 'small' | 'normal' | 'large';
 };
 
 export default function ModalBase({
@@ -54,6 +54,16 @@ export default function ModalBase({
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
+  const width = useMemo(() => {
+    switch (size) {
+      case 'small':
+        return 500;
+      case 'large':
+        return 1200;
+      default:
+        return 800;
+    }
+  }, [size]);
   useEffect(() => {
     if (isOpen) {
       // Clear tx if a tx is still there and already completed
@@ -108,9 +118,7 @@ export default function ModalBase({
       <ModalStyled
         visible={isOpen}
         onClose={(e: any) => handleOnClose(e)}
-        width={(viewport: VisualViewport) =>
-          Math.min(viewport.width - 16, size === 'small' ? 500 : 1200)
-        }
+        width={(viewport: VisualViewport) => Math.min(viewport.width - 16, width)}
         style={css}
         id={id}
         tabIndex="-1"
