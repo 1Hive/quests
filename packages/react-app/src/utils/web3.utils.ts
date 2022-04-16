@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers as Providers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { noop } from 'lodash-es';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
