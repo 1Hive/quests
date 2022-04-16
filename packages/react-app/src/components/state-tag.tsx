@@ -19,6 +19,7 @@ type Props = {
   state: string;
   size?: 'normal' | 'small';
   wide?: boolean;
+  className?: string;
 };
 
 const VISIBLE_STATES = [
@@ -33,7 +34,7 @@ const VISIBLE_STATES = [
   ENUM_CLAIM_STATE.Vetoed,
 ];
 
-export function StateTag({ state, size = 'normal', wide = false }: Props) {
+export function StateTag({ state, size = 'normal', wide = false, className }: Props) {
   const [mode, setMode] = useState<string>();
   const [tooltip, setTooltip] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
@@ -89,7 +90,7 @@ export function StateTag({ state, size = 'normal', wide = false }: Props) {
       <Tag mode="new">new</Tag>
       <Tag mode="activity">activity</Tag> */}
       {visible && (
-        <StateWrapperStyled>
+        <StateWrapperStyled className={className}>
           <StateTagStyled wide={wide} title={tooltip} label={state} mode={mode} size={size} />
         </StateWrapperStyled>
       )}

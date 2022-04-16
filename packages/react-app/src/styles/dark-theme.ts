@@ -1,3 +1,4 @@
+import { ThemeInterface } from './theme';
 import { commonTheme } from './common-theme';
 
 export const customDarkTheme = {
@@ -127,4 +128,4 @@ export const customDarkTheme = {
   warningSurface: '#3e3c2d',
   // To be used for text and outline content over warningSurface.
   warningSurfaceContent: '#bfa736',
-};
+} as ThemeInterface;

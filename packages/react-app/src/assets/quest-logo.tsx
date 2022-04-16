@@ -6,7 +6,9 @@ type Props = {
   animated?: boolean;
 };
 
-const DivStyled = styled.div`
+const DivStyled = styled.div<{
+  animated?: boolean;
+}>`
   @keyframes textScale1 {
     0% {
       transform: scale(1);
@@ -18,7 +20,7 @@ const DivStyled = styled.div`
       transform: scale(1);
     }
   }
-  ${({ animated }: any) => animated && `animation: textScale1 1.15s infinite;`}
+  ${({ animated }) => animated && `animation: textScale1 1.15s infinite;`}
   margin-bottom: ${GUpx()};
 `;
 

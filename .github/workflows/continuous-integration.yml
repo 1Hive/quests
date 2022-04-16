@@ -48,7 +48,7 @@ jobs:
           key: ${{ runner.os }}-contracts-v${{ secrets.CONTRACTS_CACHE_VERSION }}-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn ci
 
       - name: Build contracts
         run: yarn compile

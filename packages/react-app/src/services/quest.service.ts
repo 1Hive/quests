@@ -24,7 +24,7 @@ import {
   fetchActiveQuestEntitiesLight,
   fetchQuestRewardTokens,
 } from 'src/queries/quests.query';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE, IS_DEV, TOKENS } from '../constants';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -270,11 +270,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         } as ClaimModel;
       }),
   ).then((claims) =>
-    claims.sort(
-      (a: ClaimModel, b: ClaimModel) =>
-        Object.values(ENUM_CLAIM_STATE).indexOf(a.state!) -
-        Object.values(ENUM_CLAIM_STATE).indexOf(b.state!),
-    ),
+    claims.sort((a: ClaimModel, b: ClaimModel) => b.executionTimeMs! - a.executionTimeMs!),
   );
 }
 

@@ -8,10 +8,10 @@ import { FieldInput } from './field-input';
 
 // #region Styled
 
-const MaxLineStyled = styled.div`
+const MaxLineStyled = styled.div<{ maxLine: number }>`
   margin-bottom: ${GUpx()};
   display: -webkit-box;
-  -webkit-line-clamp: ${(props: any) => props.maxLine};
+  -webkit-line-clamp: ${(props) => props.maxLine};
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
@@ -21,8 +21,8 @@ const MaxLineStyled = styled.div`
   }
 `;
 
-const BlockStyled = styled.div`
-  ${({ wide }: any) => wide && 'width: 100%;'}
+const BlockStyled = styled.div<{ wide?: boolean }>`
+  ${({ wide }) => wide && 'width: 100%;'}
 `;
 
 // #endregion

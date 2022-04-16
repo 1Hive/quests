@@ -1,7 +1,7 @@
 import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { GUpx } from 'src/utils/style.util';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
 import DateFieldInput from './field-input/date-field-input';
 import { FieldInput } from './field-input/field-input';
@@ -12,23 +12,36 @@ const StatusDropdownStyled = styled(DropDown)`
   border: 1px solid ${(props: any) => props.borderColor};
 `;
 
-const FilterWrapperStyled = styled.div`
+const FilterWrapperStyled = styled.div<{
+  colDisplay?: boolean;
+  isSmallResolution?: boolean;
+}>`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: ${({ colDisplay }: any) => (colDisplay ? 'wrap' : 'no-wrap')};
+
+  flex-wrap: ${({ colDisplay }) => (colDisplay ? 'wrap' : 'no-wrap')};
+
   padding: 0 ${GUpx(2)};
-  ${({ isSmallResolution }: any) =>
+
+  ${({ isSmallResolution }) =>
     isSmallResolution
-      ? `
-    margin-right: 20px;
-    padding-bottom: ${GUpx(2)};
-    `
-      : 'height:80px;'} // Size of scrollbar because parent is 100% + 20px
+      ? css`
+          margin-right: 20px;
+          padding-bottom: ${GUpx(2)};
+        `
+      : css`
+          height: 80px;
+        `} // Size of scrollbar because parent is 100% + 20px
+
   // Each filter having a sibling
   & > div + div {
-    ${({ isSmallResolution }: any) => !isSmallResolution && `margin-left: ${GUpx()};`}
+    ${({ isSmallResolution }) =>
+      !isSmallResolution &&
+      css`
+        margin-left: ${GUpx()};
+      `}
   }
 `;
 

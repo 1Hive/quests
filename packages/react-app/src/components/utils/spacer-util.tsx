@@ -1,27 +1,35 @@
 import React, { ReactNode } from 'react';
-import styled from 'styled-components';
+import styled, { css as _css } from 'styled-components';
 
-const ChildWrapperStyled = styled.div`
+export type ChildSpacerProps = {
+  children?: ReactNode;
+  size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
+  vertical?: boolean;
+  justify?: 'start' | 'middle' | 'center' | 'end' | 'space-between' | 'space-around';
+  align?: 'start' | 'center' | 'end';
+  buttonEnd?: boolean;
+};
+
+const ChildWrapperStyled = styled.div<ChildSpacerProps>`
   display: flex;
   flex-wrap: wrap;
-  flex-direction: ${(props: any) => (props.vertical ? 'column' : 'row')};
-  ${(props: any) => (props.justify ? `justify-content:${props.justify};` : '')}
-  ${(props: any) => (props.align ? `align-items:${props.align};` : '')}
+  flex-direction: ${(props) => (props.vertical ? 'column' : 'row')};
+  ${(props) => (props.justify ? `justify-content:${props.justify};` : '')}
+  ${(props) => (props.align ? `align-items:${props.align};` : '')}
 
-  ${(props: any) =>
-    props.buttonEnd
-      ? `
-    & > div:last-child {
-      flex-grow: 1;
-      display: flex;
-      justify-content: flex-end;
+  ${(props) =>
+    props.buttonEnd &&
+    _css`
+      & > div:last-child {
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
 
-      button {
-        margin-left: auto;
+        button {
+          margin-left: auto;
+        }
       }
-    }
-  `
-      : ''}
+    `}
 `;
 
 type Props = {
@@ -157,15 +165,6 @@ export function Inset({
     </div>
   );
 }
-
-type ChildSpacerProps = {
-  children?: ReactNode;
-  size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
-  vertical?: boolean;
-  justify?: 'start' | 'middle' | 'center' | 'end' | 'space-between' | 'space-around';
-  align?: 'start' | 'center' | 'end';
-  buttonEnd?: boolean;
-};
 
 export function ChildSpacer({
   children,

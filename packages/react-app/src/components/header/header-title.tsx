@@ -2,6 +2,7 @@ import { noop } from 'lodash';
 import { Link } from 'react-router-dom';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
+import { MouseEventHandler } from 'react';
 import { ENUM_PAGES } from '../../constants';
 import { LogoTitle } from '../../assets/logo-title';
 
@@ -22,7 +23,7 @@ const TitleLinkWrapperStyled = styled.div`
 // #endregion
 
 type Props = {
-  onClick?: Function;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
 export default function HeaderTitle({ onClick = noop }: Props) {
