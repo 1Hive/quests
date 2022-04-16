@@ -14,7 +14,7 @@ const HelpWrapperStyled = styled.div<{ theme: ThemeInterface }>`
   margin-left: ${GUpx()};
   margin-right: ${GUpx(0.5)};
   svg {
-    color: ${({ theme }) => theme.content}!important;
+    color: ${({ theme }) => theme.hint}!important;
   }
   button:focus::after {
     border: none;
