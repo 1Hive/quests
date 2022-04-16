@@ -121,8 +121,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           fundModalTx(values, setSubmitting);
         }
       }}
+      validateOnChange
       validate={validate}
-      validateOnBlur
     >
       {({ values, handleSubmit, handleChange, touched, errors }) => (
         <ModalBase

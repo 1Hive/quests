@@ -609,9 +609,8 @@ export default function Quest({
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
+        validateOnChange
         validate={validate}
-        validateOnBlur
-        validateOnChange={false}
       >
         {({ values, handleChange, handleBlur, handleSubmit, errors, touched, setTouched }) =>
           isEdit && questData ? (

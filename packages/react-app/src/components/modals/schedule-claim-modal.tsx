@@ -246,7 +246,6 @@ export default function ScheduleClaimModal({
         onSubmit={(values, { setSubmitting }) => {
           onClaimSubmit(values, setSubmitting);
         }}
-        // validateOnBlur
         validateOnChange
         validate={validate}
       >
