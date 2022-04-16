@@ -11,6 +11,7 @@ export const EXPECTED_NETWORKS = IS_DEV ? ['localhost', 'rinkeby'] : ['xDai'];
 export const DEFAULT_THEME = 'dark';
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
+export const REPO_ADDRESS = 'https://github.com/1Hive/quests/';
 
 // Cryptos
 export const TOKENS = Object.freeze({

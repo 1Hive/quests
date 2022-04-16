@@ -88,6 +88,7 @@ const TwoColumnStyled = styled.div<{ twoCol?: boolean }>`
   justify-content: space-between;
   width: 100%;
   ${(props) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
+  padding: ${GUpx(3)};
 `;
 
 const FirstColStyled = styled.div`
