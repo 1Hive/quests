@@ -99,7 +99,7 @@ const FirstColStyled = styled.div`
 `;
 
 const SecondColStyled = styled.div`
-  margin: 0 ${GUpx()};
+  margin: 0 ${GUpx(3)};
   max-width: 90%;
   flex-grow: 0;
   display: flex;
