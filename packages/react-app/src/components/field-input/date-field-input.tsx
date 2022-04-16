@@ -53,7 +53,7 @@ type Props = {
   compact?: boolean;
   wide?: boolean;
   formik?: any;
-  onBlur?: FocusEventHandler<HTMLInputElement> & Function;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   error?: string | false;
 };
 

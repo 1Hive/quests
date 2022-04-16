@@ -570,6 +570,7 @@ export default function Quest({
             </QuestHeaderStyled>
             {firstStep}
             {secondStep}
+            {claimList}
           </>
         )}
         {isEdit && (
