@@ -20,7 +20,7 @@ const TitleStyled = styled.div`
 
 const ModalStyled = styled(Modal)`
   padding: ${GUpx()};
-  z-index: 9999;
+  z-index: 1;
 `;
 
 const ScrollViewStyled = styled(ScrollView)`
