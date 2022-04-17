@@ -11,6 +11,7 @@ const ButtonWrapperStyled = styled.div`
   justify-content: space-between;
   margin-bottom: ${GUpx()};
   margin-top: ${GUpx(3)};
+  align-items: center;
 `;
 const WrapperStyled = styled.div`
   display: flex;

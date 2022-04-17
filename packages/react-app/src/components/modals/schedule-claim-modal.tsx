@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
+import { ENUM_TRANSACTION_STATUS, ENUM, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -283,25 +283,13 @@ export default function ScheduleClaimModal({
                     isMarkDown
                   />,
                   <WrapperStyled>
-                    <Outset horizontal>
-                      <AmountFieldInputFormik
-                        id="questBounty"
-                        label="Available bounty"
-                        isLoading={loading}
-                        value={questTotalBounty}
-                      />
-                    </Outset>
                     <div className="inline-flex">
                       <Outset horizontal>
                         <AmountFieldInputFormik
-                          id="claimedAmount"
-                          isEdit
-                          label="Claim amount"
-                          tooltip="The expected amount to claim considering the Quest agreement. Check all bounty if you want to claim all available bounty at the moment the claim is executed."
+                          id="questBounty"
+                          label="Available bounty"
                           isLoading={loading}
-                          value={values.claimAll ? questTotalBounty : values.claimedAmount}
-                          error={touched.claimedAmount && (errors.claimedAmount as string)}
-                          disabled={values.claimAll}
+                          value={questTotalBounty}
                         />
                       </Outset>
                       <Outset horizontal>
@@ -311,11 +299,24 @@ export default function ScheduleClaimModal({
                           onChange={handleChange}
                           handleBlur={handleBlur}
                           value={values.claimAll}
+                          tooltip={`Check this if you want to claim the entire bounty available passed the claim delay of ${DEFAULT_CLAIM_EXECUTION_DELAY_MS}.`}
                           isLoading={loading}
                           isEdit
                         />
                       </Outset>
                     </div>
+                    <Outset horizontal>
+                      <AmountFieldInputFormik
+                        id="claimedAmount"
+                        isEdit
+                        label="Claim amount"
+                        tooltip="The expected amount to claim considering the Quest agreement. Check all bounty if you want to claim all available bounty at the moment the claim is executed."
+                        isLoading={loading}
+                        value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                        error={touched.claimedAmount && (errors.claimedAmount as string)}
+                        disabled={values.claimAll}
+                      />
+                    </Outset>
 
                     <Outset horizontal>
                       <AddressFieldInput

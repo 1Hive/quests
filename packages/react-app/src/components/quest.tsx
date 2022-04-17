@@ -35,6 +35,7 @@ import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import Stepper from './utils/stepper';
+import { WalletBallance } from './wallet-balance';
 
 // #region StyledComponents
 
@@ -145,8 +146,7 @@ export default function Quest({
   const { setTransaction } = useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
-
-  const [allTouched, setAllTouched] = useState(true);
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
 
   let isSubscribed = true;
 
@@ -196,7 +196,6 @@ export default function Quest({
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     validate(values); // Validate one last time before submitting
 
-    setAllTouched(true);
     if (isFormValid) {
       setLoading(true);
       let createdQuestAddress: string;
@@ -403,7 +402,7 @@ export default function Quest({
         tooltip="Title should resume the Quest and be short and clear."
         // tooltipDetail="Title should resume the quest"
         wide
-        error={(touched.title || allTouched) && errors.title}
+        error={touched.title && errors.title}
       />
     );
     const firstStep = (
@@ -577,13 +576,21 @@ export default function Quest({
         {isEdit && (
           <Stepper
             submitButton={
-              <QuestActionButtonStyled
-                key="btn-save"
-                label="Create"
-                mode="positive"
-                type="submit"
-                form={`form-quest-form-${questData?.address ?? 'new'}`}
-              />
+              <>
+                <WalletBallance
+                  key="WalletBallance-initialFunds"
+                  askedTokenAmount={values.bounty}
+                  setIsEnoughBalance={setIsEnoughBalance}
+                />
+                <QuestActionButtonStyled
+                  key="btn-save"
+                  label="Create"
+                  mode="positive"
+                  type="submit"
+                  form={`form-quest-form-${questData?.address ?? 'new'}`}
+                  disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+                />
+              </>
             }
             onNext={(currentStep) => onNext(currentStep)}
             steps={[firstStep, secondStep]}
