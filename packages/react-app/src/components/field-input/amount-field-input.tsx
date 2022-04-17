@@ -203,7 +203,7 @@ function AmountFieldInput({
   const onAmountChange = (e: any) => {
     const newAmount = e.target.value;
     setAmount(newAmount);
-    if (token && e.target.value !== '') {
+    if (token && newAmount !== '') {
       applyChanges({
         token: {
           ...token,
@@ -244,6 +244,9 @@ function AmountFieldInput({
               onChange={onAmountChange}
               placeHolder={placeHolder}
               onBlur={(e: React.FocusEvent) => {
+                const el = e.target as HTMLInputElement;
+                if (el.value === '') el.value = '0';
+                onAmountChange(e);
                 formik?.setFieldTouched(id, true);
                 formik?.handleBlur(e);
               }}
