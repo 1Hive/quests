@@ -37,11 +37,11 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
     const fetchBalances = async (_token: TokenModel) => {
       setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
     };
-    if (askedTokenAmount?.token) {
+    if (askedTokenAmount?.token && askedTokenAmount.token.token !== tokenBalance?.token.token) {
       setTokenBalance(undefined);
       fetchBalances(askedTokenAmount.token);
     }
-  }, [askedTokenAmount, walletAddress]);
+  }, [askedTokenAmount?.token, walletAddress]);
 
   useEffect(() => {
     if (tokenBalance) {
@@ -64,7 +64,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
           value={tokenBalance}
         />
       ) : (
-        <FieldInput id="balance-not-selected-token" label="Wallet balance">
+        <FieldInput id="balance-not-selected-token" label="Wallet balance" compact>
           <i>No token selected</i>
         </FieldInput>
       )}

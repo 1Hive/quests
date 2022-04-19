@@ -146,7 +146,6 @@ function AmountFieldInput({
     if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
       setHasFocused(true);
     } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
-      formik?.setFieldTouched(id, true);
       formik?.handleBlur({ ...e, target: { id, name: id } });
       setHasFocused(false);
     }
