@@ -1,6 +1,7 @@
 import { useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { useWallet } from 'src/contexts/wallet.context';
 import { DashboardModel } from 'src/models/dashboard.model';
 import { getDashboardInfo } from 'src/services/quest.service';
 import { GUpx } from 'src/utils/style.util';
@@ -39,6 +40,8 @@ const LabelStyled = styled.div`
 export default function Dashboard() {
   const theme = useTheme();
   const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
+  const { walletAddress } = useWallet();
+
   useEffect(() => {
     let isSubscribed = true;
     getDashboardInfo().then((innerDashboardModel) => {
@@ -74,7 +77,7 @@ export default function Dashboard() {
           <TextStyled theme={theme}>{dashboardModel?.questCount.toLocaleString()}</TextStyled>
         </FieldInput>
         <SpacerStyled>
-          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />
+          {walletAddress && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
         </SpacerStyled>
       </ChildSpacer>
     </BoxStyled>
