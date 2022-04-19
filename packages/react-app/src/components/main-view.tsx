@@ -1,12 +1,11 @@
 import { Root, useViewport, Button, IconFilter } from '@1hive/1hive-ui';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useWallet } from 'src/contexts/wallet.context';
 import { Logger } from 'src/utils/logger';
 import { isConnected } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { usePageContext } from 'src/contexts/page.context';
 import Skeleton from 'react-loading-skeleton';
-import { useThemeContext } from 'src/contexts/theme.context';
 import { GUpx } from 'src/utils/style.util';
 import { useFilterContext } from 'src/contexts/filter.context';
 import Header from './header';
@@ -22,33 +21,16 @@ const HeaderWrapperStyled = styled.div`
   width: 100%;
 `;
 
-const ContentWrapperStyled = styled.div`
-  padding: ${({ isSmallResolution }: any) => (isSmallResolution ? GUpx() : GUpx(4))};
+const ContentWrapperStyled = styled.div<{
+  isSmallResolution?: boolean;
+}>`
+  padding: ${({ isSmallResolution }) => (isSmallResolution ? GUpx() : GUpx(4))};
   min-height: calc(100vh - 80px);
 `;
 
 const ScrollViewStyled = styled.div`
   height: calc(100vh - 80px); // Minus header height
   overflow-y: auto;
-  /* custom scrollbar */
-  &::-webkit-scrollbar {
-    width: 20px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #4a4a4a;
-    border-radius: 20px;
-    border: 6px solid transparent;
-    background-clip: content-box;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: #a8bbbf;
-  }
 `;
 
 // #endregion
@@ -61,8 +43,6 @@ function MainView({ children }: Props) {
   const { activateWallet, walletAddress } = useWallet();
   const { page } = usePageContext();
   const { below } = useViewport();
-  const headerRef = useRef<HTMLDivElement>(null);
-  const { currentTheme } = useThemeContext();
   const { toggleFilter } = useFilterContext();
 
   useEffect(() => {
@@ -78,7 +58,7 @@ function MainView({ children }: Props) {
 
   return (
     <Root.Provider>
-      <HeaderWrapperStyled theme={currentTheme}>
+      <HeaderWrapperStyled>
         <Header>
           {below('medium') && (
             <Button
@@ -90,11 +70,8 @@ function MainView({ children }: Props) {
           )}
         </Header>
       </HeaderWrapperStyled>
-      <ScrollViewStyled id="scroll-view" theme={currentTheme} isSmallResolution={below('medium')}>
-        <ContentWrapperStyled
-          isSmallResolution={below('medium')}
-          top={headerRef.current?.clientHeight}
-        >
+      <ScrollViewStyled id="scroll-view">
+        <ContentWrapperStyled isSmallResolution={below('medium')}>
           {page ? children : <Skeleton /> /* TODO Put some spinner here */}
         </ContentWrapperStyled>
         <Footer />

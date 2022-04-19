@@ -42,6 +42,7 @@
     "react/no-unused-prop-types": "warn",
     "jsx-props-no-spreading": "off",
     "react/jsx-props-no-spreading": "off",
+    "react/state-in-constructor": "off",
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
   },
   "settings": {

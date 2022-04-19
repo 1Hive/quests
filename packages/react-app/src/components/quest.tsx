@@ -1,7 +1,7 @@
 import { Card, Button } from '@1hive/1hive-ui';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import { noop } from 'lodash-es';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { FocusEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { debounce, uniqueId } from 'lodash';
 import {
@@ -16,7 +16,7 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import * as QuestService from 'src/services/quest.service';
 import { Logger } from 'src/utils/logger';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
@@ -35,6 +35,7 @@ import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import Stepper from './utils/stepper';
+import { WalletBallance } from './wallet-balance';
 
 // #region StyledComponents
 
@@ -46,9 +47,6 @@ const LinkStyled = styled(Link)`
   font-weight: 100;
 `;
 
-const AddressWrapperStyled = styled.div`
-  width: 390px;
-`;
 const QuestActionButtonStyled = styled(Button)`
   width: 40px;
 `;
@@ -86,28 +84,38 @@ const FormStyled = styled(Form)`
   }
 `;
 
-const DivStyled = styled.div`
+const WrapperStyled = styled.div<{ twoCol?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  ${(props) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
 `;
 
 const FirstColStyled = styled.div`
   margin: 0 ${GUpx(3)};
 `;
 
-const SecondColStyled = styled.div`
+const SecondColStyled = styled.div<{ wide?: boolean }>`
   margin: 0 ${GUpx(3)};
+  max-width: 90%;
+  flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+  ${(props) => props.wide && 'width: 100%;'}
 `;
 
-const QuestHeaderStyled = styled.div`
+const QuestHeaderStyled = styled.div<{ isEdit: boolean }>`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap-reverse;
   justify-content: space-between;
-  padding: ${GUpx(3)};
-  padding-bottom: ${GUpx()};
+  ${(props) =>
+    !props.isEdit &&
+    css`
+      padding: ${GUpx(3)};
+      padding-bottom: ${GUpx()};
+    `}
   width: 100%;
 `;
 
@@ -118,7 +126,6 @@ type Props = {
   questMode?: string;
   isLoading?: boolean;
   onSave?: (_questAddress: string) => void;
-  css?: any;
 };
 
 export default function Quest({
@@ -126,7 +133,6 @@ export default function Quest({
   isLoading = false,
   questMode = ENUM_QUEST_VIEW_MODE.ReadDetail,
   onSave = noop,
-  css,
 }: Props) {
   const { walletAddress } = useWallet();
   const { defaultToken } = getNetwork();
@@ -140,8 +146,7 @@ export default function Quest({
   const { setTransaction } = useTransactionContext();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
-
-  const [allTouched, setAllTouched] = useState(true);
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
 
   let isSubscribed = true;
 
@@ -191,7 +196,6 @@ export default function Quest({
   const onQuestSubmit = async (values: QuestModel, setSubmitting: Function) => {
     validate(values); // Validate one last time before submitting
 
-    setAllTouched(true);
     if (isFormValid) {
       setLoading(true);
       let createdQuestAddress: string;
@@ -367,7 +371,7 @@ export default function Quest({
     handleChange: Function,
     errors: FormErrors<QuestModel>,
     touched: FormikTouched<QuestModel>,
-    handleBlur: Function,
+    handleBlur: FocusEventHandler<HTMLInputElement>,
     setTouched: (
       _touched: FormikTouched<QuestModel>,
       _shouldValidate?: boolean | undefined,
@@ -398,11 +402,11 @@ export default function Quest({
         tooltip="Title should resume the Quest and be short and clear."
         // tooltipDetail="Title should resume the quest"
         wide
-        error={(touched.title || allTouched) && errors.title}
+        error={touched.title && errors.title}
       />
     );
     const firstStep = (
-      <FirstColStyled gu16 className="pb-0">
+      <FirstColStyled className="pb-0">
         {isEdit && titleInput}
         <TextFieldInput
           id="description"
@@ -449,7 +453,7 @@ export default function Quest({
             }
             value={questData?.bounty}
             isLoading={loading || (!isEdit && !bounty) || !questData}
-            error={(touched.bounty || allTouched) && errors.bounty}
+            error={touched.bounty && errors.bounty}
             tokenEditable
             tokenLabel={isEdit ? 'Funding token' : undefined}
             amountLabel={isEdit ? 'Initial funding amount' : undefined}
@@ -463,8 +467,7 @@ export default function Quest({
               <AmountFieldInput
                 id="claimDeposit"
                 label="Claim deposit"
-                tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor 
-                of the challenger, you will lose this deposit."
+                tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
                 value={claimDeposit}
                 isLoading={loading || (!isEdit && !claimDeposit) || !questData}
                 wide
@@ -492,106 +495,108 @@ export default function Quest({
           formik={formRef}
         />
         {isEdit && (
-          <AddressWrapperStyled>
-            <AddressFieldInput
-              id="fallbackAddress"
-              label="Funds fallback address"
-              value={values.fallbackAddress ?? walletAddress}
-              isLoading={loading || !questData}
-              tooltip="Unused funds at the specified expiry time can be returned to this address."
-              isEdit
-              onBlur={handleBlur}
-              error={touched.fallbackAddress && errors.fallbackAddress}
-              onChange={handleChange}
-              wide
-            />
-          </AddressWrapperStyled>
+          <AddressFieldInput
+            id="fallbackAddress"
+            label="Funds fallback address"
+            value={values.fallbackAddress ?? walletAddress}
+            isLoading={loading || !questData}
+            tooltip="Unused funds at the specified expiry time can be returned to this address."
+            isEdit
+            onBlur={handleBlur}
+            error={touched.fallbackAddress && errors.fallbackAddress}
+            onChange={handleChange}
+            wide
+          />
         )}
       </SecondColStyled>
     );
 
-    return (
+    const claimList = !loading && questData?.address && (
       <>
-        {!isEdit && (
-          <QuestHeaderStyled>
-            {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
-              <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
-                {titleInput}
-              </TitleLinkStyled>
-            ) : (
-              titleInput
-            )}
-            <AddressFieldInput
-              id="address"
-              value={values.address}
-              isLoading={loading || !questData}
-            />
-          </QuestHeaderStyled>
+        {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
+          <ClaimList
+            newClaim={claimUpdated}
+            questData={questData}
+            questTotalBounty={bounty}
+            challengeDeposit={challengeDeposit}
+          />
         )}
+        {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
+          questData.address &&
+          walletAddress &&
+          bounty && (
+            <QuestFooterStyled>
+              {values.state === ENUM_QUEST_STATE.Active ? (
+                <>
+                  <FundModal quest={questData} onClose={onFundModalClosed} />
+                  {claimDeposit && (
+                    <ScheduleClaimModal
+                      questAddress={questData.address}
+                      questTotalBounty={bounty}
+                      claimDeposit={claimDeposit}
+                      onClose={onScheduleModalClosed}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {!!bounty?.parsedAmount && (
+                    <ReclaimFundsModal bounty={bounty} questData={values} />
+                  )}
+                </>
+              )}
+            </QuestFooterStyled>
+          )}
+      </>
+    );
 
-        <DivStyled>
-          {isEdit ? (
-            <Stepper
-              showButton={isEdit}
-              submitButton={
+    return (
+      <WrapperStyled>
+        {!isEdit && (
+          <>
+            <QuestHeaderStyled isEdit={isEdit}>
+              {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
+                <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
+                  {titleInput}
+                </TitleLinkStyled>
+              ) : (
+                titleInput
+              )}
+              <AddressFieldInput
+                id="address"
+                value={values.address}
+                isLoading={loading || !questData}
+              />
+            </QuestHeaderStyled>
+            {firstStep}
+            {secondStep}
+            {claimList}
+          </>
+        )}
+        {isEdit && (
+          <Stepper
+            submitButton={
+              <>
+                <WalletBallance
+                  key="WalletBallance-initialFunds"
+                  askedTokenAmount={values.bounty}
+                  setIsEnoughBalance={setIsEnoughBalance}
+                />
                 <QuestActionButtonStyled
                   key="btn-save"
                   label="Create"
                   mode="positive"
                   type="submit"
                   form={`form-quest-form-${questData?.address ?? 'new'}`}
+                  disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
                 />
-              }
-              onNext={(currentStep) => onNext(currentStep)}
-              steps={[firstStep, secondStep]}
-            />
-          ) : (
-            <>
-              {firstStep}
-              {secondStep}
-            </>
-          )}
-        </DivStyled>
-
-        {!loading && !isEdit && questData?.address && (
-          <>
-            {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && challengeDeposit && (
-              <ClaimList
-                newClaim={claimUpdated}
-                questData={questData}
-                questTotalBounty={bounty}
-                challengeDeposit={challengeDeposit}
-              />
-            )}
-            {questMode !== ENUM_QUEST_VIEW_MODE.ReadSummary &&
-              questData.address &&
-              walletAddress &&
-              bounty && (
-                <QuestFooterStyled>
-                  {values.state === ENUM_QUEST_STATE.Active ? (
-                    <>
-                      <FundModal quest={questData} onClose={onFundModalClosed} />
-                      {claimDeposit && (
-                        <ScheduleClaimModal
-                          questAddress={questData.address}
-                          questTotalBounty={bounty}
-                          claimDeposit={claimDeposit}
-                          onClose={onScheduleModalClosed}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {!!bounty?.parsedAmount && (
-                        <ReclaimFundsModal bounty={bounty} questData={values} />
-                      )}
-                    </>
-                  )}
-                </QuestFooterStyled>
-              )}
-          </>
+              </>
+            }
+            onNext={(currentStep) => onNext(currentStep)}
+            steps={[firstStep, secondStep]}
+          />
         )}
-      </>
+      </WrapperStyled>
     );
   };
 
@@ -611,9 +616,8 @@ export default function Quest({
           } as QuestModel
         }
         onSubmit={(values, { setSubmitting }) => onQuestSubmit(values, setSubmitting)}
+        validateOnChange
         validate={validate}
-        validateOnBlur
-        validateOnChange={false}
       >
         {({ values, handleChange, handleBlur, handleSubmit, errors, touched, setTouched }) =>
           isEdit && questData ? (

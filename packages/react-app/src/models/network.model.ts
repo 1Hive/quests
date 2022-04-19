@@ -14,6 +14,7 @@ export type NetworkModel = {
   governAddress: string;
   governQueueAddress: string;
   celesteAddress: string;
+  httpProvider: string;
   defaultToken: TokenModel;
   nativeToken: TokenModel;
   stableToken: TokenModel;

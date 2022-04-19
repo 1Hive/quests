@@ -123,18 +123,6 @@ export default function QuestModal({
           />
         )
       }
-      // buttons={[
-      //   (questMode === ENUM_QUEST_VIEW_MODE.Create ||
-      //     questMode === ENUM_QUEST_VIEW_MODE.Update) && (
-      //     <QuestActionButtonStyled
-      //       key="btn-save"
-      //       label="Create"
-      //       mode="positive"
-      //       type="submit"
-      //       form={`form-quest-form-${data?.address ?? 'new'}`}
-      //     />
-      //   ),
-      // ]}
       isOpen={opened}
       onClose={closeModal}
     >

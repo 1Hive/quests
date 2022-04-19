@@ -1,5 +1,5 @@
 import { useTheme, GU, Link, IconExternal } from '@1hive/1hive-ui';
-import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_QUEST_VIEW_MODE, REPO_ADDRESS } from 'src/constants';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,7 +9,7 @@ import QuestModal from './modals/quest-modal';
 
 // #region StyledComponent
 
-const FooterContainerStyled = styled.div`
+const FooterContainerStyled = styled.div<{ color: string }>`
   margin: auto;
   box-shadow: rgb(0 0 0 / 5%) 3px -2px 0px;
   display: flex;
@@ -17,7 +17,7 @@ const FooterContainerStyled = styled.div`
   justify-content: space-between;
 
   a {
-    color: ${({ color }: any) => color} !important;
+    color: ${({ color }) => color} !important;
   }
 
   padding: ${GUpx(8)};
@@ -83,7 +83,7 @@ export default function footer() {
   const year = new Date().getFullYear();
 
   return (
-    <FooterContainerStyled background={theme.surface} color={theme.contentSecondary}>
+    <FooterContainerStyled color={theme.contentSecondary}>
       <FooterContainerStyledSide>
         <FooterColumnStyled>
           <TitleLinkStyled href="#" external={false}>
@@ -138,6 +138,33 @@ export default function footer() {
             <span>Quest Wiki</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
+        </FooterColumnStyled>
+        <FooterColumnStyled>
+          <FooterTitleStyled>Feedback</FooterTitleStyled>
+          <FooterLinkStyled
+            color={theme.contentSecondary}
+            href={`${REPO_ADDRESS}/issues/new?assignees=&label=App%2CBug&template=bug_report.md&title=Bug+%3A+`}
+            external
+          >
+            <span>Report a bug</span>
+            <IconExternal size="small" />
+          </FooterLinkStyled>
+          <FooterLinkStyled
+            color={theme.contentSecondary}
+            href={`${REPO_ADDRESS}/security/policy`}
+            external
+          >
+            <span>Report a vulnerability</span>
+            <IconExternal size="small" />
+          </FooterLinkStyled>
+          <FooterLinkStyled
+            color={theme.contentSecondary}
+            href={`${REPO_ADDRESS}/issues/new?assignees=&labels=App%2CFeature&template=feature----feature_title-.md`}
+            external
+          >
+            <span>Request a feature</span>
+            <IconExternal size="small" />
+          </FooterLinkStyled>
         </FooterColumnStyled>
       </FooterContainerStyledSide>
     </FooterContainerStyled>

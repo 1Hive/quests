@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
 import { useThemeContext } from 'src/contexts/theme.context';
+import { ThemeInterface } from 'src/styles/theme';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -37,7 +38,9 @@ const EmptyStateCardStyled = styled(EmptyStateCard)`
   }
 `;
 
-const FilterWrapperStyled = styled.div`
+const FilterWrapperStyled = styled.div<{
+  theme: ThemeInterface;
+}>`
   position: sticky;
   top: -1px;
   width: calc(100% + 20px); // Size of scrollbar
@@ -139,7 +142,7 @@ export default function QuestList() {
         <Dashboard />
         {!below('medium') && <Piggy />}
       </LineStyled>
-      <FilterWrapperStyled theme={currentTheme} isSmallResolution={below('medium')}>
+      <FilterWrapperStyled theme={currentTheme}>
         <Filter />
       </FilterWrapperStyled>
       <InfiniteScroll

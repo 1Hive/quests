@@ -13,7 +13,7 @@ const InfoStyled = styled(Info)`
 `;
 
 type Props = {
-  askedTokenAmount: TokenAmountModel;
+  askedTokenAmount?: TokenAmountModel;
   setIsEnoughBalance?: (_valid: boolean) => void;
 };
 
@@ -33,7 +33,8 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
 
   useEffect(() => {
     if (tokenBalance) {
-      const isEnough = tokenBalance.parsedAmount >= askedTokenAmount.parsedAmount;
+      const isEnough =
+        (askedTokenAmount && tokenBalance.parsedAmount >= askedTokenAmount.parsedAmount) ?? false;
       _setIsEnoughBalance(isEnough);
       if (setIsEnoughBalance) setIsEnoughBalance(isEnough);
     }

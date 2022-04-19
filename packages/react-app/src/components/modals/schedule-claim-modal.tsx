@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
+import { ENUM_TRANSACTION_STATUS, ENUM, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -29,6 +29,8 @@ import Stepper from '../utils/stepper';
 
 const FormStyled = styled(Form)`
   width: 100%;
+  padding: ${GUpx()};
+  padding-bottom: 0;
 `;
 
 const OpenButtonStyled = styled(Button)`
@@ -36,8 +38,9 @@ const OpenButtonStyled = styled(Button)`
   width: fit-content;
 `;
 
-const LineStyled = styled.div`
+const WrapperStyled = styled.div`
   display: flex;
+  flex-direction: column;
   align-content: center;
 `;
 
@@ -62,7 +65,6 @@ export default function ScheduleClaimModal({
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
-  const [isSubmitStep, setIsSubmitStep] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
 
@@ -219,17 +221,15 @@ export default function ScheduleClaimModal({
           value={claimDeposit}
           compact
         />,
-        isSubmitStep && (
-          <Button
-            key="confirmButton"
-            icon={<GiBroadsword />}
-            label="Schedule claim"
-            mode="positive"
-            type="submit"
-            form="form-claim"
-            disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
-          />
-        ),
+        <Button
+          key="confirmButton"
+          icon={<GiBroadsword />}
+          label="Schedule claim"
+          mode="positive"
+          type="submit"
+          form="form-claim"
+          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+        />,
       ]}
       onClose={closeModal}
       isOpen={opened}
@@ -246,50 +246,44 @@ export default function ScheduleClaimModal({
         onSubmit={(values, { setSubmitting }) => {
           onClaimSubmit(values, setSubmitting);
         }}
-        // validateOnBlur
         validateOnChange
         validate={validate}
       >
         {({ values, handleSubmit, handleChange, handleBlur, errors, touched, setTouched }) => (
           <FormStyled id="form-claim" onSubmit={handleSubmit} ref={formRef}>
-            <Outset gu16>
-              <ChildSpacer size={16} justify="start" vertical>
-                <Stepper
-                  showButton
-                  onBack={() => {
-                    setIsSubmitStep(false);
-                  }}
-                  onNext={(currentStep: number, _isSubmitStep: boolean) => {
-                    const stepErrors = validate(values);
-                    setIsSubmitStep(_isSubmitStep);
+            <ChildSpacer size={16} justify="start" vertical>
+              <Stepper
+                onNext={(currentStep: number, _isSubmitStep: boolean) => {
+                  const stepErrors = validate(values);
 
-                    if (currentStep === 0) {
-                      setTouched({ evidence: true });
-                      return !stepErrors.evidence;
-                    }
-                    if (currentStep === 1) {
-                      return !(stepErrors.claimedAmount || stepErrors.playerAddress);
-                    }
-                    return true;
-                  }}
-                  steps={[
-                    <TextFieldInput
-                      id="evidence"
-                      isEdit
-                      label="Evidence of completion"
-                      tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
-                      isLoading={loading}
-                      value={values.evidence}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.evidence && errors.evidence}
-                      multiline
-                      wide
-                      rows={10}
-                      compact
-                      isMarkDown
-                    />,
-                    <LineStyled>
+                  if (currentStep === 0) {
+                    setTouched({ evidence: true });
+                    return !stepErrors.evidence;
+                  }
+                  if (currentStep === 1) {
+                    return !(stepErrors.claimedAmount || stepErrors.playerAddress);
+                  }
+                  return true;
+                }}
+                steps={[
+                  <TextFieldInput
+                    id="evidence"
+                    isEdit
+                    label="Evidence of completion"
+                    tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                    isLoading={loading}
+                    value={values.evidence}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.evidence && errors.evidence}
+                    multiline
+                    wide
+                    rows={10}
+                    compact
+                    isMarkDown
+                  />,
+                  <WrapperStyled>
+                    <div className="inline-flex">
                       <Outset horizontal>
                         <AmountFieldInputFormik
                           id="questBounty"
@@ -305,22 +299,26 @@ export default function ScheduleClaimModal({
                           onChange={handleChange}
                           handleBlur={handleBlur}
                           value={values.claimAll}
+                          tooltip={`Check this if you want to claim the entire bounty available passed the claim delay of ${DEFAULT_CLAIM_EXECUTION_DELAY_MS}.`}
                           isLoading={loading}
                           isEdit
                         />
                       </Outset>
-                      <Outset horizontal>
-                        <AmountFieldInputFormik
-                          id="claimedAmount"
-                          isEdit
-                          label="Claim amount"
-                          tooltip="The expected amount to claim considering the Quest agreement. Check all bounty if you want to claim all available bounty at the moment the claim is executed."
-                          isLoading={loading}
-                          value={values.claimAll ? questTotalBounty : values.claimedAmount}
-                          error={touched.claimedAmount && (errors.claimedAmount as string)}
-                          disabled={values.claimAll}
-                        />
-                      </Outset>
+                    </div>
+                    <Outset horizontal>
+                      <AmountFieldInputFormik
+                        id="claimedAmount"
+                        isEdit
+                        label="Claim amount"
+                        tooltip="The expected amount to claim considering the Quest agreement. Check all bounty if you want to claim all available bounty at the moment the claim is executed."
+                        isLoading={loading}
+                        value={values.claimAll ? questTotalBounty : values.claimedAmount}
+                        error={touched.claimedAmount && (errors.claimedAmount as string)}
+                        disabled={values.claimAll}
+                      />
+                    </Outset>
+
+                    <Outset horizontal>
                       <AddressFieldInput
                         id="playerAddress"
                         label="Player address"
@@ -333,11 +331,11 @@ export default function ScheduleClaimModal({
                         onChange={handleChange}
                         wide
                       />
-                    </LineStyled>,
-                  ]}
-                />
-              </ChildSpacer>
-            </Outset>
+                    </Outset>
+                  </WrapperStyled>,
+                ]}
+              />
+            </ChildSpacer>
           </FormStyled>
         )}
       </Formik>

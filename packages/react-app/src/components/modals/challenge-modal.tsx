@@ -358,8 +358,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             );
           }
         }}
+        validateOnChange
         validate={validate}
-        validateOnBlur
       >
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (
           <FormStyled id="form-challenge" onSubmit={handleSubmit} ref={formRef}>

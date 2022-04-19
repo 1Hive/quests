@@ -37,7 +37,6 @@ const AppStyled = styled.div`
 
 function App() {
   const { currentTheme } = useThemeContext();
-
   return (
     <AppStyled theme={currentTheme}>
       <WalletProvider>

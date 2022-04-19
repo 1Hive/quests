@@ -11,9 +11,10 @@ export const EXPECTED_NETWORKS = IS_DEV ? ['localhost', 'rinkeby'] : ['xDai'];
 export const DEFAULT_THEME = 'dark';
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
+export const REPO_ADDRESS = 'https://github.com/1Hive/quests/';
 
 // Cryptos
-export const TOKENS = {
+export const TOKENS = Object.freeze({
   // Native tokens
   Ether: {
     name: 'Ether',
@@ -63,13 +64,13 @@ export const TOKENS = {
     token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
     decimals: 18,
   } as TokenModel,
-};
+});
 
-export const NETWORK_TOKENS = {
+export const NETWORK_TOKENS = Object.freeze({
   rinkeby: [TOKENS.HoneyTest, TOKENS.RinkebyTheter, TOKENS.RinkebyHoney, TOKENS.RinkebyDai],
   xdai: [TOKENS.Honey],
   mainnet: [TOKENS.Thether],
-};
+});
 
 // Constants
 
@@ -79,23 +80,23 @@ export const QUESTS_PAGE_SIZE = 4;
 
 // Enums
 
-export const ENUM_QUEST_STATE = {
+export const ENUM_QUEST_STATE = Object.freeze({
   All: 'All',
   Draft: 'Draft', // Not yet saved
   Active: 'Active', // Contract created
   // Played: 'Played', // At least one active claim
   Expired: 'Expired', // When expireTime is past
   Archived: 'Archived', // When no more funds
-};
+});
 
-export const ENUM_QUEST_VIEW_MODE = {
+export const ENUM_QUEST_VIEW_MODE = Object.freeze({
   Create: 'CREATE',
   Update: 'UPDATE',
   ReadSummary: 'SUMMARY',
   ReadDetail: 'DETAIL',
-};
+});
 
-export const ENUM_BREAKPOINTS = {
+export const ENUM_BREAKPOINTS = Object.freeze({
   4: '4',
   8: '8',
   16: '16',
@@ -106,14 +107,14 @@ export const ENUM_BREAKPOINTS = {
   56: '56',
   64: '64',
   72: '72',
-};
+});
 
-export const ENUM_PAGES = {
+export const ENUM_PAGES = Object.freeze({
   List: 'list',
   Detail: 'detail',
-};
+});
 
-export const ENUM_CLAIM_STATE = {
+export const ENUM_CLAIM_STATE = Object.freeze({
   None: 'None',
   Scheduled: 'Scheduled',
   Challenged: 'Challenged',
@@ -123,18 +124,18 @@ export const ENUM_CLAIM_STATE = {
   Executed: 'Executed',
   Vetoed: 'Vetoed',
   Rejected: 'Rejected',
-};
+});
 
-export const ENUM_TRANSACTION_STATUS = {
+export const ENUM_TRANSACTION_STATUS = Object.freeze({
   Confirmed: 'TX_STATUS_CONFIRMED',
   Failed: 'TX_STATUS_FAILED',
   Pending: 'TX_STATUS_PENDING',
   SignatureFailed: 'TX_STATUS_SIGNATURE_FAILED',
   Signed: 'TX_STATUS_SIGNED',
   WaitingForSignature: 'TX_WAITING_FOR_SIGNATURE',
-};
+});
 
-export const ENUM_ESTIMATED_TX_TIME_MS = {
+export const ENUM_ESTIMATED_TX_TIME_MS = Object.freeze({
   Default: 15 * 1000,
   QuestCreating: 20 * 1000,
   QuestFunding: 20 * 1000,
@@ -144,17 +145,17 @@ export const ENUM_ESTIMATED_TX_TIME_MS = {
   ClaimExecuting: 30 * 1000,
   ChallengeResolving: 20 * 1000,
   TokenAproval: 20 * 1000,
-};
+});
 
-export const ENUM_DISPUTE_STATES = {
+export const ENUM_DISPUTE_STATES = Object.freeze({
   NotDisputed: 0,
   Disputed: 1,
   DisputeNotRuled: 2,
   DisputeRuledForChallenger: 3,
   DisputeRuledForSubmitter: 4,
-};
+});
 
-export const ENUM = {
+export const ENUM = Object.freeze({
   ENUM_QUEST_VIEW_MODE,
   ENUM_BREAKPOINTS,
   ENUM_PAGES,
@@ -162,19 +163,19 @@ export const ENUM = {
   ENUM_TRANSACTION_STATE: ENUM_TRANSACTION_STATUS,
   ENUM_ESTIMATED_TX_TIME_MS,
   ENUM_DISPUTE_STATES,
-};
+});
 
 // Default values
 
 export const DEFAULT_PAGE = ENUM_PAGES.List;
 
-export const DEFAULT_FILTER = {
+export const DEFAULT_FILTER = Object.freeze({
   address: '',
   title: '',
   description: '',
   minExpireTime: null,
   bounty: undefined,
   status: ENUM_QUEST_STATE.Active,
-} as FilterModel;
+} as FilterModel);
 
 export const DEFAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 15 * 1000; // Add 15 minutes by default
