@@ -20,7 +20,7 @@ const BoxStyled = styled.div`
 
 const TextStyled = styled.span`
   color: ${({ theme }: any) => theme.positive};
-  font-weight: normal !important;
+  font-weight: bold !important;
   ${textStyle('title2')};
 `;
 
