@@ -59,7 +59,12 @@ export default function Dashboard() {
           tooltip="Total of the quest bounties converted into USD"
           isLoading={!dashboardModel}
         >
-          <TextStyled theme={theme}>{dashboardModel?..toLocaleString("en-US",{style:"currency",currency:"USD"})}</TextStyled>
+          <TextStyled theme={theme}>
+            {dashboardModel?.totalFunds?.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            })}
+          </TextStyled>
         </FieldInput>
         <FieldInput
           label={<LabelStyled>Open Quests</LabelStyled>}
