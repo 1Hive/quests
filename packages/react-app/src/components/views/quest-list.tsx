@@ -39,7 +39,7 @@ const EmptyStateCardStyled = styled(EmptyStateCard)`
 
 const FilterWrapperStyled = styled.div`
   position: sticky;
-  top: 0;
+  top: -1px;
   width: calc(100% + 20px); // Size of scrollbar
   z-index: 1;
   background-image: url(${background});
@@ -61,7 +61,7 @@ const LineStyled = styled.div`
   display: flex;
   flex-direction: row;
   margin: ${GUpx(2)};
-  align-items: flex-end;
+  align-items: center;
 `;
 
 const skeletonQuests: any[] = [];
