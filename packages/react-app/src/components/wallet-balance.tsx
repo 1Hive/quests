@@ -38,6 +38,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
       setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
     };
     if (askedTokenAmount?.token) {
+      setTokenBalance(undefined);
       fetchBalances(askedTokenAmount.token);
     }
   }, [askedTokenAmount, walletAddress]);
