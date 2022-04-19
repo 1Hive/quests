@@ -138,8 +138,12 @@ function AmountFieldInput({
     hasFocusedRef.current = data;
     _setHasFocused(data);
   };
-
   const autoCompleteRef: React.Ref<any> = useRef(null);
+
+  useEffect(() => {
+    fetchAvailableTokens();
+  }, []);
+
   const handleFocusIn = (e: FocusEvent) => {
     if (
       document.activeElement === autoCompleteRef.current &&
@@ -148,20 +152,20 @@ function AmountFieldInput({
       tokenEditable
     ) {
       setHasFocused(true);
-      fetchAvailableTokens();
     } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
       formik?.setFieldTouched(id, true);
       formik?.handleBlur(e);
       setHasFocused(false);
     }
   };
+
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);
     return () => document.removeEventListener('focusin', handleFocusIn);
   }, [walletAddress, isEdit, tokenEditable, token]);
 
   useEffect(() => {
-    if (availableTokens.length) {
+    if (availableTokens.length && _hasFocused) {
       if (searchTerm && isAddress(searchTerm)) {
         setTokens([]);
         getTokenInfo(searchTerm)
@@ -178,7 +182,7 @@ function AmountFieldInput({
         );
       }
     }
-  }, [searchTerm, availableTokens]);
+  }, [searchTerm, availableTokens, _hasFocused]);
 
   useEffect(() => {
     if (!isEdit) {
@@ -232,7 +236,6 @@ function AmountFieldInput({
     if (formik) formik.setFieldValue(id, nextValue);
     else onChange(nextValue);
   };
-
   const amountField = (
     <FieldInput key={`amountField${amountLabel}`} label={amountLabel} wide={wide} compact={compact}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
@@ -280,7 +283,7 @@ function AmountFieldInput({
             onSelect={onTokenChange}
             ref={autoCompleteRef}
             onBlur={(e: FocusEvent) => formik?.handleBlur(e)}
-            placeholder="Search name or paste address"
+            placeholder={availableTokens.length ? 'Search name or paste address' : 'Loading tokens'}
             wide={wide}
             renderSelected={(i: number) => (
               <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
@@ -315,6 +318,7 @@ function AmountFieldInput({
       compact
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
       error={error}
+      className={!isEdit ? 'fit-content' : 'dd'}
     >
       {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>

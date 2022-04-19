@@ -49,7 +49,7 @@ const FilterWrapperStyled = styled.div<{
   background-color: ${({ theme }: any) => theme.background};
   &::after {
     content: '';
-    background: url(${backgroundMotif}) no-repeat center -113px;
+    background: url(${backgroundMotif}) no-repeat center -103px;
     position: absolute;
     top: 0;
     left: 0;

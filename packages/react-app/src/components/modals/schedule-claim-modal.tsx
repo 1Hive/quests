@@ -17,7 +17,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { FormErrors } from 'src/models/form-errors';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
-import { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
@@ -206,31 +206,6 @@ export default function ScheduleClaimModal({
           mode="positive"
         />
       }
-      buttons={[
-        <WalletBallance
-          key="WalletBallance-claimDeposit"
-          askedTokenAmount={claimDeposit}
-          setIsEnoughBalance={setIsEnoughBalance}
-        />,
-        <AmountFieldInputFormik
-          key="claimDeposit"
-          id="claimDeposit"
-          label="Claim Deposit"
-          tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-          isLoading={loading}
-          value={claimDeposit}
-          compact
-        />,
-        <Button
-          key="confirmButton"
-          icon={<GiBroadsword />}
-          label="Schedule claim"
-          mode="positive"
-          type="submit"
-          form="form-claim"
-          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
-        />,
-      ]}
       onClose={closeModal}
       isOpen={opened}
     >
@@ -265,6 +240,33 @@ export default function ScheduleClaimModal({
                   }
                   return true;
                 }}
+                submitButton={
+                  <>
+                    <AmountFieldInput
+                      key="claimDeposit"
+                      id="claimDeposit"
+                      label="Claim Deposit"
+                      tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
+                      isLoading={loading}
+                      value={claimDeposit}
+                      compact
+                    />
+                    <WalletBallance
+                      key="WalletBallance-claimDeposit"
+                      askedTokenAmount={claimDeposit}
+                      setIsEnoughBalance={setIsEnoughBalance}
+                    />
+                    <Button
+                      key="confirmButton"
+                      icon={<GiBroadsword />}
+                      label="Schedule claim"
+                      mode="positive"
+                      type="submit"
+                      form="form-claim"
+                      disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+                    />
+                  </>
+                }
                 steps={[
                   <TextFieldInput
                     id="evidence"
