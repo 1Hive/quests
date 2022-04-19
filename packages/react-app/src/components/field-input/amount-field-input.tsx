@@ -128,7 +128,6 @@ function AmountFieldInput({
   const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const [_hasFocused, _setHasFocused] = useState<boolean>();
-  const { walletAddress } = useWallet();
   const tokenInputId = tokenEditable ? id : `token-${id}`; // Handle label for
   const amountInputId = !tokenEditable ? id : `amount-${id}`; // Handle label for
 
@@ -145,12 +144,7 @@ function AmountFieldInput({
   }, []);
 
   const handleFocusIn = (e: FocusEvent) => {
-    if (
-      document.activeElement === autoCompleteRef.current &&
-      walletAddress &&
-      isEdit &&
-      tokenEditable
-    ) {
+    if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
       setHasFocused(true);
     } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
       formik?.setFieldTouched(id, true);
@@ -162,7 +156,7 @@ function AmountFieldInput({
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);
     return () => document.removeEventListener('focusin', handleFocusIn);
-  }, [walletAddress, isEdit, tokenEditable, token]);
+  }, [isEdit, tokenEditable, token]);
 
   useEffect(() => {
     if (availableTokens.length && _hasFocused) {
