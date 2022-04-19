@@ -11,7 +11,6 @@ import { connect, FormikContextType } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
 import { NETWORK_TOKENS } from 'src/constants';
-import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
@@ -148,7 +147,7 @@ function AmountFieldInput({
       setHasFocused(true);
     } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
       formik?.setFieldTouched(id, true);
-      formik?.handleBlur(e);
+      formik?.handleBlur({ ...e, id });
       setHasFocused(false);
     }
   };
