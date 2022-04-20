@@ -27,8 +27,8 @@ import { FormErrors } from 'src/models/form-errors';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
-import DateFieldInput, { DateFieldInputFormik } from './field-input/date-field-input';
-import AmountFieldInput, { AmountFieldInputFormik } from './field-input/amount-field-input';
+import { DateFieldInputFormik } from './field-input/date-field-input';
+import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
 import { processQuestState } from '../services/state-machine';
@@ -94,15 +94,50 @@ const WrapperStyled = styled.div<{ twoCol?: boolean }>`
 
 const FirstColStyled = styled.div`
   margin: 0 ${GUpx(3)};
+  flex-grow: 1;
+  max-width: 80%;
+  overflow-wrap: break-word;
 `;
 
-const SecondColStyled = styled.div<{ wide?: boolean }>`
+const SecondColStyled = styled.div`
   margin: 0 ${GUpx(3)};
   max-width: 90%;
   flex-grow: 0;
   display: flex;
   flex-direction: column;
-  ${(props) => props.wide && 'width: 100%;'}
+`;
+
+const HeaderRowStyled = styled.div`
+  max-width: 100%;
+  overflow-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+`;
+
+const RowColStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const FirstRowStyled = styled.div`
+  margin: ${GUpx(3)} ${GUpx(3)} ${GUpx(0)} ${GUpx(3)}; // to remove only for card?
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  justify-content: space-between;
+`;
+
+const SecondRowStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  justify-content: space-between;
 `;
 
 const QuestHeaderStyled = styled.div<{ isEdit: boolean }>`
@@ -440,75 +475,47 @@ export default function Quest({
       </FirstColStyled>
     );
     const secondStep = (
-      <SecondColStyled wide={isEdit}>
-        {(bounty !== null || isEdit) && (
-          <AmountFieldInputFormik
-            id="bounty"
-            label={questMode === ENUM_QUEST_VIEW_MODE.Create ? undefined : 'Available bounty'}
-            isEdit={isEdit}
-            tooltip={
-              isEdit
-                ? 'The initial funding of this quest. A token needs to be picked. You can enter the token address directly.'
-                : "The available amount of this quest's funding pool."
-            }
-            value={questData?.bounty}
-            isLoading={loading || (!isEdit && !bounty) || !questData}
-            error={touched.bounty && errors.bounty}
-            tokenEditable
-            tokenLabel={isEdit ? 'Funding token' : undefined}
-            amountLabel={isEdit ? 'Initial funding amount' : undefined}
-            reversed={isEdit}
-            wide
-          />
-        )}
-        {questMode === ENUM_QUEST_VIEW_MODE.ReadDetail && (
-          <>
-            {claimDeposit !== null && (
-              <AmountFieldInput
-                id="claimDeposit"
-                label="Claim deposit"
-                tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-                value={claimDeposit}
-                isLoading={loading || (!isEdit && !claimDeposit) || !questData}
+      <RowColStyled>
+        <SecondRowStyled className="pb-0">
+          <FirstColStyled>
+            <AddressFieldInput
+              id="address"
+              label="Quest Address"
+              value={values.address}
+              isLoading={loading || !questData}
+              wide={false}
+            />
+          </FirstColStyled>
+          <SecondColStyled>
+            <DateFieldInputFormik
+              id="expireTime"
+              label="Expire time"
+              tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
+              isEdit={isEdit}
+              isLoading={loading || !questData}
+              value={values.expireTime}
+              wide
+              onBlur={handleBlur}
+              error={touched.expireTime && errors.expireTime}
+              formik={formRef}
+            />
+            {isEdit && (
+              <AddressFieldInput
+                id="fallbackAddress"
+                label="Funds fallback address"
+                value={values.fallbackAddress ?? walletAddress}
+                isLoading={loading || !questData}
+                tooltip="Unused funds at the specified expiry time can be returned to this address."
+                isEdit
+                onBlur={handleBlur}
+                error={touched.fallbackAddress && errors.fallbackAddress}
+                onChange={handleChange}
                 wide
               />
             )}
-            <DateFieldInput
-              id="creationTime"
-              label="Creation time"
-              isLoading={loading || !questData}
-              value={values.creationTime}
-              wide
-            />
-          </>
-        )}
-        <DateFieldInputFormik
-          id="expireTime"
-          label="Expire time"
-          tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
-          isEdit={isEdit}
-          isLoading={loading || !questData}
-          value={values.expireTime}
-          wide
-          onBlur={handleBlur}
-          error={touched.expireTime && errors.expireTime}
-          formik={formRef}
-        />
-        {isEdit && (
-          <AddressFieldInput
-            id="fallbackAddress"
-            label="Funds fallback address"
-            value={values.fallbackAddress ?? walletAddress}
-            isLoading={loading || !questData}
-            tooltip="Unused funds at the specified expiry time can be returned to this address."
-            isEdit
-            onBlur={handleBlur}
-            error={touched.fallbackAddress && errors.fallbackAddress}
-            onChange={handleChange}
-            wide
-          />
-        )}
-      </SecondColStyled>
+          </SecondColStyled>
+        </SecondRowStyled>
+      </RowColStyled>
     );
 
     const claimList = !loading && questData?.address && (
@@ -554,6 +561,20 @@ export default function Quest({
       <WrapperStyled>
         {!isEdit && (
           <>
+            <FirstRowStyled className="pb-0">
+              <HeaderRowStyled>
+                <StateTag state={questData?.state ?? ''} />
+              </HeaderRowStyled>
+              <HeaderRowStyled>
+                <AmountFieldInput
+                  id={`balance-${questData?.bounty?.parsedAmount}`}
+                  key={`balance-${questData?.bounty?.parsedAmount}`}
+                  amountLabel={questData?.bounty?.parsedAmount.toString()}
+                  compact
+                  value={questData?.bounty}
+                />
+              </HeaderRowStyled>
+            </FirstRowStyled>
             <QuestHeaderStyled isEdit={isEdit}>
               {questMode === ENUM_QUEST_VIEW_MODE.ReadSummary ? (
                 <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${values.address}`}>
@@ -562,11 +583,6 @@ export default function Quest({
               ) : (
                 titleInput
               )}
-              <AddressFieldInput
-                id="address"
-                value={values.address}
-                isLoading={loading || !questData}
-              />
             </QuestHeaderStyled>
             {firstStep}
             {secondStep}
@@ -607,7 +623,6 @@ export default function Quest({
       id={questData?.address}
       isEdit={isEdit}
     >
-      {!loading && questData && <StateTag state={questData.state} />}
       <Formik
         initialValues={
           {
