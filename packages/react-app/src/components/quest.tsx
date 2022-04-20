@@ -480,7 +480,7 @@ export default function Quest({
     const secondStep = (
       <RowColStyled>
         <SecondRowStyled className="pb-0">
-          <FirstColStyled>
+          <FirstColStyled isEdit={isEdit}>
             <AddressFieldInput
               id="address"
               label="Quest Address"
