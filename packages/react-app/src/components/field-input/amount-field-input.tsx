@@ -69,6 +69,7 @@ const IconEditStyled = styled(IconEdit)`
 const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
   ${({ compact }) => (compact ? '' : `margin-left: ${GUpx()};`)}
   border-radius: 4px;
+  font-size: 16px;
 `;
 
 // #endregion
@@ -312,7 +313,7 @@ function AmountFieldInput({
         <TokenAmountBadge
           compact={false}
           amount={value}
-          onlySymbol={isEdit || !tagOnly}
+          onlySymbol={isEdit || (!tagOnly && !showUsd)}
           showUsd={showUsd}
           decimalsCount={decimalsCount}
         />
