@@ -1,6 +1,6 @@
 import { Modal, ScrollView, textStyle, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
@@ -53,6 +53,8 @@ export default function ModalBase({
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
+  const [txCompleted, setTxCompleted] = useState(false);
+
   const width = useMemo(() => {
     switch (size) {
       case 'small':
@@ -63,6 +65,16 @@ export default function ModalBase({
         return 800;
     }
   }, [size]);
+
+  useEffect(() => {
+    setTxCompleted(
+      (transaction &&
+        (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
+          transaction?.status === ENUM_TRANSACTION_STATUS.Failed)) ??
+        false,
+    );
+  }, [transaction?.status]);
+
   useEffect(() => {
     if (isOpen) {
       // Clear tx if a tx is still there and already completed
@@ -132,14 +144,15 @@ export default function ModalBase({
         <ScrollViewStyled vertical>
           {transaction ? <TransactionProgressComponent /> : children}
         </ScrollViewStyled>
-        {buttons ||
-          (transaction && (
-            <ModalFooterStyled>
-              <ChildSpacer justify="start" align="center" buttonEnd={!transaction}>
-                {transaction ? <Button onClick={onBackButtonClick}>Back</Button> : buttons}
-              </ChildSpacer>
-            </ModalFooterStyled>
-          ))}
+        {(buttons || txCompleted) && (
+          <ModalFooterStyled>
+            <ChildSpacer justify="start" align="center" buttonEnd={!txCompleted}>
+              {transaction
+                ? txCompleted && <Button onClick={onBackButtonClick}>Back</Button>
+                : buttons}
+            </ChildSpacer>
+          </ModalFooterStyled>
+        )}
       </ModalStyled>
     </>
   );
