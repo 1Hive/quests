@@ -5,7 +5,8 @@ export type ClaimModel = {
   questAddress: string;
   playerAddress: string;
   claimedAmount: TokenAmountModel;
-  evidence: string;
+  evidence?: string;
+  evidenceIpfsHash?: string;
 
   // Only set when fetch
   executionTimeMs?: number;
