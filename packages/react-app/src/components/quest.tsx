@@ -94,6 +94,7 @@ const WrapperStyled = styled.div<{ twoCol?: boolean }>`
 
 const FirstColStyled = styled.div`
   margin: 0 ${GUpx(3)};
+  width: 80%;
 `;
 
 const SecondColStyled = styled.div<{ wide?: boolean }>`
