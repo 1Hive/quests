@@ -92,9 +92,13 @@ const WrapperStyled = styled.div<{ twoCol?: boolean }>`
   ${(props) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
 `;
 
-const FirstColStyled = styled.div`
+const FirstColStyled = styled.div<{ isEdit: boolean }>`
   margin: 0 ${GUpx(3)};
-  width: 80%;
+  ${(props) =>
+    !props.isEdit &&
+    css`
+      width: 80%;
+    `}
 `;
 
 const SecondColStyled = styled.div<{ wide?: boolean }>`
@@ -407,7 +411,7 @@ export default function Quest({
       />
     );
     const firstStep = (
-      <FirstColStyled className="pb-0">
+      <FirstColStyled className="pb-0" isEdit={isEdit}>
         {isEdit && titleInput}
         <TextFieldInput
           id="description"
