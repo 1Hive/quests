@@ -11,7 +11,6 @@ import { connect, FormikContextType } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
 import { NETWORK_TOKENS } from 'src/constants';
-import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
@@ -128,7 +127,6 @@ function AmountFieldInput({
   const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const [_hasFocused, _setHasFocused] = useState<boolean>();
-  const { walletAddress } = useWallet();
   const tokenInputId = tokenEditable ? id : `token-${id}`; // Handle label for
   const amountInputId = !tokenEditable ? id : `amount-${id}`; // Handle label for
 
@@ -138,30 +136,28 @@ function AmountFieldInput({
     hasFocusedRef.current = data;
     _setHasFocused(data);
   };
-
   const autoCompleteRef: React.Ref<any> = useRef(null);
+
+  useEffect(() => {
+    fetchAvailableTokens();
+  }, []);
+
   const handleFocusIn = (e: FocusEvent) => {
-    if (
-      document.activeElement === autoCompleteRef.current &&
-      walletAddress &&
-      isEdit &&
-      tokenEditable
-    ) {
+    if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
       setHasFocused(true);
-      fetchAvailableTokens();
     } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
-      formik?.setFieldTouched(id, true);
-      formik?.handleBlur(e);
+      formik?.handleBlur({ ...e, target: { id, name: id } });
       setHasFocused(false);
     }
   };
+
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);
     return () => document.removeEventListener('focusin', handleFocusIn);
-  }, [walletAddress, isEdit, tokenEditable, token]);
+  }, [isEdit, tokenEditable, token]);
 
   useEffect(() => {
-    if (availableTokens.length) {
+    if (availableTokens.length && _hasFocused) {
       if (searchTerm && isAddress(searchTerm)) {
         setTokens([]);
         getTokenInfo(searchTerm)
@@ -178,7 +174,7 @@ function AmountFieldInput({
         );
       }
     }
-  }, [searchTerm, availableTokens]);
+  }, [searchTerm, availableTokens, _hasFocused]);
 
   useEffect(() => {
     if (!isEdit) {
@@ -203,7 +199,7 @@ function AmountFieldInput({
   const onAmountChange = (e: any) => {
     const newAmount = e.target.value;
     setAmount(newAmount);
-    if (token && e.target.value !== '') {
+    if (token && newAmount !== '') {
       applyChanges({
         token: {
           ...token,
@@ -232,7 +228,6 @@ function AmountFieldInput({
     if (formik) formik.setFieldValue(id, nextValue);
     else onChange(nextValue);
   };
-
   const amountField = (
     <FieldInput key={`amountField${amountLabel}`} label={amountLabel} wide={wide} compact={compact}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
@@ -244,6 +239,9 @@ function AmountFieldInput({
               onChange={onAmountChange}
               placeHolder={placeHolder}
               onBlur={(e: React.FocusEvent) => {
+                const el = e.target as HTMLInputElement;
+                if (el.value === '') el.value = '0';
+                onAmountChange(e);
                 formik?.setFieldTouched(id, true);
                 formik?.handleBlur(e);
               }}
@@ -277,7 +275,7 @@ function AmountFieldInput({
             onSelect={onTokenChange}
             ref={autoCompleteRef}
             onBlur={(e: FocusEvent) => formik?.handleBlur(e)}
-            placeholder="Search name or paste address"
+            placeholder={availableTokens.length ? 'Search name or paste address' : 'Loading tokens'}
             wide={wide}
             renderSelected={(i: number) => (
               <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
@@ -312,6 +310,7 @@ function AmountFieldInput({
       compact
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
       error={error}
+      className={!isEdit ? 'fit-content' : 'dd'}
     >
       {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>

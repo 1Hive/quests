@@ -184,6 +184,8 @@ async function generateScheduleContainer(
   const erc3000Config = governQueueResult.config;
   const lastBlockTimestamp = await getLastBlockTimestamp();
 
+  if (!claimData.evidence) throw new Error('Evidence field is required');
+
   // A bit more than the execution delay
   const executionTime =
     lastBlockTimestamp +
@@ -243,15 +245,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
         const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(
           container.payload,
         );
-        let evidence: string | undefined;
-        try {
-          evidence = await getObjectFromIpfs(evidenceIpfsHash);
-        } catch (error: any) {
-          evidence = await getObjectFromIpfs(evidenceIpfsHash, ipfsTheGraph);
-          Logger.exception(error, 'Failed to get IPFS object when fetching claims');
-        }
-        // If failed to fetch ipfs evidence
-        if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
+
         const tokenModel =
           typeof quest.rewardToken === 'string'
             ? ((await getTokenInfo(quest.rewardToken)) as TokenModel)
@@ -261,7 +255,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
             token: tokenModel,
             parsedAmount: fromBigNumber(BigNumber.from(claimAmount), tokenModel?.decimals),
           },
-          evidence,
+          evidenceIpfsHash,
           playerAddress,
           questAddress: quest.address,
           state: container.state,

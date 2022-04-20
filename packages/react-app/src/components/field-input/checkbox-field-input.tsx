@@ -1,6 +1,6 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { ReactNode } from 'react';
+import { FocusEventHandler, ReactNode } from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
@@ -99,6 +99,7 @@ type Props = {
   isLoading?: boolean;
   label?: string;
   onChange?: Function;
+  handleBlur?: FocusEventHandler<HTMLInputElement>;
   value?: boolean;
   tooltip?: ReactNode;
   compact?: boolean;
@@ -115,6 +116,7 @@ export default function CheckboxFieldInput({
   compact = false,
   onChange = noop,
   disabled = false,
+  handleBlur = noop,
 }: Props) {
   const theme = useTheme();
   return (
@@ -126,6 +128,7 @@ export default function CheckboxFieldInput({
           name={id}
           value={id}
           checked={value}
+          onBlur={handleBlur}
           disabled={disabled || !isEdit}
           onChange={(e) => onChange(e)}
         />

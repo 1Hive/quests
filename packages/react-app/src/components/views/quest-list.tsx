@@ -42,14 +42,14 @@ const FilterWrapperStyled = styled.div<{
   theme: ThemeInterface;
 }>`
   position: sticky;
-  top: 0;
+  top: -1px;
   width: calc(100% + 20px); // Size of scrollbar
   z-index: 1;
   background-image: url(${background});
   background-color: ${({ theme }: any) => theme.background};
   &::after {
     content: '';
-    background: url(${backgroundMotif}) no-repeat center -113px;
+    background: url(${backgroundMotif}) no-repeat center -103px;
     position: absolute;
     top: 0;
     left: 0;
@@ -64,7 +64,7 @@ const LineStyled = styled.div`
   display: flex;
   flex-direction: row;
   margin: ${GUpx(2)};
-  align-items: flex-end;
+  align-items: center;
 `;
 
 const skeletonQuests: any[] = [];

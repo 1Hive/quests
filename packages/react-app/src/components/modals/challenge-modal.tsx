@@ -34,12 +34,6 @@ const OpenButtonStyled = styled(Button)`
   width: fit-content;
 `;
 
-const HeaderStyled = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
 const OpenButtonWrapperStyled = styled.div`
   display: flex;
   flex-direction: column;
@@ -268,12 +262,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   return (
     <ModalBase
       id="challenge-modal"
-      title={
-        <HeaderStyled>
-          <h1>Challenge quests</h1>
-          <HelpTooltip tooltip="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge." />
-        </HeaderStyled>
-      }
+      title="Challenge quests"
       openButton={
         <OpenButtonWrapperStyled>
           {buttonLabel && (
@@ -289,6 +278,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           {!loading && challengeTimeout === false && claim.executionTimeMs && (
             <Timer end={new Date(claim.executionTimeMs)} />
           )}
+          <HelpTooltip tooltip="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge." />
         </OpenButtonWrapperStyled>
       }
       buttons={[
@@ -358,8 +348,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             );
           }
         }}
+        validateOnChange
         validate={validate}
-        validateOnBlur
       >
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (
           <FormStyled id="form-challenge" onSubmit={handleSubmit} ref={formRef}>

@@ -72,7 +72,7 @@ button {
 }
 
 .fit-content {
-  min-width: fit-content !important;
+  width: fit-content !important;
 }
 
 .inline-flex {
@@ -105,4 +105,31 @@ button {
 
 .flex-grow {
   flex-grow: 1;
+}
+
+/* custom scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4a4a4a #00000000;
+}
+*::-webkit-scrollbar {
+  width: 20px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #4a4a4a;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #a8bbbf;
+}
+*::-webkit-scrollbar-corner {
+  background-color: #00000000;
 }
