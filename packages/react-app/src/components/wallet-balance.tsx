@@ -53,7 +53,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
   }, [askedTokenAmount, tokenBalance, setIsEnoughBalance]);
   return (
     <WrapperStyled theme={currentTheme} isEnoughBalance={isEnoughBalance}>
-      {askedTokenAmount ? (
+      {askedTokenAmount?.token ? (
         <AmountFieldInput
           isLoading={!tokenBalance}
           id={`balance-${tokenBalance?.token.symbol}`}
