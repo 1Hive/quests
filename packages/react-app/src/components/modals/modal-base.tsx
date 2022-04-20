@@ -1,4 +1,4 @@
-import { Modal, ScrollView, textStyle } from '@1hive/1hive-ui';
+import { Modal, ScrollView, textStyle, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect, useMemo } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -111,6 +111,10 @@ export default function ModalBase({
     }
   };
 
+  const onBackButtonClick = () => {
+    setTransaction(undefined);
+  };
+
   return (
     <>
       <div id={openButtonId}>{openButton}</div>
@@ -128,13 +132,14 @@ export default function ModalBase({
         <ScrollViewStyled vertical>
           {transaction ? <TransactionProgressComponent /> : children}
         </ScrollViewStyled>
-        {buttons && (
-          <ModalFooterStyled>
-            <ChildSpacer justify="start" align="center" buttonEnd>
-              {!transaction && buttons}
-            </ChildSpacer>
-          </ModalFooterStyled>
-        )}
+        {buttons ||
+          (transaction && (
+            <ModalFooterStyled>
+              <ChildSpacer justify="start" align="center" buttonEnd={!transaction}>
+                {transaction ? <Button onClick={onBackButtonClick}>Back</Button> : buttons}
+              </ChildSpacer>
+            </ModalFooterStyled>
+          ))}
       </ModalStyled>
     </>
   );
