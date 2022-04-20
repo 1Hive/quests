@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
+import { useWallet } from 'src/contexts/wallet.context';
 import QuestModal from './modals/quest-modal';
 
 // #region StyledComponent
@@ -82,6 +83,8 @@ export default function footer() {
   const theme = useTheme();
   const year = new Date().getFullYear();
 
+  const { walletAddress } = useWallet();
+
   return (
     <FooterContainerStyled color={theme.contentSecondary}>
       <FooterContainerStyledSide>
@@ -104,7 +107,9 @@ export default function footer() {
           <FooterLinkStyled href="#" external={false}>
             Quest List
           </FooterLinkStyled>
-          <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
+          {walletAddress && (
+            <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
+          )}
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>
