@@ -25,7 +25,6 @@ const ModalStyled = styled(Modal)`
 
 const ScrollViewStyled = styled(ScrollView)`
   overflow: auto;
-  justify-content: center;
   max-height: calc(60vh) !important;
 `;
 

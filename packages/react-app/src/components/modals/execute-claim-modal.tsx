@@ -14,6 +14,7 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
+import { HelpTooltip } from '../field-input/help-tooltip';
 
 // #region StyledComponents
 
@@ -150,6 +151,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                 }
               />
             )}
+            <HelpTooltip tooltip="Execute the claim will send the bounty to the provided Player wallet." />
           </OpenButtonWrapperStyled>
         }
         buttons={

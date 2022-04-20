@@ -50,7 +50,7 @@ export const HelpTooltip = ({ tooltip, children }: Props) => {
         onMouseLeave={handleLeave}
         ref={wrapperRef}
       >
-        <Help hint={tooltip}>
+        <Help hint="">
           <TooltipWrapperStyled color={theme.accentContent}>
             {children ?? tooltip}
           </TooltipWrapperStyled>

@@ -3,22 +3,32 @@ import { ReactNode, useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
+// #region StyledComponents
 const QuestActionButtonStyled = styled(Button)<{ visible: boolean }>`
   visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
 `;
+
 const ButtonWrapperStyled = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: ${GUpx()};
-  margin-top: ${GUpx(3)};
+  margin-top: ${GUpx(5)};
+  margin-bottom: ${GUpx(0.5)};
   align-items: center;
 `;
+
 const WrapperStyled = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100% !important;
 `;
+
+const ContentContainerStyled = styled.div`
+  overflow: auto;
+  max-height: calc(60vh - 60px) !important;
+`;
+// #endregion
+
 type Props = {
   steps?: ReactNode[];
   submitButton?: ReactNode;
@@ -62,7 +72,7 @@ export default function Stepper({ steps, submitButton, onNext, onBack }: Props) 
 
   return (
     <WrapperStyled>
-      {steps && steps[currentStep]}
+      <ContentContainerStyled>{steps && steps[currentStep]}</ContentContainerStyled>
       <ButtonWrapperStyled>
         <QuestActionButtonStyled
           visible={!isFirstStep}

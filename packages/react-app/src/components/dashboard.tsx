@@ -21,7 +21,7 @@ const BoxStyled = styled.div`
 
 const TextStyled = styled.span`
   color: ${({ theme }: any) => theme.positive};
-  font-weight: normal !important;
+  font-weight: bold !important;
   ${textStyle('title2')};
 `;
 
@@ -62,7 +62,12 @@ export default function Dashboard() {
           tooltip="Total of the quest bounties converted into USD"
           isLoading={!dashboardModel}
         >
-          <TextStyled theme={theme}>$ {dashboardModel?.totalFunds.toLocaleString()}</TextStyled>
+          <TextStyled theme={theme}>
+            {dashboardModel?.totalFunds?.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            })}
+          </TextStyled>
         </FieldInput>
         <FieldInput
           label={<LabelStyled>Open Quests</LabelStyled>}

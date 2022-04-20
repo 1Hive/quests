@@ -4,7 +4,6 @@ import { connect, FormikContextType } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment, useMemo } from 'react';
 import { NETWORK_TOKENS } from 'src/constants';
-import { useWallet } from 'src/contexts/wallet.context';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
@@ -79,11 +78,12 @@ type TokenBadgeProp = {
   compact?: boolean;
   amount?: TokenAmountModel;
   onlySymbol?: boolean;
+  showUsd?: boolean;
   decimalsCount?: number;
 };
 
 const TokenAmountBadge = React.memo(
-  ({ className, compact, amount, onlySymbol, decimalsCount }: TokenBadgeProp) => {
+  ({ className, compact, amount, onlySymbol, decimalsCount, showUsd }: TokenBadgeProp) => {
     const copyCode = useCopyToClipboard();
 
     const usdFormat = useMemo(
@@ -108,7 +108,7 @@ const TokenAmountBadge = React.memo(
               {!onlySymbol && <>{floorNumber(amount?.parsedAmount ?? 0, decimalsCount)}&nbsp;</>}
               {amount?.token.symbol}
             </b>
-            {!onlySymbol && <>&nbsp;({usdFormat})</>}
+            {!onlySymbol && showUsd && <>&nbsp;({usdFormat})</>}
           </>
         }
         title={`Copy : ${amount?.token.token}`}
@@ -139,6 +139,8 @@ type Props = {
   tokenEditable?: boolean;
   reversed?: boolean;
   error?: string | false;
+  tagOnly?: boolean;
+  showUsd?: boolean;
 };
 
 function AmountFieldInput({
@@ -159,6 +161,8 @@ function AmountFieldInput({
   wide = false,
   tokenEditable = false,
   reversed = false,
+  tagOnly = false,
+  showUsd = false,
   error,
 }: Props) {
   const { type } = getNetwork();
@@ -169,10 +173,8 @@ function AmountFieldInput({
   const [token, setToken] = useState<TokenModel | undefined>(value?.token);
   const [availableTokens, setAvailableTokens] = useState<TokenModel[]>([]);
   const [_hasFocused, _setHasFocused] = useState<boolean>();
-  const { walletAddress } = useWallet();
   const tokenInputId = tokenEditable ? id : `token-${id}`; // Handle label for
   const amountInputId = !tokenEditable ? id : `amount-${id}`; // Handle label for
-  const [tokenLoading, setTokenLoading] = useState(false);
 
   // Needed since the access of state in event handlers is not working
   const hasFocusedRef = React.useRef(_hasFocused);
@@ -180,30 +182,28 @@ function AmountFieldInput({
     hasFocusedRef.current = data;
     _setHasFocused(data);
   };
-
   const autoCompleteRef: React.Ref<any> = useRef(null);
+
+  useEffect(() => {
+    fetchAvailableTokens();
+  }, []);
+
   const handleFocusIn = (e: FocusEvent) => {
-    if (
-      document.activeElement === autoCompleteRef.current &&
-      walletAddress &&
-      isEdit &&
-      tokenEditable
-    ) {
+    if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
       setHasFocused(true);
-      fetchAvailableTokens();
     } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
-      formik?.setFieldTouched(id, true);
-      formik?.handleBlur(e);
+      formik?.handleBlur({ ...e, target: { id, name: id } });
       setHasFocused(false);
     }
   };
+
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);
     return () => document.removeEventListener('focusin', handleFocusIn);
-  }, [walletAddress, isEdit, tokenEditable, token]);
+  }, [isEdit, tokenEditable, token]);
 
   useEffect(() => {
-    if (availableTokens.length) {
+    if (availableTokens.length && _hasFocused) {
       if (searchTerm && isAddress(searchTerm)) {
         setTokens([]);
         getTokenInfo(searchTerm)
@@ -220,7 +220,7 @@ function AmountFieldInput({
         );
       }
     }
-  }, [searchTerm, availableTokens]);
+  }, [searchTerm, availableTokens, _hasFocused]);
 
   useEffect(() => {
     if (!isEdit) {
@@ -235,10 +235,8 @@ function AmountFieldInput({
   }, [value]);
 
   const fetchAvailableTokens = async () => {
-    setTokenLoading(true);
     const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
-    setTokenLoading(false);
     setAvailableTokens(
       arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
     );
@@ -276,26 +274,28 @@ function AmountFieldInput({
     if (formik) formik.setFieldValue(id, nextValue);
     else onChange(nextValue);
   };
-
-  const amountField = isEdit && (
+  const amountField = (isEdit || !tagOnly) && (
     <FieldInput key={`amountField${amountLabel}`} label={amountLabel} wide={wide} compact={compact}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
-        {amount !== undefined && (
-          <AmountTextInputStyled
-            id={amountInputId}
-            title={!token ? 'Set token first' : undefined}
-            onChange={onAmountChange}
-            placeHolder={placeHolder}
-            onBlur={(e: React.FocusEvent) => {
-              formik?.setFieldTouched(id, true);
-              formik?.handleBlur(e);
-            }}
-            type="number"
-            value={amount}
-            wide={wide}
-            disabled={!token ? true : disabled}
-          />
-        )}
+        {amount !== undefined &&
+          (isEdit ? (
+            <AmountTextInputStyled
+              id={amountInputId}
+              title={!token ? 'Set token first' : undefined}
+              onChange={onAmountChange}
+              placeHolder={placeHolder}
+              onBlur={(e: React.FocusEvent) => {
+                formik?.setFieldTouched(id, true);
+                formik?.handleBlur(e);
+              }}
+              type="number"
+              value={amount}
+              wide={wide}
+              disabled={!token ? true : disabled}
+            />
+          ) : (
+            floorNumber(amount, decimalsCount)
+          ))}
       </AmountTokenWrapperStyled>
     </FieldInput>
   );
@@ -312,18 +312,19 @@ function AmountFieldInput({
         <TokenAmountBadge
           compact={false}
           amount={value}
-          onlySymbol={isEdit}
+          onlySymbol={isEdit || !tagOnly}
+          showUsd={showUsd}
           decimalsCount={decimalsCount}
         />
       ) : (
         <AutoCompleteWrapperStyled wide={wide} id={tokenInputId}>
           <AutoComplete
-            items={tokens.map((x, index: number) => index)}
+            items={tokens.map((_, index: number) => index)}
             onChange={setSearchTerm}
             onSelect={onTokenChange}
             ref={autoCompleteRef}
             onBlur={(e: FocusEvent) => formik?.handleBlur(e)}
-            placeholder={tokenLoading ? 'Loading tokens...' : 'Search name or paste address'}
+            placeholder={availableTokens.length ? 'Search name or paste address' : 'Loading tokens'}
             wide={wide}
             renderSelected={(i: number) => (
               <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
@@ -358,6 +359,7 @@ function AmountFieldInput({
       compact
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
       error={error}
+      className={!isEdit ? 'fit-content' : ''}
     >
       {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>
