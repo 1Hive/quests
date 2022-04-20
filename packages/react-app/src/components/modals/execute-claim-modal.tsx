@@ -1,4 +1,4 @@
-import { Button, IconCoin, Field, Timer } from '@1hive/1hive-ui';
+import { Button, IconCoin, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -14,7 +14,7 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
-import { HelpTooltip } from '../field-input/help-tooltip';
+import { FieldInput } from '../field-input/field-input';
 
 // #region StyledComponents
 
@@ -133,9 +133,9 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         openButton={
           <OpenButtonWrapperStyled>
             {!loading && !scheduleTimeout && claim.executionTimeMs ? (
-              <Field label="Claimable in">
+              <FieldInput label="Claimable in">
                 <Timer end={new Date(claim.executionTimeMs)} />
-              </Field>
+              </FieldInput>
             ) : (
               <OpenButtonStyled
                 onClick={() => setOpened(true)}
@@ -151,7 +151,6 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                 }
               />
             )}
-            <HelpTooltip tooltip="Execute the claim will send the bounty to the provided Player wallet." />
           </OpenButtonWrapperStyled>
         }
         buttons={
