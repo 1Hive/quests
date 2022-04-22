@@ -34,14 +34,16 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
   const { currentTheme } = useThemeContext();
 
   useEffect(() => {
-    const fetchBalances = async (_token: TokenModel) => {
-      setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
-    };
     if (askedTokenAmount?.token && askedTokenAmount.token.token !== tokenBalance?.token.token) {
-      setTokenBalance(undefined);
       fetchBalances(askedTokenAmount.token);
     }
-  }, [askedTokenAmount?.token, walletAddress]);
+  }, [askedTokenAmount?.token]); // Need fetch balances when token change
+
+  useEffect(() => {
+    if (askedTokenAmount?.token) {
+      fetchBalances(askedTokenAmount?.token);
+    }
+  }, [walletAddress]); // Need to fetch balances when wallet address changes
 
   useEffect(() => {
     if (tokenBalance) {
@@ -51,6 +53,12 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
       if (setIsEnoughBalance) setIsEnoughBalance(isEnough);
     }
   }, [askedTokenAmount, tokenBalance, setIsEnoughBalance]);
+
+  const fetchBalances = async (_token: TokenModel) => {
+    setTokenBalance(undefined);
+    setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
+  };
+
   return (
     <WrapperStyled theme={currentTheme} isEnoughBalance={isEnoughBalance}>
       {askedTokenAmount?.token ? (
