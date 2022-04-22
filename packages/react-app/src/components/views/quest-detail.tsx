@@ -46,13 +46,7 @@ export default function QuestDetail() {
             }}
           />
         )}
-        {!loading && (
-          <Quest
-            dataState={{ questData: quest }}
-            questMode={ENUM_QUEST_VIEW_MODE.ReadDetail}
-            isLoading={loading}
-          />
-        )}
+        {!loading && <Quest dataState={{ questData: quest }} isSummary isLoading={loading} />}
       </>
     </MainView>
   );

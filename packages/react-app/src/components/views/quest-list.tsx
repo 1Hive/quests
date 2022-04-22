@@ -175,7 +175,7 @@ export default function QuestList() {
         <div>
           {quests.map((x: QuestModel) => (
             <Outset gu16 key={x.address}>
-              <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
+              <Quest isSummary dataState={{ questData: x }} />
             </Outset>
           ))}
           {isLoading && skeletonQuests}

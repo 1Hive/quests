@@ -126,11 +126,7 @@ export default function QuestModal({
       isOpen={opened}
       onClose={closeModal}
     >
-      <Quest
-        questMode={questMode}
-        dataState={{ questData, setQuestData }}
-        onSave={(x) => fetchNewQuest(x)}
-      />
+      <Quest dataState={{ questData, setQuestData }} onSave={(x) => fetchNewQuest(x)} />
     </ModalBase>
   );
 }
