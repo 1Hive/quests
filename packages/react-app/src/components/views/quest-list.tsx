@@ -4,13 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
-import {
-  ENUM_PAGES,
-  ENUM_QUEST_STATE,
-  ENUM_QUEST_VIEW_MODE,
-  QUESTS_PAGE_SIZE,
-  DEFAULT_FILTER,
-} from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_STATE, QUESTS_PAGE_SIZE, DEFAULT_FILTER } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';

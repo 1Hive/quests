@@ -1,7 +1,5 @@
-import { Card, Button } from '@1hive/1hive-ui';
-import { Form } from 'formik';
-import { noop } from 'lodash-es';
-import { useEffect, useRef, useState } from 'react';
+import { Card } from '@1hive/1hive-ui';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
@@ -40,102 +38,24 @@ const CardStyled = styled(Card)`
   height: fit-content;
   min-height: 250px;
   ${({ isEdit }: any) => isEdit && 'border:none;'}
-  & > div:first-child {
-    padding-bottom: 0;
-  }
+  padding: ${GUpx(3)};
+  padding-bottom: 0;
 `;
 
 const QuestFooterStyled = styled.div`
   width: 100%;
   text-align: right;
   padding: ${GUpx(2)};
-  padding-top: 0;
+  padding-top: ${GUpx(4)};
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
 `;
 
-const FormStyled = styled(Form)`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-  #description {
-    height: 200px;
-  }
-`;
-
-const WrapperStyled = styled.div<{ twoCol?: boolean }>`
+const RowStyled = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: 100%;
-  ${(props) => (props.twoCol ? '' : 'flex-wrap: wrap;')}
-`;
-
-const FirstColStyled = styled.div<{ isEdit: boolean }>`
-  margin: 0 ${GUpx(3)};
-  overflow-wrap: break-word;
-  ${(props) =>
-    !props.isEdit &&
-    css`
-      width: 80%;
-    `}
-`;
-
-const SecondColStyled = styled.div`
-  margin: 0 ${GUpx(3)};
-  max-width: 90%;
-  flex-grow: 0;
-  display: flex;
-  flex-direction: column;
-`;
-
-const HeaderRowStyled = styled.div`
-  max-width: 100%;
-  overflow-wrap: break-word;
-  display: flex;
-  flex-direction: column;
-`;
-
-const RowColStyled = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-`;
-
-const FirstRowStyled = styled.div`
-  margin: ${GUpx(3)} ${GUpx(3)} ${GUpx(0)} ${GUpx(3)};
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  max-width: 100%;
-  overflow-wrap: break-word;
-  justify-content: space-between;
-`;
-
-const SecondRowStyled = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  max-width: 100%;
-  overflow-wrap: break-word;
-  justify-content: space-between;
-`;
-
-const QuestHeaderStyled = styled.div<{ isEdit: boolean }>`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap-reverse;
-  justify-content: space-between;
-  ${(props) =>
-    !props.isEdit &&
-    css`
-      padding: ${GUpx(3)};
-      padding-bottom: ${GUpx()};
-    `}
   width: 100%;
 `;
 
@@ -145,19 +65,12 @@ type Props = {
   dataState: { questData?: QuestModel; setQuestData?: (_questData: QuestModel) => void };
   isSummary?: boolean;
   isLoading?: boolean;
-  onSave?: (_questAddress: string) => void;
 };
 
-export default function Quest({
-  dataState,
-  isLoading = false,
-  isSummary = false,
-  onSave = noop,
-}: Props) {
+export default function Quest({ dataState, isLoading = false, isSummary = false }: Props) {
   const { walletAddress } = useWallet();
-  const formRef = useRef<HTMLFormElement>(null);
-  const { questData, setQuestData } = dataState;
-  const [loading, setLoading] = useState(isLoading);
+  const { questData } = dataState;
+  const [loading] = useState(isLoading);
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimUpdated, setClaimUpdate] = useState(0);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | null>();
@@ -236,17 +149,10 @@ export default function Quest({
     }, 500);
   };
 
-  const refresh = (data?: QuestModel) => {
-    if (data) {
-      setQuestData?.(data);
-    }
-  };
-
-  const questContent = () => {
-    const titleInput = (
+  const titleInput = useMemo(
+    () => (
       <TextFieldInput
         id="title"
-        label="Title"
         isLoading={loading || !questData}
         placeHolder="Quest title"
         value={questData?.title}
@@ -254,90 +160,95 @@ export default function Quest({
         tooltip="Title should resume the Quest and be short and clear."
         wide
       />
-    );
+    ),
+    [questData?.title],
+  );
 
-    const claimList = !loading && questData?.address && (
-      <>
-        {!isSummary && challengeDeposit && (
-          <ClaimList
-            newClaim={claimUpdated}
-            questData={questData}
-            questTotalBounty={bounty}
-            challengeDeposit={challengeDeposit}
-          />
-        )}
-        {!isSummary && questData.address && walletAddress && bounty && (
-          <QuestFooterStyled>
-            {questData?.state === ENUM_QUEST_STATE.Active ? (
-              <>
-                <FundModal quest={questData} onClose={onFundModalClosed} />
-                {claimDeposit && (
-                  <ScheduleClaimModal
-                    questAddress={questData.address}
-                    questTotalBounty={bounty}
-                    claimDeposit={claimDeposit}
-                    onClose={onScheduleModalClosed}
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                {!!bounty?.parsedAmount && (
-                  <ReclaimFundsModal bounty={bounty} questData={questData} />
-                )}
-              </>
-            )}
-          </QuestFooterStyled>
-        )}
-      </>
-    );
+  const addressExpireTimeRow = useMemo(
+    () => (
+      <RowStyled>
+        <AddressFieldInput
+          id="address"
+          label="Quest Address"
+          value={questData?.address}
+          isLoading={loading || !questData}
+        />
 
-    return (
-      <WrapperStyled>
-        <>
-          <QuestHeaderStyled isEdit={false}>
-            {isSummary ? (
-              <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
-                {titleInput}
-              </TitleLinkStyled>
-            ) : (
-              titleInput
-            )}
-          </QuestHeaderStyled>
-          {claimList}
-        </>
-      </WrapperStyled>
-    );
-  };
+        <DateFieldInputFormik
+          id="expireTime"
+          label="Expire time"
+          tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
+          isLoading={loading || !questData}
+          value={questData?.expireTime}
+        />
+      </RowStyled>
+    ),
+    [questData?.title],
+  );
+
+  const claimList = !loading && questData?.address && (
+    <>
+      {!isSummary && challengeDeposit && (
+        <ClaimList
+          newClaim={claimUpdated}
+          questData={questData}
+          questTotalBounty={bounty}
+          challengeDeposit={challengeDeposit}
+        />
+      )}
+      {!isSummary && questData.address && walletAddress && bounty && (
+        <QuestFooterStyled>
+          {questData?.state === ENUM_QUEST_STATE.Active ? (
+            <>
+              <FundModal quest={questData} onClose={onFundModalClosed} />
+              {claimDeposit && (
+                <ScheduleClaimModal
+                  questAddress={questData.address}
+                  questTotalBounty={bounty}
+                  claimDeposit={claimDeposit}
+                  onClose={onScheduleModalClosed}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              {!!bounty?.parsedAmount && (
+                <ReclaimFundsModal bounty={bounty} questData={questData} />
+              )}
+            </>
+          )}
+        </QuestFooterStyled>
+      )}
+    </>
+  );
 
   return (
-    <CardStyled style={css} isSummary id={questData?.address} isEdit={false}>
-      <RowColStyled className="pb-0">
-        <StateTag state={questData?.state ?? ''} />
-
+    <CardStyled style={css} isSummary id={questData?.address}>
+      <StateTag state={questData?.state ?? ''} />
+      <RowStyled className="pb-0">
+        {isSummary ? (
+          <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
+            {titleInput}
+          </TitleLinkStyled>
+        ) : (
+          titleInput
+        )}
         <AmountFieldInput
-          id={`balance-${questData?.address}`}
-          key={`balance-${questData?.address}`}
+          id={`bounty-${questData?.address}`}
+          key={`bounty-${questData?.address}`}
           compact
+          tagOnly
+          showUsd
           value={questData?.bounty}
         />
-      </RowColStyled>
-      <FirstColStyled className="pb-0" isEdit={false}>
-        <TextFieldInput
-          id="title"
-          isLoading={loading || !questData}
-          placeHolder="Quest title"
-          value={questData?.title}
-          fontSize="24px"
-          tooltip="Title should resume the Quest and be short and clear."
-          wide
-        />
+      </RowStyled>
+
+      {!isSummary && addressExpireTimeRow}
+      <RowStyled>
         <TextFieldInput
           id="description"
-          label="Description"
           value={questData?.description}
           isLoading={loading || !questData}
-          placeHolder="Quest description"
           tooltip={
             <>
               <b>The quest description should include:</b>
@@ -357,32 +268,9 @@ export default function Quest({
             <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>Read more</LinkStyled>
           }
         />
-      </FirstColStyled>
-      <RowColStyled>
-        <SecondRowStyled className="pb-0">
-          <FirstColStyled isEdit={false}>
-            <AddressFieldInput
-              id="address"
-              label="Quest Address"
-              value={questData?.address}
-              isLoading={loading || !questData}
-              wide={false}
-            />
-          </FirstColStyled>
-          <SecondColStyled>
-            <DateFieldInputFormik
-              id="expireTime"
-              label="Expire time"
-              tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
-              isEdit={false}
-              isLoading={loading || !questData}
-              value={questData?.expireTime}
-              wide
-              formik={formRef}
-            />
-          </SecondColStyled>
-        </SecondRowStyled>
-      </RowColStyled>
+      </RowStyled>
+      {isSummary && addressExpireTimeRow}
+      {claimList}
     </CardStyled>
   );
 }

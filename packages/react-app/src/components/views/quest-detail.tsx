@@ -1,6 +1,6 @@
 import { useToast } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
-import { ENUM_PAGES, ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { ENUM_PAGES } from 'src/constants';
 import { useQuery } from 'src/hooks/use-query-params';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -46,7 +46,7 @@ export default function QuestDetail() {
             }}
           />
         )}
-        {!loading && <Quest dataState={{ questData: quest }} isSummary isLoading={loading} />}
+        {!loading && <Quest dataState={{ questData: quest }} isLoading={loading} />}
       </>
     </MainView>
   );
