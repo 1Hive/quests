@@ -13,5 +13,5 @@ export const feedDummyQuestData = async (questData: QuestModel): Promise<QuestMo
       description: dummyData.slice(dummyData.indexOf('\n') + 1),
     };
   }
-  throw new Error('Not in development mode');
+  return questData;
 };
