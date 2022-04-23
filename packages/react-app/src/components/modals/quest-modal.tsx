@@ -1,6 +1,6 @@
 import { Button, IconPlus, useTheme } from '@1hive/1hive-ui';
-import { noop, uniqueId } from 'lodash-es';
-import { useEffect, useRef, useState } from 'react';
+import { debounce, noop, uniqueId } from 'lodash-es';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ENUM,
   ENUM_QUEST_STATE,
@@ -111,10 +111,10 @@ export default function QuestModal({
     onClose(success);
   };
 
-  // const debounceSave = useCallback(
-  //   debounce((data?: QuestModel) => refresh(data), 500),
-  //   [], // will be created only once initially
-  // );
+  const debounceSave = useCallback(
+    debounce((data: QuestModel) => setQuestDataState(data), 500),
+    [], // will be created only once initially
+  );
 
   const validate = (data: QuestModel) => {
     const errors = {} as FormikErrors<QuestModel>;
@@ -140,7 +140,7 @@ export default function QuestModal({
     if (data.expireTime.getTime() < Date.now())
       errors.expireTime = 'Expiration have to be later than now';
 
-    // debounceSave(data);
+    debounceSave(data);
 
     setIsFormValid(Object.keys(errors).length === 0);
     return errors;
