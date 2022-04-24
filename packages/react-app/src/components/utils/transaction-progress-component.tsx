@@ -17,11 +17,11 @@ const WrapperStyled = styled.div`
 
 const MessageStyled = styled.div<{ messageColor: string }>`
   color: ${({ messageColor }) => messageColor};
-  margin-bottom: ${GUpx()};
+  margin-bottom: ${GUpx(1)};
 `;
 
 const TransactionTitleStyled = styled.div`
-  margin: ${GUpx()};
+  margin: ${GUpx(1)};
   ${textStyle('title3')};
 `;
 

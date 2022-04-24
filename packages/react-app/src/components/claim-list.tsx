@@ -37,7 +37,7 @@ const WrapperStyled = styled.div`
 
 const HeaderStyled = styled.h1`
   font-size: large;
-  margin-left: ${GUpx()};
+  margin-left: ${GUpx(1)};
 `;
 
 const BoxStyled = styled(Box)`
@@ -52,6 +52,7 @@ type Props = {
   newClaim: number;
   challengeDeposit: TokenAmountModel;
   questTotalBounty?: TokenAmountModel | null;
+  isLoading?: boolean;
 };
 
 export default function ClaimList({
@@ -59,6 +60,7 @@ export default function ClaimList({
   newClaim,
   challengeDeposit,
   questTotalBounty,
+  isLoading = false,
 }: Props) {
   const { walletAddress } = useWallet();
   const [claims, setClaims] = useState<ClaimModel[]>([
@@ -66,14 +68,19 @@ export default function ClaimList({
   ]);
 
   useEffect(() => {
-    fetchClaims();
-  }, []);
+    if (questData.address) {
+      fetchClaims();
+    }
+  }, [questData.address]);
 
   useEffect(() => {
     // When a claim has been scheduled, newClaim will be increment by 1
     if (newClaim !== 0) {
-      if (!claims) fetchClaims();
-      else fetchNewClaimChanges(true);
+      if (!claims.length || claims[0].state === ENUM_CLAIM_STATE.None) {
+        fetchClaims();
+      } else {
+        fetchNewClaimChanges(true);
+      }
     }
   }, [newClaim]);
 
@@ -111,7 +118,7 @@ export default function ClaimList({
         <HeaderStyled>Claims</HeaderStyled>
         <HelpTooltip tooltip="A claim includes the proof of the quest's completion." />
       </ClaimHeaderStyled>
-      {claims?.length ? (
+      {claims?.length || isLoading ? (
         <Accordion
           items={claims.map((claim: ClaimModel) => {
             let actionButton;
@@ -139,14 +146,17 @@ export default function ClaimList({
               <div className="wide">
                 <Outset>
                   <ChildSpacer size={16} justify="start" align="center" buttonEnd>
-                    <FieldInput label="Status" isLoading={claim.state === ENUM_CLAIM_STATE.None}>
+                    <FieldInput
+                      label="Status"
+                      isLoading={isLoading || claim.state === ENUM_CLAIM_STATE.None}
+                    >
                       <StateTag state={claim.state ?? ''} className="pl-0" />
                     </FieldInput>
                     <AddressFieldInput
                       id="playerAddress"
                       value={claim.playerAddress}
                       label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
-                      isLoading={!claim.playerAddress}
+                      isLoading={isLoading || !claim.playerAddress}
                     />
                     {claim.claimedAmount?.parsedAmount ? (
                       <AmountFieldInput
@@ -157,7 +167,7 @@ export default function ClaimList({
                     ) : (
                       <FieldInput
                         label="Claimed amount"
-                        isLoading={claim.state === ENUM_CLAIM_STATE.None}
+                        isLoading={isLoading || claim.state === ENUM_CLAIM_STATE.None}
                       >
                         All available
                       </FieldInput>
@@ -173,7 +183,7 @@ export default function ClaimList({
                   isMarkDown
                   wide
                   label="Evidence of completion"
-                  isLoading={!claim.evidence}
+                  isLoading={isLoading || !claim.evidence}
                 />
               </Outset>,
             ];

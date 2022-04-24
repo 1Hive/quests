@@ -2,17 +2,16 @@ import styled from 'styled-components';
 import { Tag } from '@1hive/1hive-ui';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from 'src/constants';
 import { useEffect, useState } from 'react';
-import { GUpx } from 'src/utils/style.util';
 
 const StateTagStyled = styled(Tag)`
   width: ${(props: any) => (props.wide ? '100%' : 'fit-content')};
 `;
 
-const StateWrapperStyled = styled.div`
+const StateWrapperStyled = styled.div<{ visible: boolean }>`
   text-align: left;
-  padding: ${GUpx(1)};
   display: flex;
   justify-content: space-around;
+  visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
 `;
 
 type Props = {
@@ -90,7 +89,7 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
       <Tag mode="new">new</Tag>
       <Tag mode="activity">activity</Tag> */}
       {visible && (
-        <StateWrapperStyled className={className}>
+        <StateWrapperStyled className={className} visible={visible}>
           <StateTagStyled wide={wide} title={tooltip} label={state} mode={mode} size={size} />
         </StateWrapperStyled>
       )}

@@ -17,7 +17,7 @@ import ModalBase, { ModalCallback } from './modal-base';
 import IdentityBadge from '../identity-badge';
 
 const OpenButtonStyled = styled(Button)`
-  margin: 0 ${GUpx()};
+  margin: 0 ${GUpx(1)};
   width: fit-content;
 `;
 

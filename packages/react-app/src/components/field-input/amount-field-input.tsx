@@ -1,15 +1,8 @@
-import {
-  TextInput,
-  TokenBadge,
-  _AutoComplete as AutoComplete,
-  Tag,
-  IconEdit,
-  Button,
-} from '@1hive/1hive-ui';
+import { TextInput, _AutoComplete as AutoComplete, Tag, IconEdit, Button } from '@1hive/1hive-ui';
 import { parseUnits } from 'ethers/lib/utils';
 import { connect, FormikContextType } from 'formik';
 import { noop } from 'lodash-es';
-import React, { ReactNode, useEffect, useState, useRef, Fragment } from 'react';
+import React, { ReactNode, useEffect, useState, useRef, Fragment, useMemo } from 'react';
 import { NETWORK_TOKENS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
@@ -23,6 +16,7 @@ import { floorNumber } from 'src/utils/math.utils';
 import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
+import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
@@ -30,10 +24,6 @@ import { FieldInput } from './field-input';
 const AmountTextInputStyled = styled(TextInput)`
   flex-grow: 1;
   ${({ wide }: any) => (wide ? '' : `max-width: 200px;`)}
-`;
-
-const TokenBadgeStyled = styled(TokenBadge)`
-  width: fit-content;
 `;
 
 const AutoCompleteWrapperStyled = styled.div<{ wide?: boolean }>`
@@ -51,7 +41,7 @@ const AutoCompleteWrapperStyled = styled.div<{ wide?: boolean }>`
 `;
 
 const TokenNameStyled = styled.span`
-  margin-right: ${GUpx()};
+  margin-right: ${GUpx(1)};
 `;
 
 const LineStyled = styled.div`
@@ -67,16 +57,81 @@ const AmountTokenWrapperStyled = styled.div<AmountTokenWrapperStyledProps>`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  ${({ wide, isEdit }) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
+  ${({ wide, isEdit }) => (wide && isEdit ? '' : `padding-right:${GUpx(1)};`)}
   ${({ wide }) => (wide ? `width:100%;` : 'max-width:100%;')}
 `;
 
 const IconEditStyled = styled(IconEdit)`
   cursor: pointer;
-  padding-left: ${GUpx()};
+  padding-left: ${GUpx(1)};
+`;
+
+const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
+  ${({ compact }) => (compact ? '' : `margin-left: ${GUpx(1)};`)}
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 0 ${GUpx(1)};
+  font-weight: bold;
+  min-width: 0;
 `;
 
 // #endregion
+
+type TokenBadgeProp = {
+  className?: string;
+  compact?: boolean;
+  token?: TokenModel;
+  amount?: number | false;
+  usdValue?: number | false;
+  decimalsCount?: number;
+};
+
+const TokenAmountBadge = React.memo(
+  ({
+    className,
+    compact,
+    token = {
+      symbol: 'No token',
+      name: 'No token',
+      token: '0x0',
+      decimals: 0,
+      amount: '0x0',
+    },
+    amount,
+    usdValue,
+    decimalsCount,
+  }: TokenBadgeProp) => {
+    const copyCode = useCopyToClipboard();
+    const label = useMemo(() => {
+      let temp = '';
+      if (amount !== false && amount !== undefined) {
+        temp += `${floorNumber(amount ?? 0, decimalsCount)} `;
+      }
+      temp += `${token.symbol}`;
+      if (usdValue) {
+        const usdFormat = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+        }).format(usdValue);
+        temp += ` (${usdFormat})`;
+      }
+      return temp;
+    }, [token, amount, usdValue]);
+
+    return (
+      <TokenAmountButtonStyled
+        className={className}
+        compact={compact}
+        mode="strong"
+        size="mini"
+        label={label}
+        title={`Copy : ${token.token}`}
+        onClick={() => copyCode(token.token, `${token.symbol} address copied to clipboard`)}
+      />
+    );
+  },
+);
 
 type Props = {
   id: string;
@@ -97,6 +152,8 @@ type Props = {
   tokenEditable?: boolean;
   reversed?: boolean;
   error?: string | false;
+  tagOnly?: boolean;
+  showUsd?: boolean;
 };
 
 function AmountFieldInput({
@@ -117,8 +174,11 @@ function AmountFieldInput({
   wide = false,
   tokenEditable = false,
   reversed = false,
+  tagOnly = false,
+  showUsd = false,
   error,
 }: Props) {
+  let mounted = true;
   const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
@@ -140,16 +200,10 @@ function AmountFieldInput({
 
   useEffect(() => {
     fetchAvailableTokens();
+    return () => {
+      mounted = false;
+    };
   }, []);
-
-  const handleFocusIn = (e: FocusEvent) => {
-    if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
-      setHasFocused(true);
-    } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
-      formik?.handleBlur({ ...e, target: { id, name: id } });
-      setHasFocused(false);
-    }
-  };
 
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);
@@ -162,7 +216,7 @@ function AmountFieldInput({
         setTokens([]);
         getTokenInfo(searchTerm)
           .then((tokenInfo) => {
-            if (typeof tokenInfo !== 'string') if (tokenInfo) setTokens([tokenInfo]);
+            if (typeof tokenInfo !== 'string') if (tokenInfo && mounted) setTokens([tokenInfo]);
           })
           .catch(Logger.exception);
       } else {
@@ -186,20 +240,31 @@ function AmountFieldInput({
   useEffect(() => {
     setAmount(value?.parsedAmount ?? 0);
     setToken(value?.token);
-  }, [value]);
+  }, [value?.parsedAmount, value?.token]);
+
+  const handleFocusIn = (e: FocusEvent) => {
+    if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
+      setHasFocused(true);
+    } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
+      formik?.handleBlur({ ...e, target: { id, name: id } });
+      setHasFocused(false);
+    }
+  };
 
   const fetchAvailableTokens = async () => {
     const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
-    setAvailableTokens(
-      arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
-    );
+    if (mounted) {
+      setAvailableTokens(
+        arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
+      );
+    }
   };
 
   const onAmountChange = (e: any) => {
     const newAmount = e.target.value;
     setAmount(newAmount);
-    if (token && newAmount !== '') {
+    if (token && e.target.value !== '') {
       applyChanges({
         token: {
           ...token,
@@ -228,7 +293,7 @@ function AmountFieldInput({
     if (formik) formik.setFieldValue(id, nextValue);
     else onChange(nextValue);
   };
-  const amountField = (
+  const amountField = (isEdit || !tagOnly) && (
     <FieldInput key={`amountField${amountLabel}`} label={amountLabel} wide={wide} compact={compact}>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
         {amount !== undefined &&
@@ -239,9 +304,6 @@ function AmountFieldInput({
               onChange={onAmountChange}
               placeHolder={placeHolder}
               onBlur={(e: React.FocusEvent) => {
-                const el = e.target as HTMLInputElement;
-                if (el.value === '') el.value = '0';
-                onAmountChange(e);
                 formik?.setFieldTouched(id, true);
                 formik?.handleBlur(e);
               }}
@@ -265,12 +327,18 @@ function AmountFieldInput({
       compact={compact}
       tooltip="Select a token between the list or paste the token address"
     >
-      {token?.token ? (
-        <TokenBadgeStyled symbol={token?.symbol} address={token?.token} networkType="private" />
+      {!isEdit || token?.token ? (
+        <TokenAmountBadge
+          compact={false}
+          token={token}
+          amount={tagOnly && amount}
+          usdValue={showUsd && value?.usdValue}
+          decimalsCount={decimalsCount}
+        />
       ) : (
         <AutoCompleteWrapperStyled wide={wide} id={tokenInputId}>
           <AutoComplete
-            items={tokens.map((x, index: number) => index)}
+            items={tokens.map((_, index: number) => index)}
             onChange={setSearchTerm}
             onSelect={onTokenChange}
             ref={autoCompleteRef}
@@ -310,7 +378,7 @@ function AmountFieldInput({
       compact
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
       error={error}
-      className={!isEdit ? 'fit-content' : 'dd'}
+      className={!isEdit ? 'fit-content' : ''}
     >
       {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>

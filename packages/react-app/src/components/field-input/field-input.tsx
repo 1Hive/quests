@@ -70,7 +70,8 @@ const ContentWrapperStyled = styled.div<{
 
 const SkeletonWrapperStyled = styled.div`
   width: 100%;
-  padding: 0 ${GUpx()};
+  min-width: 100px;
+  padding: 0 ${GUpx(1)};
 `;
 
 type Props = {
