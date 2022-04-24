@@ -20,7 +20,6 @@ import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
 import Dashboard from '../dashboard';
 import { Filter } from '../filter';
-import backgroundMotif from '../../assets/background-motif.svg';
 import background from '../../assets/background.svg';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
@@ -41,17 +40,6 @@ const FilterWrapperStyled = styled.div<{
   z-index: 1;
   background-image: url(${background});
   background-color: ${({ theme }: any) => theme.background};
-  &::after {
-    content: '';
-    background: url(${backgroundMotif}) no-repeat center -103px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    opacity: 0.02;
-    z-index: -1;
-  }
 `;
 
 const LineStyled = styled.div`
