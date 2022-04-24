@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
-import { ENUM_PAGES, ENUM_QUEST_STATE, QUESTS_PAGE_SIZE, DEFAULT_FILTER } from 'src/constants';
+import { ENUM_PAGES, QUESTS_PAGE_SIZE, DEFAULT_FILTER } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -53,10 +53,7 @@ const skeletonQuests: any[] = [];
 for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
   skeletonQuests.push(
     <Outset gu16 key={`${i}`}>
-      <Quest
-        dataState={{ questData: { expireTime: new Date(), state: ENUM_QUEST_STATE.Draft } }}
-        isLoading
-      />
+      <Quest isLoading isSummary />
     </Outset>,
   );
 }
@@ -155,9 +152,9 @@ export default function QuestList() {
         scrollThreshold="120px"
       >
         <div>
-          {quests.map((x: QuestModel) => (
-            <Outset gu16 key={x.address}>
-              <Quest isSummary dataState={{ questData: x }} />
+          {quests.map((questData: QuestModel) => (
+            <Outset gu16 key={questData.address}>
+              <Quest isSummary questData={questData} />
             </Outset>
           ))}
           {isLoading && skeletonQuests}

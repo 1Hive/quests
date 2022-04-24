@@ -19,8 +19,8 @@ import { FieldInput } from '../field-input/field-input';
 // #region StyledComponents
 
 const OpenButtonStyled = styled(Button)`
-  margin: 0 ${GUpx()};
-  margin-bottom: ${GUpx()};
+  margin: 0 ${GUpx(1)};
+  margin-bottom: ${GUpx(1)};
   width: fit-content;
 `;
 

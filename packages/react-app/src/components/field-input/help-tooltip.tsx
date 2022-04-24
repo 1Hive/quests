@@ -11,7 +11,7 @@ const TooltipWrapperStyled = styled.div`
 `;
 
 const HelpWrapperStyled = styled.div<{ theme: ThemeInterface }>`
-  margin-left: ${GUpx()};
+  margin-left: ${GUpx(1)};
   margin-right: ${GUpx(0.5)};
   svg {
     color: ${({ theme }) => theme.hint}!important;

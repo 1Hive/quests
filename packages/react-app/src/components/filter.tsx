@@ -40,7 +40,7 @@ const FilterWrapperStyled = styled.div<{
     ${({ isSmallResolution }) =>
       !isSmallResolution &&
       css`
-        margin-left: ${GUpx()};
+        margin-left: ${GUpx(1)};
       `}
   }
 `;

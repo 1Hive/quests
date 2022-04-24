@@ -29,7 +29,7 @@ import { HelpTooltip } from '../field-input/help-tooltip';
 // #region StyledComponents
 
 const OpenButtonStyled = styled(Button)`
-  margin: ${GUpx()};
+  margin: ${GUpx(1)};
   width: fit-content;
 `;
 
@@ -47,11 +47,11 @@ const OpenButtonWrapperStyled = styled.div`
 `;
 
 const LabelStyled = styled.span`
-  margin-left: ${GUpx()};
+  margin-left: ${GUpx(1)};
 `;
 
 const FinalRulingStyled = styled.span`
-  margin-right: ${GUpx()};
+  margin-right: ${GUpx(1)};
   margin-top: ${GUpx(0.5)};
 `;
 
@@ -66,13 +66,13 @@ const RulingInfoStyled = styled(Info)`
 `;
 
 const OnlyStackholderWarnStyled = styled(Info)`
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
   display: flex;
   align-items: center;
 `;
 
 const LinkStyled = styled(Link)`
-  margin-left: ${GUpx()};
+  margin-left: ${GUpx(1)};
 `;
 
 // #endregion

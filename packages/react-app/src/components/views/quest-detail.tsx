@@ -37,16 +37,8 @@ export default function QuestDetail() {
   return (
     <MainView>
       <>
-        {loading && (
-          <Quest
-            isLoading
-            dataState={{
-              questData: undefined,
-              setQuestData: undefined,
-            }}
-          />
-        )}
-        {!loading && <Quest dataState={{ questData: quest }} isLoading={loading} />}
+        {loading && <Quest isLoading />}
+        {!loading && <Quest questData={quest} />}
       </>
     </MainView>
   );

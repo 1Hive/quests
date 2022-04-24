@@ -29,12 +29,12 @@ import Stepper from '../utils/stepper';
 
 const FormStyled = styled(Form)`
   width: 100%;
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
   padding-bottom: 0;
 `;
 
 const OpenButtonStyled = styled(Button)`
-  margin: 0 ${GUpx()};
+  margin: 0 ${GUpx(1)};
   width: fit-content;
 `;
 

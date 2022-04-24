@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 const HeaderAccountButtonStyled = styled(ButtonBase)`
   height: 100%;
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
   &:active {
     background: ${({ backgroundActive }: any) => backgroundActive};
   }
@@ -38,7 +38,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
           display: flex;
           align-items: center;
           text-align: left;
-          padding: 0 ${GUpx()};
+          padding: 0 ${GUpx(1)};
         `}
       >
         <>
@@ -48,7 +48,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
               <div
                 // @ts-ignore
                 css={`
-                  padding-left: ${GUpx()};
+                  padding-left: ${GUpx(1)};
                   padding-right: ${GUpx(0.5)};
                 `}
               >

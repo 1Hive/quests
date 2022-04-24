@@ -24,7 +24,7 @@ const InputStyled = styled.input<{
   border-radius: 12px;
   background-color: ${({ theme }: any) => theme.surface};
   height: 40px;
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
   font-size: 14px;
   &:focus-visible {
     border: 1px solid ${({ theme }: any) => theme.accent};

@@ -11,7 +11,7 @@ import { TransactionProgressComponent } from '../utils/transaction-progress-comp
 const ModalFooterStyled = styled.div`
   width: 100%;
   text-align: right;
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
 `;
 
 const TitleStyled = styled.div`
@@ -19,7 +19,7 @@ const TitleStyled = styled.div`
 `;
 
 const ModalStyled = styled(Modal)`
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
   z-index: 1;
 `;
 

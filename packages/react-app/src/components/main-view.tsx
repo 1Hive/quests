@@ -24,7 +24,7 @@ const HeaderWrapperStyled = styled.div`
 const ContentWrapperStyled = styled.div<{
   isSmallResolution?: boolean;
 }>`
-  padding: ${({ isSmallResolution }) => (isSmallResolution ? GUpx() : GUpx(4))};
+  padding: ${({ isSmallResolution }) => (isSmallResolution ? GUpx(1) : GUpx(4))};
   min-height: calc(100vh - 80px);
 `;
 

@@ -41,7 +41,7 @@ const AutoCompleteWrapperStyled = styled.div<{ wide?: boolean }>`
 `;
 
 const TokenNameStyled = styled.span`
-  margin-right: ${GUpx()};
+  margin-right: ${GUpx(1)};
 `;
 
 const LineStyled = styled.div`
@@ -57,19 +57,22 @@ const AmountTokenWrapperStyled = styled.div<AmountTokenWrapperStyledProps>`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  ${({ wide, isEdit }) => (wide && isEdit ? '' : `padding-right:${GUpx()};`)}
+  ${({ wide, isEdit }) => (wide && isEdit ? '' : `padding-right:${GUpx(1)};`)}
   ${({ wide }) => (wide ? `width:100%;` : 'max-width:100%;')}
 `;
 
 const IconEditStyled = styled(IconEdit)`
   cursor: pointer;
-  padding-left: ${GUpx()};
+  padding-left: ${GUpx(1)};
 `;
 
 const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
-  ${({ compact }) => (compact ? '' : `margin-left: ${GUpx()};`)}
+  ${({ compact }) => (compact ? '' : `margin-left: ${GUpx(1)};`)}
   border-radius: 4px;
   font-size: 16px;
+  padding: 0 ${GUpx(1)};
+  font-weight: bold;
+  min-width: 0;
 `;
 
 // #endregion
@@ -77,25 +80,44 @@ const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
 type TokenBadgeProp = {
   className?: string;
   compact?: boolean;
-  amount?: TokenAmountModel;
-  onlySymbol?: boolean;
-  showUsd?: boolean;
+  token?: TokenModel;
+  amount?: number | false;
+  usdValue?: number | false;
   decimalsCount?: number;
 };
 
 const TokenAmountBadge = React.memo(
-  ({ className, compact, amount, onlySymbol, decimalsCount, showUsd }: TokenBadgeProp) => {
+  ({
+    className,
+    compact,
+    token = {
+      symbol: 'No token',
+      name: 'No token',
+      token: '0x0',
+      decimals: 0,
+      amount: '0x0',
+    },
+    amount,
+    usdValue,
+    decimalsCount,
+  }: TokenBadgeProp) => {
     const copyCode = useCopyToClipboard();
-
-    const usdFormat = useMemo(
-      () =>
-        new Intl.NumberFormat('en-US', {
+    const label = useMemo(() => {
+      let temp = '';
+      if (amount !== false && amount !== undefined) {
+        temp += `${floorNumber(amount ?? 0, decimalsCount)} `;
+      }
+      temp += `${token.symbol}`;
+      if (usdValue) {
+        const usdFormat = new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
           minimumFractionDigits: 2,
-        }).format(amount?.usdValue ?? 0),
-      [amount?.usdValue],
-    );
+        }).format(usdValue);
+        temp += ` (${usdFormat})`;
+      }
+      return temp;
+    }, [token, amount, usdValue]);
 
     return (
       <TokenAmountButtonStyled
@@ -103,19 +125,9 @@ const TokenAmountBadge = React.memo(
         compact={compact}
         mode="strong"
         size="mini"
-        label={
-          <>
-            <b>
-              {!onlySymbol && <>{floorNumber(amount?.parsedAmount ?? 0, decimalsCount)}&nbsp;</>}
-              {amount?.token.symbol}
-            </b>
-            {!onlySymbol && showUsd && <>&nbsp;({usdFormat})</>}
-          </>
-        }
-        title={`Copy : ${amount?.token.token}`}
-        onClick={() =>
-          copyCode(amount?.token.token, `${amount?.token.symbol} address copied to clipboard`)
-        }
+        label={label}
+        title={`Copy : ${token.token}`}
+        onClick={() => copyCode(token.token, `${token.symbol} address copied to clipboard`)}
       />
     );
   },
@@ -166,6 +178,7 @@ function AmountFieldInput({
   showUsd = false,
   error,
 }: Props) {
+  let mounted = true;
   const { type } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
@@ -187,16 +200,10 @@ function AmountFieldInput({
 
   useEffect(() => {
     fetchAvailableTokens();
+    return () => {
+      mounted = false;
+    };
   }, []);
-
-  const handleFocusIn = (e: FocusEvent) => {
-    if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
-      setHasFocused(true);
-    } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
-      formik?.handleBlur({ ...e, target: { id, name: id } });
-      setHasFocused(false);
-    }
-  };
 
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);
@@ -209,7 +216,7 @@ function AmountFieldInput({
         setTokens([]);
         getTokenInfo(searchTerm)
           .then((tokenInfo) => {
-            if (typeof tokenInfo !== 'string') if (tokenInfo) setTokens([tokenInfo]);
+            if (typeof tokenInfo !== 'string') if (tokenInfo && mounted) setTokens([tokenInfo]);
           })
           .catch(Logger.exception);
       } else {
@@ -233,14 +240,25 @@ function AmountFieldInput({
   useEffect(() => {
     setAmount(value?.parsedAmount ?? 0);
     setToken(value?.token);
-  }, [value]);
+  }, [value?.parsedAmount, value?.token]);
+
+  const handleFocusIn = (e: FocusEvent) => {
+    if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
+      setHasFocused(true);
+    } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
+      formik?.handleBlur({ ...e, target: { id, name: id } });
+      setHasFocused(false);
+    }
+  };
 
   const fetchAvailableTokens = async () => {
     const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
-    setAvailableTokens(
-      arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
-    );
+    if (mounted) {
+      setAvailableTokens(
+        arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
+      );
+    }
   };
 
   const onAmountChange = (e: any) => {
@@ -309,12 +327,12 @@ function AmountFieldInput({
       compact={compact}
       tooltip="Select a token between the list or paste the token address"
     >
-      {token?.token ? (
+      {!isEdit || token?.token ? (
         <TokenAmountBadge
           compact={false}
-          amount={value}
-          onlySymbol={isEdit || (!tagOnly && !showUsd)}
-          showUsd={showUsd}
+          token={token}
+          amount={tagOnly && amount}
+          usdValue={showUsd && value?.usdValue}
           decimalsCount={decimalsCount}
         />
       ) : (

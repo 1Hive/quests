@@ -10,13 +10,13 @@ import {
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
-import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { getNetwork } from 'src/networks';
 import { Form, Formik, FormikErrors } from 'formik';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { toChecksumAddress } from 'web3-utils';
 import { useWallet } from 'src/contexts/wallet.context';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -271,9 +271,7 @@ export default function QuestModal({
         initialValues={
           {
             ...questDataState,
-            fallbackAddress: questData?.fallbackAddress ?? questData?.fallbackAddress,
-            expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
-            state: ENUM_QUEST_STATE.Draft,
+            fallbackAddress: questDataState?.fallbackAddress,
           } as QuestModel
         }
         onSubmit={onQuestSubmit}

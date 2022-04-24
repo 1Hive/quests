@@ -17,7 +17,7 @@ const TitleLinkWrapperStyled = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
-  margin-left: ${GUpx()};
+  margin-left: ${GUpx(1)};
 `;
 
 // #endregion
