@@ -56,11 +56,13 @@ type Props = {
   buttonMode?: 'link' | 'strong' | 'normal' | 'icon' | 'label';
 };
 
+const emptyQuestData = {
+  expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
+  state: ENUM_QUEST_STATE.Draft,
+};
+
 export default function QuestModal({
-  questData = {
-    expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
-    state: ENUM_QUEST_STATE.Draft,
-  },
+  questData = emptyQuestData,
   onClose = noop,
   questMode = ENUM_QUEST_VIEW_MODE.ReadSummary,
   buttonMode = 'normal',
@@ -71,7 +73,6 @@ export default function QuestModal({
   const { walletAddress } = useWallet();
   const { defaultToken } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
-  const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
@@ -150,7 +151,6 @@ export default function QuestModal({
     validate(values); // Validate one last time before submitting
 
     if (isFormValid) {
-      setLoading(true);
       let createdQuestAddress: string;
       try {
         setTransaction({
@@ -227,6 +227,7 @@ export default function QuestModal({
             if (!txReceiptFundQuest?.status || !createdQuestAddress) {
               throw new Error('Failed to create quest');
             }
+            setQuestDataState(emptyQuestData);
           }
         }
       } catch (e: any) {
@@ -238,8 +239,6 @@ export default function QuestModal({
               message: computeTransactionErrorMessage(e),
             },
         );
-      } finally {
-        setLoading(false);
       }
     }
   };
@@ -306,7 +305,7 @@ export default function QuestModal({
                       mode="positive"
                       type="submit"
                       form="form-quest"
-                      disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+                      disabled={!walletAddress || !isEnoughBalance || !isFormValid}
                     />
                   </>
                 }
@@ -317,7 +316,6 @@ export default function QuestModal({
                       id="title"
                       label="Title"
                       isEdit
-                      isLoading={loading}
                       placeHolder="Quest title"
                       value={values.title}
                       onChange={handleChange}
@@ -332,7 +330,6 @@ export default function QuestModal({
                       label="Description"
                       value={values.description}
                       isEdit
-                      isLoading={loading}
                       placeHolder="Quest description"
                       tooltip={
                         <>
@@ -360,8 +357,7 @@ export default function QuestModal({
                       id="bounty"
                       isEdit
                       tooltip="The initial funding of this quest. A token needs to be picked. You can enter the token address directly."
-                      value={questData?.bounty}
-                      isLoading={loading}
+                      value={values?.bounty}
                       error={touched.bounty && errors.bounty}
                       tokenEditable
                       tokenLabel="Funding token"
@@ -374,7 +370,6 @@ export default function QuestModal({
                       label="Expire time"
                       tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
                       isEdit
-                      isLoading={loading}
                       value={values.expireTime}
                       wide
                       onBlur={handleBlur}
@@ -385,7 +380,6 @@ export default function QuestModal({
                       id="fallbackAddress"
                       label="Funds fallback address"
                       value={values.fallbackAddress ?? walletAddress}
-                      isLoading={loading}
                       tooltip="Unused funds at the specified expiry time can be returned to this address."
                       isEdit
                       onBlur={handleBlur}

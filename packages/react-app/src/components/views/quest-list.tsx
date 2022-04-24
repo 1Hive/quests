@@ -89,6 +89,11 @@ export default function QuestList() {
     }
   }, [newQuest]);
 
+  const debounceRefresh = useCallback(
+    debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),
+    [], // will be created only once initially
+  );
+
   const refresh = (_filter?: FilterModel) => {
     if (!isLoading) {
       setQuests([]);
@@ -109,11 +114,6 @@ export default function QuestList() {
       setHasMore(res.length >= QUESTS_PAGE_SIZE);
     });
   };
-
-  const debounceRefresh = useCallback(
-    debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),
-    [], // will be created only once initially
-  );
 
   return (
     <MainView>

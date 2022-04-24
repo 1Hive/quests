@@ -1,5 +1,5 @@
 import { Card } from '@1hive/1hive-ui';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
@@ -14,7 +14,7 @@ import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
-import DateFieldInput, { DateFieldInputFormik } from './field-input/date-field-input';
+import DateFieldInput from './field-input/date-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
@@ -154,59 +154,53 @@ export default function Quest({
     }, 500);
   };
 
-  const titleInput = useMemo(
-    () => (
-      <TextFieldInput
-        id="title"
-        isLoading={isLoading || !questData}
-        placeHolder="Quest title"
-        value={questData?.title}
-        fontSize="24px"
-        tooltip="Title should resume the Quest and be short and clear."
-      />
-    ),
-    [questData?.title],
+  const titleInput = (
+    <TextFieldInput
+      id="title"
+      isLoading={isLoading || !questData}
+      placeHolder="Quest title"
+      value={questData?.title}
+      fontSize="24px"
+      tooltip="Title should resume the Quest and be short and clear."
+    />
   );
 
-  const fieldsRow = useMemo(
-    () => (
-      <RowStyled>
-        <AddressFieldInput
-          id="address"
-          label="Quest Address"
+  const fieldsRow = (
+    <RowStyled>
+      <AddressFieldInput
+        id="address"
+        label="Quest Address"
+        isLoading={isLoading || !questData}
+        value={questData?.address}
+      />
+
+      {!isSummary && (
+        <DateFieldInput
+          id="creationTime"
+          label="Creation time"
           isLoading={isLoading || !questData}
-          value={questData?.address}
+          value={questData.creationTime}
         />
+      )}
 
-        {!isSummary && (
-          <DateFieldInput
-            id="creationTime"
-            label="Creation time"
-            isLoading={isLoading || !questData}
-            value={questData.creationTime}
-          />
-        )}
+      <DateFieldInput
+        id="expireTime"
+        label="Expire time"
+        tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
+        isLoading={isLoading || !questData}
+        value={questData?.expireTime}
+      />
 
-        <DateFieldInputFormik
-          id="expireTime"
-          label="Expire time"
-          tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
-          isLoading={isLoading || !questData}
-          value={questData?.expireTime}
+      {!isSummary && (
+        <AmountFieldInput
+          id="claimDeposit"
+          label="Claim deposit"
+          tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
+          value={claimDeposit}
+          isLoading={isLoading || !claimDeposit}
         />
-
-        {!isSummary && (
-          <AmountFieldInput
-            id="claimDeposit"
-            label="Claim deposit"
-            tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-            value={claimDeposit}
-            isLoading={isLoading || !claimDeposit}
-          />
-        )}
-      </RowStyled>
-    ),
-    [questData?.title, claimDeposit],
+      )}
+    </RowStyled>
   );
 
   return (
