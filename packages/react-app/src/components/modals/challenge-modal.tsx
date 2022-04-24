@@ -20,7 +20,6 @@ import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
-import { HelpTooltip } from '../field-input/help-tooltip';
 import { WalletBallance } from '../wallet-balance';
 
 // #region StyledComponents
@@ -124,7 +123,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           setTransaction({
             id: uniqueId(),
             estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-            message: 'Approving challenge fee',
+            message: `Approving challenge fee (1/3)`,
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
@@ -168,8 +167,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             id: uniqueId(),
             estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
             message: isFeeDepositSameToken
-              ? 'Approving challenge fee + deposit'
-              : 'Approving challenge deposit',
+              ? 'Approving challenge fee + deposit (1/2)'
+              : 'Approving challenge deposit  (2/3)',
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
@@ -203,7 +202,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         setTransaction({
           id: uniqueId(),
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-          message: 'Challenging Quest',
+          message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         });
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
@@ -278,7 +277,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           {!loading && challengeTimeout === false && claim.executionTimeMs && (
             <Timer end={new Date(claim.executionTimeMs)} />
           )}
-          <HelpTooltip tooltip="A challenge allows you to deny a claim. It will be raised to Celeste and disputable voting will be used to determine the validity of this challenge." />
         </OpenButtonWrapperStyled>
       }
       buttons={[
