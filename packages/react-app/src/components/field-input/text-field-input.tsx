@@ -22,6 +22,7 @@ const MaxLineStyled = styled.div<{ maxLine: number }>`
 `;
 
 const BlockStyled = styled.div<{ wide?: boolean }>`
+  max-width: 100%;
   ${({ wide }) => wide && 'width: 100%;'}
 `;
 

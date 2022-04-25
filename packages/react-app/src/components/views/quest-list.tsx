@@ -51,11 +51,7 @@ const LineStyled = styled.div`
 
 const skeletonQuests: any[] = [];
 for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
-  skeletonQuests.push(
-    <Outset gu16 key={`${i}`}>
-      <Quest isLoading isSummary />
-    </Outset>,
-  );
+  skeletonQuests.push(<Quest key={`${i}`} isLoading isSummary />);
 }
 
 export default function QuestList() {
@@ -153,9 +149,7 @@ export default function QuestList() {
       >
         <div>
           {quests.map((questData: QuestModel) => (
-            <Outset gu16 key={questData.address}>
-              <Quest isSummary questData={questData} />
-            </Outset>
+            <Quest key={questData.address} isSummary questData={questData} />
           ))}
           {isLoading && skeletonQuests}
         </div>

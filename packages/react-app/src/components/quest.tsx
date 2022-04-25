@@ -1,4 +1,4 @@
-import { Card } from '@1hive/1hive-ui';
+import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
@@ -32,6 +32,10 @@ const LinkStyled = styled(Link)`
   font-weight: 100;
 `;
 
+const CardWrapperStyed = styled.div<{ compact: boolean }>`
+  padding: ${({ compact }) => GUpx(compact ? 1 : 2)};
+`;
+
 const CardStyled = styled(Card)<{ isSummary: boolean }>`
   justify-content: flex-start;
   align-items: flex-start;
@@ -52,18 +56,23 @@ const QuestFooterStyled = styled.div`
 
 const RowStyled = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   width: 100%;
+  flex-wrap: wrap-reverse;
+  justify-content: space-between;
 `;
 
-const ContentWrapperStyled = styled.div`
-  padding: ${GUpx(3)};
+const ContentWrapperStyled = styled.div<{ compact: boolean }>`
+  padding: ${({ compact }) => (compact ? GUpx(2) : GUpx(3))};
   width: 100%;
   min-height: 225px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+`;
+
+const BountyWrapperStyled = styled.div`
+  margin-left: auto;
+  width: fit-content;
 `;
 
 // #endregion
@@ -87,6 +96,7 @@ export default function Quest({
   const [claimUpdated, setClaimUpdate] = useState(0);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
+  const { below } = useViewport();
 
   let isSubscribed = true;
 
@@ -204,30 +214,32 @@ export default function Quest({
   );
 
   return (
-    <CardStyled style={css} isSummary={isSummary} id={questData?.address}>
-      <ContentWrapperStyled>
-        <StateTag state={questData?.state ?? ''} />
-        <RowStyled className="pb-0">
-          {isSummary ? (
-            <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
-              {titleInput}
-            </TitleLinkStyled>
-          ) : (
-            titleInput
-          )}
-          <AmountFieldInput
-            id={`bounty-${questData?.address}`}
-            key={`bounty-${questData?.address}`}
-            compact
-            tagOnly
-            showUsd
-            value={questData?.bounty}
-            isLoading={isLoading || !questData}
-          />
-        </RowStyled>
+    <CardWrapperStyed compact={below('medium')}>
+      <CardStyled style={css} isSummary={isSummary} id={questData?.address}>
+        <ContentWrapperStyled compact={below('medium')}>
+          <StateTag state={questData?.state ?? ''} />
+          <RowStyled className="pb-0">
+            {isSummary ? (
+              <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
+                {titleInput}
+              </TitleLinkStyled>
+            ) : (
+              titleInput
+            )}
+            <BountyWrapperStyled>
+              <AmountFieldInput
+                id={`bounty-${questData?.address}`}
+                key={`bounty-${questData?.address}`}
+                compact
+                tagOnly
+                showUsd
+                value={questData?.bounty}
+                isLoading={isLoading || !bounty}
+              />
+            </BountyWrapperStyled>
+          </RowStyled>
 
-        {!isSummary && fieldsRow}
-        <RowStyled>
+          {!isSummary && fieldsRow}
           <TextFieldInput
             id="description"
             value={questData?.description}
@@ -252,41 +264,41 @@ export default function Quest({
               </LinkStyled>
             }
           />
-        </RowStyled>
-        {isSummary && fieldsRow}
-      </ContentWrapperStyled>
-      {!isSummary && challengeDeposit && (
-        <ClaimList
-          newClaim={claimUpdated}
-          questData={questData}
-          questTotalBounty={bounty}
-          challengeDeposit={challengeDeposit}
-          isLoading={isLoading}
-        />
-      )}
-      {!isSummary && questData.address && walletAddress && bounty && (
-        <QuestFooterStyled>
-          {questData?.state === ENUM_QUEST_STATE.Active ? (
-            <>
-              <FundModal quest={questData} onClose={onFundModalClosed} />
-              {claimDeposit && (
-                <ScheduleClaimModal
-                  questAddress={questData.address}
-                  questTotalBounty={bounty}
-                  claimDeposit={claimDeposit}
-                  onClose={onScheduleModalClosed}
-                />
-              )}
-            </>
-          ) : (
-            <>
-              {!!bounty?.parsedAmount && (
-                <ReclaimFundsModal bounty={bounty} questData={questData} />
-              )}
-            </>
-          )}
-        </QuestFooterStyled>
-      )}
-    </CardStyled>
+          {isSummary && fieldsRow}
+        </ContentWrapperStyled>
+        {!isSummary && challengeDeposit && (
+          <ClaimList
+            newClaim={claimUpdated}
+            questData={questData}
+            questTotalBounty={bounty}
+            challengeDeposit={challengeDeposit}
+            isLoading={isLoading}
+          />
+        )}
+        {!isSummary && questData.address && walletAddress && bounty && (
+          <QuestFooterStyled>
+            {questData?.state === ENUM_QUEST_STATE.Active ? (
+              <>
+                <FundModal quest={questData} onClose={onFundModalClosed} />
+                {claimDeposit && (
+                  <ScheduleClaimModal
+                    questAddress={questData.address}
+                    questTotalBounty={bounty}
+                    claimDeposit={claimDeposit}
+                    onClose={onScheduleModalClosed}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                {!!bounty?.parsedAmount && (
+                  <ReclaimFundsModal bounty={bounty} questData={questData} />
+                )}
+              </>
+            )}
+          </QuestFooterStyled>
+        )}
+      </CardStyled>
+    </CardWrapperStyed>
   );
 }

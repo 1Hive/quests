@@ -1,7 +1,7 @@
 import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { FieldInput } from './field-input';
 
 // #region Styled
@@ -23,11 +23,7 @@ const AddressWrapperStyled = styled.div<{
   display: flex;
   flex-wrap: nowrap;
   max-width: 400px;
-  ${(props) =>
-    props.wide &&
-    css`
-      width: 100%;
-    `}
+  width: 100%;
 
   input {
     cursor: ${({ isEdit }: any) => (isEdit ? 'text' : 'default')};
