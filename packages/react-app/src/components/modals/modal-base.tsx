@@ -32,7 +32,6 @@ type Props = {
   id: string;
   children?: React.ReactNode;
   title?: React.ReactNode | string;
-  txCompleted?: boolean;
   setTxCompleted?: (_flag: boolean) => void;
   openButton: React.ReactNode;
   buttons?: React.ReactNode;
