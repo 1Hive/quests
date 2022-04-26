@@ -77,11 +77,15 @@ export default function QuestModal({
   const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
+  let mounted = true;
 
   useEffect(() => {
     feedDummyQuestData(questData).then((data) => {
-      setQuestDataState(data);
+      if (mounted) setQuestDataState(data);
     });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -227,7 +231,7 @@ export default function QuestModal({
             if (!txReceiptFundQuest?.status || !createdQuestAddress) {
               throw new Error('Failed to create quest');
             }
-            setQuestDataState(emptyQuestData);
+            if (mounted) setQuestDataState(emptyQuestData);
           }
         }
       } catch (e: any) {
