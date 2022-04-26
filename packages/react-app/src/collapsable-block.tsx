@@ -10,7 +10,7 @@ import { GUpx } from './utils/style.util';
 const IconColumnStyled = styled.div`
   display: flex;
   flex-direction: column;
-  margin-right: ${GUpx()};
+  margin-right: ${GUpx(1)};
 `;
 
 const CollapseButtonStyled = styled.a`
@@ -33,7 +33,7 @@ const LineStyled = styled.div`
 `;
 
 const ContentWrapperStyled = styled.div`
-  padding-top: ${GUpx()};
+  padding-top: ${GUpx(1)};
 `;
 
 const LabelStyled = styled.span`

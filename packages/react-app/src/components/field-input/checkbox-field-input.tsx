@@ -14,7 +14,7 @@ import { FieldInput } from './field-input';
 const CheckboxWrapperStyled = styled.div`
   display: block;
   position: relative;
-  margin: 0 ${GUpx()};
+  margin: 0 ${GUpx(1)};
   font-size: 22px;
   -webkit-user-select: none;
   -moz-user-select: none;

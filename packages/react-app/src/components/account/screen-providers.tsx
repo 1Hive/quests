@@ -125,7 +125,7 @@ function ProviderButton({ id, provider, onActivate }: ProviderButtonProps) {
       <div
         // @ts-ignore
         css={`
-          margin-top: ${GUpx()};
+          margin-top: ${GUpx(1)};
           ${textStyle('body1')};
         `}
       >

@@ -9,7 +9,7 @@ import { FieldInput } from './field-input';
 // #region Styled
 
 const MaxLineStyled = styled.div<{ maxLine: number }>`
-  margin-bottom: ${GUpx()};
+  margin-bottom: ${GUpx(1)};
   display: -webkit-box;
   -webkit-line-clamp: ${(props) => props.maxLine};
   -webkit-box-orient: vertical;
@@ -22,6 +22,7 @@ const MaxLineStyled = styled.div<{ maxLine: number }>`
 `;
 
 const BlockStyled = styled.div<{ wide?: boolean }>`
+  max-width: 100%;
   ${({ wide }) => wide && 'width: 100%;'}
 `;
 

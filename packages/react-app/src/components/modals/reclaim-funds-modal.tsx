@@ -17,7 +17,7 @@ import ModalBase, { ModalCallback } from './modal-base';
 import IdentityBadge from '../identity-badge';
 
 const OpenButtonStyled = styled(Button)`
-  margin: 0 ${GUpx()};
+  margin: 0 ${GUpx(1)};
   width: fit-content;
 `;
 
@@ -37,10 +37,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const { setTransaction } = useTransactionContext();
 
   const { walletAddress } = useWallet();
-
-  useEffect(() => {
-    console.log('txCompleted', txCompleted);
-  }, [txCompleted]);
 
   useEffect(() => {
     if (!fallbackAddress && questData.address && walletAddress) {
@@ -107,7 +103,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       <ModalBase
         id="reclaim-funds-modal"
         title="Reclaim unused quest funds"
-        txCompleted={txCompleted}
         setTxCompleted={(flag: boolean) => {
           setTxCompleted(flag);
         }}

@@ -11,7 +11,7 @@ import { TransactionProgressComponent } from '../utils/transaction-progress-comp
 const ModalFooterStyled = styled.div`
   width: 100%;
   text-align: right;
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
 `;
 
 const TitleStyled = styled.div`
@@ -19,7 +19,7 @@ const TitleStyled = styled.div`
 `;
 
 const ModalStyled = styled(Modal)`
-  padding: ${GUpx()};
+  padding: ${GUpx(1)};
   z-index: 1;
 `;
 
@@ -46,7 +46,6 @@ export default function ModalBase({
   id,
   children,
   title,
-  txCompleted,
   setTxCompleted,
   openButton,
   buttons,
@@ -57,6 +56,11 @@ export default function ModalBase({
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
+
+  const txFailed = useMemo(
+    () => transaction?.status === ENUM_TRANSACTION_STATUS.Failed,
+    [transaction?.status],
+  );
 
   const width = useMemo(() => {
     switch (size) {
@@ -70,7 +74,6 @@ export default function ModalBase({
   }, [size]);
 
   useEffect(() => {
-    console.log('transaction', transaction?.status);
     transaction !== undefined &&
       setTxCompleted &&
       setTxCompleted(
@@ -84,11 +87,7 @@ export default function ModalBase({
   useEffect(() => {
     if (isOpen) {
       // Clear tx if a tx is still there and already completed
-      if (
-        transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
-        transaction?.status === ENUM_TRANSACTION_STATUS.Failed ||
-        transaction?.id
-      )
+      if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed || transaction?.id)
         setTransaction(undefined);
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
       setTimeout(() => {
@@ -118,10 +117,7 @@ export default function ModalBase({
   const handleOnClose = (e: any) => {
     if (e) {
       onClose(transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed);
-      if (
-        transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
-        transaction?.status === ENUM_TRANSACTION_STATUS.Failed
-      ) {
+      if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed) {
         setTimeout(() => {
           setTransaction(undefined);
         }, 750);
@@ -150,11 +146,11 @@ export default function ModalBase({
         <ScrollViewStyled vertical>
           {transaction ? <TransactionProgressComponent /> : children}
         </ScrollViewStyled>
-        {(buttons || txCompleted) && (
+        {(buttons || txFailed) && (
           <ModalFooterStyled>
-            <ChildSpacer justify="start" align="center" buttonEnd={!txCompleted}>
+            <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>
               {transaction
-                ? txCompleted && <Button onClick={onBackButtonClick}>Back</Button>
+                ? txFailed && <Button onClick={onBackButtonClick}>Back</Button>
                 : buttons}
             </ChildSpacer>
           </ModalFooterStyled>

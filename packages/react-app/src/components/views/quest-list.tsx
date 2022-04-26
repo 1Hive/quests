@@ -4,13 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
-import {
-  ENUM_PAGES,
-  ENUM_QUEST_STATE,
-  ENUM_QUEST_VIEW_MODE,
-  QUESTS_PAGE_SIZE,
-  DEFAULT_FILTER,
-} from 'src/constants';
+import { ENUM_PAGES, QUESTS_PAGE_SIZE, DEFAULT_FILTER } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -26,7 +20,6 @@ import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
 import Dashboard from '../dashboard';
 import { Filter } from '../filter';
-import backgroundMotif from '../../assets/background-motif.svg';
 import background from '../../assets/background.svg';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
@@ -58,14 +51,7 @@ const LineStyled = styled.div`
 
 const skeletonQuests: any[] = [];
 for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
-  skeletonQuests.push(
-    <Outset gu16 key={`${i}`}>
-      <Quest
-        dataState={{ questData: { expireTime: new Date(), state: ENUM_QUEST_STATE.Draft } }}
-        isLoading
-      />
-    </Outset>,
-  );
+  skeletonQuests.push(<Quest key={`${i}`} isLoading isSummary />);
 }
 
 export default function QuestList() {
@@ -99,6 +85,11 @@ export default function QuestList() {
     }
   }, [newQuest]);
 
+  const debounceRefresh = useCallback(
+    debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),
+    [], // will be created only once initially
+  );
+
   const refresh = (_filter?: FilterModel) => {
     if (!isLoading) {
       setQuests([]);
@@ -119,11 +110,6 @@ export default function QuestList() {
       setHasMore(res.length >= QUESTS_PAGE_SIZE);
     });
   };
-
-  const debounceRefresh = useCallback(
-    debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),
-    [], // will be created only once initially
-  );
 
   return (
     <MainView>
@@ -162,10 +148,8 @@ export default function QuestList() {
         scrollThreshold="120px"
       >
         <div>
-          {quests.map((x: QuestModel) => (
-            <Outset gu16 key={x.address}>
-              <Quest questMode={ENUM_QUEST_VIEW_MODE.ReadSummary} dataState={{ questData: x }} />
-            </Outset>
+          {quests.map((questData: QuestModel) => (
+            <Quest key={questData.address} isSummary questData={questData} />
           ))}
           {isLoading && skeletonQuests}
         </div>

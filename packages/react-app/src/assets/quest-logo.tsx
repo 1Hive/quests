@@ -21,7 +21,7 @@ const DivStyled = styled.div<{
     }
   }
   ${({ animated }) => animated && `animation: textScale1 1.15s infinite;`}
-  margin-bottom: ${GUpx()};
+  margin-bottom: ${GUpx(1)};
 `;
 
 export default function QuestLogo({ color, animated }: Props) {

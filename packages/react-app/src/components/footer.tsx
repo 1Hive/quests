@@ -70,7 +70,7 @@ const TitleLinkStyled = styled(Link)`
 const TitleLinkWrapperStyled = styled.div`
   display: flex;
   justify-content: center;
-  margin-left: ${GUpx()};
+  margin-left: ${GUpx(1)};
 `;
 
 const IconStyled = styled.div`
