@@ -30,12 +30,17 @@ type Props = {
 export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [txCompleted, setTxCompleted] = useState(false);
   const [fallbackAddress, setFallbackAddress] = useState<string | undefined>(
     questData.fallbackAddress,
   );
   const { setTransaction } = useTransactionContext();
 
   const { walletAddress } = useWallet();
+
+  useEffect(() => {
+    console.log('txCompleted', txCompleted);
+  }, [txCompleted]);
 
   useEffect(() => {
     if (!fallbackAddress && questData.address && walletAddress) {
@@ -102,6 +107,10 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       <ModalBase
         id="reclaim-funds-modal"
         title="Reclaim unused quest funds"
+        txCompleted={txCompleted}
+        setTxCompleted={(flag: boolean) => {
+          setTxCompleted(flag);
+        }}
         openButton={
           <OpenButtonStyled
             onClick={() => setOpened(true)}
@@ -113,13 +122,17 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           />
         }
         buttons={
-          <Button
-            onClick={reclaimFundTx}
-            icon={<IconCoin />}
-            label="Reclaim funds"
-            mode="strong"
-            disabled={loading || !walletAddress}
-          />
+          !txCompleted ? (
+            <Button
+              onClick={reclaimFundTx}
+              icon={<IconCoin />}
+              label="Reclaim funds"
+              mode="strong"
+              disabled={loading || !walletAddress}
+            />
+          ) : (
+            ''
+          )
         }
         onClose={closeModal}
         isOpen={opened}

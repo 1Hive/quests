@@ -1,6 +1,6 @@
 import { Modal, ScrollView, textStyle, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
@@ -32,6 +32,8 @@ type Props = {
   id: string;
   children?: React.ReactNode;
   title?: React.ReactNode | string;
+  txCompleted?: boolean;
+  setTxCompleted?: (_flag: boolean) => void;
   openButton: React.ReactNode;
   buttons?: React.ReactNode;
   onClose?: (_success: boolean) => void;
@@ -44,6 +46,8 @@ export default function ModalBase({
   id,
   children,
   title,
+  txCompleted,
+  setTxCompleted,
   openButton,
   buttons,
   onClose = noop,
@@ -53,7 +57,6 @@ export default function ModalBase({
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
-  const [txCompleted, setTxCompleted] = useState(false);
 
   const width = useMemo(() => {
     switch (size) {
@@ -67,12 +70,15 @@ export default function ModalBase({
   }, [size]);
 
   useEffect(() => {
-    setTxCompleted(
-      (transaction &&
-        (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
-          transaction?.status === ENUM_TRANSACTION_STATUS.Failed)) ??
-        false,
-    );
+    console.log('transaction', transaction?.status);
+    transaction !== undefined &&
+      setTxCompleted &&
+      setTxCompleted(
+        (transaction &&
+          (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed ||
+            transaction?.status === ENUM_TRANSACTION_STATUS.Failed)) ??
+          false,
+      );
   }, [transaction?.status]);
 
   useEffect(() => {
