@@ -50,18 +50,20 @@ contract Quest {
     function claim(
         bytes memory _evidence,
         address _player,
-        uint256 _amount
+        uint256 _amount,
+        bool _claimAll
     ) external {
         require(msg.sender == aragonGovernAddress, "ERROR: Sender not govern");
         require(_evidence.length != 0, "ERROR: No evidence");
-
-        if (_amount > 0) {
-            rewardToken.safeTransfer(_player, _amount);
-        } else if (_amount == 0) {
+        if (_claimAll) {
             rewardToken.safeTransfer(
                 _player,
                 rewardToken.balanceOf(address(this))
             );
+        }
+        //This way the user won't need to trigger a useless safeTransfer call
+        else if (_amount > 0) {
+            rewardToken.safeTransfer(_player, _amount);
         }
 
         claims.push(Claim(_evidence, _player, _amount));

@@ -93,7 +93,8 @@ describe("[Contract] Quest", function () {
         await quest.claim(
           hashToBytes("evidence1"),
           player.address,
-          claimAmount
+          claimAmount,
+          false
         );
 
         // Assert
@@ -103,9 +104,10 @@ describe("[Contract] Quest", function () {
         );
       });
 
-      it("should transfer rest of available funds to player when claimAmount is 0", async function () {
+      it("should transfer rest of available funds to player when claimAll is true", async function () {
         // Arrange
-        const claimAmount = 0; // Claim all remaining
+        const claimAmount = 500; // Claim all remaining
+        const claimAll = true;
         const quest = await deployQuest(
           "fakeTitle",
           "0x",
@@ -120,7 +122,8 @@ describe("[Contract] Quest", function () {
         await quest.claim(
           hashToBytes("evidence1"),
           player.address,
-          claimAmount
+          claimAmount,
+          claimAll
         );
 
         // Assert
@@ -143,7 +146,8 @@ describe("[Contract] Quest", function () {
         );
 
         // Act
-        const act = () => quest.claim(evidence, player.address, claimAmount);
+        const act = () =>
+          quest.claim(evidence, player.address, claimAmount, false);
 
         // Assert
         await expect(act())
@@ -166,7 +170,8 @@ describe("[Contract] Quest", function () {
         );
 
         // Act
-        const act = () => quest.claim(evidence, player.address, claimAmount);
+        const act = () =>
+          quest.claim(evidence, player.address, claimAmount, false);
 
         // Assert
         await expect(act()).to.be.revertedWith(
@@ -189,7 +194,8 @@ describe("[Contract] Quest", function () {
         );
 
         // Act
-        const act = () => quest.claim(evidence, player.address, claimAmount);
+        const act = () =>
+          quest.claim(evidence, player.address, claimAmount, false);
 
         // Assert
         await expect(act()).to.be.revertedWith("ERROR: No evidence");
@@ -213,7 +219,7 @@ describe("[Contract] Quest", function () {
       const act = () =>
         quest
           .connect(player)
-          .claim(hashToBytes("evidence1"), player.address, 0); // player claims by himself (should throw)
+          .claim(hashToBytes("evidence1"), player.address, 0, true); // player claims by himself (should throw)
 
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: Sender not govern");

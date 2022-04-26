@@ -76,9 +76,7 @@ export default function ScheduleClaimModal({
     const errors = {} as FormErrors<ClaimModel>;
     if (!values.evidence) errors.evidence = 'Evidence of completion is required';
     if (!values.claimAll) {
-      if (!values.claimedAmount?.parsedAmount) errors.claimedAmount = 'Claim amount is required';
-      else if (values.claimedAmount.parsedAmount < 0)
-        errors.claimedAmount = 'Claim amount is invalid';
+      if (values.claimedAmount.parsedAmount < 0) errors.claimedAmount = 'Claim amount is invalid';
       else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
         errors.claimedAmount = 'Claim amount should not be higher than available bounty';
     }
@@ -154,6 +152,7 @@ export default function ScheduleClaimModal({
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
           playerAddress: values.playerAddress ?? walletAddress,
+          claimAll: values.claimAll,
           questAddress,
         },
         (txHash) => {
