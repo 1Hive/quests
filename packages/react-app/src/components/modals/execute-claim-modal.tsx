@@ -72,8 +72,8 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
 
   useEffect(() => {
     if (questTotalBounty) {
-      if (claim.claimedAmount.parsedAmount) setAmount(claim.claimedAmount);
-      else setAmount(questTotalBounty); // Claim all funds
+      if (claim.claimAll) setAmount(questTotalBounty);
+      else setAmount(claim.claimedAmount); // Claim all funds
     }
   }, [claim.claimedAmount, questTotalBounty]);
 

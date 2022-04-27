@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "Quest": {
-          "address": "0x53C6c56dF207a2049F917f800696843C2EbCaDaE",
+          "address": "0xca6fb3A292C344Ff77F94Eb84b430dDd76A9CC03",
           "abi": [
             {
               "inputs": [
@@ -97,6 +97,11 @@
                   "internalType": "uint256",
                   "name": "_amount",
                   "type": "uint256"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "_claimAll",
+                  "type": "bool"
                 }
               ],
               "name": "claim",
@@ -208,7 +213,7 @@
           ]
         },
         "QuestFactory": {
-          "address": "0x855a04deB27aBF93336d52A91F29A98Dd5605691",
+          "address": "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01",
           "abi": [
             {
               "inputs": [
@@ -319,7 +324,7 @@
           ]
         },
         "TokenMock": {
-          "address": "0xE124e8945875686A90d03a2e81bce913756EF24E",
+          "address": "0x86E3f333Bb2AfE4b3da62e4DD8eeB0F8bFfa5FBe",
           "abi": [
             {
               "inputs": [],

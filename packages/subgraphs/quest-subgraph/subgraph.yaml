@@ -6,7 +6,7 @@ dataSources:
     name: QuestFactory
     network: rinkeby
     source:
-      address: "0x855a04deB27aBF93336d52A91F29A98Dd5605691"
+      address: "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01"
       abi: QuestFactory
       startBlock: 9936882
     mapping:
