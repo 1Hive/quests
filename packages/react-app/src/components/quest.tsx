@@ -1,7 +1,7 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_STATE, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from 'src/services/quest.service';
@@ -11,6 +11,7 @@ import { GUpx } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -97,6 +98,11 @@ export default function Quest({
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const { below } = useViewport();
+  const { transaction } = useTransactionContext();
+
+  useEffect(() => {
+    transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed && setBounty(null);
+  }, [transaction]);
 
   let isSubscribed = true;
 
