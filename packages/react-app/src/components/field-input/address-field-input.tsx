@@ -1,18 +1,29 @@
 import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { FieldInput } from './field-input';
 
 // #region Styled
 
-const TextInputStyled = styled(TextInput)`
+const TextInputStyled = styled(TextInput)<{ isEdit: boolean }>`
   border-radius: 12px;
-  padding-right: 42px;
+
+  ${({ isEdit }) =>
+    isEdit
+      ? css`
+          padding-right: 42px;
+        `
+      : css`
+          padding-left: 50px;
+          :read-only {
+            color: unset;
+          }
+        `}
 `;
 
-const EthIdenticonStyled = styled(EthIdenticon)`
-  border-radius: 0 12px 12px 0;
+const EthIdenticonStyled = styled(EthIdenticon)<{ isEdit: boolean }>`
+  border-radius: ${({ isEdit }) => (isEdit ? '0 12px 12px 0' : '8px 0 0 8px')};
   padding: 0;
 `;
 
@@ -60,20 +71,18 @@ export function AddressFieldInput({
 }: Props) {
   const loadableContent = (
     <AddressWrapperStyled isEdit={isEdit} wide={wide}>
-      {isEdit ? (
-        <TextInputStyled
-          wide={wide}
-          id={id}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          adornment={<EthIdenticonStyled address={value} scale={1.66} />}
-          adornmentPosition="end"
-          adornmentSettings={{ padding: 0, width: 36 }}
-        />
-      ) : (
-        <AddressField address={value} wide={wide} autofocus={false} />
-      )}
+      <TextInputStyled
+        isEdit={isEdit}
+        wide={wide}
+        id={id}
+        value={value}
+        disabled={!isEdit}
+        onChange={onChange}
+        onBlur={onBlur}
+        adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
+        adornmentPosition={isEdit ? 'end' : 'start'}
+        adornmentSettings={{ padding: 0, width: 36 }}
+      />
     </AddressWrapperStyled>
   );
   return (

@@ -1,6 +1,6 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect, useHistory, useLocation } from 'react-router-dom';
 import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -21,15 +21,13 @@ import ClaimList from './claim-list';
 import { processQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
+import { ConditionalWrapper } from './utils/util';
 
 // #region StyledComponents
 
-const TitleLinkStyled = styled(Link)`
-  font-weight: 100;
-`;
-
-const LinkStyled = styled(Link)`
-  font-weight: 100;
+const ClickableDivStyled = styled.div`
+  text-decoration: none;
+  width: 100%;
 `;
 
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
@@ -42,6 +40,14 @@ const CardStyled = styled(Card)<{ isSummary: boolean }>`
   width: 100%;
   height: fit-content;
   min-height: 250px;
+  ${({ isSummary }) =>
+    isSummary &&
+    css`
+      &:hover {
+        box-shadow: 0px 0px 16px 4px rgba(247, 247, 206, 0.25);
+      }
+      cursor: pointer;
+    `}
 `;
 
 const QuestFooterStyled = styled.div`
@@ -99,7 +105,7 @@ export default function Quest({
   const { below } = useViewport();
 
   let isSubscribed = true;
-
+  const history = useHistory();
   useEffect(() => {
     if (!isSummary) {
       // Don't show deposit of expired
@@ -164,17 +170,6 @@ export default function Quest({
     }, 500);
   };
 
-  const titleInput = (
-    <TextFieldInput
-      id="title"
-      isLoading={isLoading || !questData}
-      placeHolder="Quest title"
-      value={questData?.title}
-      fontSize="24px"
-      tooltip="Title should resume the Quest and be short and clear."
-    />
-  );
-
   const fieldsRow = (
     <RowStyled>
       <AddressFieldInput
@@ -215,89 +210,96 @@ export default function Quest({
 
   return (
     <CardWrapperStyed compact={below('medium')}>
-      <CardStyled style={css} isSummary={isSummary} id={questData?.address}>
-        <ContentWrapperStyled compact={below('medium')}>
-          <StateTag state={questData?.state ?? ''} />
-          <RowStyled className="pb-0">
-            {isSummary ? (
-              <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
-                {titleInput}
-              </TitleLinkStyled>
-            ) : (
-              titleInput
-            )}
-            <BountyWrapperStyled>
-              <AmountFieldInput
-                id={`bounty-${questData?.address}`}
-                key={`bounty-${questData?.address}`}
-                compact
-                tagOnly
-                showUsd
-                value={questData?.bounty}
-                isLoading={isLoading || !bounty}
+      <CardStyled className="card" style={css} isSummary={isSummary} id={questData?.address}>
+        <ConditionalWrapper
+          condition={isSummary}
+          wrapper={(children) => (
+            <ClickableDivStyled
+              onClick={() => history.push(`/${ENUM_PAGES.Detail}?id=${questData?.address}`)}
+            >
+              {children}
+            </ClickableDivStyled>
+          )}
+        >
+          <ContentWrapperStyled compact={below('medium')}>
+            <StateTag state={questData?.state ?? ''} />
+            <RowStyled className="pb-0">
+              <TextFieldInput
+                id="title"
+                isLoading={isLoading || !questData}
+                placeHolder="Quest title"
+                value={questData?.title}
+                fontSize="24px"
+                tooltip="Title should resume the Quest and be short and clear."
               />
-            </BountyWrapperStyled>
-          </RowStyled>
+              <BountyWrapperStyled>
+                <AmountFieldInput
+                  id={`bounty-${questData?.address}`}
+                  key={`bounty-${questData?.address}`}
+                  compact
+                  tagOnly
+                  showUsd
+                  value={questData?.bounty}
+                  isLoading={isLoading || !bounty}
+                />
+              </BountyWrapperStyled>
+            </RowStyled>
 
-          {!isSummary && fieldsRow}
-          <TextFieldInput
-            id="description"
-            value={questData?.description}
-            isLoading={isLoading || !questData}
-            tooltip={
-              <>
-                <b>The quest description should include:</b>
-                <br />- Details about what the quest entails. <br />- What evidence must be
-                submitted by users claiming a reward for completing the quest. <br />- The payout
-                amount. This could be a constant amount for quests that payout multiple times, a
-                range with reference to what determines what amount, the contracts balance at time
-                of claim. <br />
-                ⚠️<i>The description should not include any sensitive information.</i>
-              </>
-            }
-            multiline
-            isMarkDown
-            maxLine={isSummary ? 5 : undefined}
-            ellipsis={
-              <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
-                Read more
-              </LinkStyled>
-            }
-          />
-          {isSummary && fieldsRow}
-        </ContentWrapperStyled>
-        {!isSummary && challengeDeposit && (
-          <ClaimList
-            newClaim={claimUpdated}
-            questData={questData}
-            questTotalBounty={bounty}
-            challengeDeposit={challengeDeposit}
-            isLoading={isLoading}
-          />
-        )}
-        {!isSummary && questData.address && walletAddress && bounty && (
-          <QuestFooterStyled>
-            {questData?.state === ENUM_QUEST_STATE.Active ? (
-              <>
-                <FundModal quest={questData} onClose={onFundModalClosed} />
-                {claimDeposit && (
-                  <ScheduleClaimModal
-                    questAddress={questData.address}
-                    questTotalBounty={bounty}
-                    claimDeposit={claimDeposit}
-                    onClose={onScheduleModalClosed}
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                {!!bounty?.parsedAmount && (
-                  <ReclaimFundsModal bounty={bounty} questData={questData} />
-                )}
-              </>
-            )}
-          </QuestFooterStyled>
-        )}
+            {!isSummary && fieldsRow}
+            <TextFieldInput
+              id="description"
+              value={questData?.description}
+              isLoading={isLoading || !questData}
+              tooltip={
+                <>
+                  <b>The quest description should include:</b>
+                  <br />- Details about what the quest entails. <br />- What evidence must be
+                  submitted by users claiming a reward for completing the quest. <br />- The payout
+                  amount. This could be a constant amount for quests that payout multiple times, a
+                  range with reference to what determines what amount, the contracts balance at time
+                  of claim. <br />
+                  ⚠️<i>The description should not include any sensitive information.</i>
+                </>
+              }
+              multiline
+              isMarkDown
+              maxLine={isSummary ? 5 : undefined}
+            />
+            {isSummary && fieldsRow}
+          </ContentWrapperStyled>
+          {!isSummary && challengeDeposit && (
+            <ClaimList
+              newClaim={claimUpdated}
+              questData={questData}
+              questTotalBounty={bounty}
+              challengeDeposit={challengeDeposit}
+              isLoading={isLoading}
+            />
+          )}
+          {!isSummary && questData.address && walletAddress && bounty && (
+            <QuestFooterStyled>
+              {questData?.state === ENUM_QUEST_STATE.Active ? (
+                <>
+                  <FundModal quest={questData} onClose={onFundModalClosed} />
+                  {claimDeposit && (
+                    <ScheduleClaimModal
+                      questAddress={questData.address}
+                      questTotalBounty={bounty}
+                      claimDeposit={claimDeposit}
+                      onClose={onScheduleModalClosed}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {!!bounty?.parsedAmount && (
+                    <ReclaimFundsModal bounty={bounty} questData={questData} />
+                  )}
+                </>
+              )}
+            </QuestFooterStyled>
+          )}
+        </ConditionalWrapper>
       </CardStyled>
     </CardWrapperStyed>
   );

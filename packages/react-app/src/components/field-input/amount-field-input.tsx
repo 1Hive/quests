@@ -118,7 +118,10 @@ const TokenAmountBadge = React.memo(
       }
       return temp;
     }, [token, amount, usdValue]);
-
+    const onBadgeClick = (event: Event) => {
+      copyCode(token.token, `${token.symbol} address copied to clipboard`);
+      event.stopPropagation();
+    };
     return (
       <TokenAmountButtonStyled
         className={className}
@@ -127,7 +130,10 @@ const TokenAmountBadge = React.memo(
         size="mini"
         label={label}
         title={`Copy : ${token.token}`}
-        onClick={() => copyCode(token.token, `${token.symbol} address copied to clipboard`)}
+        onClick={(e: Event) => {
+          onBadgeClick(e);
+          e.stopPropagation();
+        }}
       />
     );
   },
