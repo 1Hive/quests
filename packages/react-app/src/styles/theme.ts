@@ -50,6 +50,10 @@ export interface ThemeInterface {
    * The backgorund color for help buttons.
    */
   readonly help: string;
+  /**
+   * The font color for help buttons.
+   */
+  readonly helpContent: string;
 
   // -- SURFACES --
   /**

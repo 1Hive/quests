@@ -30,6 +30,7 @@ export const customDarkTheme = {
   accentContent: '#242424',
   // The backgorund color for help buttons.
   help: '#ebebd1',
+  helpContent: '#8d8d79',
 
   // -- SURFACES --
   // The background color used for surfaces.
