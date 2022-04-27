@@ -27,6 +27,7 @@ interface QuestInterface extends ethers.utils.Interface {
     "claims(uint256)": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
+    "questCreator()": FunctionFragment;
     "questDetailsRef()": FunctionFragment;
     "questTitle()": FunctionFragment;
     "recoverUnclaimedFunds()": FunctionFragment;
@@ -51,6 +52,10 @@ interface QuestInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "fundsRecoveryAddress",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "questCreator",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -79,6 +84,10 @@ interface QuestInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "expireTime", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "fundsRecoveryAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "questCreator",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -166,6 +175,10 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
+    questCreator(overrides?: CallOverrides): Promise<[string]>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<[string]>;
+
     questDetailsRef(overrides?: CallOverrides): Promise<[string]>;
 
     "questDetailsRef()"(overrides?: CallOverrides): Promise<[string]>;
@@ -234,6 +247,10 @@ export class Quest extends Contract {
   fundsRecoveryAddress(overrides?: CallOverrides): Promise<string>;
 
   "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
+
+  questCreator(overrides?: CallOverrides): Promise<string>;
+
+  "questCreator()"(overrides?: CallOverrides): Promise<string>;
 
   questDetailsRef(overrides?: CallOverrides): Promise<string>;
 
@@ -304,6 +321,10 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
+    questCreator(overrides?: CallOverrides): Promise<string>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<string>;
+
     questDetailsRef(overrides?: CallOverrides): Promise<string>;
 
     "questDetailsRef()"(overrides?: CallOverrides): Promise<string>;
@@ -360,6 +381,10 @@ export class Quest extends Contract {
     fundsRecoveryAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    questCreator(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     questDetailsRef(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -424,6 +449,10 @@ export class Quest extends Contract {
     "fundsRecoveryAddress()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    questCreator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     questDetailsRef(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

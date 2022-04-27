@@ -3,23 +3,23 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "./libraries/Deposit.sol";
+import "./libraries/Models.sol";
+import "./QuestFactory.sol";
 
 contract Quest {
     using SafeERC20 for IERC20;
+    using DepositLib for Models.Deposit;
 
-    struct Claim {
-        bytes evidence;
-        address player;
-        uint256 amount;
-    }
-
+    address public questCreator;
     string public questTitle;
     bytes public questDetailsRef;
     IERC20 public rewardToken;
     uint256 public expireTime;
     address public aragonGovernAddress;
     address payable public fundsRecoveryAddress;
-    Claim[] public claims;
+    Models.Claim[] public claims;
+    Models.Deposit deposit;
 
     event QuestClaimed(bytes evidence, address player, uint256 amount);
 
@@ -29,7 +29,9 @@ contract Quest {
         IERC20 _rewardToken,
         uint256 _expireTime,
         address _aragonGovernAddress,
-        address payable _fundsRecoveryAddress
+        address payable _fundsRecoveryAddress,
+        IERC20 _depositToken,
+        uint256 _depositAmount
     ) {
         questTitle = _questTitle;
         questDetailsRef = _questDetailsRef;
@@ -37,10 +39,19 @@ contract Quest {
         expireTime = _expireTime;
         aragonGovernAddress = _aragonGovernAddress;
         fundsRecoveryAddress = _fundsRecoveryAddress;
+        questCreator = msg.sender;
+        deposit = Models.Deposit(_depositToken, _depositAmount);
+
+        // Collect deposit from quest creator
+        deposit.collectFrom(questCreator);
     }
 
     function recoverUnclaimedFunds() external {
         require(block.timestamp > expireTime, "ERROR: Not expired");
+
+        // Restore deposit
+        deposit.releaseTo(questCreator);
+
         rewardToken.safeTransfer(
             fundsRecoveryAddress,
             rewardToken.balanceOf(address(this))
@@ -55,18 +66,20 @@ contract Quest {
     ) external {
         require(msg.sender == aragonGovernAddress, "ERROR: Sender not govern");
         require(_evidence.length != 0, "ERROR: No evidence");
+
         if (_claimAll) {
-            rewardToken.safeTransfer(
-                _player,
-                rewardToken.balanceOf(address(this))
-            );
+            _amount = rewardToken.balanceOf(address(this));
+            
         }
-        //This way the user won't need to trigger a useless safeTransfer call
-        else if (_amount > 0) {
+
+        if(rewardToken)
+
+        // This way the user won't need to trigger a useless safeTransfer call
+        if (_amount > 0) {
             rewardToken.safeTransfer(_player, _amount);
         }
 
-        claims.push(Claim(_evidence, _player, _amount));
+        claims.push(Models.Claim(_evidence, _player, _amount));
 
         emit QuestClaimed(_evidence, _player, _amount);
     }
