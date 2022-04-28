@@ -1,4 +1,5 @@
 import { QuestCreated } from "../generated/QuestFactory/QuestFactory";
+import { QuestCreated as QuestCreatedV2 } from "../generated/QuestFactoryV2/QuestFactory";
 import { QuestEntity } from "../generated/schema";
 import { Bytes, ipfs } from "@graphprotocol/graph-ts";
 import { BigInt } from "@graphprotocol/graph-ts";
@@ -11,7 +12,6 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questDetailsRef = event.params.questDetailsRef;
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
-  questEntity.creationTimestamp = event.params.creationTime;
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = "";
@@ -66,7 +66,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   // - contract.aragonGovernAddress(...)
 }
 
-export function handleQuestCreatedV2(event: QuestCreated): void {
+export function handleQuestCreatedV2(event: QuestCreatedV2): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
 
   questEntity.questAddress = event.params.questAddress.toHexString();
@@ -74,6 +74,7 @@ export function handleQuestCreatedV2(event: QuestCreated): void {
   questEntity.questDetailsRef = event.params.questDetailsRef;
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
+  questEntity.creationTimestamp = event.params.creationTime;
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = "";
