@@ -33,7 +33,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const [fallbackAddress, setFallbackAddress] = useState<string | undefined>(
     questData.fallbackAddress,
   );
-  const { setTransaction } = useTransactionContext();
+  const { transaction, setTransaction } = useTransactionContext();
 
   const { walletAddress } = useWallet();
 
@@ -107,7 +107,9 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
             label="Reclaim funds"
-            disabled={!bounty.parsedAmount}
+            disabled={
+              !bounty.parsedAmount || transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed
+            }
             title={bounty.parsedAmount ? 'Reclaim funds' : 'No more funds'}
             mode="strong"
           />
