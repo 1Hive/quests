@@ -7,9 +7,15 @@ use(solidity);
 
 describe("[Contract] QuestFactory", function () {
   let owner;
+  let questFactoryContract;
 
   before(async function () {
     [owner] = await ethers.getSigners();
+  });
+
+  beforeEach(async function () {
+    await deployments.fixture(["TokenMock", "QuestFactory"]);
+    questFactoryContract = await ethers.getContract("QuestFactory");
   });
 
   it("should set the owner address correctly", async function () {
@@ -17,13 +23,6 @@ describe("[Contract] QuestFactory", function () {
   });
 
   describe("createQuest()", function () {
-    let questFactoryContract;
-
-    beforeEach(async function () {
-      await deployments.fixture(["TokenMock", "QuestFactory"]);
-      questFactoryContract = await ethers.getContract("QuestFactory");
-    });
-
     it("should emit QuestCreated", async function () {
       // Arrange
       const tokenContract = await deployments.get("TokenMock");
@@ -42,6 +41,29 @@ describe("[Contract] QuestFactory", function () {
           owner.address
         )
       ).to.emit(questFactoryContract, "QuestCreated");
+    });
+  });
+
+  describe("setDeposit()", function () {
+    it("when valid, should emit DepositChanged", () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+    it("when not ownner, should revert", () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+    it("when not IERC20, should revert", () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+    it("when creating a Quest, then change depoosit, Quest should have old deposit", () => {
+      // Arrange
+      // Act
+      // Assert
     });
   });
 });

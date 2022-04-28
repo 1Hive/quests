@@ -13,7 +13,9 @@ const deployQuest = async (
   expireTime: number,
   aragonGovernAddress: Address,
   fundsRecoveryAddress: Address,
-  initialBalance: number
+  initialBalance: number,
+  depositToken: string,
+  depositAmount: number
 ) => {
   const Quest = await ethers.getContractFactory("Quest");
   const quest = await Quest.deploy(
@@ -22,7 +24,9 @@ const deployQuest = async (
     rewardToken.address,
     expireTime,
     aragonGovernAddress,
-    fundsRecoveryAddress
+    fundsRecoveryAddress,
+    depositToken,
+    depositAmount
   );
   await quest.deployed();
   await rewardToken.mint(quest.address, initialBalance);

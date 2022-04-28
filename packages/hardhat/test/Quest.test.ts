@@ -8,6 +8,7 @@ use(solidity);
 
 describe("[Contract] Quest", function () {
   const epoch0 = 0; // Set expireTime to Unix Epoch 0
+  const depositAmount = 1;
 
   let govern;
   let player;
@@ -15,6 +16,17 @@ describe("[Contract] Quest", function () {
 
   beforeEach(async function () {
     [govern, player, founder] = await ethers.getSigners();
+  });
+
+  it("when create, should collect deposit", () => {
+    // Arrange
+    // Act
+    // Assert
+  });
+  it("when create and creator aproved funds not enough, should revert", () => {
+    // Arrange
+    // Act
+    // Assert
   });
 
   describe("recoverUnclaimedFunds()", function () {
@@ -35,7 +47,9 @@ describe("[Contract] Quest", function () {
         epoch0,
         govern.address,
         founder.address,
-        questFunds
+        questFunds,
+        rewardToken.address,
+        depositAmount
       );
 
       // Act
@@ -55,7 +69,9 @@ describe("[Contract] Quest", function () {
         getNowAsUnixEpoch(),
         govern.address,
         founder.address,
-        questFunds
+        questFunds,
+        rewardToken.address,
+        depositAmount
       );
 
       // Act
@@ -63,6 +79,11 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: Not expired");
+    });
+    it("when reclaimingFunds, should return deposit", () => {
+      // Arrange
+      // Act
+      // Assert
     });
   });
 
@@ -86,7 +107,9 @@ describe("[Contract] Quest", function () {
           epoch0,
           govern.address,
           founder.address,
-          questFunds
+          questFunds,
+          rewardToken.address,
+          depositAmount
         );
 
         // Act
@@ -115,7 +138,9 @@ describe("[Contract] Quest", function () {
           epoch0,
           govern.address,
           founder.address,
-          questFunds
+          questFunds,
+          rewardToken.address,
+          depositAmount
         );
 
         // Act
@@ -142,7 +167,9 @@ describe("[Contract] Quest", function () {
           epoch0,
           govern.address,
           founder.address,
-          questFunds
+          questFunds,
+          rewardToken.address,
+          depositAmount
         );
 
         // Act
@@ -166,7 +193,9 @@ describe("[Contract] Quest", function () {
           epoch0,
           govern.address,
           founder.address,
-          questFunds
+          questFunds,
+          rewardToken.address,
+          depositAmount
         );
 
         // Act
@@ -190,7 +219,9 @@ describe("[Contract] Quest", function () {
           epoch0,
           govern.address,
           founder.address,
-          questFunds
+          questFunds,
+          rewardToken.address,
+          depositAmount
         );
 
         // Act
@@ -212,7 +243,9 @@ describe("[Contract] Quest", function () {
         epoch0,
         govern.address,
         founder.address,
-        0
+        0,
+        rewardToken.address,
+        depositAmount
       );
 
       // Act
@@ -223,6 +256,12 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: Sender not govern");
+    });
+
+    it("when deposit and rewardToken the same, should let the deposit", () => {
+      // Arrange
+      // Act
+      // Assert
     });
   });
 });
