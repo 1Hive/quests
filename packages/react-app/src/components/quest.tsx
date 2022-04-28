@@ -101,9 +101,19 @@ export default function Quest({
   const { transaction } = useTransactionContext();
 
   useEffect(() => {
-    transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction?.transactionType === 'QuestReclaimFunds' &&
+    if (
+      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction?.transactionType === 'QuestReclaimFunds'
+    ) {
       setBounty(null);
+      setTimeout(() => {
+        if (questData.address && questData.rewardToken) {
+          fetchBalanceOfQuest(questData.address, questData.rewardToken);
+          setClaimUpdate(claimUpdated + 1);
+        }
+      }, 500);
+    }
+    setBounty(null);
   }, [transaction]);
 
   let isSubscribed = true;
