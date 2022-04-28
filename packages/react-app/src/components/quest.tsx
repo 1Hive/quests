@@ -101,7 +101,9 @@ export default function Quest({
   const { transaction } = useTransactionContext();
 
   useEffect(() => {
-    transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed && setBounty(null);
+    transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction?.transactionType === 'QuestReclaimFunds' &&
+      setBounty(null);
   }, [transaction]);
 
   let isSubscribed = true;

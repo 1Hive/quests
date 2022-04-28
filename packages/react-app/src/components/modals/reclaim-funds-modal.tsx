@@ -64,6 +64,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
                 ...oldTx,
                 hash: txHash,
                 status: ENUM_TRANSACTION_STATUS.Pending,
+                transactionType: 'QuestReclaimFunds',
               },
           );
         },
@@ -75,6 +76,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             status: txReceipt?.status
               ? ENUM_TRANSACTION_STATUS.Confirmed
               : ENUM_TRANSACTION_STATUS.Failed,
+            transactionType: 'QuestReclaimFunds',
           },
       );
       if (!txReceipt?.status) throw new Error('Failed to reclaim funds');
@@ -84,6 +86,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           oldTx && {
             ...oldTx,
             status: ENUM_TRANSACTION_STATUS.Failed,
+            transactionType: 'QuestReclaimFunds',
             message: computeTransactionErrorMessage(e),
           },
       );

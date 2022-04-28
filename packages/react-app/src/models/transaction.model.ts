@@ -10,4 +10,13 @@ export class TransactionModel {
   status?: string;
 
   progress?: number;
+
+  transactionType?:
+    | 'QuestCreate'
+    | 'QuestFund'
+    | 'QuestReclaimFunds'
+    | 'ClaimSchedule'
+    | 'ClaimExecute'
+    | 'ClaimChallenge'
+    | 'ClaimChallengeResolve';
 }
