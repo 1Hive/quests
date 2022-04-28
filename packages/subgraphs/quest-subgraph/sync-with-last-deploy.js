@@ -1,14 +1,20 @@
-const network = process.argv.slice(2)[0];
-console.log(network);
+const network = process.argv.slice(2)[0]; //network
+const versionNumber = process.argv.slice(2)[1]; //num version
+
 const QuestFactory = require(`../../hardhat/deployments/${network}/QuestFactory.json`);
 const ConfigJson = require(`./config/${network}.json`);
 const yaml = require("js-yaml");
 const fs = require("fs");
 
+let includeVersionNumber = ''
+if (versionNumber){
+  includeVersionNumber = `${versionNumber}`
+}
+
 try {
   fs.writeFileSync(
-    "./abis/QuestFactory.json",
-    JSON.stringify(QuestFactory.abi)
+    `./abis/QuestFactory${includeVersionNumber}.json`,
+    JSON.stringify(QuestFactory.abi, undefined, 4)
   );
   //file written successfully
 } catch (err) {

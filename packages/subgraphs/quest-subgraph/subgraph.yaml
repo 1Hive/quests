@@ -1,14 +1,18 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
+features:
+  - fullTextSearch
+  - nonFatalErrors
+  - ipfsOnEthereumContracts
 schema:
   file: ./src/schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: QuestFactory
-    network: rinkeby
+    network: localhost
     source:
-      address: "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01"
+      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
       abi: QuestFactory
-      startBlock: 9936882
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -17,8 +21,9 @@ dataSources:
         - QuestCreated
       abis:
         - name: QuestFactory
-          file: ./abis/QuestFactory.json
+          file: ./abis/QuestFactoryV2.json
       eventHandlers:
         - event: QuestCreated(address,string,bytes,address,uint256,uint256)
           handler: handleQuestCreated
       file: ./src/mapping.ts
+

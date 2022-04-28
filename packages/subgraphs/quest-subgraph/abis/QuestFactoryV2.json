@@ -42,6 +42,12 @@
                 "internalType": "uint256",
                 "name": "expireTime",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "creationTime",
+                "type": "uint256"
             }
         ],
         "name": "QuestCreated",
@@ -89,7 +95,13 @@
             }
         ],
         "name": "createQuest",
-        "outputs": [],
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
         "stateMutability": "nonpayable",
         "type": "function"
     }
