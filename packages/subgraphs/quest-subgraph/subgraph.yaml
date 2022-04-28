@@ -20,10 +20,14 @@ dataSources:
       entities:
         - QuestCreated
       abis:
-        - name: QuestFactory
-          file: ./abis/QuestFactoryV2.json
+      - name: QuestFactory
+        file: ./abis/QuestFactory.json
+      - name: QuestFactory
+        file: ./abis/QuestFactoryV2.json
       eventHandlers:
         - event: QuestCreated(address,string,bytes,address,uint256,uint256)
+          handler: handleQuestCreatedV2
+        - event: QuestCreated(address,string,bytes,address,uint256)
           handler: handleQuestCreated
       file: ./src/mapping.ts
 
