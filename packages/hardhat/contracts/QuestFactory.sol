@@ -39,7 +39,7 @@ contract QuestFactory is Ownable {
 
     function setDeposit(IERC20 token, uint256 amount) public onlyOwner {
         deposit = Models.Deposit(token, amount);
-        emit DepositChanged(now, address(token), amount);
+        emit DepositChanged(block.timestamp, address(token), amount);
     }
 
     function createQuest(
@@ -70,7 +70,7 @@ contract QuestFactory is Ownable {
             _questDetailsRef,
             address(_rewardToken),
             _expireTime,
-            now,
+            block.timestamp,
             address(deposit.token),
             deposit.amount
         );

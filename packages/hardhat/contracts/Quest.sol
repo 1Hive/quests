@@ -48,7 +48,7 @@ contract Quest {
     }
 
     function recoverUnclaimedFunds() external {
-        require(now > expireTime, "ERROR: Not expired");
+        require(block.timestamp > expireTime, "ERROR: Not expired");
 
         // Restore deposit
         deposit.releaseTo(questCreator);
