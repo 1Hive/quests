@@ -16,8 +16,11 @@ library DepositLib {
         internal
     {
         if (_collateral.amount > 0) {
-            IERC20 token = IERC20(_collateral.token);
-            token.safeTransferFrom(_from, address(this), _collateral.amount);
+            _collateral.token.safeTransferFrom(
+                _from,
+                address(this),
+                _collateral.amount
+            );
             emit Lock(address(_collateral.token), _from, _collateral.amount);
         }
     }
@@ -26,8 +29,7 @@ library DepositLib {
         internal
     {
         if (_collateral.amount > 0) {
-            IERC20 token = IERC20(_collateral.token);
-            token.safeTransfer(_to, _collateral.amount);
+            _collateral.token.safeTransfer(_to, _collateral.amount);
             emit Unlock(address(_collateral.token), _to, _collateral.amount);
         }
     }
