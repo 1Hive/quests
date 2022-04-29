@@ -21,7 +21,7 @@ services:
       # ethereum: "localhost:http://host.docker.internal:8545"
       ethereum: "rinkeby:https://rinkeby.infura.io/v3/ba8a73e283eb4b9eafd25f5fdbfc1717"
       GRAPH_LOG: info
-      GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: true
+      GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: true
   ipfs:
     image: ipfs/go-ipfs:latest
     ports:
