@@ -90,6 +90,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
         message: 'Sending claimed amount to your wallet',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        transactionType: 'ClaimExecute',
       });
       const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
         setTransaction(

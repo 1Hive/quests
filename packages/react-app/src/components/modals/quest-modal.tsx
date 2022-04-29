@@ -162,6 +162,7 @@ export default function QuestModal({
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
           message: 'Creating Quest...',
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          transactionType: 'QuestCreate',
         });
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,
@@ -203,6 +204,7 @@ export default function QuestModal({
               estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
               message: 'Sending funds to Quest',
               status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+              transactionType: 'QuestCreate',
             });
             const txReceiptFundQuest = await QuestService.fundQuest(
               walletAddress,

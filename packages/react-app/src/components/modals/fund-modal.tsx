@@ -58,6 +58,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         estimatedDuration: ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
         message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        transactionType: 'QuestFund',
       });
       const txReceipt = await QuestService.fundQuest(
         walletAddress,

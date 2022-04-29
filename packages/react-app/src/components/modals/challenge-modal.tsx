@@ -125,6 +125,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
             message: `Approving challenge fee (1/3)`,
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+            transactionType: 'ClaimChallenge',
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
             walletAddress,
@@ -170,6 +171,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               ? 'Approving challenge fee + deposit (1/2)'
               : 'Approving challenge deposit  (2/3)',
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+            transactionType: 'ClaimChallenge',
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
             walletAddress,
@@ -204,6 +206,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          transactionType: 'ClaimChallenge',
         });
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
