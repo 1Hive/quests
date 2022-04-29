@@ -25,6 +25,7 @@ interface QuestInterface extends ethers.utils.Interface {
     "aragonGovernAddress()": FunctionFragment;
     "claim(bytes,address,uint256,bool)": FunctionFragment;
     "claims(uint256)": FunctionFragment;
+    "deposit()": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
     "questCreator()": FunctionFragment;
@@ -46,6 +47,7 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "claims",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "deposit", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "expireTime",
     values?: undefined
@@ -81,6 +83,7 @@ interface QuestInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claims", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "expireTime", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "fundsRecoveryAddress",
@@ -167,6 +170,14 @@ export class Quest extends Contract {
       }
     >;
 
+    deposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "deposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
     expireTime(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "expireTime()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -239,6 +250,14 @@ export class Quest extends Contract {
       amount: BigNumber;
     }
   >;
+
+  deposit(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+  "deposit()"(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
   expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -313,6 +332,14 @@ export class Quest extends Contract {
       }
     >;
 
+    deposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "deposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
     expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
     "expireTime()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -373,6 +400,10 @@ export class Quest extends Contract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    deposit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "deposit()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -437,6 +468,10 @@ export class Quest extends Contract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    deposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "deposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     expireTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

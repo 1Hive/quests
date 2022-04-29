@@ -19,7 +19,7 @@ contract Quest {
     address public aragonGovernAddress;
     address payable public fundsRecoveryAddress;
     Models.Claim[] public claims;
-    Models.Deposit deposit;
+    Models.Deposit public deposit;
 
     event QuestClaimed(bytes evidence, address player, uint256 amount);
 
@@ -31,7 +31,8 @@ contract Quest {
         address _aragonGovernAddress,
         address payable _fundsRecoveryAddress,
         IERC20 _depositToken,
-        uint256 _depositAmount
+        uint256 _depositAmount,
+        address _questCreator
     ) {
         questTitle = _questTitle;
         questDetailsRef = _questDetailsRef;
@@ -39,11 +40,8 @@ contract Quest {
         expireTime = _expireTime;
         aragonGovernAddress = _aragonGovernAddress;
         fundsRecoveryAddress = _fundsRecoveryAddress;
-        questCreator = msg.sender;
+        questCreator = _questCreator;
         deposit = Models.Deposit(_depositToken, _depositAmount);
-
-        // Collect deposit from quest creator
-        deposit.collectFrom(questCreator);
     }
 
     function recoverUnclaimedFunds() external {
@@ -66,13 +64,23 @@ contract Quest {
     ) external {
         require(msg.sender == aragonGovernAddress, "ERROR: Sender not govern");
         require(_evidence.length != 0, "ERROR: No evidence");
+        uint256 balance = rewardToken.balanceOf(address(this));
 
         if (_claimAll) {
-            _amount = rewardToken.balanceOf(address(this));
-            
+            // Claim all but let deposit if they are same token
+            if (rewardToken == deposit.token) {
+                _amount = balance - deposit.amount;
+            } else {
+                _amount = balance;
+            }
         }
 
-        if(rewardToken)
+        if (rewardToken == deposit.token) {
+            require(
+                balance - _amount >= deposit.amount,
+                "ERROR: Should not exceed allowed bounty"
+            );
+        }
 
         // This way the user won't need to trigger a useless safeTransfer call
         if (_amount > 0) {

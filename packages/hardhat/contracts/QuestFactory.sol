@@ -4,11 +4,14 @@ pragma solidity ^0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./Quest.sol";
+import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
+import "hardhat/console.sol";
+import "./Quest.sol";
 
 contract QuestFactory is Ownable {
     using SafeERC20 for IERC20;
+    using DepositLib for Models.Deposit;
 
     address public aragonGovernAddress;
     Models.Deposit public deposit;
@@ -21,7 +24,7 @@ contract QuestFactory is Ownable {
         uint256 expireTime,
         uint256 creationTime,
         address depositToken,
-        address depositAmount
+        uint256 depositAmount
     );
 
     event DepositChanged(uint256 timestamp, address token, uint256 amount);
@@ -55,8 +58,13 @@ contract QuestFactory is Ownable {
             aragonGovernAddress,
             _fundsRecoveryAddress,
             deposit.token,
-            deposit.amount
+            deposit.amount,
+            msg.sender
         );
+        // Collect deposit from quest creator
+        deposit.collectFrom(msg.sender);
+        // Transfer deposit to quest, so when reclaiming funds, the quest can release deposit to the creator
+        deposit.releaseTo(address(quest));
         emit QuestCreated(
             address(quest),
             _questTitle,
@@ -64,9 +72,12 @@ contract QuestFactory is Ownable {
             address(_rewardToken),
             _expireTime,
             block.timestamp,
-            deposit.token,
+            address(deposit.token),
             deposit.amount
         );
+
+        console.log(address(quest));
+
         return address(quest);
     }
 }
