@@ -293,12 +293,12 @@ export default function Quest({
             isLoading={isLoading}
           />
         )}
-        {!isSummary && questData.address && walletAddress && bounty && (
+        {!isSummary && questData.address && walletAddress && (
           <QuestFooterStyled>
             {questData?.state === ENUM_QUEST_STATE.Active ? (
               <>
                 <FundModal quest={questData} onClose={onFundModalClosed} />
-                {claimDeposit && (
+                {claimDeposit && bounty && (
                   <ScheduleClaimModal
                     questAddress={questData.address}
                     questTotalBounty={bounty}
