@@ -85,7 +85,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           oldTx && {
             ...oldTx,
             status: ENUM_TRANSACTION_STATUS.Failed,
-            transactionType: 'QuestReclaimFunds',
             message: computeTransactionErrorMessage(e),
           },
       );
@@ -109,9 +108,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
             label="Reclaim funds"
-            disabled={
-              !bounty.parsedAmount || transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed
-            }
             title={bounty.parsedAmount ? 'Reclaim funds' : 'No more funds'}
             mode="strong"
           />

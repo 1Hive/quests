@@ -113,7 +113,6 @@ export default function Quest({
         }
       }, 500);
     }
-    setBounty(null);
   }, [transaction]);
 
   let isSubscribed = true;
@@ -171,15 +170,6 @@ export default function Quest({
     if (success) {
       setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
     }
-  };
-
-  const onFundModalClosed = (success: boolean) => {
-    setTimeout(() => {
-      if (success && questData.address && questData.rewardToken) {
-        fetchBalanceOfQuest(questData.address, questData.rewardToken);
-        setClaimUpdate(claimUpdated + 1);
-      }
-    }, 500);
   };
 
   const titleInput = (
@@ -297,7 +287,7 @@ export default function Quest({
           <QuestFooterStyled>
             {questData?.state === ENUM_QUEST_STATE.Active ? (
               <>
-                <FundModal quest={questData} onClose={onFundModalClosed} />
+                <FundModal quest={questData} />
                 {claimDeposit && bounty && (
                   <ScheduleClaimModal
                     questAddress={questData.address}

@@ -1,16 +1,10 @@
-export class TransactionModel {
+export type TransactionModel = {
   hash?: string;
-
-  id!: string;
-
+  id: string;
   message?: string;
-
   estimatedDuration?: number;
-
-  status?: string;
-
+  status: string;
   progress?: number;
-
   transactionType?:
     | 'QuestCreate'
     | 'QuestFund'
@@ -19,4 +13,4 @@ export class TransactionModel {
     | 'ClaimExecute'
     | 'ClaimChallenge'
     | 'ClaimChallengeResolve';
-}
+};
