@@ -5,7 +5,7 @@ export type TransactionModel = {
   estimatedDuration?: number;
   status: string;
   progress?: number;
-  transactionType?:
+  transactionType:
     | 'QuestCreate'
     | 'QuestFund'
     | 'QuestReclaimFunds'

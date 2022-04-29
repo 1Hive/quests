@@ -33,7 +33,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
   const [fallbackAddress, setFallbackAddress] = useState<string | undefined>(
     questData.fallbackAddress,
   );
-  const { transaction, setTransaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
 
   const { walletAddress } = useWallet();
 
