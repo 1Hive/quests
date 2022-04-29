@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
-import "hardhat/console.sol";
 import "./Quest.sol";
 
 contract QuestFactory is Ownable {
@@ -75,8 +74,6 @@ contract QuestFactory is Ownable {
             address(deposit.token),
             deposit.amount
         );
-
-        console.log(address(quest));
 
         return address(quest);
     }
