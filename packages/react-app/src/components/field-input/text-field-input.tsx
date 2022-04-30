@@ -47,6 +47,7 @@ type Props = {
   ellipsis?: ReactNode;
   tooltip?: React.ReactNode;
   disableLinks?: boolean;
+  showBlocks?: boolean;
 
   onBlur?: Function;
   error?: string | false;
@@ -72,6 +73,7 @@ export default function TextFieldInput({
   onBlur = noop,
   error,
   disableLinks = false,
+  showBlocks = false,
 }: Props) {
   const [isEditState, setIsEdit] = useState(isEdit);
 
@@ -101,7 +103,7 @@ export default function TextFieldInput({
                 component: CollapsableBlock,
                 props: {
                   label: 'block',
-                  visible: !maxLine,
+                  visible: showBlocks,
                 },
               },
               code: {
@@ -109,7 +111,7 @@ export default function TextFieldInput({
                 props: {
                   label: 'code block',
                   type: 'code',
-                  visible: !maxLine,
+                  visible: showBlocks,
                 },
               },
               img: {
@@ -117,7 +119,7 @@ export default function TextFieldInput({
                 props: {
                   label: 'image',
                   type: 'image',
-                  visible: !maxLine,
+                  visible: showBlocks,
                 },
               },
               a: {

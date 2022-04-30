@@ -263,6 +263,7 @@ export default function Quest({
             multiline
             isMarkDown
             disableLinks={isSummary}
+            showBlocks={!isSummary}
             maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
             ellipsis={
               <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
