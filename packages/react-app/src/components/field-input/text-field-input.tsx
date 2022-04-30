@@ -46,6 +46,7 @@ type Props = {
   isMarkDown?: boolean;
   ellipsis?: ReactNode;
   tooltip?: React.ReactNode;
+  disableLinks?: boolean;
 
   onBlur?: Function;
   error?: string | false;
@@ -70,6 +71,7 @@ export default function TextFieldInput({
   tooltip,
   onBlur = noop,
   error,
+  disableLinks = false,
 }: Props) {
   const [isEditState, setIsEdit] = useState(isEdit);
 
@@ -119,7 +121,7 @@ export default function TextFieldInput({
                 },
               },
               a: {
-                component: 'a',
+                component: disableLinks ? 'span' : 'a',
                 props: {
                   target: '_blank',
                   tabIndex: '-1',
