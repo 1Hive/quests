@@ -26,6 +26,10 @@ const BlockStyled = styled.div<{ wide?: boolean }>`
   ${({ wide }) => wide && 'width: 100%;'}
 `;
 
+const TextFieldWrapperStyled = styled.div<{ isSummary?: boolean }>`
+  max-height: ${({ isSummary }) => (isSummary ? '179px' : '')};
+`;
+
 // #endregion
 
 type Props = {
@@ -86,7 +90,7 @@ export default function TextFieldInput({
   };
 
   const readOnlyContent = (
-    <>
+    <TextFieldWrapperStyled isSummary={!showBlocks}>
       {isMarkDown ? (
         <Markdown
           normalized
@@ -135,7 +139,7 @@ export default function TextFieldInput({
       ) : (
         value
       )}
-    </>
+    </TextFieldWrapperStyled>
   );
   const loadableContent = isEditState ? (
     <BlockStyled wide={wide}>
