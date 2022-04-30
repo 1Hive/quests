@@ -158,19 +158,19 @@ export default function ClaimList({
                       label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
                       isLoading={isLoading || !claim.playerAddress}
                     />
-                    {claim.claimedAmount?.parsedAmount ? (
-                      <AmountFieldInput
-                        id="amount"
-                        label="Claimed amount"
-                        value={claim.claimedAmount}
-                      />
-                    ) : (
+                    {claim.claimAll ? (
                       <FieldInput
                         label="Claimed amount"
                         isLoading={isLoading || claim.state === ENUM_CLAIM_STATE.None}
                       >
                         All available
                       </FieldInput>
+                    ) : (
+                      <AmountFieldInput
+                        id="amount"
+                        label="Claimed amount"
+                        value={claim.claimedAmount}
+                      />
                     )}
                     {walletAddress && actionButton}
                   </ChildSpacer>

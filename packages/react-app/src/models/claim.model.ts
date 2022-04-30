@@ -7,6 +7,7 @@ export type ClaimModel = {
   claimedAmount: TokenAmountModel;
   evidence?: string;
   evidenceIpfsHash?: string;
+  claimAll?: boolean;
 
   // Only set when fetch
   executionTimeMs?: number;
