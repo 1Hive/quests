@@ -1,7 +1,7 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_STATE, MAX_LINE_DESCRIPTION } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from 'src/services/quest.service';
@@ -253,11 +253,16 @@ export default function Quest({
                 range with reference to what determines what amount, the contracts balance at time
                 of claim. <br />
                 ⚠️<i>The description should not include any sensitive information.</i>
+                <br />
+                ⚠️
+                <i>
+                  Only the first {MAX_LINE_DESCRIPTION} lines will be displayed in summary view.
+                </i>
               </>
             }
             multiline
             isMarkDown
-            maxLine={isSummary ? 5 : undefined}
+            maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
             ellipsis={
               <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
                 Read more

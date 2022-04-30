@@ -6,6 +6,7 @@ import {
   ENUM_QUEST_STATE,
   ENUM_QUEST_VIEW_MODE,
   ENUM_TRANSACTION_STATUS,
+  MAX_LINE_DESCRIPTION,
 } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
@@ -346,6 +347,12 @@ export default function QuestModal({
                           amount, the contracts balance at time of claim.
                           <br />
                           ⚠️<i>The description should not include any sensitive information.</i>
+                          <br />
+                          ⚠️
+                          <i>
+                            Only the first {MAX_LINE_DESCRIPTION} lines will be displayed in summary
+                            view.
+                          </i>
                         </>
                       }
                       onChange={handleChange}
