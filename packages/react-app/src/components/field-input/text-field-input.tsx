@@ -26,8 +26,9 @@ const BlockStyled = styled.div<{ wide?: boolean }>`
   ${({ wide }) => wide && 'width: 100%;'}
 `;
 
-const TextFieldWrapperStyled = styled.div<{ isSummary?: boolean }>`
-  max-height: ${({ isSummary }) => (isSummary ? '179px' : '')};
+const TextFieldWrapperStyled = styled.div<{ maxLine?: number }>`
+  ${({ maxLine }) => (maxLine ? `height: ${maxLine * 24}px;` : '')};
+  overflow: hidden;
 `;
 
 // #endregion
@@ -90,7 +91,7 @@ export default function TextFieldInput({
   };
 
   const readOnlyContent = (
-    <TextFieldWrapperStyled isSummary={!showBlocks}>
+    <TextFieldWrapperStyled maxLine={maxLine}>
       {isMarkDown ? (
         <Markdown
           normalized

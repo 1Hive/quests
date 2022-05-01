@@ -39,6 +39,11 @@ const InputStyled = styled.input<{
   }
 `;
 
+const DateStyled = styled.div`
+  font-family: Ubuntu Mono;
+  font-size: 1.1rem;
+`;
+
 // #endregion
 
 type Props = {
@@ -100,7 +105,7 @@ function DateFieldInput({
       isDarkTheme={isDarkTheme(theme)}
     />
   ) : (
-    <span>{value ? new Date(value).toDateString() : 'Not set'}</span>
+    <DateStyled>{value ? new Date(value).toDateString() : 'Not set'}</DateStyled>
   );
 
   return (

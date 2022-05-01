@@ -26,6 +26,15 @@ import { AddressFieldInput } from './field-input/address-field-input';
 
 const TitleLinkStyled = styled(Link)`
   font-weight: 100;
+  width: 100%;
+
+  div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 `;
 
 const LinkStyled = styled(Link)`
@@ -240,26 +249,11 @@ export default function Quest({
           </RowStyled>
 
           {!isSummary && fieldsRow}
+
           <TextFieldInput
             id="description"
             value={questData?.description}
             isLoading={isLoading || !questData}
-            tooltip={
-              <>
-                <b>The quest description should include:</b>
-                <br />- Details about what the quest entails. <br />- What evidence must be
-                submitted by users claiming a reward for completing the quest. <br />- The payout
-                amount. This could be a constant amount for quests that payout multiple times, a
-                range with reference to what determines what amount, the contracts balance at time
-                of claim. <br />
-                ⚠️<i>The description should not include any sensitive information.</i>
-                <br />
-                ⚠️
-                <i>
-                  Only the first {MAX_LINE_DESCRIPTION} lines will be displayed in summary view.
-                </i>
-              </>
-            }
             multiline
             isMarkDown
             disableLinks={isSummary}
