@@ -4,11 +4,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
-import { ENUM_PAGES, QUESTS_PAGE_SIZE, DEFAULT_FILTER } from 'src/constants';
+import {
+  ENUM_PAGES,
+  QUESTS_PAGE_SIZE,
+  DEFAULT_FILTER,
+  ENUM_TRANSACTION_STATUS,
+} from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useQuestsContext } from 'src/contexts/quests.context';
 import styled from 'styled-components';
 import Piggy from 'src/assets/piggy';
@@ -62,8 +68,19 @@ export default function QuestList() {
   const { newQuest } = useQuestsContext();
   const { currentTheme } = useThemeContext();
   const { below } = useViewport();
+  const { transaction } = useTransactionContext();
 
   const { setPage } = usePageContext();
+
+  useEffect(() => {
+    if (
+      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction?.transactionType === 'QuestCreate'
+    ) {
+      debounceRefresh();
+    }
+    return () => debounceRefresh.cancel();
+  }, [transaction]);
 
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
