@@ -1,7 +1,12 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ENUM_PAGES, ENUM_QUEST_STATE, MAX_LINE_DESCRIPTION } from 'src/constants';
+import {
+  ENUM_PAGES,
+  ENUM_QUEST_STATE,
+  ENUM_TRANSACTION_STATUS,
+  MAX_LINE_DESCRIPTION,
+} from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from 'src/services/quest.service';
@@ -11,6 +16,7 @@ import { GUpx } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -26,7 +32,7 @@ import { AddressFieldInput } from './field-input/address-field-input';
 
 const TitleLinkStyled = styled(Link)`
   font-weight: 100;
-  width: 100%;
+  max-width: 100%;
 
   div {
     text-overflow: ellipsis;
@@ -43,14 +49,14 @@ const LinkStyled = styled(Link)`
 
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => GUpx(compact ? 1 : 2)};
+  height: 100%;
 `;
 
 const CardStyled = styled(Card)<{ isSummary: boolean }>`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  height: fit-content;
-  min-height: 250px;
+  height: 100%;
 `;
 
 const QuestFooterStyled = styled.div`
@@ -73,7 +79,8 @@ const RowStyled = styled.div`
 const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => (compact ? GUpx(2) : GUpx(3))};
   width: 100%;
-  min-height: 225px;
+  height: 100%;
+  min-height: 340px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -102,10 +109,29 @@ export default function Quest({
 }: Props) {
   const { walletAddress } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
-  const [claimUpdated, setClaimUpdate] = useState(0);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const { below } = useViewport();
+  const { transaction } = useTransactionContext();
+
+  useEffect(() => {
+    // If tx completion impact Quest bounty, update it
+    if (
+      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction.questAddress === questData.address &&
+      (transaction?.type === 'ClaimChallengeResolve' ||
+        transaction?.type === 'ClaimExecute' ||
+        transaction?.type === 'QuestFund' ||
+        transaction?.type === 'QuestReclaimFunds')
+    ) {
+      setBounty(null);
+      setTimeout(() => {
+        if (questData.address && questData.rewardToken) {
+          fetchBalanceOfQuest(questData.address, questData.rewardToken);
+        }
+      }, 500);
+    }
+  }, [transaction?.type, transaction?.status, transaction?.questAddress]);
 
   let isSubscribed = true;
 
@@ -156,21 +182,6 @@ export default function Quest({
         Logger.exception(err);
         setBounty(undefined);
       });
-  };
-
-  const onScheduleModalClosed = (success: boolean) => {
-    if (success) {
-      setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
-    }
-  };
-
-  const onFundModalClosed = (success: boolean) => {
-    setTimeout(() => {
-      if (success && questData.address && questData.rewardToken) {
-        fetchBalanceOfQuest(questData.address, questData.rewardToken);
-        setClaimUpdate(claimUpdated + 1);
-      }
-    }, 500);
   };
 
   const titleInput = (
@@ -269,24 +280,22 @@ export default function Quest({
         </ContentWrapperStyled>
         {!isSummary && challengeDeposit && (
           <ClaimList
-            newClaim={claimUpdated}
             questData={questData}
             questTotalBounty={bounty}
             challengeDeposit={challengeDeposit}
             isLoading={isLoading}
           />
         )}
-        {!isSummary && questData.address && walletAddress && bounty && (
+        {!isSummary && questData.address && walletAddress && (
           <QuestFooterStyled>
             {questData?.state === ENUM_QUEST_STATE.Active ? (
               <>
-                <FundModal quest={questData} onClose={onFundModalClosed} />
-                {claimDeposit && (
+                <FundModal quest={questData} />
+                {claimDeposit && bounty && (
                   <ScheduleClaimModal
                     questAddress={questData.address}
                     questTotalBounty={bounty}
                     claimDeposit={claimDeposit}
-                    onClose={onScheduleModalClosed}
                   />
                 )}
               </>

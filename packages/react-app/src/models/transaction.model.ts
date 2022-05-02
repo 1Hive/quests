@@ -1,13 +1,19 @@
-export class TransactionModel {
+export type TransactionModel = {
   hash?: string;
-
-  id!: string;
-
+  id: string;
   message?: string;
-
   estimatedDuration?: number;
-
-  status?: string;
-
+  status: string;
   progress?: number;
-}
+  questAddress?: string;
+  args?: any[];
+  type:
+    | 'TokenApproval'
+    | 'QuestCreate'
+    | 'QuestFund'
+    | 'QuestReclaimFunds'
+    | 'ClaimSchedule'
+    | 'ClaimExecute'
+    | 'ClaimChallenge'
+    | 'ClaimChallengeResolve';
+};

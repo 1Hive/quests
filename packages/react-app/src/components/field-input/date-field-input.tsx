@@ -40,8 +40,7 @@ const InputStyled = styled.input<{
 `;
 
 const DateStyled = styled.div`
-  font-family: Ubuntu Mono;
-  font-size: 1.1rem;
+  min-width: 130px;
 `;
 
 // #endregion

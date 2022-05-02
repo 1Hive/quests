@@ -125,6 +125,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
             message: `Approving challenge fee (1/3)`,
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+            type: 'TokenApproval',
+            questAddress: claim.questAddress,
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
             walletAddress,
@@ -165,11 +167,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           }
           setTransaction({
             id: uniqueId(),
-            estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
+            estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
             message: isFeeDepositSameToken
               ? 'Approving challenge fee + deposit (1/2)'
               : 'Approving challenge deposit  (2/3)',
             status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+            type: 'TokenApproval',
+            questAddress: claim.questAddress,
           });
           const approveTxReceipt = await QuestService.approveTokenAmount(
             walletAddress,
@@ -201,9 +205,12 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         if (!claim.container) throw new Error('Container is not defined');
         setTransaction({
           id: uniqueId(),
-          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          type: 'ClaimChallenge',
+          questAddress: claim.questAddress,
+          args: [claim.container.id],
         });
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
@@ -291,6 +298,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               : challengeDeposit
           }
           setIsEnoughBalance={setIsEnoughBalance}
+          isLoading={loading}
         />,
         challengeFee && !isFeeDepositSameToken && (
           <WalletBallance

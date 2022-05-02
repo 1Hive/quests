@@ -4,17 +4,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
-import { ENUM_PAGES, QUESTS_PAGE_SIZE, DEFAULT_FILTER } from 'src/constants';
+import {
+  ENUM_PAGES,
+  QUESTS_PAGE_SIZE,
+  DEFAULT_FILTER,
+  ENUM_TRANSACTION_STATUS,
+} from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import * as QuestService from 'src/services/quest.service';
-import { useQuestsContext } from 'src/contexts/quests.context';
 import styled from 'styled-components';
 import Piggy from 'src/assets/piggy';
 import { GUpx } from 'src/utils/style.util';
 import { useThemeContext } from 'src/contexts/theme.context';
 import { ThemeInterface } from 'src/styles/theme';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -61,15 +66,22 @@ const QuestWrapperStyled = styled.div<{
   width: ${({ singleColumn }) => (singleColumn ? '100%' : '50%')};
 `;
 
+const ScrollLabelStyled = styled.div`
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  padding: ${GUpx(2)};
+`;
+
 export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [newQuestLoading, setNewQuestLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const { filter, refreshed, setFilter } = useFilterContext();
-  const { newQuest } = useQuestsContext();
   const { currentTheme } = useThemeContext();
   const { below } = useViewport();
-
+  const { transaction } = useTransactionContext();
   const { setPage } = usePageContext();
 
   const skeletonQuests: any[] = useMemo(() => {
@@ -98,11 +110,31 @@ export default function QuestList() {
 
   useEffect(() => {
     // Should not be nullish and not already exist in list
-    if (newQuest && !quests.find((x) => x.address === newQuest.address)) {
+    if (
+      transaction?.type === 'QuestCreate' &&
+      transaction.status === ENUM_TRANSACTION_STATUS.Confirmed
+    ) {
       // Insert the newQuest at the top of the list
-      setQuests([newQuest, ...quests]);
+      const { questAddress } = transaction;
+      if (questAddress) {
+        // Wait for subgraph to index the new quest
+        setNewQuestLoading(true);
+        fetchQuestUntilNew(questAddress);
+      }
     }
-  }, [newQuest]);
+  }, [transaction?.status, transaction?.type]);
+
+  const fetchQuestUntilNew = (newQuestAddress: string) => {
+    setTimeout(async () => {
+      const newQuest = await QuestService.fetchQuest(newQuestAddress);
+      if (newQuest) {
+        setQuests([newQuest, ...quests]);
+        setNewQuestLoading(false);
+      } else {
+        fetchQuestUntilNew(newQuestAddress);
+      }
+    }, 1000);
+  };
 
   const debounceRefresh = useCallback(
     debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),
@@ -140,15 +172,13 @@ export default function QuestList() {
         <Filter />
       </FilterWrapperStyled>
       <InfiniteScroll
-        loader={<></>}
+        loader={<ScrollLabelStyled>{!isLoading && <>Scroll to load more</>}</ScrollLabelStyled>}
         dataLength={quests.length}
         next={loadMore}
         hasMore={hasMore}
         endMessage={
           quests.length ? (
-            <Outset gu16 className="center">
-              <b>No more quests found</b>
-            </Outset>
+            <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
             <Outset gu64 className="flex-center wide">
               <EmptyStateCardStyled
@@ -167,6 +197,7 @@ export default function QuestList() {
         scrollThreshold="120px"
       >
         <FlexContainerStyled>
+          {newQuestLoading && skeletonQuests[0]}
           {quests.map((questData: QuestModel) => (
             <QuestWrapperStyled singleColumn={below('medium')}>
               <Quest
