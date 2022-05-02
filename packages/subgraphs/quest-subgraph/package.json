@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "prepare:test": "mustache config/test.json src/test.template.yaml > test.yaml -p src/questFactory.yaml",
     "prepare:rinkeby": "node ./sync-with-last-deploy.js rinkeby V2 && mustache config/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "node ./sync-with-last-deploy.js localhost V2 && mustache config/localhost.json src/subgraph.template.yaml > subgraph.yaml",
     "codegen": "graph codegen",
