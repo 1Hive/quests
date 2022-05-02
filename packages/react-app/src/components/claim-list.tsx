@@ -55,6 +55,8 @@ type Props = {
   isLoading?: boolean;
 };
 
+const loadingClaim = [{ state: ENUM_CLAIM_STATE.None } as ClaimModel];
+
 export default function ClaimList({
   questData,
   newClaim,
@@ -63,9 +65,12 @@ export default function ClaimList({
   isLoading = false,
 }: Props) {
   const { walletAddress } = useWallet();
-  const [claims, setClaims] = useState<ClaimModel[]>([
-    { state: ENUM_CLAIM_STATE.None } as ClaimModel,
-  ]);
+  const [claims, setClaims] = useState<ClaimModel[]>(loadingClaim);
+  const [isLoadingState, setIsLoading] = useState(isLoading);
+
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading]);
 
   useEffect(() => {
     if (questData.address) {
@@ -85,8 +90,10 @@ export default function ClaimList({
   }, [newClaim]);
 
   const fetchClaims = async () => {
+    setIsLoading(true);
     const result = await QuestService.fetchQuestClaims(questData);
     setClaims(result); // Fetch visible data
+    setIsLoading(false);
     setClaims(
       await Promise.all(
         result.map(async (claim) => ({
@@ -106,8 +113,9 @@ export default function ClaimList({
     if (success) {
       setTimeout(async () => {
         const newClaimsSnapshot = JSON.stringify(await fetchClaims());
-        if (oldClaimsSnapshot === newClaimsSnapshot)
+        if (oldClaimsSnapshot === newClaimsSnapshot) {
           fetchNewClaimChanges(success, oldClaimsSnapshot); // If same result keep pulling
+        }
       }, 1000);
     }
   };
@@ -118,7 +126,7 @@ export default function ClaimList({
         <HeaderStyled>Claims</HeaderStyled>
         <HelpTooltip tooltip="A claim includes the proof of the quest's completion." />
       </ClaimHeaderStyled>
-      {claims?.length || isLoading ? (
+      {claims?.length || isLoadingState ? (
         <Accordion
           items={claims.map((claim: ClaimModel) => {
             let actionButton;
@@ -148,7 +156,7 @@ export default function ClaimList({
                   <ChildSpacer size={16} justify="start" align="center" buttonEnd>
                     <FieldInput
                       label="Status"
-                      isLoading={isLoading || claim.state === ENUM_CLAIM_STATE.None}
+                      isLoading={isLoadingState || claim.state === ENUM_CLAIM_STATE.None}
                     >
                       <StateTag state={claim.state ?? ''} className="pl-0" />
                     </FieldInput>
@@ -156,12 +164,12 @@ export default function ClaimList({
                       id="playerAddress"
                       value={claim.playerAddress}
                       label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
-                      isLoading={isLoading || !claim.playerAddress}
+                      isLoading={isLoadingState || !claim.playerAddress}
                     />
                     {claim.claimAll ? (
                       <FieldInput
                         label="Claimed amount"
-                        isLoading={isLoading || claim.state === ENUM_CLAIM_STATE.None}
+                        isLoading={isLoadingState || claim.state === ENUM_CLAIM_STATE.None}
                       >
                         All available
                       </FieldInput>
@@ -183,7 +191,7 @@ export default function ClaimList({
                   isMarkDown
                   wide
                   label="Evidence of completion"
-                  isLoading={isLoading || !claim.evidence}
+                  isLoading={isLoadingState || !claim.evidence}
                 />
               </Outset>,
             ];

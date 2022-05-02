@@ -53,6 +53,7 @@ const LabelStyled = styled.span`
 const FinalRulingStyled = styled.span`
   margin-right: ${GUpx(1)};
   margin-top: ${GUpx(0.5)};
+  display: flex;
 `;
 
 const FinalRulingWrapper = styled.div`
@@ -293,9 +294,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
                 [
                   <>
                     {challenger}
-                    <LabelStyled>Challenger reason</LabelStyled>
+                    <LabelStyled>Challenge reason</LabelStyled>
                   </>,
-                  <TextFieldInput id="evidenceOfCompletion" value={challenge!.reason} isMarkDown />,
+                  <TextFieldInput id="challengeReason" value={challenge!.reason} isMarkDown />,
                 ],
               ]}
             />
