@@ -19,7 +19,7 @@ services:
       ipfs: "ipfs:5001"
       # ipfs: "https://api.thegraph.com/ipfs/QmZ1yyM9esaDrDxAzsSAzf33dG5Jdp2jvqj8SxUHC5Awbe"
       # ethereum: "localhost:http://host.docker.internal:8545"
-      ethereum: "rinkeby:https://rinkeby.infura.io/v3/ba8a73e283eb4b9eafd25f5fdbfc1717"
+      ethereum: "rinkeby:https://rinkeby.infura.io/v3/74dcdd771e514bdf88cf139f93b3eae2"
       GRAPH_LOG: info
       GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: "true"
       GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: "true"

@@ -1,0 +1,12 @@
+specVersion: 0.0.4
+features:
+  - fullTextSearch
+  - nonFatalErrors
+  - ipfsOnEthereumContracts
+schema:
+  file: ./src/schema.graphql
+dataSources:
+{{#dataSources}}
+  {{> questFactory.yaml}}
+  
+{{/dataSources}}
