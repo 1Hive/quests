@@ -84,7 +84,9 @@ export default function ClaimList({
       if (!claims.length || claims[0].state === ENUM_CLAIM_STATE.None) {
         fetchClaims();
       } else {
-        fetchNewClaimChanges(true);
+        setTimeout(() => {
+          fetchClaims();
+        }, 5000);
       }
     }
   }, [newClaim]);
@@ -107,19 +109,6 @@ export default function ClaimList({
     return result;
   };
 
-  const fetchNewClaimChanges = (success: boolean, oldClaimsSnapshot?: string) => {
-    oldClaimsSnapshot = oldClaimsSnapshot ?? JSON.stringify(claims);
-    // Refresh until different
-    if (success) {
-      setTimeout(async () => {
-        const newClaimsSnapshot = JSON.stringify(await fetchClaims());
-        if (oldClaimsSnapshot === newClaimsSnapshot) {
-          fetchNewClaimChanges(success, oldClaimsSnapshot); // If same result keep pulling
-        }
-      }, 1000);
-    }
-  };
-
   return (
     <WrapperStyled>
       <ClaimHeaderStyled>
@@ -133,22 +122,12 @@ export default function ClaimList({
             if (claim.state === ENUM_CLAIM_STATE.Scheduled) {
               if (walletAddress === claim.playerAddress)
                 actionButton = (
-                  <ExecuteClaimModal
-                    claim={claim}
-                    questTotalBounty={questTotalBounty}
-                    onClose={fetchNewClaimChanges}
-                  />
+                  <ExecuteClaimModal claim={claim} questTotalBounty={questTotalBounty} />
                 );
               else
-                actionButton = (
-                  <ChallengeModal
-                    claim={claim}
-                    challengeDeposit={challengeDeposit}
-                    onClose={fetchNewClaimChanges}
-                  />
-                );
+                actionButton = <ChallengeModal claim={claim} challengeDeposit={challengeDeposit} />;
             } else if (claim.state === ENUM_CLAIM_STATE.Challenged) {
-              actionButton = <ResolveChallengeModal claim={claim} onClose={fetchNewClaimChanges} />;
+              actionButton = <ResolveChallengeModal claim={claim} />;
             } else if (!claim.state) Logger.error(`Claim doesn't have state`, { claim });
             return [
               <div className="wide">

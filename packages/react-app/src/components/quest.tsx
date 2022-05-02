@@ -101,19 +101,44 @@ export default function Quest({
   const { transaction } = useTransactionContext();
 
   useEffect(() => {
+    if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed)
+      console.log({
+        type: transaction?.type,
+        questAddress: transaction?.questAddress,
+      });
     if (
       transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction?.transactionType === 'QuestReclaimFunds'
+      transaction.questAddress === questData.address
     ) {
-      setBounty(null);
-      setTimeout(() => {
-        if (questData.address && questData.rewardToken) {
-          fetchBalanceOfQuest(questData.address, questData.rewardToken);
-          setClaimUpdate(claimUpdated + 1);
-        }
-      }, 500);
+      // If tx completion impact Quest bounty, update it
+      if (
+        transaction?.type === 'ClaimChallengeResolve' ||
+        transaction?.type === 'ClaimExecute' ||
+        transaction?.type === 'QuestFund' ||
+        transaction?.type === 'QuestReclaimFunds'
+      ) {
+        setBounty(null);
+        setTimeout(() => {
+          if (questData.address && questData.rewardToken) {
+            fetchBalanceOfQuest(questData.address, questData.rewardToken);
+          }
+        }, 500);
+      }
+
+      // If tx completion impact Claims, update them
+      if (
+        transaction?.type === 'ClaimChallengeResolve' ||
+        transaction?.type === 'ClaimExecute' ||
+        transaction?.type === 'ClaimSchedule' ||
+        transaction?.type === 'ClaimChallenge'
+      ) {
+        const oldClaimUpdated = claimUpdated;
+        setTimeout(() => {
+          setClaimUpdate(oldClaimUpdated + 1);
+        }, 500);
+      }
     }
-  }, [transaction]);
+  }, [transaction?.type, transaction?.status, transaction?.questAddress]);
 
   let isSubscribed = true;
 

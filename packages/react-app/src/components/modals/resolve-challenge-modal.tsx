@@ -138,7 +138,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
         message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        transactionType: 'ClaimChallengeResolve',
+        type: 'ClaimChallengeResolve',
+        questAddress: claim.questAddress,
       });
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,

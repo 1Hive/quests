@@ -114,7 +114,8 @@ export default function ScheduleClaimModal({
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
         message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        transactionType: 'ClaimSchedule',
+        type: 'TokenApproval',
+        questAddress,
       });
       const approveTxReceipt = await QuestService.approveTokenAmount(
         walletAddress,
@@ -146,7 +147,8 @@ export default function ScheduleClaimModal({
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        transactionType: 'ClaimSchedule',
+        type: 'ClaimSchedule',
+        questAddress,
       });
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
@@ -255,6 +257,7 @@ export default function ScheduleClaimModal({
                       key="WalletBallance-claimDeposit"
                       askedTokenAmount={claimDeposit}
                       setIsEnoughBalance={setIsEnoughBalance}
+                      isLoading={loading}
                     />
                     <Button
                       key="confirmButton"
