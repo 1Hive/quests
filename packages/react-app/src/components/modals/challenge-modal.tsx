@@ -56,17 +56,27 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { transaction, setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
 
+  const fetchFee = async () => {
+    const feeAmount = await QuestService.fetchChallengeFee();
+    if (feeAmount) setChallengeFee(feeAmount);
+  };
+
   useEffect(() => {
-    const fetchFee = async () => {
-      const feeAmount = await QuestService.fetchChallengeFee();
-      if (feeAmount) setChallengeFee(feeAmount);
-    };
     fetchFee();
   }, [walletAddress]);
+
+  useEffect(() => {
+    if (
+      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction?.transactionType === 'ClaimChallenge'
+    ) {
+      fetchFee();
+    }
+  }, [transaction]);
 
   useEffect(() => {
     let handle: number;
