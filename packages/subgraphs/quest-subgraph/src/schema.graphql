@@ -24,4 +24,13 @@ type QuestEntity @entity {
   questDetailsRef: Bytes!
   questRewardTokenAddress: Bytes!
   creationTimestamp: BigInt!
+  depositToken: Bytes!
+  depositAmount: BigInt!
+}
+
+type DepositEntity @entity {
+  id: ID!
+  timestamp: BigInt!
+  depositToken: Bytes!
+  depositAmount: BigInt!
 }

@@ -7,12 +7,12 @@ schema:
   file: ./src/schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: QuestFactoryV0
+    name: QuestFactory
     network: rinkeby
     source:
-      address: "0x1A506d3ed7E0865FFC980d2eB54662DDb587e885"
+      address: "0xf94FB88b197c8749DabD633aCd55C9F50B18E4Da"
       abi: QuestFactory
-      startBlock: 9939088
+      startBlock: 9953404
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -27,31 +27,11 @@ dataSources:
           handler: handleQuestCreated
       file: ./src/mapping.ts
   - kind: ethereum/contract
-    name: QuestFactoryV1
-    network: rinkeby
-    source:
-      address: "0x855a04deb27abf93336d52a91f29a98dd5605691"
-      abi: QuestFactory
-      startBlock: 9953404
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - QuestCreated
-      abis:
-        - name: QuestFactory
-          file: ./abis/QuestFactoryV2.json
-      eventHandlers:
-        - event: QuestCreated(address,string,bytes,address,uint256,uint256)
-          handler: handleQuestCreatedV2
-      file: ./src/mapping.ts
-  - kind: ethereum/contract
     name: QuestFactoryV2
     network: rinkeby
     source:
       address: "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01"
-      abi: QuestFactory
+      abi: QuestFactoryV2
       startBlock: 10573676
     mapping:
       kind: ethereum/events
@@ -60,9 +40,31 @@ dataSources:
       entities:
         - QuestCreated
       abis:
-        - name: QuestFactory
+        - name: QuestFactoryV2
           file: ./abis/QuestFactoryV2.json
       eventHandlers:
         - event: QuestCreated(address,string,bytes,address,uint256,uint256)
           handler: handleQuestCreatedV2
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV3
+    network: rinkeby
+    source:
+      address: "0xf94FB88b197c8749DabD633aCd55C9F50B18E4Da"
+      abi: QuestFactoryV3
+      startBlock: 10603916
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreated
+      abis:
+        - name: QuestFactoryV3
+          file: ./abis/QuestFactoryV3.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,uint256,address,uint256)
+          handler: handleQuestCreatedV3
+        - event: DepositChanged(uint256,address,uint256)
+          handler: handleDepositChanged
       file: ./src/mapping.ts

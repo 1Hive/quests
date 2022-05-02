@@ -21,6 +21,8 @@ export class QuestEntity extends Entity {
     this.set("questDetailsRef", Value.fromBytes(Bytes.empty()));
     this.set("questRewardTokenAddress", Value.fromBytes(Bytes.empty()));
     this.set("creationTimestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("depositToken", Value.fromBytes(Bytes.empty()));
+    this.set("depositAmount", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -126,5 +128,87 @@ export class QuestEntity extends Entity {
 
   set creationTimestamp(value: BigInt) {
     this.set("creationTimestamp", Value.fromBigInt(value));
+  }
+
+  get depositToken(): Bytes {
+    let value = this.get("depositToken");
+    return value!.toBytes();
+  }
+
+  set depositToken(value: Bytes) {
+    this.set("depositToken", Value.fromBytes(value));
+  }
+
+  get depositAmount(): BigInt {
+    let value = this.get("depositAmount");
+    return value!.toBigInt();
+  }
+
+  set depositAmount(value: BigInt) {
+    this.set("depositAmount", Value.fromBigInt(value));
+  }
+}
+
+export class DepositEntity extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("depositToken", Value.fromBytes(Bytes.empty()));
+    this.set("depositAmount", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save DepositEntity entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save DepositEntity entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("DepositEntity", id.toString(), this);
+    }
+  }
+
+  static load(id: string): DepositEntity | null {
+    return changetype<DepositEntity | null>(store.get("DepositEntity", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get depositToken(): Bytes {
+    let value = this.get("depositToken");
+    return value!.toBytes();
+  }
+
+  set depositToken(value: Bytes) {
+    this.set("depositToken", Value.fromBytes(value));
+  }
+
+  get depositAmount(): BigInt {
+    let value = this.get("depositAmount");
+    return value!.toBigInt();
+  }
+
+  set depositAmount(value: BigInt) {
+    this.set("depositAmount", Value.fromBigInt(value));
   }
 }
