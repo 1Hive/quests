@@ -3,11 +3,13 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./QuestFactory.sol";
 
 contract Quest {
+    using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using DepositLib for Models.Deposit;
 
@@ -71,16 +73,18 @@ contract Quest {
 
         if (_claimAll) {
             // Claim all but let deposit if they are same token
-            if (rewardToken == deposit.token) {
-                _amount = balance - deposit.amount;
+            if (address(rewardToken) == address(deposit.token)) {
+                (, uint256 result) = balance.trySub(deposit.amount);
+                _amount = result;
             } else {
                 _amount = balance;
             }
         }
 
-        if (rewardToken == deposit.token) {
+        if (address(rewardToken) == address(deposit.token)) {
+            (, uint256 result) = balance.trySub(_amount);
             require(
-                balance - _amount >= deposit.amount,
+                result >= deposit.amount,
                 "ERROR: Should not exceed allowed bounty"
             );
         }
