@@ -2,15 +2,16 @@ const fs = require("fs");
 const chalk = require("chalk");
 const hre = require("hardhat");
 
-const publishDir = "../react-app/src/contracts";
+// const publishDir = "../react-app/src/contracts";
 const graphDir = "../subgraph";
 
 function publishContract(contractName) {
   console.log(
     " 💽 Publishing",
     chalk.cyan(contractName),
-    "to",
-    chalk.gray(publishDir)
+    "to"
+    // ,
+    // chalk.gray(publishDir)
   );
   try {
     const contractArtifact = fs
@@ -83,9 +84,9 @@ function publishContract(contractName) {
 }
 
 async function main() {
-  if (!fs.existsSync(publishDir)) {
-    fs.mkdirSync(publishDir);
-  }
+  // if (!fs.existsSync(publishDir)) {
+  //   fs.mkdirSync(publishDir);
+  // }
   const finalContractList = [];
   fs.readdirSync(hre.config.paths.sources).forEach((file) => {
     if (file.indexOf(".sol") >= 0) {

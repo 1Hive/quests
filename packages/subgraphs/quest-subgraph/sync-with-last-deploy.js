@@ -23,34 +23,35 @@ import Configstore from "configstore";
 import { spawn } from "child_process";
 import { exit } from "process";
 import Mustache from "mustache";
+import path from "path";
 
 const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
 
 // Create a Configstore instance.
-const config = new Configstore(packageJson.name, { foo: "bar" });
+// const config = new Configstore(packageJson.name, { foo: "bar" });
 
 let network = argv["_"][0] || argv["network"] || argv["n"]; //network
 let versionNumber = argv["_"][1] || argv["version"] || argv["v"]; //num version
 
 if (network) {
-  config.set("network", network);
+  // config.set("network", network);
 } else {
-  if (config.has("network")) {
-    network = config.get("network");
-  } else {
+  // if (config.has("network")) {
+    // network = config.get("network");
+  // } else {
     console.warn("Warning: Using localhost as network");
     network = DEFAULT_NETWORK;
-  }
+  // }
 }
 if (versionNumber) {
-  config.set("versionNumber", versionNumber);
-} else {
-  if (config.has("versionNumber")) {
-    versionNumber = config.get("versionNumber");
-  } else {
+  // config.set("versionNumber", versionNumber);
+// } else {
+  // if (config.has("versionNumber")) {
+    // versionNumber = config.get("versionNumber");
+  // } else {
     console.warn("Warning: versionNumber is not informed (eg: ./sync -v V1)");
     versionNumber = "";
-  }
+  // }
 }
 
 console.log("network", network);
@@ -150,7 +151,7 @@ function loadFileString(path) {
 async function runMain() {
   let includeVersionNumber = "";
   if (versionNumber) {
-    includeVersionNumber = `${versionNumber}`;
+    includeVersionNumber = `V${versionNumber}`;
   }
 
   try {
@@ -158,14 +159,18 @@ async function runMain() {
     if (fs.existsSync(abiPathJson)) {
       const { isDeployNewVersion } = await promptList({
         name: "isDeployNewVersion",
-        message: `ABI file at (${abiPathJson}) already exist, want increment new version`,
+        message: `ABI file at (${abiPathJson}) already exist, want increment new version?`,
       });
       console.log(isDeployNewVersion);
       if (isDeployNewVersion) {
         runABINewVersion({ abiPathJson });
-        runMustache();
+        runMustache({
+          viewPath: "config/test.json",
+          templatePath: "src/test.template.yaml",
+          outputPath: "test_auto.yaml",
+        });
       } else {
-        console.log("I'll do nothing");
+        console.log("I'll do nothing"); // TODO Give option to overwrite the file
       }
     }
   } catch (err) {
@@ -173,83 +178,93 @@ async function runMain() {
   }
 
   async function runABINewVersion({ abiPathJson }) {
-    const QuestFactory = await loadJson(hardhatDeployment);
     try {
+      const abiFolder = folderAbove(abiPathJson);
+
+      const arrFiles = fs
+        .readdirSync(abiFolder, { withFileTypes: true })
+        .filter((item) => !item.isDirectory());
+      console.log("arrFiles:", arrFiles.length);
+      const nextVersion = arrFiles.length+1;
+      // function getFirstGroup(regexp, str) {
+      //   return Array.from(str.matchAll(regexp), m => m[1]);
+      // }
+      // arrFiles.forEach(file=>{
+      //   console.log('file:',file)
+      //   const ver = getFirstGroup(/.*?V(\d+)\.json/g,file.name);
+      //   console.log('ver:',ver)
+
+      // })
+
+      const configJson = loadJson(`./config/${network}.json`);
+      // ConfigJson.questFactoryAddress = QuestFactory.address;
+      // fs.writeFileSync(
+      //   `./config/${network}.json`,
+      //   JSON.stringify(configJson, undefined, 4)
+      // );
+      //file written successfully
+
+      const QuestFactory = await loadJson(hardhatDeployment);
+      const factoryName = hardhatDeployment.substring(
+        hardhatDeployment.lastIndexOf("/") +1
+      );
+      const partsNames = factoryName.split(".");
+      const newVersionName = `${partsNames[0]}V${nextVersion}.${partsNames[1]}`;
+      console.log("newVersionName", newVersionName);
       fs.writeFileSync(
-        abiPathJson,
+        path.join(abiFolder, `${newVersionName}`),
         JSON.stringify(QuestFactory.abi, undefined, 4)
       );
       //file written successfully
     } catch (err) {
       console.error(err);
     }
-
-    // Fetch last contract address for rinkeby
-    try {
-      const ConfigJson = loadJson(`./config/${network}.json`);
-      ConfigJson.questFactoryAddress = QuestFactory.address;
-      fs.writeFileSync(
-        `./config/${network}.json`,
-        JSON.stringify(ConfigJson, undefined, 4)
-      );
-      //file written successfully
-    } catch (err) {
-      console.error(err);
-    }
   }
 
-  async function runMustache() {
+  async function runMustache({ viewPath, templatePath, outputPath }) {
     try {
       console.log("Running Mustache-che!");
-      const view = loadJson("config/test.json");
-      // console.log("view", view);
-      const partials = {
-        "questFactory.yaml": loadFileString(`${FOLDER_PARTIALS}/questFactory.yaml`),
-      };
+      const view = loadJson(viewPath);
+      let partials = {};
 
       view.dataSources.forEach((data) => {
         const key = data.customTemplate;
         if (key) partials[key] = loadFileString(`${FOLDER_PARTIALS}/${key}`);
       });
 
-      // console.log("partials", partials);
-      
-      const html = render(
-        loadFileString("src/test.template.yaml"),
-        view,
-        partials
-        );
+      const html = render(loadFileString(templatePath), view, partials);
 
-        // console.log("html", html);
-      fs.writeFileSync(`test_auto.yaml`, html);
+      fs.writeFileSync(outputPath, html);
     } catch (error) {
-      console.error(error.message)
+      console.error(error.message);
     }
   }
 }
 
-
-// For every dynamic partial, a function which renders the subtemplate is added to the view's 
-// prototype, and their occurrences in the template are replaced with `{{{partial-(name)}}}`, 
-// now accessible through the prototype.
-
-function render( template, view, partials = {} ){
-  const prototype = {}
-  template = template.replace(/\{\{>(.*?\(.+?\).*?)\}\}/g, function(_, name, property){
-    if( !prototype[name] ){
-      prototype[name] = function(){
-          const computed = name.replace(/\((.*?)\)/, (_, property) => this[property])
-          let computedTemplate = partials[computed]
-           if( !computedTemplate ){
-              // throw new Error(`Dynamic partial "${name}:${computed}" does not exist.`)
-           }else{
-             return render(computedTemplate, this, partials)
-           }
+function render(template, view, partials = {}) {
+  const prototype = {};
+  template = template.replace(/\{\{>(.*?\(.+?\).*?)\}\}/g, function(
+    _,
+    name,
+    property
+  ) {
+    if (!prototype[name]) {
+      prototype[name] = function() {
+        const computed = name.replace(
+          /\((.*?)\)/,
+          (_, property) => this[property]
+        );
+        let computedTemplate = partials[computed];
+        if (!computedTemplate) {
+          // throw new Error(`Dynamic partial "${name}:${computed}" does not exist.`)
+        } else {
+          return render(computedTemplate, this, partials);
         }
-     }
-     return `{{{${name}}}}`
-  })
-  view = Object.assign(Object.create(prototype), view)
+      };
+    }
+    return `{{{${name}}}}`;
+  });
+  view = Object.assign(Object.create(prototype), view);
   const html = Mustache.render(template, view, partials);
-  return html
+  return html;
 }
