@@ -7,6 +7,5 @@ schema:
   file: ./src/schema.graphql
 dataSources:
 {{#dataSources}}
-  {{> questFactory.yaml}}
-  
+  {{>(customTemplate)}}
 {{/dataSources}}

@@ -14,6 +14,7 @@ import minimist from "minimist";
 import inquirer from "inquirer";
 
 const DEFAULT_NETWORK = "localhost";
+const FOLDER_PARTIALS = "src/dataSources";
 
 var argv = minimist(process.argv.slice(2));
 console.log(argv);
@@ -21,6 +22,7 @@ console.log(argv);
 import Configstore from "configstore";
 import { spawn } from "child_process";
 import { exit } from "process";
+import Mustache from "mustache";
 
 const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
 
@@ -66,9 +68,9 @@ const DEFAULT_LIST_PROMPT = {
   choices: DEFAULT_CHOICES,
 };
 
-const folderAbove = (path)=>{
-  return path.replace(/\/[^\/]+\/?$/, '')
-}
+const folderAbove = (path) => {
+  return path.replace(/\/[^\/]+\/?$/, "");
+};
 const promptList = ({ name, message }) => {
   return inquirer.prompt({ ...DEFAULT_LIST_PROMPT, name, message });
 };
@@ -97,8 +99,8 @@ if (fs.existsSync(hardhatDeployment)) {
   if (isRunHardhatDeploy) {
     try {
       const result = await runHardhatDeploy();
-      if (!result){
-        throw new Error('False!')
+      if (!result) {
+        throw new Error("False!");
       }
       runMain();
     } catch (error) {
@@ -110,21 +112,20 @@ if (fs.existsSync(hardhatDeployment)) {
 }
 
 async function runHardhatDeploy() {
-  return new Promise((res,reject)=>{
-    
-  const yarnSpawn = spawn("yarn", ["run","hardhat:deploy:local"]);
-  yarnSpawn.stdout.on("data", (data) => {
-    console.log(`[yo]: ${data}`);
+  return new Promise((res, reject) => {
+    const yarnSpawn = spawn("yarn", ["run", "hardhat:deploy:local"]);
+    yarnSpawn.stdout.on("data", (data) => {
+      console.log(`[yo]: ${data}`);
+    });
+    yarnSpawn.stderr.on("data", (data) => {
+      console.error(`[yerr]: ${data}`);
+      reject(`${data}`);
+    });
+    yarnSpawn.on("close", (code) => {
+      console.log(`[yclose]: ${code}`);
+      res(!Boolean(code));
+    });
   });
-  yarnSpawn.stderr.on("data", (data) => {
-     console.error(`[yerr]: ${data}`);
-    reject(`${data}`)
-  });
-  yarnSpawn.on("close", (code) => {
-    console.log(`[yclose]: ${code}`);
-    res(!Boolean(code))
-  });
-  })
 }
 
 function loadJson(path) {
@@ -136,9 +137,17 @@ function loadJson(path) {
   }
   return JSON.parse(fs.readFileSync(path));
 }
+function loadFileString(path) {
+  if (!path) {
+    throw new Error("loadFileString->Path need be defined");
+  }
+  if (!fs.existsSync(path)) {
+    throw new Error(`loadFileString->File in path not exist: (${path})`);
+  }
+  return fs.readFileSync(path, "utf-8");
+}
 
 async function runMain() {
-
   let includeVersionNumber = "";
   if (versionNumber) {
     includeVersionNumber = `${versionNumber}`;
@@ -153,7 +162,8 @@ async function runMain() {
       });
       console.log(isDeployNewVersion);
       if (isDeployNewVersion) {
-        runABINewVersion({abiPathJson});
+        runABINewVersion({ abiPathJson });
+        runMustache();
       } else {
         console.log("I'll do nothing");
       }
@@ -162,10 +172,9 @@ async function runMain() {
     console.error(err);
   }
 
-  async function runABINewVersion({abiPathJson}) {
+  async function runABINewVersion({ abiPathJson }) {
     const QuestFactory = await loadJson(hardhatDeployment);
     try {
-
       fs.writeFileSync(
         abiPathJson,
         JSON.stringify(QuestFactory.abi, undefined, 4)
@@ -174,15 +183,73 @@ async function runMain() {
     } catch (err) {
       console.error(err);
     }
-    
+
     // Fetch last contract address for rinkeby
     try {
       const ConfigJson = loadJson(`./config/${network}.json`);
       ConfigJson.questFactoryAddress = QuestFactory.address;
-      fs.writeFileSync(`./config/${network}.json`, JSON.stringify(ConfigJson,undefined,4));
+      fs.writeFileSync(
+        `./config/${network}.json`,
+        JSON.stringify(ConfigJson, undefined, 4)
+      );
       //file written successfully
     } catch (err) {
       console.error(err);
     }
   }
+
+  async function runMustache() {
+    try {
+      console.log("Running Mustache-che!");
+      const view = loadJson("config/test.json");
+      // console.log("view", view);
+      const partials = {
+        "questFactory.yaml": loadFileString(`${FOLDER_PARTIALS}/questFactory.yaml`),
+      };
+
+      view.dataSources.forEach((data) => {
+        const key = data.customTemplate;
+        if (key) partials[key] = loadFileString(`${FOLDER_PARTIALS}/${key}`);
+      });
+
+      // console.log("partials", partials);
+      
+      const html = render(
+        loadFileString("src/test.template.yaml"),
+        view,
+        partials
+        );
+
+        // console.log("html", html);
+      fs.writeFileSync(`test_auto.yaml`, html);
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+}
+
+
+// For every dynamic partial, a function which renders the subtemplate is added to the view's 
+// prototype, and their occurrences in the template are replaced with `{{{partial-(name)}}}`, 
+// now accessible through the prototype.
+
+function render( template, view, partials = {} ){
+  const prototype = {}
+  template = template.replace(/\{\{>(.*?\(.+?\).*?)\}\}/g, function(_, name, property){
+    if( !prototype[name] ){
+      prototype[name] = function(){
+          const computed = name.replace(/\((.*?)\)/, (_, property) => this[property])
+          let computedTemplate = partials[computed]
+           if( !computedTemplate ){
+              // throw new Error(`Dynamic partial "${name}:${computed}" does not exist.`)
+           }else{
+             return render(computedTemplate, this, partials)
+           }
+        }
+     }
+     return `{{{${name}}}}`
+  })
+  view = Object.assign(Object.create(prototype), view)
+  const html = Mustache.render(template, view, partials);
+  return html
 }
