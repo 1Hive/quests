@@ -6,7 +6,6 @@ import {
 } from "../generated/QuestFactoryV3/QuestFactoryV3";
 import { DepositEntity, QuestEntity } from "../generated/schema";
 import { Bytes, ipfs } from "@graphprotocol/graph-ts";
-import { BigInt } from "@graphprotocol/graph-ts";
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
