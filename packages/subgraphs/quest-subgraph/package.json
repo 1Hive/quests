@@ -3,14 +3,16 @@
   "license": "UNLICENSED",
   "version": "0.1.0",
   "scripts": {
-    "prepare:rinkeby": "node ./sync-with-last-deploy.js rinkeby && mustache config/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
-    "prepare:local": "node ./sync-with-last-deploy.js localhost && mustache config/localhost.json src/subgraph.template.yaml > subgraph.yaml",
+    "prepare:rinkeby": "node ./sync-with-last-deploy.js rinkeby V2 && mustache config/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
+    "prepare:local": "node ./sync-with-last-deploy.js localhost V2 && mustache config/localhost.json src/subgraph.template.yaml > subgraph.yaml",
     "codegen": "graph codegen",
     "build": "graph codegen && graph build",
     "create-local": "graph create --node http://0.0.0.0:8020/ corantin/quests-subgraph",
     "remove-local": "graph remove --node http://0.0.0.0:8020/ corantin/quests-subgraph",
-    "deploy:rinkeby": "yarn prepare:rinkeby && graph deploy corantin/quests-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy:local": "graph deploy corantin/quests-subgraph --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020"
+    "deploy:p:rinkeby": "yarn prepare:rinkeby && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph ",
+    "deploy:rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph",
+    "deploy:staging-rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
+    "deploy:local": "graph deploy --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020 corantin/quests-subgraph"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.23.2",

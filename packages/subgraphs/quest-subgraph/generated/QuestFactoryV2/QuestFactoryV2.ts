@@ -42,11 +42,15 @@ export class QuestCreated__Params {
   get expireTime(): BigInt {
     return this._event.parameters[4].value.toBigInt();
   }
+
+  get creationTime(): BigInt {
+    return this._event.parameters[5].value.toBigInt();
+  }
 }
 
-export class QuestFactory extends ethereum.SmartContract {
-  static bind(address: Address): QuestFactory {
-    return new QuestFactory("QuestFactory", address);
+export class QuestFactoryV2 extends ethereum.SmartContract {
+  static bind(address: Address): QuestFactoryV2 {
+    return new QuestFactoryV2("QuestFactoryV2", address);
   }
 
   aragonGovernAddress(): Address {
@@ -64,6 +68,53 @@ export class QuestFactory extends ethereum.SmartContract {
       "aragonGovernAddress",
       "aragonGovernAddress():(address)",
       []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  createQuest(
+    _questTitle: string,
+    _questDetailsRef: Bytes,
+    _rewardToken: Address,
+    _expireTime: BigInt,
+    _fundsRecoveryAddress: Address
+  ): Address {
+    let result = super.call(
+      "createQuest",
+      "createQuest(string,bytes,address,uint256,address):(address)",
+      [
+        ethereum.Value.fromString(_questTitle),
+        ethereum.Value.fromBytes(_questDetailsRef),
+        ethereum.Value.fromAddress(_rewardToken),
+        ethereum.Value.fromUnsignedBigInt(_expireTime),
+        ethereum.Value.fromAddress(_fundsRecoveryAddress)
+      ]
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_createQuest(
+    _questTitle: string,
+    _questDetailsRef: Bytes,
+    _rewardToken: Address,
+    _expireTime: BigInt,
+    _fundsRecoveryAddress: Address
+  ): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "createQuest",
+      "createQuest(string,bytes,address,uint256,address):(address)",
+      [
+        ethereum.Value.fromString(_questTitle),
+        ethereum.Value.fromBytes(_questDetailsRef),
+        ethereum.Value.fromAddress(_rewardToken),
+        ethereum.Value.fromUnsignedBigInt(_expireTime),
+        ethereum.Value.fromAddress(_fundsRecoveryAddress)
+      ]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -146,5 +197,9 @@ export class CreateQuestCall__Outputs {
 
   constructor(call: CreateQuestCall) {
     this._call = call;
+  }
+
+  get value0(): Address {
+    return this._call.outputValues[0].value.toAddress();
   }
 }
