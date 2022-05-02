@@ -6,6 +6,7 @@ export type TransactionModel = {
   status: string;
   progress?: number;
   questAddress?: string;
+  args?: any[];
   type:
     | 'TokenApproval'
     | 'QuestCreate'

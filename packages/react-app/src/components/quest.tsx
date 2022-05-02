@@ -94,49 +94,27 @@ export default function Quest({
 }: Props) {
   const { walletAddress } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
-  const [claimUpdated, setClaimUpdate] = useState(0);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
 
   useEffect(() => {
-    if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed)
-      console.log({
-        type: transaction?.type,
-        questAddress: transaction?.questAddress,
-      });
+    // If tx completion impact Quest bounty, update it
     if (
       transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction.questAddress === questData.address
-    ) {
-      // If tx completion impact Quest bounty, update it
-      if (
-        transaction?.type === 'ClaimChallengeResolve' ||
+      transaction.questAddress === questData.address &&
+      (transaction?.type === 'ClaimChallengeResolve' ||
         transaction?.type === 'ClaimExecute' ||
         transaction?.type === 'QuestFund' ||
-        transaction?.type === 'QuestReclaimFunds'
-      ) {
-        setBounty(null);
-        setTimeout(() => {
-          if (questData.address && questData.rewardToken) {
-            fetchBalanceOfQuest(questData.address, questData.rewardToken);
-          }
-        }, 500);
-      }
-
-      // If tx completion impact Claims, update them
-      if (
-        transaction?.type === 'ClaimChallengeResolve' ||
-        transaction?.type === 'ClaimExecute' ||
-        transaction?.type === 'ClaimSchedule' ||
-        transaction?.type === 'ClaimChallenge'
-      ) {
-        const oldClaimUpdated = claimUpdated;
-        setTimeout(() => {
-          setClaimUpdate(oldClaimUpdated + 1);
-        }, 500);
-      }
+        transaction?.type === 'QuestReclaimFunds')
+    ) {
+      setBounty(null);
+      setTimeout(() => {
+        if (questData.address && questData.rewardToken) {
+          fetchBalanceOfQuest(questData.address, questData.rewardToken);
+        }
+      }, 500);
     }
   }, [transaction?.type, transaction?.status, transaction?.questAddress]);
 
@@ -189,12 +167,6 @@ export default function Quest({
         Logger.exception(err);
         setBounty(undefined);
       });
-  };
-
-  const onScheduleModalClosed = (success: boolean) => {
-    if (success) {
-      setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
-    }
   };
 
   const titleInput = (
@@ -301,7 +273,6 @@ export default function Quest({
         </ContentWrapperStyled>
         {!isSummary && challengeDeposit && (
           <ClaimList
-            newClaim={claimUpdated}
             questData={questData}
             questTotalBounty={bounty}
             challengeDeposit={challengeDeposit}
@@ -318,7 +289,6 @@ export default function Quest({
                     questAddress={questData.address}
                     questTotalBounty={bounty}
                     claimDeposit={claimDeposit}
-                    onClose={onScheduleModalClosed}
                   />
                 )}
               </>

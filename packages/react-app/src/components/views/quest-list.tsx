@@ -89,16 +89,24 @@ export default function QuestList() {
       transaction.status === ENUM_TRANSACTION_STATUS.Confirmed
     ) {
       // Insert the newQuest at the top of the list
-      if (transaction.questAddress?.[0]) {
+      const { questAddress } = transaction;
+      if (questAddress) {
         // Wait for subgraph to index the new quest
-        const questAddress = transaction.questAddress[0];
-        setTimeout(async () => {
-          const newQuest = await QuestService.fetchQuest(questAddress);
-          if (newQuest) setQuests([newQuest, ...quests]);
-        }, 1000);
+        fetchQuestUntilNew(questAddress);
       }
     }
   }, [transaction?.status, transaction?.type]);
+
+  const fetchQuestUntilNew = (newQuestAddress: string) => {
+    setTimeout(async () => {
+      const newQuest = await QuestService.fetchQuest(newQuestAddress);
+      if (newQuest) {
+        setQuests([newQuest, ...quests]);
+      } else {
+        fetchQuestUntilNew(newQuestAddress);
+      }
+    }, 1000);
+  };
 
   const debounceRefresh = useCallback(
     debounce((nextFilter?: FilterModel) => refresh(nextFilter), 500),

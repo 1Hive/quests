@@ -64,6 +64,7 @@ const FinalRulingWrapper = styled.div`
 
 const RulingInfoStyled = styled(Info)`
   width: 100%;
+  display: flex;
 `;
 
 const OnlyStackholderWarnStyled = styled(Info)`
@@ -140,6 +141,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimChallengeResolve',
         questAddress: claim.questAddress,
+        args: [claim.container.id, dispute!.state],
       });
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,
