@@ -109,9 +109,7 @@ export function handleQuestCreatedV3(event: QuestCreatedV3): void {
 
 export function handleDepositChanged(event: DepositChanged): void {
   let questEntity = new DepositEntity(
-    event.params.timestamp.toString() +
-      event.params.token.toHex() +
-      event.params.amount.toHex()
+    `${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
   );
 
   questEntity.timestamp = event.params.timestamp;
