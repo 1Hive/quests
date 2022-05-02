@@ -179,3 +179,5 @@ export const DEFAULT_FILTER = Object.freeze({
 } as FilterModel);
 
 export const DEFAULT_CLAIM_EXECUTION_DELAY_MS = 60 * 15 * 1000; // Add 15 minutes by default
+
+export const MAX_LINE_DESCRIPTION = 5;

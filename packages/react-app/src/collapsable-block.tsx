@@ -51,18 +51,18 @@ type Props = {
   children: any;
   label?: string;
   visible?: boolean;
+  collapsed?: boolean;
   type?: 'image' | 'code' | 'default';
   alt?: string;
 };
 
 export function CollapsableBlock(props: Props) {
   const theme = useTheme();
-  const [isVisible, setVisible] = useState(props.visible);
+  const [collapsed, setCollapsed] = useState(props.collapsed);
+  const [content, setContent] = useState<ReactNode | undefined>();
   const copyCode = useCopyToClipboard();
 
-  useEffect(() => setVisible(props.visible), [props.visible]);
-
-  const [content, setContent] = useState<ReactNode | undefined>();
+  useEffect(() => setCollapsed(props.collapsed), [props.collapsed]);
 
   useEffect(() => {
     // eslint-disable-next-line jsx-a11y/alt-text
@@ -72,38 +72,42 @@ export function CollapsableBlock(props: Props) {
   }, [props, props.children]);
 
   return (
-    <WrapperStyled theme={theme}>
-      <LineStyled>
-        <CollapseButtonStyled onClick={() => setVisible(!isVisible)}>
-          <IconColumnStyled>
-            {isVisible ? (
-              <>
-                <IconDown size="tiny" />
-                <IconUp size="tiny" />
-              </>
-            ) : (
-              <>
-                <IconUp size="tiny" />
-                <IconDown size="tiny" />
-              </>
+    <>
+      {props.visible && (
+        <WrapperStyled theme={theme}>
+          <LineStyled>
+            <CollapseButtonStyled onClick={() => setCollapsed(!collapsed)}>
+              <IconColumnStyled>
+                {collapsed ? (
+                  <>
+                    <IconUp size="tiny" />
+                    <IconDown size="tiny" />
+                  </>
+                ) : (
+                  <>
+                    <IconDown size="tiny" />
+                    <IconUp size="tiny" />
+                  </>
+                )}
+              </IconColumnStyled>
+              <LabelStyled theme={theme}>
+                {collapsed ? 'Show ' : 'Hide '}
+                {props.label}
+              </LabelStyled>
+            </CollapseButtonStyled>
+            {!collapsed && (
+              <CopyButtonStyled
+                onClick={() => copyCode(content)}
+                icon={<IconCopy />}
+                size="small"
+                label="Copy"
+                display="icon"
+              />
             )}
-          </IconColumnStyled>
-          <LabelStyled theme={theme}>
-            {isVisible ? 'Hide ' : 'Show '}
-            {props.label}
-          </LabelStyled>
-        </CollapseButtonStyled>
-        {isVisible && (
-          <CopyButtonStyled
-            onClick={() => copyCode(content)}
-            icon={<IconCopy />}
-            size="small"
-            label="Copy"
-            display="icon"
-          />
-        )}
-      </LineStyled>
-      {isVisible && content ? <ContentWrapperStyled>{content}</ContentWrapperStyled> : <></>}
-    </WrapperStyled>
+          </LineStyled>
+          {!collapsed && content ? <ContentWrapperStyled>{content}</ContentWrapperStyled> : <></>}
+        </WrapperStyled>
+      )}
+    </>
   );
 }

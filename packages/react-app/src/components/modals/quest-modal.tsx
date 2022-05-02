@@ -6,6 +6,7 @@ import {
   ENUM_QUEST_STATE,
   ENUM_QUEST_VIEW_MODE,
   ENUM_TRANSACTION_STATUS,
+  MAX_LINE_DESCRIPTION,
 } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
@@ -344,8 +345,12 @@ export default function QuestModal({
                           <br />- The payout amount. This could be a constant amount for quests that
                           payout multiple times, a range with reference to what determines what
                           amount, the contracts balance at time of claim.
+                          <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed in
+                          main page. This is supposed to be an overview of the Quest. Try to stick
+                          with normal text to prevent any overflow cropping.
                           <br />
                           ⚠️<i>The description should not include any sensitive information.</i>
+                          <br />
                         </>
                       }
                       onChange={handleChange}

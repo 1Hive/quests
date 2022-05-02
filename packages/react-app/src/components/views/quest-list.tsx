@@ -1,6 +1,6 @@
 import { EmptyStateCard, Button, useViewport } from '@1hive/1hive-ui';
 import { debounce } from 'lodash-es';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
@@ -49,10 +49,17 @@ const LineStyled = styled.div`
   align-items: center;
 `;
 
-const skeletonQuests: any[] = [];
-for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
-  skeletonQuests.push(<Quest key={`${i}`} isLoading isSummary />);
-}
+const FlexContainerStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+`;
+
+const QuestWrapperStyled = styled.div<{
+  singleColumn: boolean;
+}>`
+  width: ${({ singleColumn }) => (singleColumn ? '100%' : '50%')};
+`;
 
 export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
@@ -64,6 +71,18 @@ export default function QuestList() {
   const { below } = useViewport();
 
   const { setPage } = usePageContext();
+
+  const skeletonQuests: any[] = useMemo(() => {
+    const fakeQuests = [];
+    for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
+      fakeQuests.push(
+        <QuestWrapperStyled singleColumn={below('medium')}>
+          <Quest key={`${i}`} isLoading isSummary />
+        </QuestWrapperStyled>,
+      );
+    }
+    return fakeQuests;
+  }, []);
 
   useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
 
@@ -147,12 +166,19 @@ export default function QuestList() {
         scrollableTarget="scroll-view"
         scrollThreshold="120px"
       >
-        <div>
+        <FlexContainerStyled>
           {quests.map((questData: QuestModel) => (
-            <Quest key={questData.address} isSummary questData={questData} />
+            <QuestWrapperStyled singleColumn={below('medium')}>
+              <Quest
+                key={questData.address}
+                isSummary
+                questData={questData}
+                isLoading={!questData.address}
+              />
+            </QuestWrapperStyled>
           ))}
           {isLoading && skeletonQuests}
-        </div>
+        </FlexContainerStyled>
       </InfiniteScroll>
     </MainView>
   );

@@ -1,7 +1,7 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
+import { ENUM_PAGES, ENUM_QUEST_STATE, MAX_LINE_DESCRIPTION } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from 'src/services/quest.service';
@@ -26,6 +26,15 @@ import { AddressFieldInput } from './field-input/address-field-input';
 
 const TitleLinkStyled = styled(Link)`
   font-weight: 100;
+  width: 100%;
+
+  div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 `;
 
 const LinkStyled = styled(Link)`
@@ -240,24 +249,16 @@ export default function Quest({
           </RowStyled>
 
           {!isSummary && fieldsRow}
+
           <TextFieldInput
             id="description"
             value={questData?.description}
             isLoading={isLoading || !questData}
-            tooltip={
-              <>
-                <b>The quest description should include:</b>
-                <br />- Details about what the quest entails. <br />- What evidence must be
-                submitted by users claiming a reward for completing the quest. <br />- The payout
-                amount. This could be a constant amount for quests that payout multiple times, a
-                range with reference to what determines what amount, the contracts balance at time
-                of claim. <br />
-                ⚠️<i>The description should not include any sensitive information.</i>
-              </>
-            }
             multiline
             isMarkDown
-            maxLine={isSummary ? 5 : undefined}
+            disableLinks={isSummary}
+            showBlocks={!isSummary}
+            maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
             ellipsis={
               <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
                 Read more
