@@ -66,15 +66,22 @@ const QuestWrapperStyled = styled.div<{
   width: ${({ singleColumn }) => (singleColumn ? '100%' : '50%')};
 `;
 
+const ScrollLabelStyled = styled.div`
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  padding: ${GUpx(2)};
+`;
+
 export default function QuestList() {
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [newQuestLoading, setNewQuestLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const { filter, refreshed, setFilter } = useFilterContext();
   const { currentTheme } = useThemeContext();
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
-
   const { setPage } = usePageContext();
 
   const skeletonQuests: any[] = useMemo(() => {
@@ -111,6 +118,7 @@ export default function QuestList() {
       const { questAddress } = transaction;
       if (questAddress) {
         // Wait for subgraph to index the new quest
+        setNewQuestLoading(true);
         fetchQuestUntilNew(questAddress);
       }
     }
@@ -121,6 +129,7 @@ export default function QuestList() {
       const newQuest = await QuestService.fetchQuest(newQuestAddress);
       if (newQuest) {
         setQuests([newQuest, ...quests]);
+        setNewQuestLoading(false);
       } else {
         fetchQuestUntilNew(newQuestAddress);
       }
@@ -163,15 +172,13 @@ export default function QuestList() {
         <Filter />
       </FilterWrapperStyled>
       <InfiniteScroll
-        loader={<></>}
+        loader={<ScrollLabelStyled>{!isLoading && <>Scroll to load more</>}</ScrollLabelStyled>}
         dataLength={quests.length}
         next={loadMore}
         hasMore={hasMore}
         endMessage={
           quests.length ? (
-            <Outset gu16 className="center">
-              <b>No more quests found</b>
-            </Outset>
+            <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
             <Outset gu64 className="flex-center wide">
               <EmptyStateCardStyled
@@ -190,6 +197,7 @@ export default function QuestList() {
         scrollThreshold="120px"
       >
         <FlexContainerStyled>
+          {newQuestLoading && skeletonQuests[0]}
           {quests.map((questData: QuestModel) => (
             <QuestWrapperStyled singleColumn={below('medium')}>
               <Quest

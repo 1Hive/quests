@@ -32,7 +32,7 @@ import { AddressFieldInput } from './field-input/address-field-input';
 
 const TitleLinkStyled = styled(Link)`
   font-weight: 100;
-  width: 100%;
+  max-width: 100%;
 
   div {
     text-overflow: ellipsis;
@@ -49,14 +49,14 @@ const LinkStyled = styled(Link)`
 
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => GUpx(compact ? 1 : 2)};
+  height: 100%;
 `;
 
 const CardStyled = styled(Card)<{ isSummary: boolean }>`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  height: fit-content;
-  min-height: 250px;
+  height: 100%;
 `;
 
 const QuestFooterStyled = styled.div`
@@ -79,7 +79,8 @@ const RowStyled = styled.div`
 const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => (compact ? GUpx(2) : GUpx(3))};
   width: 100%;
-  min-height: 225px;
+  height: 100%;
+  min-height: 340px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;

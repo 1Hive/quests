@@ -17,6 +17,7 @@ const BoxStyled = styled.div`
   border-radius: 8px;
   width: 100%;
   padding: ${GUpx(2)};
+  min-height: 115px;
 `;
 
 const TextStyled = styled.span`
