@@ -6,7 +6,6 @@ import ErrorBoundary from './components/utils/error-boundary';
 import { DEFAULT_THEME } from './constants';
 import { FilterContextProvider } from './contexts/filter.context';
 import { PageContextProvider } from './contexts/page.context';
-import { QuestsContextProvider } from './contexts/quests.context';
 import { TransactionContextProvider } from './contexts/transaction.context';
 import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
@@ -42,22 +41,20 @@ function App() {
       <WalletProvider>
         <PageContextProvider>
           <TransactionContextProvider>
-            <QuestsContextProvider>
-              <FilterContextProvider>
-                <Main
-                  assetsUrl="/aragon-ui/"
-                  layout={false}
-                  scrollView={false}
-                  theme={currentTheme ?? DEFAULT_THEME}
-                >
-                  <HashRouter>
-                    <ErrorBoundary>
-                      <Routes />
-                    </ErrorBoundary>
-                  </HashRouter>
-                </Main>
-              </FilterContextProvider>
-            </QuestsContextProvider>
+            <FilterContextProvider>
+              <Main
+                assetsUrl="/aragon-ui/"
+                layout={false}
+                scrollView={false}
+                theme={currentTheme ?? DEFAULT_THEME}
+              >
+                <HashRouter>
+                  <ErrorBoundary>
+                    <Routes />
+                  </ErrorBoundary>
+                </HashRouter>
+              </Main>
+            </FilterContextProvider>
           </TransactionContextProvider>
         </PageContextProvider>
       </WalletProvider>

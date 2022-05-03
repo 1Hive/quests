@@ -26,6 +26,11 @@ const BlockStyled = styled.div<{ wide?: boolean }>`
   ${({ wide }) => wide && 'width: 100%;'}
 `;
 
+const TextFieldWrapperStyled = styled.div<{ maxLine?: number }>`
+  ${({ maxLine }) => (maxLine ? `height: ${maxLine * 24}px;` : '')};
+  overflow: hidden;
+`;
+
 // #endregion
 
 type Props = {
@@ -46,6 +51,8 @@ type Props = {
   isMarkDown?: boolean;
   ellipsis?: ReactNode;
   tooltip?: React.ReactNode;
+  disableLinks?: boolean;
+  showBlocks?: boolean;
 
   onBlur?: Function;
   error?: string | false;
@@ -70,6 +77,8 @@ export default function TextFieldInput({
   tooltip,
   onBlur = noop,
   error,
+  disableLinks = false,
+  showBlocks = false,
 }: Props) {
   const [isEditState, setIsEdit] = useState(isEdit);
 
@@ -82,7 +91,7 @@ export default function TextFieldInput({
   };
 
   const readOnlyContent = (
-    <>
+    <TextFieldWrapperStyled maxLine={maxLine}>
       {isMarkDown ? (
         <Markdown
           normalized
@@ -99,7 +108,7 @@ export default function TextFieldInput({
                 component: CollapsableBlock,
                 props: {
                   label: 'block',
-                  visible: !maxLine,
+                  visible: showBlocks,
                 },
               },
               code: {
@@ -107,7 +116,7 @@ export default function TextFieldInput({
                 props: {
                   label: 'code block',
                   type: 'code',
-                  visible: !maxLine,
+                  visible: showBlocks,
                 },
               },
               img: {
@@ -115,11 +124,11 @@ export default function TextFieldInput({
                 props: {
                   label: 'image',
                   type: 'image',
-                  visible: !maxLine,
+                  visible: showBlocks,
                 },
               },
               a: {
-                component: 'a',
+                component: disableLinks ? 'span' : 'a',
                 props: {
                   target: '_blank',
                   tabIndex: '-1',
@@ -131,7 +140,7 @@ export default function TextFieldInput({
       ) : (
         value
       )}
-    </>
+    </TextFieldWrapperStyled>
   );
   const loadableContent = isEditState ? (
     <BlockStyled wide={wide}>

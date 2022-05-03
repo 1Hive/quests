@@ -53,6 +53,8 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
         message: 'Reclaiming unused fund',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        type: 'QuestReclaimFunds',
+        questAddress: questData.address,
       });
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(
         walletAddress,
@@ -107,7 +109,6 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
             label="Reclaim funds"
-            disabled={!bounty.parsedAmount}
             title={bounty.parsedAmount ? 'Reclaim funds' : 'No more funds'}
             mode="strong"
           />

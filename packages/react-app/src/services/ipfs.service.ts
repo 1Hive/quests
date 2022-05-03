@@ -54,8 +54,8 @@ export const getObjectFromIpfsSafe = async (evidenceIpfsHash: string) => {
   try {
     evidence = await getObjectFromIpfs(evidenceIpfsHash);
   } catch (error: any) {
+    Logger.warn(error, 'Failed to get IPFS object when fetching claims');
     evidence = await getObjectFromIpfs(evidenceIpfsHash, ipfsTheGraph);
-    Logger.exception(error, 'Failed to get IPFS object when fetching claims');
   }
   // If failed to fetch ipfs evidence
   if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');

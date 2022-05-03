@@ -305,8 +305,8 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   try {
     fetchedReason = await getObjectFromIpfs(reason);
   } catch (error) {
+    Logger.warn(error, 'Failed to get IPFS object when fetching challenge');
     fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph); // try with thegraph ipfs node
-    Logger.exception(error, 'Failed to get IPFS object when fetching challenge');
   }
   return {
     deposit: {
