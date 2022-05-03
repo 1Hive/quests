@@ -50,9 +50,9 @@ dataSources:
     name: QuestFactoryV3
     network: rinkeby
     source:
-      address: "0xf94FB88b197c8749DabD633aCd55C9F50B18E4Da"
+      address: "0xf8D300B19C22f1313d688bea0617BBd8cCd242d7"
       abi: QuestFactoryV3
-      startBlock: 10603916
+      startBlock: 10613166
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
