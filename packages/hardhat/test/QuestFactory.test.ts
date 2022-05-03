@@ -113,9 +113,7 @@ describe("[Contract] QuestFactory", function () {
         );
 
       // Assert
-      await expect(act()).to.be.revertedWith(
-        "ERC20: transfer amount exceeds allowance"
-      );
+      await expect(act()).to.be.revertedWith("ERROR : Deposit bad allowance");
     });
   });
 

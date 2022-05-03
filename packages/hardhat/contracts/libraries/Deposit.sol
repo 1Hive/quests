@@ -16,11 +16,22 @@ library DepositLib {
         internal
     {
         if (_collateral.amount > 0) {
+            // Verify allowance
+            uint256 allowance = _collateral.token.allowance(
+                _from,
+                address(this)
+            );
+            require(
+                allowance >= _collateral.amount,
+                "ERROR : Deposit bad allowance"
+            );
+
             _collateral.token.safeTransferFrom(
                 _from,
                 address(this),
                 _collateral.amount
             );
+
             emit Lock(address(_collateral.token), _from, _collateral.amount);
         }
     }
