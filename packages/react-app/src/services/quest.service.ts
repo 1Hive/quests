@@ -23,6 +23,7 @@ import {
   fetchQuestEntities,
   fetchActiveQuestEntitiesLight,
   fetchQuestRewardTokens,
+  fetchLastDepositEntity,
 } from 'src/queries/quests.query';
 import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
@@ -356,6 +357,19 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   };
 }
 
+export async function fetchLastQuestDeposit() {
+  const res = await fetchLastDepositEntity();
+  const [last] = res.depositEntities;
+  const token = await getTokenInfo(last.depositToken);
+  if (!token) {
+    return null;
+  }
+  return toTokenAmountModel({
+    ...token,
+    amount: last.depositAmount,
+  });
+}
+
 // #endregion
 
 // #region QuestFactory
@@ -378,7 +392,6 @@ export async function saveQuest(
     typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
-    defaultGazFees,
   );
   return handleTransaction(tx, onTx);
 }

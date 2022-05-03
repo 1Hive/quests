@@ -88,8 +88,8 @@ export default function QuestList() {
     const fakeQuests = [];
     for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
       fakeQuests.push(
-        <QuestWrapperStyled singleColumn={below('medium')}>
-          <Quest key={`${i}`} isLoading isSummary />
+        <QuestWrapperStyled singleColumn={below('medium')} key={`${i}`}>
+          <Quest isLoading isSummary />
         </QuestWrapperStyled>,
       );
     }
@@ -115,11 +115,10 @@ export default function QuestList() {
       transaction.status === ENUM_TRANSACTION_STATUS.Confirmed
     ) {
       // Insert the newQuest at the top of the list
-      const { questAddress } = transaction;
-      if (questAddress) {
+      if (transaction.args?.questAddress) {
         // Wait for subgraph to index the new quest
         setNewQuestLoading(true);
-        fetchQuestUntilNew(questAddress);
+        fetchQuestUntilNew(transaction.args.questAddress);
       }
     }
   }, [transaction?.status, transaction?.type]);
@@ -199,13 +198,8 @@ export default function QuestList() {
         <FlexContainerStyled>
           {newQuestLoading && skeletonQuests[0]}
           {quests.map((questData: QuestModel) => (
-            <QuestWrapperStyled singleColumn={below('medium')}>
-              <Quest
-                key={questData.address}
-                isSummary
-                questData={questData}
-                isLoading={!questData.address}
-              />
+            <QuestWrapperStyled singleColumn={below('medium')} key={questData.address}>
+              <Quest isSummary questData={questData} isLoading={!questData.address} />
             </QuestWrapperStyled>
           ))}
           {isLoading && skeletonQuests}

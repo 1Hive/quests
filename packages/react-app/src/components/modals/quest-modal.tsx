@@ -18,10 +18,12 @@ import { toChecksumAddress } from 'web3-utils';
 import { useWallet } from 'src/contexts/wallet.context';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { TokenAmountModel } from 'src/models/token-amount.model';
+import { approveTokenTransaction, fundQuestTransaction } from 'src/services/transaction-handler';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
-import { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { WalletBallance } from '../wallet-balance';
@@ -72,17 +74,26 @@ export default function QuestModal({
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
   const { walletAddress } = useWallet();
-  const { defaultToken } = getNetwork();
+  const { defaultToken, questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
+  const [questDeposit, setQuestDeposit] = useState<TokenAmountModel | null>();
   let mounted = true;
 
   useEffect(() => {
     feedDummyQuestData(questData).then((data) => {
-      if (mounted) setQuestDataState(data);
+      if (mounted) {
+        setQuestDataState(data);
+      }
+    });
+
+    QuestService.fetchLastQuestDeposit().then((deposit) => {
+      if (mounted) {
+        setQuestDeposit(deposit);
+      }
     });
     return () => {
       mounted = false;
@@ -154,14 +165,21 @@ export default function QuestModal({
 
   const onQuestSubmit = async (values: QuestModel) => {
     validate(values); // Validate one last time before submitting
+    if (isFormValid && questDeposit?.token) {
+      await approveTokenTransaction(
+        questDeposit?.token,
+        questFactoryAddress,
+        `Approving quest deposit (1/${values.bounty?.parsedAmount ? '3' : '2'})`,
+        walletAddress,
+        setTransaction,
+      );
 
-    if (isFormValid) {
       let newQuestAddress: string;
       try {
         setTransaction({
           id: uniqueId(),
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
-          message: 'Creating Quest...',
+          message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           type: 'QuestCreate',
         });
@@ -200,47 +218,20 @@ export default function QuestModal({
               questAddress: newQuestAddress,
             },
         );
-
-        if (txReceiptSaveQuest?.status) {
-          if (values.bounty?.parsedAmount) {
-            setTransaction({
-              id: uniqueId(),
-              estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
-              message: 'Sending funds to Quest',
-              status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-              type: 'QuestFund',
-              questAddress: newQuestAddress,
-            });
-            const txReceiptFundQuest = await QuestService.fundQuest(
-              walletAddress,
-              newQuestAddress,
-              values.bounty!,
-              (txHash) => {
-                setTransaction(
-                  (oldTx) =>
-                    oldTx && {
-                      ...oldTx,
-                      hash: txHash,
-                      status: ENUM_TRANSACTION_STATUS.Pending,
-                    },
-                );
-              },
-            );
-            setTransaction(
-              (oldTx) =>
-                oldTx && {
-                  ...oldTx,
-                  status: txReceiptSaveQuest?.status
-                    ? ENUM_TRANSACTION_STATUS.Confirmed
-                    : ENUM_TRANSACTION_STATUS.Failed,
-                },
-            );
-            if (!txReceiptFundQuest?.status || !newQuestAddress) {
-              throw new Error('Failed to create quest');
-            }
-            if (mounted) setQuestDataState(emptyQuestData);
-          }
+        if (!txReceiptSaveQuest?.status || !newQuestAddress) {
+          throw new Error('Failed to create quest');
         }
+        if (values.bounty?.parsedAmount) {
+          await fundQuestTransaction(
+            values.bounty,
+            newQuestAddress,
+            `Sending funds to the Quest (3/3)`,
+            walletAddress,
+            setTransaction,
+          );
+        }
+
+        if (mounted) setQuestDataState(emptyQuestData);
       } catch (e: any) {
         setTransaction(
           (oldTx) =>
@@ -306,17 +297,39 @@ export default function QuestModal({
                 submitButton={
                   <>
                     <WalletBallance
-                      key="wallet-balance"
+                      key="reward-token-balance"
                       askedTokenAmount={values.bounty}
                       setIsEnoughBalance={setIsEnoughBalance}
                     />
+                    {questDeposit && questDeposit?.parsedAmount > 0 && (
+                      <>
+                        {questDeposit?.token?.token !== values.bounty?.token?.token && (
+                          <WalletBallance
+                            key="collateral=token-balance"
+                            askedTokenAmount={questDeposit}
+                            setIsEnoughBalance={setIsEnoughBalance}
+                          />
+                        )}
+                        <AmountFieldInput
+                          key="questDeposit"
+                          id="questDeposit"
+                          label="Quest Deposit"
+                          tooltip="This amount will be hold by the Quest. It will be reclaimable from reclaim button once the Quest is expired."
+                          value={questDeposit}
+                          compact
+                          showUsd
+                        />
+                      </>
+                    )}
                     <Button
                       key="btn-save"
                       label="Create"
                       mode="positive"
                       type="submit"
                       form="form-quest"
-                      disabled={!walletAddress || !isEnoughBalance || !isFormValid}
+                      disabled={
+                        !walletAddress || !isEnoughBalance || !isFormValid || !questDeposit?.token
+                      }
                     />
                   </>
                 }

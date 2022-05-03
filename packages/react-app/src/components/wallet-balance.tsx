@@ -23,7 +23,7 @@ const WrapperStyled = styled.div<{ theme: ThemeInterface; isEnoughBalance: boole
 // #endregion
 
 type Props = {
-  askedTokenAmount?: TokenAmountModel;
+  askedTokenAmount?: TokenAmountModel | null;
   setIsEnoughBalance?: (_valid: boolean) => void;
   isLoading?: boolean;
 };
@@ -62,7 +62,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
 
   return (
     <WrapperStyled theme={currentTheme} isEnoughBalance={isEnoughBalance}>
-      {askedTokenAmount?.token ? (
+      {askedTokenAmount?.token && askedTokenAmount !== null ? (
         <AmountFieldInput
           isLoading={!tokenBalance || isLoading}
           id={`balance-${tokenBalance?.token.symbol}`}

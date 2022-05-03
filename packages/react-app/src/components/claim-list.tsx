@@ -73,7 +73,7 @@ export default function ClaimList({
     // If tx completion impact Claims, update them
     if (
       transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction?.questAddress === questData.address &&
+      transaction?.[0] === questData.address &&
       transaction?.type === 'ClaimSchedule'
     ) {
       fetchClaimsUntilNew();

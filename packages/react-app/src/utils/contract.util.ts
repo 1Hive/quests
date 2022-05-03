@@ -96,7 +96,7 @@ export async function getTokenInfo(tokenAddress: string) {
   } catch (error) {
     Logger.exception(error);
   }
-  return tokenAddress;
+  return null;
 }
 
 export function getQuestContract(questAddress: string, walletAddress?: string): Contract | null {

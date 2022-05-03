@@ -91,8 +91,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         message: 'Sending claimed amount to your wallet',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimExecute',
-        questAddress: claim.questAddress,
-        args: [claim.container!.id],
+        args: { questAddress: claim.questAddress, containerId: claim.container!.id },
       });
       const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
         setTransaction(

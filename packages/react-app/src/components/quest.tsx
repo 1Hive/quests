@@ -118,7 +118,7 @@ export default function Quest({
     // If tx completion impact Quest bounty, update it
     if (
       transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction.questAddress === questData.address &&
+      transaction.args?.questAddress === questData.address &&
       (transaction?.type === 'ClaimChallengeResolve' ||
         transaction?.type === 'ClaimExecute' ||
         transaction?.type === 'QuestFund' ||
@@ -131,7 +131,7 @@ export default function Quest({
         }
       }, 500);
     }
-  }, [transaction?.type, transaction?.status, transaction?.questAddress]);
+  }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
   let isSubscribed = true;
 
