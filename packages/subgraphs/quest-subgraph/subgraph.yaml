@@ -72,9 +72,9 @@ dataSources:
     name: QuestFactoryV4
     network: rinkeby
     source:
-      address: "0xFc88D4b7Fcd0Fb6675Ed88684C396A4059CDF212"
+      address: "0x9f15291090fEECB67186A2D0A24173bB2Dbb7395"
       abi: QuestFactoryV4
-      startBlock: 10614698
+      startBlock: 10615002
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

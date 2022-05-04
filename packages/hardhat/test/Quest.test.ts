@@ -61,10 +61,10 @@ describe("[Contract] Quest", function () {
       expect(await depositToken.balanceOf(creator.address)).to.eq(
         depositAmount
       );
-      expect(await quest.depositHeld()).to.eq(false);
+      expect(await quest.isDepositReleased()).to.eq(true);
     });
 
-    it.only("SHOULD not release deposit if quest is not held", async function () {
+    it("SHOULD not release deposit if quest is not held", async function () {
       // Arrange
       const quest = await deployQuest(
         "fakeTitle",

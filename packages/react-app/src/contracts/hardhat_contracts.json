@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "Quest": {
-          "address": "0xcc83C3d1067189b37f124fe9dEb7082F13962F8d",
+          "address": "0x090950cDAe25da37D8DF63fC111Ed7cBD62b80CE",
           "abi": [
             {
               "inputs": [
@@ -173,19 +173,6 @@
             },
             {
               "inputs": [],
-              "name": "depositHeld",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
               "name": "expireTime",
               "outputs": [
                 {
@@ -205,6 +192,19 @@
                   "internalType": "address payable",
                   "name": "",
                   "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "isDepositReleased",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
                 }
               ],
               "stateMutability": "view",
@@ -272,7 +272,7 @@
           ]
         },
         "QuestFactory": {
-          "address": "0xe6b97474daE6520932E8EA2e3E92e82d0dE958C0",
+          "address": "0x9f15291090fEECB67186A2D0A24173bB2Dbb7395",
           "abi": [
             {
               "inputs": [

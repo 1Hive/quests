@@ -22,7 +22,7 @@ contract Quest {
     address payable public fundsRecoveryAddress;
     Models.Claim[] public claims;
     Models.Deposit public deposit;
-    bool public depositHeld;
+    bool public isDepositReleased;
 
     event QuestClaimed(bytes evidence, address player, uint256 amount);
 
@@ -45,16 +45,16 @@ contract Quest {
         fundsRecoveryAddress = _fundsRecoveryAddress;
         questCreator = _questCreator;
         deposit = Models.Deposit(_depositToken, _depositAmount);
-        depositHeld = true;
+        isDepositReleased = false;
     }
 
     function recoverUnclaimedFunds() external {
         require(block.timestamp > expireTime, "ERROR: Not expired");
 
         // Restore deposit if not already released
-        if (depositHeld) {
+        if (!isDepositReleased) {
             deposit.releaseTo(questCreator);
-            depositHeld = false;
+            isDepositReleased = true;
         }
 
         rewardToken.safeTransfer(
