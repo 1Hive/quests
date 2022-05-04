@@ -9,6 +9,7 @@ import {
   QUESTS_PAGE_SIZE,
   DEFAULT_FILTER,
   ENUM_TRANSACTION_STATUS,
+  ENUM_QUEST_STATE,
 } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
@@ -111,6 +112,7 @@ export default function QuestList() {
   useEffect(() => {
     // Should not be nullish and not already exist in list
     if (
+      filter.status === ENUM_QUEST_STATE.Active &&
       transaction?.type === 'QuestCreate' &&
       transaction.status === ENUM_TRANSACTION_STATUS.Confirmed
     ) {

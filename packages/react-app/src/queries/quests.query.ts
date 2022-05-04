@@ -18,6 +18,8 @@ const QuestEntityQuery = gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
+      depositToken
+      depositAmount
     }
   }
 `;
@@ -53,6 +55,8 @@ const QuestEntitiesQuery = gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
+      depositToken
+      depositAmount
     }
   }
 `;
@@ -97,6 +101,8 @@ const QuestEntitiesLight = gql`
     questEntities(where: { questExpireTimeSec_gt: $expireTimeLower }) {
       id
       questRewardTokenAddress
+      depositToken
+      depositAmount
     }
   }
 `;

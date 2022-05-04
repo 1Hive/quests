@@ -25,6 +25,7 @@ import {
   fetchQuestRewardTokens,
   fetchLastDepositEntity,
 } from 'src/queries/quests.query';
+import { DepositModel } from 'src/models/deposit-model';
 import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -43,7 +44,7 @@ import {
   getGovernQueueContract,
   getCelesteContract,
 } from '../utils/contract.util';
-import { processQuestState } from './state-machine';
+import { isQuestExpired, processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 import { cacheFetchTokenPrice } from './cache.service';
 
@@ -63,7 +64,18 @@ async function mapQuest(questEntity: any) {
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
       creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
+      deposit: +questEntity.depositToken
+        ? ({
+            amount: BigNumber.from(questEntity.depositAmount),
+            token: toChecksumAddress(questEntity.depositToken),
+            released: false,
+          } as DepositModel)
+        : undefined,
+      fallbackAddress: toChecksumAddress(questEntity.fallbackAddress),
     } as QuestModel;
+    if (isQuestExpired(quest) && quest.deposit && quest.address) {
+      quest.deposit.released = await isQuestDepositReleased(quest.address);
+    }
     quest = processQuestState(quest);
     if (!quest.detailsRefIpfs) quest.description = '[No description]';
     // If failed to fetch ipfs description
@@ -333,10 +345,21 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
   const result = await fetchActiveQuestEntitiesLight();
-  const quests = result.questEntities as { id: string; questRewardTokenAddress: string }[];
+  const quests = result.questEntities as {
+    id: string;
+    questRewardTokenAddress: string;
+    depositToken: string;
+    depositAmount: string;
+  }[];
   const funds = (
     await Promise.all(
-      quests.map(async (quest) => getBalanceOf(quest.questRewardTokenAddress, quest.id)),
+      quests.map(async (quest) =>
+        getBalanceOf(quest.questRewardTokenAddress, quest.id, {
+          amount: BigNumber.from(quest.depositAmount),
+          token: quest.depositToken,
+          released: false,
+        }),
+      ),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
 
@@ -416,6 +439,11 @@ export async function getQuestRecoveryAddress(questAddress: string): Promise<str
   return getQuestContract(questAddress)?.fundsRecoveryAddress() ?? null;
 }
 
+export function isQuestDepositReleased(questAddress: string): Promise<boolean> {
+  const quest = getQuestContract(questAddress);
+  return quest.isDepositReleased();
+}
+
 // #region
 
 // #region ERC20
@@ -450,6 +478,7 @@ export async function approveTokenAmount(
 export async function getBalanceOf(
   token: TokenModel | string,
   address: string,
+  lockedFunds?: DepositModel,
 ): Promise<TokenAmountModel | null> {
   try {
     let tokenInfo: TokenModel;
@@ -458,7 +487,11 @@ export async function getBalanceOf(
     if (tokenInfo) {
       const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
-      const balance = (await erc20Contract.balanceOf(address)) as BigNumber;
+      let balance = (await erc20Contract.balanceOf(address)) as BigNumber;
+      if (lockedFunds?.token === tokenInfo.token) {
+        // Substract deposit from funds if both same token
+        balance = balance.sub(BigNumber.from(lockedFunds.amount));
+      }
       tokenInfo.amount = balance.toString();
       const price = await cacheFetchTokenPrice(tokenInfo);
       const parsedAmount = fromBigNumber(balance, tokenInfo.decimals);
