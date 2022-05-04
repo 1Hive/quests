@@ -15,7 +15,7 @@ type _Schema_
     ]
   )
 
-type QuestEntity @entity {
+type QuestEntity @entity(immutable: true) {
   id: ID!
   questAddress: String!
   questTitle: String!
@@ -30,7 +30,7 @@ type QuestEntity @entity {
   depositAmount: BigInt!
 }
 
-type DepositEntity @entity {
+type DepositEntity @entity(immutable: true) {
   id: ID!
   timestamp: BigInt!
   depositToken: Bytes!
