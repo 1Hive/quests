@@ -61,6 +61,7 @@ describe("[Contract] Quest", function () {
       expect(await depositToken.balanceOf(creator.address)).to.eq(
         depositAmount
       );
+      expect(await quest.depositHeld()).to.eq(false);
     });
 
     it("SHOULD revert WHEN not expire", async function () {
@@ -84,6 +85,7 @@ describe("[Contract] Quest", function () {
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: Not expired");
     });
+
     it("SHOULD return deposit and remaining funds separately WHEN same reward token than deposit", async () => {
       // Arrange
       const sameToken = rewardToken;

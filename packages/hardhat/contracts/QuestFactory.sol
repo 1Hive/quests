@@ -22,6 +22,7 @@ contract QuestFactory is Ownable {
         address rewardTokenAddress,
         uint256 expireTime,
         uint256 creationTime,
+        address fundsRecoveryAddress,
         address depositToken,
         uint256 depositAmount
     );
@@ -48,7 +49,7 @@ contract QuestFactory is Ownable {
         IERC20 _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress
-    ) external returns (address) {        
+    ) external returns (address) {
         // Collect deposit from quest creator
         deposit.collectFrom(msg.sender);
 
@@ -73,6 +74,7 @@ contract QuestFactory is Ownable {
             address(_rewardToken),
             _expireTime,
             block.timestamp,
+            _fundsRecoveryAddress,
             address(deposit.token),
             deposit.amount
         );

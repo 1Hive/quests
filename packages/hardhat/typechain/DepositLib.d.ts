@@ -19,12 +19,12 @@ interface DepositLibInterface extends ethers.utils.Interface {
   functions: {};
 
   events: {
-    "Lock(address,address,uint256)": EventFragment;
-    "Unlock(address,address,uint256)": EventFragment;
+    "DepositLock(address,address,uint256)": EventFragment;
+    "DepositUnlock(address,address,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Lock"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Unlock"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DepositLock"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DepositUnlock"): EventFragment;
 }
 
 export class DepositLib extends Contract {
@@ -45,9 +45,17 @@ export class DepositLib extends Contract {
   callStatic: {};
 
   filters: {
-    Lock(token: string | null, from: string | null, amount: null): EventFilter;
+    DepositLock(
+      token: string | null,
+      from: string | null,
+      amount: null
+    ): EventFilter;
 
-    Unlock(token: string | null, to: string | null, amount: null): EventFilter;
+    DepositUnlock(
+      token: string | null,
+      to: string | null,
+      amount: null
+    ): EventFilter;
   };
 
   estimateGas: {};

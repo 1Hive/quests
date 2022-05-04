@@ -9,9 +9,6 @@ import "./Models.sol";
 library DepositLib {
     using SafeERC20 for IERC20;
 
-    event Lock(address indexed token, address indexed from, uint256 amount);
-    event Unlock(address indexed token, address indexed to, uint256 amount);
-
     function collectFrom(Models.Deposit memory _collateral, address _from)
         internal
     {
@@ -31,8 +28,6 @@ library DepositLib {
                 address(this),
                 _collateral.amount
             );
-
-            emit Lock(address(_collateral.token), _from, _collateral.amount);
         }
     }
 
@@ -41,7 +36,6 @@ library DepositLib {
     {
         if (_collateral.amount > 0) {
             _collateral.token.safeTransfer(_to, _collateral.amount);
-            emit Unlock(address(_collateral.token), _to, _collateral.amount);
         }
     }
 }

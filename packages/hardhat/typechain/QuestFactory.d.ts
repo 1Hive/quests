@@ -77,7 +77,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   events: {
     "DepositChanged(uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
-    "QuestCreated(address,string,bytes,address,uint256,uint256,address,uint256)": EventFragment;
+    "QuestCreated(address,string,bytes,address,uint256,uint256,address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "DepositChanged"): EventFragment;
@@ -297,6 +297,7 @@ export class QuestFactory extends Contract {
       rewardTokenAddress: null,
       expireTime: null,
       creationTime: null,
+      fundsRecoveryAddress: null,
       depositToken: null,
       depositAmount: null
     ): EventFilter;

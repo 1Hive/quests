@@ -13,8 +13,6 @@ contract Quest {
     using SafeERC20 for IERC20;
     using DepositLib for Models.Deposit;
 
-    // Keep reference to the QuestFactory being used
-    address public factory;
     address public questCreator;
     string public questTitle;
     bytes public questDetailsRef;
@@ -24,6 +22,7 @@ contract Quest {
     address payable public fundsRecoveryAddress;
     Models.Claim[] public claims;
     Models.Deposit public deposit;
+    bool public depositHeld;
 
     event QuestClaimed(bytes evidence, address player, uint256 amount);
 
@@ -46,7 +45,7 @@ contract Quest {
         fundsRecoveryAddress = _fundsRecoveryAddress;
         questCreator = _questCreator;
         deposit = Models.Deposit(_depositToken, _depositAmount);
-        factory = msg.sender;
+        depositHeld = true;
     }
 
     function recoverUnclaimedFunds() external {
@@ -54,6 +53,7 @@ contract Quest {
 
         // Restore deposit
         deposit.releaseTo(questCreator);
+        depositHeld = false;
 
         rewardToken.safeTransfer(
             fundsRecoveryAddress,
