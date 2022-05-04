@@ -25,7 +25,7 @@ import DateFieldInput from './field-input/date-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
-import { processQuestState } from '../services/state-machine';
+import { isQuestExpired, processQuestState as computeQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 
@@ -114,6 +114,7 @@ export default function Quest({
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
+  const [state, setState] = useState(questData.state);
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   let isMounted = true;
@@ -121,10 +122,7 @@ export default function Quest({
   useEffect(() => {
     if (!isSummary) {
       // Don't show deposit of expired
-      if (
-        questData.state === ENUM_QUEST_STATE.Archived ||
-        questData.state === ENUM_QUEST_STATE.Expired
-      ) {
+      if (state === ENUM_QUEST_STATE.Archived || state === ENUM_QUEST_STATE.Expired) {
         setClaimDeposit(undefined);
       } else {
         try {
@@ -145,9 +143,13 @@ export default function Quest({
   }, []);
 
   useEffect(() => {
+    setState(questData.state);
+  }, [questData.state]);
+
+  useEffect(() => {
     // If tx completion impact Quest bounty, update it
     if (
-      questData.state === ENUM_QUEST_STATE.Active &&
+      state === ENUM_QUEST_STATE.Active &&
       transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
       transaction.args?.questAddress === questData.address &&
       (transaction?.type === 'ClaimChallengeResolve' ||
@@ -174,11 +176,22 @@ export default function Quest({
 
   const fetchBalanceOfQuest = async (address: string, token: TokenModel | string) => {
     try {
-      const result = await QuestService.getBalanceOf(token, address, questData.deposit);
-      if (isMounted) {
-        questData.bounty = result;
-        processQuestState(questData);
-        setBounty(result);
+      if (questData.address) {
+        let isDepositReleased = false;
+        if (isQuestExpired(questData)) {
+          isDepositReleased = await QuestService.isQuestDepositReleased(questData.address);
+        }
+        const result = await QuestService.getBalanceOf(
+          token,
+          address,
+          isDepositReleased ? undefined : questData.deposit,
+        );
+        if (isMounted) {
+          questData.bounty = result;
+          computeQuestState(questData, isDepositReleased);
+          setState(questData.state);
+          setBounty(result);
+        }
       }
     } catch (error) {
       Logger.exception(error);
@@ -223,7 +236,7 @@ export default function Quest({
         value={questData?.expireTime}
       />
 
-      {!isSummary && questData.state === ENUM_QUEST_STATE.Active && (
+      {!isSummary && state === ENUM_QUEST_STATE.Active && (
         <AmountFieldInput
           id="claimDeposit"
           label="Claim deposit"
@@ -303,7 +316,7 @@ export default function Quest({
               </>
             ) : (
               <>
-                {bounty?.parsedAmount && (
+                {state === ENUM_QUEST_STATE.Expired && (
                   <ReclaimFundsModal bounty={bounty} questData={questData} />
                 )}
               </>

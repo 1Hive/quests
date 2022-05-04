@@ -56,7 +56,7 @@ type onTxCallback = (_hash: string) => void;
 async function mapQuest(questEntity: any) {
   if (!questEntity) return undefined;
   try {
-    let quest = {
+    const quest = {
       address: toChecksumAddress(questEntity.questAddress),
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
@@ -68,15 +68,12 @@ async function mapQuest(questEntity: any) {
         ? ({
             amount: BigNumber.from(questEntity.depositAmount),
             token: toChecksumAddress(questEntity.depositToken),
-            released: false,
           } as DepositModel)
         : undefined,
-      fallbackAddress: toChecksumAddress(questEntity.fallbackAddress),
+      fallbackAddress: toChecksumAddress(questEntity.questFundsRecoveryAddress),
+      creatorAddress: toChecksumAddress(questEntity.questCreator),
     } as QuestModel;
-    if (isQuestExpired(quest) && quest.deposit && quest.address) {
-      quest.deposit.released = await isQuestDepositReleased(quest.address);
-    }
-    quest = processQuestState(quest);
+
     if (!quest.detailsRefIpfs) quest.description = '[No description]';
     // If failed to fetch ipfs description
     else if (!quest.description)
@@ -357,7 +354,6 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
         getBalanceOf(quest.questRewardTokenAddress, quest.id, {
           amount: BigNumber.from(quest.depositAmount),
           token: quest.depositToken,
-          released: false,
         }),
       ),
     )
@@ -439,9 +435,14 @@ export async function getQuestRecoveryAddress(questAddress: string): Promise<str
   return getQuestContract(questAddress)?.fundsRecoveryAddress() ?? null;
 }
 
-export function isQuestDepositReleased(questAddress: string): Promise<boolean> {
-  const quest = getQuestContract(questAddress);
-  return quest.isDepositReleased();
+export async function isQuestDepositReleased(questAddress: string): Promise<boolean> {
+  try {
+    const quest = getQuestContract(questAddress);
+    return await quest.isDepositReleased();
+  } catch (error) {
+    Logger.debug('Failed to get quest deposit status', { questAddress, error });
+    return false;
+  }
 }
 
 // #region

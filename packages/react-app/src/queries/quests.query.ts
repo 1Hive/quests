@@ -20,6 +20,8 @@ const QuestEntityQuery = gql`
       creationTimestamp
       depositToken
       depositAmount
+      questCreator
+      questFundsRecoveryAddress
     }
   }
 `;
@@ -57,6 +59,8 @@ const QuestEntitiesQuery = gql`
       creationTimestamp
       depositToken
       depositAmount
+      questCreator
+      questFundsRecoveryAddress
     }
   }
 `;

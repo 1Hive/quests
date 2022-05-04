@@ -133,7 +133,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
             label="Reclaim"
-            title={bounty?.parsedAmount ? 'Reclaim' : 'No more funds'}
+            title="Reclaim"
             mode="strong"
           />
         }
