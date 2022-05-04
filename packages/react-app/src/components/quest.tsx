@@ -113,6 +113,7 @@ export default function Quest({
   const { walletAddress } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
+  const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const [state, setState] = useState(questData.state);
   const { below } = useViewport();
@@ -149,7 +150,6 @@ export default function Quest({
   useEffect(() => {
     // If tx completion impact Quest bounty, update it
     if (
-      state === ENUM_QUEST_STATE.Active &&
       transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
       transaction.args?.questAddress === questData.address &&
       (transaction?.type === 'ClaimChallengeResolve' ||
@@ -177,18 +177,19 @@ export default function Quest({
   const fetchBalanceOfQuest = async (address: string, token: TokenModel | string) => {
     try {
       if (questData.address) {
-        let isDepositReleased = false;
+        let depositReleased = false;
         if (isQuestExpired(questData)) {
-          isDepositReleased = await QuestService.isQuestDepositReleased(questData.address);
+          depositReleased = await QuestService.isQuestDepositReleased(questData.address);
         }
         const result = await QuestService.getBalanceOf(
           token,
           address,
-          isDepositReleased ? undefined : questData.deposit,
+          depositReleased ? undefined : questData.deposit,
         );
         if (isMounted) {
           questData.bounty = result;
-          computeQuestState(questData, isDepositReleased);
+          setIsDepositReleased(depositReleased);
+          computeQuestState(questData, depositReleased);
           setState(questData.state);
           setBounty(result);
         }
@@ -317,7 +318,11 @@ export default function Quest({
             ) : (
               <>
                 {state === ENUM_QUEST_STATE.Expired && (
-                  <ReclaimFundsModal bounty={bounty} questData={questData} />
+                  <ReclaimFundsModal
+                    bounty={bounty}
+                    questData={questData}
+                    isDepositReleased={isDepositReleased}
+                  />
                 )}
               </>
             )}

@@ -144,12 +144,19 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                 icon={<IconCoin />}
                 label={buttonLabel}
                 mode="positive"
+                title={
+                  questTotalBounty &&
+                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
+                    ? 'Not enough funds in Quest bounty'
+                    : 'waiting for some info'
+                }
                 disabled={
                   loading ||
                   !scheduleTimeout ||
                   claim.state === ENUM_CLAIM_STATE.Challenged ||
                   !questTotalBounty ||
-                  !walletAddress
+                  !walletAddress ||
+                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
                 }
               />
             )}

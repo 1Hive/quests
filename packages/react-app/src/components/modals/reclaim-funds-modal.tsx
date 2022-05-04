@@ -38,10 +38,16 @@ const RowStyled = styled.div`
 type Props = {
   questData: QuestModel;
   bounty?: TokenAmountModel | null;
+  isDepositReleased: boolean;
   onClose?: ModalCallback;
 };
 
-export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
+export default function ReclaimFundsModal({
+  questData,
+  bounty,
+  onClose = noop,
+  isDepositReleased,
+}: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setTransaction } = useTransactionContext();
@@ -168,7 +174,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
             </FieldInput>
           </Outset>
         </RowStyled>
-        {depositTokenAmount && (
+        {depositTokenAmount && !isDepositReleased && (
           <RowStyled>
             <Outset gu16>
               <AmountFieldInputFormik
