@@ -44,7 +44,6 @@ import {
   getGovernQueueContract,
   getCelesteContract,
 } from '../utils/contract.util';
-import { isQuestExpired, processQuestState } from './state-machine';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 import { cacheFetchTokenPrice } from './cache.service';
 
