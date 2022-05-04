@@ -43,7 +43,7 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
       // Quest states
       case ENUM_QUEST_STATE.Draft:
         setMode('new');
-        setTooltip('Not yet saved');
+        setTooltip('Not saved yet');
         break;
       case ENUM_QUEST_STATE.Active:
         setMode('identifier');
@@ -51,11 +51,11 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
         break;
       case ENUM_QUEST_STATE.Expired:
         setMode('indicator');
-        setTooltip('Expire time has reached');
+        setTooltip('Expired but still have actions remaining');
         break;
       case ENUM_QUEST_STATE.Archived:
         setMode('activity');
-        setTooltip('Expired and no funds');
+        setTooltip('Expired and no more actions to do');
         break;
       // Claim states
       case ENUM_CLAIM_STATE.Scheduled:
@@ -75,7 +75,7 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
       case ENUM_CLAIM_STATE.Executed:
       case ENUM_CLAIM_STATE.Approved:
         setMode('new');
-        setTooltip('The player has successfully claim the bounty');
+        setTooltip('The player has successfully claimed the bounty');
         break;
       default:
         break;

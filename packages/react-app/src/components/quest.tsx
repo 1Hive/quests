@@ -2,6 +2,7 @@ import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  ADDRESS_ZERO,
   ENUM_PAGES,
   ENUM_QUEST_STATE,
   ENUM_TRANSACTION_STATUS,
@@ -24,7 +25,7 @@ import DateFieldInput from './field-input/date-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
-import { processQuestState } from '../services/state-machine';
+import { isQuestExpired, processQuestState as computeQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 
@@ -103,6 +104,8 @@ export default function Quest({
   questData = {
     expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
     state: ENUM_QUEST_STATE.Draft,
+    fallbackAddress: ADDRESS_ZERO,
+    creatorAddress: ADDRESS_ZERO,
   },
   isLoading = false,
   isSummary = false,
@@ -110,9 +113,39 @@ export default function Quest({
   const { walletAddress } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
+  const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
+  const [state, setState] = useState(questData.state);
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
+  let isMounted = true;
+
+  useEffect(() => {
+    if (!isSummary) {
+      // Don't show deposit of expired
+      if (state === ENUM_QUEST_STATE.Archived || state === ENUM_QUEST_STATE.Expired) {
+        setClaimDeposit(undefined);
+      } else {
+        try {
+          QuestService.fetchDeposits().then(({ challenge, claim }) => {
+            if (isMounted) {
+              setClaimDeposit(claim);
+              setChallengeDeposit(challenge);
+            }
+          });
+        } catch (error) {
+          Logger.exception(error);
+        }
+      }
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setState(questData.state);
+  }, [questData.state]);
 
   useEffect(() => {
     // If tx completion impact Quest bounty, update it
@@ -124,7 +157,7 @@ export default function Quest({
         transaction?.type === 'QuestFund' ||
         transaction?.type === 'QuestReclaimFunds')
     ) {
-      setBounty(null);
+      setBounty(undefined);
       setTimeout(() => {
         if (questData.address && questData.rewardToken) {
           fetchBalanceOfQuest(questData.address, questData.rewardToken);
@@ -133,55 +166,38 @@ export default function Quest({
     }
   }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
-  let isSubscribed = true;
-
-  useEffect(() => {
-    if (!isSummary) {
-      // Don't show deposit of expired
-      if (
-        questData.state === ENUM_QUEST_STATE.Archived ||
-        questData.state === ENUM_QUEST_STATE.Expired
-      ) {
-        setClaimDeposit(undefined);
-      } else {
-        try {
-          QuestService.fetchDeposits().then(({ challenge, claim }) => {
-            if (isSubscribed) {
-              setClaimDeposit(claim);
-              setChallengeDeposit(challenge);
-            }
-          });
-        } catch (error) {
-          Logger.exception(error);
-        }
-      }
-    }
-    return () => {
-      isSubscribed = false;
-    };
-  }, []);
-
   useEffect(() => {
     if (!questData.rewardToken) {
-      setBounty(null);
+      setBounty(undefined);
     } else if (questData.address) {
       fetchBalanceOfQuest(questData.address, questData.rewardToken);
     }
   }, [questData.address, questData.rewardToken]);
 
-  const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
-    QuestService.getBalanceOf(token, address)
-      .then((result) => {
-        if (isSubscribed) {
-          questData.bounty = result ?? undefined;
-          processQuestState(questData);
+  const fetchBalanceOfQuest = async (address: string, token: TokenModel | string) => {
+    try {
+      if (questData.address) {
+        let depositReleased = false;
+        if (isQuestExpired(questData)) {
+          depositReleased = await QuestService.isQuestDepositReleased(questData.address);
+        }
+        const result = await QuestService.getBalanceOf(
+          token,
+          address,
+          depositReleased ? undefined : questData.deposit,
+        );
+        if (isMounted) {
+          questData.bounty = result;
+          setIsDepositReleased(depositReleased);
+          computeQuestState(questData, depositReleased);
+          setState(questData.state);
           setBounty(result);
         }
-      })
-      .catch((err) => {
-        Logger.exception(err);
-        setBounty(undefined);
-      });
+      }
+    } catch (error) {
+      Logger.exception(error);
+      setBounty(undefined);
+    }
   };
 
   const titleInput = (
@@ -221,7 +237,7 @@ export default function Quest({
         value={questData?.expireTime}
       />
 
-      {!isSummary && (
+      {!isSummary && state === ENUM_QUEST_STATE.Active && (
         <AmountFieldInput
           id="claimDeposit"
           label="Claim deposit"
@@ -254,7 +270,7 @@ export default function Quest({
                 tagOnly
                 showUsd
                 value={questData?.bounty}
-                isLoading={isLoading || !bounty}
+                isLoading={isLoading || bounty === undefined}
               />
             </BountyWrapperStyled>
           </RowStyled>
@@ -301,8 +317,12 @@ export default function Quest({
               </>
             ) : (
               <>
-                {!!bounty?.parsedAmount && (
-                  <ReclaimFundsModal bounty={bounty} questData={questData} />
+                {state === ENUM_QUEST_STATE.Expired && (
+                  <ReclaimFundsModal
+                    bounty={bounty}
+                    questData={questData}
+                    isDepositReleased={isDepositReleased}
+                  />
                 )}
               </>
             )}

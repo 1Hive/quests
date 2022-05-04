@@ -55,9 +55,9 @@ export default function Claim({
     // If tx completion impact Claims, update them
     if (
       transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction?.[0] === questData.address &&
+      transaction?.args?.questAddress === questData.address &&
       claim.container &&
-      transaction?.args?.[1] === claim.container.id
+      transaction?.args?.containerId === claim.container.id
     ) {
       switch (transaction.type) {
         case 'ClaimChallengeResolve':

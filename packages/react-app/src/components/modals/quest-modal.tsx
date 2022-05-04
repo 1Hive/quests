@@ -62,7 +62,7 @@ type Props = {
 const emptyQuestData = {
   expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
   state: ENUM_QUEST_STATE.Draft,
-};
+} as QuestModel;
 
 export default function QuestModal({
   questData = emptyQuestData,
@@ -215,7 +215,7 @@ export default function QuestModal({
               status: txReceiptSaveQuest?.status
                 ? ENUM_TRANSACTION_STATUS.Confirmed
                 : ENUM_TRANSACTION_STATUS.Failed,
-              questAddress: newQuestAddress,
+              args: { questAddress: newQuestAddress },
             },
         );
         if (!txReceiptSaveQuest?.status || !newQuestAddress) {

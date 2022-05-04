@@ -1,4 +1,4 @@
-import { Button, IconCoin, Field } from '@1hive/1hive-ui';
+import { Button, IconCoin } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
@@ -10,40 +10,70 @@ import { GUpx } from 'src/utils/style.util';
 import Skeleton from 'react-loading-skeleton';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { getTokenInfo } from 'src/utils/contract.util';
+import { toTokenAmountModel } from 'src/utils/data.utils';
+import { TokenModel } from 'src/models/token.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import IdentityBadge from '../identity-badge';
+import { FieldInput } from '../field-input/field-input';
+
+// #region StyledComponents
 
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx(1)};
   width: fit-content;
 `;
 
+const RowStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+// #endregion
+
 type Props = {
   questData: QuestModel;
-  bounty: TokenAmountModel;
+  bounty?: TokenAmountModel | null;
+  isDepositReleased: boolean;
   onClose?: ModalCallback;
 };
 
-export default function ReclaimFundsModal({ questData, bounty, onClose = noop }: Props) {
+export default function ReclaimFundsModal({
+  questData,
+  bounty,
+  onClose = noop,
+  isDepositReleased,
+}: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [fallbackAddress, setFallbackAddress] = useState<string | undefined>(
-    questData.fallbackAddress,
-  );
   const { setTransaction } = useTransactionContext();
-
   const { walletAddress } = useWallet();
+  const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
+  let isMounted = true;
 
   useEffect(() => {
-    if (!fallbackAddress && questData.address && walletAddress) {
-      QuestService.getQuestRecoveryAddress(questData.address).then((x) => {
-        setFallbackAddress(x ?? undefined);
+    if (questData.deposit) {
+      const depositAmount = questData.deposit;
+      getTokenInfo(questData.deposit?.token).then((token) => {
+        if (isMounted) {
+          setDepositTokenAmount(
+            toTokenAmountModel({
+              ...token,
+              amount: depositAmount.amount.toString(),
+            } as TokenModel),
+          );
+        }
       });
     }
-  }, [walletAddress]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const reclaimFundTx = async () => {
     try {
@@ -51,7 +81,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
-        message: 'Reclaiming unused fund',
+        message: 'Reclaiming funds and deposit',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'QuestReclaimFunds',
         args: { questAddress: questData.address },
@@ -103,13 +133,13 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
     <>
       <ModalBase
         id="reclaim-funds-modal"
-        title="Reclaim unused quest funds"
+        title="Reclaim funds and deposit"
         openButton={
           <OpenButtonStyled
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
-            label="Reclaim funds"
-            title={bounty.parsedAmount ? 'Reclaim funds' : 'No more funds'}
+            label="Reclaim"
+            title="Reclaim"
             mode="strong"
           />
         }
@@ -117,7 +147,7 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
           <Button
             onClick={reclaimFundTx}
             icon={<IconCoin />}
-            label="Reclaim funds"
+            label="Reclaim"
             mode="strong"
             disabled={loading || !walletAddress}
           />
@@ -125,21 +155,46 @@ export default function ReclaimFundsModal({ questData, bounty, onClose = noop }:
         onClose={closeModal}
         isOpen={opened}
       >
-        <Outset gu16>
-          <AmountFieldInputFormik
-            id="bounty"
-            label="Reclaimable funds"
-            isLoading={loading}
-            value={bounty}
-          />
-          <Field label="will be send to">
-            {!loading && fallbackAddress ? (
-              <IdentityBadge entity={fallbackAddress} badgeOnly />
-            ) : (
-              <Skeleton />
-            )}
-          </Field>
-        </Outset>
+        <RowStyled>
+          <Outset gu16>
+            <AmountFieldInputFormik
+              id="bounty"
+              label="Reclaimable funds"
+              isLoading={loading}
+              value={bounty}
+            />
+          </Outset>
+          <Outset gu16>
+            <FieldInput label="will be send to">
+              {!loading ? (
+                <IdentityBadge entity={questData.fallbackAddress} badgeOnly />
+              ) : (
+                <Skeleton />
+              )}
+            </FieldInput>
+          </Outset>
+        </RowStyled>
+        {depositTokenAmount && !isDepositReleased && (
+          <RowStyled>
+            <Outset gu16>
+              <AmountFieldInputFormik
+                id="bounty"
+                label="Reclaimable deposit"
+                isLoading={loading}
+                value={depositTokenAmount}
+              />
+            </Outset>
+            <Outset gu16>
+              <FieldInput label="will be send to">
+                {!loading && questData.creatorAddress ? (
+                  <IdentityBadge entity={questData.creatorAddress} badgeOnly />
+                ) : (
+                  <Skeleton />
+                )}
+              </FieldInput>
+            </Outset>
+          </RowStyled>
+        )}
       </ModalBase>
     </>
   );
