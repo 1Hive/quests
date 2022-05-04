@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "Quest": {
-          "address": "0x3a61515EDc3FDc4C461726F0A3B43107fbA4926d",
+          "address": "0xcc83C3d1067189b37f124fe9dEb7082F13962F8d",
           "abi": [
             {
               "inputs": [
@@ -272,7 +272,7 @@
           ]
         },
         "QuestFactory": {
-          "address": "0xFc88D4b7Fcd0Fb6675Ed88684C396A4059CDF212",
+          "address": "0xe6b97474daE6520932E8EA2e3E92e82d0dE958C0",
           "abi": [
             {
               "inputs": [

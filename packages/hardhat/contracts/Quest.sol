@@ -51,9 +51,11 @@ contract Quest {
     function recoverUnclaimedFunds() external {
         require(block.timestamp > expireTime, "ERROR: Not expired");
 
-        // Restore deposit
-        deposit.releaseTo(questCreator);
-        depositHeld = false;
+        // Restore deposit if not already released
+        if (depositHeld) {
+            deposit.releaseTo(questCreator);
+            depositHeld = false;
+        }
 
         rewardToken.safeTransfer(
             fundsRecoveryAddress,

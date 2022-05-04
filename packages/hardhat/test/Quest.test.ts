@@ -64,6 +64,28 @@ describe("[Contract] Quest", function () {
       expect(await quest.depositHeld()).to.eq(false);
     });
 
+    it.only("SHOULD not release deposit if quest is not held", async function () {
+      // Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epoch0,
+        govern.address,
+        creator.address,
+        questFunds,
+        depositToken,
+        depositAmount,
+        creator
+      );
+      await quest.recoverUnclaimedFunds();
+
+      // Act
+      await quest.recoverUnclaimedFunds();
+
+      // Assert
+    });
+
     it("SHOULD revert WHEN not expire", async function () {
       // Arrange
       const quest = await deployQuest(
