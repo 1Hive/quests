@@ -24,6 +24,8 @@ type QuestEntity @entity {
   questDetailsRef: Bytes!
   questRewardTokenAddress: Bytes!
   creationTimestamp: BigInt!
+  questFundsRecoveryAddress: Bytes!
+  questCreator: Bytes!
   depositToken: Bytes!
   depositAmount: BigInt!
 }

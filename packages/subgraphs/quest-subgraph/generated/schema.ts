@@ -21,6 +21,8 @@ export class QuestEntity extends Entity {
     this.set("questDetailsRef", Value.fromBytes(Bytes.empty()));
     this.set("questRewardTokenAddress", Value.fromBytes(Bytes.empty()));
     this.set("creationTimestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("questFundsRecoveryAddress", Value.fromBytes(Bytes.empty()));
+    this.set("questCreator", Value.fromBytes(Bytes.empty()));
     this.set("depositToken", Value.fromBytes(Bytes.empty()));
     this.set("depositAmount", Value.fromBigInt(BigInt.zero()));
   }
@@ -128,6 +130,24 @@ export class QuestEntity extends Entity {
 
   set creationTimestamp(value: BigInt) {
     this.set("creationTimestamp", Value.fromBigInt(value));
+  }
+
+  get questFundsRecoveryAddress(): Bytes {
+    let value = this.get("questFundsRecoveryAddress");
+    return value!.toBytes();
+  }
+
+  set questFundsRecoveryAddress(value: Bytes) {
+    this.set("questFundsRecoveryAddress", Value.fromBytes(value));
+  }
+
+  get questCreator(): Bytes {
+    let value = this.get("questCreator");
+    return value!.toBytes();
+  }
+
+  set questCreator(value: Bytes) {
+    this.set("questCreator", Value.fromBytes(value));
   }
 
   get depositToken(): Bytes {

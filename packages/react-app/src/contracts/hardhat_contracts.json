@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "Quest": {
-          "address": "0x71e259816b6c23936832ea01050fe9c54b1a8c69",
+          "address": "0x3a61515EDc3FDc4C461726F0A3B43107fbA4926d",
           "abi": [
             {
               "inputs": [
@@ -173,12 +173,12 @@
             },
             {
               "inputs": [],
-              "name": "expireTime",
+              "name": "depositHeld",
               "outputs": [
                 {
-                  "internalType": "uint256",
+                  "internalType": "bool",
                   "name": "",
-                  "type": "uint256"
+                  "type": "bool"
                 }
               ],
               "stateMutability": "view",
@@ -186,12 +186,12 @@
             },
             {
               "inputs": [],
-              "name": "factory",
+              "name": "expireTime",
               "outputs": [
                 {
-                  "internalType": "address",
+                  "internalType": "uint256",
                   "name": "",
-                  "type": "address"
+                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -272,7 +272,7 @@
           ]
         },
         "QuestFactory": {
-          "address": "0xf8D300B19C22f1313d688bea0617BBd8cCd242d7",
+          "address": "0xFc88D4b7Fcd0Fb6675Ed88684C396A4059CDF212",
           "abi": [
             {
               "inputs": [
@@ -381,6 +381,12 @@
                 {
                   "indexed": false,
                   "internalType": "address",
+                  "name": "fundsRecoveryAddress",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
                   "name": "depositToken",
                   "type": "address"
                 },
@@ -389,6 +395,12 @@
                   "internalType": "uint256",
                   "name": "depositAmount",
                   "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "creator",
+                  "type": "address"
                 }
               ],
               "name": "QuestCreated",

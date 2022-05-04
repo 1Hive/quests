@@ -24,7 +24,8 @@ contract QuestFactory is Ownable {
         uint256 creationTime,
         address fundsRecoveryAddress,
         address depositToken,
-        uint256 depositAmount
+        uint256 depositAmount,
+        address creator
     );
 
     event DepositChanged(uint256 timestamp, address token, uint256 amount);
@@ -76,7 +77,8 @@ contract QuestFactory is Ownable {
             block.timestamp,
             _fundsRecoveryAddress,
             address(deposit.token),
-            deposit.amount
+            deposit.amount,
+            msg.sender
         );
 
         return address(quest);

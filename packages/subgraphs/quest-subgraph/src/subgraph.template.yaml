@@ -68,4 +68,26 @@ dataSources:
         - event: DepositChanged(uint256,address,uint256)
           handler: handleDepositChanged
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV4
+    network: {{network}}
+    source:
+      address: "{{questFactoryAddressV4}}"
+      abi: QuestFactoryV4
+      startBlock: {{startBlockV4}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreated
+      abis:
+        - name: QuestFactoryV4
+          file: ./abis/QuestFactoryV4.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,uint256,address,address,uint256,address)
+          handler: handleQuestCreatedV4
+        - event: DepositChanged(uint256,address,uint256)
+          handler: handleDepositChanged
+      file: ./src/mapping.ts
 

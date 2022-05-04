@@ -10,7 +10,7 @@ dataSources:
     name: QuestFactory
     network: rinkeby
     source:
-      address: "0xf94FB88b197c8749DabD633aCd55C9F50B18E4Da"
+      address: "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01"
       abi: QuestFactory
       startBlock: 9953404
     mapping:
@@ -68,3 +68,26 @@ dataSources:
         - event: DepositChanged(uint256,address,uint256)
           handler: handleDepositChanged
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV4
+    network: rinkeby
+    source:
+      address: "0xFc88D4b7Fcd0Fb6675Ed88684C396A4059CDF212"
+      abi: QuestFactoryV4
+      startBlock: 10614698
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreated
+      abis:
+        - name: QuestFactoryV4
+          file: ./abis/QuestFactoryV4.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,uint256,address,address,uint256,address)
+          handler: handleQuestCreatedV4
+        - event: DepositChanged(uint256,address,uint256)
+          handler: handleDepositChanged
+      file: ./src/mapping.ts
+
