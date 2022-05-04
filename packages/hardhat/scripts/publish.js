@@ -2,15 +2,16 @@ const fs = require("fs");
 const chalk = require("chalk");
 const hre = require("hardhat");
 
-const publishDir = "../react-app/src/contracts";
+// const publishDir = "../react-app/src/contracts";
 const graphDir = "../subgraph";
 
 function publishContract(contractName) {
   console.log(
     " 💽 Publishing",
     chalk.cyan(contractName),
-    "to",
-    chalk.gray(publishDir)
+    "to"
+    // ,
+    // chalk.gray(publishDir)
   );
   try {
     const contractArtifact = fs
@@ -36,28 +37,28 @@ function publishContract(contractName) {
 
     graphConfig = JSON.parse(graphConfig);
     graphConfig[contractName + "Address"] = address;
-    fs.writeFileSync(
-      `${publishDir}/${contractName}.address.js`,
-      `module.exports = "${address}";`
-    );
-    fs.writeFileSync(
-      `${publishDir}/${contractName}.abi.js`,
-      `module.exports = ${JSON.stringify(contract.abi, null, 2)};`
-    );
-    fs.writeFileSync(
-      `${publishDir}/${contractName}.bytecode.js`,
-      `module.exports = "${contract.bytecode}";`
-    );
+    // fs.writeFileSync(
+    //   `${publishDir}/${contractName}.address.js`,
+    //   `module.exports = "${address}";`
+    // );
+    // fs.writeFileSync(
+    //   `${publishDir}/${contractName}.abi.js`,
+    //   `module.exports = ${JSON.stringify(contract.abi, null, 2)};`
+    // );
+    // fs.writeFileSync(
+    //   `${publishDir}/${contractName}.bytecode.js`,
+    //   `module.exports = "${contract.bytecode}";`
+    // );
 
     const folderPath = graphConfigPath.replace("/config.json", "");
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath);
     }
-    fs.writeFileSync(graphConfigPath, JSON.stringify(graphConfig, null, 2));
-    fs.writeFileSync(
-      `${graphDir}/abis/${contractName}.json`,
-      JSON.stringify(contract.abi, null, 2)
-    );
+    // fs.writeFileSync(graphConfigPath, JSON.stringify(graphConfig, null, 2));
+    // fs.writeFileSync(
+    //   `${graphDir}/abis/${contractName}.json`,
+    //   JSON.stringify(contract.abi, null, 2)
+    // );
 
     console.log(
       " 📠 Published " + chalk.green(contractName) + " to the frontend."
@@ -83,9 +84,9 @@ function publishContract(contractName) {
 }
 
 async function main() {
-  if (!fs.existsSync(publishDir)) {
-    fs.mkdirSync(publishDir);
-  }
+  // if (!fs.existsSync(publishDir)) {
+  //   fs.mkdirSync(publishDir);
+  // }
   const finalContractList = [];
   fs.readdirSync(hre.config.paths.sources).forEach((file) => {
     if (file.indexOf(".sol") >= 0) {
@@ -96,10 +97,10 @@ async function main() {
       }
     }
   });
-  fs.writeFileSync(
-    `${publishDir}/contracts.js`,
-    `module.exports = ${JSON.stringify(finalContractList)};`
-  );
+  // fs.writeFileSync(
+  //   `${publishDir}/contracts.js`,
+  //   `module.exports = ${JSON.stringify(finalContractList)};`
+  // );
 }
 main()
   .then(() => process.exit(0))

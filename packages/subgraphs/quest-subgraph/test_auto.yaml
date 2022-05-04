@@ -1,0 +1,68 @@
+specVersion: 0.0.4
+features:
+  - fullTextSearch
+  - nonFatalErrors
+  - ipfsOnEthereumContracts
+schema:
+  file: ./src/schema.graphql
+dataSources:
+  - kind: ethereum/contract
+  name: QuestFactory
+  network: 
+  source:
+    address: "0x1A506d3ed7E0865FFC980d2eB54662DDb587e885"
+    abi: QuestFactory
+    startBlock: 9939088
+  mapping:
+    kind: ethereum/events
+    apiVersion: 0.0.6
+    language: wasm/assemblyscript
+    entities:
+      - QuestCreated
+    abis:
+      - name: QuestFactory
+        file: ./abis/QuestFactory.json
+    eventHandlers:
+      - event: QuestCreated(address,string,bytes,address,uint256)
+        handler: handleQuestCreated
+    file: ./src/mapping.ts
+  - kind: ethereum/contract
+  name: QuestFactoryV1
+  network: 
+  source:
+    address: "0x855a04deb27abf93336d52a91f29a98dd5605691"
+    abi: QuestFactoryV1
+    startBlock: 9953404
+  mapping:
+    kind: ethereum/events
+    apiVersion: 0.0.6
+    language: wasm/assemblyscript
+    entities:
+      - QuestCreated
+    abis:
+      - name: QuestFactoryV1
+        file: ./abis/QuestFactoryV1.json
+    eventHandlers:
+      - event: QuestCreated(address,string)
+        handler: handleQues
+    file: ./src/mapping.ts
+  - kind: ethereum/contract
+  name: QuestFactoryV2
+  network: 
+  source:
+    address: "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01"
+    abi: QuestFactoryV2
+    startBlock: 10573676
+  mapping:
+    kind: ethereum/events
+    apiVersion: 0.0.6
+    language: wasm/assemblyscript
+    entities:
+      - QuestCreated
+    abis:
+      - name: QuestFactoryV2
+        file: ./abis/QuestFactoryV2.json
+    eventHandlers:
+      - event: QuestCreated(address,string,bytes,address,uint256)
+        handler: handleQuestCreated
+    file: ./src/mapping.ts
