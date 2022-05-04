@@ -65,33 +65,6 @@ const QuestEntitiesQuery = gql`
   }
 `;
 
-const LastDepositEntityQuery = gql`
-  query depositEntities {
-    depositEntities(first: 1, orderBy: timestamp) {
-      id
-      timestamp
-      depositToken
-      depositAmount
-    }
-  }
-`;
-
-// TODO : Uncoment when subgraph have support for combining where and full text query
-// const QuestSearchQuery = gql`
-//   query questSearch($first: Int, $skip: Int, $text: String) {
-//     questSearch(first: $first, skip: $skip, text: $text) {
-//       id
-//       questAddress
-//       questTitle
-//       questDescription
-//       questExpireTimeSec
-//       questDetailsRef
-//       questRewardTokenAddress
-//       creationTimestamp
-//     }
-//   }
-// `;
-
 const QuestRewardTokens = gql`
   query questEntities($first: Int) {
     questEntities(first: $first, orderBy: creationTimestamp, orderDirection: desc) {
@@ -151,5 +124,3 @@ export const fetchActiveQuestEntitiesLight = () =>
   request(questsSubgraph, QuestEntitiesLight, {
     expireTimeLower: msToSec(Date.now()),
   });
-
-export const fetchLastDepositEntity = () => request(questsSubgraph, LastDepositEntityQuery, {});

@@ -42,7 +42,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
 
   useEffect(() => {
     if (askedTokenAmount?.token) {
-      fetchBalances(askedTokenAmount?.token);
+      fetchBalances(askedTokenAmount.token);
     }
   }, [walletAddress]); // Need to fetch balances when wallet address changes
 
@@ -57,7 +57,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
 
   const fetchBalances = async (_token: TokenModel) => {
     setTokenBalance(undefined);
-    setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
+    setTokenBalance((await getBalanceOf({ ..._token }, walletAddress)) ?? undefined);
   };
 
   return (

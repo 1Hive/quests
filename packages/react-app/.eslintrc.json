@@ -43,7 +43,8 @@
     "jsx-props-no-spreading": "off",
     "react/jsx-props-no-spreading": "off",
     "react/state-in-constructor": "off",
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-debugger": "warn"
   },
   "settings": {
     "import/resolver": {
