@@ -26,6 +26,7 @@ import {
   fetchLastDepositEntity,
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
+import { compareCaseInsensitive } from 'src/utils/string.util';
 import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV, TOKENS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -357,7 +358,6 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
       ),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
-
   const totalFunds = funds.map((x) => x.usdValue).filter((x) => x !== undefined) as number[];
 
   if (IS_DEV) {
@@ -488,7 +488,7 @@ export async function getBalanceOf(
       const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
       let balance = (await erc20Contract.balanceOf(address)) as BigNumber;
-      if (lockedFunds?.token === tokenInfo.token) {
+      if (lockedFunds && compareCaseInsensitive(lockedFunds.token, tokenInfo.token)) {
         // Substract deposit from funds if both same token
         balance = balance.sub(BigNumber.from(lockedFunds.amount));
       }
