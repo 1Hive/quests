@@ -23,7 +23,6 @@ import {
   fetchQuestEntities,
   fetchActiveQuestEntitiesLight,
   fetchQuestRewardTokens,
-  fetchLastDepositEntity,
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
@@ -375,16 +374,16 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   };
 }
 
-export async function fetchLastQuestDeposit() {
-  const res = await fetchLastDepositEntity();
-  const [last] = res.depositEntities;
-  const token = await getTokenInfo(last.depositToken);
+export async function fetchCreateQuestDeposit(walletAddress: string) {
+  const questFactoryContract = getQuestFactoryContract(walletAddress);
+  const res = await questFactoryContract.deposit();
+  const token = await getTokenInfo(res.token);
   if (!token) {
     return null;
   }
   return toTokenAmountModel({
     ...token,
-    amount: last.depositAmount,
+    amount: res.amount.toString(),
   });
 }
 

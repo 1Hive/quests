@@ -90,7 +90,7 @@ export default function QuestModal({
       }
     });
 
-    QuestService.fetchLastQuestDeposit().then((deposit) => {
+    QuestService.fetchCreateQuestDeposit(walletAddress).then((deposit) => {
       if (mounted) {
         setQuestDeposit(deposit);
       }
@@ -296,20 +296,20 @@ export default function QuestModal({
               <Stepper
                 submitButton={
                   <>
-                    <WalletBallance
-                      key="reward-token-balance"
-                      askedTokenAmount={values.bounty}
-                      setIsEnoughBalance={setIsEnoughBalance}
-                    />
+                    {questDeposit?.token?.token !== values.bounty?.token?.token && (
+                      <WalletBallance
+                        key="reward-token-balance"
+                        askedTokenAmount={values.bounty}
+                        setIsEnoughBalance={setIsEnoughBalance}
+                      />
+                    )}
                     {questDeposit && questDeposit?.parsedAmount > 0 && (
                       <>
-                        {questDeposit?.token?.token !== values.bounty?.token?.token && (
-                          <WalletBallance
-                            key="collateral=token-balance"
-                            askedTokenAmount={questDeposit}
-                            setIsEnoughBalance={setIsEnoughBalance}
-                          />
-                        )}
+                        <WalletBallance
+                          key="collateral-token-balance"
+                          askedTokenAmount={questDeposit}
+                          setIsEnoughBalance={setIsEnoughBalance}
+                        />
                         <AmountFieldInput
                           key="questDeposit"
                           id="questDeposit"

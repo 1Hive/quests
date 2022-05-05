@@ -1,3 +1,4 @@
+import { ContractReceipt } from 'ethers';
 import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -20,29 +21,35 @@ export async function approveTokenTransaction(
     status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
     type: 'TokenApproval',
   });
-  const approveTxReceipt = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
+  let approveTxReceipt: ContractReceipt | null;
+  try {
+    approveTxReceipt = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            hash: txHash,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          },
+      );
+    });
+  } finally {
     setTransaction(
       (oldTx) =>
         oldTx && {
           ...oldTx,
-          hash: txHash,
-          status: ENUM_TRANSACTION_STATUS.Pending,
+          status: approveTxReceipt?.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
         },
     );
-  });
-  setTransaction(
-    (oldTx) =>
-      oldTx && {
-        ...oldTx,
-        status: approveTxReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
-      },
-  );
-  if (!approveTxReceipt?.status)
+  }
+
+  if (!approveTxReceipt?.status) {
     throw new Error(
       `Failed to approve token allowance : ${token.name} (${token.symbol}-${token.token})`,
     );
+  }
 }
 
 export async function fundQuestTransaction(
