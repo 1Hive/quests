@@ -1,4 +1,8 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
+features:
+  - fullTextSearch
+  - nonFatalErrors
+  - ipfsOnEthereumContracts
 schema:
   file: ./src/schema.graphql
 dataSources:
@@ -6,9 +10,9 @@ dataSources:
     name: QuestFactory
     network: rinkeby
     source:
-      address: "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01"
+      address: "0x7617d5C550884147a1aFFf0d01ba67518A8560A5"
       abi: QuestFactory
-      startBlock: 9936882
+      startBlock: 10625695
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -19,6 +23,8 @@ dataSources:
         - name: QuestFactory
           file: ./abis/QuestFactory.json
       eventHandlers:
-        - event: QuestCreated(address,string,bytes,address,uint256,uint256)
+        - event: QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address)
           handler: handleQuestCreated
+        - event: DepositChanged(uint256,address,uint256)
+          handler: handleDepositChanged
       file: ./src/mapping.ts

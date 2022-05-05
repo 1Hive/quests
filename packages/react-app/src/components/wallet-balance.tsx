@@ -23,11 +23,12 @@ const WrapperStyled = styled.div<{ theme: ThemeInterface; isEnoughBalance: boole
 // #endregion
 
 type Props = {
-  askedTokenAmount?: TokenAmountModel;
+  askedTokenAmount?: TokenAmountModel | null;
   setIsEnoughBalance?: (_valid: boolean) => void;
+  isLoading?: boolean;
 };
 
-export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) {
+export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading = false }: Props) {
   const { walletAddress } = useWallet();
   const [tokenBalance, setTokenBalance] = useState<TokenAmountModel>();
   const [isEnoughBalance, _setIsEnoughBalance] = useState(true);
@@ -41,7 +42,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
 
   useEffect(() => {
     if (askedTokenAmount?.token) {
-      fetchBalances(askedTokenAmount?.token);
+      fetchBalances(askedTokenAmount.token);
     }
   }, [walletAddress]); // Need to fetch balances when wallet address changes
 
@@ -56,14 +57,14 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
 
   const fetchBalances = async (_token: TokenModel) => {
     setTokenBalance(undefined);
-    setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
+    setTokenBalance((await getBalanceOf({ ..._token }, walletAddress)) ?? undefined);
   };
 
   return (
     <WrapperStyled theme={currentTheme} isEnoughBalance={isEnoughBalance}>
-      {askedTokenAmount?.token ? (
+      {askedTokenAmount?.token && askedTokenAmount !== null ? (
         <AmountFieldInput
-          isLoading={!tokenBalance}
+          isLoading={!tokenBalance || isLoading}
           id={`balance-${tokenBalance?.token.symbol}`}
           key={`balance-${tokenBalance?.token.token}`}
           compact
@@ -72,7 +73,12 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance }: Props) 
           value={tokenBalance}
         />
       ) : (
-        <FieldInput id="balance-not-selected-token" label="Wallet balance" compact>
+        <FieldInput
+          id="balance-not-selected-token"
+          label="Wallet balance"
+          compact
+          isLoading={isLoading}
+        >
           <i>No token selected</i>
         </FieldInput>
       )}

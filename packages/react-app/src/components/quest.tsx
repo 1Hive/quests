@@ -1,7 +1,13 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
+import {
+  ADDRESS_ZERO,
+  ENUM_PAGES,
+  ENUM_QUEST_STATE,
+  ENUM_TRANSACTION_STATUS,
+  MAX_LINE_DESCRIPTION,
+} from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from 'src/services/quest.service';
@@ -11,6 +17,7 @@ import { GUpx } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -18,7 +25,7 @@ import DateFieldInput from './field-input/date-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
-import { processQuestState } from '../services/state-machine';
+import { isQuestExpired, processQuestState as computeQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 
@@ -26,6 +33,15 @@ import { AddressFieldInput } from './field-input/address-field-input';
 
 const TitleLinkStyled = styled(Link)`
   font-weight: 100;
+  max-width: 100%;
+
+  div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 `;
 
 const LinkStyled = styled(Link)`
@@ -34,14 +50,14 @@ const LinkStyled = styled(Link)`
 
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => GUpx(compact ? 1 : 2)};
+  height: 100%;
 `;
 
 const CardStyled = styled(Card)<{ isSummary: boolean }>`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  height: fit-content;
-  min-height: 250px;
+  height: 100%;
 `;
 
 const QuestFooterStyled = styled.div`
@@ -64,7 +80,8 @@ const RowStyled = styled.div`
 const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => (compact ? GUpx(2) : GUpx(3))};
   width: 100%;
-  min-height: 225px;
+  height: 100%;
+  min-height: 340px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -87,31 +104,31 @@ export default function Quest({
   questData = {
     expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
     state: ENUM_QUEST_STATE.Draft,
+    fallbackAddress: ADDRESS_ZERO,
+    creatorAddress: ADDRESS_ZERO,
   },
   isLoading = false,
   isSummary = false,
 }: Props) {
   const { walletAddress } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
-  const [claimUpdated, setClaimUpdate] = useState(0);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
+  const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
+  const [state, setState] = useState(questData.state);
   const { below } = useViewport();
-
-  let isSubscribed = true;
+  const { transaction } = useTransactionContext();
+  let isMounted = true;
 
   useEffect(() => {
     if (!isSummary) {
       // Don't show deposit of expired
-      if (
-        questData.state === ENUM_QUEST_STATE.Archived ||
-        questData.state === ENUM_QUEST_STATE.Expired
-      ) {
+      if (state === ENUM_QUEST_STATE.Archived || state === ENUM_QUEST_STATE.Expired) {
         setClaimDeposit(undefined);
       } else {
         try {
           QuestService.fetchDeposits().then(({ challenge, claim }) => {
-            if (isSubscribed) {
+            if (isMounted) {
               setClaimDeposit(claim);
               setChallengeDeposit(challenge);
             }
@@ -122,46 +139,65 @@ export default function Quest({
       }
     }
     return () => {
-      isSubscribed = false;
+      isMounted = false;
     };
   }, []);
 
   useEffect(() => {
+    setState(questData.state);
+  }, [questData.state]);
+
+  useEffect(() => {
+    // If tx completion impact Quest bounty, update it
+    if (
+      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction.args?.questAddress === questData.address &&
+      (transaction?.type === 'ClaimChallengeResolve' ||
+        transaction?.type === 'ClaimExecute' ||
+        transaction?.type === 'QuestFund' ||
+        transaction?.type === 'QuestReclaimFunds')
+    ) {
+      setBounty(undefined);
+      setTimeout(() => {
+        if (questData.address && questData.rewardToken) {
+          fetchBalanceOfQuest(questData.address, questData.rewardToken);
+        }
+      }, 500);
+    }
+  }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
+
+  useEffect(() => {
     if (!questData.rewardToken) {
-      setBounty(null);
+      setBounty(undefined);
     } else if (questData.address) {
       fetchBalanceOfQuest(questData.address, questData.rewardToken);
     }
   }, [questData.address, questData.rewardToken]);
 
-  const fetchBalanceOfQuest = (address: string, token: TokenModel | string) => {
-    QuestService.getBalanceOf(token, address)
-      .then((result) => {
-        if (isSubscribed) {
-          questData.bounty = result ?? undefined;
-          processQuestState(questData);
+  const fetchBalanceOfQuest = async (address: string, token: TokenModel | string) => {
+    try {
+      if (questData.address) {
+        let depositReleased = false;
+        if (isQuestExpired(questData)) {
+          depositReleased = await QuestService.isQuestDepositReleased(questData.address);
+        }
+        const result = await QuestService.getBalanceOf(
+          token,
+          address,
+          depositReleased ? undefined : questData.deposit,
+        );
+        if (isMounted) {
+          questData.bounty = result;
+          setIsDepositReleased(depositReleased);
+          computeQuestState(questData, depositReleased);
+          setState(questData.state);
           setBounty(result);
         }
-      })
-      .catch((err) => {
-        Logger.exception(err);
-        setBounty(undefined);
-      });
-  };
-
-  const onScheduleModalClosed = (success: boolean) => {
-    if (success) {
-      setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
-    }
-  };
-
-  const onFundModalClosed = (success: boolean) => {
-    setTimeout(() => {
-      if (success && questData.address && questData.rewardToken) {
-        fetchBalanceOfQuest(questData.address, questData.rewardToken);
-        setClaimUpdate(claimUpdated + 1);
       }
-    }, 500);
+    } catch (error) {
+      Logger.exception(error);
+      setBounty(undefined);
+    }
   };
 
   const titleInput = (
@@ -201,7 +237,7 @@ export default function Quest({
         value={questData?.expireTime}
       />
 
-      {!isSummary && (
+      {!isSummary && state === ENUM_QUEST_STATE.Active && (
         <AmountFieldInput
           id="claimDeposit"
           label="Claim deposit"
@@ -234,30 +270,22 @@ export default function Quest({
                 tagOnly
                 showUsd
                 value={questData?.bounty}
-                isLoading={isLoading || !bounty}
+                isLoading={isLoading || bounty === undefined}
               />
             </BountyWrapperStyled>
           </RowStyled>
 
           {!isSummary && fieldsRow}
+
           <TextFieldInput
             id="description"
             value={questData?.description}
             isLoading={isLoading || !questData}
-            tooltip={
-              <>
-                <b>The quest description should include:</b>
-                <br />- Details about what the quest entails. <br />- What evidence must be
-                submitted by users claiming a reward for completing the quest. <br />- The payout
-                amount. This could be a constant amount for quests that payout multiple times, a
-                range with reference to what determines what amount, the contracts balance at time
-                of claim. <br />
-                ⚠️<i>The description should not include any sensitive information.</i>
-              </>
-            }
             multiline
             isMarkDown
-            maxLine={isSummary ? 5 : undefined}
+            disableLinks={isSummary}
+            showBlocks={!isSummary}
+            maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
             ellipsis={
               <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
                 Read more
@@ -268,31 +296,33 @@ export default function Quest({
         </ContentWrapperStyled>
         {!isSummary && challengeDeposit && (
           <ClaimList
-            newClaim={claimUpdated}
             questData={questData}
             questTotalBounty={bounty}
             challengeDeposit={challengeDeposit}
             isLoading={isLoading}
           />
         )}
-        {!isSummary && questData.address && walletAddress && bounty && (
+        {!isSummary && questData.address && walletAddress && (
           <QuestFooterStyled>
             {questData?.state === ENUM_QUEST_STATE.Active ? (
               <>
-                <FundModal quest={questData} onClose={onFundModalClosed} />
-                {claimDeposit && (
+                <FundModal quest={questData} />
+                {claimDeposit && bounty && (
                   <ScheduleClaimModal
                     questAddress={questData.address}
                     questTotalBounty={bounty}
                     claimDeposit={claimDeposit}
-                    onClose={onScheduleModalClosed}
                   />
                 )}
               </>
             ) : (
               <>
-                {!!bounty?.parsedAmount && (
-                  <ReclaimFundsModal bounty={bounty} questData={questData} />
+                {state === ENUM_QUEST_STATE.Expired && (
+                  <ReclaimFundsModal
+                    bounty={bounty}
+                    questData={questData}
+                    isDepositReleased={isDepositReleased}
+                  />
                 )}
               </>
             )}

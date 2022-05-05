@@ -7,6 +7,7 @@ packages/hardhat/*.txt
 **/node_modules
 packages/hardhat/artifacts
 packages/hardhat/cache
+packages/hardhat/deployments/localhost
 packages/**/data
 docker/**/data
 

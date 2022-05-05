@@ -7,10 +7,11 @@ export const feedDummyQuestData = async (questData: QuestModel): Promise<QuestMo
     // Load dummy data only for rinkeby testing and flag activated
     const resp = await fetch('https://jaspervdj.be/lorem-markdownum/markdown.txt');
     const dummyData = await resp.text();
+    const dummySplit = dummyData.split('\n');
     return {
       ...(questData ?? {}),
-      title: dummyData.substring(1, dummyData.indexOf('\n')),
-      description: dummyData.slice(dummyData.indexOf('\n') + 1),
+      title: dummySplit[0].substring(2),
+      description: dummySplit.splice(4, dummySplit.length).join('\n'),
     };
   }
   return questData;

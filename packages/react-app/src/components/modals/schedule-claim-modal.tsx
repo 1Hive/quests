@@ -1,4 +1,4 @@
-import { Button, useToast } from '@1hive/1hive-ui';
+import { Button } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
@@ -15,6 +15,7 @@ import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 
 import { FormErrors } from 'src/models/form-errors';
+import { approveTokenTransaction } from 'src/services/transaction-handler';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -59,7 +60,6 @@ export default function ScheduleClaimModal({
   claimDeposit,
   onClose = noop,
 }: Props) {
-  const toast = useToast();
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
@@ -107,44 +107,20 @@ export default function ScheduleClaimModal({
       setLoading(true);
       const { governQueueAddress } = getNetwork();
       const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
-      const message = 'Approving claim deposit (1/2)';
-      toast(message);
-      setTransaction({
-        id: uniqueId(),
-        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-        message,
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-      });
-      const approveTxReceipt = await QuestService.approveTokenAmount(
-        walletAddress,
-        governQueueAddress,
+      await approveTokenTransaction(
         scheduleDeposit.token,
-        (txHash) => {
-          setTransaction(
-            (oldTx) =>
-              oldTx && {
-                ...oldTx,
-                hash: txHash,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              },
-          );
-        },
+        governQueueAddress,
+        'Approving claim deposit (1/2)',
+        walletAddress,
+        setTransaction,
       );
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: approveTxReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
-      if (!approveTxReceipt?.status) throw new Error('Failed to approve deposit');
       setTransaction({
         id: uniqueId(),
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        type: 'ClaimSchedule',
+        args: { questAddress },
       });
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
@@ -253,6 +229,7 @@ export default function ScheduleClaimModal({
                       key="WalletBallance-claimDeposit"
                       askedTokenAmount={claimDeposit}
                       setIsEnoughBalance={setIsEnoughBalance}
+                      isLoading={loading}
                     />
                     <Button
                       key="confirmButton"
