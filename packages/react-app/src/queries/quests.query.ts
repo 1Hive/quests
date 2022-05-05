@@ -18,6 +18,10 @@ const QuestEntityQuery = gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
+      depositToken
+      depositAmount
+      questCreator
+      questFundsRecoveryAddress
     }
   }
 `;
@@ -53,25 +57,13 @@ const QuestEntitiesQuery = gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
+      depositToken
+      depositAmount
+      questCreator
+      questFundsRecoveryAddress
     }
   }
 `;
-
-// TODO : Uncoment when subgraph have support for combining where and full text query
-// const QuestSearchQuery = gql`
-//   query questSearch($first: Int, $skip: Int, $text: String) {
-//     questSearch(first: $first, skip: $skip, text: $text) {
-//       id
-//       questAddress
-//       questTitle
-//       questDescription
-//       questExpireTimeSec
-//       questDetailsRef
-//       questRewardTokenAddress
-//       creationTimestamp
-//     }
-//   }
-// `;
 
 const QuestRewardTokens = gql`
   query questEntities($first: Int) {
@@ -86,6 +78,8 @@ const QuestEntitiesLight = gql`
     questEntities(where: { questExpireTimeSec_gt: $expireTimeLower }) {
       id
       questRewardTokenAddress
+      depositToken
+      depositAmount
     }
   }
 `;
@@ -95,7 +89,11 @@ export const fetchQuestEnity = (questAddress: string) =>
     ID: questAddress.toLowerCase(), // Subgraph address are stored lowercase
   }).then((res) => res.questEntity);
 
-export const fetchQuestEntities = (currentIndex: number, count: number, filter: FilterModel) => {
+export const fetchQuestEntities = async (
+  currentIndex: number,
+  count: number,
+  filter: FilterModel,
+) => {
   let expireTimeLowerMs = 0;
   let expireTimeUpperMs = GQL_MAX_INT_MS;
   if (filter.status === ENUM_QUEST_STATE.Active) {
@@ -106,14 +104,15 @@ export const fetchQuestEntities = (currentIndex: number, count: number, filter: 
   } else {
     expireTimeLowerMs = filter.minExpireTime?.getTime() ?? 0;
   }
-  return request(questsSubgraph, QuestEntitiesQuery, {
+  const res = await request(questsSubgraph, QuestEntitiesQuery, {
     skip: currentIndex,
     first: count,
     expireTimeLower: Math.round(expireTimeLowerMs / 1000),
     expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
     title: filter.title,
     description: filter.description,
-  }).then((res) => res.questEntities);
+  });
+  return res.questEntities;
 };
 
 export const fetchQuestRewardTokens = () =>

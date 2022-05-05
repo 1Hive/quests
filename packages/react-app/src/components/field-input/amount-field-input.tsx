@@ -146,7 +146,7 @@ type Props = {
   amountLabel?: string;
   tokenLabel?: string;
   placeHolder?: string;
-  value?: TokenAmountModel;
+  value?: TokenAmountModel | null;
   onChange?: Function;
   formik?: FormikContextType<any>;
   compact?: boolean;

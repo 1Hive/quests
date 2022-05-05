@@ -1,4 +1,8 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
+features:
+  - fullTextSearch
+  - nonFatalErrors
+  - ipfsOnEthereumContracts
 schema:
   file: ./src/schema.graphql
 dataSources:
@@ -19,6 +23,9 @@ dataSources:
         - name: QuestFactory
           file: ./abis/QuestFactory.json
       eventHandlers:
-        - event: QuestCreated(address,string,bytes,address,uint256,uint256)
+        - event: QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address)
           handler: handleQuestCreated
+        - event: DepositChanged(uint256,address,uint256)
+          handler: handleDepositChanged
       file: ./src/mapping.ts
+

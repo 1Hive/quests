@@ -5,8 +5,11 @@ export type TransactionModel = {
   estimatedDuration?: number;
   status: string;
   progress?: number;
-  questAddress?: string;
-  args?: any[];
+  args?: {
+    questAddress?: string;
+    containerId?: string;
+    disputeState?: number;
+  };
   type:
     | 'TokenApproval'
     | 'QuestCreate'

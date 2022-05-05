@@ -140,8 +140,11 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimChallengeResolve',
-        questAddress: claim.questAddress,
-        args: [claim.container.id, dispute!.state],
+        args: {
+          questAddress: claim.questAddress,
+          containerId: claim.container.id,
+          disputeState: dispute!.state,
+        },
       });
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,

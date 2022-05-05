@@ -1,18 +1,16 @@
-import { Button, useToast } from '@1hive/1hive-ui';
+import { Button } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
-import { noop, uniqueId } from 'lodash-es';
+import { noop } from 'lodash-es';
 import { useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
-import { ENUM_ESTIMATED_TX_TIME_MS, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
-import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { FundModel } from 'src/models/fund.model';
 import { FormErrors } from 'src/models/form-errors';
-import * as QuestService from '../../services/quest.service';
+import { fundQuestTransaction } from 'src/services/transaction-handler';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
@@ -41,62 +39,23 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
-  const toast = useToast();
 
   const closeModal = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
 
-  const fundModalTx = async (values: any, setSubmitting: Function) => {
-    try {
+  const onSubmit = async (values: FundModel) => {
+    validate(values); // validate one last time before submiting
+    if (isFormValid && quest.address) {
       setLoading(true);
-      const message = 'Sending funds to Quest';
-      toast(message);
-      setTransaction({
-        id: uniqueId(),
-        estimatedDuration: ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
-        message,
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        type: 'QuestFund',
-        questAddress: quest.address,
-      });
-      const txReceipt = await QuestService.fundQuest(
-        walletAddress,
-        quest.address!,
+      await fundQuestTransaction(
         values.fundAmount,
-        (txHash) => {
-          setTransaction(
-            (oldTx) =>
-              oldTx && {
-                ...oldTx,
-                hash: txHash,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              },
-          );
-        },
+        quest.address,
+        'Sending funds to the Quest',
+        walletAddress,
+        setTransaction,
       );
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: txReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
-      if (!txReceipt?.status) throw new Error('Failed to fund quest');
-    } catch (e: any) {
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: ENUM_TRANSACTION_STATUS.Failed,
-            message: computeTransactionErrorMessage(e),
-          },
-      );
-    } finally {
-      setSubmitting(false);
       setLoading(false);
     }
   };
@@ -117,12 +76,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           fundAmount: { parsedAmount: 0, token: quest.rewardToken },
         } as FundModel
       }
-      onSubmit={(values, { setSubmitting }) => {
-        validate(values); // validate one last time before submiting
-        if (isFormValid) {
-          fundModalTx(values, setSubmitting);
-        }
-      }}
+      onSubmit={onSubmit}
       validateOnChange
       validate={validate}
     >

@@ -91,8 +91,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         message: 'Sending claimed amount to your wallet',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimExecute',
-        questAddress: claim.questAddress,
-        args: [claim.container!.id],
+        args: { questAddress: claim.questAddress, containerId: claim.container!.id },
       });
       const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
         setTransaction(
@@ -145,12 +144,19 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                 icon={<IconCoin />}
                 label={buttonLabel}
                 mode="positive"
+                title={
+                  questTotalBounty &&
+                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
+                    ? 'Not enough funds in Quest bounty'
+                    : 'waiting for some info'
+                }
                 disabled={
                   loading ||
                   !scheduleTimeout ||
                   claim.state === ENUM_CLAIM_STATE.Challenged ||
                   !questTotalBounty ||
-                  !walletAddress
+                  !walletAddress ||
+                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
                 }
               />
             )}
