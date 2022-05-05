@@ -1,0 +1,23 @@
+{
+    "network": "rinkeby",
+    "dataSources":[
+        {
+            "nameContract":"QuestFactory",
+            "startBlock": 9939088,
+            "questFactoryAddress": "0x1A506d3ed7E0865FFC980d2eB54662DDb587e885",
+            "customTemplate":"questFactory.yaml"
+        },
+        {
+            "nameContract":"QuestFactoryV1",
+            "startBlock": 9953404,
+            "questFactoryAddress": "0x855a04deb27abf93336d52a91f29a98dd5605691",
+            "customTemplate":"questFactoryV1.yaml"
+        },
+        {
+            "nameContract":"QuestFactoryV2",
+            "startBlock": 10573676,
+            "questFactoryAddress": "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01"
+            ,"customTemplate":"questFactory.yaml"
+        }
+    ]
+}

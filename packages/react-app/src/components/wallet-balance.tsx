@@ -23,7 +23,7 @@ const WrapperStyled = styled.div<{ theme: ThemeInterface; isEnoughBalance: boole
 // #endregion
 
 type Props = {
-  askedTokenAmount?: TokenAmountModel;
+  askedTokenAmount?: TokenAmountModel | null;
   setIsEnoughBalance?: (_valid: boolean) => void;
   isLoading?: boolean;
 };
@@ -42,7 +42,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
 
   useEffect(() => {
     if (askedTokenAmount?.token) {
-      fetchBalances(askedTokenAmount?.token);
+      fetchBalances(askedTokenAmount.token);
     }
   }, [walletAddress]); // Need to fetch balances when wallet address changes
 
@@ -57,12 +57,12 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
 
   const fetchBalances = async (_token: TokenModel) => {
     setTokenBalance(undefined);
-    setTokenBalance((await getBalanceOf(_token, walletAddress)) ?? undefined);
+    setTokenBalance((await getBalanceOf({ ..._token }, walletAddress)) ?? undefined);
   };
 
   return (
     <WrapperStyled theme={currentTheme} isEnoughBalance={isEnoughBalance}>
-      {askedTokenAmount?.token ? (
+      {askedTokenAmount?.token && askedTokenAmount !== null ? (
         <AmountFieldInput
           isLoading={!tokenBalance || isLoading}
           id={`balance-${tokenBalance?.token.symbol}`}

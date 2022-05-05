@@ -9,6 +9,7 @@ import {
   QUESTS_PAGE_SIZE,
   DEFAULT_FILTER,
   ENUM_TRANSACTION_STATUS,
+  ENUM_QUEST_STATE,
 } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
@@ -88,8 +89,8 @@ export default function QuestList() {
     const fakeQuests = [];
     for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
       fakeQuests.push(
-        <QuestWrapperStyled singleColumn={below('medium')}>
-          <Quest key={`${i}`} isLoading isSummary />
+        <QuestWrapperStyled singleColumn={below('medium')} key={`${i}`}>
+          <Quest isLoading isSummary />
         </QuestWrapperStyled>,
       );
     }
@@ -111,15 +112,16 @@ export default function QuestList() {
   useEffect(() => {
     // Should not be nullish and not already exist in list
     if (
+      filter.status === ENUM_QUEST_STATE.Active &&
       transaction?.type === 'QuestCreate' &&
-      transaction.status === ENUM_TRANSACTION_STATUS.Confirmed
+      transaction.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      filter.status !== ENUM_QUEST_STATE.Expired
     ) {
       // Insert the newQuest at the top of the list
-      const { questAddress } = transaction;
-      if (questAddress) {
+      if (transaction.args?.questAddress) {
         // Wait for subgraph to index the new quest
         setNewQuestLoading(true);
-        fetchQuestUntilNew(questAddress);
+        fetchQuestUntilNew(transaction.args.questAddress);
       }
     }
   }, [transaction?.status, transaction?.type]);
@@ -177,7 +179,7 @@ export default function QuestList() {
         next={loadMore}
         hasMore={hasMore}
         endMessage={
-          quests.length ? (
+          quests.length || newQuestLoading ? (
             <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
             <Outset gu64 className="flex-center wide">
@@ -199,13 +201,8 @@ export default function QuestList() {
         <FlexContainerStyled>
           {newQuestLoading && skeletonQuests[0]}
           {quests.map((questData: QuestModel) => (
-            <QuestWrapperStyled singleColumn={below('medium')}>
-              <Quest
-                key={questData.address}
-                isSummary
-                questData={questData}
-                isLoading={!questData.address}
-              />
+            <QuestWrapperStyled singleColumn={below('medium')} key={questData.address}>
+              <Quest isSummary questData={questData} isLoading={!questData.address} />
             </QuestWrapperStyled>
           ))}
           {isLoading && skeletonQuests}
