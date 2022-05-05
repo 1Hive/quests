@@ -9,7 +9,6 @@ import "./libraries/Models.sol";
 import "./Quest.sol";
 
 contract QuestFactory is Ownable {
-    using SafeERC20 for IERC20;
     using DepositLib for Models.Deposit;
 
     address public aragonGovernAddress;
@@ -53,7 +52,6 @@ contract QuestFactory is Ownable {
     ) external returns (address) {
         // Collect deposit from quest creator
         deposit.collectFrom(msg.sender);
-
         Quest quest = new Quest(
             _questTitle,
             _questDetailsRef,
@@ -68,6 +66,7 @@ contract QuestFactory is Ownable {
 
         // Transfer deposit to quest, so when reclaiming funds, the quest can release deposit to the creator
         deposit.releaseTo(address(quest));
+
         emit QuestCreated(
             address(quest),
             _questTitle,

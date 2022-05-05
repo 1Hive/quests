@@ -33,7 +33,7 @@ describe("[Contract] Quest", function () {
     depositToken = await tokenMockFactory.deploy("Deposit Token", "DTOKEN");
   });
 
-  describe("recoverUnclaimedFunds()", function () {
+  describe("recoverFundsAndDeposit()", function () {
     const questFunds = fromNumber(1000);
 
     it("SHOULD empty the quest funds and creator recover his funds and deposit", async function () {
@@ -52,7 +52,7 @@ describe("[Contract] Quest", function () {
       );
 
       // Act
-      await quest.recoverUnclaimedFunds();
+      await quest.recoverFundsAndDeposit();
 
       // Assert
       expect(await rewardToken.balanceOf(quest.address)).to.eq(0);
@@ -78,10 +78,10 @@ describe("[Contract] Quest", function () {
         depositAmount,
         creator
       );
-      await quest.recoverUnclaimedFunds();
+      await quest.recoverFundsAndDeposit();
 
       // Act
-      await quest.recoverUnclaimedFunds();
+      await quest.recoverFundsAndDeposit();
 
       // Assert
     });
@@ -102,7 +102,7 @@ describe("[Contract] Quest", function () {
       );
 
       // Act
-      const act = () => quest.recoverUnclaimedFunds();
+      const act = () => quest.recoverFundsAndDeposit();
 
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: Not expired");
@@ -124,7 +124,7 @@ describe("[Contract] Quest", function () {
         creator
       );
       // Act
-      await quest.recoverUnclaimedFunds();
+      await quest.recoverFundsAndDeposit();
 
       // Assert
       expect(await sameToken.balanceOf(quest.address)).to.eq(0);

@@ -32,7 +32,7 @@ interface QuestInterface extends ethers.utils.Interface {
     "questCreator()": FunctionFragment;
     "questDetailsRef()": FunctionFragment;
     "questTitle()": FunctionFragment;
-    "recoverUnclaimedFunds()": FunctionFragment;
+    "recoverFundsAndDeposit()": FunctionFragment;
     "rewardToken()": FunctionFragment;
   };
 
@@ -74,7 +74,7 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "recoverUnclaimedFunds",
+    functionFragment: "recoverFundsAndDeposit",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -108,7 +108,7 @@ interface QuestInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "questTitle", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "recoverUnclaimedFunds",
+    functionFragment: "recoverFundsAndDeposit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -211,9 +211,9 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<[string]>;
 
-    recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
+    recoverFundsAndDeposit(overrides?: Overrides): Promise<ContractTransaction>;
 
-    "recoverUnclaimedFunds()"(
+    "recoverFundsAndDeposit()"(
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -296,9 +296,9 @@ export class Quest extends Contract {
 
   "questTitle()"(overrides?: CallOverrides): Promise<string>;
 
-  recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
+  recoverFundsAndDeposit(overrides?: Overrides): Promise<ContractTransaction>;
 
-  "recoverUnclaimedFunds()"(
+  "recoverFundsAndDeposit()"(
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -381,9 +381,9 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<string>;
 
-    recoverUnclaimedFunds(overrides?: CallOverrides): Promise<void>;
+    recoverFundsAndDeposit(overrides?: CallOverrides): Promise<void>;
 
-    "recoverUnclaimedFunds()"(overrides?: CallOverrides): Promise<void>;
+    "recoverFundsAndDeposit()"(overrides?: CallOverrides): Promise<void>;
 
     rewardToken(overrides?: CallOverrides): Promise<string>;
 
@@ -450,9 +450,9 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    recoverUnclaimedFunds(overrides?: Overrides): Promise<BigNumber>;
+    recoverFundsAndDeposit(overrides?: Overrides): Promise<BigNumber>;
 
-    "recoverUnclaimedFunds()"(overrides?: Overrides): Promise<BigNumber>;
+    "recoverFundsAndDeposit()"(overrides?: Overrides): Promise<BigNumber>;
 
     rewardToken(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -530,9 +530,11 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    recoverUnclaimedFunds(overrides?: Overrides): Promise<PopulatedTransaction>;
+    recoverFundsAndDeposit(
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
-    "recoverUnclaimedFunds()"(
+    "recoverFundsAndDeposit()"(
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
