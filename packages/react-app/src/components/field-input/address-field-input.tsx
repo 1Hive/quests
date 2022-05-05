@@ -8,7 +8,6 @@ import { FieldInput } from './field-input';
 
 const TextInputStyled = styled(TextInput)`
   border-radius: 12px;
-  //overflow: hidden !important;
   width: 100%;
   text-overflow: ellipsis;
   padding-right: 42px;
@@ -28,7 +27,6 @@ const AddressWrapperStyled = styled.div<{
 }>`
   align-items: center;
   display: flex;
-  //flex-wrap: nowrap;
   max-width: 400px;
   width: 100%;
 

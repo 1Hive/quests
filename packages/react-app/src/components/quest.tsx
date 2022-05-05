@@ -112,6 +112,7 @@ export default function Quest({
   isSummary = false,
 }: Props) {
   const { walletAddress } = useWallet();
+  const history = useHistory();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
@@ -138,7 +139,6 @@ export default function Quest({
   }, [transaction?.type, transaction?.status, transaction?.questAddress]);
 
   let isSubscribed = true;
-  const history = useHistory();
   useEffect(() => {
     if (!isSummary) {
       // Don't show deposit of expired
