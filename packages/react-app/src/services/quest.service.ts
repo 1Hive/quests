@@ -141,9 +141,9 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
 }
 
 function decodeClaimAction(payload: PayloadModel) {
-  const [evidenceIpfsHash, playerAddress, claimAmount] =
+  const [evidenceIpfsHash, playerAddress, claimAmount, claimAll] =
     getQuestContractInterface().decodeFunctionData('claim', payload.actions[0].data);
-  return { evidenceIpfsHash, playerAddress, claimAmount };
+  return { evidenceIpfsHash, playerAddress, claimAmount, claimAll };
 }
 
 function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
@@ -151,6 +151,7 @@ function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
     evidenceIpfsHash,
     claimData.playerAddress,
     toBigNumber(claimData.claimedAmount),
+    claimData.claimAll,
   ]);
 }
 
@@ -242,7 +243,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
     res
       .filter((x) => x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase())
       .map(async (container) => {
-        const { evidenceIpfsHash, claimAmount, playerAddress } = decodeClaimAction(
+        const { evidenceIpfsHash, claimAmount, playerAddress, claimAll } = decodeClaimAction(
           container.payload,
         );
 
@@ -259,6 +260,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           playerAddress,
           questAddress: quest.address,
           state: container.state,
+          claimAll,
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,
         } as ClaimModel;
@@ -303,8 +305,8 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   try {
     fetchedReason = await getObjectFromIpfs(reason);
   } catch (error) {
+    Logger.warn(error, 'Failed to get IPFS object when fetching challenge');
     fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph); // try with thegraph ipfs node
-    Logger.exception(error, 'Failed to get IPFS object when fetching challenge');
   }
   return {
     deposit: {

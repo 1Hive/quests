@@ -23,7 +23,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
-    "claim(bytes,address,uint256)": FunctionFragment;
+    "claim(bytes,address,uint256,bool)": FunctionFragment;
     "claims(uint256)": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
@@ -39,7 +39,7 @@ interface QuestInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claim",
-    values: [BytesLike, string, BigNumberish]
+    values: [BytesLike, string, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "claims",
@@ -124,13 +124,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -191,13 +193,15 @@ export class Quest extends Contract {
     _evidence: BytesLike,
     _player: string,
     _amount: BigNumberish,
+    _claimAll: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claim(bytes,address,uint256)"(
+  "claim(bytes,address,uint256,bool)"(
     _evidence: BytesLike,
     _player: string,
     _amount: BigNumberish,
+    _claimAll: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -258,13 +262,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -328,13 +334,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -383,13 +391,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

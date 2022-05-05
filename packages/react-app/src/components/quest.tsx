@@ -1,7 +1,12 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { Link, Redirect, useHistory, useLocation } from 'react-router-dom';
-import { ENUM_PAGES, ENUM_QUEST_STATE } from 'src/constants';
+import {
+  ENUM_PAGES,
+  ENUM_QUEST_STATE,
+  ENUM_TRANSACTION_STATUS,
+  MAX_LINE_DESCRIPTION,
+} from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from 'src/services/quest.service';
@@ -11,6 +16,7 @@ import { GUpx } from 'src/utils/style.util';
 import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
+import { useTransactionContext } from 'src/contexts/transaction.context';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -30,15 +36,33 @@ const ClickableDivStyled = styled.div`
   width: 100%;
 `;
 
+const TitleLinkStyled = styled(Link)`
+  font-weight: 100;
+  max-width: 100%;
+
+  div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+`;
+
+const LinkStyled = styled(Link)`
+  font-weight: 100;
+`;
+
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => GUpx(compact ? 1 : 2)};
+  height: 100%;
 `;
 
 const CardStyled = styled(Card)<{ isSummary: boolean }>`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  height: fit-content;
+  height: 100%;
   min-height: 250px;
   ${({ isSummary }) =>
     isSummary &&
@@ -70,7 +94,8 @@ const RowStyled = styled.div`
 const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => (compact ? GUpx(2) : GUpx(3))};
   width: 100%;
-  min-height: 225px;
+  height: 100%;
+  min-height: 340px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -99,10 +124,29 @@ export default function Quest({
 }: Props) {
   const { walletAddress } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
-  const [claimUpdated, setClaimUpdate] = useState(0);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
   const { below } = useViewport();
+  const { transaction } = useTransactionContext();
+
+  useEffect(() => {
+    // If tx completion impact Quest bounty, update it
+    if (
+      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction.questAddress === questData.address &&
+      (transaction?.type === 'ClaimChallengeResolve' ||
+        transaction?.type === 'ClaimExecute' ||
+        transaction?.type === 'QuestFund' ||
+        transaction?.type === 'QuestReclaimFunds')
+    ) {
+      setBounty(null);
+      setTimeout(() => {
+        if (questData.address && questData.rewardToken) {
+          fetchBalanceOfQuest(questData.address, questData.rewardToken);
+        }
+      }, 500);
+    }
+  }, [transaction?.type, transaction?.status, transaction?.questAddress]);
 
   let isSubscribed = true;
   const history = useHistory();
@@ -155,20 +199,16 @@ export default function Quest({
       });
   };
 
-  const onScheduleModalClosed = (success: boolean) => {
-    if (success) {
-      setClaimUpdate(claimUpdated + 1); // Trigger a claim update in claim list
-    }
-  };
-
-  const onFundModalClosed = (success: boolean) => {
-    setTimeout(() => {
-      if (success && questData.address && questData.rewardToken) {
-        fetchBalanceOfQuest(questData.address, questData.rewardToken);
-        setClaimUpdate(claimUpdated + 1);
-      }
-    }, 500);
-  };
+  const titleInput = (
+    <TextFieldInput
+      id="title"
+      isLoading={isLoading || !questData}
+      placeHolder="Quest title"
+      value={questData?.title}
+      fontSize="24px"
+      tooltip="Title should resume the Quest and be short and clear."
+    />
+  );
 
   const fieldsRow = (
     <RowStyled>
@@ -246,47 +286,42 @@ export default function Quest({
             </RowStyled>
 
             {!isSummary && fieldsRow}
+
             <TextFieldInput
               id="description"
               value={questData?.description}
               isLoading={isLoading || !questData}
-              tooltip={
-                <>
-                  <b>The quest description should include:</b>
-                  <br />- Details about what the quest entails. <br />- What evidence must be
-                  submitted by users claiming a reward for completing the quest. <br />- The payout
-                  amount. This could be a constant amount for quests that payout multiple times, a
-                  range with reference to what determines what amount, the contracts balance at time
-                  of claim. <br />
-                  ⚠️<i>The description should not include any sensitive information.</i>
-                </>
-              }
               multiline
               isMarkDown
-              maxLine={isSummary ? 5 : undefined}
+              disableLinks={isSummary}
+              showBlocks={!isSummary}
+              maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
+              ellipsis={
+                <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
+                  Read more
+                </LinkStyled>
+              }
             />
             {isSummary && fieldsRow}
           </ContentWrapperStyled>
           {!isSummary && challengeDeposit && (
             <ClaimList
-              newClaim={claimUpdated}
               questData={questData}
               questTotalBounty={bounty}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
             />
           )}
-          {!isSummary && questData.address && walletAddress && bounty && (
+          {!isSummary && questData.address && walletAddress && (
             <QuestFooterStyled>
               {questData?.state === ENUM_QUEST_STATE.Active ? (
                 <>
-                  <FundModal quest={questData} onClose={onFundModalClosed} />
-                  {claimDeposit && (
+                  <FundModal quest={questData} />
+                  {claimDeposit && bounty && (
                     <ScheduleClaimModal
                       questAddress={questData.address}
                       questTotalBounty={bounty}
                       claimDeposit={claimDeposit}
-                      onClose={onScheduleModalClosed}
                     />
                   )}
                 </>

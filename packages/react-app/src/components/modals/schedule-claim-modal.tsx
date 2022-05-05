@@ -76,9 +76,7 @@ export default function ScheduleClaimModal({
     const errors = {} as FormErrors<ClaimModel>;
     if (!values.evidence) errors.evidence = 'Evidence of completion is required';
     if (!values.claimAll) {
-      if (!values.claimedAmount?.parsedAmount) errors.claimedAmount = 'Claim amount is required';
-      else if (values.claimedAmount.parsedAmount < 0)
-        errors.claimedAmount = 'Claim amount is invalid';
+      if (values.claimedAmount.parsedAmount < 0) errors.claimedAmount = 'Claim amount is invalid';
       else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
         errors.claimedAmount = 'Claim amount should not be higher than available bounty';
     }
@@ -116,6 +114,8 @@ export default function ScheduleClaimModal({
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
         message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        type: 'TokenApproval',
+        questAddress,
       });
       const approveTxReceipt = await QuestService.approveTokenAmount(
         walletAddress,
@@ -147,6 +147,8 @@ export default function ScheduleClaimModal({
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        type: 'ClaimSchedule',
+        questAddress,
       });
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
@@ -154,6 +156,7 @@ export default function ScheduleClaimModal({
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
           playerAddress: values.playerAddress ?? walletAddress,
+          claimAll: values.claimAll,
           questAddress,
         },
         (txHash) => {
@@ -254,6 +257,7 @@ export default function ScheduleClaimModal({
                       key="WalletBallance-claimDeposit"
                       askedTokenAmount={claimDeposit}
                       setIsEnoughBalance={setIsEnoughBalance}
+                      isLoading={loading}
                     />
                     <Button
                       key="confirmButton"

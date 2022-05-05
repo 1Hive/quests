@@ -6,6 +6,7 @@ import {
   ENUM_QUEST_STATE,
   ENUM_QUEST_VIEW_MODE,
   ENUM_TRANSACTION_STATUS,
+  MAX_LINE_DESCRIPTION,
 } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
@@ -155,13 +156,14 @@ export default function QuestModal({
     validate(values); // Validate one last time before submitting
 
     if (isFormValid) {
-      let createdQuestAddress: string;
+      let newQuestAddress: string;
       try {
         setTransaction({
           id: uniqueId(),
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
           message: 'Creating Quest...',
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          type: 'QuestCreate',
         });
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,
@@ -184,6 +186,10 @@ export default function QuestModal({
             );
           },
         );
+
+        newQuestAddress = txReceiptSaveQuest?.events?.flatMap((x) => x.args).filter((x) => !!x)[0];
+        if (!newQuestAddress) throw Error('Something went wrong, Quest was not created');
+
         setTransaction(
           (oldTx) =>
             oldTx && {
@@ -191,22 +197,23 @@ export default function QuestModal({
               status: txReceiptSaveQuest?.status
                 ? ENUM_TRANSACTION_STATUS.Confirmed
                 : ENUM_TRANSACTION_STATUS.Failed,
+              questAddress: newQuestAddress,
             },
         );
 
         if (txReceiptSaveQuest?.status) {
           if (values.bounty?.parsedAmount) {
-            createdQuestAddress = (txReceiptSaveQuest?.events?.[0] as any)?.args?.[0];
-            if (!createdQuestAddress) throw Error('Something went wrong, Quest was not created');
             setTransaction({
               id: uniqueId(),
               estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
               message: 'Sending funds to Quest',
               status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+              type: 'QuestFund',
+              questAddress: newQuestAddress,
             });
             const txReceiptFundQuest = await QuestService.fundQuest(
               walletAddress,
-              createdQuestAddress,
+              newQuestAddress,
               values.bounty!,
               (txHash) => {
                 setTransaction(
@@ -228,7 +235,7 @@ export default function QuestModal({
                     : ENUM_TRANSACTION_STATUS.Failed,
                 },
             );
-            if (!txReceiptFundQuest?.status || !createdQuestAddress) {
+            if (!txReceiptFundQuest?.status || !newQuestAddress) {
               throw new Error('Failed to create quest');
             }
             if (mounted) setQuestDataState(emptyQuestData);
@@ -344,8 +351,12 @@ export default function QuestModal({
                           <br />- The payout amount. This could be a constant amount for quests that
                           payout multiple times, a range with reference to what determines what
                           amount, the contracts balance at time of claim.
+                          <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed in
+                          main page. This is supposed to be an overview of the Quest. Try to stick
+                          with normal text to prevent any overflow cropping.
                           <br />
                           ⚠️<i>The description should not include any sensitive information.</i>
+                          <br />
                         </>
                       }
                       onChange={handleChange}

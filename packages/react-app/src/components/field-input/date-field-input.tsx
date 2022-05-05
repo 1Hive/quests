@@ -39,6 +39,10 @@ const InputStyled = styled.input<{
   }
 `;
 
+const DateStyled = styled.div`
+  min-width: 130px;
+`;
+
 // #endregion
 
 type Props = {
@@ -100,7 +104,7 @@ function DateFieldInput({
       isDarkTheme={isDarkTheme(theme)}
     />
   ) : (
-    <span>{value ? new Date(value).toDateString() : 'Not set'}</span>
+    <DateStyled>{value ? new Date(value).toDateString() : 'Not set'}</DateStyled>
   );
 
   return (
