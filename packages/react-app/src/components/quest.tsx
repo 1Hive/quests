@@ -105,7 +105,9 @@ const BountyWrapperStyled = styled.div`
   margin-left: auto;
   width: fit-content;
 `;
-
+const AddressFieldInputStyled = styled(AddressFieldInput)`
+  z-index: 2;
+`;
 // #endregion
 
 type Props = {
@@ -212,7 +214,7 @@ export default function Quest({
 
   const fieldsRow = (
     <RowStyled>
-      <AddressFieldInput
+      <AddressFieldInputStyled
         id="address"
         label="Quest Address"
         isLoading={isLoading || !questData}

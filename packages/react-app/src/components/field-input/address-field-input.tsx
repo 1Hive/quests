@@ -1,29 +1,34 @@
-import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
+import { TextInput, EthIdenticon, IconCopy, Button, TextCopy } from '@1hive/1hive-ui';
+import { ClientError } from 'graphql-request';
 import { noop } from 'lodash-es';
 import React from 'react';
+import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
 import styled, { css } from 'styled-components';
 import { FieldInput } from './field-input';
 
 // #region Styled
 
-const TextInputStyled = styled(TextInput)<{ isEdit: boolean }>`
+const TextInputStyled = styled(TextInput)`
   border-radius: 12px;
-
-  ${({ isEdit }) =>
-    isEdit
-      ? css`
-          padding-right: 42px;
-        `
-      : css`
-          padding-left: 50px;
-          :read-only {
-            color: unset;
-          }
-        `}
+  //overflow: hidden !important;
+  width: 100%;
+  text-overflow: ellipsis;
+  padding-right: 42px;
+`;
+const TextCopyStyled = styled(TextCopy)`
+  margin-left: 1px;
+`;
+const ButtonStyled = styled(Button)`
+  border: none;
+  background: none;
+  margin-left: -45px;
+  z-index: 0;
+  margin-bottom: 1px;
+  cursor: pointer;
 `;
 
 const EthIdenticonStyled = styled(EthIdenticon)<{ isEdit: boolean }>`
-  border-radius: ${({ isEdit }) => (isEdit ? '0 12px 12px 0' : '8px 0 0 8px')};
+  border-radius: ${({ isEdit }) => (isEdit ? '0 12px 12px 0' : '4px 0 0 4px')};
   padding: 0;
 `;
 
@@ -31,8 +36,9 @@ const AddressWrapperStyled = styled.div<{
   wide: boolean;
   isEdit: boolean;
 }>`
+  align-items: center;
   display: flex;
-  flex-wrap: nowrap;
+  //flex-wrap: nowrap;
   max-width: 400px;
   width: 100%;
 
@@ -69,20 +75,40 @@ export function AddressFieldInput({
   onBlur = noop,
   error,
 }: Props) {
+  const copyCode = useCopyToClipboard();
+  const copyAddress = () => {
+    copyCode(value, 'Wallet address copied to clipboard');
+  };
   const loadableContent = (
-    <AddressWrapperStyled isEdit={isEdit} wide={wide}>
-      <TextInputStyled
-        isEdit={isEdit}
-        wide={wide}
-        id={id}
-        value={value}
-        disabled={!isEdit}
-        onChange={onChange}
-        onBlur={onBlur}
-        adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
-        adornmentPosition={isEdit ? 'end' : 'start'}
-        adornmentSettings={{ padding: 0, width: 36 }}
-      />
+    <AddressWrapperStyled isEdit={isEdit} wide={wide} onClick={(e) => e.stopPropagation()}>
+      {isEdit ? (
+        <TextInputStyled
+          isEdit={isEdit}
+          wide={wide}
+          id={id}
+          value={value}
+          disabled={!isEdit}
+          onChange={onChange}
+          onBlur={onBlur}
+          adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
+          adornmentPosition={isEdit ? 'end' : 'start'}
+          adornmentSettings={{ padding: 0, width: 36 }}
+        />
+      ) : (
+        <TextCopyStyled
+          isEdit={isEdit}
+          wide={wide}
+          message="Address copied to clipboard"
+          id={id}
+          value={value}
+          disabled={!isEdit}
+          onChange={onChange}
+          onBlur={onBlur}
+          adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
+          adornmentPosition={isEdit ? 'end' : 'start'}
+          adornmentSettings={{ padding: 0, width: 36 }}
+        />
+      )}
     </AddressWrapperStyled>
   );
   return (
