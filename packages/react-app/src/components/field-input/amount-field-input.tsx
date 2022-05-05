@@ -66,7 +66,7 @@ const IconEditStyled = styled(IconEdit)`
   padding-left: ${GUpx(1)};
 `;
 
-const TokenAmountButtonStyled = styled(Button) <{ compact?: boolean }>`
+const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
   ${({ compact }) => (compact ? '' : `margin-left: ${GUpx(1)};`)}
   border-radius: 4px;
   font-size: 16px;
@@ -123,7 +123,7 @@ const TokenAmountBadge = React.memo(
       copyCode(token.token, `${token.symbol} address copied to clipboard`);
       event.stopPropagation();
     };
-    
+
     return (
       <TokenAmountButtonStyled
         className={className}
