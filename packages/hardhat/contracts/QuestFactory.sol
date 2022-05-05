@@ -51,8 +51,6 @@ contract QuestFactory is Ownable {
         uint256 _expireTime,
         address payable _fundsRecoveryAddress
     ) external returns (address) {
-        // Collect deposit from quest creator
-        deposit.collectFrom(msg.sender);
 
         Quest quest = new Quest(
             _questTitle,
@@ -65,6 +63,9 @@ contract QuestFactory is Ownable {
             deposit.amount,
             msg.sender
         );
+
+        // Collect deposit from quest creator
+        deposit.collectFrom(msg.sender);
 
         // Transfer deposit to quest, so when reclaiming funds, the quest can release deposit to the creator
         deposit.releaseTo(address(quest));

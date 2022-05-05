@@ -15,7 +15,7 @@ import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
-
+import "hardhat-gas-reporter"
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
 /*
@@ -205,6 +205,11 @@ const config: HardhatUserConfig = {
   },
   ovm: {
     solcVersion: "0.7.6",
+  },
+  gasReporter: {
+    enabled: true,
+    currency: 'USD',
+    gasPrice: 21,
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
