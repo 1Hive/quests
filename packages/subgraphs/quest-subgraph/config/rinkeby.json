@@ -1,11 +1,5 @@
 {
   "network": "rinkeby",
-  "startBlock": 9953404,
-  "questFactoryAddress": "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01",
-  "startBlockV2": 10573676,
-  "questFactoryAddressV2": "0xa8922609D34472977D2C7749D6eB6E1F0eFe8e01",
-  "startBlockV3": 10613166,
-  "questFactoryAddressV3": "0xf8D300B19C22f1313d688bea0617BBd8cCd242d7",
-  "startBlockV4": 10615002,
-  "questFactoryAddressV4": "0x9f15291090fEECB67186A2D0A24173bB2Dbb7395"
+  "startBlock": 10625695,
+  "questFactoryAddress": "0x7617d5C550884147a1aFFf0d01ba67518A8560A5"
 }

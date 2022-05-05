@@ -37,11 +37,29 @@ contract QuestFactory is Ownable {
         setDeposit(_depositToken, _depositAmount);
     }
 
+    /*
+     * @dev Set the deposit token and amount.
+     * @param _depositToken The deposit token.
+     * @param _depositAmount The deposit amount.
+     * emit DepositChanged
+     */
     function setDeposit(IERC20 token, uint256 amount) public onlyOwner {
         deposit = Models.Deposit(token, amount);
         emit DepositChanged(block.timestamp, address(token), amount);
     }
 
+    /*
+     * Collect deposit, deploy a new Quest with given info contract
+     * and transfer deposit to new Quest.
+     * @param _title Quest title.
+     * @param _details Quest details.
+     * @param _rewardTokenAddress Reward token address.
+     * @param _expireTime Expire time.
+     * @param _fundsRecoveryAddress Funds recovery address.
+     * requires deposit allowance
+     * returns Quest address.
+     * emits QuestCreated
+     */
     function createQuest(
         string memory _questTitle,
         bytes memory _questDetailsRef,
@@ -49,8 +67,6 @@ contract QuestFactory is Ownable {
         uint256 _expireTime,
         address payable _fundsRecoveryAddress
     ) external returns (address) {
-        // Collect deposit from quest creator
-        deposit.collectFrom(msg.sender);
         Quest quest = new Quest(
             _questTitle,
             _questDetailsRef,
@@ -63,8 +79,8 @@ contract QuestFactory is Ownable {
             msg.sender
         );
 
-        // Transfer deposit to quest, so when reclaiming funds, the quest can release deposit to the creator
-        deposit.releaseTo(address(quest));
+        // Collect deposit from quest creator and send it to quest
+        deposit.collectFrom(msg.sender, address(quest));
 
         emit QuestCreated(
             address(quest),

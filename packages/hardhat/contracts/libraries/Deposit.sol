@@ -9,6 +9,26 @@ import "./Models.sol";
 library DepositLib {
     using SafeERC20 for IERC20;
 
+    /*
+     * Collect deposit from signer and send it to _to address.
+     * @param _token The deposit token.
+     * @param _amount The deposit amount.
+     * @param _to The address where the deposit should be transfered.
+     */
+    function collectFrom(
+        Models.Deposit memory _collateral,
+        address _from,
+        address _to
+    ) internal {
+        collectFrom(_collateral, _from);
+        releaseTo(_collateral, _to);
+    }
+
+    /*
+     * Collect deposit from signer
+     * @param _token The deposit token.
+     * @param _amount The deposit amount.
+     */
     function collectFrom(Models.Deposit memory _collateral, address _from)
         internal
     {

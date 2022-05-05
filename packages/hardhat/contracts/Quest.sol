@@ -48,6 +48,10 @@ contract Quest {
         isDepositReleased = false;
     }
 
+    /*
+     * Release deposit to creator and send unused funds to fundsRecoveryAddress.
+     * requires quests to have expired
+     */
     function recoverFundsAndDeposit() external {
         require(block.timestamp > expireTime, "ERROR: Not expired");
 
@@ -63,6 +67,16 @@ contract Quest {
         );
     }
 
+    /*
+     * Claim a quest reward.
+     * @param _evidence Evidence of the claim.
+     * @param _player Player address.
+     * @param _amount Amount of the reward.
+     * requires sender to be aragonGovernAddress
+     * requires evidence to not be empty
+     * requires claim amount to not exceed available deposit when same token
+     * emit QuestClaimed
+     */
     function claim(
         bytes memory _evidence,
         address _player,
@@ -91,7 +105,6 @@ contract Quest {
             );
         }
 
-        // This way the user won't need to trigger a useless safeTransfer call
         if (_amount > 0) {
             rewardToken.safeTransfer(_player, _amount);
         }
