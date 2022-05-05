@@ -128,7 +128,7 @@ export function handleQuestCreatedV4(event: QuestCreatedV4): void {
   questEntity.questDetailsRef = event.params.questDetailsRef;
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
-  questEntity.creationTimestamp = event.params.creationTime;
+  questEntity.creationTimestamp = event.block.timestamp;
   questEntity.questFundsRecoveryAddress = event.params.fundsRecoveryAddress;
   questEntity.depositToken = event.params.depositToken;
   questEntity.depositAmount = event.params.depositAmount;
