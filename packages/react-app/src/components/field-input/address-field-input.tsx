@@ -1,9 +1,7 @@
-import { TextInput, EthIdenticon, IconCopy, Button, TextCopy } from '@1hive/1hive-ui';
-import { ClientError } from 'graphql-request';
+import { TextInput, EthIdenticon, TextCopy } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
-import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { FieldInput } from './field-input';
 
 // #region Styled
@@ -17,14 +15,6 @@ const TextInputStyled = styled(TextInput)`
 `;
 const TextCopyStyled = styled(TextCopy)`
   margin-left: 1px;
-`;
-const ButtonStyled = styled(Button)`
-  border: none;
-  background: none;
-  margin-left: -45px;
-  z-index: 0;
-  margin-bottom: 1px;
-  cursor: pointer;
 `;
 
 const EthIdenticonStyled = styled(EthIdenticon)<{ isEdit: boolean }>`
@@ -75,10 +65,6 @@ export function AddressFieldInput({
   onBlur = noop,
   error,
 }: Props) {
-  const copyCode = useCopyToClipboard();
-  const copyAddress = () => {
-    copyCode(value, 'Wallet address copied to clipboard');
-  };
   const loadableContent = (
     <AddressWrapperStyled isEdit={isEdit} wide={wide} onClick={(e) => e.stopPropagation()}>
       {isEdit ? (

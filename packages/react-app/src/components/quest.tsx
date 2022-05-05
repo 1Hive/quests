@@ -1,6 +1,6 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
-import { Link, Redirect, useHistory, useLocation } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import {
   ENUM_PAGES,
   ENUM_QUEST_STATE,
@@ -34,19 +34,6 @@ import { ConditionalWrapper } from './utils/util';
 const ClickableDivStyled = styled.div`
   text-decoration: none;
   width: 100%;
-`;
-
-const TitleLinkStyled = styled(Link)`
-  font-weight: 100;
-  max-width: 100%;
-
-  div {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
 `;
 
 const LinkStyled = styled(Link)`
@@ -200,17 +187,6 @@ export default function Quest({
         setBounty(undefined);
       });
   };
-
-  const titleInput = (
-    <TextFieldInput
-      id="title"
-      isLoading={isLoading || !questData}
-      placeHolder="Quest title"
-      value={questData?.title}
-      fontSize="24px"
-      tooltip="Title should resume the Quest and be short and clear."
-    />
-  );
 
   const fieldsRow = (
     <RowStyled>
