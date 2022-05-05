@@ -443,7 +443,7 @@ export async function isQuestDepositReleased(questAddress: string): Promise<bool
   }
 }
 
-// #region
+// #endregion
 
 // #region ERC20
 
@@ -573,7 +573,7 @@ export async function resolveClaimChallenge(
   return handleTransaction(tx, onTx);
 }
 
-// #region
+// #endregion
 
 // #region Celeste
 

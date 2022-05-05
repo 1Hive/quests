@@ -114,7 +114,8 @@ export default function QuestList() {
     if (
       filter.status === ENUM_QUEST_STATE.Active &&
       transaction?.type === 'QuestCreate' &&
-      transaction.status === ENUM_TRANSACTION_STATUS.Confirmed
+      transaction.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      filter.status !== ENUM_QUEST_STATE.Expired
     ) {
       // Insert the newQuest at the top of the list
       if (transaction.args?.questAddress) {
@@ -178,7 +179,7 @@ export default function QuestList() {
         next={loadMore}
         hasMore={hasMore}
         endMessage={
-          quests.length ? (
+          quests.length || newQuestLoading ? (
             <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
             <Outset gu64 className="flex-center wide">
