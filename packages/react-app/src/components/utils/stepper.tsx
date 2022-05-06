@@ -10,10 +10,11 @@ const QuestActionButtonStyled = styled(Button)<{ visible: boolean }>`
 
 const ButtonWrapperStyled = styled.div`
   display: flex;
-  justify-content: space-between;
   margin-top: ${GUpx(5)};
   margin-bottom: ${GUpx(0.5)};
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
 `;
 
 const WrapperStyled = styled.div`
@@ -27,6 +28,15 @@ const ContentContainerStyled = styled.div`
   overflow: auto;
   max-height: calc(60vh - 60px) !important;
 `;
+
+const SubmitWrapperStyled = styled.div`
+  display: flex;
+  justify-content: space-between;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  align-items: center;
+`;
+
 // #endregion
 
 type Props = {
@@ -83,7 +93,7 @@ export default function Stepper({ steps, submitButton, onNext, onBack }: Props) 
         {!isSubmitStep ? (
           <QuestActionButtonStyled visible label="Next" mode="positive" onClick={nextStep} />
         ) : (
-          submitButton
+          <SubmitWrapperStyled>{submitButton}</SubmitWrapperStyled>
         )}
       </ButtonWrapperStyled>
     </WrapperStyled>

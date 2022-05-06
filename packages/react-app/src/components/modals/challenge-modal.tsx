@@ -273,17 +273,19 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           value={challengeFee}
           compact
         />,
-        <Button
-          key="confirmButton"
-          icon={<IconFlag />}
-          label={buttonLabel}
-          mode="negative"
-          type="submit"
-          form="form-challenge"
-          disabled={
-            loading || !walletAddress || !isEnoughBalance || challengeTimeout || !isFormValid
-          }
-        />,
+        <Outset>
+          <Button
+            key="confirmButton"
+            icon={<IconFlag />}
+            label={buttonLabel}
+            mode="negative"
+            type="submit"
+            form="form-challenge"
+            disabled={
+              loading || !walletAddress || !isEnoughBalance || challengeTimeout || !isFormValid
+            }
+          />
+        </Outset>,
       ]}
       onClose={closeModal}
       isOpen={opened}
