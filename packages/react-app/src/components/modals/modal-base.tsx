@@ -23,11 +23,6 @@ const ModalStyled = styled(Modal)`
   z-index: 1;
 `;
 
-const ScrollViewStyled = styled(ScrollView)`
-  overflow: auto;
-  max-height: calc(60vh) !important;
-`;
-
 type Props = {
   id: string;
   children?: React.ReactNode;
@@ -129,9 +124,7 @@ export default function ModalBase({
         <Outset gu8>
           <TitleStyled>{title}</TitleStyled>
         </Outset>
-        <ScrollViewStyled vertical>
-          {transaction ? <TransactionProgressComponent /> : children}
-        </ScrollViewStyled>
+        {transaction ? <TransactionProgressComponent /> : children}
         {(buttons || txFailed) && (
           <ModalFooterStyled>
             <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>
