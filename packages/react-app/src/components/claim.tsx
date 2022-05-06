@@ -1,3 +1,4 @@
+import { useViewport } from '@1hive/1hive-ui';
 import { useEffect, useMemo, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -6,6 +7,7 @@ import { ClaimModel } from 'src/models/claim.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { Logger } from 'src/utils/logger';
+import styled, { css } from 'styled-components';
 import { AddressFieldInput } from './field-input/address-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import { FieldInput } from './field-input/field-input';
@@ -14,6 +16,18 @@ import ExecuteClaimModal from './modals/execute-claim-modal';
 import ResolveChallengeModal from './modals/resolve-challenge-modal';
 import { StateTag } from './state-tag';
 import { Outset, ChildSpacer } from './utils/spacer-util';
+
+// #region StyledComponents
+
+const AddressWrapperStyled = styled.div<{ isSmallScreen: boolean }>`
+  ${({ isSmallScreen }) =>
+    isSmallScreen &&
+    css`
+      max-width: 200px;
+    `}
+`;
+
+// #endregion
 
 type Props = {
   claim: ClaimModel;
@@ -33,6 +47,7 @@ export default function Claim({
   const { walletAddress } = useWallet();
   const { transaction } = useTransactionContext();
   const [state, setState] = useState(claim.state);
+  const { below } = useViewport();
 
   useEffect(() => {
     setState(claim.state);
@@ -84,16 +99,24 @@ export default function Claim({
   return (
     <div className="wide">
       <Outset>
-        <ChildSpacer size={16} justify="start" align="center" buttonEnd>
+        <ChildSpacer
+          size={below('medium') ? 0 : 16}
+          justify="start"
+          align={below('medium') ? 'start' : 'center'}
+          buttonEnd
+          vertical={below('medium')}
+        >
           <FieldInput label="Status" isLoading={isLoading || state === ENUM_CLAIM_STATE.None}>
             <StateTag state={state ?? ''} className="pl-0" />
           </FieldInput>
-          <AddressFieldInput
-            id="playerAddress"
-            value={claim.playerAddress}
-            label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
-            isLoading={isLoading || !claim.playerAddress}
-          />
+          <AddressWrapperStyled isSmallScreen={below('medium')}>
+            <AddressFieldInput
+              id="playerAddress"
+              value={claim.playerAddress}
+              label={walletAddress === claim.playerAddress ? 'You' : 'Claiming player'}
+              isLoading={isLoading || !claim.playerAddress}
+            />
+          </AddressWrapperStyled>
           {claim.claimAll ? (
             <FieldInput
               label="Claimed amount"

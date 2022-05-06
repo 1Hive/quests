@@ -3,7 +3,7 @@ import styled, { css as _css } from 'styled-components';
 
 export type ChildSpacerProps = {
   children?: ReactNode;
-  size?: 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
+  size?: 0 | 4 | 8 | 16 | 24 | 32 | 40 | 48 | 56 | 64 | 72;
   vertical?: boolean;
   justify?: 'start' | 'middle' | 'center' | 'end' | 'space-between' | 'space-around';
   align?: 'start' | 'center' | 'end';
@@ -179,8 +179,9 @@ export function ChildSpacer({
     <ChildWrapperStyled justify={justify} vertical={vertical} align={align} buttonEnd={buttonEnd}>
       {React.Children.map(children, (child, i) => {
         let className = '';
-        if (i !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
-        if (i !== childList.length - 1) className += ` p${vertical ? 'b' : 'r'}-${size}`;
+        if (i !== 0 && size !== 0) className = `p${vertical ? 't' : 'l'}-${size}`;
+        if (i !== childList.length - 1 && size !== 0)
+          className += ` p${vertical ? 'b' : 'r'}-${size}`;
         return (
           // eslint-disable-next-line react/no-array-index-key
           <div className={className} key={`child-${i}`}>
