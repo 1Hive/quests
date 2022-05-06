@@ -41,13 +41,6 @@ const FooterTitleStyled = styled.div`
   font-weight: 400;
 `;
 
-const FooterLinkStyled = styled(Link)`
-  margin-right: ${3 * GU}px;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-`;
-
 const LineStyled = styled.div`
   display: flex;
   align-items: top;
@@ -104,27 +97,27 @@ export default function footer() {
       <FooterContainerStyledSide>
         <FooterColumnStyled>
           <FooterTitleStyled>Quests</FooterTitleStyled>
-          <FooterLinkStyled href="#" external={false}>
+          <FooterNavItemStyled href="#" external={false}>
             Quest List
-          </FooterLinkStyled>
+          </FooterNavItemStyled>
           {walletAddress && (
             <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
           )}
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>
-          <FooterLinkStyled href="https://twitter.com/1HiveOrg" external>
+          <FooterNavItemStyled href="https://twitter.com/1HiveOrg" external>
             <IconStyled>
               <FontAwesomeIcon icon={faTwitter} />
             </IconStyled>
             Follow Twitter
-          </FooterLinkStyled>
-          <FooterLinkStyled href="https://discord.gg/4fm7pgB" external>
+          </FooterNavItemStyled>
+          <FooterNavItemStyled href="https://discord.gg/4fm7pgB" external>
             <IconStyled>
               <FontAwesomeIcon icon={faDiscord} />
             </IconStyled>
             Join Discord
-          </FooterLinkStyled>
+          </FooterNavItemStyled>
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Links</FooterTitleStyled>
@@ -146,30 +139,30 @@ export default function footer() {
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Feedback</FooterTitleStyled>
-          <FooterLinkStyled
+          <FooterNavItemStyled
             color={theme.contentSecondary}
             href={`${REPO_ADDRESS}/issues/new?assignees=&label=App%2CBug&template=bug_report.md&title=Bug+%3A+`}
             external
           >
             <span>Report a bug</span>
             <IconExternal size="small" />
-          </FooterLinkStyled>
-          <FooterLinkStyled
+          </FooterNavItemStyled>
+          <FooterNavItemStyled
             color={theme.contentSecondary}
             href={`${REPO_ADDRESS}/security/policy`}
             external
           >
             <span>Report a vulnerability</span>
             <IconExternal size="small" />
-          </FooterLinkStyled>
-          <FooterLinkStyled
+          </FooterNavItemStyled>
+          <FooterNavItemStyled
             color={theme.contentSecondary}
             href={`${REPO_ADDRESS}/issues/new?assignees=&labels=App%2CFeature&template=feature----feature_title-.md`}
             external
           >
             <span>Request a feature</span>
             <IconExternal size="small" />
-          </FooterLinkStyled>
+          </FooterNavItemStyled>
         </FooterColumnStyled>
       </FooterContainerStyledSide>
     </FooterContainerStyled>
