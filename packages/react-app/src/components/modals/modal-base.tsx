@@ -1,4 +1,4 @@
-import { Modal, ScrollView, textStyle, Button } from '@1hive/1hive-ui';
+import { Modal, textStyle, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect, useMemo } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
