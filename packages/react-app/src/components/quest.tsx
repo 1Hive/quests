@@ -1,6 +1,6 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
-import { useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { ReactNode, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   ADDRESS_ZERO,
   ENUM_PAGES,
@@ -37,23 +37,20 @@ const ClickableDivStyled = styled.div`
   width: 100%;
 `;
 
-const LinkStyled = styled(Link)`
-  font-weight: 100;
-`;
-
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => GUpx(compact ? 1 : 2)};
   height: 100%;
 `;
 
-const CardStyled = styled(Card)<{ isSummary: boolean }>`
+const CardStyled = styled(Card)<{ isSummary: boolean; highlight: boolean }>`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
   height: 100%;
   min-height: 250px;
-  ${({ isSummary }) =>
+  ${({ isSummary, highlight }) =>
     isSummary &&
+    highlight &&
     css`
       &:hover {
         box-shadow: 0px 0px 16px 4px rgba(247, 247, 206, 0.25);
@@ -93,9 +90,11 @@ const BountyWrapperStyled = styled.div`
   margin-left: auto;
   width: fit-content;
 `;
+
 const AddressFieldInputStyled = styled(AddressFieldInput)`
   z-index: 2;
 `;
+
 // #endregion
 
 type Props = {
@@ -117,6 +116,7 @@ export default function Quest({
   const { walletAddress } = useWallet();
   const history = useHistory();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
+  const [highlight, setHighlight] = useState<boolean>(true);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
@@ -224,14 +224,22 @@ export default function Quest({
     }
   };
 
+  const HighlightBlocker = ({ children }: { children: ReactNode }) => (
+    <div onMouseLeave={() => setHighlight(true)} onMouseEnter={() => setHighlight(false)}>
+      {children}
+    </div>
+  );
+
   const fieldsRow = (
     <RowStyled>
-      <AddressFieldInputStyled
-        id="address"
-        label="Quest Address"
-        isLoading={isLoading || !questData}
-        value={questData?.address}
-      />
+      <HighlightBlocker>
+        <AddressFieldInputStyled
+          id="address"
+          label="Quest Address"
+          isLoading={isLoading || !questData}
+          value={questData?.address}
+        />
+      </HighlightBlocker>
 
       {!isSummary && (
         <DateFieldInput
@@ -264,9 +272,15 @@ export default function Quest({
 
   return (
     <CardWrapperStyed compact={below('medium')}>
-      <CardStyled className="card" style={css} isSummary={isSummary} id={questData?.address}>
+      <CardStyled
+        className="card"
+        style={css}
+        isSummary={isSummary}
+        highlight={highlight}
+        id={questData?.address}
+      >
         <ConditionalWrapper
-          condition={isSummary}
+          condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
               onClick={() => history.push(`/${ENUM_PAGES.Detail}?id=${questData?.address}`)}
@@ -285,15 +299,17 @@ export default function Quest({
                 fontSize="24px"
               />
               <BountyWrapperStyled>
-                <AmountFieldInput
-                  id={`bounty-${questData?.address}`}
-                  key={`bounty-${questData?.address}`}
-                  compact
-                  tagOnly
-                  showUsd
-                  value={questData?.bounty}
-                  isLoading={isLoading || !bounty}
-                />
+                <HighlightBlocker>
+                  <AmountFieldInput
+                    id={`bounty-${questData?.address}`}
+                    key={`bounty-${questData?.address}`}
+                    compact
+                    tagOnly
+                    showUsd
+                    value={questData?.bounty}
+                    isLoading={isLoading || !bounty}
+                  />
+                </HighlightBlocker>
               </BountyWrapperStyled>
             </RowStyled>
 
@@ -308,11 +324,7 @@ export default function Quest({
               disableLinks={isSummary}
               showBlocks={!isSummary}
               maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
-              ellipsis={
-                <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
-                  Read more
-                </LinkStyled>
-              }
+              ellipsis="..."
             />
             {isSummary && fieldsRow}
           </ContentWrapperStyled>
