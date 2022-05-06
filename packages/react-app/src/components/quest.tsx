@@ -225,7 +225,11 @@ export default function Quest({
   };
 
   const HighlightBlocker = ({ children }: { children: ReactNode }) => (
-    <div onMouseLeave={() => setHighlight(true)} onMouseEnter={() => setHighlight(false)}>
+    <div
+      onMouseLeave={() => setHighlight(true)}
+      onMouseEnter={() => setHighlight(false)}
+      className="max-width-100"
+    >
       {children}
     </div>
   );
