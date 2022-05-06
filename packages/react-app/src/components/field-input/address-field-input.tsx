@@ -1,4 +1,4 @@
-import { TextInput, EthIdenticon, AddressField } from '@1hive/1hive-ui';
+import { TextInput, EthIdenticon, TextCopy } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React from 'react';
 import styled from 'styled-components';
@@ -8,11 +8,16 @@ import { FieldInput } from './field-input';
 
 const TextInputStyled = styled(TextInput)`
   border-radius: 12px;
+  width: 100%;
+  text-overflow: ellipsis;
   padding-right: 42px;
 `;
+const TextCopyStyled = styled(TextCopy)`
+  margin-left: 1px;
+`;
 
-const EthIdenticonStyled = styled(EthIdenticon)`
-  border-radius: 0 12px 12px 0;
+const EthIdenticonStyled = styled(EthIdenticon)<{ isEdit: boolean }>`
+  border-radius: ${({ isEdit }) => (isEdit ? '0 12px 12px 0' : '4px 0 0 4px')};
   padding: 0;
 `;
 
@@ -20,8 +25,8 @@ const AddressWrapperStyled = styled.div<{
   wide: boolean;
   isEdit: boolean;
 }>`
+  align-items: center;
   display: flex;
-  flex-wrap: nowrap;
   max-width: 400px;
   width: 100%;
 
@@ -59,20 +64,34 @@ export function AddressFieldInput({
   error,
 }: Props) {
   const loadableContent = (
-    <AddressWrapperStyled isEdit={isEdit} wide={wide}>
+    <AddressWrapperStyled isEdit={isEdit} wide={wide} onClick={(e) => e.stopPropagation()}>
       {isEdit ? (
         <TextInputStyled
+          isEdit={isEdit}
           wide={wide}
           id={id}
           value={value}
+          disabled={!isEdit}
           onChange={onChange}
           onBlur={onBlur}
-          adornment={<EthIdenticonStyled address={value} scale={1.66} />}
-          adornmentPosition="end"
+          adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
+          adornmentPosition={isEdit ? 'end' : 'start'}
           adornmentSettings={{ padding: 0, width: 36 }}
         />
       ) : (
-        <AddressField address={value} wide={wide} autofocus={false} />
+        <TextCopyStyled
+          isEdit={isEdit}
+          wide={wide}
+          message="Address copied to clipboard"
+          id={id}
+          value={value}
+          disabled={!isEdit}
+          onChange={onChange}
+          onBlur={onBlur}
+          adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
+          adornmentPosition={isEdit ? 'end' : 'start'}
+          adornmentSettings={{ padding: 0, width: 36 }}
+        />
       )}
     </AddressWrapperStyled>
   );

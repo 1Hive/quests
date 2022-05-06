@@ -1,6 +1,6 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { ReactNode, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   ADDRESS_ZERO,
   ENUM_PAGES,
@@ -28,24 +28,13 @@ import ClaimList from './claim-list';
 import { isQuestExpired, processQuestState as computeQuestState } from '../services/state-machine';
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
+import { ConditionalWrapper } from './utils/util';
 
 // #region StyledComponents
 
-const TitleLinkStyled = styled(Link)`
-  font-weight: 100;
-  max-width: 100%;
-
-  div {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-`;
-
-const LinkStyled = styled(Link)`
-  font-weight: 100;
+const ClickableDivStyled = styled.div`
+  text-decoration: none;
+  width: 100%;
 `;
 
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
@@ -53,11 +42,21 @@ const CardWrapperStyed = styled.div<{ compact: boolean }>`
   height: 100%;
 `;
 
-const CardStyled = styled(Card)<{ isSummary: boolean }>`
+const CardStyled = styled(Card)<{ isSummary: boolean; highlight: boolean }>`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
   height: 100%;
+  min-height: 250px;
+  ${({ isSummary, highlight }) =>
+    isSummary &&
+    highlight &&
+    css`
+      &:hover {
+        box-shadow: 0px 0px 16px 4px rgba(247, 247, 206, 0.25);
+      }
+      cursor: pointer;
+    `}
 `;
 
 const QuestFooterStyled = styled.div`
@@ -92,6 +91,10 @@ const BountyWrapperStyled = styled.div`
   width: fit-content;
 `;
 
+const AddressFieldInputStyled = styled(AddressFieldInput)`
+  z-index: 2;
+`;
+
 // #endregion
 
 type Props = {
@@ -111,7 +114,9 @@ export default function Quest({
   isSummary = false,
 }: Props) {
   const { walletAddress } = useWallet();
+  const history = useHistory();
   const [bounty, setBounty] = useState<TokenAmountModel | null>();
+  const [highlight, setHighlight] = useState<boolean>(true);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
@@ -142,6 +147,25 @@ export default function Quest({
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    // If tx completion impact Quest bounty, update it
+    if (
+      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction.args?.questAddress === questData.address &&
+      (transaction?.type === 'ClaimChallengeResolve' ||
+        transaction?.type === 'ClaimExecute' ||
+        transaction?.type === 'QuestFund' ||
+        transaction?.type === 'QuestReclaimFunds')
+    ) {
+      setBounty(null);
+      setTimeout(() => {
+        if (questData.address && questData.rewardToken) {
+          fetchBalanceOfQuest(questData.address, questData.rewardToken);
+        }
+      }, 500);
+    }
+  }, [transaction?.type, transaction?.status]);
 
   useEffect(() => {
     setState(questData.state);
@@ -200,25 +224,22 @@ export default function Quest({
     }
   };
 
-  const titleInput = (
-    <TextFieldInput
-      id="title"
-      isLoading={isLoading || !questData}
-      placeHolder="Quest title"
-      value={questData?.title}
-      fontSize="24px"
-      tooltip="Title should resume the Quest and be short and clear."
-    />
+  const HighlightBlocker = ({ children }: { children: ReactNode }) => (
+    <div onMouseLeave={() => setHighlight(true)} onMouseEnter={() => setHighlight(false)}>
+      {children}
+    </div>
   );
 
   const fieldsRow = (
     <RowStyled>
-      <AddressFieldInput
-        id="address"
-        label="Quest Address"
-        isLoading={isLoading || !questData}
-        value={questData?.address}
-      />
+      <HighlightBlocker>
+        <AddressFieldInputStyled
+          id="address"
+          label="Quest Address"
+          isLoading={isLoading || !questData}
+          value={questData?.address}
+        />
+      </HighlightBlocker>
 
       {!isSummary && (
         <DateFieldInput
@@ -251,83 +272,97 @@ export default function Quest({
 
   return (
     <CardWrapperStyed compact={below('medium')}>
-      <CardStyled style={css} isSummary={isSummary} id={questData?.address}>
-        <ContentWrapperStyled compact={below('medium')}>
-          <StateTag state={questData?.state ?? ''} />
-          <RowStyled className="pb-0">
-            {isSummary ? (
-              <TitleLinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
-                {titleInput}
-              </TitleLinkStyled>
-            ) : (
-              titleInput
-            )}
-            <BountyWrapperStyled>
-              <AmountFieldInput
-                id={`bounty-${questData?.address}`}
-                key={`bounty-${questData?.address}`}
-                compact
-                tagOnly
-                showUsd
-                value={questData?.bounty}
-                isLoading={isLoading || bounty === undefined}
+      <CardStyled
+        className="card"
+        style={css}
+        isSummary={isSummary}
+        highlight={highlight}
+        id={questData?.address}
+      >
+        <ConditionalWrapper
+          condition={isSummary && !isLoading}
+          wrapper={(children) => (
+            <ClickableDivStyled
+              onClick={() => history.push(`/${ENUM_PAGES.Detail}?id=${questData?.address}`)}
+            >
+              {children}
+            </ClickableDivStyled>
+          )}
+        >
+          <ContentWrapperStyled compact={below('medium')}>
+            <StateTag state={questData?.state ?? ''} />
+            <RowStyled className="pb-0">
+              <TextFieldInput
+                id="title"
+                isLoading={isLoading || !questData}
+                value={questData?.title}
+                fontSize="24px"
               />
-            </BountyWrapperStyled>
-          </RowStyled>
-
-          {!isSummary && fieldsRow}
-
-          <TextFieldInput
-            id="description"
-            value={questData?.description}
-            isLoading={isLoading || !questData}
-            multiline
-            isMarkDown
-            disableLinks={isSummary}
-            showBlocks={!isSummary}
-            maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
-            ellipsis={
-              <LinkStyled to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}>
-                Read more
-              </LinkStyled>
-            }
-          />
-          {isSummary && fieldsRow}
-        </ContentWrapperStyled>
-        {!isSummary && challengeDeposit && (
-          <ClaimList
-            questData={questData}
-            questTotalBounty={bounty}
-            challengeDeposit={challengeDeposit}
-            isLoading={isLoading}
-          />
-        )}
-        {!isSummary && questData.address && walletAddress && (
-          <QuestFooterStyled>
-            {questData?.state === ENUM_QUEST_STATE.Active ? (
-              <>
-                <FundModal quest={questData} />
-                {claimDeposit && bounty && (
-                  <ScheduleClaimModal
-                    questAddress={questData.address}
-                    questTotalBounty={bounty}
-                    claimDeposit={claimDeposit}
+              <BountyWrapperStyled>
+                <HighlightBlocker>
+                  <AmountFieldInput
+                    id={`bounty-${questData?.address}`}
+                    key={`bounty-${questData?.address}`}
+                    compact
+                    tagOnly
+                    showUsd
+                    value={questData?.bounty}
+                    isLoading={isLoading || !bounty}
                   />
-                )}
-              </>
-            ) : (
-              <>
-                {state === ENUM_QUEST_STATE.Expired && (
-                  <ReclaimFundsModal
-                    bounty={bounty}
-                    questData={questData}
-                    isDepositReleased={isDepositReleased}
-                  />
-                )}
-              </>
-            )}
-          </QuestFooterStyled>
-        )}
+                </HighlightBlocker>
+              </BountyWrapperStyled>
+            </RowStyled>
+
+            {!isSummary && fieldsRow}
+
+            <TextFieldInput
+              id="description"
+              value={questData?.description}
+              isLoading={isLoading || !questData}
+              multiline
+              isMarkDown
+              disableLinks={isSummary}
+              showBlocks={!isSummary}
+              maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
+              ellipsis="..."
+            />
+            {isSummary && fieldsRow}
+          </ContentWrapperStyled>
+          {!isSummary && challengeDeposit && (
+            <ClaimList
+              questData={questData}
+              questTotalBounty={bounty}
+              challengeDeposit={challengeDeposit}
+              isLoading={isLoading}
+            />
+          )}
+          {!isSummary && questData.address && walletAddress && (
+            <QuestFooterStyled>
+              {questData?.state === ENUM_QUEST_STATE.Active ? (
+                <>
+                  <FundModal quest={questData} />
+                  {claimDeposit && bounty && (
+                    <ScheduleClaimModal
+                      questAddress={questData.address}
+                      questTotalBounty={bounty}
+                      claimDeposit={claimDeposit}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {state === ENUM_QUEST_STATE.Expired && (
+                    <ReclaimFundsModal
+                      bounty={bounty}
+                      questData={questData}
+                      isDepositReleased={isDepositReleased}
+                    />
+                  )}
+                </>
+              )}
+            </QuestFooterStyled>
+          )}
+        </ConditionalWrapper>
       </CardStyled>
     </CardWrapperStyed>
   );
