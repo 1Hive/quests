@@ -23,7 +23,8 @@ export const networks = Object.freeze({
     type: 'rinkeby',
     explorerBase: 'etherscan',
     // defaultEthNode: 'https://rinkeby.eth.aragon.network/',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging', // TODO : Restore to https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
+    // questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
     celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
     uniswapSubgraph:
