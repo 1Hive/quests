@@ -284,6 +284,7 @@ export default function Quest({
           wrapper={(children) => (
             <ClickableDivStyled
               onClick={() => history.push(`/${ENUM_PAGES.Detail}?id=${questData?.address}`)}
+              onMouseEnter={() => setHighlight(true)}
             >
               {children}
             </ClickableDivStyled>
