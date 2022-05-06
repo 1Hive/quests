@@ -196,7 +196,7 @@ export default function QuestList() {
         pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
         releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
         scrollableTarget="scroll-view"
-        scrollThreshold={below('medium') ? '1000px' : '120px'}
+        scrollThreshold={below('medium') ? '1000px' : '200px'}
       >
         <FlexContainerStyled>
           {newQuestLoading && skeletonQuests[0]}
