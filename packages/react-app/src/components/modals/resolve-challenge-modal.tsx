@@ -19,6 +19,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
 import { getCelesteContract, getGovernQueueContract } from 'src/utils/contract.util';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { getNetwork } from 'src/networks';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -86,6 +87,7 @@ type Props = {
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
+  const { type } = getNetwork();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
@@ -216,14 +218,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             ) : (
               <>
                 Ruling in progress, please come back later...
-                {process.env.NODE_ENV === 'production' ? (
-                  <LinkStyled
-                    external
-                    href={
-                      process.env.NODE_ENV === 'production' &&
-                      `https://celeste.1hive.org/#/disputes/${dispute.id}`
-                    }
-                  >
+                {type === 'xdai' ? (
+                  <LinkStyled external href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>
                     See dispute
                   </LinkStyled>
                 ) : (
