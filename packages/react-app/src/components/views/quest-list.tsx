@@ -84,6 +84,7 @@ export default function QuestList() {
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   const { setPage } = usePageContext();
+  let isMounted = true;
 
   const skeletonQuests: any[] = useMemo(() => {
     const fakeQuests = [];
@@ -97,7 +98,12 @@ export default function QuestList() {
     return fakeQuests;
   }, []);
 
-  useEffect(() => setPage(ENUM_PAGES.List), [setPage]);
+  useEffect(() => {
+    setPage(ENUM_PAGES.List);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     debounceRefresh(filter);
@@ -129,6 +135,7 @@ export default function QuestList() {
   const fetchQuestUntilNew = (newQuestAddress: string) => {
     setTimeout(async () => {
       const newQuest = await QuestService.fetchQuest(newQuestAddress);
+      if (!isMounted) return;
       if (newQuest) {
         setQuests([newQuest, ...quests]);
         setNewQuestLoading(false);
@@ -148,6 +155,7 @@ export default function QuestList() {
       setQuests([]);
       setIsLoading(true);
       QuestService.fetchQuestsPaging(0, QUESTS_PAGE_SIZE, _filter ?? filter).then((res) => {
+        if (!isMounted) return;
         setIsLoading(false);
         setQuests(res);
         setHasMore(res.length >= QUESTS_PAGE_SIZE);
@@ -158,6 +166,7 @@ export default function QuestList() {
   const loadMore = () => {
     setIsLoading(true);
     QuestService.fetchQuestsPaging(quests.length, QUESTS_PAGE_SIZE, filter).then((res) => {
+      if (!isMounted) return;
       setIsLoading(false);
       setQuests(quests.concat(res));
       setHasMore(res.length >= QUESTS_PAGE_SIZE);

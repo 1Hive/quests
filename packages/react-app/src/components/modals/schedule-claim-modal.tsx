@@ -231,17 +231,16 @@ export default function ScheduleClaimModal({
                       setIsEnoughBalance={setIsEnoughBalance}
                       isLoading={loading}
                     />
-                    <Outset>
-                      <Button
-                        key="confirmButton"
-                        icon={<GiBroadsword />}
-                        label="Schedule claim"
-                        mode="positive"
-                        type="submit"
-                        form="form-claim"
-                        disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
-                      />
-                    </Outset>
+                    <Button
+                      key="confirmButton"
+                      icon={<GiBroadsword />}
+                      label="Schedule claim"
+                      mode="positive"
+                      type="submit"
+                      form="form-claim"
+                      className="m-8"
+                      disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+                    />
                   </>
                 }
                 steps={[

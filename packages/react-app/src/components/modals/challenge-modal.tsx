@@ -109,7 +109,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     onClose(success);
   };
 
-  const challengeTx = async (values: Partial<ChallengeModel>, setSubmitting: Function) => {
+  const challengeTx = async (values: Partial<ChallengeModel>) => {
     if (!values.reason) {
       toast('Reason is required');
     } else {
@@ -200,7 +200,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         );
         toast(computeTransactionErrorMessage(e));
       } finally {
-        setSubmitting(false);
         setLoading(false);
       }
     }
@@ -273,35 +272,31 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           value={challengeFee}
           compact
         />,
-        <Outset>
-          <Button
-            key="confirmButton"
-            icon={<IconFlag />}
-            label={buttonLabel}
-            mode="negative"
-            type="submit"
-            form="form-challenge"
-            disabled={
-              loading || !walletAddress || !isEnoughBalance || challengeTimeout || !isFormValid
-            }
-          />
-        </Outset>,
+        <Button
+          key="confirmButton"
+          icon={<IconFlag />}
+          label={buttonLabel}
+          mode="negative"
+          type="submit"
+          form="form-challenge"
+          disabled={
+            loading || !walletAddress || !isEnoughBalance || challengeTimeout || !isFormValid
+          }
+          className="m-8"
+        />,
       ]}
       onClose={closeModal}
       isOpen={opened}
     >
       <Formik
         initialValues={{ reason: '' } as any}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={(values) => {
           validate(values); // validate one last time before submiting
           if (isFormValid) {
-            challengeTx(
-              {
-                reason: values.reason,
-                deposit: challengeDeposit,
-              },
-              setSubmitting,
-            );
+            challengeTx({
+              reason: values.reason,
+              deposit: challengeDeposit,
+            });
           }
         }}
         validateOnChange

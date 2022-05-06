@@ -130,7 +130,7 @@ export function Inset({
   let classes = className;
   if (vertical && horizontal) {
     if (gu4) classes += ' m-4';
-    else if (gu16) classes += ' m-16';
+    else if (gu16) classes += ' m-86';
     else if (gu24) classes += ' m-24';
     else if (gu32) classes += ' m-32';
     else if (gu40) classes += ' m-40';

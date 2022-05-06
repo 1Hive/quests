@@ -1,5 +1,5 @@
 import { useTheme, Button, IconQuestion, Popover } from '@1hive/1hive-ui';
-import { ReactNode, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -48,16 +48,48 @@ export const HelpTooltip = ({ tooltip, children }: Props) => {
   const theme = useTheme();
   const buttonElement = useRef();
   const [visible, setVisible] = useState(false);
+  const [_isHover, _setIsHover] = useState(false);
+  const [showing, setShowing] = useState(false);
+  const isHoverRef = useRef(_isHover);
+  const setIsHover = (isHover: boolean) => {
+    isHoverRef.current = isHover;
+    _setIsHover(isHover);
+  };
+
+  let isMounted = true;
+
+  useEffect(
+    () => () => {
+      isMounted = false;
+    },
+    [],
+  );
 
   const handleClick = (e: Event) => {
     e.stopPropagation();
     setVisible(true);
   };
 
+  const showDelayed = () => {
+    setIsHover(true);
+    setTimeout(() => {
+      setShowing(true);
+      setTimeout(() => setShowing(false), 100);
+      if (isHoverRef.current && isMounted) setVisible(true);
+    }, 100);
+  };
+
+  const closeImediatly = () => {
+    if (!showing) {
+      setIsHover(false);
+      setVisible(false);
+    }
+  };
+
   return (
     <HelpWrapperStyled>
       <HelpButtonStyled
-        onMouseEnter={() => setVisible(true)}
+        onMouseEnter={() => showDelayed()}
         ref={buttonElement}
         icon={<IconQuestion />}
         mode="normal"
@@ -66,14 +98,15 @@ export const HelpTooltip = ({ tooltip, children }: Props) => {
         label="Open tooltip"
         onClick={handleClick}
         theme={theme}
+        onMouseLeave={() => closeImediatly()}
       />
       <PopoverStyled
         visible={visible}
         opener={buttonElement.current}
-        onClose={() => setVisible(false)}
+        onClose={() => closeImediatly()}
         theme={theme}
       >
-        <TooltipWrapperStyled theme={theme} onMouseLeave={() => setVisible(false)}>
+        <TooltipWrapperStyled theme={theme} onMouseLeave={() => closeImediatly()}>
           {children ?? tooltip}
         </TooltipWrapperStyled>
       </PopoverStyled>

@@ -28,7 +28,6 @@ import { AddressFieldInput } from '../field-input/address-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { WalletBallance } from '../wallet-balance';
 import { feedDummyQuestData } from '../utils/debug-util';
-import { Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
 
@@ -322,18 +321,17 @@ export default function QuestModal({
                         />
                       </>
                     )}
-                    <Outset>
-                      <Button
-                        key="btn-save"
-                        label="Create"
-                        mode="positive"
-                        type="submit"
-                        form="form-quest"
-                        disabled={
-                          !walletAddress || !isEnoughBalance || !isFormValid || !questDeposit?.token
-                        }
-                      />
-                    </Outset>
+                    <Button
+                      key="btn-save"
+                      label="Create"
+                      mode="positive"
+                      type="submit"
+                      form="form-quest"
+                      className="m-8"
+                      disabled={
+                        !walletAddress || !isEnoughBalance || !isFormValid || !questDeposit?.token
+                      }
+                    />
                   </>
                 }
                 onNext={(currentStep) => onNext(currentStep)}
