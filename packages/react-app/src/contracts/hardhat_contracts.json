@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "Quest": {
-          "address": "0x53C6c56dF207a2049F917f800696843C2EbCaDaE",
+          "address": "0x1035cb31e90b084876074F1A1acf7D4527ab3967",
           "abi": [
             {
               "inputs": [
@@ -37,6 +37,21 @@
                 {
                   "internalType": "address payable",
                   "name": "_fundsRecoveryAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_depositToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_depositAmount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_questCreator",
                   "type": "address"
                 }
               ],
@@ -97,6 +112,11 @@
                   "internalType": "uint256",
                   "name": "_amount",
                   "type": "uint256"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "_claimAll",
+                  "type": "bool"
                 }
               ],
               "name": "claim",
@@ -122,6 +142,24 @@
                 {
                   "internalType": "address",
                   "name": "player",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "deposit",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "token",
                   "type": "address"
                 },
                 {
@@ -161,6 +199,32 @@
             },
             {
               "inputs": [],
+              "name": "isDepositReleased",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "questCreator",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
               "name": "questDetailsRef",
               "outputs": [
                 {
@@ -187,7 +251,7 @@
             },
             {
               "inputs": [],
-              "name": "recoverUnclaimedFunds",
+              "name": "recoverFundsAndDeposit",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
@@ -208,7 +272,7 @@
           ]
         },
         "QuestFactory": {
-          "address": "0x855a04deB27aBF93336d52A91F29A98Dd5605691",
+          "address": "0x7617d5C550884147a1aFFf0d01ba67518A8560A5",
           "abi": [
             {
               "inputs": [
@@ -216,10 +280,64 @@
                   "internalType": "address",
                   "name": "_aragonGovernAddress",
                   "type": "address"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_depositToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_depositAmount",
+                  "type": "uint256"
                 }
               ],
               "stateMutability": "nonpayable",
               "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "DepositChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "previousOwner",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "newOwner",
+                  "type": "address"
+                }
+              ],
+              "name": "OwnershipTransferred",
+              "type": "event"
             },
             {
               "anonymous": false,
@@ -256,9 +374,27 @@
                 },
                 {
                   "indexed": false,
+                  "internalType": "address",
+                  "name": "fundsRecoveryAddress",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "depositToken",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
                   "internalType": "uint256",
-                  "name": "creationTime",
+                  "name": "depositAmount",
                   "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "creator",
+                  "type": "address"
                 }
               ],
               "name": "QuestCreated",
@@ -315,382 +451,28 @@
               ],
               "stateMutability": "nonpayable",
               "type": "function"
-            }
-          ]
-        },
-        "TokenMock": {
-          "address": "0xE124e8945875686A90d03a2e81bce913756EF24E",
-          "abi": [
-            {
-              "inputs": [],
-              "stateMutability": "payable",
-              "type": "constructor"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "Approval",
-              "type": "event"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "from",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "to",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "Transfer",
-              "type": "event"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                }
-              ],
-              "name": "allowance",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "approve",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "account",
-                  "type": "address"
-                }
-              ],
-              "name": "balanceOf",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
             },
             {
               "inputs": [],
-              "name": "decimals",
+              "name": "deposit",
               "outputs": [
-                {
-                  "internalType": "uint8",
-                  "name": "",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "subtractedValue",
-                  "type": "uint256"
-                }
-              ],
-              "name": "decreaseAllowance",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "addedValue",
-                  "type": "uint256"
-                }
-              ],
-              "name": "increaseAllowance",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "initialBalance",
-                  "type": "uint256"
-                }
-              ],
-              "name": "mint",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "name",
-              "outputs": [
-                {
-                  "internalType": "string",
-                  "name": "",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "symbol",
-              "outputs": [
-                {
-                  "internalType": "string",
-                  "name": "",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "totalSupply",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "recipient",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "transfer",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "sender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "recipient",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "transferFrom",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            }
-          ]
-        }
-      }
-    }
-  },
-  "1337": {
-    "localhost": {
-      "name": "localhost",
-      "chainId": "1337",
-      "contracts": {
-        "Quest": {
-          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-          "abi": [
-            {
-              "inputs": [
-                {
-                  "internalType": "string",
-                  "name": "_questTitle",
-                  "type": "string"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "_questDetailsRef",
-                  "type": "bytes"
-                },
                 {
                   "internalType": "contract IERC20",
-                  "name": "_rewardToken",
+                  "name": "token",
                   "type": "address"
                 },
                 {
-                  "internalType": "uint256",
-                  "name": "_expireTime",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "_aragonGovernAddress",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address payable",
-                  "name": "_fundsRecoveryAddress",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": false,
-                  "internalType": "bytes",
-                  "name": "evidence",
-                  "type": "bytes"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "address",
-                  "name": "player",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
                   "internalType": "uint256",
                   "name": "amount",
                   "type": "uint256"
                 }
               ],
-              "name": "QuestClaimed",
-              "type": "event"
+              "stateMutability": "view",
+              "type": "function"
             },
             {
               "inputs": [],
-              "name": "aragonGovernAddress",
+              "name": "owner",
               "outputs": [
                 {
                   "internalType": "address",
@@ -702,24 +484,8 @@
               "type": "function"
             },
             {
-              "inputs": [
-                {
-                  "internalType": "bytes",
-                  "name": "_evidence",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "address",
-                  "name": "_player",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "_amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "claim",
+              "inputs": [],
+              "name": "renounceOwnership",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
@@ -727,21 +493,8 @@
             {
               "inputs": [
                 {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "claims",
-              "outputs": [
-                {
-                  "internalType": "bytes",
-                  "name": "evidence",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "address",
-                  "name": "player",
+                  "internalType": "contract IERC20",
+                  "name": "token",
                   "type": "address"
                 },
                 {
@@ -750,176 +503,20 @@
                   "type": "uint256"
                 }
               ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "expireTime",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "fundsRecoveryAddress",
-              "outputs": [
-                {
-                  "internalType": "address payable",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "questDetailsRef",
-              "outputs": [
-                {
-                  "internalType": "bytes",
-                  "name": "",
-                  "type": "bytes"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "questTitle",
-              "outputs": [
-                {
-                  "internalType": "string",
-                  "name": "",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "recoverUnclaimedFunds",
+              "name": "setDeposit",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "rewardToken",
-              "outputs": [
-                {
-                  "internalType": "contract IERC20",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            }
-          ]
-        },
-        "QuestFactory": {
-          "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-          "abi": [
-            {
               "inputs": [
                 {
                   "internalType": "address",
-                  "name": "_aragonGovernAddress",
+                  "name": "newOwner",
                   "type": "address"
                 }
               ],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": false,
-                  "internalType": "address",
-                  "name": "questAddress",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "string",
-                  "name": "questTitle",
-                  "type": "string"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "bytes",
-                  "name": "questDetailsRef",
-                  "type": "bytes"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "address",
-                  "name": "rewardTokenAddress",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "expireTime",
-                  "type": "uint256"
-                }
-              ],
-              "name": "QuestCreated",
-              "type": "event"
-            },
-            {
-              "inputs": [],
-              "name": "aragonGovernAddress",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "string",
-                  "name": "_questTitle",
-                  "type": "string"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "_questDetailsRef",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "contract IERC20",
-                  "name": "_rewardToken",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "_expireTime",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address payable",
-                  "name": "_fundsRecoveryAddress",
-                  "type": "address"
-                }
-              ],
-              "name": "createQuest",
+              "name": "transferOwnership",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
@@ -927,7 +524,7 @@
           ]
         },
         "TokenMock": {
-          "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+          "address": "0x86E3f333Bb2AfE4b3da62e4DD8eeB0F8bFfa5FBe",
           "abi": [
             {
               "inputs": [],

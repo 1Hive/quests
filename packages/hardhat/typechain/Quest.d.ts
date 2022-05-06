@@ -23,13 +23,16 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
-    "claim(bytes,address,uint256)": FunctionFragment;
+    "claim(bytes,address,uint256,bool)": FunctionFragment;
     "claims(uint256)": FunctionFragment;
+    "deposit()": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
+    "isDepositReleased()": FunctionFragment;
+    "questCreator()": FunctionFragment;
     "questDetailsRef()": FunctionFragment;
     "questTitle()": FunctionFragment;
-    "recoverUnclaimedFunds()": FunctionFragment;
+    "recoverFundsAndDeposit()": FunctionFragment;
     "rewardToken()": FunctionFragment;
   };
 
@@ -39,18 +42,27 @@ interface QuestInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claim",
-    values: [BytesLike, string, BigNumberish]
+    values: [BytesLike, string, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "claims",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "deposit", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "expireTime",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "fundsRecoveryAddress",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isDepositReleased",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "questCreator",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -62,7 +74,7 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "recoverUnclaimedFunds",
+    functionFragment: "recoverFundsAndDeposit",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -76,9 +88,18 @@ interface QuestInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claims", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "expireTime", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "fundsRecoveryAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isDepositReleased",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "questCreator",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -87,7 +108,7 @@ interface QuestInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "questTitle", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "recoverUnclaimedFunds",
+    functionFragment: "recoverFundsAndDeposit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -124,13 +145,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -156,6 +179,14 @@ export class Quest extends Contract {
       }
     >;
 
+    deposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "deposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
     expireTime(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "expireTime()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -163,6 +194,14 @@ export class Quest extends Contract {
     fundsRecoveryAddress(overrides?: CallOverrides): Promise<[string]>;
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<[string]>;
+
+    isDepositReleased(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "isDepositReleased()"(overrides?: CallOverrides): Promise<[boolean]>;
+
+    questCreator(overrides?: CallOverrides): Promise<[string]>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<[string]>;
 
     questDetailsRef(overrides?: CallOverrides): Promise<[string]>;
 
@@ -172,9 +211,9 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<[string]>;
 
-    recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
+    recoverFundsAndDeposit(overrides?: Overrides): Promise<ContractTransaction>;
 
-    "recoverUnclaimedFunds()"(
+    "recoverFundsAndDeposit()"(
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -191,13 +230,15 @@ export class Quest extends Contract {
     _evidence: BytesLike,
     _player: string,
     _amount: BigNumberish,
+    _claimAll: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "claim(bytes,address,uint256)"(
+  "claim(bytes,address,uint256,bool)"(
     _evidence: BytesLike,
     _player: string,
     _amount: BigNumberish,
+    _claimAll: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -223,6 +264,14 @@ export class Quest extends Contract {
     }
   >;
 
+  deposit(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+  "deposit()"(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
   expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
   "expireTime()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -230,6 +279,14 @@ export class Quest extends Contract {
   fundsRecoveryAddress(overrides?: CallOverrides): Promise<string>;
 
   "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
+
+  isDepositReleased(overrides?: CallOverrides): Promise<boolean>;
+
+  "isDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
+
+  questCreator(overrides?: CallOverrides): Promise<string>;
+
+  "questCreator()"(overrides?: CallOverrides): Promise<string>;
 
   questDetailsRef(overrides?: CallOverrides): Promise<string>;
 
@@ -239,9 +296,9 @@ export class Quest extends Contract {
 
   "questTitle()"(overrides?: CallOverrides): Promise<string>;
 
-  recoverUnclaimedFunds(overrides?: Overrides): Promise<ContractTransaction>;
+  recoverFundsAndDeposit(overrides?: Overrides): Promise<ContractTransaction>;
 
-  "recoverUnclaimedFunds()"(
+  "recoverFundsAndDeposit()"(
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -258,13 +315,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -290,6 +349,14 @@ export class Quest extends Contract {
       }
     >;
 
+    deposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "deposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
     expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
     "expireTime()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -297,6 +364,14 @@ export class Quest extends Contract {
     fundsRecoveryAddress(overrides?: CallOverrides): Promise<string>;
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
+
+    isDepositReleased(overrides?: CallOverrides): Promise<boolean>;
+
+    "isDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
+
+    questCreator(overrides?: CallOverrides): Promise<string>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<string>;
 
     questDetailsRef(overrides?: CallOverrides): Promise<string>;
 
@@ -306,9 +381,9 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<string>;
 
-    recoverUnclaimedFunds(overrides?: CallOverrides): Promise<void>;
+    recoverFundsAndDeposit(overrides?: CallOverrides): Promise<void>;
 
-    "recoverUnclaimedFunds()"(overrides?: CallOverrides): Promise<void>;
+    "recoverFundsAndDeposit()"(overrides?: CallOverrides): Promise<void>;
 
     rewardToken(overrides?: CallOverrides): Promise<string>;
 
@@ -328,13 +403,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -345,6 +422,10 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    deposit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "deposit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
     "expireTime()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -352,6 +433,14 @@ export class Quest extends Contract {
     fundsRecoveryAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    isDepositReleased(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "isDepositReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    questCreator(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     questDetailsRef(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -361,9 +450,9 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    recoverUnclaimedFunds(overrides?: Overrides): Promise<BigNumber>;
+    recoverFundsAndDeposit(overrides?: Overrides): Promise<BigNumber>;
 
-    "recoverUnclaimedFunds()"(overrides?: Overrides): Promise<BigNumber>;
+    "recoverFundsAndDeposit()"(overrides?: Overrides): Promise<BigNumber>;
 
     rewardToken(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -383,13 +472,15 @@ export class Quest extends Contract {
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "claim(bytes,address,uint256)"(
+    "claim(bytes,address,uint256,bool)"(
       _evidence: BytesLike,
       _player: string,
       _amount: BigNumberish,
+      _claimAll: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -403,6 +494,10 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    deposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "deposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     expireTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "expireTime()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -415,6 +510,16 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    isDepositReleased(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "isDepositReleased()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    questCreator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "questCreator()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     questDetailsRef(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "questDetailsRef()"(
@@ -425,9 +530,11 @@ export class Quest extends Contract {
 
     "questTitle()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    recoverUnclaimedFunds(overrides?: Overrides): Promise<PopulatedTransaction>;
+    recoverFundsAndDeposit(
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
-    "recoverUnclaimedFunds()"(
+    "recoverFundsAndDeposit()"(
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

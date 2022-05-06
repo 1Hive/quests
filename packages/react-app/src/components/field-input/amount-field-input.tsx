@@ -105,7 +105,7 @@ const TokenAmountBadge = React.memo(
     const label = useMemo(() => {
       let temp = '';
       if (amount !== false && amount !== undefined) {
-        temp += `${floorNumber(amount ?? 0, decimalsCount)} `;
+        temp += `${floorNumber(amount ?? 0, decimalsCount).toLocaleString()} `;
       }
       temp += `${token.symbol}`;
       if (usdValue) {
@@ -119,6 +119,11 @@ const TokenAmountBadge = React.memo(
       return temp;
     }, [token, amount, usdValue]);
 
+    const onBadgeClick = (event: Event) => {
+      copyCode(token.token, `${token.symbol} address copied to clipboard`);
+      event.stopPropagation();
+    };
+
     return (
       <TokenAmountButtonStyled
         className={className}
@@ -127,7 +132,7 @@ const TokenAmountBadge = React.memo(
         size="mini"
         label={label}
         title={`Copy : ${token.token}`}
-        onClick={() => copyCode(token.token, `${token.symbol} address copied to clipboard`)}
+        onClick={onBadgeClick}
       />
     );
   },
@@ -141,7 +146,7 @@ type Props = {
   amountLabel?: string;
   tokenLabel?: string;
   placeHolder?: string;
-  value?: TokenAmountModel;
+  value?: TokenAmountModel | null;
   onChange?: Function;
   formik?: FormikContextType<any>;
   compact?: boolean;
@@ -245,7 +250,11 @@ function AmountFieldInput({
   const handleFocusIn = (e: FocusEvent) => {
     if (document.activeElement === autoCompleteRef.current && isEdit && tokenEditable) {
       setHasFocused(true);
-    } else if (document.activeElement !== autoCompleteRef.current && hasFocusedRef.current) {
+    } else if (
+      document.activeElement !== autoCompleteRef.current &&
+      hasFocusedRef.current &&
+      !document.activeElement?.children[0]?.classList.contains('token-row')
+    ) {
       formik?.handleBlur({ ...e, target: { id, name: id } });
       setHasFocused(false);
     }
@@ -313,7 +322,7 @@ function AmountFieldInput({
               disabled={!token ? true : disabled}
             />
           ) : (
-            floorNumber(amount, decimalsCount)
+            floorNumber(amount, decimalsCount).toLocaleString()
           ))}
       </AmountTokenWrapperStyled>
     </FieldInput>
@@ -349,9 +358,11 @@ function AmountFieldInput({
               <Fragment key={tokens[i].token}>{tokens[i].name}</Fragment>
             )}
             renderItem={(i: number) => (
-              <LineStyled key={tokens[i].symbol}>
+              <LineStyled key={tokens[i].symbol} className="token-row">
                 <TokenNameStyled>{tokens[i].name}</TokenNameStyled>
-                <Tag mode="identifier">{tokens[i].symbol}</Tag>
+                <Tag mode="identifier" title={tokens[i].token}>
+                  {tokens[i].symbol}
+                </Tag>
               </LineStyled>
             )}
             tabIndex="-1"

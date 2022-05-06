@@ -37,7 +37,7 @@ function getContract(
   contractName: string,
   questAddressOverride?: string,
   walletAddress?: string,
-): Contract | null {
+): Contract {
   try {
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
@@ -96,10 +96,10 @@ export async function getTokenInfo(tokenAddress: string) {
   } catch (error) {
     Logger.exception(error);
   }
-  return tokenAddress;
+  return null;
 }
 
-export function getQuestContract(questAddress: string, walletAddress?: string): Contract | null {
+export function getQuestContract(questAddress: string, walletAddress?: string): Contract {
   return getContract('Quest', questAddress, walletAddress);
 }
 

@@ -1,9 +1,23 @@
-import { QuestCreated } from "../generated/QuestFactory/QuestFactory";
-import { QuestEntity } from "../generated/schema";
+import {
+  QuestCreated,
+  DepositChanged,
+} from "../generated/QuestFactory/QuestFactory";
+import { DepositEntity, QuestEntity } from "../generated/schema";
 import { Bytes, ipfs } from "@graphprotocol/graph-ts";
-import { BigInt } from "@graphprotocol/graph-ts";
 
-export function handleQuestCreated(event: QuestCreated): void {
+export function handleDepositChanged(event: DepositChanged): void {
+  let questEntity = new DepositEntity(
+    `${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
+  );
+
+  questEntity.timestamp = event.params.timestamp;
+  questEntity.depositToken = event.params.token;
+  questEntity.depositAmount = event.params.amount;
+
+  questEntity.save();
+}
+
+export function handleQuestCreatedV4(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
 
   questEntity.questAddress = event.params.questAddress.toHexString();
@@ -11,7 +25,11 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questDetailsRef = event.params.questDetailsRef;
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
-  questEntity.creationTimestamp = event.params.creationTime;
+  questEntity.creationTimestamp = event.block.timestamp;
+  questEntity.questFundsRecoveryAddress = event.params.fundsRecoveryAddress;
+  questEntity.depositToken = event.params.depositToken;
+  questEntity.depositAmount = event.params.depositAmount;
+  questEntity.questCreator = event.params.creator;
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = "";
@@ -33,35 +51,5 @@ export function handleQuestCreated(event: QuestCreated): void {
     }
   }
 
-  //   let collateral = metadata.get("collateral");
-  //   questEntity.questMetaCollateralPercentage = collateral
-  //     ? collateral.toBigInt()
-  //     : null;
-
-  //   let tags = metadata.get("tags");
-  //   questEntity.questMetaTags = tags
-  //     ? tags
-  //         .toArray()
-  //         .filter((x) => !x.isNull())
-  //         .map<string>((x) => x.toString())
-  //     : [];
-
   questEntity.save();
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.aragonGovernAddress(...)
 }

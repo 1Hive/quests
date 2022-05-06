@@ -24,6 +24,7 @@ export const networks = Object.freeze({
     explorerBase: 'etherscan',
     // defaultEthNode: 'https://rinkeby.eth.aragon.network/',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
+    // questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
     celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
     uniswapSubgraph:
@@ -61,7 +62,7 @@ export const networks = Object.freeze({
     type: 'private',
     subgraph: 'https://localhost:8000/subgraphs/name/corantin/quests-subgraph',
     defaultEthNode: 'http://0.0.0.0:8545/',
-    questFactory: HardhatDeployement[1337].localhost.contracts.QuestFactory.address,
+    questFactory: HardhatDeployement[1337]?.localhost.contracts.QuestFactory.address,
     govern: 0,
     isTestNetwork: true,
   },

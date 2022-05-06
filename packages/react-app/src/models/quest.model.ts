@@ -1,19 +1,21 @@
 import { TokenModel } from './token.model';
 import { TokenAmountModel } from './token-amount.model';
+import { DepositModel } from './deposit-model';
 
 export type QuestModel = {
   // User defined
   title?: string;
   description?: string;
   expireTime: Date;
-  fallbackAddress?: string;
+  fallbackAddress: string;
+  creatorAddress: string;
 
   // Computed
   creationTime?: Date;
   address?: string;
-  bounty?: TokenAmountModel;
+  bounty?: TokenAmountModel | null;
   rewardToken?: TokenModel | string;
   detailsRefIpfs?: string;
-  creatorAddress?: string;
   state: string;
+  deposit?: DepositModel;
 };
