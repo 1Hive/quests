@@ -18,6 +18,12 @@ const BoxStyled = styled.div`
   width: 100%;
   padding: ${GUpx(2)};
   min-height: 115px;
+  display: flex;
+  align-items: center;
+
+  & > div {
+    width: 100%;
+  }
 `;
 
 const TextStyled = styled.span`
