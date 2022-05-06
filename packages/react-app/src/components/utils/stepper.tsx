@@ -1,7 +1,8 @@
-import { Button } from '@1hive/1hive-ui';
+import { Button, useViewport } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
+import { ConditionalWrapper } from './util';
 
 // #region StyledComponents
 const QuestActionButtonStyled = styled(Button)<{ visible: boolean }>`
@@ -14,7 +15,7 @@ const ButtonWrapperStyled = styled.div`
   margin-bottom: ${GUpx(0.5)};
   align-items: center;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  justify-content: space-between;
 `;
 
 const WrapperStyled = styled.div`
@@ -49,6 +50,7 @@ export default function Stepper({ steps, submitButton, onNext, onBack }: Props) 
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitStep, setIsSubmitStep] = useState(false);
   const [isFirstStep, setIsFirstStep] = useState(true);
+  const { below } = useViewport();
 
   const nextStep = () => {
     const isValid = onNext?.(currentStep, currentStep + 2 === steps?.length);
@@ -93,7 +95,12 @@ export default function Stepper({ steps, submitButton, onNext, onBack }: Props) 
         {!isSubmitStep ? (
           <QuestActionButtonStyled visible label="Next" mode="positive" onClick={nextStep} />
         ) : (
-          <SubmitWrapperStyled>{submitButton}</SubmitWrapperStyled>
+          <ConditionalWrapper
+            condition={below('medium')}
+            wrapper={(children) => <SubmitWrapperStyled>{children}</SubmitWrapperStyled>}
+          >
+            {submitButton}
+          </ConditionalWrapper>
         )}
       </ButtonWrapperStyled>
     </WrapperStyled>
