@@ -136,6 +136,10 @@ export default function footer() {
             <span>Quest Wiki</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
+          <FooterNavItemStyled href="https://github.com/1Hive/quests" external>
+            <span>Github</span>
+            <IconExternal size="small" />
+          </FooterNavItemStyled>
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Feedback</FooterTitleStyled>

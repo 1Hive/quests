@@ -37,6 +37,7 @@ const ButtonLinkStyled = styled(Button)`
   padding: 0;
   height: fit-content;
   color: ${({ theme }: any) => theme.contentSecondary};
+  font-weight: bold;
 `;
 
 const FormStyled = styled(Form)`
