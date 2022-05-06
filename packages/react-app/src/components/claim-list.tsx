@@ -58,6 +58,13 @@ export default function ClaimList({
   const [claims, setClaims] = useState<ClaimModel[]>(loadingClaim);
   const [isLoadingState, setIsLoading] = useState(isLoading);
   const { transaction } = useTransactionContext();
+  let isMounted = true;
+  useEffect(
+    () => () => {
+      isMounted = false;
+    },
+    [],
+  );
 
   useEffect(() => {
     setIsLoading(isLoading);
@@ -87,6 +94,7 @@ export default function ClaimList({
     }
     setTimeout(async () => {
       const results = await QuestService.fetchQuestClaims(questData);
+      if (!isMounted) return;
       if (results.length === claimsCount) {
         fetchClaimsUntilNew(claimsCount);
       } else {
@@ -100,22 +108,23 @@ export default function ClaimList({
   const fetchClaims = async () => {
     setIsLoading(true);
     const results = await QuestService.fetchQuestClaims(questData);
+    if (!isMounted) return;
     setClaims(results); // Fetch visible data
     setIsLoading(false);
     await fetchEvidenceOfCompletions(results);
   };
 
   const fetchEvidenceOfCompletions = async (result: ClaimModel[]) => {
-    setClaims(
-      await Promise.all(
-        result.map(async (claim) => ({
-          ...claim,
-          evidence: claim.evidenceIpfsHash
-            ? await getObjectFromIpfsSafe(claim.evidenceIpfsHash)
-            : 'No evidence',
-        })),
-      ),
-    ); // Fetch evidence wich is currently hidden in accordion
+    const claimsRes = await Promise.all(
+      result.map(async (claim) => ({
+        ...claim,
+        evidence: claim.evidenceIpfsHash
+          ? await getObjectFromIpfsSafe(claim.evidenceIpfsHash)
+          : 'No evidence',
+      })),
+    );
+    if (!isMounted) return;
+    setClaims(claimsRes); // Fetch evidence wich is currently hidden in accordion
   };
 
   return (
