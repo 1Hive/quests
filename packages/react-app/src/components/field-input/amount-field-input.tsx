@@ -204,7 +204,7 @@ function AmountFieldInput({
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
   useEffect(() => {
-    if (isEdit && !availableTokens) fetchAvailableTokens();
+    if (isEdit && !availableTokens.length) fetchAvailableTokens();
     return () => {
       mounted = false;
     };
