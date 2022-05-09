@@ -75,7 +75,7 @@ export default function QuestModal({
   const [opened, setOpened] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
   const { walletAddress } = useWallet();
-  const { defaultToken, questFactoryAddress } = getNetwork();
+  const { questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
@@ -191,7 +191,7 @@ export default function QuestModal({
             ...values,
             expireTime: values.expireTime,
             creatorAddress: walletAddress,
-            rewardToken: values.bounty!.token ?? defaultToken,
+            rewardToken: values.bounty!.token,
           },
           undefined,
           (txHash) => {
@@ -368,7 +368,7 @@ export default function QuestModal({
                           amount, the contracts balance at time of claim.
                           <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed in
                           main page. This is supposed to be an overview of the Quest. Try to stick
-                          with normal text to prevent any overflow cropping.
+                          not use styled text to prevent any overflow cropping due to oversize.
                           <br />
                           ⚠️<i>The description should not include any sensitive information.</i>
                           <br />

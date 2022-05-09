@@ -87,7 +87,7 @@ type Props = {
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
-  const { type } = getNetwork();
+  const { networkId } = getNetwork();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
@@ -218,7 +218,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             ) : (
               <>
                 Ruling in progress, please come back later...
-                {type === 'xdai' ? (
+                {networkId === 'gnosis' ? (
                   <LinkStyled external href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>
                     See dispute
                   </LinkStyled>

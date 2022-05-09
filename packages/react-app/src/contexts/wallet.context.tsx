@@ -34,7 +34,7 @@ function WalletAugmented({ children }: Props) {
       return new EthersProviders.JsonRpcProvider(undefined, network.chainId);
     }
 
-    const ensRegistry = network?.ensRegistry;
+    const ensRegistry = undefined; // network?.ensRegistry;
     return new EthersProviders.Web3Provider(ethereum, {
       name: '',
       chainId: getDefaultChain(),

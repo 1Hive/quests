@@ -116,26 +116,6 @@ export function Filter({ compact }: Props) {
               compact={compact}
             />
           </FieldInput>
-          {
-            // TODO : We don't have this information available in subgraph
-            /* <AmountFieldInput
-          id="filterBounty"
-          label="Min available bounty"
-          value={filter.bounty}
-          onChange={(x: any) => setFilter({ ...filter, bounty: x }, true)}
-          wide={!below('medium')}
-        /> */
-          }
-
-          {/* <TagFieldInput
-          id="filterTags"
-          label="Tags"
-          isEdit
-        wide={!below('medium')}
-          placeholder="Search"
-          value={filter.tags}
-          onChange={(x: string[]) => setFilter({ ...filter, tags: x })}
-        /> TODO : Restore after MVP */}
           <ResetButtonStyled
             label="Reset"
             mode="strong"
