@@ -14,6 +14,7 @@
     "deploy:p:rinkeby": "yarn prepare:rinkeby && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph ",
     "deploy:rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph",
     "deploy:staging-rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
+    "deploy:gnosis": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
     "deploy:local": "graph deploy --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020 corantin/quests-subgraph",
     "hardhat:deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local && yarn workspace @1hive/quests-hardhat postdeploy"
   },
