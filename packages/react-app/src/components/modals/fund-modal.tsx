@@ -37,7 +37,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
 
   const closeModal = (success: boolean) => {
@@ -83,6 +83,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
       {({ values, handleSubmit, handleChange, touched, errors }) => (
         <ModalBase
           id="fund-modal"
+          expectedTransactionType="QuestFund"
           title="Fund quest"
           openButton={
             <OpenButtonStyled
@@ -90,6 +91,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               onClick={() => setOpened(true)}
               label="Fund"
               mode="strong"
+              title={transaction ? `Wait for completion of : ${transaction.message}` : 'Fund'}
+              disabled={!!transaction}
             />
           }
           buttons={[

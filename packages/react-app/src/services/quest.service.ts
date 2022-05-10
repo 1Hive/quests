@@ -189,7 +189,8 @@ async function generateScheduleContainer(
   claimData: ClaimModel,
   extraDelaySec?: number,
 ): Promise<ContainerModel> {
-  const { governAddress } = getNetwork();
+  const questContract = getQuestContract(claimData.questAddress);
+  const governAddress = await questContract.aragonGovernAddress();
   const governQueueResult = await fetchGovernQueue();
   const erc3000Config = governQueueResult.config;
   const lastBlockTimestamp = await getLastBlockTimestamp();

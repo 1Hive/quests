@@ -9,7 +9,6 @@ export type NetworkModel = {
   governSubgraph: string;
   uniswapSubgraph: string;
   questFactoryAddress: string;
-  governAddress: string;
   governQueueAddress: string;
   celesteAddress: string;
   httpProvider: string;

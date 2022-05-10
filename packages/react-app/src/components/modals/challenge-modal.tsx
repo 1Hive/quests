@@ -57,7 +57,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
 
@@ -215,6 +215,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   return (
     <ModalBase
       id="challenge-modal"
+      expectedTransactionType="ClaimChallenge"
       title="Challenge quests"
       openButton={
         <OpenButtonWrapperStyled>
@@ -224,8 +225,21 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               onClick={() => setOpened(true)}
               label={buttonLabel}
               mode="negative"
-              title="This claim can't be challenged anymore"
-              disabled={!buttonLabel || loading || challengeTimeout || !walletAddress}
+              title={
+                // TODO : Improve this
+                // eslint-disable-next-line no-nested-ternary
+                transaction
+                  ? `Wait for completion of : ${transaction.message}`
+                  : // eslint-disable-next-line no-nested-ternary
+                  challengeTimeout
+                  ? "This claim can't be challenged anymore"
+                  : !buttonLabel || loading || !walletAddress
+                  ? 'Loading ...'
+                  : buttonLabel
+              }
+              disabled={
+                !buttonLabel || loading || !walletAddress || challengeTimeout || !!transaction
+              }
             />
           )}
           {!loading && challengeTimeout === false && claim.executionTimeMs && (

@@ -94,7 +94,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const governQueueContract = getGovernQueueContract(walletAddress);
   const celesteContract = getCelesteContract();
 
@@ -241,6 +241,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   return (
     <ModalBase
       id="resolve-challenge-modal"
+      expectedTransactionType="ClaimChallengeResolve"
       title={
         <HeaderStyled>
           <h1>Resolve claim challenge</h1>
@@ -253,7 +254,18 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             onClick={() => setOpened(true)}
             label="Open resolve"
             mode="positive"
-            disabled={loading || !dispute || !governQueueContract || !celesteContract}
+            title={
+              // TODO : Improve this
+              // eslint-disable-next-line no-nested-ternary
+              transaction
+                ? `Wait for completion of : ${transaction.message}`
+                : loading || !dispute || !governQueueContract || !celesteContract
+                ? 'Loading...'
+                : 'Open resolve'
+            }
+            disabled={
+              loading || !dispute || !governQueueContract || !celesteContract || !!transaction
+            }
           />
         </OpenButtonWrapperStyled>
       }

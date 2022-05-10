@@ -50,7 +50,7 @@ export default function ReclaimFundsModal({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
   let isMounted = true;
@@ -133,14 +133,16 @@ export default function ReclaimFundsModal({
     <>
       <ModalBase
         id="reclaim-funds-modal"
+        expectedTransactionType="QuestReclaimFunds"
         title="Reclaim funds and deposit"
         openButton={
           <OpenButtonStyled
             onClick={() => setOpened(true)}
             icon={<IconCoin />}
             label="Reclaim"
-            title="Reclaim"
             mode="strong"
+            title={transaction ? `Wait for completion of : ${transaction.message}` : 'Reclaim'}
+            disabled={!!transaction}
           />
         }
         buttons={

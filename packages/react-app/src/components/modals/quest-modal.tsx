@@ -78,7 +78,7 @@ export default function QuestModal({
   const { questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
   const [questDeposit, setQuestDeposit] = useState<TokenAmountModel | null>();
@@ -249,10 +249,16 @@ export default function QuestModal({
   return (
     <ModalBase
       id="create-quest-modal"
+      expectedTransactionType="QuestCreate"
       title="Create quest"
       openButton={
         buttonMode === 'link' ? (
-          <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick}>
+          <ButtonLinkStyled
+            theme={theme}
+            onClick={onOpenButtonClick}
+            title={transaction ? `Wait for completion of : ${transaction.message}` : 'Create quest'}
+            disabled={!!transaction}
+          >
             {buttonLabel}
           </ButtonLinkStyled>
         ) : (
@@ -263,6 +269,8 @@ export default function QuestModal({
             mode={buttonMode === 'strong' ? 'strong' : 'normal'}
             display={buttonMode === 'icon' ? 'icon' : 'label'}
             onClick={onOpenButtonClick}
+            title={transaction ? `Wait for completion of : ${transaction.message}` : 'Create quest'}
+            disabled={!!transaction}
           />
         )
       }

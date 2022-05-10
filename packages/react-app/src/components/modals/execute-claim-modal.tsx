@@ -43,7 +43,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [amount, setAmount] = useState<TokenAmountModel>();
   const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   useEffect(() => {
     let handle: number;
@@ -131,6 +131,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
     <>
       <ModalBase
         id="execute-claim-modal"
+        expectedTransactionType="ClaimExecute"
         title="Claim quest bounty"
         openButton={
           <OpenButtonWrapperStyled>
@@ -145,10 +146,14 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                 label={buttonLabel}
                 mode="positive"
                 title={
+                  // TODO : Improve this
+                  // eslint-disable-next-line no-nested-ternary
                   questTotalBounty &&
                   claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
                     ? 'Not enough funds in Quest bounty'
-                    : 'waiting for some info'
+                    : transaction
+                    ? `Wait for completion of : ${transaction.message}`
+                    : 'Loading...'
                 }
                 disabled={
                   loading ||
@@ -156,7 +161,8 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                   claim.state === ENUM_CLAIM_STATE.Challenged ||
                   !questTotalBounty ||
                   !walletAddress ||
-                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
+                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount ||
+                  !!transaction
                 }
               />
             )}

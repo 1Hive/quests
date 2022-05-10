@@ -1,3 +1,13 @@
+export type TransactionType =
+  | 'TokenApproval'
+  | 'QuestCreate'
+  | 'QuestFund'
+  | 'QuestReclaimFunds'
+  | 'ClaimSchedule'
+  | 'ClaimExecute'
+  | 'ClaimChallenge'
+  | 'ClaimChallengeResolve';
+
 export type TransactionModel = {
   hash?: string;
   id: string;
@@ -10,13 +20,5 @@ export type TransactionModel = {
     containerId?: string;
     disputeState?: number;
   };
-  type:
-    | 'TokenApproval'
-    | 'QuestCreate'
-    | 'QuestFund'
-    | 'QuestReclaimFunds'
-    | 'ClaimSchedule'
-    | 'ClaimExecute'
-    | 'ClaimChallenge'
-    | 'ClaimChallengeResolve';
+  type: TransactionType;
 };

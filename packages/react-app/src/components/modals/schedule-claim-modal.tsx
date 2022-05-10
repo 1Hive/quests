@@ -66,7 +66,7 @@ export default function ScheduleClaimModal({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -171,6 +171,7 @@ export default function ScheduleClaimModal({
   return (
     <ModalBase
       id="schedule-claim-modal"
+      expectedTransactionType="ClaimSchedule"
       title="Claim quest"
       openButton={
         <OpenButtonStyled
@@ -178,6 +179,8 @@ export default function ScheduleClaimModal({
           onClick={() => setOpened(true)}
           label="Schedule claim"
           mode="positive"
+          title={transaction ? `Wait for completion of : ${transaction.message}` : 'Schedule claim'}
+          disabled={!!transaction}
         />
       }
       onClose={closeModal}

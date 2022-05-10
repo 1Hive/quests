@@ -3,6 +3,7 @@ import { noop } from 'lodash-es';
 import React, { useEffect, useMemo } from 'react';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { TransactionType } from 'src/models/transaction.model';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
@@ -25,6 +26,7 @@ const ModalStyled = styled(Modal)`
 
 type Props = {
   id: string;
+  expectedTransactionType?: TransactionType;
   children?: React.ReactNode;
   title?: React.ReactNode | string;
   openButton: React.ReactNode;
@@ -37,6 +39,7 @@ type Props = {
 
 export default function ModalBase({
   id,
+  expectedTransactionType,
   children,
   title,
   openButton,
@@ -68,8 +71,12 @@ export default function ModalBase({
   useEffect(() => {
     if (isOpen) {
       // Clear tx if a tx is still there and already completed
-      if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed || transaction?.id)
+      if (
+        transaction?.type === expectedTransactionType &&
+        (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed)
+      ) {
         setTransaction(undefined);
+      }
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
       setTimeout(() => {
         (document.getElementById(id) as HTMLElement)?.focus();
@@ -97,8 +104,15 @@ export default function ModalBase({
 
   const handleOnClose = (e: any) => {
     if (e) {
-      onClose(transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed);
-      if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed) {
+      onClose(
+        transaction?.type === expectedTransactionType &&
+          transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed,
+      );
+      if (
+        (transaction?.type === expectedTransactionType &&
+          transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) ||
+        txFailed
+      ) {
         setTimeout(() => {
           setTransaction(undefined);
         }, 750);
@@ -124,7 +138,11 @@ export default function ModalBase({
         <Outset gu8>
           <TitleStyled>{title}</TitleStyled>
         </Outset>
-        {transaction ? <TransactionProgressComponent /> : children}
+        {transaction && transaction?.type === expectedTransactionType ? (
+          <TransactionProgressComponent />
+        ) : (
+          children
+        )}
         {(buttons || txFailed) && (
           <ModalFooterStyled>
             <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>
