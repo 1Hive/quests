@@ -9,7 +9,6 @@ import { FieldInput } from './field-input';
 // #region Styled
 
 const MaxLineStyled = styled.div<{ maxLine: number }>`
-  margin-bottom: ${GUpx(1)};
   display: -webkit-box;
   -webkit-line-clamp: ${(props) => props.maxLine};
   -webkit-box-orient: vertical;
@@ -27,8 +26,9 @@ const BlockStyled = styled.div<{ wide?: boolean }>`
 `;
 
 const TextFieldWrapperStyled = styled.div<{ maxLine?: number }>`
-  ${({ maxLine }) => (maxLine ? `height: ${maxLine * 24}px;` : '')};
+  ${({ maxLine }) => (maxLine ? `height: ${maxLine + 1 * 30}px;` : '')};
   overflow: hidden;
+  margin-bottom: ${GUpx(1)};
 `;
 
 // #endregion
@@ -91,7 +91,7 @@ export default function TextFieldInput({
   };
 
   const readOnlyContent = (
-    <TextFieldWrapperStyled maxLine={maxLine}>
+    <>
       {isMarkDown ? (
         <Markdown
           normalized
@@ -140,7 +140,7 @@ export default function TextFieldInput({
       ) : (
         value
       )}
-    </TextFieldWrapperStyled>
+    </>
   );
   const loadableContent = isEditState ? (
     <BlockStyled wide={wide}>
@@ -161,10 +161,10 @@ export default function TextFieldInput({
     <BlockStyled>
       <div style={{ ...css, fontSize }}>
         {maxLine ? (
-          <div>
+          <TextFieldWrapperStyled>
             <MaxLineStyled maxLine={maxLine}>{readOnlyContent}</MaxLineStyled>
             {ellipsis}
-          </div>
+          </TextFieldWrapperStyled>
         ) : (
           readOnlyContent
         )}
