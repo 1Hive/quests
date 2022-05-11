@@ -50,7 +50,7 @@ export default function ReclaimFundsModal({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
   const modalId = useMemo(() => uniqueId('reclaim-funds-modal'), []);

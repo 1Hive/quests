@@ -93,7 +93,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('resolve-challenge-modal'), []);
 
   useEffect(() => {
