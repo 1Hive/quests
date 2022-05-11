@@ -345,7 +345,7 @@ export default function Quest({
               {questData?.state === ENUM_QUEST_STATE.Active ? (
                 <>
                   <FundModal quest={questData} />
-                  {claimDeposit && bounty && (
+                  {claimDeposit && (
                     <ScheduleClaimModal
                       questAddress={questData.address}
                       questTotalBounty={bounty}

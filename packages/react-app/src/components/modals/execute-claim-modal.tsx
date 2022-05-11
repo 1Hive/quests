@@ -1,6 +1,6 @@
 import { Button, IconCoin, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import styled from 'styled-components';
@@ -45,6 +45,8 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
   const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
+  const modalId = useMemo(() => uniqueId('execute-claim-modal'), []);
+
   useEffect(() => {
     let handle: number;
     const launchTimeoutAsync = async (execTimeMs: number) => {
@@ -86,7 +88,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
     try {
       setLoading(true);
       setTransaction({
-        id: uniqueId(),
+        modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
         message: 'Sending claimed amount to your wallet',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
@@ -130,8 +132,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   return (
     <>
       <ModalBase
-        id="execute-claim-modal"
-        expectedTransactionType="ClaimExecute"
+        id={modalId}
         title="Claim quest bounty"
         openButton={
           <OpenButtonWrapperStyled>
@@ -146,13 +147,9 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                 label={buttonLabel}
                 mode="positive"
                 title={
-                  // TODO : Improve this
-                  // eslint-disable-next-line no-nested-ternary
                   questTotalBounty &&
                   claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
                     ? 'Not enough funds in Quest bounty'
-                    : transaction
-                    ? `Wait for completion of : ${transaction.message}`
                     : 'Loading...'
                 }
                 disabled={
@@ -162,7 +159,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                   !questTotalBounty ||
                   !walletAddress ||
                   claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount ||
-                  !!transaction
+                  (transaction && transaction.modalId !== modalId)
                 }
               />
             )}

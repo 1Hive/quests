@@ -1,6 +1,6 @@
 import { Button, IconCoin } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { QuestModel } from 'src/models/quest.model';
@@ -53,6 +53,7 @@ export default function ReclaimFundsModal({
   const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
+  const modalId = useMemo(() => uniqueId('reclaim-funds-modal'), []);
   let isMounted = true;
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function ReclaimFundsModal({
     try {
       setLoading(true);
       setTransaction({
-        id: uniqueId(),
+        modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
         message: 'Reclaiming funds and deposit',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
@@ -132,8 +133,7 @@ export default function ReclaimFundsModal({
   return (
     <>
       <ModalBase
-        id="reclaim-funds-modal"
-        expectedTransactionType="QuestReclaimFunds"
+        id={modalId}
         title="Reclaim funds and deposit"
         openButton={
           <OpenButtonStyled
@@ -141,8 +141,7 @@ export default function ReclaimFundsModal({
             icon={<IconCoin />}
             label="Reclaim"
             mode="strong"
-            title={transaction ? `Wait for completion of : ${transaction.message}` : 'Reclaim'}
-            disabled={!!transaction}
+            title="Reclaim"
           />
         }
         buttons={
@@ -151,7 +150,12 @@ export default function ReclaimFundsModal({
             icon={<IconCoin />}
             label="Reclaim"
             mode="strong"
-            disabled={loading || !walletAddress}
+            title={
+              transaction && transaction.modalId !== modalId
+                ? `Pending transaction (${transaction.message})`
+                : 'Reclaim'
+            }
+            disabled={loading || !walletAddress || (transaction && transaction.modalId !== modalId)}
           />
         }
         onClose={closeModal}

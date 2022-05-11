@@ -10,7 +10,7 @@ export type TransactionType =
 
 export type TransactionModel = {
   hash?: string;
-  id: string;
+  modalId: string;
   message?: string;
   estimatedDuration?: number;
   status: string;

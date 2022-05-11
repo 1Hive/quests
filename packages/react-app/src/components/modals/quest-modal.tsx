@@ -1,6 +1,6 @@
 import { Button, IconPlus, useTheme } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ENUM,
   ENUM_QUEST_STATE,
@@ -38,6 +38,7 @@ const ButtonLinkStyled = styled(Button)`
   height: fit-content;
   color: ${({ theme }: any) => theme.contentSecondary};
   font-weight: bold;
+  background: transparent;
 `;
 
 const FormStyled = styled(Form)`
@@ -78,11 +79,12 @@ export default function QuestModal({
   const { questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
   const [questDeposit, setQuestDeposit] = useState<TokenAmountModel | null>();
   let mounted = true;
+  const modalId = useMemo(() => uniqueId('quest-modal'), []);
 
   useEffect(() => {
     feedDummyQuestData(questData).then((data) => {
@@ -168,6 +170,7 @@ export default function QuestModal({
     validate(values); // Validate one last time before submitting
     if (isFormValid && questDeposit?.token) {
       await approveTokenTransaction(
+        modalId,
         questDeposit?.token,
         questFactoryAddress,
         `Approving quest deposit (1/${values.bounty?.parsedAmount ? '3' : '2'})`,
@@ -178,7 +181,7 @@ export default function QuestModal({
       let newQuestAddress: string;
       try {
         setTransaction({
-          id: uniqueId(),
+          modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
           message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
@@ -224,6 +227,7 @@ export default function QuestModal({
         }
         if (values.bounty?.parsedAmount) {
           await fundQuestTransaction(
+            modalId,
             values.bounty,
             newQuestAddress,
             `Sending funds to the Quest (3/3)`,
@@ -248,17 +252,11 @@ export default function QuestModal({
 
   return (
     <ModalBase
-      id="create-quest-modal"
-      expectedTransactionType="QuestCreate"
+      id={modalId}
       title="Create quest"
       openButton={
         buttonMode === 'link' ? (
-          <ButtonLinkStyled
-            theme={theme}
-            onClick={onOpenButtonClick}
-            title={transaction ? `Wait for completion of : ${transaction.message}` : 'Create quest'}
-            disabled={!!transaction}
-          >
+          <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick} title="Create quest">
             {buttonLabel}
           </ButtonLinkStyled>
         ) : (
@@ -269,8 +267,7 @@ export default function QuestModal({
             mode={buttonMode === 'strong' ? 'strong' : 'normal'}
             display={buttonMode === 'icon' ? 'icon' : 'label'}
             onClick={onOpenButtonClick}
-            title={transaction ? `Wait for completion of : ${transaction.message}` : 'Create quest'}
-            disabled={!!transaction}
+            title="Create quest"
           />
         )
       }

@@ -1,7 +1,7 @@
 import { Button } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
-import { noop } from 'lodash-es';
-import { useRef, useState } from 'react';
+import { noop, uniqueId } from 'lodash-es';
+import { useMemo, useRef, useState } from 'react';
 import { GiTwoCoins } from 'react-icons/gi';
 import styled from 'styled-components';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -37,8 +37,9 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
+  const modalId = useMemo(() => uniqueId('fund-modal'), []);
 
   const closeModal = (success: boolean) => {
     setOpened(false);
@@ -50,6 +51,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
     if (isFormValid && quest.address) {
       setLoading(true);
       await fundQuestTransaction(
+        modalId,
         values.fundAmount,
         quest.address,
         'Sending funds to the Quest',
@@ -82,8 +84,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
     >
       {({ values, handleSubmit, handleChange, touched, errors }) => (
         <ModalBase
-          id="fund-modal"
-          expectedTransactionType="QuestFund"
+          id={modalId}
           title="Fund quest"
           openButton={
             <OpenButtonStyled
@@ -91,8 +92,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               onClick={() => setOpened(true)}
               label="Fund"
               mode="strong"
-              title={transaction ? `Wait for completion of : ${transaction.message}` : 'Fund'}
-              disabled={!!transaction}
+              title="Fund"
             />
           }
           buttons={[

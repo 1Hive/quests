@@ -1,6 +1,6 @@
 import { Button } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
@@ -49,7 +49,7 @@ const WrapperStyled = styled.div`
 
 type Props = {
   questAddress: string;
-  questTotalBounty: TokenAmountModel;
+  questTotalBounty?: TokenAmountModel | null;
   claimDeposit: TokenAmountModel;
   onClose?: ModalCallback;
 };
@@ -66,7 +66,8 @@ export default function ScheduleClaimModal({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
+  const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -77,7 +78,7 @@ export default function ScheduleClaimModal({
     if (!values.evidence) errors.evidence = 'Evidence of completion is required';
     if (!values.claimAll) {
       if (values.claimedAmount.parsedAmount < 0) errors.claimedAmount = 'Claim amount is invalid';
-      else if (values.claimedAmount.parsedAmount > questTotalBounty.parsedAmount)
+      else if (values.claimedAmount.parsedAmount > questTotalBounty!.parsedAmount)
         errors.claimedAmount = 'Claim amount should not be higher than available bounty';
     }
 
@@ -108,6 +109,7 @@ export default function ScheduleClaimModal({
       const { governQueueAddress } = getNetwork();
       const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
       await approveTokenTransaction(
+        modalId,
         scheduleDeposit.token,
         governQueueAddress,
         'Approving claim deposit (1/2)',
@@ -115,7 +117,7 @@ export default function ScheduleClaimModal({
         setTransaction,
       );
       setTransaction({
-        id: uniqueId(),
+        modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
@@ -170,8 +172,7 @@ export default function ScheduleClaimModal({
 
   return (
     <ModalBase
-      id="schedule-claim-modal"
-      expectedTransactionType="ClaimSchedule"
+      id={modalId}
       title="Claim quest"
       openButton={
         <OpenButtonStyled
@@ -179,8 +180,8 @@ export default function ScheduleClaimModal({
           onClick={() => setOpened(true)}
           label="Schedule claim"
           mode="positive"
-          title={transaction ? `Wait for completion of : ${transaction.message}` : 'Schedule claim'}
-          disabled={!!transaction}
+          title="Schedule claim"
+          disabled={!questTotalBounty}
         />
       }
       onClose={closeModal}
@@ -190,7 +191,7 @@ export default function ScheduleClaimModal({
         initialValues={
           {
             evidence: '',
-            claimedAmount: { parsedAmount: 0, token: questTotalBounty.token } as TokenAmountModel,
+            claimedAmount: { parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel,
             claimAll: false,
             playerAddress: undefined,
           } as any
@@ -242,6 +243,7 @@ export default function ScheduleClaimModal({
                       type="submit"
                       form="form-claim"
                       className="m-8"
+                      title="Schedule claim"
                       disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
                     />
                   </>
