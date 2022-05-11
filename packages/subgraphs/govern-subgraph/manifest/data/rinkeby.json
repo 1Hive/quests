@@ -1,12 +1,5 @@
 {
   "network": "rinkeby",
-  "dataSources": {
-    "GovernRegistry": [
-      {
-        "name": "GovernRegistry",
-        "address": "0x7a044ff5148220866B9c21E9C6537C7c960eed40",
-        "startBlock": 9932541
-      }
-    ]
-  }
+  "startBlock": 9950063,
+  "governQueueAddress": "0x19B918802eA9C71c500Ca481917F383f3992cDB0"
 }

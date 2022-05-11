@@ -10,7 +10,6 @@ packages/hardhat/deployments/localhost
 packages/services/**/data
 docker/**/data
 
-packages/subgraph/config/config.json
 packages/react-app/public/aragon-ui
 
 # dependencies

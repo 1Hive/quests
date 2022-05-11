@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from "dotenv";
 import "solidity-coverage";
 import "hardhat-deploy";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import fs from "fs";
 import chalk from "chalk";
 import "@nomiclabs/hardhat-waffle";
@@ -10,10 +10,13 @@ import "@nomiclabs/hardhat-web3";
 import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
 import "hardhat-typechain";
-import { task, HardhatUserConfig } from "hardhat/config";
-import { HttpNetworkUserConfig } from "hardhat/types";
+import { task, HardhatUserConfig, types } from "hardhat/config";
+import { HttpNetworkUserConfig, Network } from "hardhat/types";
 import { resolve } from "path";
 import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
+import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/dist/src/types";
+import GovernQueueFactoryAbi from "./abi/contracts/GovernQueueFactory.json";
+
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
@@ -539,5 +542,150 @@ task("send", "Send ETH")
 
     return send(fromSigner, txRequest);
   });
+
+task("newGovernQueueGnosis")
+  .addParam("aclRoot", "Address that will be granted Root ACL role")
+  .addOptionalParam(
+    "queueFactoryAddress",
+    "Address of the queue factory",
+    "TODO",
+    types.string
+  )
+  .addOptionalParam("resolver", "Address of Celeste(IArbitrator)", "TODO")
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 7 days)",
+    604800,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token (default is HNY)",
+    "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+    types.string
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    0.01,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token (default is HNY)",
+    "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+    types.string
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    0.01,
+    types.float
+  )
+  .setAction(deployGovernQueue);
+
+task("newGovernQueueRinkeby")
+  .addParam("aclRoot", "Address that will be granted Root ACL role")
+  .addOptionalParam(
+    "queueFactoryAddress",
+    "Address of the queue factory",
+    "0x3383032F06BB4Bc4c9DfE08c564cde467c2f725e",
+    types.string
+  )
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    "0xdd58ebed3c36460939285a92807f90e3d3a26789",
+    types.string
+  )
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 5 min)",
+    300,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token (default is HNYT)",
+    "0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9"
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    0.01,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token (default is HNYT)",
+    "0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9"
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    0.01,
+    types.float
+  )
+  .setAction(deployGovernQueue);
+
+async function deployGovernQueue(
+  {
+    aclRoot,
+    queueFactoryAddress,
+    resolver,
+    executionDelay,
+    scheduleDepositToken,
+    scheduleDepositAmount,
+    challengeDepositToken,
+    challengeDepositAmount,
+  }: {
+    aclRoot: string;
+    queueFactoryAddress: string;
+    resolver: string;
+    executionDelay: number;
+    scheduleDepositToken: string;
+    scheduleDepositAmount: number;
+    challengeDepositToken: string;
+    challengeDepositAmount: number;
+  },
+  {
+    network,
+    ethers,
+  }: {
+    ethers: typeof import("C:/Repos/quests/node_modules/ethers/lib/ethers") &
+      HardhatEthersHelpers;
+    network: Network;
+  }
+) {
+  const queueFactory = await ethers.getContractAt(
+    GovernQueueFactoryAbi,
+    queueFactoryAddress
+  );
+  const config = {
+    resolver: resolver,
+    executionDelay,
+    scheduleDeposit: {
+      token: scheduleDepositToken,
+      amount: BigNumber.from(
+        ethers.utils.parseEther(scheduleDepositAmount.toString())
+      ),
+    },
+    challengeDeposit: {
+      token: challengeDepositToken,
+      amount: BigNumber.from(
+        ethers.utils.parseEther(challengeDepositAmount.toString())
+      ),
+    },
+    rules: ethers.constants.HashZero,
+    maxCalldataSize: 100000,
+  };
+  const tx = await queueFactory.newQueue(
+    aclRoot,
+    config,
+    ethers.constants.HashZero
+  );
+  const res = await tx.wait();
+  console.log("Deployed queue:", res.logs[0].address);
+}
 
 module.exports = config;
