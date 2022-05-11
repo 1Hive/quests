@@ -111,6 +111,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               form="form-fund"
               label="Fund"
               mode="strong"
+              title={loading ? 'Loading ...' : 'Fund'}
               disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
             />,
           ]}

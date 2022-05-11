@@ -66,7 +66,12 @@ export function Filter({ compact }: Props) {
     <>
       {(isFilterShown || !below('medium')) && (
         <FilterWrapperStyled colDisplay={below('medium')} isSmallResolution={below('medium')}>
-          <FieldInput className="flex-grow" label={!compact ? 'Title' : ''} wide={below('medium')}>
+          <FieldInput
+            className="flex-grow"
+            label={!compact ? 'Title' : ''}
+            wide={below('medium')}
+            id="filterTitle"
+          >
             <SearchInput
               id="filterTitle"
               placeholder="Search by title"
@@ -80,6 +85,7 @@ export function Filter({ compact }: Props) {
             className="flex-grow"
             label={!compact ? 'Description' : ''}
             wide={below('medium')}
+            id="filterDescription"
           >
             <SearchInput
               id="filterDescription"
@@ -105,7 +111,7 @@ export function Filter({ compact }: Props) {
             wide={below('medium')}
             compact={compact}
           />
-          <FieldInput label={!compact ? 'Status' : ''} wide={below('medium')}>
+          <FieldInput label={!compact ? 'Status' : ''} wide={below('medium')} id="filterStatus">
             <StatusDropdownStyled
               id="filterStatus"
               items={states}

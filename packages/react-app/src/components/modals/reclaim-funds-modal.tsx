@@ -150,12 +150,8 @@ export default function ReclaimFundsModal({
             icon={<IconCoin />}
             label="Reclaim"
             mode="strong"
-            title={
-              transaction && transaction.modalId !== modalId
-                ? `Pending transaction (${transaction.message})`
-                : 'Reclaim'
-            }
-            disabled={loading || !walletAddress || (transaction && transaction.modalId !== modalId)}
+            title={loading ? 'Loading ...' : 'Reclaim'}
+            disabled={loading || !walletAddress}
           />
         }
         onClose={closeModal}

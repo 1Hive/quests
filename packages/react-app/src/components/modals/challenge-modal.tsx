@@ -228,13 +228,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               label={buttonLabel}
               mode="negative"
               title={challengeTimeout ? "This claim can't be challenged anymore" : buttonLabel}
-              disabled={
-                !buttonLabel ||
-                loading ||
-                !walletAddress ||
-                challengeTimeout ||
-                (transaction && transaction.modalId !== modalId)
-              }
+              disabled={!buttonLabel || loading || !walletAddress || challengeTimeout}
             />
           )}
           {!loading && challengeTimeout === false && claim.executionTimeMs && (

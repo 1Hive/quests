@@ -372,8 +372,8 @@ export default function QuestModal({
                           payout multiple times, a range with reference to what determines what
                           amount, the contracts balance at time of claim.
                           <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed in
-                          main page. This is supposed to be an overview of the Quest. Try to stick
-                          not use styled text to prevent any overflow cropping due to oversize.
+                          main page. This is supposed to be an overview of the Quest. Try not to use
+                          styled text to prevent any overflow cutting due to oversize.
                           <br />
                           ⚠️<i>The description should not include any sensitive information.</i>
                           <br />

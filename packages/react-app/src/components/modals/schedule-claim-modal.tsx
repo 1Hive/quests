@@ -180,7 +180,7 @@ export default function ScheduleClaimModal({
           onClick={() => setOpened(true)}
           label="Schedule claim"
           mode="positive"
-          title="Schedule claim"
+          title={!questTotalBounty ? 'Loading ...' : 'Schedule claim'}
           disabled={!questTotalBounty}
         />
       }

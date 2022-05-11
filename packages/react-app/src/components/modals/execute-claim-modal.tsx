@@ -158,8 +158,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
                   claim.state === ENUM_CLAIM_STATE.Challenged ||
                   !questTotalBounty ||
                   !walletAddress ||
-                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount ||
-                  (transaction && transaction.modalId !== modalId)
+                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
                 }
               />
             )}

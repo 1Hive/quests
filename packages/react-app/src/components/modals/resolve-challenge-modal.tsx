@@ -268,14 +268,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           icon={<IconFlag />}
           label="Resolve"
           mode="positive"
-          disabled={
-            loading ||
-            !walletAddress ||
-            !isRuled ||
-            (transaction && transaction.modalId !== modalId)
-          }
+          disabled={loading || !walletAddress || !isRuled}
           onClick={resolveChallengeTx}
-          title={isRuled ? 'Publish dispute result' : 'Need to be ruled'}
+          title={isRuled ? 'Publish dispute result' : 'Need to be ruled in celeste'}
         />,
       ]}
       onClose={closeModal}
