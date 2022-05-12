@@ -1,6 +1,6 @@
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/dist/src/types";
 import GovernQueueFactoryAbi from "../abi/contracts/Externals/GovernQueueFactory.json";
-import { Network } from "hardhat/types";
+import { HardhatRuntimeEnvironment, Network } from "hardhat/types";
 import fs from "fs";
 import { BigNumber } from "ethers";
 
@@ -15,14 +15,7 @@ export default async function deployGovernQueue(
     challengeDepositToken: string;
     challengeDepositAmount: number;
   },
-  {
-    network,
-    ethers,
-  }: {
-    ethers: typeof import("C:/Repos/quests/node_modules/ethers/lib/ethers") &
-      HardhatEthersHelpers;
-    network: Network;
-  }
+  { network, ethers }: HardhatRuntimeEnvironment
 ) {
   const queueFactory = await ethers.getContractAt(
     GovernQueueFactoryAbi,

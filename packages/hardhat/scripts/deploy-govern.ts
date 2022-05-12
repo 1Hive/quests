@@ -1,18 +1,11 @@
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/dist/src/types";
-import { Network } from "hardhat/types";
+import { HardhatRuntimeEnvironment, Network } from "hardhat/types";
 import GovernFactoryAbi from "../abi/contracts/Externals/GovernFactory.json";
 import fs from "fs";
 
 export default async function deployGovern(
   args: { initialExecutorAddress: string; governFactoryAddress: string },
-  {
-    network,
-    ethers,
-  }: {
-    ethers: typeof import("C:/Repos/quests/node_modules/ethers/lib/ethers") &
-      HardhatEthersHelpers;
-    network: Network;
-  }
+  { network, ethers }: HardhatRuntimeEnvironment
 ) {
   const governFactory = await ethers.getContractAt(
     GovernFactoryAbi,
