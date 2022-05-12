@@ -1,8 +1,8 @@
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/dist/src/types";
 import GovernQueueFactoryAbi from "../abi/contracts/Externals/GovernQueueFactory.json";
 import { Network } from "hardhat/types";
-import { BigNumber } from "ethers";
 import fs from "fs";
+import { BigNumber } from "ethers";
 
 export default async function deployGovernQueue(
   args: {

@@ -18,7 +18,6 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.23.1",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "ethers": "^5.4.6",
     "mocha": "^9.1.1",
     "prettier": "^2.3.1",
     "prettier-plugin-solidity": "^1.0.0-beta.14",
@@ -48,7 +47,8 @@
     "qrcode-terminal": "^0.12.0",
     "ramda": "^0.27.1",
     "solidity-coverage": "^0.7.16",
-    "typechain": "^4.0.0"
+    "typechain": "^4.0.0",
+    "ethers": "^5.4.6"
   },
   "scripts": {
     "chain": "hardhat node --hostname 0.0.0.0 --network hardhat --no-deploy --show-accounts",
