@@ -11,8 +11,8 @@ dataSources:
     network: rinkeby
     source:
       abi: GovernQueue
-      address: "0x19B918802eA9C71c500Ca481917F383f3992cDB0"
-      startBlock: 9950063
+      address: "0x1A1Ae5f070059e1011F22BA99341fFCAe75EC2e9"
+      startBlock: 10661306
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
