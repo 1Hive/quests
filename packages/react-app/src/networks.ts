@@ -30,8 +30,8 @@ export const networks = Object.freeze({
     uniswapSubgraph:
       'https://api.thegraph.com/subgraphs/name/luckywebdev/uniswap-v2-subgraph-rinkeby',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
-    governAddress: '0xa0F5e6759d49063040eAB18c1B0E684C45a4B4cA',
-    governQueueAddress: '0x19B918802eA9C71c500Ca481917F383f3992cDB0',
+    governAddress: '0x4d59433d9E4BA3037cc88059c0Fb4fb954e67058',
+    governQueueAddress: '0xB1A040265451828Be68d4DfE7cc38105bD7A7E74',
     celesteAddress: '0xdd58ebed3c36460939285a92807f90e3d3a26789',
     httpProvider: 'https://rinkeby.infura.io/v3',
     defaultToken: TOKENS.HoneyTest,
