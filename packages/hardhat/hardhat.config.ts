@@ -24,6 +24,7 @@ import deployGovern from "./scripts/deploy-govern";
 import governRinkeby from "./deployments/rinkeby/Govern.json";
 import governGnosis from "./deployments/xdai/Govern.json";
 import defaultConfig from "./default-config.json";
+import { update } from "ramda";
 
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
@@ -691,10 +692,10 @@ task("newQuestFactory:gnosis")
       "Deployed quest factory (" + hre.network.name + "):",
       deployResult.address
     );
-    fs.writeFileSync(
-      "./deployments/" + hre.network.name + "/QuestFactory.json",
-      JSON.stringify(deployResult)
-    );
+    updateContractResult(hre.network, "QuestFactory", {
+      address: deployResult.address,
+      abi: deployResult.abi,
+    });
   });
 
 task("newQuestFactory:rinkeby")
@@ -721,6 +722,10 @@ task("newQuestFactory:rinkeby")
   )
   .setAction(async (args, hre) => {
     const deployResult = await deployQuestFactory(hre, args);
+    updateContractResult(hre.network, "QuestFactory", {
+      address: deployResult.address,
+      abi: deployResult.abi,
+    });
     console.log(
       "Deployed QuestFactory (" + hre.network.name + "):",
       deployResult.address
@@ -825,3 +830,10 @@ task("deployAll:rinkeby")
   );
 
 module.exports = hardhatConfig;
+function updateContractResult(
+  network: Network,
+  arg1: string,
+  arg2: { address: string; abi: import("hardhat-deploy/dist/types").ABI }
+) {
+  throw new Error("Function not implemented.");
+}

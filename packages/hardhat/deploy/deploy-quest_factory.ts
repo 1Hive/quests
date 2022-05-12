@@ -31,6 +31,7 @@ export default async (
     from: deployer,
     args: constructorArguments,
     log: true,
+    gasPrice: "5000000000",
   });
   await ethers.getContract("QuestFactory", deployResult.address);
 
