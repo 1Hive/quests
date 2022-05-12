@@ -1,5 +1,4 @@
 import { ContractReceipt } from 'ethers';
-import { uniqueId } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -8,6 +7,7 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { approveTokenAmount, fundQuest } from './quest.service';
 
 export async function approveTokenTransaction(
+  modalId: string,
   token: TokenModel,
   spender: string,
   message: string,
@@ -15,7 +15,7 @@ export async function approveTokenTransaction(
   setTransaction: Dispatch<SetStateAction<TransactionModel | undefined>>,
 ) {
   setTransaction({
-    id: uniqueId(),
+    modalId,
     estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
     message,
     status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
@@ -53,6 +53,7 @@ export async function approveTokenTransaction(
 }
 
 export async function fundQuestTransaction(
+  modalId: string,
   funds: TokenAmountModel,
   questAddress: string,
   message: string,
@@ -60,7 +61,7 @@ export async function fundQuestTransaction(
   setTransaction: Dispatch<SetStateAction<TransactionModel | undefined>>,
 ) {
   setTransaction({
-    id: uniqueId(),
+    modalId,
     estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
     message,
     status: ENUM_TRANSACTION_STATUS.WaitingForSignature,

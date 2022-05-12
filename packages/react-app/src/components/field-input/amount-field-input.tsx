@@ -3,7 +3,6 @@ import { parseUnits } from 'ethers/lib/utils';
 import { connect, FormikContextType } from 'formik';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment, useMemo } from 'react';
-import { NETWORK_TOKENS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
@@ -17,6 +16,7 @@ import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
+import { NETWORK_TOKENS } from 'src/constants';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
@@ -184,7 +184,7 @@ function AmountFieldInput({
   error,
 }: Props) {
   let mounted = true;
-  const { type } = getNetwork();
+  const { networkId } = getNetwork();
   const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
@@ -261,7 +261,7 @@ function AmountFieldInput({
   };
 
   const fetchAvailableTokens = async () => {
-    const networkDefaultTokens = (NETWORK_TOKENS[type] as TokenModel[]) ?? [];
+    const networkDefaultTokens = (NETWORK_TOKENS[networkId] as TokenModel[]) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
     if (mounted) {
       setAvailableTokens(
@@ -303,7 +303,13 @@ function AmountFieldInput({
     else onChange(nextValue);
   };
   const amountField = (isEdit || !tagOnly) && (
-    <FieldInput key={`amountField${amountLabel}`} label={amountLabel} wide={wide} compact={compact}>
+    <FieldInput
+      id={amountInputId}
+      key={amountInputId}
+      label={amountLabel}
+      wide={wide}
+      compact={compact}
+    >
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
         {amount !== undefined &&
           (isEdit ? (
@@ -330,7 +336,8 @@ function AmountFieldInput({
 
   const tokenField = (
     <FieldInput
-      key={`tokenLabel${tokenLabel}`}
+      id={tokenInputId}
+      key={tokenInputId}
       label={tokenLabel}
       wide={wide}
       compact={compact}
@@ -345,8 +352,9 @@ function AmountFieldInput({
           decimalsCount={decimalsCount}
         />
       ) : (
-        <AutoCompleteWrapperStyled wide={wide} id={tokenInputId}>
+        <AutoCompleteWrapperStyled wide={wide}>
           <AutoComplete
+            id={tokenInputId}
             items={tokens.map((_, index: number) => index)}
             onChange={setSearchTerm}
             onSelect={onTokenChange}

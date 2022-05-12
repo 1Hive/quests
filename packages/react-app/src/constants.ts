@@ -19,7 +19,6 @@ export const TOKENS = Object.freeze({
   Ether: {
     name: 'Ether',
     symbol: 'ETH',
-    token: '',
     decimals: 18,
   } as TokenModel,
   xDAI: {
@@ -31,7 +30,13 @@ export const TOKENS = Object.freeze({
   Thether: {
     name: 'Tether',
     symbol: 'USDT',
-    token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    decimals: 18,
+  } as TokenModel,
+  UsdCoin: {
+    name: 'USD Coin',
+    symbol: 'USDC',
+    token: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     decimals: 18,
   } as TokenModel,
   Honey: {

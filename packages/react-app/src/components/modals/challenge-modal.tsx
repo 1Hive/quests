@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, FormikErrors } from 'formik';
 import { ClaimModel } from 'src/models/claim.model';
@@ -60,6 +60,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
+  const modalId = useMemo(() => uniqueId('challenge-modal'), []);
 
   useEffect(() => {
     const fetchFee = async () => {
@@ -121,6 +122,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           (!isFeeDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
         ) {
           await approveTokenTransaction(
+            modalId,
             challengeFee.token,
             governQueueAddress,
             'Approving challenge fee (1/3)',
@@ -141,6 +143,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             tokenToApprove = claim.container!.config.challengeDeposit;
           }
           await approveTokenTransaction(
+            modalId,
             tokenToApprove,
             governQueueAddress,
             isFeeDepositSameToken
@@ -153,7 +156,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
 
         if (!claim.container) throw new Error('Container is not defined');
         setTransaction({
-          id: uniqueId(),
+          modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
@@ -214,7 +217,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
 
   return (
     <ModalBase
-      id="challenge-modal"
+      id={modalId}
       title="Challenge quests"
       openButton={
         <OpenButtonWrapperStyled>
@@ -224,8 +227,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               onClick={() => setOpened(true)}
               label={buttonLabel}
               mode="negative"
-              title="This claim can't be challenged anymore"
-              disabled={!buttonLabel || loading || challengeTimeout || !walletAddress}
+              title={challengeTimeout ? "This claim can't be challenged anymore" : buttonLabel}
+              disabled={!buttonLabel || loading || !walletAddress || challengeTimeout}
             />
           )}
           {!loading && challengeTimeout === false && claim.executionTimeMs && (

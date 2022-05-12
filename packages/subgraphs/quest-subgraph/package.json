@@ -7,6 +7,7 @@
     "prepare:test": "mustache config/test.json src/test.template.yaml > test.yaml -p src/questFactory.yaml",
     "prepare:rinkeby": "node ./sync-with-last-deploy.js rinkeby V2 && mustache config/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "node ./sync-with-last-deploy.js localhost V2 && mustache config/localhost.json src/subgraph.template.yaml > subgraph.yaml",
+    "prepare:gnosis": "node ./sync-with-last-deploy.js xdai V2 && mustache config/gnosis.json src/subgraph.template.yaml > subgraph.yaml",
     "codegen": "graph codegen",
     "build": "graph codegen && graph build",
     "create-local": "graph create --node http://0.0.0.0:8020/ corantin/quests-subgraph",
@@ -14,6 +15,7 @@
     "deploy:p:rinkeby": "yarn prepare:rinkeby && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph ",
     "deploy:rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph",
     "deploy:staging-rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
+    "deploy:gnosis": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-gnosis",
     "deploy:local": "graph deploy --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020 corantin/quests-subgraph",
     "hardhat:deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local && yarn workspace @1hive/quests-hardhat postdeploy"
   },

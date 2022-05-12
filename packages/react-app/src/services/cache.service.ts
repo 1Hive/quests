@@ -18,7 +18,7 @@ export async function cacheFetchTokenPrice(token: TokenModel) {
     return tokenPriceMap.get(id)!;
   }
   tokenPriceMap.set(id, null); // Set to null to indicate that it is being fetched
-  const res = await fetchRoutePairWithStable(id);
+  const res = await fetchRoutePairWithStable(token);
   const tokenPrice = ethers.utils.parseEther(res.price);
   tokenPriceMap.set(id, tokenPrice);
   return tokenPrice;

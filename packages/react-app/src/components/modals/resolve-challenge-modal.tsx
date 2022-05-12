@@ -8,7 +8,7 @@ import {
   IconCaution,
 } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, useMemo } from 'react';
 import styled from 'styled-components';
 import { ClaimModel } from 'src/models/claim.model';
 import { ENUM, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -17,7 +17,6 @@ import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
-import { getCelesteContract, getGovernQueueContract } from 'src/utils/contract.util';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getNetwork } from 'src/networks';
 import ModalBase, { ModalCallback } from './modal-base';
@@ -87,7 +86,7 @@ type Props = {
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
-  const { type } = getNetwork();
+  const { networkId } = getNetwork();
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
@@ -95,23 +94,20 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
   const { setTransaction } = useTransactionContext();
-  const governQueueContract = getGovernQueueContract(walletAddress);
-  const celesteContract = getCelesteContract();
+  const modalId = useMemo(() => uniqueId('resolve-challenge-modal'), []);
 
   useEffect(() => {
     const fetchChallengeAndDispute = async () => {
-      if (celesteContract) {
-        if (!claim.container) throw new Error('Container is required to fetch challenge disputes');
-        const challengeResult = await QuestService.fetchChallenge(claim.container);
-        if (!challengeResult)
-          throw new Error(`Failed to fetch challenge with container id ${claim.container.id}`);
-        setChallenge(challengeResult);
-        if (challengeResult) {
-          const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
-          setDispute(disputeModel ?? undefined);
-        }
-        setLoading(false);
+      if (!claim.container) throw new Error('Container is required to fetch challenge disputes');
+      const challengeResult = await QuestService.fetchChallenge(claim.container);
+      if (!challengeResult)
+        throw new Error(`Failed to fetch challenge with container id ${claim.container.id}`);
+      setChallenge(challengeResult);
+      if (challengeResult) {
+        const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
+        setDispute(disputeModel ?? undefined);
       }
+      setLoading(false);
     };
     fetchChallengeAndDispute();
   }, [claim.container]);
@@ -137,7 +133,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       if (!claim.container) throw new Error('Container is not defined');
       const message = 'Resolving claim challenge';
       setTransaction({
-        id: uniqueId(),
+        modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
         message,
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
@@ -218,7 +214,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             ) : (
               <>
                 Ruling in progress, please come back later...
-                {type === 'xdai' ? (
+                {networkId === 'gnosis' ? (
                   <LinkStyled external href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>
                     See dispute
                   </LinkStyled>
@@ -240,7 +236,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
 
   return (
     <ModalBase
-      id="resolve-challenge-modal"
+      id={modalId}
       title={
         <HeaderStyled>
           <h1>Resolve claim challenge</h1>
@@ -253,7 +249,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             onClick={() => setOpened(true)}
             label="Open resolve"
             mode="positive"
-            disabled={loading || !dispute || !governQueueContract || !celesteContract}
+            title={loading || !dispute ? 'Loading...' : 'Open resolve'}
+            disabled={loading || !dispute}
           />
         </OpenButtonWrapperStyled>
       }
@@ -273,7 +270,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           mode="positive"
           disabled={loading || !walletAddress || !isRuled}
           onClick={resolveChallengeTx}
-          title={isRuled ? 'Publish dispute result' : 'Need to be ruled'}
+          title={isRuled ? 'Publish dispute result' : 'Need to be ruled in celeste'}
         />,
       ]}
       onClose={closeModal}

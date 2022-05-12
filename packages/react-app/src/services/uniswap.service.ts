@@ -2,13 +2,11 @@ import { request } from 'graphql-request';
 import { PairModel } from 'src/models/uniswap.model';
 import { getNetwork } from 'src/networks';
 import { UniswapPairsEntityQuery } from 'src/queries/uniswap-pairs-entity.query';
-import { TOKENS } from 'src/constants';
 import { arrayDistinct } from 'src/utils/array.util';
-import Web3 from 'web3';
-import { getDefaultProvider } from 'src/utils/web3.utils';
 import { Route, Trade, Pair } from '@uniswap/v2-sdk';
 import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
+import { TokenModel } from 'src/models/token.model';
+import { getUniswapPairContract } from 'src/utils/contract.util';
 import { Logger } from '../utils/logger';
 
 // #region Private
@@ -31,25 +29,13 @@ function mapPairList(pairs: any[]): Promise<PairModel[]> {
 
 // #region Subgraph Queries
 
-export async function fetchPairWithStables(tokenA: string): Promise<PairModel[] | undefined> {
-  const { uniswapSubgraph } = getNetwork();
+export async function fetchPairWithStables(tokenA: TokenModel): Promise<PairModel[] | undefined> {
+  const { uniswapSubgraph, stableTokens } = getNetwork();
   if (!uniswapSubgraph) return undefined;
 
   const queryResult = await request(uniswapSubgraph, UniswapPairsEntityQuery, {
-    tokenA: tokenA.toLowerCase(), // Subgraph address are stored lowercase
-    tokenBArray: arrayDistinct([
-      // Some stables address should be here
-      TOKENS.RinkebyDai.token,
-      TOKENS.RinkebyHoney.token,
-      TOKENS.RinkebyTheter.token,
-      '0x531eab8bb6a2359fe52ca5d308d85776549a0af9',
-      '0xd92e713d051c37ebb2561803a3b5fbabc4962431',
-      '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      '0x8ad45fe3869fd7e414f7851ccf95f24b1ecd344b',
-      '0xab0733588776b8881f7712f6abca98f510e6b63d',
-      '0xd9ba894e0097f8cc2bbc9d24d308b98e36dc6d02',
-      '0x531eab8bb6a2359fe52ca5d308d85776549a0af9',
-    ]).map((token) => token.toLowerCase()),
+    tokenA: tokenA.token.toLowerCase(), // Subgraph address are stored lowercase
+    tokenBArray: arrayDistinct(stableTokens).map((token) => token.token.toLowerCase()),
   });
   return mapPairList(queryResult.pairs);
 }
@@ -57,13 +43,11 @@ export async function fetchPairWithStables(tokenA: string): Promise<PairModel[] 
 
 // #region Contract Queries
 
-export async function fetchRoutePairWithStable(tokenA: string) {
+export async function fetchRoutePairWithStable(tokenA: TokenModel) {
   const { chainId, isTestNetwork } = getNetwork();
   const PRICE_ZERO = Promise.resolve({ price: isTestNetwork ? '1' : '0' }); // Fallback to 1 for dev or 0 for production
 
   try {
-    tokenA = Web3.utils.toChecksumAddress(tokenA);
-
     const pairsWithStables = await fetchPairWithStables(tokenA);
 
     if (!pairsWithStables || pairsWithStables.length === 0) {
@@ -80,22 +64,11 @@ export async function fetchRoutePairWithStable(tokenA: string) {
       throw new Error('Token common Stable not found: dont have pair with stables knowed');
     }
 
-    const provider = getDefaultProvider();
-
-    const tokenAObj = new Token(chainId, tokenA, 18, symbol, name); // TODO should use variable decimals here
+    const tokenAObj = new Token(chainId, tokenA.token, tokenA.decimals, tokenA.symbol, tokenA.name);
     const tokenStableObj = new Token(chainId, commonStable, +decimals, symbol, name);
 
     const pairAddress = Pair.getAddress(tokenAObj, tokenStableObj);
-
-    const contract = new ethers.Contract(
-      pairAddress,
-      [
-        'function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)',
-        'function token0() external view returns (address)',
-        'function token1() external view returns (address)',
-      ],
-      provider,
-    );
+    const contract = getUniswapPairContract(pairAddress);
     const reserves = await contract.getReserves();
     const token0Address = await contract.token0();
     const token1Address = await contract.token1();
