@@ -189,7 +189,8 @@ async function generateScheduleContainer(
   claimData: ClaimModel,
   extraDelaySec?: number,
 ): Promise<ContainerModel> {
-  const { governAddress } = getNetwork();
+  const questContract = getQuestContract(claimData.questAddress);
+  const governAddress = await questContract.aragonGovernAddress();
   const governQueueResult = await fetchGovernQueue();
   const erc3000Config = governQueueResult.config;
   const lastBlockTimestamp = await getLastBlockTimestamp();
@@ -468,9 +469,7 @@ export async function approveTokenAmount(
 ): Promise<ethers.ContractReceipt | null> {
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
   if (!erc20Contract) return null;
-  const { defaultGazFees } = getNetwork();
-  Logger.debug('Approving token amount...', { tokenAmount, fromAddress: toAddress });
-  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, defaultGazFees);
+  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount);
   return handleTransaction(tx, onTx);
 }
 
@@ -518,9 +517,8 @@ export async function scheduleQuestClaim(
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
   const container = await generateScheduleContainer(walletAddress, claimData);
-  const { defaultGazFees } = getNetwork();
   Logger.debug('Scheduling quest claim...', { container });
-  const tx = (await governQueueContract.schedule(container, defaultGazFees)) as ContractTransaction;
+  const tx = (await governQueueContract.schedule(container)) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
 
@@ -531,12 +529,11 @@ export async function executeQuestClaim(
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
-  const { defaultGazFees } = getNetwork();
   Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
-  const tx = await governQueueContract.execute(
-    { config: claimData.container!.config, payload: claimData.container!.payload },
-    defaultGazFees,
-  );
+  const tx = await governQueueContract.execute({
+    config: claimData.container!.config,
+    payload: claimData.container!.payload,
+  });
   return handleTransaction(tx, onTx);
 }
 
@@ -550,11 +547,9 @@ export async function challengeQuestClaim(
   if (!governQueueContract) return null;
   Logger.debug('Challenging quest...', { container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
-  const { defaultGazFees } = getNetwork();
   const tx = await governQueueContract.challenge(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
-    defaultGazFees,
   );
   return handleTransaction(tx, onTx);
 }
@@ -568,8 +563,7 @@ export async function resolveClaimChallenge(
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
-  const { defaultGazFees } = getNetwork();
-  const tx = await governQueueContract.resolve(container, dispute.id, defaultGazFees);
+  const tx = await governQueueContract.resolve(container, dispute.id);
   return handleTransaction(tx, onTx);
 }
 

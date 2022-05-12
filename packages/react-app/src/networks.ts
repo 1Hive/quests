@@ -1,77 +1,71 @@
 import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getDefaultChain } from './local-settings';
 import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
-import { TOKENS } from './constants';
 import { NetworkModel } from './models/network.model';
+import { TOKENS } from './constants';
+
+type StagingNetworkModel = Partial<NetworkModel> & {
+  stagingOf: string;
+};
 
 export const networks = Object.freeze({
-  mainnet: {
-    chainId: 1,
-    name: 'Mainnet',
-    type: 'mainnet',
-    explorerBase: 'etherscan',
-    defaultEthNode: 'https://eth.aragon.network/',
-    subgraph: '',
-    defaultToken: TOKENS.HoneyTest,
-    nativeToken: TOKENS.Ether,
-    stableToken: TOKENS.Thether,
-    isTestNetwork: false,
-  },
   rinkeby: {
+    networkId: 'rinkeby',
     chainId: 4,
     name: 'Rinkeby',
-    type: 'rinkeby',
     explorerBase: 'etherscan',
-    // defaultEthNode: 'https://rinkeby.eth.aragon.network/',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
-    // questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
-    celesteSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/celest-1hive-rinkeby',
-    uniswapSubgraph:
-      'https://api.thegraph.com/subgraphs/name/luckywebdev/uniswap-v2-subgraph-rinkeby',
+    uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
-    governAddress: '0x4d59433d9E4BA3037cc88059c0Fb4fb954e67058',
     governQueueAddress: '0xB1A040265451828Be68d4DfE7cc38105bD7A7E74',
     celesteAddress: '0xdd58ebed3c36460939285a92807f90e3d3a26789',
     httpProvider: 'https://rinkeby.infura.io/v3',
-    defaultToken: TOKENS.HoneyTest,
-    nativeToken: TOKENS.Ether,
     isTestNetwork: true,
-    defaultGazFees: {
-      gasLimit: 11e5,
-      gasPrice: 2e9,
-    },
-  } as NetworkModel,
-  xdai: {
-    chainId: 100,
-    name: 'xDai',
-    type: 'xdai',
-    explorerBase: 'blockscout',
-    defaultEthNode: 'https://xdai.poanetwork.dev/',
-    questFactory: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
-    govern: '', // TODO : When govern will be on xDai
-    httpProvider: 'https://xdai.poanetwork.dev',
-    defaultToken: TOKENS.Honey,
-    nativeToken: TOKENS.xDAI,
-    stableToken: TOKENS.xDAI,
-    isTestNetwork: false,
+    stableTokens: [TOKENS.RinkebyDai, TOKENS.RinkebyTheter],
   },
+  rinkebyStaging: {
+    stagingOf: 'rinkeby',
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
+  } as StagingNetworkModel,
+  gnosis: {
+    networkId: 'gnosis',
+    chainId: 100,
+    name: 'gnosis',
+    explorerBase: 'blockscout',
+    httpProvider: 'https://xdai.poanetwork.dev',
+    questFactoryAddress: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
+    celesteAddress: 'TODO',
+    governQueueAddress: 'TODO',
+    governSubgraph: 'TODO',
+    questsSubgraph: 'TODO',
+    uniswapSubgraph: 'TODO',
+    isTestNetwork: false,
+    stableTokens: [TOKENS.Thether, TOKENS.UsdCoin],
+  } as NetworkModel,
+  gnosisStaging: {
+    stagingOf: 'gnosis',
+  } as StagingNetworkModel,
   local: {
+    id: 'local',
     chainId: 1337,
     name: 'Localhost',
-    type: 'private',
     subgraph: 'https://localhost:8000/subgraphs/name/corantin/quests-subgraph',
     defaultEthNode: 'http://0.0.0.0:8545/',
     questFactory: HardhatDeployement[1337]?.localhost.contracts.QuestFactory.address,
     govern: 0,
     isTestNetwork: true,
-  },
-});
+  } as unknown as NetworkModel,
+} as { [key: string]: NetworkModel | StagingNetworkModel });
 
 function getNetworkInternalName(chainId = getDefaultChain()) {
   return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkType(chainId);
 }
 
 export function getNetwork(chainId = getDefaultChain()): NetworkModel {
-  return networks[getNetworkInternalName(chainId)];
+  let network = networks[getNetworkInternalName(chainId)];
+  if ('stagingOf' in network) {
+    network = { ...networks[network.stagingOf], ...network } as NetworkModel;
+  }
+  return network;
 }

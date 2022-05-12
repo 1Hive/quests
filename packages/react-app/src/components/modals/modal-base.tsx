@@ -67,9 +67,6 @@ export default function ModalBase({
 
   useEffect(() => {
     if (isOpen) {
-      // Clear tx if a tx is still there and already completed
-      if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed || transaction?.id)
-        setTransaction(undefined);
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
       setTimeout(() => {
         (document.getElementById(id) as HTMLElement)?.focus();
@@ -82,6 +79,16 @@ export default function ModalBase({
 
     return () => document.removeEventListener('keydown', escFunction, false);
   }, [isOpen]);
+
+  useEffect(() => {
+    if (
+      (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed) &&
+      transaction?.modalId === id &&
+      !isOpen
+    ) {
+      setTransaction(undefined);
+    }
+  }, [transaction?.status, txFailed]);
 
   const escFunction = (e: any) => {
     const modalDom = document.getElementById(id) as HTMLElement;
@@ -97,8 +104,14 @@ export default function ModalBase({
 
   const handleOnClose = (e: any) => {
     if (e) {
-      onClose(transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed);
-      if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed) {
+      onClose(
+        transaction?.modalId === id && transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed,
+      );
+      if (
+        (transaction?.modalId === id &&
+          transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) ||
+        txFailed
+      ) {
         setTimeout(() => {
           setTransaction(undefined);
         }, 750);
@@ -124,7 +137,7 @@ export default function ModalBase({
         <Outset gu8>
           <TitleStyled>{title}</TitleStyled>
         </Outset>
-        {transaction ? <TransactionProgressComponent /> : children}
+        {transaction && transaction?.modalId === id ? <TransactionProgressComponent /> : children}
         {(buttons || txFailed) && (
           <ModalFooterStyled>
             <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>

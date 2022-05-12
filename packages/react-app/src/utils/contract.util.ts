@@ -5,6 +5,7 @@ import { toChecksumAddress } from 'web3-utils';
 import { ContractInstanceError } from 'src/models/contract-error';
 import { Logger } from 'src/utils/logger';
 import ERC20 from '../contracts/ERC20.json';
+import UniswapPair from '../contracts/UniswapPair.json';
 import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
@@ -30,19 +31,20 @@ function getContractsJson(network?: any) {
     GovernQueue,
     ERC20,
     Celeste,
+    UniswapPair,
   };
 }
 
 function getContract(
   contractName: string,
-  questAddressOverride?: string,
+  contractAddressOverride?: string,
   walletAddress?: string,
 ): Contract {
   try {
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
     const askedContract = contracts[contractName];
-    const contractAddress = questAddressOverride ?? askedContract.address;
+    const contractAddress = contractAddressOverride ?? askedContract.address;
     const contractAbi = askedContract.abi ?? askedContract;
     const provider = getDefaultProvider();
 
@@ -101,6 +103,10 @@ export async function getTokenInfo(tokenAddress: string) {
 
 export function getQuestContract(questAddress: string, walletAddress?: string): Contract {
   return getContract('Quest', questAddress, walletAddress);
+}
+
+export function getUniswapPairContract(pairAddress: string) {
+  return getContract('UniswapPair', pairAddress);
 }
 
 export function getCelesteContract() {

@@ -82,7 +82,7 @@ function Header({ children }: Props) {
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
           {
-            // TODO : Restore when toggle theme is implemented
+            // TODO : Restore when light theme is implemented
             /* <ThemeButtonStyled
             ref={activityOpener}
             className="ml-8"
