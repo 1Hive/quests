@@ -31,16 +31,21 @@ export async function approveTokenTransaction(
       status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       type: 'TokenApproval',
     });
-    approveTxReceipt = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            hash: txHash,
-            status: ENUM_TRANSACTION_STATUS.Pending,
-          },
-      );
-    });
+    approveTxReceipt = await approveTokenAmount(
+      walletAddress,
+      spender,
+      { ...token, amount: '0' },
+      (txHash) => {
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              hash: txHash,
+              status: ENUM_TRANSACTION_STATUS.Pending,
+            },
+        );
+      },
+    );
 
     if (!approveTxReceipt?.status) {
       setTransaction(
