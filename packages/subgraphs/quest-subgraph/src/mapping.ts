@@ -17,7 +17,7 @@ export function handleDepositChanged(event: DepositChanged): void {
   questEntity.save();
 }
 
-export function handleQuestCreatedV4(event: QuestCreated): void {
+export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
 
   questEntity.questAddress = event.params.questAddress.toHexString();

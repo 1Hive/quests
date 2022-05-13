@@ -469,7 +469,9 @@ export async function approveTokenAmount(
 ): Promise<ethers.ContractReceipt | null> {
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
   if (!erc20Contract) return null;
-  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount);
+  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
+    gasLimit: 40000,
+  });
   return handleTransaction(tx, onTx);
 }
 

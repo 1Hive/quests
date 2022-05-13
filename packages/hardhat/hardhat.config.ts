@@ -557,6 +557,7 @@ task("send", "Send ETH")
   });
 
 task("newGovernQueue:gnosis")
+  .setDescription("Deploy a new GovernQueue and export it to front end")
   .addParam("aclRoot", "Address that will be granted Root ACL role")
   .addOptionalParam(
     "governQueueFactoryAddress",
@@ -599,6 +600,7 @@ task("newGovernQueue:gnosis")
   .setAction(deployGovernQueue);
 
 task("newGovernQueue:rinkeby")
+  .setDescription("Deploy a new GovernQueue and export it to front end")
   .addParam("aclRoot", "Address that will be granted Root ACL role")
   .addOptionalParam(
     "governQueueFactoryAddress",
@@ -641,6 +643,7 @@ task("newGovernQueue:rinkeby")
   .setAction(deployGovernQueue);
 
 task("newGovern:gnosis")
+  .setDescription("Deploy a new Govern and export it to front end")
   .addParam(
     "initialExecutorAddress",
     "Address of the initial executor (should usually be the GovernQueue)"
@@ -653,6 +656,7 @@ task("newGovern:gnosis")
   .setAction(deployGovern);
 
 task("newGovern:rinkeby")
+  .setDescription("Deploy a new Govern and export it to front end")
   .addParam(
     "initialExecutorAddress",
     "Address of the initial executor (should usually be the GovernQueue)"
@@ -665,6 +669,7 @@ task("newGovern:rinkeby")
   .setAction(deployGovern);
 
 task("newQuestFactory:gnosis")
+  .setDescription("Deploy a new QuestFactory and export it to front end")
   .addOptionalParam(
     "governAddress",
     "Address of the govern",
@@ -698,6 +703,7 @@ task("newQuestFactory:gnosis")
   });
 
 task("newQuestFactory:rinkeby")
+  .setDescription("Deploy a new QuestFactory and export it to front end")
   .addOptionalParam(
     "governAddress",
     "Address of the govern",
@@ -734,7 +740,9 @@ task("newQuestFactory:rinkeby")
   });
 
 task("deployAll:rinkeby")
-  .setDescription("Deploy all the needed Govern and Quest contracts")
+  .setDescription(
+    "Deploy all the needed Govern and Quest contracts and export them to frontend"
+  )
   .addOptionalParam(
     "ownerAddress",
     "Address that will be granted Root ACL role and owner for QuestFactory",
