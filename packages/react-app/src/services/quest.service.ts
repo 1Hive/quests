@@ -467,6 +467,7 @@ export async function approveTokenAmount(
   tokenAmount: TokenModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
+  Logger.debug('Approving token amount...', { toAddress, tokenAmount });
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
   if (!erc20Contract) return null;
   const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
