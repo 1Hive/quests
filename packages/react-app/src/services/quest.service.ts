@@ -426,7 +426,9 @@ export async function reclaimQuestUnusedFunds(
   const questContract = getQuestContract(quest.address, walletAddress);
   if (!questContract) return null;
   Logger.debug('Reclaiming quest unused funds...', { quest });
-  const tx = await questContract.recoverUnclaimedFunds();
+  const tx = await questContract.recoverUnclaimedFunds({
+    gasLimit: 150000,
+  });
   return handleTransaction(tx, onTx);
 }
 
@@ -457,7 +459,9 @@ export async function fundQuest(
   const contract = getERC20Contract(amount.token, walletAddress);
   if (!contract) return null;
   Logger.debug('Funding quest...', { questAddress, amount });
-  const tx = await contract.transfer(questAddress, toBigNumber(amount));
+  const tx = await contract.transfer(questAddress, toBigNumber(amount), {
+    gasLimit: 150000,
+  });
   return handleTransaction(tx, onTx);
 }
 
@@ -535,7 +539,9 @@ export async function scheduleQuestClaim(
   if (!governQueueContract) return null;
   const container = await generateScheduleContainer(walletAddress, claimData);
   Logger.debug('Scheduling quest claim...', { container });
-  const tx = (await governQueueContract.schedule(container)) as ContractTransaction;
+  const tx = (await governQueueContract.schedule(container, {
+    gasLimit: 150000,
+  })) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
 
@@ -547,10 +553,15 @@ export async function executeQuestClaim(
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
   Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
-  const tx = await governQueueContract.execute({
-    config: claimData.container!.config,
-    payload: claimData.container!.payload,
-  });
+  const tx = await governQueueContract.execute(
+    {
+      config: claimData.container!.config,
+      payload: claimData.container!.payload,
+    },
+    {
+      gasLimit: 150000,
+    },
+  );
   return handleTransaction(tx, onTx);
 }
 
@@ -567,6 +578,9 @@ export async function challengeQuestClaim(
   const tx = await governQueueContract.challenge(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
+    {
+      gasLimit: 150000,
+    },
   );
   return handleTransaction(tx, onTx);
 }
@@ -580,7 +594,9 @@ export async function resolveClaimChallenge(
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
-  const tx = await governQueueContract.resolve(container, dispute.id);
+  const tx = await governQueueContract.resolve(container, dispute.id, {
+    gasLimit: 150000,
+  });
   return handleTransaction(tx, onTx);
 }
 

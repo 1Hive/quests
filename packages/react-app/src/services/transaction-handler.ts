@@ -27,7 +27,7 @@ export async function approveTokenTransaction(
     setTransaction({
       modalId,
       estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
-      message: 'Revoking already existing aproval',
+      message: 'Revoking already existing approval',
       status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
       type: 'TokenApproval',
     });
