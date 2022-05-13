@@ -15,7 +15,9 @@ import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
 import deployQuestFactory from "./deploy/deploy-quest_factory";
-import deployGovernQueue from "./scripts/deploy-govern_queue";
+import deployGovernQueue, {
+  generateQueueConfig,
+} from "./scripts/deploy-govern_queue";
 import deployGovern from "./scripts/deploy-govern";
 import governRinkeby from "./deployments/rinkeby/Govern.json";
 import governGnosis from "./deployments/xdai/Govern.json";
@@ -554,6 +556,122 @@ task("send", "Send ETH")
     debug(JSON.stringify(txRequest, null, 2));
 
     return send(fromSigner, txRequest);
+  });
+
+task("generateGovernQueueConfig:gnosis")
+  .setDescription("Generate GovernQueue config tupple")
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 7 days)",
+    defaultConfig.ClaimDelay.xdai,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token (default is HNY)",
+    defaultConfig.ScheduleDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.xdai.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token (default is HNY)",
+    defaultConfig.ChallengeDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.xdai.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    defaultConfig.IArbitratorCelesteAddress.xdai
+  )
+  .addOptionalParam(
+    "rules",
+    "Rules of how DAO should be managed",
+    "0x0000000000000000000000000000000000000000"
+  )
+  .addOptionalParam(
+    "maxCalldataSize",
+    "Max calldatasize for the schedule",
+    100000,
+    types.int
+  )
+  .setAction(async (taskArgs) => {
+    const config = generateQueueConfig(taskArgs);
+    console.log("Config tupple : ", JSON.stringify(Object.values(config)));
+  });
+
+task("generateGovernQueueConfig:rinkeby")
+  .setDescription("Generate GovernQueue config tupple")
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 7 days)",
+    defaultConfig.ClaimDelay.rinkeby,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token (default is HNY)",
+    defaultConfig.ScheduleDeposit.rinkeby.token
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.rinkeby.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token (default is HNY)",
+    defaultConfig.ChallengeDeposit.rinkeby.token
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.rinkeby.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    defaultConfig.IArbitratorCelesteAddress.rinkeby
+  )
+  .addOptionalParam(
+    "rules",
+    "Rules of how DAO should be managed",
+    "0x0000000000000000000000000000000000000000"
+  )
+  .addOptionalParam(
+    "maxCalldataSize",
+    "Max calldatasize for the schedule",
+    100000,
+    types.int
+  )
+  .setAction(async (taskArgs) => {
+    const config = generateQueueConfig(taskArgs);
+    const tupple = [
+      config.executionDelay,
+      [
+        config.scheduleDeposit.token,
+        config.scheduleDeposit.amount.toHexString(),
+      ],
+      [
+        config.challengeDeposit.token,
+        config.challengeDeposit.amount.toHexString(),
+      ],
+      config.resolver,
+      config.rules,
+      config.maxCalldataSize,
+    ];
+    console.log("Config tupple : ", JSON.stringify(tupple));
   });
 
 task("newGovernQueue:gnosis")

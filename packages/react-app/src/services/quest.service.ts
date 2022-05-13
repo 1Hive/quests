@@ -469,11 +469,25 @@ export async function approveTokenAmount(
 ): Promise<ethers.ContractReceipt | null> {
   Logger.debug('Approving token amount...', { toAddress, tokenAmount });
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
-  if (!erc20Contract) return null;
+  if (!erc20Contract)
+    throw new Error(
+      `Failed when approving token amount : Erc20Contract is null \n${JSON.stringify({
+        walletAddress,
+        toAddress,
+        tokenAmount,
+      })}`,
+    );
+
   const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
-    gasLimit: 40000,
+    gasLimit: 150000,
   });
   return handleTransaction(tx, onTx);
+}
+
+export function getAllowanceOf(walletAddress: string, token: TokenModel, spender: string) {
+  const erc20Contract = getERC20Contract(token.token, walletAddress);
+  if (!erc20Contract) throw new Error('Fetching allowance : Erc20Contract is null');
+  return erc20Contract.allowance(walletAddress, spender);
 }
 
 export async function getBalanceOf(

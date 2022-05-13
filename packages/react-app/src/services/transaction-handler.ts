@@ -1,10 +1,11 @@
-import { ContractReceipt } from 'ethers';
+import { BigNumber, ContractReceipt } from 'ethers';
 import { Dispatch, SetStateAction } from 'react';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { TransactionModel } from 'src/models/transaction.model';
-import { approveTokenAmount, fundQuest } from './quest.service';
+import { Logger } from 'src/utils/logger';
+import { approveTokenAmount, fundQuest, getAllowanceOf } from './quest.service';
 
 export async function approveTokenTransaction(
   modalId: string,
@@ -14,6 +15,47 @@ export async function approveTokenTransaction(
   walletAddress: string,
   setTransaction: Dispatch<SetStateAction<TransactionModel | undefined>>,
 ) {
+  const amountBn = BigNumber.from(token.amount);
+  const allowance = await getAllowanceOf(walletAddress, token, spender);
+  if (allowance.lt(amountBn)) {
+    Logger.info('Allowance is already enough, skiping approve.');
+    return;
+  }
+  let approveTxReceipt: ContractReceipt | null;
+  if (!allowance.isZero()) {
+    // Reset approval to 0 before approving again
+    setTransaction({
+      modalId,
+      estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
+      message: 'Revoking already existing aproval',
+      status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+      type: 'TokenApproval',
+    });
+    approveTxReceipt = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            hash: txHash,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          },
+      );
+    });
+
+    if (!approveTxReceipt?.status) {
+      setTransaction(
+        (oldTx) =>
+          oldTx && {
+            ...oldTx,
+            status: ENUM_TRANSACTION_STATUS.Failed,
+          },
+      );
+      throw new Error(
+        `Failed to revoke existing allowance : ${token.name} (${token.symbol}-${token.token})`,
+      );
+    }
+  }
+
   setTransaction({
     modalId,
     estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
@@ -21,7 +63,6 @@ export async function approveTokenTransaction(
     status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
     type: 'TokenApproval',
   });
-  let approveTxReceipt: ContractReceipt | null;
   try {
     approveTxReceipt = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
       setTransaction(
