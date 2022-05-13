@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from "dotenv";
 import "solidity-coverage";
 import "hardhat-deploy";
-import { BigNumber, utils } from "ethers";
+import { utils } from "ethers";
 import fs from "fs";
 import chalk from "chalk";
 import "@nomiclabs/hardhat-waffle";
@@ -10,12 +10,8 @@ import "@nomiclabs/hardhat-web3";
 import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
 import "hardhat-typechain";
-import { task, HardhatUserConfig, types, subtask } from "hardhat/config";
-import {
-  HardhatRuntimeEnvironment,
-  HttpNetworkUserConfig,
-  Network,
-} from "hardhat/types";
+import { task, HardhatUserConfig, types } from "hardhat/config";
+import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
 import deployQuestFactory from "./deploy/deploy-quest_factory";
@@ -24,7 +20,7 @@ import deployGovern from "./scripts/deploy-govern";
 import governRinkeby from "./deployments/rinkeby/Govern.json";
 import governGnosis from "./deployments/xdai/Govern.json";
 import defaultConfig from "./default-config.json";
-import { update } from "ramda";
+import exportContractResult from "./scripts/export-contract-result";
 
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
@@ -91,8 +87,10 @@ const hardhatConfig: HardhatUserConfig = {
       */
     },
     rinkeby: {
+      chainId: 4,
       url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: getAccounts(),
+      gasPrice: 40000000000,
     },
     kovan: {
       url: "https://kovan.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
@@ -116,6 +114,7 @@ const hardhatConfig: HardhatUserConfig = {
       accounts: getAccounts(),
     },
     xdai: {
+      chainId: 100,
       url: "https://rpc.xdaichain.com/",
       gasPrice: 1000000000,
       accounts: getAccounts(),
@@ -692,7 +691,7 @@ task("newQuestFactory:gnosis")
       "Deployed quest factory (" + hre.network.name + "):",
       deployResult.address
     );
-    updateContractResult(hre.network, "QuestFactory", {
+    exportContractResult(hre.network, "QuestFactory", {
       address: deployResult.address,
       abi: deployResult.abi,
     });
@@ -721,8 +720,10 @@ task("newQuestFactory:rinkeby")
     types.float
   )
   .setAction(async (args, hre) => {
+    console.log("Deploying QuestFactory...");
     const deployResult = await deployQuestFactory(hre, args);
-    updateContractResult(hre.network, "QuestFactory", {
+
+    exportContractResult(hre.network, "QuestFactory", {
       address: deployResult.address,
       abi: deployResult.abi,
     });
@@ -830,10 +831,3 @@ task("deployAll:rinkeby")
   );
 
 module.exports = hardhatConfig;
-function updateContractResult(
-  network: Network,
-  arg1: string,
-  arg2: { address: string; abi: import("hardhat-deploy/dist/types").ABI }
-) {
-  throw new Error("Function not implemented.");
-}

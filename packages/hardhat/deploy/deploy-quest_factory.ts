@@ -31,11 +31,11 @@ export default async (
     from: deployer,
     args: constructorArguments,
     log: true,
-    gasPrice: "5000000000",
   });
   await ethers.getContract("QuestFactory", deployResult.address);
 
   try {
+    console.log("Verifying QuestFactory...");
     setTimeout(
       async () =>
         await run("verify:verify", {

@@ -2,13 +2,15 @@
   "name": "@aragon/govern-subgraph",
   "version": "1.0.0-beta.12",
   "scripts": {
+    "prepare-rinkeby": "node ./scripts/sync-with-last-deploy.js rinkeby",
+    "prepare-gnosis": "node ./scripts/sync-with-last-deploy.js gnosis",
     "manifest-rinkeby": "mustache manifest/data/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
-    "manifest-xdai": "mustache manifest/data/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
+    "manifest-gnosis": "mustache manifest/data/gnosis.json src/subgraph.template.yaml > subgraph.yaml",
     "build": "graph codegen && graph build",
-    "deploy-rinkeby": "graph deploy corantin/govern-1hive-rinkeby --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token [THE_GRAPH_ACCESS_TOKEN]",
-    "deploy-rinkeby-staging": "graph deploy corantin/govern-1hive-rinkeby-staging --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token [THE_GRAPH_ACCESS_TOKEN]",
-    "deploy-xdai": "graph deploy govern-1hive-xdai --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token [THE_GRAPH_ACCESS_TOKEN]",
-    "deploy-xdai-staging": "graph deploy govern-1hive-xdai-staging --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token [THE_GRAPH_ACCESS_TOKEN]",
+    "deploy-rinkeby": "node ./scripts/deploy.js corantin govern-1hive-rinkeby rinkeby",
+    "deploy-rinkeby-staging": "node ./scripts/deploy.js corantin govern-1hive-rinkeby-staging rinkeby",
+    "deploy-xdai": "node ./scripts/deploy.js corantin govern-1hive-xdai xdai",
+    "deploy-xdai-staging": "node ./scripts/deploy.js corantin govern-1hive-xdai-staging xdai",
     "create-local": "graph create corantin/govern-1hive-local --node http://localhost:8020",
     "deploy-local": "graph deploy corantin/govern-1hive-local --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020"
   },
@@ -21,7 +23,10 @@
     "@aragon/govern-core": "^1.0.0-beta.12",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
-    "file-type": "^16.5.0"
+    "file-type": "^16.5.0",
+    "cross-var": "^1.1.0",
+    "dotenv": "^10.0.0",
+    "dotenv-cli": "^4.0.0"
   },
   "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }

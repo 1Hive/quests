@@ -62,10 +62,15 @@ export function getUseWalletProviders() {
 export function getNetworkType(chainId = getDefaultChain()) {
   const chainIdStr = String(chainId);
 
-  if (chainIdStr === '1') return 'mainnet';
-  if (chainIdStr === '3') return 'ropsten';
-  if (chainIdStr === '4') return 'rinkeby';
-  if (chainIdStr === '100') return 'xdai';
+  let key;
+  if (chainIdStr === '1') key = 'mainnet';
+  if (chainIdStr === '3') key = 'ropsten';
+  if (chainIdStr === '4') key = 'rinkeby';
+  if (chainIdStr === '100') key = 'xdai';
+  if (key) {
+    if (env('STAGING')) key += 'Staging';
+    return key;
+  }
 
   return DEFAULT_LOCAL_CHAIN;
 }

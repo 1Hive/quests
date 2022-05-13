@@ -1,5 +1,1 @@
-{
-  "network": "rinkeby",
-  "startBlock": 10661306,
-  "governQueueAddress": "0x1A1Ae5f070059e1011F22BA99341fFCAe75EC2e9"
-}
+{"network":"rinkeby","startBlock":10661306,"governQueueAddress":"0xBf360A9be19A8467f10D97c63675Df4C87547694"}

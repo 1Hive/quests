@@ -2,7 +2,7 @@ import GovernQueueFactoryAbi from "../abi/contracts/Externals/GovernQueueFactory
 import { HardhatRuntimeEnvironment, Network } from "hardhat/types";
 import fs from "fs";
 import { BigNumber } from "ethers";
-import exportContractResult from "./exportContractResult";
+import exportContractResult from "./export-contract-result";
 import GovernQueueAbi from "../abi/contracts/Externals/GovernQueue.json";
 
 export default async function deployGovernQueue(
@@ -52,6 +52,7 @@ export default async function deployGovernQueue(
   const res = await tx.wait();
   const newQueueAddress = res.logs[0].address;
   console.log("Deployed GovernQueue (" + network.name + "): ", newQueueAddress);
+  try {
   fs.writeFileSync(
     "./deployments/" + network.name + "/GovernQueue.json",
     JSON.stringify({
@@ -59,7 +60,12 @@ export default async function deployGovernQueue(
       abi: GovernQueueAbi,
     })
   );
-
+} catch (error) {
+    console.error(
+      "Error during publishing deployement result into GovernQueue.json",
+      error
+    );
+  }
   exportContractResult(network, "GovernQueue", {
     address: newQueueAddress,
     abi: GovernQueueAbi as [],
