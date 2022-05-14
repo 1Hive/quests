@@ -427,7 +427,7 @@ export async function reclaimQuestUnusedFunds(
   if (!questContract) return null;
   Logger.debug('Reclaiming quest unused funds...', { quest });
   const tx = await questContract.recoverUnclaimedFunds({
-    gasLimit: 150000,
+    gasLimit: 300000,
   });
   return handleTransaction(tx, onTx);
 }
@@ -483,7 +483,7 @@ export async function approveTokenAmount(
     );
 
   const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
-    gasLimit: 150000,
+    gasLimit: 300000,
   });
   return handleTransaction(tx, onTx);
 }
@@ -559,7 +559,7 @@ export async function executeQuestClaim(
       payload: claimData.container!.payload,
     },
     {
-      gasLimit: 150000,
+      gasLimit: 300000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -579,7 +579,7 @@ export async function challengeQuestClaim(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
     {
-      gasLimit: 150000,
+      gasLimit: 300000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -595,7 +595,7 @@ export async function resolveClaimChallenge(
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
   const tx = await governQueueContract.resolve(container, dispute.id, {
-    gasLimit: 150000,
+    gasLimit: 300000,
   });
   return handleTransaction(tx, onTx);
 }
