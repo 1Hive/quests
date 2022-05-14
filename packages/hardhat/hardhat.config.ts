@@ -976,9 +976,11 @@ task("deployAll:rinkeby")
 
     signature = web3.eth.abi.encodeFunctionSignature(resolveABI as unknown as string)
     console.log("resolve: ",signature)
-    
+
     signature = web3.eth.abi.encodeFunctionSignature(challengeABI as unknown as string)
     console.log("challenge: ",signature)
+
+    console.log("0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF")
     
   })
 
