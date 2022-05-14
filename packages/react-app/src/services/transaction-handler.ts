@@ -15,12 +15,8 @@ export async function approveTokenTransaction(
   walletAddress: string,
   setTransaction: Dispatch<SetStateAction<TransactionModel | undefined>>,
 ) {
-  const amountBn = BigNumber.from(token.amount);
   const allowance = await getAllowanceOf(walletAddress, token, spender);
-  if (allowance.lt(amountBn)) {
-    Logger.info('Allowance is already enough, skiping approve.');
-    return;
-  }
+
   let approveTxReceipt: ContractReceipt | null;
   if (!allowance.isZero()) {
     // Reset approval to 0 before approving again

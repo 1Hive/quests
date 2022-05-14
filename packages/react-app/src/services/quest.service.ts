@@ -460,7 +460,7 @@ export async function fundQuest(
   if (!contract) return null;
   Logger.debug('Funding quest...', { questAddress, amount });
   const tx = await contract.transfer(questAddress, toBigNumber(amount), {
-    gasLimit: 150000,
+    gasLimit: 300000,
   });
   return handleTransaction(tx, onTx);
 }

@@ -173,7 +173,7 @@ export default function QuestModal({
         modalId,
         questDeposit?.token,
         questFactoryAddress,
-        `Approving quest deposit (1/${values.bounty?.parsedAmount ? '3' : '2'})`,
+        `Approving quest deposit (1/${values.bounty?.parsedAmount ? '4' : '2'})`,
         walletAddress,
         setTransaction,
       );
@@ -183,7 +183,7 @@ export default function QuestModal({
         setTransaction({
           modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
-          message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
+          message: `Creating Quest (2/${values.bounty?.parsedAmount ? '4' : '2'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           type: 'QuestCreate',
         });
@@ -226,11 +226,20 @@ export default function QuestModal({
           throw new Error('Failed to create quest');
         }
         if (values.bounty?.parsedAmount) {
+          await approveTokenTransaction(
+            modalId,
+            values.bounty.token,
+            newQuestAddress,
+            `Approving fund deposit (3/4)`,
+            walletAddress,
+            setTransaction,
+          );
+
           await fundQuestTransaction(
             modalId,
             values.bounty,
             newQuestAddress,
-            `Sending funds to the Quest (3/3)`,
+            `Sending funds to the Quest (4/4)`,
             walletAddress,
             setTransaction,
           );
