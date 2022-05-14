@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from "dotenv";
 import "solidity-coverage";
 import "hardhat-deploy";
-import { BigNumber, utils } from "ethers";
+import { utils } from "ethers";
 import fs from "fs";
 import chalk from "chalk";
 import "@nomiclabs/hardhat-waffle";
@@ -24,6 +24,7 @@ import governGnosis from "./deployments/xdai/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
+import CelesteMock from "./deployments/rinkeby/OwnableCeleste.json";
 
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
@@ -599,7 +600,7 @@ task("generateGovernQueueConfig:gnosis")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    defaultConfig.IArbitratorCelesteAddress.xdai
+    defaultConfig.CelesteResolver.xdai
   )
   .addOptionalParam(
     "rules",
@@ -650,7 +651,7 @@ task("generateGovernQueueConfig:rinkeby")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    defaultConfig.IArbitratorCelesteAddress.rinkeby
+    CelesteMock.address
   )
   .addOptionalParam(
     "rules",
@@ -693,7 +694,7 @@ task("newGovernQueue:gnosis")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    defaultConfig.IArbitratorCelesteAddress.xdai
+    defaultConfig.CelesteResolver.xdai
   )
   .addOptionalParam(
     "executionDelay",
@@ -736,7 +737,7 @@ task("newGovernQueue:rinkeby")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    defaultConfig.IArbitratorCelesteAddress.rinkeby
+    CelesteMock.address
   )
   .addOptionalParam(
     "executionDelay",
@@ -1033,7 +1034,7 @@ task("deployCeleste:rinkeby")
         console.log("Verifying OwnableCeleste...");
         await new Promise((res, rej) => {
           setTimeout(
-             () =>
+            () =>
               run("verify:verify", {
                 address: result.address,
                 constructorArguments,

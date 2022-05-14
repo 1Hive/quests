@@ -6,7 +6,6 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { ClaimModel } from 'src/models/claim.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { Logger } from 'src/utils/logger';
 import styled, { css } from 'styled-components';
 import { AddressFieldInput } from './field-input/address-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
@@ -56,7 +55,7 @@ export default function Claim({
   }, [claim.state]);
 
   useEffect(() => {
-    if (waitForClose) return;
+    if (waitForClose || !state) return;
     if (state === ENUM_CLAIM_STATE.Scheduled) {
       if (walletAddress === claim.playerAddress) {
         setActionButton(
@@ -77,8 +76,7 @@ export default function Claim({
       }
     } else if (state === ENUM_CLAIM_STATE.Challenged) {
       setActionButton(<ResolveChallengeModal claim={claim} onClose={onActionClose} />);
-    } else if (!state) {
-      Logger.error(`Claim doesn't have valid state`, { claim, state });
+    } else {
       setActionButton(undefined);
     }
   }, [state, walletAddress, waitForClose]);

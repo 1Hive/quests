@@ -579,7 +579,7 @@ export async function challengeQuestClaim(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
     {
-      gasLimit: 500000,
+      gasLimit: 1000000,
     },
   );
   return handleTransaction(tx, onTx);

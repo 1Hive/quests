@@ -23,6 +23,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestFactoryInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
+    "c_0x8b2f0f3a(bytes32)": FunctionFragment;
     "createQuest(string,bytes,address,uint256,address)": FunctionFragment;
     "deposit()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -34,6 +35,10 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "aragonGovernAddress",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x8b2f0f3a",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "createQuest",
@@ -56,6 +61,10 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "aragonGovernAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x8b2f0f3a",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -102,6 +111,16 @@ export class QuestFactory extends Contract {
     aragonGovernAddress(overrides?: CallOverrides): Promise<[string]>;
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
+
+    c_0x8b2f0f3a(
+      c__0x8b2f0f3a: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x8b2f0f3a(bytes32)"(
+      c__0x8b2f0f3a: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
 
     createQuest(
       _questTitle: string,
@@ -164,6 +183,16 @@ export class QuestFactory extends Contract {
 
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
+  c_0x8b2f0f3a(
+    c__0x8b2f0f3a: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x8b2f0f3a(bytes32)"(
+    c__0x8b2f0f3a: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   createQuest(
     _questTitle: string,
     _questDetailsRef: BytesLike,
@@ -224,6 +253,16 @@ export class QuestFactory extends Contract {
     aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
+
+    c_0x8b2f0f3a(
+      c__0x8b2f0f3a: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x8b2f0f3a(bytes32)"(
+      c__0x8b2f0f3a: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     createQuest(
       _questTitle: string,
@@ -308,6 +347,16 @@ export class QuestFactory extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    c_0x8b2f0f3a(
+      c__0x8b2f0f3a: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x8b2f0f3a(bytes32)"(
+      c__0x8b2f0f3a: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     createQuest(
       _questTitle: string,
       _questDetailsRef: BytesLike,
@@ -367,6 +416,16 @@ export class QuestFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "aragonGovernAddress()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x8b2f0f3a(
+      c__0x8b2f0f3a: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x8b2f0f3a(bytes32)"(
+      c__0x8b2f0f3a: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

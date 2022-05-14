@@ -19,25 +19,25 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface DepositLibInterface extends ethers.utils.Interface {
+interface ModelsInterface extends ethers.utils.Interface {
   functions: {
-    "c_0x94360f43(bytes32)": FunctionFragment;
+    "c_0x851b47c5(bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "c_0x94360f43",
+    functionFragment: "c_0x851b47c5",
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "c_0x94360f43",
+    functionFragment: "c_0x851b47c5",
     data: BytesLike
   ): Result;
 
   events: {};
 }
 
-export class DepositLib extends Contract {
+export class Models extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -48,38 +48,38 @@ export class DepositLib extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: DepositLibInterface;
+  interface: ModelsInterface;
 
   functions: {
-    c_0x94360f43(
-      c__0x94360f43: BytesLike,
+    c_0x851b47c5(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    "c_0x94360f43(bytes32)"(
-      c__0x94360f43: BytesLike,
+    "c_0x851b47c5(bytes32)"(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<[void]>;
   };
 
-  c_0x94360f43(
-    c__0x94360f43: BytesLike,
+  c_0x851b47c5(
+    c__0x851b47c5: BytesLike,
     overrides?: CallOverrides
   ): Promise<void>;
 
-  "c_0x94360f43(bytes32)"(
-    c__0x94360f43: BytesLike,
+  "c_0x851b47c5(bytes32)"(
+    c__0x851b47c5: BytesLike,
     overrides?: CallOverrides
   ): Promise<void>;
 
   callStatic: {
-    c_0x94360f43(
-      c__0x94360f43: BytesLike,
+    c_0x851b47c5(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "c_0x94360f43(bytes32)"(
-      c__0x94360f43: BytesLike,
+    "c_0x851b47c5(bytes32)"(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -87,25 +87,25 @@ export class DepositLib extends Contract {
   filters: {};
 
   estimateGas: {
-    c_0x94360f43(
-      c__0x94360f43: BytesLike,
+    c_0x851b47c5(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "c_0x94360f43(bytes32)"(
-      c__0x94360f43: BytesLike,
+    "c_0x851b47c5(bytes32)"(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    c_0x94360f43(
-      c__0x94360f43: BytesLike,
+    c_0x851b47c5(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "c_0x94360f43(bytes32)"(
-      c__0x94360f43: BytesLike,
+    "c_0x851b47c5(bytes32)"(
+      c__0x851b47c5: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

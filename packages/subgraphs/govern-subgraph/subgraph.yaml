@@ -1,0 +1,51 @@
+# Do not edit subgraph.yaml,this is a generated file.
+# Instead, edit subgraph.template.yaml and run `yarn manifest-<network>-[staging]`
+specVersion: 0.0.2
+description: A template for Aragon subgraphs
+repository: https://github.com/aragon/govern
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GovernQueue
+    network: rinkeby
+    source:
+      abi: GovernQueue
+      address: "0xBf360A9be19A8467f10D97c63675Df4C87547694"
+      startBlock: 10661306
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Collateral
+        - Config
+        - Container
+        - ContainerEvent
+        - Payload
+        - Role
+      abis:
+        - name: GovernQueue
+          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+        - name: ERC20
+          file: ./govern-contract-utils/abi/contracts/erc20/ERC20.sol/ERC20.json
+      eventHandlers:
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes,uint256))
+          handler: handleConfigured
+        - event: Frozen(indexed bytes4,indexed address)
+          handler: handleFrozen
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
+          handler: handleGranted
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes))
+          handler: handleScheduled
+        - event: Executed(indexed bytes32,indexed address)
+          handler: handleExecuted
+        - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
+          handler: handleChallenged
+        - event: Vetoed(indexed bytes32,indexed address,bytes)
+          handler: handleVetoed
+        - event: Resolved(indexed bytes32,indexed address,bool)
+          handler: handleResolved
+        - event: Revoked(indexed bytes4,indexed address,indexed address)
+          handler: handleRevoked
+      file: ./src/GovernQueue.ts

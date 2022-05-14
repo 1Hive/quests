@@ -55,8 +55,7 @@
     "rinkeby": 300,
     "xdai": 604800
   },
-  "IArbitratorCelesteAddress": {
-    "rinkeby": "0xdd58ebed3c36460939285a92807f90e3d3a26789",
+  "CelesteResolver": {
     "xdai": "TODO"
   }
 }

@@ -11,7 +11,7 @@ pragma solidity ^0.5.8;
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract ERC20 {
+contract GovernERC20 {
     function totalSupply() public view returns (uint256);
 
     function balanceOf(address _who) public view returns (uint256);
@@ -94,7 +94,7 @@ interface IArbitrator {
         view
         returns (
             address recipient,
-            ERC20 feeToken,
+            GovernERC20 feeToken,
             uint256 feeAmount
         );
 }
@@ -106,7 +106,7 @@ interface IArbitrator {
 
 pragma solidity ^0.5.8;
 
-library SafeERC20 {
+library SafeGovernERC20 {
     // Before 0.5, solidity has a mismatch between `address.transfer()` and `token.transfer()`:
     // https://github.com/ethereum/solidity/issues/3544
     bytes4 private constant TRANSFER_SELECTOR = 0xa9059cbb;
@@ -116,7 +116,7 @@ library SafeERC20 {
      *      Note that this makes an external call to the token.
      */
     function safeTransfer(
-        ERC20 _token,
+        GovernERC20 _token,
         address _to,
         uint256 _amount
     ) internal returns (bool) {
@@ -133,7 +133,7 @@ library SafeERC20 {
      *      Note that this makes an external call to the token.
      */
     function safeTransferFrom(
-        ERC20 _token,
+        GovernERC20 _token,
         address _from,
         address _to,
         uint256 _amount
@@ -152,7 +152,7 @@ library SafeERC20 {
      *      Note that this makes an external call to the token.
      */
     function safeApprove(
-        ERC20 _token,
+        GovernERC20 _token,
         address _spender,
         uint256 _amount
     ) internal returns (bool) {
@@ -210,7 +210,7 @@ library SafeERC20 {
 pragma solidity ^0.5.8;
 
 contract OwnableCeleste is IArbitrator {
-    using SafeERC20 for ERC20;
+    using SafeGovernERC20 for GovernERC20;
 
     // Note that Aragon Court treats the possible outcomes as arbitrary numbers, leaving the Arbitrable (us) to define how to understand them.
     // Some outcomes [0, 1, and 2] are reserved by Aragon Court: "missing", "leaked", and "refused", respectively.
@@ -233,7 +233,7 @@ contract OwnableCeleste is IArbitrator {
         State state;
     }
 
-    ERC20 public feeToken;
+    GovernERC20 public feeToken;
     uint256 public feeAmount;
     uint256 public currentId;
     address public owner;
@@ -244,7 +244,7 @@ contract OwnableCeleste is IArbitrator {
         _;
     }
 
-    constructor(ERC20 _feeToken, uint256 _feeAmount) public {
+    constructor(GovernERC20 _feeToken, uint256 _feeAmount) public {
         owner = msg.sender;
         feeToken = _feeToken;
         feeAmount = _feeAmount;
@@ -342,7 +342,7 @@ contract OwnableCeleste is IArbitrator {
         view
         returns (
             address,
-            ERC20,
+            GovernERC20,
             uint256
         )
     {
