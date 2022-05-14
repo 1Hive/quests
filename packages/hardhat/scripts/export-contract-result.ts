@@ -8,6 +8,21 @@ export default function exportContractResult(
   contractName: string,
   contractValue: ContractsJson
 ) {
+  // Export to hardhat single file
+  try {
+    fs.writeFileSync(
+      `./deployments/${network.name}/${contractName}.json`,
+      JSON.stringify({
+        address: contractValue.address,
+        abi: contractValue.abi,
+      })
+    );
+  } catch (error) {
+    console.error(
+      "Error during publishing deployement result into GovernQueue.json",
+      error
+    );
+  }
   const path = "../react-app/src/contracts/hardhat_contracts.json";
   try {
     hardhatContracts[network.config.chainId][network.name].contracts[

@@ -1,7 +1,7 @@
 import GovernQueueFactoryAbi from "../abi/contracts/Externals/GovernQueueFactory.json";
 import { HardhatRuntimeEnvironment, Network } from "hardhat/types";
 import fs from "fs";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import exportContractResult from "./export-contract-result";
 import GovernQueueAbi from "../abi/contracts/Externals/GovernQueue.json";
 
@@ -19,15 +19,11 @@ export function generateQueueConfig(args: {
     executionDelay: args.executionDelay,
     scheduleDeposit: {
       token: args.scheduleDepositToken,
-      amount: BigNumber.from(
-        (args.scheduleDepositAmount * 10 ** 18).toString()
-      ),
+      amount: ethers.utils.parseEther(args.scheduleDepositAmount.toString()),
     },
     challengeDeposit: {
       token: args.challengeDepositToken,
-      amount: BigNumber.from(
-        (args.challengeDepositAmount * 10 ** 18).toString()
-      ),
+      amount: ethers.utils.parseEther(args.challengeDepositAmount.toString()),
     },
     resolver: args.resolver,
     rules: args.rules,
@@ -74,20 +70,7 @@ export default async function deployGovernQueue(
   const res = await tx.wait();
   const newQueueAddress = res.logs[0].address;
   console.log("Deployed GovernQueue (" + network.name + "): ", newQueueAddress);
-  try {
-    fs.writeFileSync(
-      "./deployments/" + network.name + "/GovernQueue.json",
-      JSON.stringify({
-        address: newQueueAddress,
-        abi: GovernQueueAbi,
-      })
-    );
-  } catch (error) {
-    console.error(
-      "Error during publishing deployement result into GovernQueue.json",
-      error
-    );
-  }
+
   exportContractResult(network, "GovernQueue", {
     address: newQueueAddress,
     abi: GovernQueueAbi as [],

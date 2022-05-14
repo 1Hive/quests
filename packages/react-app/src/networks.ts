@@ -19,7 +19,7 @@ export const networks = Object.freeze({
     uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[4].rinkeby.contracts.GovernQueue.address,
-    celesteAddress: '0xdd58ebed3c36460939285a92807f90e3d3a26789',
+    celesteAddress: HardhatDeployement[4].rinkeby.contracts.Celeste.address,
     httpProvider: 'https://rinkeby.infura.io/v3',
     isTestNetwork: true,
     stableTokens: [TOKENS.RinkebyDai, TOKENS.RinkebyTheter],

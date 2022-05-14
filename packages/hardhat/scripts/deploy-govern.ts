@@ -23,20 +23,7 @@ export default async function deployGovern(
   const res = await tx.wait();
   const newGovernAddress = res.logs[0].address;
   console.log("Deployed govern (" + network.name + "): ", newGovernAddress);
-  try {
-    fs.writeFileSync(
-      "./deployments/" + network.name + "/Govern.json",
-      JSON.stringify({
-        address: newGovernAddress,
-        abi: GovernAbi,
-      })
-    );
-  } catch (error) {
-    console.error(
-      "Error during publishing deployement result into Govern.json",
-      error
-    );
-  }
+
   exportContractResult(network, "Govern", {
     address: newGovernAddress,
     abi: GovernAbi as [],

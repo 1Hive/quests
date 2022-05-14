@@ -8,7 +8,6 @@ import ERC20 from '../contracts/ERC20.json';
 import UniswapPair from '../contracts/UniswapPair.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
-import Celeste from '../contracts/Celeste.json';
 
 let contracts: any;
 
@@ -28,7 +27,6 @@ function getContractsJson(network?: any) {
   return {
     ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
     ERC20,
-    Celeste,
     UniswapPair,
   };
 }

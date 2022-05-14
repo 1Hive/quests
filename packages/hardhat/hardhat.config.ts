@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from "dotenv";
 import "solidity-coverage";
 import "hardhat-deploy";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import fs from "fs";
 import chalk from "chalk";
 import "@nomiclabs/hardhat-waffle";
@@ -24,6 +24,7 @@ import governGnosis from "./deployments/xdai/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
+import OwnableCelesteMock from "./abi/contracts/Externals/OwnableCelesteMock.json";
 
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
@@ -985,10 +986,46 @@ task("sigAbi").setAction(async (_args, { web3 }) => {
       continue;
     }
     let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
-    console.log(`${obj.name} :`, signature);
+    console.log(`${obj.name}:`, signature);
   }
 
   console.log("Grant all user", "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF");
 });
+
+task("deployCeleste:rinkeby")
+  .setDescription("Deploy a mock version of Celeste on rinkeby")
+  .addOptionalParam(
+    "feeToken",
+    "Address of the challenge fee token",
+    defaultConfig.ChallengeFee.rinkeby.token
+  )
+  .addOptionalParam(
+    "feeAmount",
+    "Amount of the challenge fee",
+    defaultConfig.ChallengeFee.rinkeby.amount,
+    types.float
+  )
+  .setAction(
+    async (args, { deployments, ethers, getNamedAccounts, network }) => {
+      const { deployer, owner } = await getNamedAccounts();
+      const result = await deployments.deploy("OwnableCeleste", {
+        from: deployer,
+        args: [
+          args.feeToken,
+          ethers.utils.parseEther(args.feeAmount.toString()),
+        ],
+        contract: {
+          abi: OwnableCelesteMock.abi,
+          bytecode: OwnableCelesteMock.bytecode,
+        },
+        gasLimit: 10000000,
+      });
+      console.log("Deployed Celeste (" + network.name + "):", result.address);
+      const contract = await ethers.getContractAt(result.abi, result.address);
+      await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
+      console.log("Ownership transfered to: ", owner);
+      exportContractResult(network, "Celeste", result);
+    }
+  );
 
 module.exports = hardhatConfig;

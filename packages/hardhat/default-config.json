@@ -14,7 +14,7 @@
     },
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.1
+      "amount": 0.01
     }
   },
   "ScheduleDeposit": {
@@ -24,7 +24,7 @@
     },
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.1
+      "amount": 0.01
     }
   },
   "ChallengeDeposit": {
@@ -34,7 +34,17 @@
     },
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.1
+      "amount": 0.01
+    }
+  },
+  "ChallengeFee": {
+    "rinkeby": {
+      "token": "0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9",
+      "amount": 0.05
+    },
+    "xdai": {
+      "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+      "amount": 0.05
     }
   },
   "RootOwner": {
