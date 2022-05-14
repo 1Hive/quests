@@ -1,10 +1,9 @@
-import { BigNumber, ContractReceipt } from 'ethers';
+import { ContractReceipt } from 'ethers';
 import { Dispatch, SetStateAction } from 'react';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { TransactionModel } from 'src/models/transaction.model';
-import { Logger } from 'src/utils/logger';
 import { approveTokenAmount, fundQuest, getAllowanceOf } from './quest.service';
 
 export async function approveTokenTransaction(
