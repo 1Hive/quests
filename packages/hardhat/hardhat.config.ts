@@ -24,7 +24,6 @@ import governGnosis from "./deployments/xdai/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
-import OwnableCelesteMock from "./abi/contracts/Externals/OwnableCelesteMock.json";
 
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
@@ -210,13 +209,20 @@ const hardhatConfig: HardhatUserConfig = {
     },
   },
   solidity: {
-    version: "0.8.1",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 20000,
+    compilers: [
+      {
+        version: "0.5.8",
       },
-    },
+      {
+        version: "0.8.1",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 20000,
+          },
+        },
+      },
+    ],
   },
   ovm: {
     solcVersion: "0.7.6",
@@ -1006,18 +1012,15 @@ task("deployCeleste:rinkeby")
     types.float
   )
   .setAction(
-    async (args, { deployments, ethers, getNamedAccounts, network }) => {
+    async (args, { deployments, ethers, getNamedAccounts, network, run }) => {
       const { deployer, owner } = await getNamedAccounts();
+      const constructorArguments = [
+        args.feeToken,
+        ethers.utils.parseEther(args.feeAmount.toString()),
+      ];
       const result = await deployments.deploy("OwnableCeleste", {
         from: deployer,
-        args: [
-          args.feeToken,
-          ethers.utils.parseEther(args.feeAmount.toString()),
-        ],
-        contract: {
-          abi: OwnableCelesteMock.abi,
-          bytecode: OwnableCelesteMock.bytecode,
-        },
+        args: constructorArguments,
         gasLimit: 10000000,
       });
       console.log("Deployed Celeste (" + network.name + "):", result.address);
@@ -1025,6 +1028,22 @@ task("deployCeleste:rinkeby")
       await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
       console.log("Ownership transfered to: ", owner);
       exportContractResult(network, "Celeste", result);
+
+      try {
+        console.log("Verifying OwnableCeleste...");
+        await new Promise((res, rej) => {
+          setTimeout(
+             () =>
+              run("verify:verify", {
+                address: result.address,
+                constructorArguments,
+              }).then,
+            2000
+          ); // Wait for contract to be deployed
+        });
+      } catch (error) {
+        console.error("Failed when verifying OwnableCeleste contract", error);
+      }
     }
   );
 

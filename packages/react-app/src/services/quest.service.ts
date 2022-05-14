@@ -608,9 +608,10 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
   const celesteContract = getCelesteContract();
   if (!celesteContract) return null;
   const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  const token = await getTokenInfo(feeToken);
+  if (!token) return null;
   return toTokenAmountModel({
-    ...TOKENS.Honey,
-    token: feeToken,
+    ...token,
     amount: feeAmount,
   });
 }
