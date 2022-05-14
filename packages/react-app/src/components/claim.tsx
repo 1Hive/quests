@@ -1,5 +1,5 @@
 import { useViewport } from '@1hive/1hive-ui';
-import { useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
@@ -48,53 +48,78 @@ export default function Claim({
   const { transaction } = useTransactionContext();
   const [state, setState] = useState(claim.state);
   const { below } = useViewport();
+  const [waitForClose, setWaitForClose] = useState(false);
+  const [actionButton, setActionButton] = useState<ReactNode>();
 
   useEffect(() => {
     setState(claim.state);
   }, [claim.state]);
 
-  const actionButton = useMemo(() => {
+  useEffect(() => {
+    if (waitForClose) return;
     if (state === ENUM_CLAIM_STATE.Scheduled) {
-      if (walletAddress === claim.playerAddress)
-        return <ExecuteClaimModal claim={claim} questTotalBounty={questTotalBounty} />;
-      return <ChallengeModal claim={claim} challengeDeposit={challengeDeposit} />;
+      if (walletAddress === claim.playerAddress) {
+        setActionButton(
+          <ExecuteClaimModal
+            claim={claim}
+            questTotalBounty={questTotalBounty}
+            onClose={onActionClose}
+          />,
+        );
+      } else {
+        setActionButton(
+          <ChallengeModal
+            claim={claim}
+            challengeDeposit={challengeDeposit}
+            onClose={onActionClose}
+          />,
+        );
+      }
+    } else if (state === ENUM_CLAIM_STATE.Challenged) {
+      setActionButton(<ResolveChallengeModal claim={claim} onClose={onActionClose} />);
+    } else if (!state) {
+      Logger.error(`Claim doesn't have valid state`, { claim, state });
+      setActionButton(undefined);
     }
-    if (state === ENUM_CLAIM_STATE.Challenged) {
-      return <ResolveChallengeModal claim={claim} />;
-    }
-    if (!state) Logger.error(`Claim doesn't have valid state`, { claim, state });
-    return undefined;
-  }, [state, walletAddress]);
+  }, [state, walletAddress, waitForClose]);
 
   useEffect(() => {
     // If tx completion impact Claims, update them
     if (
-      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
       transaction?.args?.questAddress === questData.address &&
       claim.container &&
       transaction?.args?.containerId === claim.container.id
     ) {
-      switch (transaction.type) {
-        case 'ClaimChallengeResolve':
-          {
-            // Second arg is the dispute resolution result
-            const newState =
-              transaction.args[1] === ENUM_DISPUTE_STATES.DisputeRuledForChallenger
-                ? ENUM_CLAIM_STATE.Rejected
-                : ENUM_CLAIM_STATE.Executed;
-            setState(newState);
-          }
-          break;
-        case 'ClaimExecute':
-          setState(ENUM_CLAIM_STATE.Executed);
-          break;
-        case 'ClaimChallenge':
-          setState(ENUM_CLAIM_STATE.Challenged);
-          break;
-        default:
+      // Little hack here but if the tx is in this state, modal is probably open
+      if (transaction?.status === ENUM_TRANSACTION_STATUS.WaitingForSignature) {
+        setWaitForClose(true);
+      } else if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) {
+        switch (transaction.type) {
+          case 'ClaimChallengeResolve':
+            {
+              // Second arg is the dispute resolution result
+              const newState =
+                transaction.args.disputeState === ENUM_DISPUTE_STATES.DisputeRuledForChallenger
+                  ? ENUM_CLAIM_STATE.Rejected
+                  : ENUM_CLAIM_STATE.Executed;
+              setState(newState);
+            }
+            break;
+          case 'ClaimExecute':
+            setState(ENUM_CLAIM_STATE.Executed);
+            break;
+          case 'ClaimChallenge':
+            setState(ENUM_CLAIM_STATE.Challenged);
+            break;
+          default:
+        }
       }
     }
   }, [transaction?.status, transaction?.type, transaction?.[0], claim.container]);
+
+  const onActionClose = () => {
+    setWaitForClose(false);
+  };
 
   return (
     <div className="wide">

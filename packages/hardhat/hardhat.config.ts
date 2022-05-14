@@ -981,7 +981,9 @@ task("sigAbi").setAction(async (_args, { web3 }) => {
     "configure",
   ];
   for (const obj of GovernQueueAbi) {
-    if (obj.type !== "function" || !aclFunctions.includes(obj.name)) continue;
+    if (obj.type !== "function" || !aclFunctions.includes(obj.name)) {
+      continue;
+    }
     let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
     console.log(`${obj.name} :`, signature);
   }

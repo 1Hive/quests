@@ -427,7 +427,7 @@ export async function reclaimQuestUnusedFunds(
   if (!questContract) return null;
   Logger.debug('Reclaiming quest unused funds...', { quest });
   const tx = await questContract.recoverUnclaimedFunds({
-    gasLimit: 300000,
+    gasLimit: 1000000,
   });
   return handleTransaction(tx, onTx);
 }
@@ -460,7 +460,7 @@ export async function fundQuest(
   if (!contract) return null;
   Logger.debug('Funding quest...', { questAddress, amount });
   const tx = await contract.transfer(questAddress, toBigNumber(amount), {
-    gasLimit: 300000,
+    gasLimit: 1000000,
   });
   return handleTransaction(tx, onTx);
 }
@@ -483,7 +483,7 @@ export async function approveTokenAmount(
     );
 
   const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
-    gasLimit: 300000,
+    gasLimit: 1000000,
   });
   return handleTransaction(tx, onTx);
 }
@@ -540,7 +540,7 @@ export async function scheduleQuestClaim(
   const container = await generateScheduleContainer(walletAddress, claimData);
   Logger.debug('Scheduling quest claim...', { container });
   const tx = (await governQueueContract.schedule(container, {
-    gasLimit: 300000,
+    gasLimit: 500000,
   })) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
@@ -559,7 +559,7 @@ export async function executeQuestClaim(
       payload: claimData.container!.payload,
     },
     {
-      gasLimit: 300000,
+      gasLimit: 500000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -579,7 +579,7 @@ export async function challengeQuestClaim(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
     {
-      gasLimit: 1000000,
+      gasLimit: 500000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -595,7 +595,7 @@ export async function resolveClaimChallenge(
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
   const tx = await governQueueContract.resolve(container, dispute.id, {
-    gasLimit: 300000,
+    gasLimit: 1000000,
   });
   return handleTransaction(tx, onTx);
 }
