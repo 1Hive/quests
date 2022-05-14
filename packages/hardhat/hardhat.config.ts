@@ -23,7 +23,7 @@ import governRinkeby from "./deployments/rinkeby/Govern.json";
 import governGnosis from "./deployments/xdai/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
-import { challengeABI, executeABI, resolveABI, scheduleABI } from "./scripts/signatures-abi";
+import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
 
 dotenvConfig({ path: resolve(__dirname, "../../local.env") });
 
@@ -957,31 +957,36 @@ task("deployAll:rinkeby")
     }
   );
 
-  task('sig')
-  .addOptionalParam('func','function signature without variables names','schedule(ERC3000Data.Container)')
-  .setAction(async (args:{func:string},_b)=>{
-    const {func} = args
-    const keccak = utils.keccak256(utils.toUtf8Bytes(func)).substring(0,(4+1)*2);
-    console.log(keccak)
-  })
+task("sig")
+  .addOptionalParam(
+    "func",
+    "function signature without variables names",
+    "schedule(ERC3000Data.Container)"
+  )
+  .setAction(async (args: { func: string }, _b) => {
+    const { func } = args;
+    const keccak = utils
+      .keccak256(utils.toUtf8Bytes(func))
+      .substring(0, (4 + 1) * 2);
+    console.log(keccak);
+  });
 
-  task('sigAbi')
-  .setAction(async (_args,{web3})=>{
+task("sigAbi").setAction(async (_args, { web3 }) => {
+  const aclFunctions = [
+    "schedule",
+    "resolve",
+    "challenge",
+    "execute",
+    "veto",
+    "configure",
+  ];
+  for (const obj of GovernQueueAbi) {
+    if (obj.type !== "function" || !aclFunctions.includes(obj.name)) continue;
+    let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+    console.log(`${obj.name} :`, signature);
+  }
 
-    let signature = web3.eth.abi.encodeFunctionSignature(scheduleABI as unknown as string)
-    console.log("schedule: ",signature)
-
-    signature = web3.eth.abi.encodeFunctionSignature(executeABI as unknown as string)
-    console.log("execute: ",signature)
-
-    signature = web3.eth.abi.encodeFunctionSignature(resolveABI as unknown as string)
-    console.log("resolve: ",signature)
-
-    signature = web3.eth.abi.encodeFunctionSignature(challengeABI as unknown as string)
-    console.log("challenge: ",signature)
-
-    console.log("0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF")
-    
-  })
+  console.log("Grant all user", "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF");
+});
 
 module.exports = hardhatConfig;
