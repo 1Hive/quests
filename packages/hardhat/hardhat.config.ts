@@ -956,4 +956,136 @@ task("deployAll:rinkeby")
     }
   );
 
+  task('sig')
+  .addOptionalParam('func','function signature without variables names','schedule(ERC3000Data.Container)')
+  .setAction(async (args:{func:string},_b)=>{
+    const {func} = args
+    const keccak = utils.keccak256(utils.toUtf8Bytes(func)).substring(0,(4+1)*2);
+    console.log(keccak)
+  })
+
+  task('sigAbi')
+  .setAction(async (_args,{web3})=>{
+     const keccak = web3.eth.abi.encodeFunctionSignature({
+      "inputs": [
+        {
+          "components": [
+            {
+              "components": [
+                { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+                {
+                  "internalType": "uint256",
+                  "name": "executionTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "submitter",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IERC3000Executor",
+                  "name": "executor",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "to",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "value",
+                      "type": "uint256"
+                    },
+                    { "internalType": "bytes", "name": "data", "type": "bytes" }
+                  ],
+                  "internalType": "struct ERC3000Data.Action[]",
+                  "name": "actions",
+                  "type": "tuple[]"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "allowFailuresMap",
+                  "type": "bytes32"
+                },
+                { "internalType": "bytes", "name": "proof", "type": "bytes" }
+              ],
+              "internalType": "struct ERC3000Data.Payload",
+              "name": "payload",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "executionDelay",
+                  "type": "uint256"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "token",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "amount",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Collateral",
+                  "name": "scheduleDeposit",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "token",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "amount",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Collateral",
+                  "name": "challengeDeposit",
+                  "type": "tuple"
+                },
+                {
+                  "internalType": "address",
+                  "name": "resolver",
+                  "type": "address"
+                },
+                { "internalType": "bytes", "name": "rules", "type": "bytes" },
+                {
+                  "internalType": "uint256",
+                  "name": "maxCalldataSize",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct ERC3000Data.Config",
+              "name": "config",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ERC3000Data.Container",
+          "name": "_container",
+          "type": "tuple"
+        }
+      ],
+      "name": "schedule",
+      "type": "function"
+    })
+    
+    console.log(keccak)
+    
+  })
+
 module.exports = hardhatConfig;
