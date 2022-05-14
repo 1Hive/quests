@@ -26,7 +26,7 @@ import {
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV, TOKENS } from '../constants';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
