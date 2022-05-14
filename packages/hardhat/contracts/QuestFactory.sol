@@ -31,10 +31,14 @@ contract QuestFactory is Ownable {
     constructor(
         address _aragonGovernAddress,
         IERC20 _depositToken,
-        uint256 _depositAmount
+        uint256 _depositAmount,
+        address _initialOwner
     ) {
         aragonGovernAddress = _aragonGovernAddress;
         setDeposit(_depositToken, _depositAmount);
+        if (_initialOwner != msg.sender) {
+            transferOwnership(_initialOwner);
+        }
     }
 
     /*

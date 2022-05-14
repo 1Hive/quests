@@ -6,10 +6,8 @@ import { ContractInstanceError } from 'src/models/contract-error';
 import { Logger } from 'src/utils/logger';
 import ERC20 from '../contracts/ERC20.json';
 import UniswapPair from '../contracts/UniswapPair.json';
-import GovernQueue from '../contracts/GovernQueue.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
-import Celeste from '../contracts/Celeste.json';
 
 let contracts: any;
 
@@ -28,9 +26,7 @@ function getContractsJson(network?: any) {
   network = network ?? getNetwork();
   return {
     ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
-    GovernQueue,
     ERC20,
-    Celeste,
     UniswapPair,
   };
 }

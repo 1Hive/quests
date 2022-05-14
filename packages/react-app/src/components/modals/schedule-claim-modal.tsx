@@ -1,6 +1,6 @@
 import { Button } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
@@ -68,11 +68,20 @@ export default function ScheduleClaimModal({
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
+  let mounted = true;
+
+  useEffect(
+    () => () => {
+      mounted = false;
+    },
+    [],
+  );
 
   const closeModal = (succeed: any) => {
     setOpened(false);
     onClose(succeed);
   };
+
   const validate = (values: ClaimModel & { claimAll: boolean }) => {
     const errors = {} as FormErrors<ClaimModel>;
     if (!values.evidence) errors.evidence = 'Evidence of completion is required';
@@ -92,6 +101,7 @@ export default function ScheduleClaimModal({
     setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
+
   const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }, setSubmitting: Function) => {
     validate(values); // Validate one last time before submitting
     if (isFormValid) {
@@ -156,17 +166,21 @@ export default function ScheduleClaimModal({
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
     } catch (e: any) {
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: ENUM_TRANSACTION_STATUS.Failed,
-            message: computeTransactionErrorMessage(e),
-          },
-      );
+      if (mounted) {
+        setTransaction(
+          (oldTx) =>
+            oldTx && {
+              ...oldTx,
+              status: ENUM_TRANSACTION_STATUS.Failed,
+              message: computeTransactionErrorMessage(e),
+            },
+        );
+      }
     } finally {
-      setSubmitting(false);
-      setLoading(false);
+      if (mounted) {
+        setSubmitting(false);
+        setLoading(false);
+      }
     }
   };
 

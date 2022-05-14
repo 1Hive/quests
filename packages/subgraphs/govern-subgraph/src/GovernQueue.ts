@@ -9,9 +9,9 @@ import {
   Revoked as RevokedEvent,
   Scheduled as ScheduledEvent,
   Vetoed as VetoedEvent
-} from '../generated/templates/GovernQueue/GovernQueue'
+} from '../generated/GovernQueue/GovernQueue'
 
-import { GovernQueue as GovernQueueContract } from '../generated/templates/GovernQueue/GovernQueue'
+import { GovernQueue as GovernQueueContract } from '../generated/GovernQueue/GovernQueue'
 import { getERC20Info } from './utils/tokens';
 
 import {

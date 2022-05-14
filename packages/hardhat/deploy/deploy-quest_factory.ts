@@ -1,14 +1,57 @@
-module.exports = async ({ getNamedAccounts, deployments }) => {
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import "@nomiclabs/hardhat-etherscan";
+import defaultConfig from "../default-config.json";
+
+export default async (
+  {
+    getNamedAccounts,
+    deployments,
+    ethers,
+    network,
+    run,
+  }: HardhatRuntimeEnvironment,
+  args?: {
+    governAddress: string;
+    createDepositToken: string;
+    createDepositAmount: number;
+  }
+) => {
   const { deploy } = deployments;
-  const { deployer, govern } = await getNamedAccounts();
-  await deploy("QuestFactory", {
+  const { deployer, govern, owner } = await getNamedAccounts();
+  const deposit = args
+    ? { token: args.createDepositToken, amount: args.createDepositAmount }
+    : defaultConfig.CreateQuestDeposit[network.name];
+  const constructorArguments = [
+    args.governAddress ?? govern,
+    deposit.token,
+    ethers.utils.parseEther(deposit.amount.toString()),
+    owner,
+  ];
+  const deployResult = await deploy("QuestFactory", {
     from: deployer,
-    args: [
-      govern,
-      "0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd",
-      "100000000000000000",
-    ],
+    args: constructorArguments,
     log: true,
   });
+  await ethers.getContract("QuestFactory", deployResult.address);
+
+  try {
+    console.log("Verifying QuestFactory...");
+    await new Promise((res, rej) => {
+      setTimeout(
+        () =>
+          run("verify:verify", {
+            address: deployResult.address,
+            constructorArguments,
+          })
+            .then(res)
+            .catch(rej),
+        2000
+      ); // Wait for contract to be deployed
+    });
+  } catch (error) {
+    console.error("Failed when verifying the QuestFactory", error);
+  }
+
+  return deployResult;
 };
-module.exports.tags = ["QuestFactory"];
+export const tags = ["QuestFactory"];

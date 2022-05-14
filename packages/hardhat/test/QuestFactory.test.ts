@@ -26,6 +26,19 @@ describe("[Contract] QuestFactory", function () {
     [owner, stranger] = await ethers.getSigners();
   });
 
+  it("SHOULD transfer ownership WHEN initialOwner is different than deployer", async function () {
+    // Arrange
+    // Act
+    questFactoryContract = await new QuestFactory__factory(owner).deploy(
+      owner.address,
+      depositToken.address,
+      depositAmount,
+      stranger.address
+    );
+    // Assert
+    expect(await questFactoryContract.owner()).to.equal(stranger.address);
+  });
+
   beforeEach(async function () {
     const tokenMockFactory = new TokenMock__factory(owner);
     rewardToken = await tokenMockFactory.deploy("Reward Token", "RTOKEN");
@@ -34,7 +47,8 @@ describe("[Contract] QuestFactory", function () {
     questFactoryContract = await new QuestFactory__factory(owner).deploy(
       owner.address,
       depositToken.address,
-      depositAmount
+      depositAmount,
+      owner.address
     );
     await depositToken.connect(owner).mint(owner.address, fromNumber(1000));
   });

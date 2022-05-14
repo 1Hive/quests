@@ -1,7 +1,7 @@
 // Not actually used but so verification using etherscan-verify will verify the quest contract
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
-  const { deployer, govern } = await getNamedAccounts();
+  const { deployer } = await getNamedAccounts();
   await deploy("Quest", {
     from: deployer,
     args: [

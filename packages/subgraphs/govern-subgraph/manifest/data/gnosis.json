@@ -1,12 +1,5 @@
 {
-  "network": "mainnet",
-  "dataSources": {
-    "GovernRegistry": [
-      {
-        "name": "GovernRegistry",
-        "address": "0xf2b7D096cd34F228A6413e276132C21D98b19882",
-        "startBlock": 13003760
-      }
-    ]
-  }
+  "network": "xdai",
+  "startBlock": 0,
+  "governQueueAddress": "TODO"
 }

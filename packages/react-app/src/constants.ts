@@ -51,12 +51,6 @@ export const TOKENS = Object.freeze({
     token: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
     decimals: 18,
   } as TokenModel,
-  RinkebyHoney: {
-    name: 'Honey',
-    symbol: 'HNY',
-    token: '0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd',
-    decimals: 18,
-  } as TokenModel,
   HoneyTest: {
     name: 'HoneyTest',
     symbol: 'HNYT',
@@ -72,7 +66,7 @@ export const TOKENS = Object.freeze({
 });
 
 export const NETWORK_TOKENS = Object.freeze({
-  rinkeby: [TOKENS.HoneyTest, TOKENS.RinkebyTheter, TOKENS.RinkebyHoney, TOKENS.RinkebyDai],
+  rinkeby: [TOKENS.HoneyTest, TOKENS.RinkebyTheter, TOKENS.RinkebyDai],
   xdai: [TOKENS.Honey],
   mainnet: [TOKENS.Thether],
 });

@@ -26,7 +26,7 @@ import {
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV, TOKENS } from '../constants';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -426,7 +426,9 @@ export async function reclaimQuestUnusedFunds(
   const questContract = getQuestContract(quest.address, walletAddress);
   if (!questContract) return null;
   Logger.debug('Reclaiming quest unused funds...', { quest });
-  const tx = await questContract.recoverUnclaimedFunds();
+  const tx = await questContract.recoverUnclaimedFunds({
+    gasLimit: 1000000,
+  });
   return handleTransaction(tx, onTx);
 }
 
@@ -457,7 +459,9 @@ export async function fundQuest(
   const contract = getERC20Contract(amount.token, walletAddress);
   if (!contract) return null;
   Logger.debug('Funding quest...', { questAddress, amount });
-  const tx = await contract.transfer(questAddress, toBigNumber(amount));
+  const tx = await contract.transfer(questAddress, toBigNumber(amount), {
+    gasLimit: 1000000,
+  });
   return handleTransaction(tx, onTx);
 }
 
@@ -467,10 +471,27 @@ export async function approveTokenAmount(
   tokenAmount: TokenModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
+  Logger.debug('Approving token amount...', { toAddress, tokenAmount });
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
-  if (!erc20Contract) return null;
-  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount);
+  if (!erc20Contract)
+    throw new Error(
+      `Failed when approving token amount : Erc20Contract is null \n${JSON.stringify({
+        walletAddress,
+        toAddress,
+        tokenAmount,
+      })}`,
+    );
+
+  const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
+    gasLimit: 1000000,
+  });
   return handleTransaction(tx, onTx);
+}
+
+export function getAllowanceOf(walletAddress: string, token: TokenModel, spender: string) {
+  const erc20Contract = getERC20Contract(token.token, walletAddress);
+  if (!erc20Contract) throw new Error('Fetching allowance : Erc20Contract is null');
+  return erc20Contract.allowance(walletAddress, spender);
 }
 
 export async function getBalanceOf(
@@ -518,7 +539,9 @@ export async function scheduleQuestClaim(
   if (!governQueueContract) return null;
   const container = await generateScheduleContainer(walletAddress, claimData);
   Logger.debug('Scheduling quest claim...', { container });
-  const tx = (await governQueueContract.schedule(container)) as ContractTransaction;
+  const tx = (await governQueueContract.schedule(container, {
+    gasLimit: 500000,
+  })) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
 
@@ -530,10 +553,15 @@ export async function executeQuestClaim(
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
   Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
-  const tx = await governQueueContract.execute({
-    config: claimData.container!.config,
-    payload: claimData.container!.payload,
-  });
+  const tx = await governQueueContract.execute(
+    {
+      config: claimData.container!.config,
+      payload: claimData.container!.payload,
+    },
+    {
+      gasLimit: 500000,
+    },
+  );
   return handleTransaction(tx, onTx);
 }
 
@@ -550,6 +578,9 @@ export async function challengeQuestClaim(
   const tx = await governQueueContract.challenge(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
+    {
+      gasLimit: 1000000,
+    },
   );
   return handleTransaction(tx, onTx);
 }
@@ -563,7 +594,9 @@ export async function resolveClaimChallenge(
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
-  const tx = await governQueueContract.resolve(container, dispute.id);
+  const tx = await governQueueContract.resolve(container, dispute.id, {
+    gasLimit: 1000000,
+  });
   return handleTransaction(tx, onTx);
 }
 
@@ -575,9 +608,10 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
   const celesteContract = getCelesteContract();
   if (!celesteContract) return null;
   const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  const token = await getTokenInfo(feeToken);
+  if (!token) return null;
   return toTokenAmountModel({
-    ...TOKENS.Honey,
-    token: feeToken,
+    ...token,
     amount: feeAmount,
   });
 }

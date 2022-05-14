@@ -11,7 +11,12 @@ import { noop, uniqueId } from 'lodash-es';
 import { useState, useEffect, Fragment, useMemo } from 'react';
 import styled from 'styled-components';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
+import {
+  ENUM,
+  ENUM_CLAIM_STATE,
+  ENUM_DISPUTE_STATES,
+  ENUM_TRANSACTION_STATUS,
+} from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
@@ -268,7 +273,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           icon={<IconFlag />}
           label="Resolve"
           mode="positive"
-          disabled={loading || !walletAddress || !isRuled}
+          disabled={
+            loading || !walletAddress || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged
+          }
           onClick={resolveChallengeTx}
           title={isRuled ? 'Publish dispute result' : 'Need to be ruled in celeste'}
         />,

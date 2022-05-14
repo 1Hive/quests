@@ -6,16 +6,16 @@ repository: https://github.com/aragon/govern
 schema:
   file: ./schema.graphql
 dataSources:
-{{> GovernRegistry.yaml}}
-templates:
   - kind: ethereum/contract
     name: GovernQueue
     network: {{network}}
     source:
       abi: GovernQueue
+      address: "{{governQueueAddress}}"
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.1
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
         - Collateral
@@ -26,9 +26,9 @@ templates:
         - Role
       abis:
         - name: GovernQueue
-          file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
         - name: ERC20
-          file: $GOVERN_CONTRACT_UTILS_MODULE/abi/contracts/erc20/ERC20.sol/ERC20.json
+          file: ./govern-contract-utils/abi/contracts/erc20/ERC20.sol/ERC20.json
       eventHandlers:
         - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes,uint256))
           handler: handleConfigured
@@ -49,37 +49,3 @@ templates:
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
       file: ./src/GovernQueue.ts
-  - kind: ethereum/contract
-    name: Govern
-    network: {{network}}
-    source:
-      abi: Govern
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.1
-      language: wasm/assemblyscript
-      entities:
-        - Container
-        - ContainerEvent
-        - Role
-      abis:
-        - name: Govern
-          file: $GOVERN_CORE_MODULE/abi/contracts/Govern.sol/Govern.json
-        - name: GovernQueue
-          file: $GOVERN_CORE_MODULE/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
-      eventHandlers:
-        - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
-          handler: handleExecuted
-        - event: ETHDeposited(address,uint256)
-          handler: handleETHDeposited
-        - event: Deposited(indexed address,indexed address,uint256,string)
-          handler: handleDeposited
-        - event: Withdrawn(indexed address,indexed address,address,uint256,string)
-          handler: handleWithdrawn
-        - event: Frozen(indexed bytes4,indexed address)
-          handler: handleFrozen
-        - event: Granted(indexed bytes4,indexed address,indexed address,address)
-          handler: handleGranted
-        - event: Revoked(indexed bytes4,indexed address,indexed address)
-          handler: handleRevoked
-      file: ./src/Govern.ts
