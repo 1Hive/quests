@@ -4,6 +4,7 @@ import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
+import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
@@ -64,7 +65,7 @@ function AccountModule({ compact = false }: Props) {
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
   const [activationError, setActivationError] = useState();
   const popoverFocusElement = useRef<any>();
-  const [buttonLabel, setButtonLabel] = useState('Connect Wallet');
+  const [buttonLabel, setButtonLabel] = useState<string>();
 
   const clearError = useCallback(() => setActivationError(undefined), []);
 
@@ -75,12 +76,17 @@ function AccountModule({ compact = false }: Props) {
   }, [walletAddress]);
 
   const activate = useCallback(
-    async (providerId: string = 'metamask') => {
+    async (providerId: string = 'injected') => {
       try {
-        if (await isConnected()) await activateWallet(providerId);
+        if (await isConnected()) {
+          await activateWallet(providerId);
+        } else {
+          setButtonLabel('Connect Wallet');
+        }
       } catch (error: any) {
         setButtonLabel('Wrong network');
         setActivationError(error);
+        Logger.warn(error);
       }
     },
     [walletAddress],
