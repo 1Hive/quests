@@ -80,11 +80,8 @@ function AccountModule({ compact = false }: Props) {
       try {
         if (await isConnected()) {
           await activateWallet(providerId);
-        } else {
-          setButtonLabel('Connect Wallet');
         }
       } catch (error: any) {
-        setButtonLabel('Wrong network');
         setActivationError(error);
         Logger.warn(error);
       }
@@ -118,7 +115,6 @@ function AccountModule({ compact = false }: Props) {
 
     if (activating) {
       setActivatingDelayed(activating);
-      setButtonLabel('Connecting...');
       return noop;
     }
 
@@ -135,9 +131,17 @@ function AccountModule({ compact = false }: Props) {
 
   const { screenIndex, direction } = useMemo(() => {
     const screenId = (() => {
-      if (activationError) return 'error';
-      if (activatingDelayed) return 'connecting';
+      if (activationError) {
+        setButtonLabel('Wrong network');
+        return 'error';
+      }
+      if (activatingDelayed) {
+        setButtonLabel('Connecting...');
+        return 'connecting';
+      }
       if (walletAddress) return 'connected';
+
+      setButtonLabel('Connect wallet');
       return 'providers';
     })();
 
