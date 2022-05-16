@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
-import { getUseWalletProviders } from '../../utils/web3.utils';
+import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
 import HeaderPopover from '../header/header-popover';
 import AccountButton from './account-button';
 import AccountScreenConnected from './screen-connected';
@@ -64,6 +64,7 @@ function AccountModule({ compact = false }: Props) {
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
   const [activationError, setActivationError] = useState();
   const popoverFocusElement = useRef<any>();
+  const [buttonLabel, setButtonLabel] = useState('Connect Wallet');
 
   const clearError = useCallback(() => setActivationError(undefined), []);
 
@@ -74,15 +75,20 @@ function AccountModule({ compact = false }: Props) {
   }, [walletAddress]);
 
   const activate = useCallback(
-    async (providerId) => {
+    async (providerId: string = 'metamask') => {
       try {
-        await activateWallet(providerId);
+        if (await isConnected()) await activateWallet(providerId);
       } catch (error: any) {
+        setButtonLabel('Wrong network');
         setActivationError(error);
       }
     },
     [walletAddress],
   );
+
+  useEffect(() => {
+    activate();
+  }, []);
 
   // Don’t animate the slider until the popover has opened
   useEffect(() => {
@@ -106,6 +112,7 @@ function AccountModule({ compact = false }: Props) {
 
     if (activating) {
       setActivatingDelayed(activating);
+      setButtonLabel('Connecting...');
       return noop;
     }
 
@@ -165,7 +172,7 @@ function AccountModule({ compact = false }: Props) {
         <Button
           mode="strong"
           icon={<IconConnect />}
-          label="Connect Wallet"
+          label={buttonLabel}
           onClick={toggle}
           display={compact ? 'icon' : 'all'}
         />

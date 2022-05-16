@@ -1,8 +1,5 @@
 import { Root, useViewport, Button, IconFilter } from '@1hive/1hive-ui';
-import React, { useEffect } from 'react';
-import { useWallet } from 'src/contexts/wallet.context';
-import { Logger } from 'src/utils/logger';
-import { isConnected } from 'src/utils/web3.utils';
+import React from 'react';
 import styled from 'styled-components';
 import { usePageContext } from 'src/contexts/page.context';
 import Skeleton from 'react-loading-skeleton';
@@ -41,21 +38,9 @@ type Props = {
 };
 
 function MainView({ children }: Props) {
-  const { activateWallet, walletAddress } = useWallet();
   const { page } = usePageContext();
   const { below } = useViewport();
   const { toggleFilter } = useFilterContext();
-
-  useEffect(() => {
-    const tryConnect = async () => {
-      try {
-        if (await isConnected()) activateWallet().catch(Logger.exception);
-      } catch (error) {
-        Logger.exception(error);
-      }
-    };
-    if (!walletAddress) tryConnect();
-  }, []);
 
   return (
     <Root.Provider>

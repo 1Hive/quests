@@ -29,15 +29,15 @@ function WalletAugmented({ children }: Props) {
   const { ethereum } = wallet;
 
   const ethers = useMemo(() => {
-    const network = getNetwork();
+    const { chainId, networkId } = getNetwork();
     if (!ethereum) {
-      return new EthersProviders.JsonRpcProvider(undefined, network.chainId);
+      return new EthersProviders.JsonRpcProvider(undefined, chainId);
     }
 
     const ensRegistry = undefined; // network?.ensRegistry;
     return new EthersProviders.Web3Provider(ethereum, {
-      name: '',
-      chainId: getDefaultChain(),
+      name: networkId,
+      chainId,
       ensAddress: ensRegistry,
     });
   }, [ethereum]);
