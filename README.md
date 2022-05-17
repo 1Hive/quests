@@ -26,11 +26,7 @@ Start the project
 
 ```sh
 # Rinkeby testnet
-yarn start
-# Local chain (not working for the moment, missing the local subgraph)
-> yarn start:local
-> yarn chain
-> yarn deploy:local
+yarn start:rinkeby
 ```
 
 ### Docs
@@ -49,7 +45,7 @@ yarn start
 
 #### Connect
 
-1. Select xDai chain if realease or Rinkeby chain if debug
+1. Select xDai chain if **production** or Rinkeby chain if **preview**
 2. Click Enable Button account
 3. Click on Metamask button
 
@@ -57,4 +53,4 @@ yarn start
 
 - [Kanban board](https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board)
 - Discord : 1Hive (Quest Swarm channel)
-- [Deployed app](https://quests.vercel.app/)
+- [Deployed app](https://quests.1hive.org/)
