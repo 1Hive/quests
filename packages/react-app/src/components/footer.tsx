@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
+import { getNetwork } from 'src/networks';
 import QuestModal from './modals/quest-modal';
 
 // #region StyledComponent
@@ -75,8 +76,8 @@ const IconStyled = styled.div`
 export default function footer() {
   const theme = useTheme();
   const year = new Date().getFullYear();
-
   const { walletAddress } = useWallet();
+  const { networkId } = getNetwork();
 
   return (
     <FooterContainerStyled color={theme.contentSecondary}>
@@ -122,10 +123,14 @@ export default function footer() {
         <FooterColumnStyled>
           <FooterTitleStyled>Links</FooterTitleStyled>
           <FooterNavItemStyled
-            href="https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"
+            href={
+              networkId === 'rinkeby'
+                ? 'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'
+                : 'https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9'
+            }
             external
           >
-            <span>Get Honey</span>
+            <span>{networkId === 'rinkeby' ? 'Get test Honey' : 'Get Honey'}</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
           <FooterNavItemStyled href="https://forum.1hive.org/" external>
