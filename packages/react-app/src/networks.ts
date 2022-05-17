@@ -1,6 +1,6 @@
 import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getDefaultChain } from './local-settings';
-import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
+import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel } from './models/network.model';
 import { TOKENS } from './constants';
 
@@ -39,7 +39,7 @@ export const networks = Object.freeze({
     questFactoryAddress: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[100]?.xdai.contracts.GovernQueue.address,
     celesteAddress: 'TODO',
-    httpProvider: 'https://xdai.poanetwork.dev',
+    httpProvider: 'https://rpc.gnosischain.com/',
     isTestNetwork: false,
     stableTokens: [TOKENS.Thether, TOKENS.UsdCoin],
   } as NetworkModel,
@@ -59,7 +59,7 @@ export const networks = Object.freeze({
 } as { [key: string]: NetworkModel | StagingNetworkModel });
 
 function getNetworkInternalName(chainId = getDefaultChain()) {
-  return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkType(chainId);
+  return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkId(chainId);
 }
 
 export function getNetwork(chainId = getDefaultChain()): NetworkModel {

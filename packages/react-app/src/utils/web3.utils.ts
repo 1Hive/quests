@@ -1,13 +1,15 @@
 import { BigNumber, ethers } from 'ethers';
 import { noop } from 'lodash-es';
+import { getProvider } from 'src/ethereum-providers';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
+import { isDesktop, isMobile } from 'react-device-detect';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { Logger } from './logger';
 
-const DEFAULT_LOCAL_CHAIN = 'private';
+const DEFAULT_LOCAL_CHAIN = '';
 
 const ethOrWeb = (window as any).ethereum ?? (window as any).web3?.currentProvider;
 ethOrWeb?.on('chainChanged', (_chainId: string) => window.location.reload());
@@ -47,19 +49,20 @@ export async function isConnected() {
 }
 
 export function getUseWalletProviders() {
-  const providers = [{ id: 'injected' }];
+  const providersIds = ['injected', 'frame'];
 
-  if (env('FORTMATIC_API_KEY')) {
-    providers.push({
-      id: 'fortmatic',
-      useWalletConf: { apiKey: env('FORTMATIC_API_KEY') },
-    } as any);
-  }
+  const providers = providersIds.map((id) => getProvider(id));
 
-  return providers;
+  return providers.filter(
+    (p) =>
+      p != null &&
+      ((p.type === 'Mobile' && isMobile) ||
+        (p.type === 'Desktop' && isDesktop) ||
+        p.type === 'Any'),
+  ) as any[];
 }
 
-export function getNetworkType(chainId = getDefaultChain()) {
+export function getNetworkId(chainId = getDefaultChain()) {
   const chainIdStr = String(chainId);
 
   let key;
@@ -76,7 +79,7 @@ export function getNetworkType(chainId = getDefaultChain()) {
 }
 
 export function isLocalOrUnknownNetwork(chainId = getDefaultChain()) {
-  return getNetworkType(chainId) === DEFAULT_LOCAL_CHAIN;
+  return getNetworkId(chainId) === DEFAULT_LOCAL_CHAIN;
 }
 
 export function getUseWalletConnectors() {
@@ -94,7 +97,7 @@ export function getNetworkName(chainId = getDefaultChain()) {
   if (chainIdStr === '1') return 'Mainnet';
   if (chainIdStr === '3') return 'Ropsten';
   if (chainIdStr === '4') return 'Rinkeby';
-  if (chainIdStr === '100') return 'xDai';
+  if (chainIdStr === '100') return 'Gnosis';
 
   return 'unknown';
 }

@@ -112,7 +112,7 @@ const AccountModuleConnectingScreen = React.memo(({ onCancel, providerId }: Prop
           flex-grow: 0;
         `}
       >
-        <Button mode="negative" onClick={onCancel} label="cancel" />
+        <Button mode="negative" onClick={onCancel} label="Cancel" />
       </div>
     </section>
   );

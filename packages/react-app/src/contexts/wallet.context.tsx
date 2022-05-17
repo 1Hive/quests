@@ -1,7 +1,6 @@
 import { providers as EthersProviders } from 'ethers';
 import React, { useContext, useMemo } from 'react';
 import { useWallet, UseWalletProvider } from 'use-wallet';
-import { getDefaultChain } from '../local-settings';
 import { getNetwork } from '../networks';
 import { getUseWalletConnectors } from '../utils/web3.utils';
 
@@ -61,7 +60,7 @@ function WalletAugmented({ children }: Props) {
 }
 
 function WalletProvider({ children }: Props) {
-  const chainId = getDefaultChain();
+  const { chainId } = getNetwork();
 
   const connectors = getUseWalletConnectors();
   return (

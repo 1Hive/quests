@@ -4,6 +4,7 @@ import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
+import { getProviderFromUseWalletId } from 'src/ethereum-providers';
 import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
@@ -34,9 +35,9 @@ const SCREENS = [
   {
     id: 'providers',
     height:
-      6 * GU + // header
-      (12 + 1.5) * GU * Math.ceil(getUseWalletProviders().length / 2) + // buttons
-      7 * GU, // footer
+      66 + // header
+      104 * getUseWalletProviders().length + // buttons
+      40, // footer
   },
   {
     id: 'connecting',
@@ -63,7 +64,8 @@ function AccountModule({ compact = false }: Props) {
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
-  const [activationError, setActivationError] = useState();
+  const [activationError, setActivationError] =
+    useState<{ name: string; label: string; detail: string }>();
   const popoverFocusElement = useRef<any>();
   const [buttonLabel, setButtonLabel] = useState<string>();
 
@@ -76,10 +78,11 @@ function AccountModule({ compact = false }: Props) {
   }, [walletAddress]);
 
   const activate = useCallback(
-    async (providerId: string = 'injected') => {
+    async (id?: string) => {
       try {
-        if (await isConnected()) {
-          await activateWallet(providerId);
+        if (id || (await isConnected())) {
+          if (!id) id = getProviderFromUseWalletId()?.id;
+          await activateWallet(id);
         }
       } catch (error: any) {
         setActivationError(error);
@@ -132,7 +135,9 @@ function AccountModule({ compact = false }: Props) {
   const { screenIndex, direction } = useMemo(() => {
     const screenId = (() => {
       if (activationError) {
-        setButtonLabel('Wrong network');
+        setButtonLabel(
+          activationError.name === 'UnsupportedChainError' ? 'Wrong network' : 'Failed to enable',
+        );
         return 'error';
       }
       if (activatingDelayed) {

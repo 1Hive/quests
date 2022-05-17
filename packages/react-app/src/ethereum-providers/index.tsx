@@ -2,8 +2,8 @@ import cipher from './icons/Cipher.png';
 import fortmatic from './icons/Fortmatic.svg';
 import frame from './icons/Frame.png';
 import metamask from './icons/Metamask.png';
-import portis from './icons/Portis.svg';
 import status from './icons/Status.png';
+import walletConnect from './icons/WalletConnect.png';
 
 // See the corresponding prop type, EthereumProviderType, in prop-types.js.
 const PROVIDERS = new Map(
@@ -16,15 +16,17 @@ const PROVIDERS = new Map(
       strings: {
         'your Ethereum provider': 'Frame',
       },
+      detect: (p: any) => p.isFrame,
     },
     {
-      id: 'metamask',
+      id: 'injected',
       name: 'Metamask',
       type: 'Desktop',
       image: metamask,
       strings: {
         'your Ethereum provider': 'Metamask',
       },
+      detect: (p: any) => p.isMetaMask,
     },
     {
       id: 'status',
@@ -34,6 +36,7 @@ const PROVIDERS = new Map(
       strings: {
         'your Ethereum provider': 'Status',
       },
+      detect: (p: any) => p.isStatus,
     },
     {
       id: 'cipher',
@@ -43,6 +46,7 @@ const PROVIDERS = new Map(
       strings: {
         'your Ethereum provider': 'Cipher',
       },
+      detect: (p: any) => p.isCipher,
     },
     {
       id: 'fortmatic',
@@ -52,15 +56,17 @@ const PROVIDERS = new Map(
       strings: {
         'your Ethereum provider': 'Fortmatic',
       },
+      detect: (p: any) => p.isFortmatic,
     },
     {
-      id: 'portis',
-      name: 'Portis',
+      id: 'walletconnect',
+      name: 'WalletConnect',
       type: 'Any',
-      image: portis,
+      image: walletConnect,
       strings: {
-        'your Ethereum provider': 'Portis',
+        'your Ethereum provider': 'WalletConnect',
       },
+      detect: (p: any) => p.isWalletConnect,
     },
     {
       id: 'unknown',
@@ -94,20 +100,25 @@ function getProviderString(string: string, providerId: string = 'unknown') {
 }
 
 // Get an identifier for the provider, if it can be detected.
-function identifyProvider(provider: any) {
-  if (provider && provider.isMetaMask) {
-    return 'metamask';
+function identifyProvider(ethers: any) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const p of PROVIDERS.values()) {
+    if (p.detect?.(ethers)) {
+      return p.id;
+    }
   }
   return 'unknown';
 }
 
 // Get a provider from its useWallet() identifier.
-function getProviderFromUseWalletId(id: string) {
-  const ethers = (window as any).ethereum;
-  if (id === 'injected' && ethers) {
-    return getProvider(identifyProvider(ethers)) || getProvider('unknown');
+function getProviderFromUseWalletId(id?: string) {
+  const ethers = (window as any).ethereum ?? (window as any).web3;
+  let provider;
+  if (!id && ethers) {
+    provider = getProvider(identifyProvider(ethers)) || getProvider('unknown');
   }
-  return getProvider(id) || getProvider('unknown');
+  if (id) provider = getProvider(id);
+  return provider ?? getProvider('unknown');
 }
 
 export { getProvider, identifyProvider, getProviderString, getProviderFromUseWalletId };
