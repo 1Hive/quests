@@ -89,7 +89,7 @@ const PROVIDERS = new Map(
 
 // Get a providers object for a given ID.
 function getProvider(providerId: string) {
-  if (providerId === 'injected' && !(window as any).ethereum) return PROVIDERS.get('unknown');
+  if (!providerId) return PROVIDERS.get('unknown');
   return PROVIDERS.get(providerId);
 }
 

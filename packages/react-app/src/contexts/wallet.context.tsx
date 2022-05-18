@@ -41,8 +41,12 @@ function WalletAugmented({ children }: Props) {
   const ethers = useMemo(() => {
     const { chainId, networkId, name } = getNetwork();
 
-    window.ethereum = ethereum;
-    ethereum?.on('chainChanged', (_chainId: string) => window.location.reload());
+    if (ethereum) {
+      window.ethereum = ethereum;
+      ethereum?.on('chainChanged', (_chainId: string) => window.location.reload());
+    }
+
+    setActivating(undefined);
 
     if (ethereum && +ethereum.chainId !== chainId) {
       const connectorInfo = getProviderFromUseWalletId(wallet.connector);
@@ -70,7 +74,6 @@ function WalletAugmented({ children }: Props) {
   const handleConnect = async (id: string) => {
     setActivating(id);
     await wallet.connect(id);
-    setActivating(undefined);
   };
 
   const contextValue = useMemo(
