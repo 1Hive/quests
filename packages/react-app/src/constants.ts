@@ -6,8 +6,6 @@ export const PCT_BASE = BigInt(1e18);
 export const APP_TITLE = 'Quests';
 
 // Env
-export const IS_DEV = process.env?.NODE_ENV === 'development';
-export const EXPECTED_NETWORKS = IS_DEV ? ['localhost', 'rinkeby'] : ['xDai'];
 export const DEFAULT_THEME = 'dark';
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';

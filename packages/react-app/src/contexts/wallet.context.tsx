@@ -1,5 +1,5 @@
 import { providers as EthersProviders } from 'ethers';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useWallet, UseWalletProvider } from 'use-wallet';
 import { getNetwork } from '../networks';
 import { getUseWalletConnectors } from '../utils/web3.utils';
@@ -10,6 +10,7 @@ export type WalletContextModel = {
   deactivateWallet: Function;
   activateWallet: Function;
   activated: string;
+  activationError: { name: string; message: string };
 };
 
 const WalletAugmentedContext = React.createContext<WalletContextModel | undefined>(undefined);
@@ -26,9 +27,29 @@ type Props = {
 function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
   const { ethereum } = wallet;
+  const [activationError, setActivationError] = useState<{ name: string; message: string }>();
+  const [activating, setActivating] = useState(false);
+
+  useEffect(() => {
+    const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
+    if (lastWalletConnected) {
+      handleConnect(lastWalletConnected);
+    }
+  }, []);
 
   const ethers = useMemo(() => {
-    const { chainId, networkId } = getNetwork();
+    const { chainId, networkId, name } = getNetwork();
+
+    if (ethereum && +ethereum.chainId !== chainId) {
+      setActivationError({
+        name: 'Wrong Network',
+        message: `Please select the ${name} network in your wallet and try again.`,
+      });
+      return null;
+    }
+
+    setActivationError(undefined);
+
     if (!ethereum) {
       return new EthersProviders.JsonRpcProvider(undefined, chainId);
     }
@@ -41,29 +62,25 @@ function WalletAugmented({ children }: Props) {
     });
   }, [ethereum]);
 
-  const handleActivateWallet = (id?: string) => {
-    if (!id) {
-      id = localStorage.getItem('LAST_WALLET_CONNECTOR') ?? undefined;
-    }
-    if (id) {
-      wallet.connect(id);
-      localStorage.setItem('LAST_WALLET_CONNECTOR', id);
-    }
-  };
-
-  const handleDeactivateWallet = () => {
-    wallet.reset();
-    localStorage.removeItem('LAST_WALLET_CONNECTOR');
+  const handleConnect = async (id: string) => {
+    setActivating(true);
+    await wallet.connect(id);
+    setActivating(false);
   };
 
   const contextValue = useMemo(
     () => ({
       ...wallet,
       ethers,
+      activationError,
       walletAddress: wallet.account,
-      activateWallet: handleActivateWallet,
-      deactivateWallet: handleDeactivateWallet,
+      activateWallet: handleConnect,
+      deactivateWallet: () => {
+        wallet.reset();
+        localStorage.removeItem('LAST_WALLET_CONNECTOR');
+      },
       activated: wallet.connector,
+      activating,
     }),
     [wallet, ethers],
   );
@@ -76,11 +93,9 @@ function WalletAugmented({ children }: Props) {
 }
 
 function WalletProvider({ children }: Props) {
-  const { chainId } = getNetwork();
-
   const connectors = getUseWalletConnectors();
   return (
-    <UseWalletProvider chainId={chainId} connectors={connectors}>
+    <UseWalletProvider connectors={connectors} autoConnect>
       <WalletAugmented>{children}</WalletAugmented>
     </UseWalletProvider>
   );

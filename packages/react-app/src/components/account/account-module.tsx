@@ -4,8 +4,6 @@ import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
-import { getProviderFromUseWalletId } from 'src/ethereum-providers';
-import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
@@ -64,12 +62,8 @@ function AccountModule({ compact = false }: Props) {
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
-  const [activationError, setActivationError] =
-    useState<{ name: string; label: string; detail: string }>();
   const popoverFocusElement = useRef<any>();
   const [buttonLabel, setButtonLabel] = useState<string>();
-
-  const clearError = useCallback(() => setActivationError(undefined), []);
 
   const toggle = useCallback(() => setOpened((opened) => !opened), []);
 
@@ -79,21 +73,12 @@ function AccountModule({ compact = false }: Props) {
 
   const activate = useCallback(
     async (id?: string) => {
-      try {
-        if (id || (await isConnected())) {
-          await activateWallet(id);
-        }
-      } catch (error: any) {
-        setActivationError(error);
-        Logger.warn(error);
+      if (id || (await isConnected())) {
+        await activateWallet(id);
       }
     },
     [walletAddress],
   );
-
-  useEffect(() => {
-    activate();
-  }, []);
 
   // Don’t animate the slider until the popover has opened
   useEffect(() => {
@@ -111,7 +96,7 @@ function AccountModule({ compact = false }: Props) {
 
   // Always show the “connecting…” screen, even if there are no delay
   useEffect(() => {
-    if (activationError) {
+    if (wallet.activationError) {
       setActivatingDelayed(undefined);
     }
 
@@ -127,16 +112,14 @@ function AccountModule({ compact = false }: Props) {
     return () => {
       clearTimeout(timer);
     };
-  }, [activating, activationError]);
+  }, [activating, wallet.activationError]);
 
   const previousScreenIndex = useRef(-1);
 
   const { screenIndex, direction } = useMemo(() => {
     const screenId = (() => {
-      if (activationError) {
-        setButtonLabel(
-          activationError.name === 'UnsupportedChainError' ? 'Wrong network' : 'Failed to enable',
-        );
+      if (wallet.activationError) {
+        setButtonLabel(wallet.activationError.name);
         return 'error';
       }
       if (activatingDelayed) {
@@ -155,7 +138,7 @@ function AccountModule({ compact = false }: Props) {
     previousScreenIndex.current = screenIndex;
 
     return { direction, screenIndex };
-  }, [walletAddress, activationError, activatingDelayed]);
+  }, [walletAddress, wallet.activationError, activatingDelayed]);
 
   const screen = SCREENS[screenIndex];
   const screenId = screen.id;
@@ -166,7 +149,6 @@ function AccountModule({ compact = false }: Props) {
       return false;
     }
     setOpened(false);
-    setActivationError(undefined);
     return true;
   }, [screenId]);
 
@@ -241,7 +223,10 @@ function AccountModule({ compact = false }: Props) {
                       }
                       if (screen.id === 'error') {
                         return (
-                          <AccountModuleErrorScreen error={activationError} onBack={clearError} />
+                          <AccountModuleErrorScreen
+                            error={wallet.activationError}
+                            onBack={() => wallet.deactivateWallet()}
+                          />
                         );
                       }
                       return <ScreenProviders onActivate={activate} />;

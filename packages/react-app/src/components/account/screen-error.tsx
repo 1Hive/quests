@@ -1,32 +1,17 @@
 import { Button, GU, IconRefresh, textStyle, useTheme } from '@1hive/1hive-ui';
-import { string } from 'prop-types';
-import { useMemo, useRef } from 'react';
-import { getNetworkName } from '../../utils/web3.utils';
 import connectionError from './assets/connection-error.png';
 
 type Props = {
-  error?: Object;
+  error?: { name: string; message: string };
   onBack: Function;
 };
 
 function AccountModuleErrorScreen({ error, onBack }: Props) {
   const theme = useTheme();
-  const elementRef = useRef();
-
-  const [title, secondary] = useMemo(() => {
-    if (error instanceof string) {
-      return [
-        'Wrong network',
-        `Please select the ${getNetworkName()} network in your wallet and try again.`,
-      ];
-    }
-    return ['Failed to enable your account', 'You can try another Ethereum wallet.'];
-  }, [error]);
 
   return (
     <section
       // @ts-ignore
-      ref={elementRef}
       css={`
         display: flex;
         flex-direction: column;
@@ -64,7 +49,7 @@ function AccountModuleErrorScreen({ error, onBack }: Props) {
             font-weight: 600;
           `}
         >
-          {title}
+          {error?.name}
         </h1>
         <p
           // @ts-ignore
@@ -73,7 +58,7 @@ function AccountModuleErrorScreen({ error, onBack }: Props) {
             color: ${theme.surfaceContentSecondary};
           `}
         >
-          {secondary}
+          {error?.message}
         </p>
       </div>
       <div

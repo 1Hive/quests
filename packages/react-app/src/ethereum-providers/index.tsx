@@ -3,7 +3,7 @@ import fortmatic from './icons/Fortmatic.svg';
 import frame from './icons/Frame.png';
 import metamask from './icons/Metamask.png';
 import status from './icons/Status.png';
-import walletConnect from './icons/WalletConnect.png';
+import walletConnect from './icons/WalletConnect.svg';
 
 // See the corresponding prop type, EthereumProviderType, in prop-types.js.
 const PROVIDERS = new Map(
@@ -60,11 +60,11 @@ const PROVIDERS = new Map(
     },
     {
       id: 'walletconnect',
-      name: 'WalletConnect',
+      name: 'Wallet Connect',
       type: 'Any',
       image: walletConnect,
       strings: {
-        'your Ethereum provider': 'WalletConnect',
+        'your Ethereum provider': 'Wallet Connect',
       },
       detect: (p: any) => p.isWalletConnect,
     },

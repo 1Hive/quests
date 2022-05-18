@@ -41,12 +41,7 @@ function AccountScreenConnected({ wallet }: Props) {
         padding: ${GUpx(2)};
       `}
     >
-      <div
-        // @ts-ignore
-        css={`
-          padding-top: ${GUpx(2)};
-        `}
-      >
+      <div>
         <h4
           // @ts-ignore
           css={`
@@ -71,6 +66,7 @@ function AccountScreenConnected({ wallet }: Props) {
               display: flex;
               align-items: center;
               margin-right: ${GUpx(3)};
+              height: ${GUpx(6)};
             `}
           >
             <img
