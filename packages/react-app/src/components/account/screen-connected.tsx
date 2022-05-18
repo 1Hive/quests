@@ -24,7 +24,7 @@ function AccountScreenConnected({ wallet }: Props) {
   const copy = useCopyToClipboard();
 
   const networkName = getNetworkName();
-  const providerInfo = getProviderFromUseWalletId(wallet.activated) ?? {
+  const providerInfo = getProviderFromUseWalletId(wallet.activatedId) ?? {
     name: 'Unknown',
     image: undefined,
     id: undefined,

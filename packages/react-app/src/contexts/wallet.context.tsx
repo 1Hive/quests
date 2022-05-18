@@ -9,8 +9,8 @@ export type WalletContextModel = {
   walletAddress: string;
   deactivateWallet: Function;
   activateWallet: Function;
-  activated: string;
-  activating: string;
+  activatedId: string;
+  activatingId: string;
   activationError: { name: string; message: string };
 };
 
@@ -29,7 +29,7 @@ function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
   const { ethereum } = wallet;
   const [activationError, setActivationError] = useState<{ name: string; message: string }>();
-  const [activating, setActivating] = useState<string>();
+  const [activatingId, setActivating] = useState<string>();
 
   useEffect(() => {
     const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
@@ -77,9 +77,9 @@ function WalletAugmented({ children }: Props) {
   };
 
   const handleDeconnect = () => {
+    setActivating(undefined);
     wallet.reset();
     localStorage.removeItem('LAST_WALLET_CONNECTOR');
-    setActivating(undefined);
   };
   const contextValue = useMemo(
     () => ({
@@ -89,8 +89,8 @@ function WalletAugmented({ children }: Props) {
       walletAddress: wallet.account,
       activateWallet: handleConnect,
       deactivateWallet: handleDeconnect,
-      activated: wallet.connector,
-      activating,
+      activatedId: wallet.connector,
+      activatingId,
     }),
     [wallet, ethers],
   );

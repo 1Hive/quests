@@ -58,7 +58,7 @@ type Props = {
 function AccountModule({ compact = false }: Props) {
   const buttonRef = useRef<any>();
   const wallet = useWallet();
-  const { walletAddress, activating, deactivateWallet, activateWallet } = wallet;
+  const { walletAddress, activatingId, deactivateWallet, activateWallet } = wallet;
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
@@ -100,8 +100,8 @@ function AccountModule({ compact = false }: Props) {
       setActivatingDelayed(undefined);
     }
 
-    if (activating) {
-      setActivatingDelayed(!!activating);
+    if (activatingId) {
+      setActivatingDelayed(!!activatingId);
       return noop;
     }
 
@@ -112,7 +112,7 @@ function AccountModule({ compact = false }: Props) {
     return () => {
       clearTimeout(timer);
     };
-  }, [activating, wallet.activationError]);
+  }, [activatingId, wallet.activationError]);
 
   const previousScreenIndex = useRef(-1);
 
@@ -191,7 +191,7 @@ function AccountModule({ compact = false }: Props) {
             config={springs.smooth}
             items={{
               screen,
-              activating: wallet.activating,
+              activating: wallet.activatingId,
               wallet,
             }}
             keys={({ screen }) => screen.id + activatingDelayed}
