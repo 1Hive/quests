@@ -81,7 +81,6 @@ function AccountModule({ compact = false }: Props) {
     async (id?: string) => {
       try {
         if (id || (await isConnected())) {
-          if (!id) id = getProviderFromUseWalletId()?.id;
           await activateWallet(id);
         }
       } catch (error: any) {

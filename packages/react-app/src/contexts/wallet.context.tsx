@@ -41,13 +41,29 @@ function WalletAugmented({ children }: Props) {
     });
   }, [ethereum]);
 
+  const handleActivateWallet = (id?: string) => {
+    if (!id) {
+      id = localStorage.getItem('LAST_WALLET_CONNECTOR') ?? undefined;
+    }
+    if (id) {
+      wallet.connect(id);
+      localStorage.setItem('LAST_WALLET_CONNECTOR', id);
+    }
+  };
+
+  const handleDeactivateWallet = () => {
+    wallet.reset();
+    localStorage.removeItem('LAST_WALLET_CONNECTOR');
+  };
+
   const contextValue = useMemo(
     () => ({
       ...wallet,
       ethers,
       walletAddress: wallet.account,
-      activateWallet: wallet.connect,
-      deactivateWallet: wallet.reset,
+      activateWallet: handleActivateWallet,
+      deactivateWallet: handleDeactivateWallet,
+      activated: wallet.connector,
     }),
     [wallet, ethers],
   );

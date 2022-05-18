@@ -117,8 +117,7 @@ function getProviderFromUseWalletId(id?: string) {
   let provider;
   if (!id && ethers) {
     provider = getProvider(identifyProvider(ethers)) || getProvider('unknown');
-  }
-  if (id) provider = getProvider(id);
+  } else if (id) provider = getProvider(id);
   return provider ?? getProvider('unknown');
 }
 
