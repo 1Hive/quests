@@ -46,8 +46,8 @@ function WalletAugmented({ children }: Props) {
       ...wallet,
       ethers,
       walletAddress: wallet.account,
-      activateWallet: wallet.activate,
-      deactivateWallet: wallet.deactivate,
+      activateWallet: wallet.connect,
+      deactivateWallet: wallet.reset,
     }),
     [wallet, ethers],
   );

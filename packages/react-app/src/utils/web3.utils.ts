@@ -49,17 +49,27 @@ export async function isConnected() {
 }
 
 export function getUseWalletProviders() {
+  const { chainId } = getNetwork();
   const providersIds = ['injected', 'frame'];
 
-  const providers = providersIds.map((id) => getProvider(id));
+  let providers = providersIds.map((id) => getProvider(id));
 
-  return providers.filter(
+  providers.push({
+    ...getProvider('walletconnect'),
+    useWalletConf: {
+      rpc: {
+        [chainId]: getRpcUrl(),
+      },
+    },
+  } as any);
+  providers = providers.filter(
     (p) =>
       p != null &&
       ((p.type === 'Mobile' && isMobile) ||
         (p.type === 'Desktop' && isDesktop) ||
         p.type === 'Any'),
-  ) as any[];
+  );
+  return providers as any[];
 }
 
 export function getNetworkId(chainId = getDefaultChain()) {
@@ -129,14 +139,19 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 
   return +ethers.utils.formatUnits(bigNumber, decimals);
 }
 
-export function getDefaultProvider() {
-  const { httpProvider, chainId: expectedChainId } = getNetwork();
+export function getRpc() {
+  const { chainId: expectedChainId } = getNetwork();
   let provider = ethOrWeb;
   if (!provider || +provider.chainId !== +expectedChainId) {
-    provider = new Web3.providers.HttpProvider(`${httpProvider}/${env('INFURA_API_KEY')}`);
+    provider = new Web3.providers.HttpProvider(getRpcUrl());
   }
 
   return provider && new ethers.providers.Web3Provider(provider);
+}
+
+export function getRpcUrl(chainId?: number) {
+  const { rpcUri, rpcKeyEnvName } = getNetwork(chainId);
+  return `${rpcUri}${rpcKeyEnvName ? `/${env(rpcKeyEnvName)}` : ''}`;
 }
 
 // Re-export some web3-utils functions
