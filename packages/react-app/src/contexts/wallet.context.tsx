@@ -76,6 +76,11 @@ function WalletAugmented({ children }: Props) {
     await wallet.connect(id);
   };
 
+  const handleDeconnect = () => {
+    wallet.reset();
+    localStorage.removeItem('LAST_WALLET_CONNECTOR');
+    setActivating(undefined);
+  };
   const contextValue = useMemo(
     () => ({
       ...wallet,
@@ -83,10 +88,7 @@ function WalletAugmented({ children }: Props) {
       activationError,
       walletAddress: wallet.account,
       activateWallet: handleConnect,
-      deactivateWallet: () => {
-        wallet.reset();
-        localStorage.removeItem('LAST_WALLET_CONNECTOR');
-      },
+      deactivateWallet: handleDeconnect,
       activated: wallet.connector,
       activating,
     }),
