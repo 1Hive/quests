@@ -58,7 +58,7 @@ export function getUseWalletProviders() {
     ...getProvider('walletconnect'),
     useWalletConf: {
       rpc: {
-        [chainId]: getRpcUrl(),
+        [chainId]: getRpcUrl(chainId),
       },
     },
   } as any);
