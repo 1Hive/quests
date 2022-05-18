@@ -102,9 +102,9 @@ const TokenAmountBadge = React.memo(
     const label = useMemo(() => {
       let temp = '';
       if (amount !== false && amount !== undefined) {
-        const amountFormat = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 4 }).format(
-          amount,
-        );
+        const amountFormat = new Intl.NumberFormat('en-US', {
+          maximumFractionDigits: 4,
+        }).format(amount);
         temp += `${amountFormat} `;
       }
       temp += `${token.symbol}`;
@@ -318,7 +318,7 @@ function AmountFieldInput({
               disabled={!token ? true : disabled}
             />
           ) : (
-            Intl.NumberFormat('en-IN', { maximumSignificantDigits: 4 }).format(amount)
+            Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(amount)
           ))}
       </AmountTokenWrapperStyled>
     </FieldInput>
