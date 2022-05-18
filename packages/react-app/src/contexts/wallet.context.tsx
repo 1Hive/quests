@@ -1,15 +1,16 @@
 import { providers as EthersProviders } from 'ethers';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { getProviderFromUseWalletId } from 'src/ethereum-providers';
 import { useWallet, UseWalletProvider } from 'use-wallet';
 import { getNetwork } from '../networks';
 import { getUseWalletConnectors } from '../utils/web3.utils';
 
 export type WalletContextModel = {
   walletAddress: string;
-  activating: any;
   deactivateWallet: Function;
   activateWallet: Function;
   activated: string;
+  activating: string;
   activationError: { name: string; message: string };
 };
 
@@ -28,7 +29,7 @@ function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
   const { ethereum } = wallet;
   const [activationError, setActivationError] = useState<{ name: string; message: string }>();
-  const [activating, setActivating] = useState(false);
+  const [activating, setActivating] = useState<string>();
 
   useEffect(() => {
     const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
@@ -40,10 +41,14 @@ function WalletAugmented({ children }: Props) {
   const ethers = useMemo(() => {
     const { chainId, networkId, name } = getNetwork();
 
+    window.ethereum = ethereum;
+    ethereum?.on('chainChanged', (_chainId: string) => window.location.reload());
+
     if (ethereum && +ethereum.chainId !== chainId) {
+      const connectorInfo = getProviderFromUseWalletId(wallet.connector);
       setActivationError({
         name: 'Wrong Network',
-        message: `Please select the ${name} network in your wallet and try again.`,
+        message: `Please select the ${name} network in your wallet (${connectorInfo?.name}) and try again.`,
       });
       return null;
     }
@@ -63,9 +68,9 @@ function WalletAugmented({ children }: Props) {
   }, [ethereum]);
 
   const handleConnect = async (id: string) => {
-    setActivating(true);
+    setActivating(id);
     await wallet.connect(id);
-    setActivating(false);
+    setActivating(undefined);
   };
 
   const contextValue = useMemo(

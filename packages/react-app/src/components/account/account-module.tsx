@@ -101,7 +101,7 @@ function AccountModule({ compact = false }: Props) {
     }
 
     if (activating) {
-      setActivatingDelayed(activating);
+      setActivatingDelayed(!!activating);
       return noop;
     }
 
@@ -191,7 +191,7 @@ function AccountModule({ compact = false }: Props) {
             config={springs.smooth}
             items={{
               screen,
-              activating: screen.id === 'error' ? null : activatingDelayed,
+              activating: wallet.activating,
               wallet,
             }}
             keys={({ screen }) => screen.id + activatingDelayed}
@@ -213,7 +213,7 @@ function AccountModule({ compact = false }: Props) {
                       if (screen.id === 'connecting') {
                         return (
                           <AccountModuleConnectingScreen
-                            providerId={activating as any}
+                            providerId={activating}
                             onCancel={handleCancelConnection}
                           />
                         );

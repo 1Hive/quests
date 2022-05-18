@@ -1,18 +1,15 @@
 import { BigNumber, ethers } from 'ethers';
 import { noop } from 'lodash-es';
-import { getProvider } from 'src/ethereum-providers';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { isDesktop, isMobile } from 'react-device-detect';
+import { getProvider } from 'src/ethereum-providers';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = '';
-
-const ethOrWeb = (window as any).ethereum ?? (window as any).web3?.currentProvider;
-ethOrWeb?.on('chainChanged', (_chainId: string) => window.location.reload());
 
 export function getWeb3(): Web3 {
   let ethereum: any = null;
@@ -139,9 +136,9 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 
   return +ethers.utils.formatUnits(bigNumber, decimals);
 }
 
-export function getRpc() {
+export function getDefaultProvider() {
   const { chainId: expectedChainId } = getNetwork();
-  let provider = ethOrWeb;
+  let provider = (window as any).ethereum ?? (window as any).web3?.currentProvider;
   if (!provider || +provider.chainId !== +expectedChainId) {
     provider = new Web3.providers.HttpProvider(getRpcUrl());
   }

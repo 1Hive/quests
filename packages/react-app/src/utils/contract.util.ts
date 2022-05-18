@@ -1,6 +1,6 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
-import { getRpc } from 'src/utils/web3.utils';
+import { getDefaultProvider } from 'src/utils/web3.utils';
 import { toChecksumAddress } from 'web3-utils';
 import { ContractInstanceError } from 'src/models/contract-error';
 import { Logger } from 'src/utils/logger';
@@ -42,7 +42,7 @@ function getContract(
     const askedContract = contracts[contractName];
     const contractAddress = contractAddressOverride ?? askedContract.address;
     const contractAbi = askedContract.abi ?? askedContract;
-    const provider = getRpc();
+    const provider = getDefaultProvider();
 
     if (!contractAddress) throw new Error(`${contractName} address was not defined`);
     if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
