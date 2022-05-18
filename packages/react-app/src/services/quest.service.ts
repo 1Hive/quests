@@ -426,7 +426,7 @@ export async function reclaimQuestUnusedFunds(
   const questContract = getQuestContract(quest.address, walletAddress);
   if (!questContract) return null;
   Logger.debug('Reclaiming quest unused funds...', { quest });
-  const tx = await questContract.recoverUnclaimedFunds({
+  const tx = await questContract.recoverFundsAndDeposit({
     gasLimit: 1000000,
   });
   return handleTransaction(tx, onTx);

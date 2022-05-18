@@ -111,9 +111,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   };
 
   const challengeTx = async (values: Partial<ChallengeModel>) => {
-    if (!values.reason) {
-      toast('Reason is required');
-    } else {
+    if (isFormValid) {
       try {
         setLoading(true);
         const { governQueueAddress } = getNetwork();
@@ -166,7 +164,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
           {
-            reason: values.reason,
+            reason: values.reason!,
             deposit: challengeDeposit,
             challengerAddress: walletAddress,
           },
