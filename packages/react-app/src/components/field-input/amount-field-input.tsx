@@ -11,7 +11,6 @@ import { arrayDistinctBy } from 'src/utils/array.util';
 import { getTokenInfo } from 'src/utils/contract.util';
 import { GUpx } from 'src/utils/style.util';
 import { Logger } from 'src/utils/logger';
-import { floorNumber } from 'src/utils/math.utils';
 import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
@@ -83,7 +82,6 @@ type TokenBadgeProp = {
   token?: TokenModel;
   amount?: number | false;
   usdValue?: number | false;
-  decimalsCount?: number;
 };
 
 const TokenAmountBadge = React.memo(
@@ -99,13 +97,15 @@ const TokenAmountBadge = React.memo(
     },
     amount,
     usdValue,
-    decimalsCount,
   }: TokenBadgeProp) => {
     const copyCode = useCopyToClipboard();
     const label = useMemo(() => {
       let temp = '';
       if (amount !== false && amount !== undefined) {
-        temp += `${floorNumber(amount ?? 0, decimalsCount).toLocaleString()} `;
+        const amountFormat = new Intl.NumberFormat('en-US', {
+          maximumFractionDigits: 4,
+        }).format(amount);
+        temp += `${amountFormat} `;
       }
       temp += `${token.symbol}`;
       if (usdValue) {
@@ -151,7 +151,6 @@ type Props = {
   formik?: FormikContextType<any>;
   compact?: boolean;
   tooltip?: ReactNode;
-  maxDecimals?: number;
   disabled?: boolean;
   wide?: boolean;
   tokenEditable?: boolean;
@@ -174,7 +173,6 @@ function AmountFieldInput({
   formik,
   tooltip,
   compact = false,
-  maxDecimals,
   disabled = false,
   wide = false,
   tokenEditable = false,
@@ -185,7 +183,6 @@ function AmountFieldInput({
 }: Props) {
   let mounted = true;
   const { networkId } = getNetwork();
-  const [decimalsCount, setDecimalsCount] = useState(maxDecimals);
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount);
@@ -234,13 +231,6 @@ function AmountFieldInput({
       }
     }
   }, [searchTerm, availableTokens, _hasFocused]);
-
-  useEffect(() => {
-    if (!isEdit) {
-      if (value?.parsedAmount && (!maxDecimals || maxDecimals > 0))
-        setDecimalsCount(maxDecimals ?? 4);
-    }
-  }, [maxDecimals, isEdit, value?.parsedAmount]);
 
   useEffect(() => {
     setAmount(value?.parsedAmount ?? 0);
@@ -328,7 +318,7 @@ function AmountFieldInput({
               disabled={!token ? true : disabled}
             />
           ) : (
-            floorNumber(amount, decimalsCount).toLocaleString()
+            Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(amount)
           ))}
       </AmountTokenWrapperStyled>
     </FieldInput>
@@ -349,7 +339,6 @@ function AmountFieldInput({
           token={token}
           amount={tagOnly && amount}
           usdValue={showUsd && value?.usdValue}
-          decimalsCount={decimalsCount}
         />
       ) : (
         <AutoCompleteWrapperStyled wide={wide}>
