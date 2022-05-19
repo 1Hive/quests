@@ -9,7 +9,7 @@ import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { Logger } from './logger';
 
-const DEFAULT_LOCAL_CHAIN = '';
+const DEFAULT_LOCAL_CHAIN = 'custom';
 
 export function getWeb3(): Web3 {
   let ethereum: any = null;
@@ -70,13 +70,12 @@ export function getUseWalletProviders() {
 }
 
 export function getNetworkId(chainId = getDefaultChain()) {
-  const chainIdStr = String(chainId);
-
   let key;
-  if (chainIdStr === '1') key = 'mainnet';
-  if (chainIdStr === '3') key = 'ropsten';
-  if (chainIdStr === '4') key = 'rinkeby';
-  if (chainIdStr === '100') key = 'xdai';
+  if (chainId === 1) key = 'mainnet';
+  if (chainId === 3) key = 'ropsten';
+  if (chainId === 4) key = 'rinkeby';
+  if (chainId === 100) key = 'xdai';
+  if (chainId === 1337) key = 'local';
   if (key) {
     if (env('STAGING')) key += 'Staging';
     return key;
@@ -86,7 +85,7 @@ export function getNetworkId(chainId = getDefaultChain()) {
 }
 
 export function isLocalOrUnknownNetwork(chainId = getDefaultChain()) {
-  return getNetworkId(chainId) === DEFAULT_LOCAL_CHAIN;
+  return chainId === 1337 || getNetworkId(chainId) === DEFAULT_LOCAL_CHAIN;
 }
 
 export function getUseWalletConnectors() {

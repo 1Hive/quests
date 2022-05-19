@@ -191,7 +191,7 @@ function AccountModule({ compact = false }: Props) {
             config={springs.smooth}
             items={{
               screen,
-              activating: wallet.activatingId,
+              activatingId: wallet.activatingId,
               wallet,
             }}
             keys={({ screen }) => screen.id + activatingDelayed}
@@ -205,7 +205,7 @@ function AccountModule({ compact = false }: Props) {
               transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
             }}
           >
-            {({ screen, activating, wallet }) =>
+            {({ screen, activatingId, wallet }) =>
               ({ opacity, transform }: any) =>
                 (
                   <AnimatedDivStyled style={{ opacity, transform }}>
@@ -213,7 +213,7 @@ function AccountModule({ compact = false }: Props) {
                       if (screen.id === 'connecting') {
                         return (
                           <AccountModuleConnectingScreen
-                            providerId={activating}
+                            providerId={activatingId}
                             onCancel={handleCancelConnection}
                           />
                         );
