@@ -3,7 +3,7 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { getDefaultProvider } from 'ethers';
+import { getDefaultProvider } from './web3.utils';
 
 const KNOWN_FORMATS = {
   onlydate: 'DD/MM/YYYY',
