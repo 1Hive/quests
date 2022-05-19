@@ -9,7 +9,7 @@ import {
 } from '@1hive/1hive-ui';
 import { useCallback } from 'react';
 import { GUpx } from 'src/utils/style.util';
-import { getProviderFromUseWalletId } from '../../ethereum-providers';
+import { getProviderFromUseWalletId } from 'src/ethereum-providers';
 import { useCopyToClipboard } from '../../hooks/use-copy-to-clipboard.hook';
 import { getNetworkName } from '../../utils/web3.utils';
 import IdentityBadge from '../identity-badge';
@@ -24,7 +24,7 @@ function AccountScreenConnected({ wallet }: Props) {
   const copy = useCopyToClipboard();
 
   const networkName = getNetworkName();
-  const providerInfo = getProviderFromUseWalletId(wallet.activated) ?? {
+  const providerInfo = getProviderFromUseWalletId(wallet.activatedId) ?? {
     name: 'Unknown',
     image: undefined,
     id: undefined,
@@ -41,12 +41,7 @@ function AccountScreenConnected({ wallet }: Props) {
         padding: ${GUpx(2)};
       `}
     >
-      <div
-        // @ts-ignore
-        css={`
-          padding-top: ${GUpx(2)};
-        `}
-      >
+      <div>
         <h4
           // @ts-ignore
           css={`
@@ -71,6 +66,7 @@ function AccountScreenConnected({ wallet }: Props) {
               display: flex;
               align-items: center;
               margin-right: ${GUpx(3)};
+              height: ${GUpx(6)};
             `}
           >
             <img

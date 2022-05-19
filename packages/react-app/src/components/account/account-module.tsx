@@ -4,7 +4,6 @@ import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
-import { Logger } from 'src/utils/logger';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
@@ -34,9 +33,9 @@ const SCREENS = [
   {
     id: 'providers',
     height:
-      6 * GU + // header
-      (12 + 1.5) * GU * Math.ceil(getUseWalletProviders().length / 2) + // buttons
-      7 * GU, // footer
+      66 + // header
+      104 * getUseWalletProviders().length + // buttons
+      40, // footer
   },
   {
     id: 'connecting',
@@ -59,15 +58,12 @@ type Props = {
 function AccountModule({ compact = false }: Props) {
   const buttonRef = useRef<any>();
   const wallet = useWallet();
-  const { walletAddress, activating, deactivateWallet, activateWallet } = wallet;
+  const { walletAddress, activatingId, deactivateWallet, activateWallet } = wallet;
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
-  const [activationError, setActivationError] = useState();
   const popoverFocusElement = useRef<any>();
   const [buttonLabel, setButtonLabel] = useState<string>();
-
-  const clearError = useCallback(() => setActivationError(undefined), []);
 
   const toggle = useCallback(() => setOpened((opened) => !opened), []);
 
@@ -76,22 +72,13 @@ function AccountModule({ compact = false }: Props) {
   }, [walletAddress]);
 
   const activate = useCallback(
-    async (providerId: string = 'injected') => {
-      try {
-        if (await isConnected()) {
-          await activateWallet(providerId);
-        }
-      } catch (error: any) {
-        setActivationError(error);
-        Logger.warn(error);
+    async (id?: string) => {
+      if (id || (await isConnected())) {
+        await activateWallet(id);
       }
     },
     [walletAddress],
   );
-
-  useEffect(() => {
-    activate();
-  }, []);
 
   // Don’t animate the slider until the popover has opened
   useEffect(() => {
@@ -109,12 +96,12 @@ function AccountModule({ compact = false }: Props) {
 
   // Always show the “connecting…” screen, even if there are no delay
   useEffect(() => {
-    if (activationError) {
+    if (wallet.activationError) {
       setActivatingDelayed(undefined);
     }
 
-    if (activating) {
-      setActivatingDelayed(activating);
+    if (activatingId) {
+      setActivatingDelayed(!!activatingId);
       return noop;
     }
 
@@ -125,14 +112,14 @@ function AccountModule({ compact = false }: Props) {
     return () => {
       clearTimeout(timer);
     };
-  }, [activating, activationError]);
+  }, [activatingId, wallet.activationError]);
 
   const previousScreenIndex = useRef(-1);
 
   const { screenIndex, direction } = useMemo(() => {
     const screenId = (() => {
-      if (activationError) {
-        setButtonLabel('Wrong network');
+      if (wallet.activationError) {
+        setButtonLabel(wallet.activationError.name);
         return 'error';
       }
       if (activatingDelayed) {
@@ -151,7 +138,7 @@ function AccountModule({ compact = false }: Props) {
     previousScreenIndex.current = screenIndex;
 
     return { direction, screenIndex };
-  }, [walletAddress, activationError, activatingDelayed]);
+  }, [walletAddress, wallet.activationError, activatingDelayed]);
 
   const screen = SCREENS[screenIndex];
   const screenId = screen.id;
@@ -162,7 +149,6 @@ function AccountModule({ compact = false }: Props) {
       return false;
     }
     setOpened(false);
-    setActivationError(undefined);
     return true;
   }, [screenId]);
 
@@ -205,7 +191,7 @@ function AccountModule({ compact = false }: Props) {
             config={springs.smooth}
             items={{
               screen,
-              activating: screen.id === 'error' ? null : activatingDelayed,
+              activatingId: wallet.activatingId,
               wallet,
             }}
             keys={({ screen }) => screen.id + activatingDelayed}
@@ -219,7 +205,7 @@ function AccountModule({ compact = false }: Props) {
               transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
             }}
           >
-            {({ screen, activating, wallet }) =>
+            {({ screen, activatingId, wallet }) =>
               ({ opacity, transform }: any) =>
                 (
                   <AnimatedDivStyled style={{ opacity, transform }}>
@@ -227,7 +213,7 @@ function AccountModule({ compact = false }: Props) {
                       if (screen.id === 'connecting') {
                         return (
                           <AccountModuleConnectingScreen
-                            providerId={activating as any}
+                            providerId={activatingId}
                             onCancel={handleCancelConnection}
                           />
                         );
@@ -237,7 +223,10 @@ function AccountModule({ compact = false }: Props) {
                       }
                       if (screen.id === 'error') {
                         return (
-                          <AccountModuleErrorScreen error={activationError} onBack={clearError} />
+                          <AccountModuleErrorScreen
+                            error={wallet.activationError}
+                            onBack={() => wallet.deactivateWallet()}
+                          />
                         );
                       }
                       return <ScreenProviders onActivate={activate} />;

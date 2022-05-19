@@ -26,7 +26,7 @@ import {
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, IS_DEV } from '../constants';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -360,12 +360,10 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   ).filter((x) => !!x) as TokenAmountModel[];
   const totalFunds = funds.map((x) => x.usdValue).filter((x) => x !== undefined) as number[];
 
-  if (IS_DEV) {
-    BigNumber.prototype.toJSON = function toJSON() {
-      return fromBigNumber(this, 18);
-    };
-    Logger.debug('totalFunds', JSON.stringify(totalFunds, null, 4));
-  }
+  BigNumber.prototype.toJSON = function toJSON() {
+    return fromBigNumber(this, 18);
+  };
+  Logger.debug('totalFunds', JSON.stringify(totalFunds, null, 4));
 
   const totalFundsSummed = totalFunds.length ? totalFunds.reduce((a, b) => a + b) : 0;
 

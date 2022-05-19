@@ -3,14 +3,13 @@ import { noop } from 'lodash-es';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
+import { isDesktop, isMobile } from 'react-device-detect';
+import { getProvider } from 'src/ethereum-providers';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { Logger } from './logger';
 
-const DEFAULT_LOCAL_CHAIN = 'private';
-
-const ethOrWeb = (window as any).ethereum ?? (window as any).web3?.currentProvider;
-ethOrWeb?.on('chainChanged', (_chainId: string) => window.location.reload());
+const DEFAULT_LOCAL_CHAIN = 'custom';
 
 export function getWeb3(): Web3 {
   let ethereum: any = null;
@@ -47,26 +46,36 @@ export async function isConnected() {
 }
 
 export function getUseWalletProviders() {
-  const providers = [{ id: 'injected' }];
+  const { chainId } = getNetwork();
+  const providersIds = ['injected', 'frame'];
 
-  if (env('FORTMATIC_API_KEY')) {
-    providers.push({
-      id: 'fortmatic',
-      useWalletConf: { apiKey: env('FORTMATIC_API_KEY') },
-    } as any);
-  }
+  let providers = providersIds.map((id) => getProvider(id));
 
-  return providers;
+  providers.push({
+    ...getProvider('walletconnect'),
+    useWalletConf: {
+      rpc: {
+        [chainId]: getRpcUrl(chainId),
+      },
+    },
+  } as any);
+  providers = providers.filter(
+    (p) =>
+      p != null &&
+      ((p.type === 'Mobile' && isMobile) ||
+        (p.type === 'Desktop' && isDesktop) ||
+        p.type === 'Any'),
+  );
+  return providers as any[];
 }
 
-export function getNetworkType(chainId = getDefaultChain()) {
-  const chainIdStr = String(chainId);
-
+export function getNetworkId(chainId = getDefaultChain()) {
   let key;
-  if (chainIdStr === '1') key = 'mainnet';
-  if (chainIdStr === '3') key = 'ropsten';
-  if (chainIdStr === '4') key = 'rinkeby';
-  if (chainIdStr === '100') key = 'xdai';
+  if (chainId === 1) key = 'mainnet';
+  if (chainId === 3) key = 'ropsten';
+  if (chainId === 4) key = 'rinkeby';
+  if (chainId === 100) key = 'xdai';
+  if (chainId === 1337) key = 'local';
   if (key) {
     if (env('STAGING')) key += 'Staging';
     return key;
@@ -76,7 +85,7 @@ export function getNetworkType(chainId = getDefaultChain()) {
 }
 
 export function isLocalOrUnknownNetwork(chainId = getDefaultChain()) {
-  return getNetworkType(chainId) === DEFAULT_LOCAL_CHAIN;
+  return chainId === 1337 || getNetworkId(chainId) === DEFAULT_LOCAL_CHAIN;
 }
 
 export function getUseWalletConnectors() {
@@ -94,7 +103,7 @@ export function getNetworkName(chainId = getDefaultChain()) {
   if (chainIdStr === '1') return 'Mainnet';
   if (chainIdStr === '3') return 'Ropsten';
   if (chainIdStr === '4') return 'Rinkeby';
-  if (chainIdStr === '100') return 'xDai';
+  if (chainIdStr === '100') return 'Gnosis';
 
   return 'unknown';
 }
@@ -127,13 +136,18 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 
 }
 
 export function getDefaultProvider() {
-  const { httpProvider, chainId: expectedChainId } = getNetwork();
-  let provider = ethOrWeb;
+  const { chainId: expectedChainId } = getNetwork();
+  let provider = (window as any).ethereum ?? (window as any).web3?.currentProvider;
   if (!provider || +provider.chainId !== +expectedChainId) {
-    provider = new Web3.providers.HttpProvider(`${httpProvider}/${env('INFURA_API_KEY')}`);
+    provider = new Web3.providers.HttpProvider(getRpcUrl());
   }
 
   return provider && new ethers.providers.Web3Provider(provider);
+}
+
+export function getRpcUrl(chainId?: number) {
+  const { rpcUri, rpcKeyEnvName } = getNetwork(chainId);
+  return `${rpcUri}${rpcKeyEnvName ? `/${env(rpcKeyEnvName)}` : ''}`;
 }
 
 // Re-export some web3-utils functions
