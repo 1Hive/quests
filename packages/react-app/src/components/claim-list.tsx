@@ -47,7 +47,7 @@ type Props = {
   isLoading?: boolean;
 };
 
-const loadingClaim = [{ state: ENUM_CLAIM_STATE.None } as ClaimModel];
+const loadingClaim = { state: ENUM_CLAIM_STATE.None } as ClaimModel;
 
 export default function ClaimList({
   questData,
@@ -55,7 +55,7 @@ export default function ClaimList({
   questTotalBounty,
   isLoading = false,
 }: Props) {
-  const [claims, setClaims] = useState<ClaimModel[]>(loadingClaim);
+  const [claims, setClaims] = useState<ClaimModel[]>([loadingClaim]);
   const [isLoadingState, setIsLoading] = useState(isLoading);
   const { transaction } = useTransactionContext();
   let isMounted = true;
@@ -89,7 +89,7 @@ export default function ClaimList({
 
   const fetchClaimsUntilNew = (claimsCount?: number) => {
     if (!claimsCount) {
-      setIsLoading(true);
+      setClaims([loadingClaim, ...claims]);
       claimsCount = claims.length;
     }
     setTimeout(async () => {

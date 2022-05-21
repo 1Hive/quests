@@ -49,6 +49,11 @@ yarn start:rinkeby
 2. Click Enable Button account
 3. Click on Metamask button
 
+### Code review
+- main <- dev <- other branches
+- Required reviewer for main <- dev
+- [Suggested QA sanity routine](https://hackmd.io/@Gossman/HkLGbAHPc)
+
 ### Additional Resources
 
 - [Kanban board](https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board)

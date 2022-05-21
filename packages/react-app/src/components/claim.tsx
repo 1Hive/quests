@@ -20,10 +20,13 @@ import { Outset, ChildSpacer } from './utils/spacer-util';
 
 const AddressWrapperStyled = styled.div<{ isSmallScreen: boolean }>`
   ${({ isSmallScreen }) =>
-    isSmallScreen &&
-    css`
-      max-width: 200px;
-    `}
+    isSmallScreen
+      ? css`
+          max-width: 200px;
+        `
+      : css`
+          margin-top: 8px;
+        `}
 `;
 
 // #endregion
@@ -129,7 +132,11 @@ export default function Claim({
           buttonEnd
           vertical={below('medium')}
         >
-          <FieldInput label="Status" isLoading={isLoading || state === ENUM_CLAIM_STATE.None}>
+          <FieldInput
+            label="Status"
+            isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
+            compact
+          >
             <StateTag state={state ?? ''} className="pl-0" />
           </FieldInput>
           <AddressWrapperStyled isSmallScreen={below('medium')}>

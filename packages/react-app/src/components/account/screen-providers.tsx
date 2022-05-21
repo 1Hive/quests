@@ -61,9 +61,7 @@ function ScreenProviders({ onActivate }: ScreenProvidersProps) {
             margin-top: ${2 * GU}px;
           `}
         >
-          <Link href="https://ethereum.org/wallets/" css="text-decoration: none">
-            What is an Ethereum provider?
-          </Link>
+          <Link href="https://ethereum.org/wallets/">What is an Ethereum provider?</Link>
         </div>
       </div>
     </div>

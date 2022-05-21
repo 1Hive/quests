@@ -1,6 +1,6 @@
 import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getDefaultChain } from './local-settings';
-import { getNetworkType, isLocalOrUnknownNetwork } from './utils/web3.utils';
+import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel } from './models/network.model';
 import { TOKENS } from './constants';
 
@@ -20,7 +20,8 @@ export const networks = Object.freeze({
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[4].rinkeby.contracts.GovernQueue.address,
     celesteAddress: HardhatDeployement[4].rinkeby.contracts.Celeste.address,
-    httpProvider: 'https://rinkeby.infura.io/v3',
+    rpcUri: 'https://rinkeby.infura.io/v3',
+    rpcKeyEnvName: 'INFURA_API_KEY',
     isTestNetwork: true,
     stableTokens: [TOKENS.RinkebyDai, TOKENS.RinkebyTheter],
   },
@@ -39,7 +40,7 @@ export const networks = Object.freeze({
     questFactoryAddress: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[100]?.xdai.contracts.GovernQueue.address,
     celesteAddress: 'TODO',
-    httpProvider: 'https://xdai.poanetwork.dev',
+    rpcUri: 'https://rpc.gnosischain.com/',
     isTestNetwork: false,
     stableTokens: [TOKENS.Thether, TOKENS.UsdCoin],
   } as NetworkModel,
@@ -59,7 +60,7 @@ export const networks = Object.freeze({
 } as { [key: string]: NetworkModel | StagingNetworkModel });
 
 function getNetworkInternalName(chainId = getDefaultChain()) {
-  return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkType(chainId);
+  return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkId(chainId);
 }
 
 export function getNetwork(chainId = getDefaultChain()): NetworkModel {
