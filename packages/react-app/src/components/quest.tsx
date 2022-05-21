@@ -123,6 +123,7 @@ export default function Quest({
   const [state, setState] = useState(questData.state);
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
+  const [waitForClose, setWaitForClose] = useState(false);
   let isMounted = true;
 
   useEffect(() => {
@@ -151,19 +152,26 @@ export default function Quest({
   useEffect(() => {
     // If tx completion impact Quest bounty, update it
     if (
-      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction.args?.questAddress === questData.address &&
+      transaction?.args?.questAddress === questData.address &&
       (transaction?.type === 'ClaimChallengeResolve' ||
         transaction?.type === 'ClaimExecute' ||
         transaction?.type === 'QuestFund' ||
         transaction?.type === 'QuestReclaimFunds')
     ) {
-      setBounty(null);
-      setTimeout(() => {
-        if (questData.address && questData.rewardToken) {
-          fetchBalanceOfQuest(questData.address, questData.rewardToken);
-        }
-      }, 500);
+      if (
+        transaction?.status === ENUM_TRANSACTION_STATUS.Pending &&
+        transaction?.type === 'QuestReclaimFunds'
+      ) {
+        // Should wait for close beecause changing the state will cause QuestReclaimFunds to be removed from DOM
+        setWaitForClose(true);
+      } else if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) {
+        setBounty(null);
+        setTimeout(() => {
+          if (questData.address && questData.rewardToken) {
+            fetchBalanceOfQuest(questData.address, questData.rewardToken);
+          }
+        }, 500);
+      }
     }
   }, [transaction?.type, transaction?.status]);
 
@@ -355,11 +363,12 @@ export default function Quest({
                 </>
               ) : (
                 <>
-                  {state === ENUM_QUEST_STATE.Expired && (
+                  {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
                     <ReclaimFundsModal
                       bounty={bounty}
                       questData={questData}
                       isDepositReleased={isDepositReleased}
+                      onClose={() => setWaitForClose(false)}
                     />
                   )}
                 </>
