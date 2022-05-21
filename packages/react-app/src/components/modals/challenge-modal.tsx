@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-undef */
 import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
@@ -57,7 +58,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('challenge-modal'), []);
@@ -281,7 +282,23 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           type="submit"
           form="form-challenge"
           disabled={
-            loading || !walletAddress || !isEnoughBalance || challengeTimeout || !isFormValid
+            loading ||
+            !walletAddress ||
+            !isEnoughBalance ||
+            challengeTimeout ||
+            !isFormValid ||
+            transaction
+          }
+          title={
+            challengeTimeout
+              ? 'Challenge timeout'
+              : loading || !walletAddress
+              ? 'Not ready ...'
+              : !isFormValid
+              ? 'Form not valid'
+              : transaction
+              ? 'Wait for previous transaction to complete'
+              : 'Challenge'
           }
           className="m-8"
         />,

@@ -20,13 +20,10 @@ import { Outset, ChildSpacer } from './utils/spacer-util';
 
 const AddressWrapperStyled = styled.div<{ isSmallScreen: boolean }>`
   ${({ isSmallScreen }) =>
-    isSmallScreen
-      ? css`
-          max-width: 200px;
-        `
-      : css`
-          margin-top: 8px;
-        `}
+    isSmallScreen &&
+    css`
+      max-width: 200px;
+    `}
 `;
 
 // #endregion
@@ -132,11 +129,7 @@ export default function Claim({
           buttonEnd
           vertical={below('medium')}
         >
-          <FieldInput
-            label="Status"
-            isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
-            compact
-          >
+          <FieldInput label="Status" isLoading={isLoading || state === ENUM_CLAIM_STATE.None}>
             <StateTag state={state ?? ''} className="pl-0" />
           </FieldInput>
           <AddressWrapperStyled isSmallScreen={below('medium')}>
@@ -160,6 +153,7 @@ export default function Claim({
               label="Claimed amount"
               value={claim.claimedAmount}
               isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
+              compact={false}
             />
           )}
           {walletAddress && actionButton}
