@@ -325,7 +325,18 @@ function AmountFieldInput({
               disabled={!token ? true : disabled}
             />
           ) : (
-            <AmountEllipsisWrapperStyled>
+            <ConditionalWrapper
+              condition={compact}
+              wrapper={(children) => (
+                <AmountEllipsisWrapperStyled title={children?.toString()}>
+                  {children}
+                </AmountEllipsisWrapperStyled>
+              )}
+            >
+              {Intl.NumberFormat('en-US', { maximumFractionDigits: 4, useGrouping: true }).format(
+                amount,
+              )}
+            </ConditionalWrapper>
               {Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(amount)}
             </AmountEllipsisWrapperStyled>
           ))}
