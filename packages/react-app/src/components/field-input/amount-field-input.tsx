@@ -74,6 +74,13 @@ const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
   min-width: 0;
 `;
 
+const AmountEllipsisWrapperStyled = styled.div`
+  overflow: hidden;
+  max-width: ${GUpx(9)};
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 // #endregion
 
 type TokenBadgeProp = {
@@ -318,7 +325,9 @@ function AmountFieldInput({
               disabled={!token ? true : disabled}
             />
           ) : (
-            Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(amount)
+            <AmountEllipsisWrapperStyled>
+              {Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(amount)}
+            </AmountEllipsisWrapperStyled>
           ))}
       </AmountTokenWrapperStyled>
     </FieldInput>
