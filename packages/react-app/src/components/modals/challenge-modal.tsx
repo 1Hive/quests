@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-undef */
 import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useEffect, useMemo } from 'react';

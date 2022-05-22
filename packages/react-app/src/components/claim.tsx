@@ -153,7 +153,6 @@ export default function Claim({
               label="Claimed amount"
               value={claim.claimedAmount}
               isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
-              compact={false}
             />
           )}
           {walletAddress && actionButton}
