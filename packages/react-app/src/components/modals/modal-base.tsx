@@ -141,7 +141,7 @@ export default function ModalBase({
         {(buttons || txFailed) && (
           <ModalFooterStyled>
             <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>
-              {transaction
+              {transaction && transaction?.modalId === id
                 ? txFailed && <Button onClick={onBackButtonClick}>Back</Button>
                 : buttons}
             </ChildSpacer>

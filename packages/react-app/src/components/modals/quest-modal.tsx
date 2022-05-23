@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Button, IconPlus, useTheme } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -79,7 +80,7 @@ export default function QuestModal({
   const { questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
   const [questDeposit, setQuestDeposit] = useState<TokenAmountModel | null>();
@@ -334,8 +335,21 @@ export default function QuestModal({
                       type="submit"
                       form="form-quest"
                       className="m-8"
+                      title={
+                        !walletAddress || !questDeposit?.token
+                          ? 'Not ready ...'
+                          : !isFormValid
+                          ? 'Form not valid'
+                          : transaction
+                          ? 'Wait for previous transaction to complete'
+                          : 'Schedule claim'
+                      }
                       disabled={
-                        !walletAddress || !isEnoughBalance || !isFormValid || !questDeposit?.token
+                        !walletAddress ||
+                        !questDeposit?.token ||
+                        !isEnoughBalance ||
+                        !isFormValid ||
+                        transaction
                       }
                     />
                   </>

@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { getProviderFromUseWalletId } from 'src/ethereum-providers';
 import { useWallet, UseWalletProvider } from 'use-wallet';
 import { getNetwork } from '../networks';
-import { getUseWalletConnectors } from '../utils/web3.utils';
+import { getDefaultProvider, getUseWalletConnectors } from '../utils/web3.utils';
 
 export type WalletContextModel = {
   walletAddress: string;
@@ -54,13 +54,13 @@ function WalletAugmented({ children }: Props) {
         name: 'Wrong Network',
         message: `Please select the ${name} network in your wallet (${connectorInfo?.name}) and try again.`,
       });
-      return null;
+      return getDefaultProvider();
     }
 
     setActivationError(undefined);
 
     if (!ethereum) {
-      return new EthersProviders.JsonRpcProvider(undefined, chainId);
+      return getDefaultProvider();
     }
 
     const ensRegistry = undefined; // network?.ensRegistry;

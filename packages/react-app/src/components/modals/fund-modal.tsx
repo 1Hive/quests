@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Button } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop, uniqueId } from 'lodash-es';
@@ -37,7 +38,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const modalId = useMemo(() => uniqueId('fund-modal'), []);
 
@@ -111,8 +112,18 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               form="form-fund"
               label="Fund"
               mode="strong"
-              title={loading ? 'Loading ...' : 'Fund'}
-              disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+              title={
+                loading || !walletAddress
+                  ? 'Not ready ...'
+                  : !isFormValid
+                  ? 'Form not valid'
+                  : transaction
+                  ? 'Wait for previous transaction to complete'
+                  : 'Fund'
+              }
+              disabled={
+                loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction
+              }
             />,
           ]}
           onClose={closeModal}

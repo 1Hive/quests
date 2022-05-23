@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Button,
   IconFlag,
@@ -98,7 +99,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('resolve-challenge-modal'), []);
 
   useEffect(() => {
@@ -274,10 +275,22 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           label="Resolve"
           mode="positive"
           disabled={
-            loading || !walletAddress || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged
+            loading ||
+            !walletAddress ||
+            !isRuled ||
+            claim.state !== ENUM_CLAIM_STATE.Challenged ||
+            transaction
           }
           onClick={resolveChallengeTx}
-          title={isRuled ? 'Publish dispute result' : 'Need to be ruled in celeste'}
+          title={
+            !isRuled
+              ? 'Need to be ruled in celeste'
+              : loading || !walletAddress
+              ? 'Not ready ...'
+              : transaction
+              ? 'Wait for previous transaction to complete'
+              : 'Publish dispute result'
+          }
         />,
       ]}
       onClose={closeModal}

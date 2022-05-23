@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Button } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo, useEffect } from 'react';
@@ -66,7 +67,7 @@ export default function ScheduleClaimModal({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
   let mounted = true;
 
@@ -256,8 +257,18 @@ export default function ScheduleClaimModal({
                     type="submit"
                     form="form-claim"
                     className="m-8"
-                    title="Schedule claim"
-                    disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
+                    title={
+                      loading || !walletAddress
+                        ? 'Not ready ...'
+                        : !isFormValid
+                        ? 'Form not valid'
+                        : transaction
+                        ? 'Wait for previous transaction to complete'
+                        : 'Schedule claim'
+                    }
+                    disabled={
+                      loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction
+                    }
                   />
                 </>
               }
