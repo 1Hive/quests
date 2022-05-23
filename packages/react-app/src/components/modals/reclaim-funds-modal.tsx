@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Button, IconCoin } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
@@ -50,7 +51,7 @@ export default function ReclaimFundsModal({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
   const modalId = useMemo(() => uniqueId('reclaim-funds-modal'), []);
@@ -150,8 +151,14 @@ export default function ReclaimFundsModal({
             icon={<IconCoin />}
             label="Reclaim"
             mode="strong"
-            title={loading ? 'Loading ...' : 'Reclaim'}
-            disabled={loading || !walletAddress}
+            title={
+              loading || !walletAddress
+                ? 'Not ready ...'
+                : transaction
+                ? 'Wait for previous transaction to complete'
+                : 'Reclaim remaining funds and deposit'
+            }
+            disabled={loading || !walletAddress || transaction}
           />
         }
         onClose={closeModal}

@@ -301,13 +301,7 @@ function AmountFieldInput({
     else onChange(nextValue);
   };
   const amountField = (isEdit || !tagOnly) && (
-    <FieldInput
-      id={amountInputId}
-      key={amountInputId}
-      label={amountLabel}
-      wide={wide}
-      compact={compact}
-    >
+    <FieldInput id={amountInputId} key={amountInputId} label={amountLabel} wide={wide} compact>
       <AmountTokenWrapperStyled isEdit={isEdit} wide={wide}>
         {amount !== undefined &&
           (isEdit ? (
@@ -349,7 +343,7 @@ function AmountFieldInput({
       key={tokenInputId}
       label={tokenLabel}
       wide={wide}
-      compact={compact}
+      compact
       tooltip="Select a token between the list or paste the token address"
     >
       {!isEdit || token?.token ? (
@@ -402,7 +396,7 @@ function AmountFieldInput({
       tooltip={tooltip}
       isLoading={isLoading}
       wide={wide}
-      compact
+      compact={compact}
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
       error={error}
       className={!isEdit ? 'fit-content' : ''}

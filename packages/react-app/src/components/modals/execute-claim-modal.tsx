@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Button, IconCoin, Timer } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
@@ -43,7 +44,7 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
   const [amount, setAmount] = useState<TokenAmountModel>();
   const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
-  const { setTransaction } = useTransactionContext();
+  const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('execute-claim-modal'), []);
 
@@ -171,9 +172,17 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             label={buttonLabel}
             disabled={
               loading ||
+              !walletAddress ||
               !scheduleTimeout ||
               claim.state === ENUM_CLAIM_STATE.Challenged ||
-              !walletAddress
+              transaction
+            }
+            title={
+              loading || !walletAddress || !scheduleTimeout
+                ? 'Not ready ...'
+                : transaction
+                ? 'Wait for previous transaction to complete'
+                : 'Trigger claim operation in the chain'
             }
             mode="positive"
           />
