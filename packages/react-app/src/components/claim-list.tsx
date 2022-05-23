@@ -43,18 +43,12 @@ const BoxStyled = styled(Box)`
 type Props = {
   questData: QuestModel;
   challengeDeposit: TokenAmountModel;
-  questTotalBounty?: TokenAmountModel | null;
   isLoading?: boolean;
 };
 
 const loadingClaim = { state: ENUM_CLAIM_STATE.None } as ClaimModel;
 
-export default function ClaimList({
-  questData,
-  challengeDeposit,
-  questTotalBounty,
-  isLoading = false,
-}: Props) {
+export default function ClaimList({ questData, challengeDeposit, isLoading = false }: Props) {
   const [claims, setClaims] = useState<ClaimModel[]>([loadingClaim]);
   const [isLoadingState, setIsLoading] = useState(isLoading);
   const { transaction } = useTransactionContext();
@@ -139,7 +133,6 @@ export default function ClaimList({
             <Claim
               claim={claim}
               challengeDeposit={challengeDeposit}
-              questTotalBounty={questTotalBounty}
               isLoading={isLoadingState}
               questData={questData}
             />,
