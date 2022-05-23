@@ -17,6 +17,7 @@ import styled from 'styled-components';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
 import { NETWORK_TOKENS } from 'src/constants';
 import { FieldInput } from './field-input';
+import { ConditionalWrapper } from '../utils/util';
 
 // #region StyledComponents
 
@@ -72,6 +73,13 @@ const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
   padding: 0 ${GUpx(1)};
   font-weight: bold;
   min-width: 0;
+`;
+
+const AmountEllipsisWrapperStyled = styled.div`
+  overflow: hidden;
+  max-width: ${GUpx(15)};
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 // #endregion
@@ -312,7 +320,18 @@ function AmountFieldInput({
               disabled={!token ? true : disabled}
             />
           ) : (
-            Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(amount)
+            <ConditionalWrapper
+              condition={compact}
+              wrapper={(children) => (
+                <AmountEllipsisWrapperStyled title={children?.toString()}>
+                  {children}
+                </AmountEllipsisWrapperStyled>
+              )}
+            >
+              {Intl.NumberFormat('en-US', { maximumFractionDigits: 4, useGrouping: true }).format(
+                amount,
+              )}
+            </ConditionalWrapper>
           ))}
       </AmountTokenWrapperStyled>
     </FieldInput>
