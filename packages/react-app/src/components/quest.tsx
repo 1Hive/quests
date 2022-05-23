@@ -173,30 +173,11 @@ export default function Quest({
         }, 500);
       }
     }
-  }, [transaction?.type, transaction?.status]);
+  }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
   useEffect(() => {
     setState(questData.state);
   }, [questData.state]);
-
-  useEffect(() => {
-    // If tx completion impact Quest bounty, update it
-    if (
-      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction.args?.questAddress === questData.address &&
-      (transaction?.type === 'ClaimChallengeResolve' ||
-        transaction?.type === 'ClaimExecute' ||
-        transaction?.type === 'QuestFund' ||
-        transaction?.type === 'QuestReclaimFunds')
-    ) {
-      setBounty(undefined);
-      setTimeout(() => {
-        if (questData.address && questData.rewardToken) {
-          fetchBalanceOfQuest(questData.address, questData.rewardToken);
-        }
-      }, 500);
-    }
-  }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
   useEffect(() => {
     if (!questData.rewardToken) {
