@@ -31,18 +31,11 @@ const AddressWrapperStyled = styled.div<{ isSmallScreen: boolean }>`
 type Props = {
   claim: ClaimModel;
   isLoading?: boolean;
-  questTotalBounty?: TokenAmountModel | null;
   challengeDeposit: TokenAmountModel;
   questData: QuestModel;
 };
 
-export default function Claim({
-  claim,
-  isLoading,
-  questTotalBounty,
-  challengeDeposit,
-  questData,
-}: Props) {
+export default function Claim({ claim, isLoading, challengeDeposit, questData }: Props) {
   const { walletAddress } = useWallet();
   const { transaction } = useTransactionContext();
   const [state, setState] = useState(claim.state);
@@ -61,7 +54,7 @@ export default function Claim({
         setActionButton(
           <ExecuteClaimModal
             claim={claim}
-            questTotalBounty={questTotalBounty}
+            questTotalBounty={questData.bounty}
             onClose={onActionClose}
           />,
         );

@@ -115,7 +115,7 @@ export default function Quest({
 }: Props) {
   const { walletAddress } = useWallet();
   const history = useHistory();
-  const [bounty, setBounty] = useState<TokenAmountModel | null>();
+  const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
@@ -321,10 +321,9 @@ export default function Quest({
             />
             {isSummary && fieldsRow}
           </ContentWrapperStyled>
-          {!isSummary && challengeDeposit && (
+          {!isSummary && challengeDeposit && bounty && (
             <ClaimList
-              questData={questData}
-              questTotalBounty={bounty}
+              questData={{ ...questData, bounty }}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
             />
