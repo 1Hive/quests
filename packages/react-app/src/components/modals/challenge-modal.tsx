@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
+import { Button, useToast, IconFlag } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
@@ -51,8 +51,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
-  const [challengeTimeout, setChallengedTimeout] = useState<boolean | undefined>(undefined);
-  const [buttonLabel, setOpenButtonLabel] = useState<string>();
+  // const [challengeTimeout, setChallengedTimeout] = useState<boolean | undefined>(undefined);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
@@ -69,34 +68,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     };
     fetchFee();
   }, [walletAddress]);
-
-  useEffect(() => {
-    let handle: number;
-    const launchSetTimeoutAsync = async (execTimeMs: number) => {
-      const now = Date.now();
-
-      if (now > execTimeMs) setChallengedTimeout(true);
-      else {
-        setChallengedTimeout(false);
-        handle = window.setTimeout(() => {
-          setChallengedTimeout(true);
-        }, execTimeMs - now); // To ms
-      }
-    };
-    if (claim.executionTimeMs) launchSetTimeoutAsync(claim.executionTimeMs);
-    return () => {
-      if (handle) clearTimeout(handle);
-    };
-  }, [claim.executionTimeMs]);
-
-  useEffect(() => {
-    if (challengeTimeout !== undefined) {
-      if (challengeTimeout)
-        // wait to load
-        setOpenButtonLabel('Challenge period over');
-      else setOpenButtonLabel('Challenge');
-    }
-  }, [claim.state, challengeTimeout]);
 
   useEffect(() => {
     if (challengeFee)
@@ -219,19 +190,14 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       title="Challenge quests"
       openButton={
         <OpenButtonWrapperStyled>
-          {buttonLabel && (
-            <OpenButtonStyled
-              icon={<IconFlag />}
-              onClick={() => setOpened(true)}
-              label={buttonLabel}
-              mode="negative"
-              title={challengeTimeout ? "This claim can't be challenged anymore" : buttonLabel}
-              disabled={!buttonLabel || loading || !walletAddress || challengeTimeout}
-            />
-          )}
-          {!loading && challengeTimeout === false && claim.executionTimeMs && (
-            <Timer end={new Date(claim.executionTimeMs)} />
-          )}
+          <OpenButtonStyled
+            icon={<IconFlag />}
+            onClick={() => setOpened(true)}
+            label="Challenge"
+            mode="negative"
+            title={"This claim can't be challenged anymore"}
+            disabled={loading || !walletAddress}
+          />
         </OpenButtonWrapperStyled>
       }
       buttons={[
@@ -276,22 +242,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         <Button
           key="confirmButton"
           icon={<IconFlag />}
-          label={buttonLabel}
+          label="Challenge"
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={
-            loading ||
-            !walletAddress ||
-            !isEnoughBalance ||
-            challengeTimeout ||
-            !isFormValid ||
-            transaction
-          }
+          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction}
           title={
-            challengeTimeout
-              ? 'Challenge timeout'
-              : loading || !walletAddress
+            loading || !walletAddress
               ? 'Not ready ...'
               : !isFormValid
               ? 'Form not valid'

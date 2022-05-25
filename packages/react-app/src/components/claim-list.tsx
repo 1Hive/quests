@@ -6,7 +6,7 @@ import { ENUM_CLAIM_STATE, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { QuestModel } from 'src/models/quest.model';
 import { useEffect, useState } from 'react';
-import { getObjectFromIpfsSafe } from 'src/services/ipfs.service';
+import { getObjectFromIpfs, ipfsTheGraph } from 'src/services/ipfs.service';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { HelpTooltip } from './field-input/help-tooltip';
 import * as QuestService from '../services/quest.service';
@@ -83,8 +83,8 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
 
   const fetchClaimsUntilNew = (claimsCount?: number) => {
     if (!claimsCount) {
-      setClaims([loadingClaim, ...claims]);
       claimsCount = claims.length;
+      setClaims([loadingClaim, ...claims]);
     }
     setTimeout(async () => {
       const results = await QuestService.fetchQuestClaims(questData);
@@ -113,7 +113,7 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
       result.map(async (claim) => ({
         ...claim,
         evidence: claim.evidenceIpfsHash
-          ? await getObjectFromIpfsSafe(claim.evidenceIpfsHash)
+          ? await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph)
           : 'No evidence',
       })),
     );

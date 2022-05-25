@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconCoin, Timer } from '@1hive/1hive-ui';
+import { Button, IconCoin } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -15,7 +15,6 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
-import { FieldInput } from '../field-input/field-input';
 
 // #region StyledComponents
 
@@ -35,43 +34,29 @@ const OpenButtonWrapperStyled = styled.div`
 type Props = {
   claim: ClaimModel;
   questTotalBounty?: TokenAmountModel | null;
+  isClaimable?: boolean;
   onClose?: ModalCallback;
 };
 
-export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = noop }: Props) {
+export default function ExecuteClaimModal({
+  claim,
+  questTotalBounty,
+  isClaimable,
+  onClose = noop,
+}: Props) {
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<TokenAmountModel>();
-  const [scheduleTimeout, setScheduleTimeout] = useState<boolean>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
   const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('execute-claim-modal'), []);
 
   useEffect(() => {
-    let handle: number;
-    const launchTimeoutAsync = async (execTimeMs: number) => {
-      const now = Date.now();
-      if (now >= execTimeMs) setScheduleTimeout(true);
-      else {
-        setScheduleTimeout(false);
-        handle = window.setTimeout(() => {
-          setScheduleTimeout(true);
-        }, execTimeMs - now); // To ms
-      }
-      setLoading(false);
-    };
-    if (claim.executionTimeMs) launchTimeoutAsync(claim.executionTimeMs);
-    return () => {
-      if (handle) clearTimeout(handle);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (scheduleTimeout === undefined) return;
+    if (isClaimable === undefined) return;
     if (claim.state === ENUM_CLAIM_STATE.Challenged) setButtonLabel('Challenged by someone');
     else setButtonLabel('Claim');
-  }, [claim.state, claim.executionTimeMs, scheduleTimeout]);
+  }, [claim.state, claim.executionTimeMs, isClaimable]);
 
   useEffect(() => {
     if (questTotalBounty) {
@@ -137,32 +122,27 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
         title="Claim quest bounty"
         openButton={
           <OpenButtonWrapperStyled>
-            {!loading && !scheduleTimeout && claim.executionTimeMs ? (
-              <FieldInput label="Claimable in">
-                <Timer end={new Date(claim.executionTimeMs)} />
-              </FieldInput>
-            ) : (
-              <OpenButtonStyled
-                onClick={() => setOpened(true)}
-                icon={<IconCoin />}
-                label={buttonLabel}
-                mode="positive"
-                title={
-                  questTotalBounty &&
-                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
-                    ? 'Not enough funds in Quest bounty'
-                    : 'Loading...'
-                }
-                disabled={
-                  loading ||
-                  !scheduleTimeout ||
-                  claim.state === ENUM_CLAIM_STATE.Challenged ||
-                  !questTotalBounty ||
-                  !walletAddress ||
-                  claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
-                }
-              />
-            )}
+            <OpenButtonStyled
+              onClick={() => setOpened(true)}
+              icon={<IconCoin />}
+              label={buttonLabel}
+              mode="positive"
+              title={
+                questTotalBounty &&
+                claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
+                  ? 'Not enough funds in Quest bounty'
+                  : 'Loading...'
+              }
+              disabled={
+                loading ||
+                !isClaimable ||
+                claim.state === ENUM_CLAIM_STATE.Challenged ||
+                !questTotalBounty ||
+                !walletAddress ||
+                !isClaimable ||
+                claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
+              }
+            />
           </OpenButtonWrapperStyled>
         }
         buttons={
@@ -173,12 +153,12 @@ export default function ExecuteClaimModal({ claim, questTotalBounty, onClose = n
             disabled={
               loading ||
               !walletAddress ||
-              !scheduleTimeout ||
+              !isClaimable ||
               claim.state === ENUM_CLAIM_STATE.Challenged ||
               transaction
             }
             title={
-              loading || !walletAddress || !scheduleTimeout
+              loading || !walletAddress || !isClaimable
                 ? 'Not ready ...'
                 : transaction
                 ? 'Wait for previous transaction to complete'
