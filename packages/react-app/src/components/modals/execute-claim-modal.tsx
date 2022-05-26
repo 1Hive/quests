@@ -12,6 +12,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -57,7 +58,7 @@ export default function ExecuteClaimModal({
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<TokenAmountModel>();
   const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('execute-claim-modal'), []);
   const isMountedRef = useIsMountedRef();
@@ -83,33 +84,28 @@ export default function ExecuteClaimModal({
   const claimTx = async () => {
     try {
       setLoading(true);
-      setTransaction({
+      const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
         message: 'Sending claimed amount to your wallet',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimExecute',
         args: { questAddress: claim.questAddress, containerId: claim.container!.id },
-      });
+      } as TransactionModel;
+      setTransaction(txPayload);
       const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
-        setTransaction(
-          (oldTx) =>
-            oldTx && {
-              ...oldTx,
-              hash: txHash,
-              status: ENUM_TRANSACTION_STATUS.Pending,
-            },
-        );
+        setTransaction({
+          ...txPayload,
+          hash: txHash,
+          status: ENUM_TRANSACTION_STATUS.Pending,
+        });
       });
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: txReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
+      setTransaction({
+        ...txPayload,
+        status: txReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      });
       if (!txReceipt?.status) throw new Error('Failed to execute claim');
     } catch (e: any) {
       setTransaction(
@@ -165,14 +161,11 @@ export default function ExecuteClaimModal({
               loading ||
               !walletAddress ||
               !isClaimable ||
-              claim.state === ENUM_CLAIM_STATE.Challenged ||
-              !!transaction
+              claim.state === ENUM_CLAIM_STATE.Challenged
             }
             title={
               loading || !walletAddress || !isClaimable
                 ? 'Not ready ...'
-                : transaction
-                ? 'Wait for previous transaction to complete'
                 : 'Trigger claim operation in the chain'
             }
             mode="positive"

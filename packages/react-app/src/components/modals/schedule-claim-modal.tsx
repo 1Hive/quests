@@ -18,6 +18,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -68,7 +69,7 @@ export default function ScheduleClaimModal({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
   const isMountedRef = useIsMountedRef();
 
@@ -121,14 +122,15 @@ export default function ScheduleClaimModal({
         walletAddress,
         setTransaction,
       );
-      setTransaction({
+      const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimSchedule',
         args: { questAddress },
-      });
+      } as TransactionModel;
+      setTransaction(txPayload);
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
         {
@@ -139,25 +141,19 @@ export default function ScheduleClaimModal({
           questAddress,
         },
         (txHash) => {
-          setTransaction(
-            (oldTx) =>
-              oldTx && {
-                ...oldTx,
-                hash: txHash,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              },
-          );
+          setTransaction({
+            ...txPayload,
+            hash: txHash,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          });
         },
       );
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: scheduleReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
+      setTransaction({
+        ...txPayload,
+        status: scheduleReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      });
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
     } catch (e: any) {
@@ -181,7 +177,7 @@ export default function ScheduleClaimModal({
   return (
     <ModalBase
       id={modalId}
-      title="Claim quest"
+      title="Schedule a Quest claim"
       openButton={
         <OpenButtonStyled
           icon={<GiBroadsword />}
@@ -255,13 +251,9 @@ export default function ScheduleClaimModal({
                         ? 'Not ready ...'
                         : !isFormValid
                         ? 'Form not valid'
-                        : transaction
-                        ? 'Wait for previous transaction to complete'
                         : 'Schedule claim'
                     }
-                    disabled={
-                      loading || !walletAddress || !isEnoughBalance || !isFormValid || !!transaction
-                    }
+                    disabled={!isEnoughBalance}
                   />
                 </>
               }

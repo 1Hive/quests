@@ -15,6 +15,7 @@ import { getTokenInfo } from 'src/utils/contract.util';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { TokenModel } from 'src/models/token.model';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -52,7 +53,7 @@ export default function ReclaimFundsModal({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
   const modalId = useMemo(() => uniqueId('reclaim-funds-modal'), []);
@@ -77,37 +78,32 @@ export default function ReclaimFundsModal({
   const reclaimFundTx = async () => {
     try {
       setLoading(true);
-      setTransaction({
+      const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
         message: 'Reclaiming funds and deposit',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'QuestReclaimFunds',
         args: { questAddress: questData.address },
-      });
+      } as TransactionModel;
+      setTransaction(txPayload);
       const txReceipt = await QuestService.reclaimQuestUnusedFunds(
         walletAddress,
         questData,
         (txHash) => {
-          setTransaction(
-            (oldTx) =>
-              oldTx && {
-                ...oldTx,
-                hash: txHash,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              },
-          );
+          setTransaction({
+            ...txPayload,
+            hash: txHash,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          });
         },
       );
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: txReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
+      setTransaction({
+        ...txPayload,
+        status: txReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      });
       if (!txReceipt?.status) throw new Error('Failed to reclaim funds');
     } catch (e: any) {
       setTransaction(
@@ -151,13 +147,9 @@ export default function ReclaimFundsModal({
             label="Reclaim"
             mode="strong"
             title={
-              loading || !walletAddress
-                ? 'Not ready ...'
-                : transaction
-                ? 'Wait for previous transaction to complete'
-                : 'Reclaim remaining funds and deposit'
+              loading || !walletAddress ? 'Not ready ...' : 'Reclaim remaining funds and deposit'
             }
-            disabled={loading || !walletAddress || !!transaction}
+            disabled={loading || !walletAddress}
           />
         }
         onClose={closeModal}

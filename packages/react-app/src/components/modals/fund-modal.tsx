@@ -39,7 +39,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const modalId = useMemo(() => uniqueId('fund-modal'), []);
   const isMountedRef = useIsMountedRef();
@@ -121,13 +121,9 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                   ? 'Not ready ...'
                   : !isFormValid
                   ? 'Form not valid'
-                  : transaction
-                  ? 'Wait for previous transaction to complete'
                   : 'Fund'
               }
-              disabled={
-                loading || !walletAddress || !isEnoughBalance || !isFormValid || !!transaction
-              }
+              disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
             />,
           ]}
           onClose={closeModal}

@@ -17,6 +17,7 @@ import { TokenModel } from 'src/models/token.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -56,7 +57,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('challenge-modal'), []);
@@ -125,14 +126,15 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         }
 
         if (!claim.container) throw new Error('Container is not defined');
-        setTransaction({
+        const txPayload = {
           modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           type: 'ClaimChallenge',
           args: { questAddress: claim.questAddress, containerId: claim.container.id },
-        });
+        } as TransactionModel;
+        setTransaction(txPayload);
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
           {
@@ -142,25 +144,19 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           },
           claim.container,
           (txHash) => {
-            setTransaction(
-              (oldTx) =>
-                oldTx && {
-                  ...oldTx,
-                  hash: txHash,
-                  status: ENUM_TRANSACTION_STATUS.Pending,
-                },
-            );
+            setTransaction({
+              ...txPayload,
+              hash: txHash,
+              status: ENUM_TRANSACTION_STATUS.Pending,
+            });
           },
         );
-        setTransaction(
-          (oldTx) =>
-            oldTx && {
-              ...oldTx,
-              status: challengeTxReceipt?.status
-                ? ENUM_TRANSACTION_STATUS.Confirmed
-                : ENUM_TRANSACTION_STATUS.Failed,
-            },
-        );
+        setTransaction({
+          ...txPayload,
+          status: challengeTxReceipt?.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+        });
         if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
       } catch (e: any) {
         setTransaction(
@@ -249,14 +245,12 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid || !!transaction}
+          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
           title={
             loading || !walletAddress
               ? 'Not ready ...'
               : !isFormValid
               ? 'Form not valid'
-              : transaction
-              ? 'Wait for previous transaction to complete'
               : 'Challenge'
           }
           className="m-8"

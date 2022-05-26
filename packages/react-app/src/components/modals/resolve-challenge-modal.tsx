@@ -27,6 +27,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getNetwork } from 'src/networks';
 import { getObjectFromIpfs, ipfsTheGraph } from 'src/services/ipfs.service';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -101,7 +102,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [evidence, setEvidence] = useState<string>();
   const modalId = useMemo(() => uniqueId('resolve-challenge-modal'), []);
   const isMountedRef = useIsMountedRef();
@@ -147,7 +148,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       setLoading(true);
       if (!claim.container) throw new Error('Container is not defined');
       const message = 'Resolving claim challenge';
-      setTransaction({
+      const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
         message,
@@ -158,31 +159,26 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           containerId: claim.container.id,
           disputeState: dispute!.state,
         },
-      });
+      } as TransactionModel;
+      setTransaction(txPayload);
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,
         claim.container,
         dispute!,
         (txHash) => {
-          setTransaction(
-            (oldTx) =>
-              oldTx && {
-                ...oldTx,
-                hash: txHash,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              },
-          );
+          setTransaction({
+            ...txPayload,
+            hash: txHash,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          });
         },
       );
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: challengeTxReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
+      setTransaction({
+        ...txPayload,
+        status: challengeTxReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      });
       if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
     } catch (e: any) {
       setTransaction(
@@ -295,11 +291,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           label="Resolve"
           mode="positive"
           disabled={
-            loading ||
-            !walletAddress ||
-            !isRuled ||
-            claim.state !== ENUM_CLAIM_STATE.Challenged ||
-            !!transaction
+            loading || !walletAddress || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged
           }
           onClick={resolveChallengeTx}
           title={
@@ -307,8 +299,6 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
               ? 'Need to be ruled in celeste'
               : loading || !walletAddress
               ? 'Not ready ...'
-              : transaction
-              ? 'Wait for previous transaction to complete'
               : 'Publish dispute result'
           }
         />,
