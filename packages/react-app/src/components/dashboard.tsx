@@ -7,7 +7,7 @@ import { getDashboardInfo } from 'src/services/quest.service';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input/field-input';
-import QuestModal from './modals/quest-modal';
+import QuestModal from './modals/create-quest-modal';
 import { ChildSpacer } from './utils/spacer-util';
 
 // #region StyledComponents

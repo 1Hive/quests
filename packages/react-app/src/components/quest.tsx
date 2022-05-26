@@ -18,6 +18,7 @@ import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -124,7 +125,7 @@ export default function Quest({
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   const [waitForClose, setWaitForClose] = useState(false);
-  let isMounted = true;
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     if (!isSummary) {
@@ -134,7 +135,7 @@ export default function Quest({
       } else {
         try {
           QuestService.fetchDeposits().then(({ challenge, claim }) => {
-            if (isMounted) {
+            if (isMountedRef.current) {
               setClaimDeposit(claim);
               setChallengeDeposit(challenge);
             }
@@ -144,9 +145,6 @@ export default function Quest({
         }
       }
     }
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -199,7 +197,7 @@ export default function Quest({
           address,
           depositReleased ? undefined : questData.deposit,
         );
-        if (isMounted) {
+        if (isMountedRef.current) {
           questData.bounty = result;
           setIsDepositReleased(depositReleased);
           computeQuestState(questData, depositReleased);
@@ -208,8 +206,10 @@ export default function Quest({
         }
       }
     } catch (error) {
-      Logger.exception(error);
-      setBounty(undefined);
+      if (isMountedRef.current) {
+        Logger.exception(error);
+        setBounty(undefined);
+      }
     }
   };
 
@@ -311,6 +311,7 @@ export default function Quest({
 
             <TextFieldInput
               id="description"
+              label={isSummary ? undefined : 'Description'}
               value={questData?.description}
               isLoading={isLoading || !questData}
               multiline
@@ -321,7 +322,7 @@ export default function Quest({
             />
             {isSummary && fieldsRow}
           </ContentWrapperStyled>
-          {!isSummary && challengeDeposit && bounty && (
+          {!isSummary && challengeDeposit && (
             <ClaimList
               questData={{ ...questData, bounty }}
               challengeDeposit={challengeDeposit}

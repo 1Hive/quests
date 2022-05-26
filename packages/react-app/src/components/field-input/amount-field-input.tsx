@@ -16,6 +16,7 @@ import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
 import { NETWORK_TOKENS } from 'src/constants';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { FieldInput } from './field-input';
 import { ConditionalWrapper } from '../utils/util';
 
@@ -189,7 +190,7 @@ function AmountFieldInput({
   showUsd = false,
   error,
 }: Props) {
-  let mounted = true;
+  const isMountedRef = useIsMountedRef();
   const { networkId } = getNetwork();
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
@@ -210,9 +211,6 @@ function AmountFieldInput({
 
   useEffect(() => {
     if (isEdit && !availableTokens.length) fetchAvailableTokens();
-    return () => {
-      mounted = false;
-    };
   }, [isEdit]);
 
   useEffect(() => {
@@ -226,7 +224,8 @@ function AmountFieldInput({
         setTokens([]);
         getTokenInfo(searchTerm)
           .then((tokenInfo) => {
-            if (typeof tokenInfo !== 'string') if (tokenInfo && mounted) setTokens([tokenInfo]);
+            if (typeof tokenInfo !== 'string')
+              if (tokenInfo && isMountedRef.current) setTokens([tokenInfo]);
           })
           .catch(Logger.exception);
       } else {
@@ -261,7 +260,7 @@ function AmountFieldInput({
   const fetchAvailableTokens = async () => {
     const networkDefaultTokens = (NETWORK_TOKENS[networkId] as TokenModel[]) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
-    if (mounted) {
+    if (isMountedRef.current) {
       setAvailableTokens(
         arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
       );

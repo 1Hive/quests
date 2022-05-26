@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconCoin } from '@1hive/1hive-ui';
+import { Button, IconCoin, IconCaution, Info } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
@@ -10,6 +10,8 @@ import { ClaimModel } from 'src/models/claim.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
+import { compareCaseInsensitive } from 'src/utils/string.util';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -27,6 +29,13 @@ const OpenButtonStyled = styled(Button)`
 const OpenButtonWrapperStyled = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const OnlyStackholderWarnStyled = styled(Info)`
+  padding: ${GUpx(1)};
+  margin-top: ${GUpx(4)};
+  display: flex;
+  align-items: center;
 `;
 
 // #endregion
@@ -51,6 +60,7 @@ export default function ExecuteClaimModal({
   const { setTransaction, transaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('execute-claim-modal'), []);
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     if (isClaimable === undefined) return;
@@ -111,7 +121,9 @@ export default function ExecuteClaimModal({
           },
       );
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -128,15 +140,14 @@ export default function ExecuteClaimModal({
               label={buttonLabel}
               mode="positive"
               title={
-                questTotalBounty &&
-                claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
-                  ? 'Not enough funds in Quest bounty'
-                  : 'Loading...'
+                !isClaimable
+                  ? 'Wait for the delay period to end before claiming...'
+                  : questTotalBounty &&
+                    claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
+                  ? 'Not enough funds in Quest to claim'
+                  : 'Open quest claim'
               }
               disabled={
-                loading ||
-                !isClaimable ||
-                claim.state === ENUM_CLAIM_STATE.Challenged ||
                 !questTotalBounty ||
                 !walletAddress ||
                 !isClaimable ||
@@ -147,7 +158,7 @@ export default function ExecuteClaimModal({
         }
         buttons={
           <Button
-            onClick={() => claimTx()}
+            onClick={claimTx}
             icon={<IconCoin />}
             label={buttonLabel}
             disabled={
@@ -155,7 +166,7 @@ export default function ExecuteClaimModal({
               !walletAddress ||
               !isClaimable ||
               claim.state === ENUM_CLAIM_STATE.Challenged ||
-              transaction
+              !!transaction
             }
             title={
               loading || !walletAddress || !isClaimable
@@ -184,6 +195,12 @@ export default function ExecuteClaimModal({
             isLoading={loading}
             value={claim.playerAddress}
           />
+          {!compareCaseInsensitive(claim.playerAddress, walletAddress) && (
+            <OnlyStackholderWarnStyled mode="warning">
+              <IconCaution />
+              <span>Only the player may execute the claim</span>
+            </OnlyStackholderWarnStyled>
+          )}
         </Outset>
       </ModalBase>
     </>

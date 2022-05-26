@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import { Button } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
@@ -17,6 +17,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 
 import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -69,14 +70,7 @@ export default function ScheduleClaimModal({
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction, transaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
-  let mounted = true;
-
-  useEffect(
-    () => () => {
-      mounted = false;
-    },
-    [],
-  );
+  const isMountedRef = useIsMountedRef();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -103,18 +97,18 @@ export default function ScheduleClaimModal({
     return errors;
   };
 
-  const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }, setSubmitting: Function) => {
+  const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }) => {
     validate(values); // Validate one last time before submitting
     if (isFormValid) {
       if (values.claimAll) {
         values.claimedAmount.parsedAmount = 0;
         values.claimedAmount.token.amount = '0';
       }
-      scheduleClaimTx(values, setSubmitting);
+      scheduleClaimTx(values);
     }
   };
 
-  const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
+  const scheduleClaimTx = async (values: Partial<ClaimModel>) => {
     try {
       setLoading(true);
       const { governQueueAddress } = getNetwork();
@@ -167,7 +161,7 @@ export default function ScheduleClaimModal({
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
     } catch (e: any) {
-      if (mounted) {
+      if (isMountedRef.current) {
         setTransaction(
           (oldTx) =>
             oldTx && {
@@ -178,8 +172,7 @@ export default function ScheduleClaimModal({
         );
       }
     } finally {
-      if (mounted) {
-        setSubmitting(false);
+      if (isMountedRef.current) {
         setLoading(false);
       }
     }
@@ -195,7 +188,7 @@ export default function ScheduleClaimModal({
           onClick={() => setOpened(true)}
           label="Schedule claim"
           mode="positive"
-          title={!questTotalBounty ? 'Loading ...' : 'Schedule claim'}
+          title={!questTotalBounty ? 'Loading ...' : 'Open schedule claim'}
           disabled={!questTotalBounty}
         />
       }
@@ -211,8 +204,8 @@ export default function ScheduleClaimModal({
             playerAddress: undefined,
           } as any
         }
-        onSubmit={(values, { setSubmitting }) => {
-          onClaimSubmit(values, setSubmitting);
+        onSubmit={(values) => {
+          onClaimSubmit(values);
         }}
         validateOnChange
         validate={validate}
@@ -267,7 +260,7 @@ export default function ScheduleClaimModal({
                         : 'Schedule claim'
                     }
                     disabled={
-                      loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction
+                      loading || !walletAddress || !isEnoughBalance || !isFormValid || !!transaction
                     }
                   />
                 </>

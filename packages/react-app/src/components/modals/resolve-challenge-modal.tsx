@@ -25,6 +25,8 @@ import { useWallet } from 'src/contexts/wallet.context';
 import Skeleton from 'react-loading-skeleton';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getNetwork } from 'src/networks';
+import { getObjectFromIpfs, ipfsTheGraph } from 'src/services/ipfs.service';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -100,12 +102,19 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
   const { setTransaction, transaction } = useTransactionContext();
+  const [evidence, setEvidence] = useState<string>();
   const modalId = useMemo(() => uniqueId('resolve-challenge-modal'), []);
+  const isMountedRef = useIsMountedRef();
+
+  useEffect(() => {
+    fetchEvidence();
+  }, []);
 
   useEffect(() => {
     const fetchChallengeAndDispute = async () => {
       if (!claim.container) throw new Error('Container is required to fetch challenge disputes');
       const challengeResult = await QuestService.fetchChallenge(claim.container);
+      if (!isMountedRef.current) return;
       if (!challengeResult)
         throw new Error(`Failed to fetch challenge with container id ${claim.container.id}`);
       setChallenge(challengeResult);
@@ -185,7 +194,18 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           },
       );
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
+    }
+  };
+
+  const fetchEvidence = async () => {
+    const evidenceResult = claim.evidenceIpfsHash
+      ? await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph)
+      : 'No evidence';
+    if (isMountedRef.current) {
+      setEvidence(evidenceResult);
     }
   };
 
@@ -255,8 +275,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             onClick={() => setOpened(true)}
             label="Open resolve"
             mode="positive"
-            title={loading || !dispute ? 'Loading...' : 'Open resolve'}
-            disabled={loading || !dispute}
+            title={!dispute ? 'Loading...' : 'Open resolve'}
+            disabled={!dispute}
           />
         </OpenButtonWrapperStyled>
       }
@@ -279,7 +299,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             !walletAddress ||
             !isRuled ||
             claim.state !== ENUM_CLAIM_STATE.Challenged ||
-            transaction
+            !!transaction
           }
           onClick={resolveChallengeTx}
           title={
@@ -308,7 +328,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
                     {player}
                     <LabelStyled>Player evidence of completion</LabelStyled>
                   </>,
-                  <TextFieldInput id="evidenceOfCompletion" value={claim.evidence} isMarkDown />,
+                  <TextFieldInput id="evidenceOfCompletion" value={evidence} isMarkDown />,
                 ],
                 [
                   <>

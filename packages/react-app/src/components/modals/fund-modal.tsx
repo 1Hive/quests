@@ -12,6 +12,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { FundModel } from 'src/models/fund.model';
 import { FormErrors } from 'src/models/form-errors';
 import { fundQuestTransaction } from 'src/services/transaction-handler';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
@@ -41,6 +42,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const { setTransaction, transaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const modalId = useMemo(() => uniqueId('fund-modal'), []);
+  const isMountedRef = useIsMountedRef();
 
   const closeModal = (success: boolean) => {
     setOpened(false);
@@ -59,7 +61,9 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         walletAddress,
         setTransaction,
       );
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -122,7 +126,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                   : 'Fund'
               }
               disabled={
-                loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction
+                loading || !walletAddress || !isEnoughBalance || !isFormValid || !!transaction
               }
             />,
           ]}

@@ -7,7 +7,7 @@ import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
 import { getNetwork } from 'src/networks';
-import QuestModal from './modals/quest-modal';
+import QuestModal from './modals/create-quest-modal';
 
 // #region StyledComponent
 

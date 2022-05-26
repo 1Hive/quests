@@ -21,6 +21,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { approveTokenTransaction, fundQuestTransaction } from 'src/services/transaction-handler';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -84,24 +85,21 @@ export default function QuestModal({
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
   const [questDeposit, setQuestDeposit] = useState<TokenAmountModel | null>();
-  let mounted = true;
+  const isMountedRef = useIsMountedRef();
   const modalId = useMemo(() => uniqueId('quest-modal'), []);
 
   useEffect(() => {
     feedDummyQuestData(questData).then((data) => {
-      if (mounted) {
+      if (isMountedRef.current) {
         setQuestDataState(data);
       }
     });
 
     QuestService.fetchCreateQuestDeposit(walletAddress).then((deposit) => {
-      if (mounted) {
+      if (isMountedRef.current) {
         setQuestDeposit(deposit);
       }
     });
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -237,7 +235,9 @@ export default function QuestModal({
           );
         }
 
-        if (mounted) setQuestDataState(emptyQuestData);
+        if (isMountedRef.current) {
+          setQuestDataState(emptyQuestData);
+        }
       } catch (e: any) {
         setTransaction(
           (oldTx) =>
@@ -349,7 +349,7 @@ export default function QuestModal({
                         !questDeposit?.token ||
                         !isEnoughBalance ||
                         !isFormValid ||
-                        transaction
+                        !!transaction
                       }
                     />
                   </>

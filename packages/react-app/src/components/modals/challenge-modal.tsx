@@ -16,6 +16,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { TokenModel } from 'src/models/token.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -51,7 +52,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
-  // const [challengeTimeout, setChallengedTimeout] = useState<boolean | undefined>(undefined);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
@@ -60,11 +60,12 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('challenge-modal'), []);
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     const fetchFee = async () => {
       const feeAmount = await QuestService.fetchChallengeFee();
-      if (feeAmount) setChallengeFee(feeAmount);
+      if (feeAmount && isMountedRef.current) setChallengeFee(feeAmount);
     };
     fetchFee();
   }, [walletAddress]);
@@ -172,7 +173,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         );
         toast(computeTransactionErrorMessage(e));
       } finally {
-        setLoading(false);
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
       }
     }
   };
@@ -195,8 +198,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             onClick={() => setOpened(true)}
             label="Challenge"
             mode="negative"
-            title={"This claim can't be challenged anymore"}
-            disabled={loading || !walletAddress}
+            title={"Open challenge for this quest's claim"}
+            disabled={!walletAddress}
           />
         </OpenButtonWrapperStyled>
       }
@@ -246,7 +249,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction}
+          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid || !!transaction}
           title={
             loading || !walletAddress
               ? 'Not ready ...'

@@ -1,6 +1,6 @@
 import { ENUM_QUEST_VIEW_MODE } from '../constants';
 import { useWallet } from '../contexts/wallet.context';
-import QuestModal from './modals/quest-modal';
+import QuestModal from './modals/create-quest-modal';
 import { Filter } from './filter';
 import { Outset } from './utils/spacer-util';
 

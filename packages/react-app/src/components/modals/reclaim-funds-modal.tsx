@@ -14,6 +14,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getTokenInfo } from 'src/utils/contract.util';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { TokenModel } from 'src/models/token.model';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -55,13 +56,13 @@ export default function ReclaimFundsModal({
   const { walletAddress } = useWallet();
   const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
   const modalId = useMemo(() => uniqueId('reclaim-funds-modal'), []);
-  let isMounted = true;
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     if (questData.deposit) {
       const depositAmount = questData.deposit;
       getTokenInfo(questData.deposit?.token).then((token) => {
-        if (isMounted) {
+        if (isMountedRef.current) {
           setDepositTokenAmount(
             toTokenAmountModel({
               ...token,
@@ -71,10 +72,6 @@ export default function ReclaimFundsModal({
         }
       });
     }
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   const reclaimFundTx = async () => {
@@ -122,7 +119,9 @@ export default function ReclaimFundsModal({
           },
       );
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -158,7 +157,7 @@ export default function ReclaimFundsModal({
                 ? 'Wait for previous transaction to complete'
                 : 'Reclaim remaining funds and deposit'
             }
-            disabled={loading || !walletAddress || transaction}
+            disabled={loading || !walletAddress || !!transaction}
           />
         }
         onClose={closeModal}

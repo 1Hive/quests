@@ -1,5 +1,6 @@
 import { ContractReceipt } from 'ethers';
 import { Dispatch, SetStateAction } from 'react';
+import { isDevelopement } from 'src/components/utils/debug-util';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
@@ -18,6 +19,9 @@ export async function approveTokenTransaction(
 
   let approveTxReceipt: ContractReceipt | null;
   if (!allowance.isZero()) {
+    if (isDevelopement()) {
+      return; // Skip only if development mode (having permanent allowance is a security risk see https://kalis.me/unlimited-erc20-allowances/#:~:text=several%20such%20exploits.-,bug%20exploits,-In%20early%202020)
+    }
     // Reset approval to 0 before approving again
     setTransaction({
       modalId,
@@ -87,6 +91,13 @@ export async function approveTokenTransaction(
   }
 
   if (!approveTxReceipt?.status) {
+    setTransaction(
+      (oldTx) =>
+        oldTx && {
+          ...oldTx,
+          status: ENUM_TRANSACTION_STATUS.Failed,
+        },
+    );
     throw new Error(
       `Failed to approve token allowance : ${token.name} (${token.symbol}-${token.token})`,
     );
@@ -130,6 +141,13 @@ export async function fundQuestTransaction(
   );
 
   if (!txReceipt) {
+    setTransaction(
+      (oldTx) =>
+        oldTx && {
+          ...oldTx,
+          status: ENUM_TRANSACTION_STATUS.Failed,
+        },
+    );
     throw new Error('Failed to fund quest');
   }
 }
