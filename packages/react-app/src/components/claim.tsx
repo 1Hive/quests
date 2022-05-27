@@ -88,7 +88,9 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
             setState(ENUM_CLAIM_STATE.Executed);
             break;
           case 'ClaimChallenge':
-            setState(ENUM_CLAIM_STATE.Challenged);
+            setTimeout(() => {
+              setState(ENUM_CLAIM_STATE.Challenged);
+            }, 1000); // Wait for subgrapph to index challenge event
             break;
           default:
         }

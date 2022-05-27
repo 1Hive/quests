@@ -110,7 +110,7 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
       items.unshift(skeletonClaim);
     }
     return items;
-  }, [claims, loadingClaim]);
+  }, [claims, loadingClaim, questData.bounty, isLoading, challengeDeposit]);
 
   useEffect(() => {
     if (questData.address) {
