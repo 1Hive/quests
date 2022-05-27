@@ -332,15 +332,13 @@ export default function QuestModal({
                       form="form-quest"
                       className="m-8"
                       title={
-                        !walletAddress || !questDeposit?.token
+                        !questDeposit?.token
                           ? 'Not ready ...'
                           : !isFormValid
                           ? 'Form not valid'
                           : 'Schedule claim'
                       }
-                      disabled={
-                        !walletAddress || !questDeposit?.token || !isEnoughBalance || !isFormValid
-                      }
+                      disabled={!questDeposit?.token || !isEnoughBalance || !isFormValid}
                     />
                   </>
                 }

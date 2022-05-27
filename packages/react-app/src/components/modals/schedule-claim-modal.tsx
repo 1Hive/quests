@@ -238,13 +238,7 @@ export default function ScheduleClaimModal({
                     type="submit"
                     form="form-claim"
                     className="m-8"
-                    title={
-                      !walletAddress
-                        ? 'Not ready ...'
-                        : !isFormValid
-                        ? 'Form not valid'
-                        : 'Schedule claim'
-                    }
+                    title={!isFormValid ? 'Form not valid' : 'Schedule claim'}
                     disabled={!isEnoughBalance}
                   />
                 </>

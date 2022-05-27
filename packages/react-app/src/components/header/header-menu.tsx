@@ -30,7 +30,7 @@ type Props = {
 
 export default function HeaderMenu({ below }: Props) {
   const theme = useTheme();
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
 
   return (
     <HeaderNavStyled>
@@ -53,7 +53,7 @@ export default function HeaderMenu({ below }: Props) {
             <IconExternal />
           </HeaderNavItemStyled>
 
-          {walletAddress && (
+          {walletConnected && (
             <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="normal" />
           )}
         </>

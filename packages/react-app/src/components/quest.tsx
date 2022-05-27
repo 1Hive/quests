@@ -114,7 +114,7 @@ export default function Quest({
   isLoading = false,
   isSummary = false,
 }: Props) {
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
   const history = useHistory();
   const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
@@ -329,7 +329,7 @@ export default function Quest({
               isLoading={isLoading}
             />
           )}
-          {!isSummary && questData.address && walletAddress && (
+          {!isSummary && questData.address && walletConnected && (
             <QuestFooterStyled>
               {questData?.state === ENUM_QUEST_STATE.Active ? (
                 <>

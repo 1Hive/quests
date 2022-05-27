@@ -68,7 +68,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       if (feeAmount && isMountedRef.current) setChallengeFee(feeAmount);
     };
     fetchFee();
-  }, [walletAddress]);
+  }, []);
 
   useEffect(() => {
     if (challengeFee)
@@ -188,8 +188,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             onClick={() => setOpened(true)}
             label="Challenge"
             mode="negative"
-            title={"Open challenge for this quest's claim"}
-            disabled={!walletAddress}
+            title="Open challenge for this quest's claim"
           />
         </OpenButtonWrapperStyled>
       }
@@ -237,8 +236,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={!walletAddress || !isEnoughBalance || !isFormValid}
-          title={!walletAddress ? 'Not ready ...' : !isFormValid ? 'Form not valid' : 'Challenge'}
+          disabled={!isEnoughBalance || !isFormValid}
+          title={!isFormValid ? 'Form not valid' : 'Challenge'}
           className="m-8"
         />,
       ]}

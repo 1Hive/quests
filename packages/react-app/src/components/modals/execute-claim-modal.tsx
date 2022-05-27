@@ -11,10 +11,9 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { compareCaseInsensitive } from 'src/utils/string.util';
-import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import * as QuestService from '../../services/quest.service';
-import { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import AmountFieldInput from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
@@ -55,12 +54,10 @@ export default function ExecuteClaimModal({
   claimable,
 }: Props) {
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<TokenAmountModel>();
   const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('execute-claim-modal'), []);
-  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     if (questTotalBounty) {
@@ -76,7 +73,6 @@ export default function ExecuteClaimModal({
 
   const claimTx = async () => {
     try {
-      setLoading(true);
       const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
@@ -109,10 +105,6 @@ export default function ExecuteClaimModal({
             message: computeTransactionErrorMessage(e),
           },
       );
-    } finally {
-      if (isMountedRef.current) {
-        setLoading(false);
-      }
     }
   };
 
@@ -138,7 +130,6 @@ export default function ExecuteClaimModal({
               }
               disabled={
                 !questTotalBounty ||
-                !walletAddress ||
                 claim.claimedAmount.parsedAmount > questTotalBounty.parsedAmount ||
                 !claimable
               }
@@ -150,10 +141,8 @@ export default function ExecuteClaimModal({
             onClick={claimTx}
             icon={<IconCoin />}
             label="Claim"
-            disabled={loading || !walletAddress || claim.state === ENUM_CLAIM_STATE.Challenged}
-            title={
-              loading || !walletAddress ? 'Not ready ...' : 'Trigger claim operation in the chain'
-            }
+            disabled={claim.state === ENUM_CLAIM_STATE.Challenged}
+            title="Trigger claim operation in the chain"
             mode="positive"
           />
         }
@@ -162,16 +151,10 @@ export default function ExecuteClaimModal({
         size="small"
       >
         <Outset gu16>
-          <AmountFieldInputFormik
-            id="bounty"
-            label="Claim amount"
-            isLoading={loading}
-            value={amount}
-          />
+          <AmountFieldInput id="bounty" label="Claim amount" value={amount} />
           <AddressFieldInput
             id="playerAddress"
             label="will be sent to"
-            isLoading={loading}
             value={claim.playerAddress}
           />
           {!compareCaseInsensitive(claim.playerAddress, walletAddress) && (

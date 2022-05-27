@@ -108,8 +108,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               form="form-fund"
               label="Fund"
               mode="strong"
-              title={!walletAddress ? 'Not ready ...' : !isFormValid ? 'Form not valid' : 'Fund'}
-              disabled={!walletAddress || !isEnoughBalance || !isFormValid}
+              title={!isFormValid ? 'Form not valid' : 'Fund'}
+              disabled={!isEnoughBalance || !isFormValid}
             />,
           ]}
           onClose={closeModal}

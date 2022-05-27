@@ -47,7 +47,7 @@ const LabelStyled = styled.div`
 export default function Dashboard() {
   const theme = useTheme();
   const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
 
   useEffect(() => {
     let isSubscribed = true;
@@ -84,7 +84,7 @@ export default function Dashboard() {
           <TextStyled theme={theme}>{dashboardModel?.questCount.toLocaleString()}</TextStyled>
         </FieldInput>
         <SpacerStyled>
-          {walletAddress && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
+          {walletConnected && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
         </SpacerStyled>
       </ChildSpacer>
     </BoxStyled>

@@ -139,8 +139,7 @@ export default function ReclaimFundsModal({
             icon={<IconCoin />}
             label="Reclaim"
             mode="strong"
-            title={!walletAddress ? 'Not ready ...' : 'Reclaim remaining funds and deposit'}
-            disabled={!walletAddress}
+            title="Reclaim remaining funds and deposit"
           />
         }
         onClose={closeModal}
