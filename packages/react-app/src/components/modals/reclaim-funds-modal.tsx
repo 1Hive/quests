@@ -8,7 +8,6 @@ import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/style.util';
-import Skeleton from 'react-loading-skeleton';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getTokenInfo } from 'src/utils/contract.util';
@@ -52,7 +51,6 @@ export default function ReclaimFundsModal({
   isDepositReleased,
 }: Props) {
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const [depositTokenAmount, setDepositTokenAmount] = useState<TokenAmountModel>();
@@ -77,7 +75,6 @@ export default function ReclaimFundsModal({
 
   const reclaimFundTx = async () => {
     try {
-      setLoading(true);
       const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
@@ -114,10 +111,6 @@ export default function ReclaimFundsModal({
             message: computeTransactionErrorMessage(e),
           },
       );
-    } finally {
-      if (isMountedRef.current) {
-        setLoading(false);
-      }
     }
   };
 
@@ -146,10 +139,8 @@ export default function ReclaimFundsModal({
             icon={<IconCoin />}
             label="Reclaim"
             mode="strong"
-            title={
-              loading || !walletAddress ? 'Not ready ...' : 'Reclaim remaining funds and deposit'
-            }
-            disabled={loading || !walletAddress}
+            title={!walletAddress ? 'Not ready ...' : 'Reclaim remaining funds and deposit'}
+            disabled={!walletAddress}
           />
         }
         onClose={closeModal}
@@ -157,20 +148,11 @@ export default function ReclaimFundsModal({
       >
         <RowStyled>
           <Outset gu16>
-            <AmountFieldInputFormik
-              id="bounty"
-              label="Reclaimable funds"
-              isLoading={loading}
-              value={bounty}
-            />
+            <AmountFieldInputFormik id="bounty" label="Reclaimable funds" value={bounty} />
           </Outset>
           <Outset gu16>
             <FieldInput label="will be send to">
-              {!loading ? (
-                <IdentityBadge entity={questData.fallbackAddress} badgeOnly />
-              ) : (
-                <Skeleton />
-              )}
+              <IdentityBadge entity={questData.fallbackAddress} badgeOnly />
             </FieldInput>
           </Outset>
         </RowStyled>
@@ -180,17 +162,12 @@ export default function ReclaimFundsModal({
               <AmountFieldInputFormik
                 id="bounty"
                 label="Reclaimable deposit"
-                isLoading={loading}
                 value={depositTokenAmount}
               />
             </Outset>
             <Outset gu16>
               <FieldInput label="will be send to">
-                {!loading && questData.creatorAddress ? (
-                  <IdentityBadge entity={questData.creatorAddress} badgeOnly />
-                ) : (
-                  <Skeleton />
-                )}
+                <IdentityBadge entity={questData.creatorAddress} badgeOnly />
               </FieldInput>
             </Outset>
           </RowStyled>

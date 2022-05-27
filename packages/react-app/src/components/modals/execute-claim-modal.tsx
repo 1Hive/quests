@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import { Button, IconCoin, IconCaution, Info } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import styled from 'styled-components';
@@ -44,30 +44,23 @@ const OnlyStackholderWarnStyled = styled(Info)`
 type Props = {
   claim: ClaimModel;
   questTotalBounty?: TokenAmountModel | null;
-  isClaimable?: boolean;
+  claimable: boolean;
   onClose?: ModalCallback;
 };
 
 export default function ExecuteClaimModal({
   claim,
   questTotalBounty,
-  isClaimable,
   onClose = noop,
+  claimable,
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<TokenAmountModel>();
-  const [buttonLabel, setButtonLabel] = useState<ReactNode>('Claim');
   const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('execute-claim-modal'), []);
   const isMountedRef = useIsMountedRef();
-
-  useEffect(() => {
-    if (isClaimable === undefined) return;
-    if (claim.state === ENUM_CLAIM_STATE.Challenged) setButtonLabel('Challenged by someone');
-    else setButtonLabel('Claim');
-  }, [claim.state, claim.executionTimeMs, isClaimable]);
 
   useEffect(() => {
     if (questTotalBounty) {
@@ -87,7 +80,7 @@ export default function ExecuteClaimModal({
       const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
-        message: 'Sending claimed amount to your wallet',
+        message: 'Claiming bounty',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimExecute',
         args: { questAddress: claim.questAddress, containerId: claim.container!.id },
@@ -133,10 +126,10 @@ export default function ExecuteClaimModal({
             <OpenButtonStyled
               onClick={() => setOpened(true)}
               icon={<IconCoin />}
-              label={buttonLabel}
+              label="Claim"
               mode="positive"
               title={
-                !isClaimable
+                !claimable
                   ? 'Wait for the delay period to end before claiming...'
                   : questTotalBounty &&
                     claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
@@ -146,8 +139,8 @@ export default function ExecuteClaimModal({
               disabled={
                 !questTotalBounty ||
                 !walletAddress ||
-                !isClaimable ||
-                claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount
+                claim.claimedAmount.parsedAmount >= questTotalBounty.parsedAmount ||
+                !claimable
               }
             />
           </OpenButtonWrapperStyled>
@@ -156,17 +149,10 @@ export default function ExecuteClaimModal({
           <Button
             onClick={claimTx}
             icon={<IconCoin />}
-            label={buttonLabel}
-            disabled={
-              loading ||
-              !walletAddress ||
-              !isClaimable ||
-              claim.state === ENUM_CLAIM_STATE.Challenged
-            }
+            label="Claim"
+            disabled={loading || !walletAddress || claim.state === ENUM_CLAIM_STATE.Challenged}
             title={
-              loading || !walletAddress || !isClaimable
-                ? 'Not ready ...'
-                : 'Trigger claim operation in the chain'
+              loading || !walletAddress ? 'Not ready ...' : 'Trigger claim operation in the chain'
             }
             mode="positive"
           />

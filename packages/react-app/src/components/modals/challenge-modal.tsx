@@ -51,7 +51,6 @@ type Props = {
 
 export default function ChallengeModal({ claim, challengeDeposit, onClose = noop }: Props) {
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
@@ -86,7 +85,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const challengeTx = async (values: Partial<ChallengeModel>) => {
     if (isFormValid) {
       try {
-        setLoading(true);
         const { governQueueAddress } = getNetwork();
         if (
           challengeFee?.parsedAmount &&
@@ -168,10 +166,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             },
         );
         toast(computeTransactionErrorMessage(e));
-      } finally {
-        if (isMountedRef.current) {
-          setLoading(false);
-        }
       }
     }
   };
@@ -211,7 +205,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               : challengeDeposit
           }
           setIsEnoughBalance={setIsEnoughBalance}
-          isLoading={loading}
         />,
         challengeFee && !isFeeDepositSameToken && (
           <WalletBallance
@@ -225,7 +218,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           id="challengeDeposit"
           label="Challenge Deposit"
           tooltip="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
-          isLoading={loading}
           value={challengeDeposit}
           compact
         />,
@@ -234,7 +226,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           id="challengeFee"
           label="Challenge fee"
           tooltip="This is the challenge cost defined by Celeste."
-          isLoading={loading || challengeFee === undefined}
+          isLoading={challengeFee === undefined}
           value={challengeFee}
           compact
         />,
@@ -245,14 +237,8 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={loading || !walletAddress || !isEnoughBalance || !isFormValid}
-          title={
-            loading || !walletAddress
-              ? 'Not ready ...'
-              : !isFormValid
-              ? 'Form not valid'
-              : 'Challenge'
-          }
+          disabled={!walletAddress || !isEnoughBalance || !isFormValid}
+          title={!walletAddress ? 'Not ready ...' : !isFormValid ? 'Form not valid' : 'Challenge'}
           className="m-8"
         />,
       ]}
@@ -281,7 +267,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 isEdit
                 label="Challenge reason"
                 tooltip="Reason why this claim should be challenged."
-                isLoading={loading}
                 value={values.reason}
                 onChange={handleChange}
                 multiline

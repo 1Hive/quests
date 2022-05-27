@@ -3,8 +3,8 @@ import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
-import { useTimeout } from 'src/hooks/use-hooks';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { useNow } from 'src/hooks/use-now.hook';
 import { ClaimModel } from 'src/models/claim.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -44,23 +44,18 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
   const [state, setState] = useState(claim.state);
   const { below } = useViewport();
   const [waitForClose, setWaitForClose] = useState(false);
-  const [isClaimable, setIsClaimable] = useState(false);
   const [actionButton, setActionButton] = useState<ReactNode>();
   const isMountedRef = useIsMountedRef();
-
-  useTimeout(() => {
-    if (claim.executionTimeMs) setIsClaimable(true);
-  }, Math.max((claim.executionTimeMs ?? 0) - Date.now(), 0));
+  const now = useNow();
+  const claimable = useMemo(() => !!claim.executionTimeMs && claim.executionTimeMs <= now, [now]);
 
   useEffect(() => {
     setState(claim.state);
   }, [claim.state]);
 
   const timer = useMemo(
-    () =>
-      claim.executionTimeMs &&
-      claim.executionTimeMs - Date.now() > 0 && <Timer end={new Date(claim.executionTimeMs)} />,
-    [claim.executionTimeMs],
+    () => !claimable && claim.executionTimeMs && <Timer end={new Date(claim.executionTimeMs)} />,
+    [claim.executionTimeMs, claimable],
   );
 
   const onActionClose = () => {
@@ -104,14 +99,14 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
   useEffect(() => {
     if (waitForClose || !state || !isMountedRef.current) return;
     if (state === ENUM_CLAIM_STATE.Scheduled) {
-      if (compareCaseInsensitive(walletAddress, claim.playerAddress) || isClaimable) {
+      if (compareCaseInsensitive(walletAddress, claim.playerAddress) || claimable) {
         setActionButton(
           <>
             <ExecuteClaimModal
               claim={claim}
               questTotalBounty={questData.bounty}
               onClose={onActionClose}
-              isClaimable={isClaimable}
+              claimable={claimable}
             />
             {timer}
           </>,
@@ -136,7 +131,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
       return;
     }
     setActionButton(undefined);
-  }, [state, walletAddress, waitForClose, isClaimable, claim, questData.bounty, challengeDeposit]);
+  }, [state, walletAddress, waitForClose, claim, questData.bounty, challengeDeposit, claimable]);
 
   return (
     <div className="wide">
