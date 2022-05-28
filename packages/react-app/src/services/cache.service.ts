@@ -1,20 +1,23 @@
-import { BigNumber, Contract, ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
 import { sleep } from 'src/utils/common.util';
-import { getProviderOrSigner } from 'src/utils/contract.util';
 import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import { fetchRoutePairWithStable } from './uniswap.service';
 
-const cacheMap = new Map<string, Map<string, { value: any; expirationMs?: number } | null>>();
+let cacheMap: Map<
+  string,
+  Map<string, { value: any; expirationMs?: number } | null>
+> = retrieveCache();
 
 export async function cacheFetchTokenPrice(token: TokenModel) {
-  return buildCache<BigNumber>(
+  const price = await buildCache<string>(
     'token-price',
     token.token,
-    () => fetchRoutePairWithStable(token).then((x) => ethers.utils.parseEther(x.price)),
+    () => fetchRoutePairWithStable(token).then((x) => x.price),
     ONE_HOUR_IN_MS / 2, // 30 min
   );
+  return ethers.utils.parseEther(price);
 }
 
 export async function cacheFetchBalance(
@@ -22,12 +25,13 @@ export async function cacheFetchBalance(
   address: string,
   erc20Contract: ethers.Contract,
 ) {
-  return buildCache<BigNumber>(
+  const balance = await buildCache<string>(
     'balance',
     token.token + address,
-    () => erc20Contract.balanceOf(address),
+    () => erc20Contract.balanceOf(address).then((x: BigNumber) => x.toString()),
     30 * 1000, // 30 sec
   );
+  return BigNumber.from(balance.toString());
 }
 
 export async function cacheTokenInfo(address: string, erc20Contract: ethers.Contract) {
@@ -48,6 +52,9 @@ async function buildCache<TValue>(
   fetchValue: () => Promise<TValue>,
   cacheDurationMs?: number, // Undefined for permanent cache
 ): Promise<TValue> {
+  if (!cacheMap) {
+    cacheMap = retrieveCache();
+  }
   let cache = cacheMap.get(cacheId);
   if (!cache) {
     cache = new Map<string, { value: TValue; expirationMs: number } | null>();
@@ -79,5 +86,44 @@ async function buildCache<TValue>(
     expirationMs: cacheDurationMs ? Date.now() + cacheDurationMs : undefined,
   });
   Logger.debug('Building cached version of', { cacheId, valueId, value, cacheDurationMs });
+  saveCacheAsync(); // Save cache without waiting for it to be saved
   return value;
+}
+
+function replacer(key: string, value: any) {
+  if (value instanceof Map) {
+    return {
+      dataType: 'Map',
+      value: Array.from(value.entries()), // or with spread: value: [...value]
+    };
+  }
+  return value;
+}
+
+function reviver(key: string, value: any) {
+  if (typeof value === 'object' && value !== null) {
+    if (value.dataType === 'Map') {
+      return new Map(value.value);
+    }
+  }
+  return value;
+}
+
+function saveCacheAsync() {
+  localStorage.setItem('cache', JSON.stringify(cacheMap, replacer));
+}
+
+function retrieveCache() {
+  try {
+    const cacheJson = localStorage.getItem('cache');
+    if (cacheJson) {
+      const map = JSON.parse(cacheJson, reviver) as Map<string, Map<string, any>>;
+      if (map.size > 0) {
+        return map;
+      }
+    }
+  } catch (error) {
+    Logger.debug('Error retrieving cache from storage', error);
+  }
+  return new Map<string, Map<string, any>>();
 }

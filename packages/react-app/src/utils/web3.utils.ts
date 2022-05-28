@@ -140,10 +140,10 @@ export function getDefaultProvider(): ethers.providers.Provider {
   const { networkId, chainId: expectedChainId } = getNetwork();
   let provider = (window as any).ethereum ?? (window as any).web3?.currentProvider;
   if (!provider || +provider.chainId !== +expectedChainId) {
-    provider = new ethers.providers.StaticJsonRpcProvider(getRpcUrl());
+    provider = new ethers.providers.StaticJsonRpcProvider(getRpcUrl(), networkId);
   }
 
-  return provider && new ethers.providers.Web3Provider(provider);
+  return provider;
 }
 
 export function getRpcUrl(chainId?: number) {

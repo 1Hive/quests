@@ -9,7 +9,6 @@ import ERC20 from '../contracts/ERC20.json';
 import UniswapPair from '../contracts/UniswapPair.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
-import { sleep } from './common.util';
 
 let contracts: any;
 const contractMap = new Map<string, Contract>();
