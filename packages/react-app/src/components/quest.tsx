@@ -196,6 +196,7 @@ export default function Quest({
           token,
           address,
           depositReleased ? undefined : questData.deposit,
+          true,
         );
         if (isMountedRef.current) {
           questData.bounty = result;

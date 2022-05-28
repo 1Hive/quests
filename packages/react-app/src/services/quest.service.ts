@@ -45,7 +45,7 @@ import {
   getCelesteContract,
 } from '../utils/contract.util';
 import { getLastBlockTimestamp } from '../utils/date.utils';
-import { cacheFetchTokenPrice } from './cache.service';
+import { cacheFetchBalance, cacheFetchTokenPrice } from './cache.service';
 
 let questList: QuestModel[] = [];
 
@@ -345,10 +345,15 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   const funds = (
     await Promise.all(
       quests.map(async (quest) =>
-        getBalanceOf(quest.questRewardTokenAddress, quest.id, {
-          amount: BigNumber.from(quest.depositAmount),
-          token: quest.depositToken,
-        }),
+        getBalanceOf(
+          quest.questRewardTokenAddress,
+          quest.id,
+          {
+            amount: BigNumber.from(quest.depositAmount),
+            token: quest.depositToken,
+          },
+          true,
+        ),
       ),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
@@ -490,6 +495,7 @@ export async function getBalanceOf(
   token: TokenModel | string,
   address: string,
   lockedFunds?: DepositModel,
+  useCache?: boolean,
 ): Promise<TokenAmountModel | null> {
   try {
     let tokenInfo: TokenModel;
@@ -498,7 +504,9 @@ export async function getBalanceOf(
     if (tokenInfo) {
       const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
-      let balance = (await erc20Contract.balanceOf(address)) as BigNumber;
+      let balance = useCache
+        ? await cacheFetchBalance(tokenInfo, address, erc20Contract)
+        : ((await erc20Contract.balanceOf(address)) as BigNumber);
       if (lockedFunds && compareCaseInsensitive(lockedFunds.token, tokenInfo.token)) {
         // Substract deposit from funds if both same token
         balance = balance.sub(BigNumber.from(lockedFunds.amount));
