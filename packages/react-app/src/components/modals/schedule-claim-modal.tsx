@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import { Button } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
@@ -17,6 +17,8 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 
 import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -62,21 +64,13 @@ export default function ScheduleClaimModal({
   onClose = noop,
 }: Props) {
   const { walletAddress } = useWallet();
-  const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
-  let mounted = true;
-
-  useEffect(
-    () => () => {
-      mounted = false;
-    },
-    [],
-  );
+  const isMountedRef = useIsMountedRef();
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -103,20 +97,19 @@ export default function ScheduleClaimModal({
     return errors;
   };
 
-  const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }, setSubmitting: Function) => {
+  const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }) => {
     validate(values); // Validate one last time before submitting
     if (isFormValid) {
       if (values.claimAll) {
         values.claimedAmount.parsedAmount = 0;
         values.claimedAmount.token.amount = '0';
       }
-      scheduleClaimTx(values, setSubmitting);
+      scheduleClaimTx(values);
     }
   };
 
-  const scheduleClaimTx = async (values: Partial<ClaimModel>, setSubmitting: Function) => {
+  const scheduleClaimTx = async (values: Partial<ClaimModel>) => {
     try {
-      setLoading(true);
       const { governQueueAddress } = getNetwork();
       const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
       await approveTokenTransaction(
@@ -127,14 +120,15 @@ export default function ScheduleClaimModal({
         walletAddress,
         setTransaction,
       );
-      setTransaction({
+      const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
         status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
         type: 'ClaimSchedule',
         args: { questAddress },
-      });
+      } as TransactionModel;
+      setTransaction(txPayload);
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
         {
@@ -145,29 +139,23 @@ export default function ScheduleClaimModal({
           questAddress,
         },
         (txHash) => {
-          setTransaction(
-            (oldTx) =>
-              oldTx && {
-                ...oldTx,
-                hash: txHash,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              },
-          );
+          setTransaction({
+            ...txPayload,
+            hash: txHash,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          });
         },
       );
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: scheduleReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
+      setTransaction({
+        ...txPayload,
+        status: scheduleReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      });
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
     } catch (e: any) {
-      if (mounted) {
+      if (isMountedRef.current) {
         setTransaction(
           (oldTx) =>
             oldTx && {
@@ -177,25 +165,20 @@ export default function ScheduleClaimModal({
             },
         );
       }
-    } finally {
-      if (mounted) {
-        setSubmitting(false);
-        setLoading(false);
-      }
     }
   };
 
   return (
     <ModalBase
       id={modalId}
-      title="Claim quest"
+      title="Schedule a Quest claim"
       openButton={
         <OpenButtonStyled
           icon={<GiBroadsword />}
           onClick={() => setOpened(true)}
           label="Schedule claim"
           mode="positive"
-          title={!questTotalBounty ? 'Loading ...' : 'Schedule claim'}
+          title={!questTotalBounty ? 'Loading ...' : 'Open schedule claim'}
           disabled={!questTotalBounty}
         />
       }
@@ -211,8 +194,8 @@ export default function ScheduleClaimModal({
             playerAddress: undefined,
           } as any
         }
-        onSubmit={(values, { setSubmitting }) => {
-          onClaimSubmit(values, setSubmitting);
+        onSubmit={(values) => {
+          onClaimSubmit(values);
         }}
         validateOnChange
         validate={validate}
@@ -239,7 +222,6 @@ export default function ScheduleClaimModal({
                     id="claimDeposit"
                     label="Claim Deposit"
                     tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-                    isLoading={loading}
                     value={claimDeposit}
                     compact
                   />
@@ -247,7 +229,6 @@ export default function ScheduleClaimModal({
                     key="WalletBallance-claimDeposit"
                     askedTokenAmount={claimDeposit}
                     setIsEnoughBalance={setIsEnoughBalance}
-                    isLoading={loading}
                   />
                   <Button
                     key="confirmButton"
@@ -257,18 +238,8 @@ export default function ScheduleClaimModal({
                     type="submit"
                     form="form-claim"
                     className="m-8"
-                    title={
-                      loading || !walletAddress
-                        ? 'Not ready ...'
-                        : !isFormValid
-                        ? 'Form not valid'
-                        : transaction
-                        ? 'Wait for previous transaction to complete'
-                        : 'Schedule claim'
-                    }
-                    disabled={
-                      loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction
-                    }
+                    title={!isFormValid ? 'Form not valid' : 'Schedule claim'}
+                    disabled={!isEnoughBalance}
                   />
                 </>
               }
@@ -278,7 +249,6 @@ export default function ScheduleClaimModal({
                   isEdit
                   label="Evidence of completion"
                   tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
-                  isLoading={loading}
                   value={values.evidence}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -295,7 +265,6 @@ export default function ScheduleClaimModal({
                       <AmountFieldInputFormik
                         id="questBounty"
                         label="Available bounty"
-                        isLoading={loading}
                         value={questTotalBounty}
                       />
                     </Outset>
@@ -307,7 +276,6 @@ export default function ScheduleClaimModal({
                         handleBlur={handleBlur}
                         value={values.claimAll}
                         tooltip={`Check this if you want to claim the entire bounty available passed the claim delay of ${DEFAULT_CLAIM_EXECUTION_DELAY_MS}.`}
-                        isLoading={loading}
                         isEdit
                       />
                     </Outset>
@@ -318,7 +286,6 @@ export default function ScheduleClaimModal({
                       isEdit
                       label="Claim amount"
                       tooltip="The expected amount to claim considering the Quest agreement. Check all bounty if you want to claim all available bounty at the moment the claim is executed."
-                      isLoading={loading}
                       value={values.claimAll ? questTotalBounty : values.claimedAmount}
                       error={touched.claimedAmount && (errors.claimedAmount as string)}
                       disabled={values.claimAll}
@@ -330,7 +297,6 @@ export default function ScheduleClaimModal({
                       id="playerAddress"
                       label="Player address"
                       value={values.playerAddress ?? walletAddress}
-                      isLoading={loading}
                       tooltip="Usually is the connected wallet but it can also be set to another address."
                       error={touched.playerAddress && errors.playerAddress}
                       onBlur={handleBlur}

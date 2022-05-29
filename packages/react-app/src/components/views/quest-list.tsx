@@ -21,6 +21,7 @@ import { GUpx } from 'src/utils/style.util';
 import { useThemeContext } from 'src/contexts/theme.context';
 import { ThemeInterface } from 'src/styles/theme';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -84,7 +85,7 @@ export default function QuestList() {
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   const { setPage } = usePageContext();
-  let isMounted = true;
+  const isMountedRef = useIsMountedRef();
 
   const skeletonQuests: any[] = useMemo(() => {
     const fakeQuests = [];
@@ -100,9 +101,6 @@ export default function QuestList() {
 
   useEffect(() => {
     setPage(ENUM_PAGES.List);
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -135,7 +133,9 @@ export default function QuestList() {
   const fetchQuestUntilNew = (newQuestAddress: string) => {
     setTimeout(async () => {
       const newQuest = await QuestService.fetchQuest(newQuestAddress);
-      if (!isMounted) return;
+      if (!isMountedRef.current) {
+        return;
+      }
       if (newQuest) {
         setQuests([newQuest, ...quests]);
         setNewQuestLoading(false);
@@ -155,7 +155,9 @@ export default function QuestList() {
       setQuests([]);
       setIsLoading(true);
       QuestService.fetchQuestsPaging(0, QUESTS_PAGE_SIZE, _filter ?? filter).then((res) => {
-        if (!isMounted) return;
+        if (!isMountedRef.current) {
+          return;
+        }
         setIsLoading(false);
         setQuests(res);
         setHasMore(res.length >= QUESTS_PAGE_SIZE);
@@ -166,7 +168,9 @@ export default function QuestList() {
   const loadMore = () => {
     setIsLoading(true);
     QuestService.fetchQuestsPaging(quests.length, QUESTS_PAGE_SIZE, filter).then((res) => {
-      if (!isMounted) return;
+      if (!isMountedRef.current) {
+        return;
+      }
       setIsLoading(false);
       setQuests(quests.concat(res));
       setHasMore(res.length >= QUESTS_PAGE_SIZE);

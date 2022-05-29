@@ -7,7 +7,7 @@ import { getDashboardInfo } from 'src/services/quest.service';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input/field-input';
-import QuestModal from './modals/quest-modal';
+import QuestModal from './modals/create-quest-modal';
 import { ChildSpacer } from './utils/spacer-util';
 
 // #region StyledComponents
@@ -47,7 +47,7 @@ const LabelStyled = styled.div`
 export default function Dashboard() {
   const theme = useTheme();
   const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
 
   useEffect(() => {
     let isSubscribed = true;
@@ -84,7 +84,7 @@ export default function Dashboard() {
           <TextStyled theme={theme}>{dashboardModel?.questCount.toLocaleString()}</TextStyled>
         </FieldInput>
         <SpacerStyled>
-          {walletAddress && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
+          {walletConnected && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
         </SpacerStyled>
       </ChildSpacer>
     </BoxStyled>

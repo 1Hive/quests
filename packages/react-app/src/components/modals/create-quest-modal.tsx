@@ -21,6 +21,8 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { approveTokenTransaction, fundQuestTransaction } from 'src/services/transaction-handler';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -80,28 +82,25 @@ export default function QuestModal({
   const { questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
   const [questDeposit, setQuestDeposit] = useState<TokenAmountModel | null>();
-  let mounted = true;
+  const isMountedRef = useIsMountedRef();
   const modalId = useMemo(() => uniqueId('quest-modal'), []);
 
   useEffect(() => {
     feedDummyQuestData(questData).then((data) => {
-      if (mounted) {
+      if (isMountedRef.current) {
         setQuestDataState(data);
       }
     });
 
     QuestService.fetchCreateQuestDeposit(walletAddress).then((deposit) => {
-      if (mounted) {
+      if (isMountedRef.current) {
         setQuestDeposit(deposit);
       }
     });
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -181,13 +180,14 @@ export default function QuestModal({
 
       let newQuestAddress: string;
       try {
-        setTransaction({
+        const txPayload = {
           modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
           message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           type: 'QuestCreate',
-        });
+        } as TransactionModel;
+        setTransaction(txPayload);
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,
           values.fallbackAddress ?? walletAddress,
@@ -199,30 +199,24 @@ export default function QuestModal({
           },
           undefined,
           (txHash) => {
-            setTransaction(
-              (oldTx) =>
-                oldTx && {
-                  ...oldTx,
-                  hash: txHash,
-                  status: ENUM_TRANSACTION_STATUS.Pending,
-                },
-            );
+            setTransaction({
+              ...txPayload,
+              hash: txHash,
+              status: ENUM_TRANSACTION_STATUS.Pending,
+            });
           },
         );
 
         newQuestAddress = txReceiptSaveQuest?.events?.flatMap((x) => x.args).filter((x) => !!x)[0];
         if (!newQuestAddress) throw Error('Something went wrong, Quest was not created');
 
-        setTransaction(
-          (oldTx) =>
-            oldTx && {
-              ...oldTx,
-              status: txReceiptSaveQuest?.status
-                ? ENUM_TRANSACTION_STATUS.Confirmed
-                : ENUM_TRANSACTION_STATUS.Failed,
-              args: { questAddress: newQuestAddress },
-            },
-        );
+        setTransaction({
+          ...txPayload,
+          status: txReceiptSaveQuest?.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+          args: { questAddress: newQuestAddress },
+        });
         if (!txReceiptSaveQuest?.status || !newQuestAddress) {
           throw new Error('Failed to create quest');
         }
@@ -237,7 +231,9 @@ export default function QuestModal({
           );
         }
 
-        if (mounted) setQuestDataState(emptyQuestData);
+        if (isMountedRef.current) {
+          setQuestDataState(emptyQuestData);
+        }
       } catch (e: any) {
         setTransaction(
           (oldTx) =>
@@ -336,21 +332,13 @@ export default function QuestModal({
                       form="form-quest"
                       className="m-8"
                       title={
-                        !walletAddress || !questDeposit?.token
+                        !questDeposit?.token
                           ? 'Not ready ...'
                           : !isFormValid
                           ? 'Form not valid'
-                          : transaction
-                          ? 'Wait for previous transaction to complete'
                           : 'Schedule claim'
                       }
-                      disabled={
-                        !walletAddress ||
-                        !questDeposit?.token ||
-                        !isEnoughBalance ||
-                        !isFormValid ||
-                        transaction
-                      }
+                      disabled={!questDeposit?.token || !isEnoughBalance || !isFormValid}
                     />
                   </>
                 }

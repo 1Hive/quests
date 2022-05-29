@@ -311,13 +311,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   if (!result) return null;
 
   const { disputeId, reason, createdAt, resolver, collateral, challenger } = result;
-  let fetchedReason: string | undefined;
-  try {
-    fetchedReason = await getObjectFromIpfs(reason);
-  } catch (error) {
-    Logger.warn(error, 'Failed to get IPFS object when fetching challenge');
-    fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph); // try with thegraph ipfs node
-  }
+  const fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph);
   return {
     deposit: {
       parsedAmount: fromBigNumber(collateral.amount, collateral.decimals),
