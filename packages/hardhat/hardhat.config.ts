@@ -1048,4 +1048,24 @@ task("deployCeleste:rinkeby")
     }
   );
 
+task(
+  "verify-quests-contracts",
+  "Verify contracts with etherscan api"
+).setAction(async (_args, { run, network }) => {
+  const questFactoryDeploy = require(`./deployments/${network.name.toLowerCase()}/QuestFactory.json`);
+  const questDeploy = require(`./deployments/${network.name.toLowerCase()}/Quest.json`);
+  console.log("Quest", {
+    address: questDeploy.address,
+    constructorArguments: questDeploy.args,
+  });
+  await run("verify:verify", {
+    address: questFactoryDeploy.address,
+    constructorArguments: questFactoryDeploy.args,
+  });
+  await run("verify:verify", {
+    address: questDeploy.address,
+    constructorArguments: questDeploy.args,
+  });
+});
+
 module.exports = hardhatConfig;
