@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { BigNumber, ethers } from 'ethers';
 import { noop } from 'lodash-es';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -135,14 +136,14 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 
   return +ethers.utils.formatUnits(bigNumber, decimals);
 }
 
-export function getDefaultProvider() {
-  const { chainId: expectedChainId } = getNetwork();
+export function getDefaultProvider(): ethers.providers.Provider {
+  const { networkId, chainId: expectedChainId } = getNetwork();
   let provider = (window as any).ethereum ?? (window as any).web3?.currentProvider;
   if (!provider || +provider.chainId !== +expectedChainId) {
-    provider = new Web3.providers.HttpProvider(getRpcUrl());
+    provider = new ethers.providers.StaticJsonRpcProvider(getRpcUrl(), networkId);
   }
 
-  return provider && new ethers.providers.Web3Provider(provider);
+  return provider;
 }
 
 export function getRpcUrl(chainId?: number) {

@@ -4,12 +4,14 @@ import { getDefaultProvider } from 'src/utils/web3.utils';
 import { toChecksumAddress } from 'web3-utils';
 import { ContractInstanceError } from 'src/models/contract-error';
 import { Logger } from 'src/utils/logger';
+import { cacheTokenInfo } from 'src/services/cache.service';
 import ERC20 from '../contracts/ERC20.json';
 import UniswapPair from '../contracts/UniswapPair.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
 import { getNetwork } from '../networks';
 
 let contracts: any;
+const contractMap = new Map<string, Contract>();
 
 // walletAddress is not optional
 export function getSigner(ethersProvider: any, walletAddress: any) {
@@ -37,17 +39,28 @@ function getContract(
   walletAddress?: string,
 ): Contract {
   try {
+    const id = (contractAddressOverride ?? contractName) + (walletAddress ?? '');
+    let contract = contractMap.get(id);
+    if (contract) {
+      return contract;
+    }
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
     const askedContract = contracts[contractName];
-    const contractAddress = contractAddressOverride ?? askedContract.address;
+    const contractAddress: string = contractAddressOverride ?? askedContract.address;
     const contractAbi = askedContract.abi ?? askedContract;
     const provider = getDefaultProvider();
 
     if (!contractAddress) throw new Error(`${contractName} address was not defined`);
     if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
 
-    return new Contract(contractAddress, contractAbi, getProviderOrSigner(provider, walletAddress));
+    contract = new Contract(
+      contractAddress,
+      contractAbi,
+      getProviderOrSigner(provider, walletAddress),
+    );
+    contractMap.set(id, contract);
+    return contract;
   } catch (error) {
     throw new ContractInstanceError(
       contractName,
@@ -80,9 +93,7 @@ export async function getTokenInfo(tokenAddress: string) {
   try {
     const tokenContract = getERC20Contract(tokenAddress);
     if (tokenContract) {
-      const symbol = await tokenContract.symbol();
-      const decimals = await tokenContract.decimals();
-      const name = await tokenContract.name();
+      const { symbol, decimals, name } = await cacheTokenInfo(tokenAddress, tokenContract);
       return {
         symbol,
         decimals,
