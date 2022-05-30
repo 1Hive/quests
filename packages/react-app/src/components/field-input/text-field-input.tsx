@@ -108,7 +108,7 @@ export default function TextFieldInput({
                 component: CollapsableBlock,
                 props: {
                   label: 'block',
-                  visible: showBlocks.toString(),
+                  visible: showBlocks ? 'true' : undefined,
                 },
               },
               code: {
@@ -116,7 +116,7 @@ export default function TextFieldInput({
                 props: {
                   label: 'code block',
                   type: 'code',
-                  visible: showBlocks.toString(),
+                  visible: showBlocks ? 'true' : undefined,
                 },
               },
               img: {
@@ -124,7 +124,7 @@ export default function TextFieldInput({
                 props: {
                   label: 'image',
                   type: 'image',
-                  visible: showBlocks.toString(),
+                  visible: showBlocks ? 'true' : undefined,
                 },
               },
               a: {
