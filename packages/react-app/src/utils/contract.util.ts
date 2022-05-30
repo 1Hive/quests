@@ -8,6 +8,7 @@ import { cacheTokenInfo } from 'src/services/cache.service';
 import ERC20 from '../contracts/ERC20.json';
 import UniswapPair from '../contracts/UniswapPair.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
+import CelesteDisputeManager from '../contracts/CelesteDisputeManager.json';
 import { getNetwork } from '../networks';
 
 let contracts: any;
@@ -30,6 +31,7 @@ function getContractsJson(network?: any) {
     ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
     ERC20,
     UniswapPair,
+    CelesteDisputeManager,
   };
 }
 
@@ -116,9 +118,10 @@ export function getUniswapPairContract(pairAddress: string) {
   return getContract('UniswapPair', pairAddress);
 }
 
-export function getCelesteContract() {
+export async function getCelesteDisputeManagerContract() {
   const { celesteAddress } = getNetwork();
-  return getContract('Celeste', celesteAddress);
+  const disputeManagerAddress = await getContract('Celeste', celesteAddress).getDisputeManager();
+  return getContract('CelesteDisputeManager', disputeManagerAddress);
 }
 
 export function getQuestContractInterface() {

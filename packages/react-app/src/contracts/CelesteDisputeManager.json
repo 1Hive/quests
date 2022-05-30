@@ -1,0 +1,70 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getDisputeFees",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "_disputeId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDispute",
+    "outputs": [
+      {
+        "name": "subject",
+        "type": "address"
+      },
+      {
+        "name": "possibleRulings",
+        "type": "uint8"
+      },
+      {
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "name": "finalRuling",
+        "type": "uint8"
+      },
+      {
+        "name": "lastRoundId",
+        "type": "uint256"
+      },
+      {
+        "name": "createTermId",
+        "type": "uint64"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "mockCelesteAddress",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  }
+]

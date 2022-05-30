@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useThemeContext } from 'src/contexts/theme.context';
 import { useWallet } from 'src/contexts/wallet.context';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { getBalanceOf } from 'src/services/quest.service';
@@ -33,6 +34,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
   const [tokenBalance, setTokenBalance] = useState<TokenAmountModel>();
   const [isEnoughBalance, _setIsEnoughBalance] = useState(true);
   const { currentTheme } = useThemeContext();
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     if (askedTokenAmount?.token && askedTokenAmount.token.token !== tokenBalance?.token.token) {
@@ -57,7 +59,10 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
 
   const fetchBalances = async (_token: TokenModel) => {
     setTokenBalance(undefined);
-    setTokenBalance((await getBalanceOf({ ..._token }, walletAddress)) ?? undefined);
+    const balance = (await getBalanceOf({ ..._token }, walletAddress)) ?? undefined;
+    if (isMountedRef.current) {
+      setTokenBalance(balance);
+    }
   };
 
   return (

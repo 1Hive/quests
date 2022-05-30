@@ -128,7 +128,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
       return;
     }
 
-    if (state === ENUM_CLAIM_STATE.Challenged) {
+    if (state === ENUM_CLAIM_STATE.Challenged || state === ENUM_CLAIM_STATE.Rejected) {
       setActionButton(<ResolveChallengeModal claim={claim} onClose={onActionClose} />);
       return;
     }

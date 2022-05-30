@@ -42,7 +42,7 @@ import {
   getQuestFactoryContract,
   getQuestContract,
   getGovernQueueContract,
-  getCelesteContract,
+  getCelesteDisputeManagerContract,
 } from '../utils/contract.util';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 import { cacheFetchBalance, cacheFetchTokenPrice } from './cache.service';
@@ -605,9 +605,9 @@ export async function resolveClaimChallenge(
 // #region Celeste
 
 export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
-  const celesteContract = getCelesteContract();
+  const celesteContract = await getCelesteDisputeManagerContract();
   if (!celesteContract) return null;
-  const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  const [feeToken, feeAmount] = await celesteContract.getDisputeFees();
   const token = await getTokenInfo(feeToken);
   if (!token) return null;
   return toTokenAmountModel({
@@ -619,17 +619,17 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
 export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel | null> {
-  const celesteContract = getCelesteContract();
-  if (!celesteContract) {
+  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract();
+  if (!celesteDisputeManagerContract) {
     return null;
   }
   if (!challenge.disputeId) {
     throw new Error('Dispute does not exist yet, please try again later');
   }
-  const dispute = await celesteContract.getDispute(challenge.disputeId);
+  const dispute = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
   return {
     id: challenge.disputeId,
-    state: dispute.ruling,
+    state: dispute.state,
   };
 }
 
