@@ -138,9 +138,12 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 
 
 export function getDefaultProvider(): ethers.providers.Provider {
   const { networkId, chainId: expectedChainId } = getNetwork();
-  let provider = (window as any).ethereum ?? (window as any).web3?.currentProvider;
-  if (!provider || +provider.chainId !== +expectedChainId) {
+  const injectedProvider = (window as any).ethereum ?? (window as any).web3?.currentProvider;
+  let provider;
+  if (!injectedProvider || +injectedProvider.chainId !== +expectedChainId) {
     provider = new ethers.providers.StaticJsonRpcProvider(getRpcUrl(), networkId);
+  } else {
+    provider = new ethers.providers.Web3Provider(injectedProvider);
   }
 
   return provider;
