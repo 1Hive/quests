@@ -866,6 +866,94 @@ task("newQuestFactory:rinkeby")
     );
   });
 
+async function deployAll(args, { run, network }) {
+  const governQueueAddress = await run(`newGovernQueue:${network}`, {
+    aclRoot: args.ownerAddress,
+    governQueueFactoryAddress: args.governQueueFactoryAddress,
+    resolver: args.resolver,
+    executionDelay: args.executionDelay,
+    scheduleDepositToken: args.scheduleDepositToken,
+    scheduleDepositAmount: args.scheduleDepositAmount,
+    challengeDepositToken: args.challengeDepositToken,
+    challengeDepositAmount: args.challengeDepositAmount,
+  });
+  const governAddress = await run(`newGovern:${network}`, {
+    initialExecutorAddress: governQueueAddress,
+    governFactoryAddress: args.governFactoryAddress,
+  });
+  await run(`newQuestFactory:${network}`, {
+    governAddress,
+    initialOwner: args.ownerAddress,
+    createDepositToken: args.createDepositToken,
+    createDepositAmount: args.createDepositAmount,
+  });
+}
+
+task("deployAll:gnosis")
+  .setDescription(
+    "Deploy all the needed Govern and Quest contracts and export them to frontend"
+  )
+  .addOptionalParam(
+    "ownerAddress",
+    "Address that will be granted Root ACL role and owner for QuestFactory",
+    defaultConfig.RootOwner.xdai
+  )
+  .addOptionalParam(
+    "governQueueFactoryAddress",
+    "Address of the govern queue factory",
+    defaultConfig.GovernQueueFactory.xdai
+  )
+  .addOptionalParam(
+    "governFactoryAddress",
+    "Address of the govern factory",
+    defaultConfig.GovernFactory.xdai
+  )
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    defaultConfig.CelesteResolver.xdai
+  )
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 5 min)",
+    defaultConfig.ClaimDelay.xdai,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.xdai.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.xdai.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "createQuestDepositToken",
+    "Address of the create quest deposit token",
+    defaultConfig.CreateQuestDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "createQuestDepositAmount",
+    "Amount of the create quest deposit token",
+    defaultConfig.CreateQuestDeposit.xdai.amount,
+    types.float
+  )
+  .setAction(deployAll);
+
 task("deployAll:rinkeby")
   .setDescription(
     "Deploy all the needed Govern and Quest contracts and export them to frontend"
@@ -885,7 +973,11 @@ task("deployAll:rinkeby")
     "Address of the govern factory",
     defaultConfig.GovernFactory.rinkeby
   )
-  .addOptionalParam("resolver", "Address of Celeste(IArbitrator)")
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    CelesteMock.address
+  )
   .addOptionalParam(
     "executionDelay",
     "Execution delay for claims in seconds (default is 5 min)",
@@ -925,45 +1017,7 @@ task("deployAll:rinkeby")
     defaultConfig.CreateQuestDeposit.rinkeby.amount,
     types.float
   )
-  .setAction(
-    async (
-      args: {
-        ownerAddress: string;
-        governQueueFactoryAddress: string;
-        governFactoryAddress: string;
-        resolver: string;
-        executionDelay: number;
-        scheduleDepositToken: string;
-        scheduleDepositAmount: number;
-        challengeDepositToken: string;
-        challengeDepositAmount: number;
-        createDepositToken: string;
-        createDepositAmount: number;
-      },
-      { run }
-    ) => {
-      const governQueueAddress = await run("newGovernQueue:rinkeby", {
-        aclRoot: args.ownerAddress,
-        governQueueFactoryAddress: args.governQueueFactoryAddress,
-        resolver: args.resolver,
-        executionDelay: args.executionDelay,
-        scheduleDepositToken: args.scheduleDepositToken,
-        scheduleDepositAmount: args.scheduleDepositAmount,
-        challengeDepositToken: args.challengeDepositToken,
-        challengeDepositAmount: args.challengeDepositAmount,
-      });
-      const governAddress = await run("newGovern:rinkeby", {
-        initialExecutorAddress: governQueueAddress,
-        governFactoryAddress: args.governFactoryAddress,
-      });
-      await run("newQuestFactory:rinkeby", {
-        governAddress,
-        initialOwner: args.ownerAddress,
-        createDepositToken: args.createDepositToken,
-        createDepositAmount: args.createDepositAmount,
-      });
-    }
-  );
+  .setAction(deployAll);
 
 task("sig")
   .addOptionalParam(
