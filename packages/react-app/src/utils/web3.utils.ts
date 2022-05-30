@@ -72,11 +72,11 @@ export function getUseWalletProviders() {
 
 export function getNetworkId(chainId = getDefaultChain()) {
   let key;
-  if (chainId === 1) key = 'mainnet';
-  if (chainId === 3) key = 'ropsten';
-  if (chainId === 4) key = 'rinkeby';
-  if (chainId === 100) key = 'xdai';
-  if (chainId === 1337) key = 'local';
+  if (+chainId === 1) key = 'mainnet';
+  if (+chainId === 3) key = 'ropsten';
+  if (+chainId === 4) key = 'rinkeby';
+  if (+chainId === 100) key = 'gnosis';
+  if (+chainId === 1337) key = 'local';
   if (key) {
     if (env('STAGING')) key += 'Staging';
     return key;

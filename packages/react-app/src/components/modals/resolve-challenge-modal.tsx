@@ -246,7 +246,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
               ) : (
                 <>
                   Ruling in progress, please come back later...
-                  {networkId === 'gnosis' ? (
+                  {networkId === 'xdai' ? (
                     <LinkStyled
                       external
                       href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}

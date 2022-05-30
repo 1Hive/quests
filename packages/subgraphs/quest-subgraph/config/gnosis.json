@@ -1,5 +1,5 @@
 {
   "network": "xdai",
-  "startBlock": 0,
-  "questFactoryAddress": ""
+  "startBlock": 22411544,
+  "questFactoryAddress": "0x77CB0E7453c9B9E867777f199b48253875F684eE"
 }

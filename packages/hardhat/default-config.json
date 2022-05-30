@@ -14,7 +14,7 @@
     },
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.01
+      "amount": 0.1
     }
   },
   "ScheduleDeposit": {
@@ -24,7 +24,7 @@
     },
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.01
+      "amount": 0.1
     }
   },
   "ChallengeDeposit": {
@@ -34,7 +34,7 @@
     },
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.01
+      "amount": 0.1
     }
   },
   "ChallengeFee": {

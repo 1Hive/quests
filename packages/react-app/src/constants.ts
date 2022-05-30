@@ -25,16 +25,16 @@ export const TOKENS = Object.freeze({
     decimals: 18,
   } as TokenModel,
   // ERC20 tokens
-  Thether: {
-    name: 'Tether',
-    symbol: 'USDT',
-    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+  GnosisDai: {
+    name: 'Dai Stablecoin',
+    symbol: 'DAI',
+    token: '0x44fa8e6f47987339850636f88629646662444217',
     decimals: 18,
   } as TokenModel,
-  UsdCoin: {
-    name: 'USD Coin',
+  GnosisUsdCoin: {
+    name: 'USDC Stablecoin',
     symbol: 'USDC',
-    token: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    token: '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83',
     decimals: 18,
   } as TokenModel,
   Honey: {
@@ -66,7 +66,7 @@ export const TOKENS = Object.freeze({
 export const NETWORK_TOKENS = Object.freeze({
   rinkeby: [TOKENS.HoneyTest, TOKENS.RinkebyTheter, TOKENS.RinkebyDai],
   xdai: [TOKENS.Honey],
-  mainnet: [TOKENS.Thether],
+  mainnet: [TOKENS.GnosisDai],
 });
 
 // Constants
