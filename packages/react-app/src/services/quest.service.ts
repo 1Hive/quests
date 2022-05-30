@@ -620,13 +620,16 @@ export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel | null> {
   const celesteContract = getCelesteContract();
-  if (!celesteContract) return null;
-  if (challenge.disputeId === undefined)
+  if (!celesteContract) {
+    return null;
+  }
+  if (!challenge.disputeId) {
     throw new Error('Dispute does not exist yet, please try again later');
-  const { state } = await celesteContract.disputes(challenge.disputeId);
+  }
+  const dispute = await celesteContract.getDispute(challenge.disputeId);
   return {
     id: challenge.disputeId,
-    state,
+    state: dispute.ruling,
   };
 }
 
