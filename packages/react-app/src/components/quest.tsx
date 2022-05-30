@@ -36,6 +36,7 @@ import { ConditionalWrapper } from './utils/util';
 const ClickableDivStyled = styled.div`
   text-decoration: none;
   width: 100%;
+  height: 100%;
 `;
 
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
