@@ -882,24 +882,25 @@ async function deployAll(
   },
   { run, network }: any
 ) {
-  const governQueueAddress = await run(
-    `newGovernQueue:${network.name.toLowerCase()}`,
-    {
-      aclRoot: args.ownerAddress,
-      governQueueFactoryAddress: args.governQueueFactoryAddress,
-      resolver: args.resolver,
-      executionDelay: args.executionDelay,
-      scheduleDepositToken: args.scheduleDepositToken,
-      scheduleDepositAmount: args.scheduleDepositAmount,
-      challengeDepositToken: args.challengeDepositToken,
-      challengeDepositAmount: args.challengeDepositAmount,
-    }
-  );
-  const governAddress = await run(`newGovern:${network.name.toLowerCase()}`, {
+  let networkId = network.name.toLowerCase();
+  if (networkId === "xdai") {
+    networkId = "gnosis";
+  }
+  const governQueueAddress = await run(`newGovernQueue:${networkId}`, {
+    aclRoot: args.ownerAddress,
+    governQueueFactoryAddress: args.governQueueFactoryAddress,
+    resolver: args.resolver,
+    executionDelay: args.executionDelay,
+    scheduleDepositToken: args.scheduleDepositToken,
+    scheduleDepositAmount: args.scheduleDepositAmount,
+    challengeDepositToken: args.challengeDepositToken,
+    challengeDepositAmount: args.challengeDepositAmount,
+  });
+  const governAddress = await run(`newGovern:${networkId}`, {
     initialExecutorAddress: governQueueAddress,
     governFactoryAddress: args.governFactoryAddress,
   });
-  await run(`newQuestFactory:${network.name.toLowerCase()}`, {
+  await run(`newQuestFactory:${networkId}`, {
     governAddress,
     initialOwner: args.ownerAddress,
     createDepositToken: args.createDepositToken,
