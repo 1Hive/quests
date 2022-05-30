@@ -866,22 +866,40 @@ task("newQuestFactory:rinkeby")
     );
   });
 
-async function deployAll(args, { run, network }) {
-  const governQueueAddress = await run(`newGovernQueue:${network}`, {
-    aclRoot: args.ownerAddress,
-    governQueueFactoryAddress: args.governQueueFactoryAddress,
-    resolver: args.resolver,
-    executionDelay: args.executionDelay,
-    scheduleDepositToken: args.scheduleDepositToken,
-    scheduleDepositAmount: args.scheduleDepositAmount,
-    challengeDepositToken: args.challengeDepositToken,
-    challengeDepositAmount: args.challengeDepositAmount,
-  });
-  const governAddress = await run(`newGovern:${network}`, {
+async function deployAll(
+  args: {
+    ownerAddress: string;
+    governQueueFactoryAddress: string;
+    governFactoryAddress: string;
+    resolver: string;
+    executionDelay: number;
+    scheduleDepositToken: string;
+    scheduleDepositAmount: number;
+    challengeDepositToken: string;
+    challengeDepositAmount: number;
+    createDepositToken: string;
+    createDepositAmount: number;
+  },
+  { run, network }: any
+) {
+  const governQueueAddress = await run(
+    `newGovernQueue:${network.name.toLowerCase()}`,
+    {
+      aclRoot: args.ownerAddress,
+      governQueueFactoryAddress: args.governQueueFactoryAddress,
+      resolver: args.resolver,
+      executionDelay: args.executionDelay,
+      scheduleDepositToken: args.scheduleDepositToken,
+      scheduleDepositAmount: args.scheduleDepositAmount,
+      challengeDepositToken: args.challengeDepositToken,
+      challengeDepositAmount: args.challengeDepositAmount,
+    }
+  );
+  const governAddress = await run(`newGovern:${network.name.toLowerCase()}`, {
     initialExecutorAddress: governQueueAddress,
     governFactoryAddress: args.governFactoryAddress,
   });
-  await run(`newQuestFactory:${network}`, {
+  await run(`newQuestFactory:${network.name.toLowerCase()}`, {
     governAddress,
     initialOwner: args.ownerAddress,
     createDepositToken: args.createDepositToken,
