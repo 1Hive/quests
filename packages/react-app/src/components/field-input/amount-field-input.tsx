@@ -107,6 +107,7 @@ const TokenAmountBadge = React.memo(
     amount,
     usdValue,
   }: TokenBadgeProp) => {
+    const { isTestNetwork } = getNetwork();
     const copyCode = useCopyToClipboard();
     const label = useMemo(() => {
       let temp = '';
@@ -117,15 +118,17 @@ const TokenAmountBadge = React.memo(
         temp += `${amountFormat} `;
       }
       temp += `${token.symbol}`;
-      if (usdValue) {
-        const usdFormat = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 2,
-        }).format(usdValue);
-        temp += ` (${usdFormat})`;
-      } else if (usdValue === 0) {
-        temp += ' (no pairs*)';
+      if (amount) {
+        if (usdValue || isTestNetwork) {
+          const usdFormat = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+          }).format(usdValue || amount);
+          temp += ` (${usdFormat})`;
+        } else if (usdValue === undefined) {
+          temp += ' (*)';
+        }
       }
 
       return temp;

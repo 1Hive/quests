@@ -12,13 +12,13 @@ let cacheMap: Map<
 > = retrieveCache();
 
 export async function cacheFetchTokenPrice(token: TokenModel) {
-  const price = await buildCache<string>(
+  const price = await buildCache<string | undefined>(
     'token-price',
     token.token,
     () => fetchRoutePairWithStable(token).then((x) => x.price),
     ONE_HOUR_IN_MS / 2, // 30 min
   );
-  return ethers.utils.parseEther(price);
+  return price === undefined ? undefined : ethers.utils.parseEther(price);
 }
 
 export async function cacheFetchBalance(

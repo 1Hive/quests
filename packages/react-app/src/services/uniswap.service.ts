@@ -41,8 +41,6 @@ export async function fetchPairWithStables(tokenA: TokenModel): Promise<PairMode
 // #region Contract Queries
 
 export async function fetchRoutePairWithStable(tokenA: TokenModel) {
-  const { isTestNetwork } = getNetwork();
-  const PRICE_ZERO = Promise.resolve({ price: isTestNetwork ? '1' : '0' }); // Fallback to 1 for dev or 0 for production
   try {
     const pairsWithStables = await fetchPairWithStables(tokenA);
 
@@ -91,7 +89,7 @@ export async function fetchRoutePairWithStable(tokenA: TokenModel) {
     };
   } catch (error) {
     Logger.warn('warning - fetchRoutePairWithStable:', error);
-    return PRICE_ZERO;
+    return { price: undefined };
   }
 }
 

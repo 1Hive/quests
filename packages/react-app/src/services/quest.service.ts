@@ -335,6 +335,7 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
+  const { isTestNetwork } = getNetwork();
   const result = await fetchActiveQuestEntitiesLight();
   const quests = result.questEntities as {
     id: string;
@@ -357,7 +358,14 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
       ),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
-  const totalFunds = funds.map((x) => x.usdValue).filter((x) => x !== undefined) as number[];
+  const totalFunds = funds
+    .map((x) => {
+      if (isTestNetwork && x.usdValue === undefined) {
+        return x.parsedAmount; // fallabck to 1$ value for rinkeby environment
+      }
+      return x.usdValue;
+    })
+    .filter((x) => x !== undefined) as number[];
 
   BigNumber.prototype.toJSON = function toJSON() {
     return fromBigNumber(this, 18);
@@ -517,7 +525,8 @@ export async function getBalanceOf(
       return {
         token: tokenInfo,
         parsedAmount,
-        usdValue: parsedAmount * fromBigNumber(price, tokenInfo.decimals),
+        usdValue:
+          price === undefined ? undefined : parsedAmount * fromBigNumber(price, tokenInfo.decimals),
       };
     }
   } catch (error) {
