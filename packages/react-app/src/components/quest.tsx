@@ -18,6 +18,7 @@ import { TokenModel } from 'src/models/token.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -35,6 +36,7 @@ import { ConditionalWrapper } from './utils/util';
 const ClickableDivStyled = styled.div`
   text-decoration: none;
   width: 100%;
+  height: 100%;
 `;
 
 const CardWrapperStyed = styled.div<{ compact: boolean }>`
@@ -113,9 +115,9 @@ export default function Quest({
   isLoading = false,
   isSummary = false,
 }: Props) {
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
   const history = useHistory();
-  const [bounty, setBounty] = useState<TokenAmountModel | null>();
+  const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
@@ -124,7 +126,7 @@ export default function Quest({
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   const [waitForClose, setWaitForClose] = useState(false);
-  let isMounted = true;
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     if (!isSummary) {
@@ -134,7 +136,7 @@ export default function Quest({
       } else {
         try {
           QuestService.fetchDeposits().then(({ challenge, claim }) => {
-            if (isMounted) {
+            if (isMountedRef.current) {
               setClaimDeposit(claim);
               setChallengeDeposit(challenge);
             }
@@ -144,9 +146,6 @@ export default function Quest({
         }
       }
     }
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -173,30 +172,11 @@ export default function Quest({
         }, 500);
       }
     }
-  }, [transaction?.type, transaction?.status]);
+  }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
   useEffect(() => {
     setState(questData.state);
   }, [questData.state]);
-
-  useEffect(() => {
-    // If tx completion impact Quest bounty, update it
-    if (
-      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      transaction.args?.questAddress === questData.address &&
-      (transaction?.type === 'ClaimChallengeResolve' ||
-        transaction?.type === 'ClaimExecute' ||
-        transaction?.type === 'QuestFund' ||
-        transaction?.type === 'QuestReclaimFunds')
-    ) {
-      setBounty(undefined);
-      setTimeout(() => {
-        if (questData.address && questData.rewardToken) {
-          fetchBalanceOfQuest(questData.address, questData.rewardToken);
-        }
-      }, 500);
-    }
-  }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
   useEffect(() => {
     if (!questData.rewardToken) {
@@ -217,8 +197,9 @@ export default function Quest({
           token,
           address,
           depositReleased ? undefined : questData.deposit,
+          true,
         );
-        if (isMounted) {
+        if (isMountedRef.current) {
           questData.bounty = result;
           setIsDepositReleased(depositReleased);
           computeQuestState(questData, depositReleased);
@@ -227,8 +208,10 @@ export default function Quest({
         }
       }
     } catch (error) {
-      Logger.exception(error);
-      setBounty(undefined);
+      if (isMountedRef.current) {
+        Logger.exception(error);
+        setBounty(undefined);
+      }
     }
   };
 
@@ -330,6 +313,7 @@ export default function Quest({
 
             <TextFieldInput
               id="description"
+              label={isSummary ? undefined : 'Description'}
               value={questData?.description}
               isLoading={isLoading || !questData}
               multiline
@@ -342,13 +326,12 @@ export default function Quest({
           </ContentWrapperStyled>
           {!isSummary && challengeDeposit && (
             <ClaimList
-              questData={questData}
-              questTotalBounty={bounty}
+              questData={{ ...questData, bounty }}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
             />
           )}
-          {!isSummary && questData.address && walletAddress && (
+          {!isSummary && questData.address && walletConnected && (
             <QuestFooterStyled>
               {questData?.state === ENUM_QUEST_STATE.Active ? (
                 <>

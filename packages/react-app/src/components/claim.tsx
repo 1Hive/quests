@@ -1,11 +1,14 @@
-import { useViewport } from '@1hive/1hive-ui';
-import { ReactNode, useEffect, useState } from 'react';
+import { useViewport, Timer } from '@1hive/1hive-ui';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { ENUM_CLAIM_STATE, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { useNow } from 'src/hooks/use-now.hook';
 import { ClaimModel } from 'src/models/claim.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
+import { compareCaseInsensitive } from 'src/utils/string.util';
 import styled, { css } from 'styled-components';
 import { AddressFieldInput } from './field-input/address-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
@@ -31,55 +34,33 @@ const AddressWrapperStyled = styled.div<{ isSmallScreen: boolean }>`
 type Props = {
   claim: ClaimModel;
   isLoading?: boolean;
-  questTotalBounty?: TokenAmountModel | null;
   challengeDeposit: TokenAmountModel;
   questData: QuestModel;
 };
 
-export default function Claim({
-  claim,
-  isLoading,
-  questTotalBounty,
-  challengeDeposit,
-  questData,
-}: Props) {
-  const { walletAddress } = useWallet();
+export default function Claim({ claim, isLoading, challengeDeposit, questData }: Props) {
+  const { walletAddress, walletConnected } = useWallet();
   const { transaction } = useTransactionContext();
   const [state, setState] = useState(claim.state);
   const { below } = useViewport();
   const [waitForClose, setWaitForClose] = useState(false);
   const [actionButton, setActionButton] = useState<ReactNode>();
+  const isMountedRef = useIsMountedRef();
+  const now = useNow();
+  const claimable = useMemo(() => !!claim.executionTimeMs && claim.executionTimeMs <= now, [now]);
 
   useEffect(() => {
     setState(claim.state);
   }, [claim.state]);
 
-  useEffect(() => {
-    if (waitForClose || !state) return;
-    if (state === ENUM_CLAIM_STATE.Scheduled) {
-      if (walletAddress === claim.playerAddress) {
-        setActionButton(
-          <ExecuteClaimModal
-            claim={claim}
-            questTotalBounty={questTotalBounty}
-            onClose={onActionClose}
-          />,
-        );
-      } else {
-        setActionButton(
-          <ChallengeModal
-            claim={claim}
-            challengeDeposit={challengeDeposit}
-            onClose={onActionClose}
-          />,
-        );
-      }
-    } else if (state === ENUM_CLAIM_STATE.Challenged) {
-      setActionButton(<ResolveChallengeModal claim={claim} onClose={onActionClose} />);
-    } else {
-      setActionButton(undefined);
-    }
-  }, [state, walletAddress, waitForClose]);
+  const timer = useMemo(
+    () => !claimable && claim.executionTimeMs && <Timer end={new Date(claim.executionTimeMs)} />,
+    [claim.executionTimeMs, claimable],
+  );
+
+  const onActionClose = () => {
+    setWaitForClose(false);
+  };
 
   useEffect(() => {
     // If tx completion impact Claims, update them
@@ -107,7 +88,9 @@ export default function Claim({
             setState(ENUM_CLAIM_STATE.Executed);
             break;
           case 'ClaimChallenge':
-            setState(ENUM_CLAIM_STATE.Challenged);
+            setTimeout(() => {
+              setState(ENUM_CLAIM_STATE.Challenged);
+            }, 1000); // Wait for subgrapph to index challenge event
             break;
           default:
         }
@@ -115,9 +98,42 @@ export default function Claim({
     }
   }, [transaction?.status, transaction?.type, transaction?.[0], claim.container]);
 
-  const onActionClose = () => {
-    setWaitForClose(false);
-  };
+  useEffect(() => {
+    if (waitForClose || !state || !isMountedRef.current) return;
+    if (state === ENUM_CLAIM_STATE.Scheduled) {
+      if (compareCaseInsensitive(walletAddress, claim.playerAddress) || claimable) {
+        setActionButton(
+          <>
+            <ExecuteClaimModal
+              claim={claim}
+              questTotalBounty={questData.bounty}
+              onClose={onActionClose}
+              claimable={claimable}
+            />
+            {timer}
+          </>,
+        );
+        return;
+      }
+      setActionButton(
+        <>
+          <ChallengeModal
+            claim={claim}
+            challengeDeposit={challengeDeposit}
+            onClose={onActionClose}
+          />
+          {timer}
+        </>,
+      );
+      return;
+    }
+
+    if (state === ENUM_CLAIM_STATE.Challenged) {
+      setActionButton(<ResolveChallengeModal claim={claim} onClose={onActionClose} />);
+      return;
+    }
+    setActionButton(undefined);
+  }, [state, walletAddress, waitForClose, claim, questData.bounty, challengeDeposit, claimable]);
 
   return (
     <div className="wide">
@@ -155,7 +171,7 @@ export default function Claim({
               isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
             />
           )}
-          {walletAddress && actionButton}
+          {walletConnected && state && actionButton}
         </ChildSpacer>
       </Outset>
     </div>

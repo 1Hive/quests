@@ -7,7 +7,7 @@ import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
 import { getNetwork } from 'src/networks';
-import QuestModal from './modals/quest-modal';
+import QuestModal from './modals/create-quest-modal';
 
 // #region StyledComponent
 
@@ -76,7 +76,7 @@ const IconStyled = styled.div`
 export default function footer() {
   const theme = useTheme();
   const year = new Date().getFullYear();
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
   const { networkId } = getNetwork();
 
   return (
@@ -101,7 +101,7 @@ export default function footer() {
           <FooterNavItemStyled href="#" external={false}>
             Quest List
           </FooterNavItemStyled>
-          {walletAddress && (
+          {walletConnected && (
             <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
           )}
         </FooterColumnStyled>

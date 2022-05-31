@@ -1,5 +1,6 @@
 import { useTheme, Button, IconQuestion, Popover } from '@1hive/1hive-ui';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useRef, useState } from 'react';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -56,14 +57,7 @@ export const HelpTooltip = ({ tooltip, children }: Props) => {
     _setIsHover(isHover);
   };
 
-  let isMounted = true;
-
-  useEffect(
-    () => () => {
-      isMounted = false;
-    },
-    [],
-  );
+  const isMountedRef = useIsMountedRef();
 
   const handleClick = (e: Event) => {
     e.stopPropagation();
@@ -75,7 +69,7 @@ export const HelpTooltip = ({ tooltip, children }: Props) => {
     setTimeout(() => {
       setShowing(true);
       setTimeout(() => setShowing(false), 100);
-      if (isHoverRef.current && isMounted) setVisible(true);
+      if (isHoverRef.current && isMountedRef.current) setVisible(true);
     }, 100);
   };
 

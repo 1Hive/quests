@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, useToast, IconFlag, Timer } from '@1hive/1hive-ui';
+import { Button, useToast, IconFlag } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
@@ -16,6 +16,8 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { TokenModel } from 'src/models/token.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -49,54 +51,24 @@ type Props = {
 
 export default function ChallengeModal({ claim, challengeDeposit, onClose = noop }: Props) {
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
-  const [challengeTimeout, setChallengedTimeout] = useState<boolean | undefined>(undefined);
-  const [buttonLabel, setOpenButtonLabel] = useState<string>();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
   const modalId = useMemo(() => uniqueId('challenge-modal'), []);
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     const fetchFee = async () => {
       const feeAmount = await QuestService.fetchChallengeFee();
-      if (feeAmount) setChallengeFee(feeAmount);
+      if (feeAmount && isMountedRef.current) setChallengeFee(feeAmount);
     };
     fetchFee();
-  }, [walletAddress]);
-
-  useEffect(() => {
-    let handle: number;
-    const launchSetTimeoutAsync = async (execTimeMs: number) => {
-      const now = Date.now();
-
-      if (now > execTimeMs) setChallengedTimeout(true);
-      else {
-        setChallengedTimeout(false);
-        handle = window.setTimeout(() => {
-          setChallengedTimeout(true);
-        }, execTimeMs - now); // To ms
-      }
-    };
-    if (claim.executionTimeMs) launchSetTimeoutAsync(claim.executionTimeMs);
-    return () => {
-      if (handle) clearTimeout(handle);
-    };
-  }, [claim.executionTimeMs]);
-
-  useEffect(() => {
-    if (challengeTimeout !== undefined) {
-      if (challengeTimeout)
-        // wait to load
-        setOpenButtonLabel('Challenge period over');
-      else setOpenButtonLabel('Challenge');
-    }
-  }, [claim.state, challengeTimeout]);
+  }, []);
 
   useEffect(() => {
     if (challengeFee)
@@ -113,7 +85,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const challengeTx = async (values: Partial<ChallengeModel>) => {
     if (isFormValid) {
       try {
-        setLoading(true);
         const { governQueueAddress } = getNetwork();
         if (
           challengeFee?.parsedAmount &&
@@ -153,14 +124,15 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         }
 
         if (!claim.container) throw new Error('Container is not defined');
-        setTransaction({
+        const txPayload = {
           modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
           status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
           type: 'ClaimChallenge',
           args: { questAddress: claim.questAddress, containerId: claim.container.id },
-        });
+        } as TransactionModel;
+        setTransaction(txPayload);
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
           {
@@ -170,25 +142,19 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           },
           claim.container,
           (txHash) => {
-            setTransaction(
-              (oldTx) =>
-                oldTx && {
-                  ...oldTx,
-                  hash: txHash,
-                  status: ENUM_TRANSACTION_STATUS.Pending,
-                },
-            );
+            setTransaction({
+              ...txPayload,
+              hash: txHash,
+              status: ENUM_TRANSACTION_STATUS.Pending,
+            });
           },
         );
-        setTransaction(
-          (oldTx) =>
-            oldTx && {
-              ...oldTx,
-              status: challengeTxReceipt?.status
-                ? ENUM_TRANSACTION_STATUS.Confirmed
-                : ENUM_TRANSACTION_STATUS.Failed,
-            },
-        );
+        setTransaction({
+          ...txPayload,
+          status: challengeTxReceipt?.status
+            ? ENUM_TRANSACTION_STATUS.Confirmed
+            : ENUM_TRANSACTION_STATUS.Failed,
+        });
         if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
       } catch (e: any) {
         setTransaction(
@@ -200,8 +166,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             },
         );
         toast(computeTransactionErrorMessage(e));
-      } finally {
-        setLoading(false);
       }
     }
   };
@@ -219,19 +183,13 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       title="Challenge quests"
       openButton={
         <OpenButtonWrapperStyled>
-          {buttonLabel && (
-            <OpenButtonStyled
-              icon={<IconFlag />}
-              onClick={() => setOpened(true)}
-              label={buttonLabel}
-              mode="negative"
-              title={challengeTimeout ? "This claim can't be challenged anymore" : buttonLabel}
-              disabled={!buttonLabel || loading || !walletAddress || challengeTimeout}
-            />
-          )}
-          {!loading && challengeTimeout === false && claim.executionTimeMs && (
-            <Timer end={new Date(claim.executionTimeMs)} />
-          )}
+          <OpenButtonStyled
+            icon={<IconFlag />}
+            onClick={() => setOpened(true)}
+            label="Challenge"
+            mode="negative"
+            title="Open challenge for this quest's claim"
+          />
         </OpenButtonWrapperStyled>
       }
       buttons={[
@@ -246,7 +204,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
               : challengeDeposit
           }
           setIsEnoughBalance={setIsEnoughBalance}
-          isLoading={loading}
         />,
         challengeFee && !isFeeDepositSameToken && (
           <WalletBallance
@@ -260,7 +217,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           id="challengeDeposit"
           label="Challenge Deposit"
           tooltip="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
-          isLoading={loading}
           value={challengeDeposit}
           compact
         />,
@@ -269,36 +225,19 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           id="challengeFee"
           label="Challenge fee"
           tooltip="This is the challenge cost defined by Celeste."
-          isLoading={loading || challengeFee === undefined}
+          isLoading={challengeFee === undefined}
           value={challengeFee}
           compact
         />,
         <Button
           key="confirmButton"
           icon={<IconFlag />}
-          label={buttonLabel}
+          label="Challenge"
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={
-            loading ||
-            !walletAddress ||
-            !isEnoughBalance ||
-            challengeTimeout ||
-            !isFormValid ||
-            transaction
-          }
-          title={
-            challengeTimeout
-              ? 'Challenge timeout'
-              : loading || !walletAddress
-              ? 'Not ready ...'
-              : !isFormValid
-              ? 'Form not valid'
-              : transaction
-              ? 'Wait for previous transaction to complete'
-              : 'Challenge'
-          }
+          disabled={!isEnoughBalance || !isFormValid}
+          title={!isFormValid ? 'Form not valid' : 'Challenge'}
           className="m-8"
         />,
       ]}
@@ -327,7 +266,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
                 isEdit
                 label="Challenge reason"
                 tooltip="Reason why this claim should be challenged."
-                isLoading={loading}
                 value={values.reason}
                 onChange={handleChange}
                 multiline

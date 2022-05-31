@@ -22,9 +22,13 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
 import { useWallet } from 'src/contexts/wallet.context';
-import Skeleton from 'react-loading-skeleton';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getNetwork } from 'src/networks';
+import { getObjectFromIpfs, ipfsTheGraph } from 'src/services/ipfs.service';
+import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TransactionModel } from 'src/models/transaction.model';
+import Skeleton from 'react-loading-skeleton';
+import { ContainerModel } from 'src/models/govern.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -93,29 +97,35 @@ type Props = {
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
   const { networkId } = getNetwork();
-  const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
   const [challenge, setChallenge] = useState<ChallengeModel | null>();
   const [dispute, setDispute] = useState<DisputeModel>();
   const [isStackholder, setIsStackholder] = useState(false);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
+  const [evidence, setEvidence] = useState<string>();
   const modalId = useMemo(() => uniqueId('resolve-challenge-modal'), []);
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    const fetchChallengeAndDispute = async () => {
-      if (!claim.container) throw new Error('Container is required to fetch challenge disputes');
-      const challengeResult = await QuestService.fetchChallenge(claim.container);
+    fetchEvidence();
+  }, []);
+
+  useEffect(() => {
+    const fetchChallengeAndDispute = async (container: ContainerModel) => {
+      const challengeResult = await QuestService.fetchChallenge(container);
+      if (!isMountedRef.current) return;
       if (!challengeResult)
-        throw new Error(`Failed to fetch challenge with container id ${claim.container.id}`);
+        throw new Error(`Failed to fetch challenge with container id ${container.id}`);
       setChallenge(challengeResult);
       if (challengeResult) {
         const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
         setDispute(disputeModel ?? undefined);
       }
-      setLoading(false);
     };
-    fetchChallengeAndDispute();
+    if (claim.container) {
+      fetchChallengeAndDispute(claim.container);
+    }
   }, [claim.container]);
 
   useEffect(() => {
@@ -135,10 +145,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
 
   const resolveChallengeTx = async () => {
     try {
-      setLoading(true);
       if (!claim.container) throw new Error('Container is not defined');
       const message = 'Resolving claim challenge';
-      setTransaction({
+      const txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
         message,
@@ -149,31 +158,26 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           containerId: claim.container.id,
           disputeState: dispute!.state,
         },
-      });
+      } as TransactionModel;
+      setTransaction(txPayload);
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,
         claim.container,
         dispute!,
         (txHash) => {
-          setTransaction(
-            (oldTx) =>
-              oldTx && {
-                ...oldTx,
-                hash: txHash,
-                status: ENUM_TRANSACTION_STATUS.Pending,
-              },
-          );
+          setTransaction({
+            ...txPayload,
+            hash: txHash,
+            status: ENUM_TRANSACTION_STATUS.Pending,
+          });
         },
       );
-      setTransaction(
-        (oldTx) =>
-          oldTx && {
-            ...oldTx,
-            status: challengeTxReceipt?.status
-              ? ENUM_TRANSACTION_STATUS.Confirmed
-              : ENUM_TRANSACTION_STATUS.Failed,
-          },
-      );
+      setTransaction({
+        ...txPayload,
+        status: challengeTxReceipt?.status
+          ? ENUM_TRANSACTION_STATUS.Confirmed
+          : ENUM_TRANSACTION_STATUS.Failed,
+      });
       if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
     } catch (e: any) {
       setTransaction(
@@ -184,8 +188,15 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             message: computeTransactionErrorMessage(e),
           },
       );
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchEvidence = async () => {
+    const evidenceResult = claim.evidenceIpfsHash
+      ? await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph)
+      : 'No evidence';
+    if (isMountedRef.current) {
+      setEvidence(evidenceResult);
     }
   };
 
@@ -194,50 +205,62 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     onClose(success);
   };
 
-  const player = (
-    <IdentityBadge
-      customLabel="Player"
-      entity={claim?.playerAddress}
-      connectedAccount={claim?.playerAddress === walletAddress}
-    />
+  const player = useMemo(
+    () => (
+      <IdentityBadge
+        customLabel="Player"
+        entity={claim?.playerAddress}
+        connectedAccount={claim?.playerAddress === walletAddress}
+      />
+    ),
+    [claim?.playerAddress, walletAddress],
   );
 
-  const challenger = (
-    <IdentityBadge
-      customLabel="Challenger"
-      entity={challenge?.challengerAddress}
-      connectedAccount={challenge?.challengerAddress === walletAddress}
-    />
+  const challenger = useMemo(
+    () => (
+      <IdentityBadge
+        customLabel="Challenger"
+        entity={challenge?.challengerAddress}
+        connectedAccount={challenge?.challengerAddress === walletAddress}
+      />
+    ),
+    [challenge?.challengerAddress, walletAddress],
   );
 
-  const finalRuling = (
-    <FinalRulingWrapper>
-      {dispute?.state && (
-        <RulingInfoStyled mode={isRuled ? 'info' : 'warning'}>
-          <FinalRulingStyled>
-            {isRuled ? (
-              'Ruled in favor of'
-            ) : (
-              <>
-                Ruling in progress, please come back later...
-                {networkId === 'gnosis' ? (
-                  <LinkStyled external href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}>
-                    See dispute
-                  </LinkStyled>
-                ) : (
-                  <HelpTooltip
-                    tooltip={`This is a mocked celeste dispute with id ${dispute.id}`}
-                    key={dispute.id}
-                  />
-                )}
-              </>
-            )}
-          </FinalRulingStyled>
-          {dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForChallenger && challenger}
-          {dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForSubmitter && player}
-        </RulingInfoStyled>
-      )}
-    </FinalRulingWrapper>
+  const finalRuling = useMemo(
+    () => (
+      <FinalRulingWrapper>
+        {dispute?.state && (
+          <RulingInfoStyled mode={isRuled ? 'info' : 'warning'}>
+            <FinalRulingStyled>
+              {isRuled ? (
+                'Ruled in favor of'
+              ) : (
+                <>
+                  Ruling in progress, please come back later...
+                  {networkId === 'gnosis' ? (
+                    <LinkStyled
+                      external
+                      href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}
+                    >
+                      See dispute
+                    </LinkStyled>
+                  ) : (
+                    <HelpTooltip
+                      tooltip={`This is a mocked celeste dispute with id ${dispute.id}`}
+                      key={dispute.id}
+                    />
+                  )}
+                </>
+              )}
+            </FinalRulingStyled>
+            {dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForChallenger && challenger}
+            {dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForSubmitter && player}
+          </RulingInfoStyled>
+        )}
+      </FinalRulingWrapper>
+    ),
+    [isRuled, dispute?.state, player, challenger],
   );
 
   return (
@@ -255,8 +278,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             onClick={() => setOpened(true)}
             label="Open resolve"
             mode="positive"
-            title={loading || !dispute ? 'Loading...' : 'Open resolve'}
-            disabled={loading || !dispute}
+            title={!dispute ? 'Loading...' : 'Open resolve'}
+            disabled={!dispute}
           />
         </OpenButtonWrapperStyled>
       }
@@ -265,7 +288,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           {isRuled && !isStackholder && (
             <OnlyStackholderWarnStyled mode="warning">
               <IconCaution />
-              <span> Only a stackholder of this challenge may resolve it</span>
+              <span>Only a stackholder of this challenge may resolve it</span>
             </OnlyStackholderWarnStyled>
           )}
         </Fragment>,
@@ -274,21 +297,13 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           icon={<IconFlag />}
           label="Resolve"
           mode="positive"
-          disabled={
-            loading ||
-            !walletAddress ||
-            !isRuled ||
-            claim.state !== ENUM_CLAIM_STATE.Challenged ||
-            transaction
-          }
+          disabled={!walletAddress || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged}
           onClick={resolveChallengeTx}
           title={
             !isRuled
               ? 'Need to be ruled in celeste'
-              : loading || !walletAddress
+              : !walletAddress
               ? 'Not ready ...'
-              : transaction
-              ? 'Wait for previous transaction to complete'
               : 'Publish dispute result'
           }
         />,
@@ -297,10 +312,10 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       isOpen={opened}
     >
       <Outset gu16>
-        {loading ? (
-          <Skeleton />
-        ) : (
-          <>
+        <>
+          {!challenge || !evidence ? (
+            <Skeleton />
+          ) : (
             <Accordion
               items={[
                 [
@@ -308,20 +323,20 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
                     {player}
                     <LabelStyled>Player evidence of completion</LabelStyled>
                   </>,
-                  <TextFieldInput id="evidenceOfCompletion" value={claim.evidence} isMarkDown />,
+                  <TextFieldInput id="evidenceOfCompletion" value={evidence} isMarkDown />,
                 ],
                 [
                   <>
                     {challenger}
                     <LabelStyled>Challenge reason</LabelStyled>
                   </>,
-                  <TextFieldInput id="challengeReason" value={challenge!.reason} isMarkDown />,
+                  <TextFieldInput id="challengeReason" value={challenge.reason} isMarkDown />,
                 ],
               ]}
             />
-            {finalRuling}
-          </>
-        )}
+          )}
+          {finalRuling}
+        </>
       </Outset>
     </ModalBase>
   );

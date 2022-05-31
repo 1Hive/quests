@@ -6,6 +6,7 @@ import { getNetwork } from '../networks';
 import { getDefaultProvider, getUseWalletConnectors } from '../utils/web3.utils';
 
 export type WalletContextModel = {
+  walletConnected: boolean;
   walletAddress: string;
   deactivateWallet: Function;
   activateWallet: Function;
@@ -30,6 +31,7 @@ function WalletAugmented({ children }: Props) {
   const { ethereum } = wallet;
   const [activationError, setActivationError] = useState<{ name: string; message: string }>();
   const [activatingId, setActivating] = useState<string>();
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
@@ -39,6 +41,7 @@ function WalletAugmented({ children }: Props) {
   }, []);
 
   const ethers = useMemo(() => {
+    setIsConnected(false);
     const { chainId, networkId, name } = getNetwork();
 
     if (ethereum) {
@@ -63,6 +66,8 @@ function WalletAugmented({ children }: Props) {
       return getDefaultProvider();
     }
 
+    setIsConnected(true);
+
     const ensRegistry = undefined; // network?.ensRegistry;
     return new EthersProviders.Web3Provider(ethereum, {
       name: networkId,
@@ -76,10 +81,11 @@ function WalletAugmented({ children }: Props) {
     await wallet.connect(id);
   };
 
-  const handleDeconnect = () => {
+  const handleDisconnect = () => {
     setActivating(undefined);
     wallet.reset();
     localStorage.removeItem('LAST_WALLET_CONNECTOR');
+    setIsConnected(false);
   };
   const contextValue = useMemo(
     () => ({
@@ -88,9 +94,10 @@ function WalletAugmented({ children }: Props) {
       activationError,
       walletAddress: wallet.account,
       activateWallet: handleConnect,
-      deactivateWallet: handleDeconnect,
+      deactivateWallet: handleDisconnect,
       activatedId: wallet.connector,
       activatingId,
+      walletConnected: isConnected,
     }),
     [wallet, ethers],
   );

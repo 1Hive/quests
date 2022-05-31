@@ -3,7 +3,7 @@ import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
-import QuestModal from '../modals/quest-modal';
+import QuestModal from '../modals/create-quest-modal';
 // #region StyledComponents
 
 const HeaderNavStyled = styled.nav`
@@ -30,7 +30,7 @@ type Props = {
 
 export default function HeaderMenu({ below }: Props) {
   const theme = useTheme();
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
 
   return (
     <HeaderNavStyled>
@@ -53,7 +53,7 @@ export default function HeaderMenu({ below }: Props) {
             <IconExternal />
           </HeaderNavItemStyled>
 
-          {walletAddress && (
+          {walletConnected && (
             <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="normal" />
           )}
         </>

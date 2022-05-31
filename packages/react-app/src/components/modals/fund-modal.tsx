@@ -35,10 +35,9 @@ type Props = {
 export default function FundModal({ quest, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { setTransaction, transaction } = useTransactionContext();
+  const { setTransaction } = useTransactionContext();
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const modalId = useMemo(() => uniqueId('fund-modal'), []);
 
@@ -50,7 +49,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const onSubmit = async (values: FundModel) => {
     validate(values); // validate one last time before submiting
     if (isFormValid && quest.address) {
-      setLoading(true);
       await fundQuestTransaction(
         modalId,
         values.fundAmount,
@@ -59,7 +57,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         walletAddress,
         setTransaction,
       );
-      setLoading(false);
     }
   };
 
@@ -102,7 +99,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
                 key="fundAmount"
                 askedTokenAmount={values.fundAmount}
                 setIsEnoughBalance={setIsEnoughBalance}
-                isLoading={loading}
               />
             ),
             <Button
@@ -112,18 +108,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               form="form-fund"
               label="Fund"
               mode="strong"
-              title={
-                loading || !walletAddress
-                  ? 'Not ready ...'
-                  : !isFormValid
-                  ? 'Form not valid'
-                  : transaction
-                  ? 'Wait for previous transaction to complete'
-                  : 'Fund'
-              }
-              disabled={
-                loading || !walletAddress || !isEnoughBalance || !isFormValid || transaction
-              }
+              title={!isFormValid ? 'Form not valid' : 'Fund'}
+              disabled={!isEnoughBalance || !isFormValid}
             />,
           ]}
           onClose={closeModal}
@@ -132,19 +118,13 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         >
           <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
-              <AddressFieldInput
-                id="address"
-                label="Quest address"
-                value={quest.address}
-                isLoading={loading}
-              />
+              <AddressFieldInput id="address" label="Quest address" value={quest.address} />
               <AmountFieldInputFormik
                 id="fundAmount"
                 isEdit
                 label="Amount"
                 tooltip="The amount of the given token"
                 onChange={handleChange}
-                isLoading={loading}
                 value={values.fundAmount}
                 error={touched.fundAmount && (errors.fundAmount as string)}
               />
