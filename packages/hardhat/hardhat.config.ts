@@ -615,7 +615,15 @@ task("generateGovernQueueConfig:gnosis")
   )
   .setAction(async (taskArgs) => {
     const config = generateQueueConfig(taskArgs);
-    console.log("Config tupple : ", JSON.stringify(Object.values(config)));
+    const tupple = [
+      config.executionDelay,
+      [config.scheduleDeposit.token, config.scheduleDeposit.amount],
+      [config.challengeDeposit.token, config.challengeDeposit.amount],
+      config.resolver,
+      config.rules,
+      config.maxCalldataSize,
+    ];
+    console.log("Config tupple : ", JSON.stringify(tupple));
   });
 
 task("generateGovernQueueConfig:rinkeby")
@@ -668,14 +676,8 @@ task("generateGovernQueueConfig:rinkeby")
     const config = generateQueueConfig(taskArgs);
     const tupple = [
       config.executionDelay,
-      [
-        config.scheduleDeposit.token,
-        config.scheduleDeposit.amount.toHexString(),
-      ],
-      [
-        config.challengeDeposit.token,
-        config.challengeDeposit.amount.toHexString(),
-      ],
+      [config.scheduleDeposit.token, config.scheduleDeposit.amount],
+      [config.challengeDeposit.token, config.challengeDeposit.amount],
       config.resolver,
       config.rules,
       config.maxCalldataSize,

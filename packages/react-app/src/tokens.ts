@@ -1,7 +1,7 @@
 import { TokenModel } from './models/token.model';
 
 export const TOKENS = Object.freeze({
-  gnosis: {
+  xdai: {
     Dai: {
       name: 'Dai Stablecoin',
       symbol: 'DAI',
@@ -56,6 +56,6 @@ export const TOKENS = Object.freeze({
 });
 
 export const StableTokens = Object.freeze({
-  gnosis: [TOKENS.gnosis.Dai, TOKENS.gnosis.Theter, TOKENS.gnosis.UsdCoin],
+  gnosis: [TOKENS.xdai.Dai, TOKENS.xdai.Theter, TOKENS.xdai.UsdCoin],
   rinkeby: [TOKENS.rinkeby.Dai, TOKENS.rinkeby.Theter, TOKENS.rinkeby.UsdCoin],
 });
