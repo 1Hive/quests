@@ -2,7 +2,7 @@ import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getDefaultChain } from './local-settings';
 import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel } from './models/network.model';
-import { TOKENS } from './constants';
+import { StableTokens } from './tokens';
 
 type StagingNetworkModel = Partial<NetworkModel> & {
   stagingOf: string;
@@ -23,7 +23,7 @@ export const networks = Object.freeze({
     rpcUri: 'https://rinkeby.infura.io/v3',
     rpcKeyEnvName: 'INFURA_API_KEY',
     isTestNetwork: true,
-    stableTokens: [TOKENS.RinkebyDai, TOKENS.RinkebyTheter, TOKENS.RinkebyUni],
+    stableTokens: StableTokens.rinkeby,
   },
   rinkebyStaging: {
     stagingOf: 'rinkeby',
@@ -37,13 +37,13 @@ export const networks = Object.freeze({
     explorerBase: 'blockscout',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-gnosis',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai',
-    tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/honeyswap-v2',
+    tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/honeyswap-xdai',
     questFactoryAddress: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[100]?.xdai.contracts.GovernQueue.address,
     celesteAddress: '0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85',
     rpcUri: 'https://rpc.gnosischain.com/',
     isTestNetwork: false,
-    stableTokens: [TOKENS.GnosisDai, TOKENS.GnosisUsdCoin],
+    stableTokens: StableTokens.gnosis,
   } as NetworkModel,
   gnosisStaging: {
     stagingOf: 'gnosis',

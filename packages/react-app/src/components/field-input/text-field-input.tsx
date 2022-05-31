@@ -1,7 +1,7 @@
 import { TextInput, Markdown, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { CollapsableBlock } from 'src/collapsable-block';
+import { CollapsableBlock } from 'src/components/collapsable-block';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';

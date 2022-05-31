@@ -145,6 +145,10 @@ export default function footer() {
             <span>Github</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
+          <FooterNavItemStyled href="https://github.com/1Hive/quests" external>
+            <span>Stable token list</span>
+            <IconExternal size="small" />
+          </FooterNavItemStyled>
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Feedback</FooterTitleStyled>

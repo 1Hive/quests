@@ -1,5 +1,4 @@
 import { FilterModel } from './models/filter.model';
-import { TokenModel } from './models/token.model';
 
 export const PCT_BASE = BigInt(1e18);
 
@@ -10,70 +9,6 @@ export const DEFAULT_THEME = 'dark';
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 export const REPO_ADDRESS = 'https://github.com/1Hive/quests/';
-
-// Cryptos
-export const TOKENS = Object.freeze({
-  // Native tokens
-  Ether: {
-    name: 'Ether',
-    symbol: 'ETH',
-    decimals: 18,
-  } as TokenModel,
-  xDAI: {
-    name: 'xDAI',
-    symbol: 'xDAI',
-    decimals: 18,
-  } as TokenModel,
-  // ERC20 tokens
-  GnosisDai: {
-    name: 'Dai Stablecoin',
-    symbol: 'DAI',
-    token: '0x44fa8e6f47987339850636f88629646662444217',
-    decimals: 18,
-  } as TokenModel,
-  GnosisUsdCoin: {
-    name: 'USDC Stablecoin',
-    symbol: 'USDC',
-    token: '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83',
-    decimals: 18,
-  } as TokenModel,
-  Honey: {
-    name: 'Honey',
-    symbol: 'HNY',
-    token: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
-    decimals: 18,
-  } as TokenModel,
-  RinkebyTheter: {
-    name: 'Tether',
-    symbol: 'USDT',
-    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    decimals: 18,
-  } as TokenModel,
-  RinkebyUni: {
-    name: 'Uniswap',
-    symbol: 'UNI',
-    token: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
-    decimals: 18,
-  } as TokenModel,
-  HoneyTest: {
-    name: 'HoneyTest',
-    symbol: 'HNYT',
-    token: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
-    decimals: 18,
-  } as TokenModel,
-  RinkebyDai: {
-    name: 'Dai Stablecoin',
-    symbol: 'DAI',
-    token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
-    decimals: 18,
-  } as TokenModel,
-});
-
-export const NETWORK_TOKENS = Object.freeze({
-  rinkeby: [TOKENS.HoneyTest, TOKENS.RinkebyTheter, TOKENS.RinkebyDai],
-  xdai: [TOKENS.Honey],
-  mainnet: [TOKENS.GnosisDai],
-});
 
 // Constants
 

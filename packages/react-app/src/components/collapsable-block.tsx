@@ -2,8 +2,8 @@
 import { Button, IconDown, IconUp, IconCopy, useTheme } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useCopyToClipboard } from './hooks/use-copy-to-clipboard.hook';
-import { GUpx } from './utils/style.util';
+import { useCopyToClipboard } from '../hooks/use-copy-to-clipboard.hook';
+import { GUpx } from '../utils/style.util';
 
 // #region StyledComponents
 
