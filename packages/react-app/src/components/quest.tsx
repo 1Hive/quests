@@ -237,12 +237,20 @@ export default function Quest({
       </HighlightBlocker>
 
       {!isSummary && (
-        <DateFieldInput
-          id="creationTime"
-          label="Creation time"
-          isLoading={isLoading || !questData}
-          value={questData.creationTime}
-        />
+        <>
+          <AddressFieldInputStyled
+            id="creator"
+            label="Creator"
+            isLoading={isLoading || !questData}
+            value={questData?.creatorAddress}
+          />
+          <DateFieldInput
+            id="creationTime"
+            label="Creation time"
+            isLoading={isLoading || !questData}
+            value={questData.creationTime}
+          />
+        </>
       )}
 
       <DateFieldInput
