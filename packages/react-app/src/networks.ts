@@ -23,7 +23,7 @@ export const networks = Object.freeze({
     rpcUri: 'https://rinkeby.infura.io/v3',
     rpcKeyEnvName: 'INFURA_API_KEY',
     isTestNetwork: true,
-    stableTokens: [TOKENS.RinkebyDai, TOKENS.RinkebyTheter],
+    stableTokens: [TOKENS.RinkebyDai, TOKENS.RinkebyTheter, TOKENS.RinkebyUni],
   },
   rinkebyStaging: {
     stagingOf: 'rinkeby',

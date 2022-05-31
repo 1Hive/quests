@@ -46,7 +46,13 @@ export const TOKENS = Object.freeze({
   RinkebyTheter: {
     name: 'Tether',
     symbol: 'USDT',
-    token: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
+    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    decimals: 18,
+  } as TokenModel,
+  RinkebyUni: {
+    name: 'Uniswap',
+    symbol: 'UNI',
+    token: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
     decimals: 18,
   } as TokenModel,
   HoneyTest: {
