@@ -331,6 +331,7 @@ export default function Quest({
               maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
               wide
             />
+
             {isSummary && fieldsRow}
           </ContentWrapperStyled>
           {!isSummary && challengeDeposit && (

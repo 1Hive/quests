@@ -19,6 +19,7 @@ import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
+import { FaEdit, FaEye } from 'react-icons/fa';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -48,6 +49,23 @@ const WrapperStyled = styled.div`
   align-content: center;
 `;
 
+const LineStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const ButtonLinkStyled = styled(Button)`
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  height: fit-content;
+  color: ${({ theme }: any) => theme.contentSecondary};
+  font-weight: bold;
+  background: transparent;
+  padding-top: 4px;
+`;
+
 // #endregion
 
 type Props = {
@@ -67,6 +85,7 @@ export default function ScheduleClaimModal({
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
@@ -246,8 +265,26 @@ export default function ScheduleClaimModal({
               steps={[
                 <TextFieldInput
                   id="evidence"
-                  isEdit
-                  label="Evidence of completion"
+                  isEdit={!showPreview}
+                  label={
+                    <LineStyled>
+                      Evidence of completion
+                      <Outset horizontal>
+                        <ButtonLinkStyled
+                          size="mini"
+                          icon={showPreview ? <FaEdit /> : <FaEye />}
+                          display="icon"
+                          label={showPreview ? 'Edit' : 'Preview'}
+                          onClick={() => setShowPreview((old) => !old)}
+                          title={
+                            showPreview
+                              ? 'Back to edit mode'
+                              : 'Show a preview of the evidence of completion'
+                          }
+                        />
+                      </Outset>
+                    </LineStyled>
+                  }
                   tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
                   value={values.evidence}
                   onChange={handleChange}

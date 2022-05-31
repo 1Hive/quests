@@ -1,6 +1,6 @@
-import { TextInput, Markdown, Button } from '@1hive/1hive-ui';
+import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode } from 'react';
 import { CollapsableBlock } from 'src/components/collapsable-block';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -37,7 +37,7 @@ type Props = {
   id: string;
   isEdit?: boolean;
   isLoading?: boolean;
-  label?: string;
+  label?: ReactNode;
   onChange?: Function;
   placeHolder?: string;
   value?: string;
@@ -80,16 +80,6 @@ export default function TextFieldInput({
   disableLinks = false,
   showBlocks = false,
 }: Props) {
-  const [isEditState, setIsEdit] = useState(isEdit);
-
-  useEffect(() => {
-    setIsEdit(isEdit);
-  }, [isEdit]);
-
-  const handlePreview = () => {
-    setIsEdit(!isEditState);
-  };
-
   const readOnlyContent = (
     <>
       {isMarkDown ? (
@@ -142,7 +132,7 @@ export default function TextFieldInput({
       )}
     </>
   );
-  const loadableContent = isEditState ? (
+  const loadableContent = isEdit ? (
     <BlockStyled wide={wide}>
       <TextInput
         id={id}
@@ -155,7 +145,6 @@ export default function TextFieldInput({
         style={css}
         rows={rows}
       />
-      {isMarkDown && isEdit && <Button size="mini" label="Preview" onClick={handlePreview} />}
     </BlockStyled>
   ) : (
     <BlockStyled wide={wide}>
@@ -169,7 +158,6 @@ export default function TextFieldInput({
           readOnlyContent
         )}
       </div>
-      {isMarkDown && isEdit && <Button size="mini" label="Edit" onClick={handlePreview} />}
     </BlockStyled>
   );
   return (

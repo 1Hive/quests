@@ -124,13 +124,13 @@ export default function ExecuteClaimModal({
                 !claimable
                   ? 'Wait for the delay period to end before claiming...'
                   : questTotalBounty &&
-                    claim.claimedAmount.parsedAmount > questTotalBounty.parsedAmount
+                    claim.claimedAmount.parsedAmount > questTotalBounty?.parsedAmount
                   ? 'Not enough funds in Quest to claim'
                   : 'Open quest claim'
               }
               disabled={
                 !questTotalBounty ||
-                claim.claimedAmount.parsedAmount > questTotalBounty.parsedAmount ||
+                claim.claimedAmount.parsedAmount > questTotalBounty?.parsedAmount ||
                 !claimable
               }
             />
