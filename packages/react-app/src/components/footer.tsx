@@ -7,7 +7,9 @@ import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
 import { getNetwork } from 'src/networks';
+import { useEffect, useState } from 'react';
 import QuestModal from './modals/create-quest-modal';
+import { GenericTooltip } from './field-input/generic-tooltip';
 
 // #region StyledComponent
 
@@ -57,6 +59,14 @@ const FooterNavItemStyled = styled(Link)`
   font-weight: bold;
 `;
 
+const FooterInfoItemStyled = styled.div`
+  margin-right: ${3 * GU}px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-weight: bold;
+`;
+
 const TitleLinkStyled = styled(Link)`
   text-decoration: none;
 `;
@@ -78,6 +88,14 @@ export default function footer() {
   const year = new Date().getFullYear();
   const { walletConnected } = useWallet();
   const { networkId } = getNetwork();
+  const { stableTokens } = getNetwork();
+  const [stableList, setStableList] = useState('');
+
+  useEffect(() => {
+    const list = stableTokens.map((tokenModel) => `${tokenModel.name} (${tokenModel.token})`);
+    const stableListText = `Stable list tokens:\n${list.join('\n')}`;
+    setStableList(stableListText);
+  }, [setStableList]);
 
   return (
     <FooterContainerStyled color={theme.contentSecondary}>
@@ -121,7 +139,7 @@ export default function footer() {
           </FooterNavItemStyled>
         </FooterColumnStyled>
         <FooterColumnStyled>
-          <FooterTitleStyled>Links</FooterTitleStyled>
+          <FooterTitleStyled>Links & Info</FooterTitleStyled>
           <FooterNavItemStyled
             href={
               networkId === 'rinkeby'
@@ -145,13 +163,9 @@ export default function footer() {
             <span>Github</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
-          <FooterNavItemStyled
-            href="https://github.com/1Hive/quests/blob/first-release-candidate/packages/react-app/src/tokens.ts#:~:text=export%20const%20StableTokens,%7D)%3B"
-            external
-          >
-            <span>Stable tokens</span>
-            <IconExternal size="small" />
-          </FooterNavItemStyled>
+          <FooterInfoItemStyled>
+            <GenericTooltip label="Stable list" tooltip={stableList} />
+          </FooterInfoItemStyled>
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Feedback</FooterTitleStyled>
