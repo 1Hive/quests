@@ -363,7 +363,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
       if (isTestNetwork && x.usdValue === undefined) {
         return x.parsedAmount; // fallabck to 1$ value for rinkeby environment
       }
-      return x.usdValue;
+      return x.usdValue ?? 0;
     })
     .filter((x) => x !== undefined) as number[];
 
