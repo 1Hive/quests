@@ -3,10 +3,7 @@ import { PairModel } from 'src/models/uniswap.model';
 import { getNetwork } from 'src/networks';
 import { UniswapPairsEntityQuery } from 'src/queries/uniswap-pairs-entity.query';
 import { arrayDistinct } from 'src/utils/array.util';
-import { Route, Trade, Pair } from '@uniswap/v2-sdk';
-import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
 import { TokenModel } from 'src/models/token.model';
-import { getUniswapPairContract } from 'src/utils/contract.util';
 import { Logger } from '../utils/logger';
 
 // #region Private
@@ -44,7 +41,7 @@ export async function fetchPairWithStables(tokenA: TokenModel): Promise<PairMode
 // #region Contract Queries
 
 export async function fetchRoutePairWithStable(tokenA: TokenModel) {
-  const { chainId, isTestNetwork } = getNetwork();
+  const { isTestNetwork } = getNetwork();
   const PRICE_ZERO = Promise.resolve({ price: isTestNetwork ? '1' : '0' }); // Fallback to 1 for dev or 0 for production
   try {
     const pairsWithStables = await fetchPairWithStables(tokenA);
@@ -59,38 +56,38 @@ export async function fetchRoutePairWithStable(tokenA: TokenModel) {
       throw new Error('Stable token not defined');
     }
 
-    const { token: commonStable, decimals, symbol, name } = firstPair.token1;
+    const { token: commonStable } = firstPair.token1;
 
     if (!commonStable) {
       throw new Error('Token common Stable not found: dont have pair with stables knowed');
     }
 
-    const tokenAObj = new Token(chainId, tokenA.token, tokenA.decimals, tokenA.symbol, tokenA.name);
-    const tokenStableObj = new Token(chainId, commonStable, +decimals, symbol, name);
+    // const tokenAObj = new Token(chainId, tokenA.token, tokenA.decimals, tokenA.symbol, tokenA.name);
+    // const tokenStableObj = new Token(chainId, commonStable, +decimals, symbol, name);
 
-    const pairAddress = Pair.getAddress(tokenAObj, tokenStableObj);
-    const contract = getUniswapPairContract(pairAddress);
-    const reserves = await contract.getReserves();
-    const token0Address = await contract.token0();
-    const token1Address = await contract.token1();
-    const token0 = [tokenAObj, tokenStableObj].find((token) => token.address === token0Address);
-    const token1 = [tokenAObj, tokenStableObj].find((token) => token.address === token1Address);
+    // const pairAddress = Pair.getAddress(tokenAObj, tokenStableObj);
+    // const contract = getUniswapPairContract(pairAddress);
+    // const reserves = await contract.getReserves();
+    // const token0Address = await contract.token0();
+    // const token1Address = await contract.token1();
+    // const token0 = [tokenAObj, tokenStableObj].find((token) => token.address === token0Address);
+    // const token1 = [tokenAObj, tokenStableObj].find((token) => token.address === token1Address);
 
-    if (!token0 || !token1) {
-      throw new Error('Token0 and Token1 are different from initial pair informed');
-    }
+    // if (!token0 || !token1) {
+    //   throw new Error('Token0 and Token1 are different from initial pair informed');
+    // }
 
-    const pair = new Pair(
-      CurrencyAmount.fromRawAmount(token0, reserves.reserve0.toString()),
-      CurrencyAmount.fromRawAmount(token1, reserves.reserve1.toString()),
-    );
+    // const pair = new Pair(
+    //   CurrencyAmount.fromRawAmount(tokenAObj, fromBigNumber(firstPair.reserve0)),
+    //   CurrencyAmount.fromRawAmount(tokenStableObj, fromBigNumber(firstPair.reserve1)),
+    // );
 
-    const route = new Route([pair], tokenAObj, tokenStableObj);
+    // const route = new Route([pair], tokenAObj, tokenStableObj);
 
-    const tokenAmount = CurrencyAmount.fromRawAmount(tokenAObj, '1000000000000000000');
-    const trade = new Trade(route, tokenAmount, TradeType.EXACT_INPUT);
+    // const tokenAmount = CurrencyAmount.fromRawAmount(tokenAObj, '1000000000000000000');
+    // const trade = new Trade(route, tokenAmount, TradeType.EXACT_INPUT);
     return {
-      price: trade.executionPrice.toSignificant(6),
+      price: firstPair.token1Price.substring(0, 18), // trade.executionPrice.toSignificant(6),
     };
   } catch (error) {
     Logger.warn('warning - fetchRoutePairWithStable:', error);
