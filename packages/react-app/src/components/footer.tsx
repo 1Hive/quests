@@ -145,8 +145,11 @@ export default function footer() {
             <span>Github</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
-          <FooterNavItemStyled href="https://github.com/1Hive/quests" external>
-            <span>Stable token list</span>
+          <FooterNavItemStyled
+            href="https://github.com/1Hive/quests/blob/first-release-candidate/packages/react-app/src/tokens.ts#:~:text=export%20const%20StableTokens,%7D)%3B"
+            external
+          >
+            <span>Stable tokens</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
         </FooterColumnStyled>
