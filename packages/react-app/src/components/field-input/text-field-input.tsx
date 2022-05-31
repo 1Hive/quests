@@ -158,7 +158,7 @@ export default function TextFieldInput({
       {isMarkDown && isEdit && <Button size="mini" label="Preview" onClick={handlePreview} />}
     </BlockStyled>
   ) : (
-    <BlockStyled>
+    <BlockStyled wide={wide}>
       <div style={{ ...css, fontSize }}>
         {maxLine ? (
           <TextFieldWrapperStyled>
@@ -181,6 +181,7 @@ export default function TextFieldInput({
         error={error}
         compact={compact}
         isLoading={isLoading}
+        wide={wide}
       >
         {loadableContent}
       </FieldInput>

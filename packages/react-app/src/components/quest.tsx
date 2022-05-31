@@ -321,6 +321,7 @@ export default function Quest({
               disableLinks={isSummary}
               showBlocks={!isSummary}
               maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
+              wide
             />
             {isSummary && fieldsRow}
           </ContentWrapperStyled>
