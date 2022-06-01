@@ -22,7 +22,7 @@ export default async (
     ? { token: args.createDepositToken, amount: args.createDepositAmount }
     : defaultConfig.CreateQuestDeposit[network.name];
   const constructorArguments = [
-    args.governAddress ?? govern,
+    args?.governAddress ?? govern,
     deposit.token,
     ethers.utils.parseEther(deposit.amount.toString()),
     owner,

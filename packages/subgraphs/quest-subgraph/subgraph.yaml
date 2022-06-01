@@ -10,9 +10,9 @@ dataSources:
     name: QuestFactory
     network: xdai
     source:
-      address: "0x77CB0E7453c9B9E867777f199b48253875F684eE"
+      address: "0x4a3127598257B5A0404b858E134Cf5e1c3cAe137"
       abi: QuestFactory
-      startBlock: 22411544
+      startBlock: 22446141
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
