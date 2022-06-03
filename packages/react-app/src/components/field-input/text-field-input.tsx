@@ -53,7 +53,6 @@ type Props = {
   tooltip?: React.ReactNode;
   disableLinks?: boolean;
   showBlocks?: boolean;
-
   onBlur?: Function;
   error?: string | false;
 };
@@ -78,7 +77,7 @@ export default function TextFieldInput({
   onBlur = noop,
   error,
   disableLinks = false,
-  showBlocks = false,
+  showBlocks = true,
 }: Props) {
   const readOnlyContent = (
     <>

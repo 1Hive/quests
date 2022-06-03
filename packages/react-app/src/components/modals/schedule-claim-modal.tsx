@@ -285,7 +285,7 @@ export default function ScheduleClaimModal({
                       </Outset>
                     </LineStyled>
                   }
-                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future. And make sure to include contact information if you want the Creator to be able to contact you."
                   value={values.evidence}
                   onChange={handleChange}
                   onBlur={handleBlur}

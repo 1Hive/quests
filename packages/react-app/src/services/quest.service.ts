@@ -261,7 +261,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           typeof quest.rewardToken === 'string'
             ? ((await getTokenInfo(quest.rewardToken)) as TokenModel)
             : quest.rewardToken;
-        return {
+        const claim = {
           claimedAmount: {
             token: tokenModel,
             parsedAmount: fromBigNumber(BigNumber.from(claimAmount), tokenModel?.decimals),
@@ -274,6 +274,18 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,
         } as ClaimModel;
+
+        try {
+          if (claim.evidenceIpfsHash) {
+            claim.evidence = await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph);
+          } else {
+            claim.evidence = 'No evidence submited from Player';
+          }
+        } catch (error) {
+          claim.evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
+        }
+
+        return claim;
       }),
   ).then((claims) =>
     claims.sort((a: ClaimModel, b: ClaimModel) => b.executionTimeMs! - a.executionTimeMs!),

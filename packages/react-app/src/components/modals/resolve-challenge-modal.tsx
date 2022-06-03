@@ -297,7 +297,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             {isRuled && !isStackholder && (
               <OnlyStackholderWarnStyled mode="warning">
                 <IconCaution />
-                <span>Only a stackholder of this challenge may resolve it</span>
+                <span>Only a stakeholder of this challenge should resolve it</span>
               </OnlyStackholderWarnStyled>
             )}
           </Fragment>,

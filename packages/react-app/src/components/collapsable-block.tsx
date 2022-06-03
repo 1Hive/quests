@@ -1,6 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import { Button, IconDown, IconUp, IconCopy, useTheme } from '@1hive/1hive-ui';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useCopyToClipboard } from '../hooks/use-copy-to-clipboard.hook';
 import { GUpx } from '../utils/style.util';
@@ -59,16 +59,14 @@ type Props = {
 export function CollapsableBlock(props: Props) {
   const theme = useTheme();
   const [collapsed, setCollapsed] = useState(props.collapsed);
-  const [content, setContent] = useState<ReactNode | undefined>();
   const copyCode = useCopyToClipboard();
 
   useEffect(() => setCollapsed(props.collapsed), [props.collapsed]);
 
-  useEffect(() => {
+  const content = useMemo(() => {
     // eslint-disable-next-line jsx-a11y/alt-text
-    if (props.type === 'image') setContent(<img {...props} />);
-    else
-      setContent(props.children?.props?.children ? props.children.props.children : props.children);
+    if (props.type === 'image') return <img {...props} />;
+    return props.children?.props?.children ? props.children.props.children : props.children;
   }, [props, props.children]);
 
   return (
