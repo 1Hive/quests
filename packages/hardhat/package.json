@@ -68,7 +68,6 @@
     "send": "hardhat send",
     "generate": "hardhat generate",
     "account": "hardhat account",
-    "verify:rinkeby": "hardhat verify-quests-contracts --network rinkeby",
-    "verify:gnosis": "hardhat verify-quests-contracts --network xdai"
+    "verify:rinkeby": "hardhat verify-quests-contracts --network rinkeby"
   }
 }

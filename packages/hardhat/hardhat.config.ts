@@ -1133,14 +1133,22 @@ task(
     address: questDeploy.address,
     constructorArguments: questDeploy.args,
   });
-  await run("verify:verify", {
-    address: questFactoryDeploy.address,
-    constructorArguments: questFactoryDeploy.args,
-  });
-  await run("verify:verify", {
-    address: questDeploy.address,
-    constructorArguments: questDeploy.args,
-  });
+  try {
+    await run("verify:verify", {
+      address: questFactoryDeploy.address,
+      constructorArguments: questFactoryDeploy.args,
+    });
+  } catch (error) {
+    console.error("Failed when verifying QuestFactory contract", error);
+  }
+  try {
+    await run("verify:verify", {
+      address: questDeploy.address,
+      constructorArguments: questDeploy.args,
+    });
+  } catch (error) {
+    console.error("Failed when verifying Quest contract", error);
+  }
 });
 
 module.exports = hardhatConfig;

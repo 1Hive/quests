@@ -390,26 +390,27 @@ export default function QuestModal({
                                 }
                               />
                             </Outset>
-                            <Button
-                              size="mini"
-                              label={simulateSummary ? 'Detail' : 'Summary'}
-                              onClick={() => setSimulateSummary((old) => !old)}
-                              disabled={!showPreview}
-                              title={
-                                !showPreview
-                                  ? 'Enable preview first'
-                                  : `Simulate ${
-                                      simulateSummary ? 'detail' : 'summary'
-                                    } description view`
-                              }
-                            />
+                            {showPreview && (
+                              <Button
+                                size="mini"
+                                label={simulateSummary ? 'Detail' : 'Summary'}
+                                onClick={() => setSimulateSummary((old) => !old)}
+                                title={
+                                  !showPreview
+                                    ? 'Enable preview first'
+                                    : `Simulate ${
+                                        simulateSummary ? 'detail' : 'summary'
+                                      } description view`
+                                }
+                              />
+                            )}
                           </LineStyled>
                         </>
                       }
                       value={values.description}
                       isEdit={!showPreview}
                       placeHolder="Quest description"
-                      showBlocks
+                      showBlocks={!simulateSummary}
                       tooltip={
                         <>
                           <b>The quest description should include:</b>

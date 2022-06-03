@@ -1,22 +1,22 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconCoin, IconCaution, Info } from '@1hive/1hive-ui';
+import { Button, IconCaution, IconCoin, Info } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
-import { ENUM_CLAIM_STATE, ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
+import { ENUM, ENUM_CLAIM_STATE, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import styled from 'styled-components';
-import { GUpx } from 'src/utils/style.util';
+import { useWallet } from 'src/contexts/wallet.context';
 import { ClaimModel } from 'src/models/claim.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
-import { useWallet } from 'src/contexts/wallet.context';
+import { TransactionModel } from 'src/models/transaction.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { compareCaseInsensitive } from 'src/utils/string.util';
-import { TransactionModel } from 'src/models/transaction.model';
+import { GUpx } from 'src/utils/style.util';
+import styled from 'styled-components';
 import * as QuestService from '../../services/quest.service';
+import { AddressFieldInput } from '../field-input/address-field-input';
 import AmountFieldInput from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
-import { AddressFieldInput } from '../field-input/address-field-input';
 
 // #region StyledComponents
 
@@ -160,7 +160,7 @@ export default function ExecuteClaimModal({
           {!compareCaseInsensitive(claim.playerAddress, walletAddress) && (
             <OnlyStackholderWarnStyled mode="warning">
               <IconCaution />
-              <span>Only the player may execute the claim</span>
+              <span>Only a stakeholder of the Quest should execute this claim</span>
             </OnlyStackholderWarnStyled>
           )}
         </Outset>
