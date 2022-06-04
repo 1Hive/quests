@@ -90,7 +90,6 @@ export default function ClaimList({
           value={claim.evidence}
           isMarkDown
           wide
-          blockVisibility="collapsed"
           label="Evidence of completion"
         />
         {claim.contactInformation && (
