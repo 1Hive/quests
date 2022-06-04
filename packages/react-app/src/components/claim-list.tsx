@@ -85,6 +85,13 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
           wide
           label="Evidence of completion"
         />
+        <TextFieldInput
+          id="contact"
+          value={claim.contactInformation}
+          isMarkDown
+          wide
+          label="Contact information"
+        />
       </EvidenceWrapperStyled>,
     ]);
     if (loadingClaim) {

@@ -202,7 +202,11 @@ async function generateScheduleContainer(
     lastBlockTimestamp +
     erc3000Config.executionDelay +
     (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
-  const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
+  const evidenceIpfsHash = await pushObjectToIpfs({
+    evidence: claimData.evidence,
+    contactInformation: claimData.contactInformation,
+  });
+
   const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
 
   return {
@@ -275,14 +279,25 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           container,
         } as ClaimModel;
 
-        try {
-          if (claim.evidenceIpfsHash) {
-            claim.evidence = await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph);
-          } else {
-            claim.evidence = 'No evidence submited from Player';
+        if (claim.evidenceIpfsHash) {
+          try {
+            const obj = await getObjectFromIpfs<{ evidence: string; contactInformation: string }>(
+              claim.evidenceIpfsHash,
+              ipfsTheGraph,
+            );
+            if (!obj) throw new Error('Ipfs result is undefined');
+
+            if (typeof obj === 'string') {
+              claim.evidence = obj;
+            } else {
+              claim.evidence = obj.evidence;
+              claim.contactInformation = obj.contactInformation;
+            }
+          } catch (error) {
+            claim.evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
           }
-        } catch (error) {
-          claim.evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
+        } else {
+          claim.evidence = 'No evidence submited from Player';
         }
 
         return claim;
