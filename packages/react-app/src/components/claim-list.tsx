@@ -90,13 +90,13 @@ export default function ClaimList({
           value={claim.evidence}
           isMarkDown
           wide
+          blockVisibility="collapsed"
           label="Evidence of completion"
         />
         {claim.contactInformation && (
           <TextFieldInput
             id="contact"
             value={claim.contactInformation}
-            isMarkDown
             wide
             label="Contact information"
           />

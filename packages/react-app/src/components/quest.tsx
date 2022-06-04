@@ -330,7 +330,7 @@ export default function Quest({
               multiline
               isMarkDown
               disableLinks={isSummary}
-              showBlocks={!isSummary}
+              blockVisibility={isSummary ? 'hidden' : 'visible'}
               maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
               wide
             />
@@ -367,7 +367,11 @@ export default function Quest({
                       isDepositReleased={isDepositReleased}
                       onClose={() => setWaitForClose(false)}
                       pendingClaims={
-                        !!claims?.find((claim) => claim.state === ENUM_CLAIM_STATE.Scheduled)
+                        !!claims?.find(
+                          (claim) =>
+                            claim.state === ENUM_CLAIM_STATE.Scheduled ||
+                            claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
+                        )
                       }
                     />
                   )}

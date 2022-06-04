@@ -26,7 +26,7 @@ import {
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -273,7 +273,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           evidenceIpfsHash,
           playerAddress,
           questAddress: quest.address,
-          state: container.state,
+          state: container.state ? ENUM_CLAIM_STATE[container.state] : undefined,
           claimAll,
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,

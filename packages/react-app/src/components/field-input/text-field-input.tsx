@@ -52,7 +52,7 @@ type Props = {
   ellipsis?: ReactNode;
   tooltip?: React.ReactNode;
   disableLinks?: boolean;
-  showBlocks?: boolean;
+  blockVisibility?: 'visible' | 'collapsed' | 'hidden';
   onBlur?: Function;
   error?: string | false;
 };
@@ -77,7 +77,7 @@ export default function TextFieldInput({
   onBlur = noop,
   error,
   disableLinks = false,
-  showBlocks = true,
+  blockVisibility = 'visible',
 }: Props) {
   const readOnlyContent = (
     <>
@@ -97,7 +97,8 @@ export default function TextFieldInput({
                 component: CollapsableBlock,
                 props: {
                   label: 'block',
-                  visible: showBlocks ? 'true' : undefined,
+                  visible: blockVisibility !== 'hidden',
+                  collapsed: blockVisibility === 'collapsed',
                 },
               },
               code: {
@@ -105,7 +106,8 @@ export default function TextFieldInput({
                 props: {
                   label: 'code block',
                   type: 'code',
-                  visible: showBlocks ? 'true' : undefined,
+                  visible: blockVisibility !== 'hidden',
+                  collapsed: blockVisibility === 'collapsed',
                 },
               },
               img: {
@@ -113,7 +115,8 @@ export default function TextFieldInput({
                 props: {
                   label: 'image',
                   type: 'image',
-                  visible: showBlocks ? 'true' : undefined,
+                  visible: blockVisibility !== 'hidden',
+                  collapsed: blockVisibility === 'collapsed',
                 },
               },
               a: {

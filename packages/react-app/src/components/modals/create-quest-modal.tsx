@@ -410,7 +410,7 @@ export default function QuestModal({
                       value={values.description}
                       isEdit={!showPreview}
                       placeHolder="Quest description"
-                      showBlocks={!simulateSummary}
+                      blockVisibility={simulateSummary ? 'hidden' : 'visible'}
                       tooltip={
                         <>
                           <b>The quest description should include:</b>
