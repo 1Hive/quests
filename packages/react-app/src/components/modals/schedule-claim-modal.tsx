@@ -65,6 +65,9 @@ const ButtonLinkStyled = styled(Button)`
   background: transparent;
   padding-top: 4px;
 `;
+const DivStyled = styled.div`
+  width: 406px;
+`;
 
 // #endregion
 
@@ -153,6 +156,7 @@ export default function ScheduleClaimModal({
         {
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
+          contactInformation: values.contactInformation,
           playerAddress: values.playerAddress ?? walletAddress,
           claimAll: values.claimAll,
           questAddress,
@@ -210,6 +214,7 @@ export default function ScheduleClaimModal({
             evidence: '',
             claimedAmount: { parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel,
             claimAll: false,
+            contactInformation: undefined,
             playerAddress: undefined,
           } as any
         }
@@ -341,6 +346,21 @@ export default function ScheduleClaimModal({
                       onChange={handleChange}
                       wide
                     />
+                  </Outset>
+                  <Outset>
+                    <DivStyled>
+                      <TextFieldInput
+                        id="contactInformation"
+                        isEdit
+                        label="Contact information (optional)"
+                        tooltip="The necessary contact information that the creator will use to communicate with you."
+                        value={values.contactInformation}
+                        onChange={handleChange}
+                        compact
+                        wide
+                        isMarkDown
+                      />
+                    </DivStyled>
                   </Outset>
                 </WrapperStyled>,
               ]}

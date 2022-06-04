@@ -8,7 +8,7 @@ export type ClaimModel = {
   evidence?: string;
   evidenceIpfsHash?: string;
   claimAll?: boolean;
-
+  contactInformation?: string;
   // Only set when fetch
   executionTimeMs?: number;
   state?: string;
