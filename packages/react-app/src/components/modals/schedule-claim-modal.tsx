@@ -65,7 +65,7 @@ const ButtonLinkStyled = styled(Button)`
   background: transparent;
   padding-top: 4px;
 `;
-const DivStyled = styled.div`
+const ContactInformationWrapperStyled = styled.div`
   width: 406px;
 `;
 
@@ -199,7 +199,7 @@ export default function ScheduleClaimModal({
         <OpenButtonStyled
           icon={<GiBroadsword />}
           onClick={() => setOpened(true)}
-          label="Schedule claim"
+          label="Claim this Quest"
           mode="positive"
           title={!questTotalBounty ? 'Loading ...' : 'Open schedule claim'}
           disabled={!questTotalBounty}
@@ -257,12 +257,12 @@ export default function ScheduleClaimModal({
                   <Button
                     key="confirmButton"
                     icon={<GiBroadsword />}
-                    label="Schedule claim"
+                    label="Claim this Quest"
                     mode="positive"
                     type="submit"
                     form="form-claim"
                     className="m-8"
-                    title={!isFormValid ? 'Form not valid' : 'Schedule claim'}
+                    title={!isFormValid ? 'Form not valid' : 'Claim this Quest'}
                     disabled={!isEnoughBalance}
                   />
                 </>
@@ -348,7 +348,7 @@ export default function ScheduleClaimModal({
                     />
                   </Outset>
                   <Outset>
-                    <DivStyled>
+                    <ContactInformationWrapperStyled>
                       <TextFieldInput
                         id="contactInformation"
                         isEdit
@@ -356,11 +356,12 @@ export default function ScheduleClaimModal({
                         tooltip="The necessary contact information that the creator will use to communicate with you."
                         value={values.contactInformation}
                         onChange={handleChange}
+                        placeHolder="e.g. discord, email, phone number, etc."
                         compact
                         wide
                         isMarkDown
                       />
-                    </DivStyled>
+                    </ContactInformationWrapperStyled>
                   </Outset>
                 </WrapperStyled>,
               ]}

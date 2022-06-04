@@ -55,6 +55,7 @@ export const ENUM_PAGES = Object.freeze({
 export const ENUM_CLAIM_STATE = Object.freeze({
   None: 'None',
   Scheduled: 'Scheduled',
+  AvailableToExecute: 'Available to execute',
   Challenged: 'Challenged',
   // Final states
   Approved: 'Approved',

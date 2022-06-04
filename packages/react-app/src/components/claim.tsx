@@ -1,6 +1,11 @@
 import { useViewport, Timer } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
-import { ENUM_CLAIM_STATE, ENUM_DISPUTE_STATES, ENUM_TRANSACTION_STATUS } from 'src/constants';
+import {
+  ENUM_CLAIM_STATE,
+  ENUM_DISPUTE_STATES,
+  ENUM_QUEST_STATE,
+  ENUM_TRANSACTION_STATUS,
+} from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
@@ -50,8 +55,12 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
   const claimable = useMemo(() => !!claim.executionTimeMs && claim.executionTimeMs <= now, [now]);
 
   useEffect(() => {
-    setState(claim.state);
-  }, [claim.state]);
+    setState(
+      claim.state === ENUM_CLAIM_STATE.Scheduled && claimable
+        ? ENUM_CLAIM_STATE.AvailableToExecute
+        : claim.state,
+    );
+  }, [claim.state, claimable]);
 
   const timer = useMemo(
     () => !claimable && claim.executionTimeMs && <Timer end={new Date(claim.executionTimeMs)} />,
@@ -100,8 +109,11 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
 
   useEffect(() => {
     if (waitForClose || !state || !isMountedRef.current) return;
-    if (state === ENUM_CLAIM_STATE.Scheduled) {
-      if (compareCaseInsensitive(walletAddress, claim.playerAddress) || claimable) {
+    if (state === ENUM_CLAIM_STATE.Scheduled || state === ENUM_CLAIM_STATE.AvailableToExecute) {
+      if (
+        compareCaseInsensitive(walletAddress, claim.playerAddress) ||
+        (claimable && questData.state !== ENUM_QUEST_STATE.Active)
+      ) {
         setActionButton(
           <>
             <ExecuteClaimModal

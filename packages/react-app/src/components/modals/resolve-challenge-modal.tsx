@@ -145,10 +145,11 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   }, [dispute?.state]);
 
   useEffect(() => {
-    if (challenge && claim)
+    if (challenge && claim) {
       setIsStackholder(
         challenge.challengerAddress === walletAddress || claim.playerAddress === walletAddress,
       );
+    }
   }, [claim, challenge, walletAddress]);
 
   const resolveChallengeTx = async () => {
@@ -297,7 +298,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             {isRuled && !isStackholder && (
               <OnlyStackholderWarnStyled mode="warning">
                 <IconCaution />
-                <span>Only a stakeholder of this challenge should resolve it</span>
+                <Outset>Only a stakeholder of this challenge should resolve it</Outset>
               </OnlyStackholderWarnStyled>
             )}
           </Fragment>,

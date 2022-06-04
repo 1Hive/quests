@@ -8,6 +8,7 @@ import { QuestModel } from 'src/models/quest.model';
 import { useEffect, useMemo, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { noop } from 'lodash';
 import { HelpTooltip } from './field-input/help-tooltip';
 import * as QuestService from '../services/quest.service';
 import Claim from './claim';
@@ -47,9 +48,15 @@ type Props = {
   questData: QuestModel;
   challengeDeposit: TokenAmountModel;
   isLoading?: boolean;
+  onClaimsFetched?: (_claims: ClaimModel[]) => void;
 };
 
-export default function ClaimList({ questData, challengeDeposit, isLoading = false }: Props) {
+export default function ClaimList({
+  questData,
+  challengeDeposit,
+  isLoading = false,
+  onClaimsFetched = noop,
+}: Props) {
   const [claims, setClaims] = useState<ClaimModel[]>([]);
   const [loadingClaim, setLoadingClaim] = useState(true);
   const { transaction } = useTransactionContext();
@@ -85,13 +92,15 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
           wide
           label="Evidence of completion"
         />
-        <TextFieldInput
-          id="contact"
-          value={claim.contactInformation}
-          isMarkDown
-          wide
-          label="Contact information"
-        />
+        {claim.contactInformation && (
+          <TextFieldInput
+            id="contact"
+            value={claim.contactInformation}
+            isMarkDown
+            wide
+            label="Contact information"
+          />
+        )}
       </EvidenceWrapperStyled>,
     ]);
     if (loadingClaim) {
@@ -105,6 +114,10 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
       fetchClaims();
     }
   }, [questData.address]);
+
+  useEffect(() => {
+    onClaimsFetched(claims);
+  }, [claims]);
 
   useEffect(() => {
     // If tx completion impact Claims, update them

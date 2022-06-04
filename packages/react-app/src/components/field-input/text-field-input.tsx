@@ -139,7 +139,7 @@ export default function TextFieldInput({
         wide={wide}
         onChange={onChange}
         onBlur={onBlur}
-        placeHolder={placeHolder}
+        placeholder={placeHolder}
         multiline={multiline}
         style={css}
         rows={rows}

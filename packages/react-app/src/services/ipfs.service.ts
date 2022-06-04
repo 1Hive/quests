@@ -51,10 +51,14 @@ export async function getObjectFromIpfs<TResult = string>(
 
     const ipfsResult = decodedSplit[decodedSplit.length - 1];
     try {
-      return JSON.parse(ipfsResult) as TResult;
-    } catch (err) {
-      return ipfsResult;
+      const parsed = JSON.parse(ipfsResult) as TResult;
+      if (typeof parsed === 'object') {
+        return parsed;
+      }
+    } catch {
+      // eslint-disable-next-line no-empty
     }
+    return ipfsResult; // Return the raw string
   }
   return undefined; // No result
 }

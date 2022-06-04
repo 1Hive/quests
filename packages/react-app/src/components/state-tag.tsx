@@ -25,6 +25,7 @@ const VISIBLE_STATES = [
   ENUM_QUEST_STATE.Expired,
   ENUM_QUEST_STATE.Archived,
   ENUM_CLAIM_STATE.Scheduled,
+  ENUM_CLAIM_STATE.AvailableToExecute,
   ENUM_CLAIM_STATE.Challenged,
   ENUM_CLAIM_STATE.Executed,
   ENUM_CLAIM_STATE.Cancelled,
@@ -37,6 +38,7 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
   const [mode, setMode] = useState<string>();
   const [tooltip, setTooltip] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
+  const [labelOverride, setLabelOverride] = useState<string>();
 
   useEffect(() => {
     switch (state) {
@@ -59,8 +61,13 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
         break;
       // Claim states
       case ENUM_CLAIM_STATE.Scheduled:
+        setLabelOverride('In review');
         setMode('identifier');
-        setTooltip('The claim is active and may pass when delay is over');
+        setTooltip('The claim is in a review period');
+        break;
+      case ENUM_CLAIM_STATE.AvailableToExecute:
+        setMode('identifier');
+        setTooltip('The review period is over and the claim is available to execute');
         break;
       case ENUM_CLAIM_STATE.Challenged:
         setMode('indicator');
@@ -90,7 +97,13 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
       <Tag mode="activity">activity</Tag> */}
       {visible && (
         <StateWrapperStyled className={className} visible={visible}>
-          <StateTagStyled wide={wide} title={tooltip} label={state} mode={mode} size={size} />
+          <StateTagStyled
+            wide={wide}
+            title={tooltip}
+            label={labelOverride ?? state}
+            mode={mode}
+            size={size}
+          />
         </StateWrapperStyled>
       )}
     </>

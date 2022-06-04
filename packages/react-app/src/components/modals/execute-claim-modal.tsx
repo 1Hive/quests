@@ -160,7 +160,7 @@ export default function ExecuteClaimModal({
           {!compareCaseInsensitive(claim.playerAddress, walletAddress) && (
             <OnlyStackholderWarnStyled mode="warning">
               <IconCaution />
-              <span>Only a stakeholder of the Quest should execute this claim</span>
+              <Outset>Consider contact the player after executing this Claim</Outset>
             </OnlyStackholderWarnStyled>
           )}
         </Outset>

@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   ADDRESS_ZERO,
+  ENUM_CLAIM_STATE,
   ENUM_PAGES,
   ENUM_QUEST_STATE,
   ENUM_TRANSACTION_STATUS,
@@ -19,6 +20,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { ClaimModel } from 'src/models/claim.model';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -119,6 +121,7 @@ export default function Quest({
   const history = useHistory();
   const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
+  const [claims, setClaims] = useState<ClaimModel[]>();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
@@ -339,6 +342,7 @@ export default function Quest({
               questData={{ ...questData, bounty }}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
+              onClaimsFetched={setClaims}
             />
           )}
           {!isSummary && questData.address && walletConnected && (
@@ -362,6 +366,9 @@ export default function Quest({
                       questData={questData}
                       isDepositReleased={isDepositReleased}
                       onClose={() => setWaitForClose(false)}
+                      pendingClaims={
+                        !!claims?.find((claim) => claim.state === ENUM_CLAIM_STATE.Scheduled)
+                      }
                     />
                   )}
                 </>
