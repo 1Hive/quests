@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { getProviderFromUseWalletId } from 'src/ethereum-providers';
 import { useWallet, UseWalletProvider } from 'use-wallet';
 import { useNetworkContext } from 'src/contexts/network.context';
-import { setCurrentChain } from 'src/local-settings';
 import { getDefaultProvider, getUseWalletConnectors } from '../utils/web3.utils';
 import { EXPECTED_CHAIN_ID } from '../constants';
 
