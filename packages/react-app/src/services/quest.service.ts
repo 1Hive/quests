@@ -202,10 +202,9 @@ async function generateScheduleContainer(
     lastBlockTimestamp +
     erc3000Config.executionDelay +
     (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
-  const claimInfoIpfsHash = await pushObjectToIpfs({
-    evidence: claimData.evidence,
-    contactInformation: claimData.contactInformation,
-  });
+  const claimInfoIpfsHash = await pushObjectToIpfs(
+    `${claimData.evidence}\nContactInformation: ${claimData.contactInformation}`,
+  );
 
   const claimCall = encodeClaimAction(claimData, claimInfoIpfsHash);
 
@@ -293,16 +292,19 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
 export async function fetchClaimIpfsInfo(claimInfoIpfsHash?: string) {
   if (claimInfoIpfsHash) {
     try {
-      const ipfsResult = await getObjectFromIpfs<{ evidence: string; contactInformation: string }>(
-        claimInfoIpfsHash,
-        ipfsTheGraph,
-      );
+      const ipfsResult = await getObjectFromIpfs<string>(claimInfoIpfsHash, ipfsTheGraph);
       if (!ipfsResult) throw new Error('Ipfs result is undefined');
 
-      if (typeof ipfsResult === 'string') {
-        return { evidence: ipfsResult };
+      if (ipfsResult.includes('ContactInformation: ')) {
+        const splitResult = ipfsResult.split('\n');
+        const contactInformation = splitResult[splitResult.length - 1].replace(
+          'ContactInformation: ',
+          '',
+        ); // Contact information is always the last line and remove the prefix
+        const evidence = splitResult.slice(0, splitResult.length - 1).join('\n'); // Evidence is everything but the last line
+        return { evidence, contactInformation };
       }
-      return { evidence: ipfsResult.evidence, contactInformation: ipfsResult.contactInformation };
+      return { evidence: ipfsResult };
     } catch (error) {
       return { evidence: formatIpfsMarkdownLink(claimInfoIpfsHash, 'See evidence') };
     }
