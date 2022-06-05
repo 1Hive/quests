@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
-import { getNetwork } from 'src/networks';
 import { useEffect, useState } from 'react';
+import { useNetworkContext } from 'src/contexts/network.context';
 import QuestModal from './modals/create-quest-modal';
 import { GenericTooltip } from './field-input/generic-tooltip';
 
@@ -87,8 +87,8 @@ export default function footer() {
   const theme = useTheme();
   const year = new Date().getFullYear();
   const { walletConnected } = useWallet();
-  const { networkId } = getNetwork();
-  const { stableTokens } = getNetwork();
+  const { networkId } = useNetworkContext();
+  const { stableTokens } = useNetworkContext();
   const [stableList, setStableList] = useState('');
 
   useEffect(() => {

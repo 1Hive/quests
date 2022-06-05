@@ -1,9 +1,9 @@
 import { GU, Link, useTheme, IconExternal } from '@1hive/1hive-ui';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
-import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
+import { useNetworkContext } from 'src/contexts/network.context';
 import QuestModal from '../modals/create-quest-modal';
 // #region StyledComponents
 
@@ -31,7 +31,7 @@ type Props = {
 
 export default function HeaderMenu({ below }: Props) {
   const theme = useTheme();
-  const { networkId } = getNetwork();
+  const { networkId } = useNetworkContext();
   const { walletConnected } = useWallet();
 
   return (

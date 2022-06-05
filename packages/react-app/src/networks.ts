@@ -1,5 +1,5 @@
 import HardhatDeployement from './contracts/hardhat_contracts.json';
-import { getDefaultChain } from './local-settings';
+import { getCurrentChain } from './local-settings';
 import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel } from './models/network.model';
 import { StableTokens } from './tokens';
@@ -33,7 +33,7 @@ export const networks = Object.freeze({
   gnosis: {
     networkId: 'xdai',
     chainId: 100,
-    name: 'gnosis',
+    name: 'Gnosis',
     explorerBase: 'blockscout',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-gnosis',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai',
@@ -49,22 +49,21 @@ export const networks = Object.freeze({
     stagingOf: 'gnosis',
   } as StagingNetworkModel,
   local: {
-    id: 'local',
+    networkId: 'local',
     chainId: 1337,
     name: 'Localhost',
-    subgraph: 'https://localhost:8000/subgraphs/name/corantin/quests-subgraph',
+    questsSubgraph: 'https://localhost:8000/subgraphs/name/corantin/quests-subgraph',
     defaultEthNode: 'http://0.0.0.0:8545/',
-    questFactory: HardhatDeployement[1337]?.localhost.contracts.QuestFactory.address,
-    govern: 0,
+    questFactoryAddress: HardhatDeployement[1337]?.localhost.contracts.QuestFactory.address,
     isTestNetwork: true,
   } as unknown as NetworkModel,
 } as { [key: string]: NetworkModel | StagingNetworkModel });
 
-function getNetworkInternalName(chainId = getDefaultChain()) {
+function getNetworkInternalName(chainId = getCurrentChain()) {
   return isLocalOrUnknownNetwork(chainId) ? 'local' : getNetworkId(chainId);
 }
 
-export function getNetwork(chainId = getDefaultChain()): NetworkModel {
+export function getNetwork(chainId = getCurrentChain()): NetworkModel {
   let network = networks[getNetworkInternalName(chainId)];
   if ('stagingOf' in network) {
     network = { ...networks[network.stagingOf], ...network } as NetworkModel;

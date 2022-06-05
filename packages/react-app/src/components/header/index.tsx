@@ -1,13 +1,15 @@
-import { BackButton, GU, useTheme, useViewport } from '@1hive/1hive-ui';
+import { BackButton, GU, useTheme, useViewport, DropDown } from '@1hive/1hive-ui';
 import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useNetworkContext } from 'src/contexts/network.context';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
+import { networks } from '../../networks';
 
 // #region StyledComponents
 const HeaderWraperStyled = styled.header`
@@ -65,6 +67,15 @@ function Header({ children }: Props) {
   const { page } = usePageContext();
   const { below } = useViewport();
   const layoutSmall = below('medium');
+  const { name, changeNetwork } = useNetworkContext();
+
+  const networkNames = useMemo(
+    () =>
+      Object.values(networks)
+        .filter((network) => !(network as any).stagingOf && network.networkId !== 'local')
+        .map((network) => network.name), // Skip staging networks
+    [networks],
+  );
 
   return (
     <HeaderWraperStyled theme={theme}>
@@ -81,6 +92,17 @@ function Header({ children }: Props) {
         <HeaderRightPanelStyled>
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
+          <DropDown
+            items={networkNames}
+            selected={networkNames.indexOf(name)}
+            onChange={(i: number) => {
+              changeNetwork(
+                Object.values(networks).find((network) => network.name === networkNames[i])!
+                  .chainId!,
+              );
+              window.location.reload();
+            }}
+          />
           {
             // TODO : Restore when light theme is implemented
             /* <ThemeButtonStyled

@@ -1,6 +1,7 @@
 import { useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
+import { useNetworkContext } from 'src/contexts/network.context';
 import { useWallet } from 'src/contexts/wallet.context';
 import { DashboardModel } from 'src/models/dashboard.model';
 import { getDashboardInfo } from 'src/services/quest.service';
@@ -48,6 +49,7 @@ export default function Dashboard() {
   const theme = useTheme();
   const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
   const { walletConnected } = useWallet();
+  const { networkId } = useNetworkContext();
 
   useEffect(() => {
     let isSubscribed = true;
@@ -59,7 +61,7 @@ export default function Dashboard() {
     return () => {
       isSubscribed = false;
     };
-  }, []);
+  }, [networkId]);
 
   return (
     <BoxStyled theme={theme}>

@@ -9,7 +9,6 @@ import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
-import { getNetwork } from 'src/networks';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { BigNumber } from 'ethers';
 import { useWallet } from 'src/contexts/wallet.context';
@@ -19,6 +18,7 @@ import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
+import { useNetworkContext } from 'src/contexts/network.context';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -104,7 +104,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const challengeTx = async (values: Partial<ChallengeModel>) => {
     if (isFormValid) {
       try {
-        const { governQueueAddress } = getNetwork();
+        const { governQueueAddress } = useNetworkContext();
         if (
           challengeFee?.parsedAmount &&
           (!isFeeDepositSameToken || !+claim.container!.config.challengeDeposit.amount)

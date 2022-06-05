@@ -16,6 +16,8 @@ export const GQL_MAX_INT_MS = (2 ** 31 - 1) * 1000;
 
 export const QUESTS_PAGE_SIZE = 4;
 
+export const EXPECTED_CHAIN_ID = [100, 4, 1337];
+
 // Enums
 
 export const ENUM_QUEST_STATE = Object.freeze({

@@ -4,6 +4,7 @@ import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
@@ -19,6 +20,7 @@ const AccountWrapperStyled = styled.div`
   align-items: center;
   justify-content: space-around;
   outline: 0;
+  margin-right: ${GUpx(2)};
 `;
 
 const AnimatedDivStyled = styled(animated.div)`

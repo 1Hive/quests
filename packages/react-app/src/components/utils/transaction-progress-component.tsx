@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
-import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/style.util';
+import { useNetworkContext } from 'src/contexts/network.context';
 import QuestLogo from '../../assets/quest-logo';
 import { Outset } from './spacer-util';
 
@@ -26,7 +26,7 @@ const TransactionTitleStyled = styled.div`
 `;
 
 export function TransactionProgressComponent() {
-  const network = getNetwork();
+  const network = useNetworkContext();
   const { transaction } = useTransactionContext();
   const [message, setMessage] = useState<string | undefined>();
   const {

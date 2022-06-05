@@ -13,6 +13,7 @@ import background from './assets/background.svg';
 import backgroundMotif from './assets/background-motif.svg';
 import { isDarkTheme } from './utils/style.util';
 import { useThemeContext } from './contexts/theme.context';
+import { NetworkContextProvider } from './contexts/network.context';
 
 // #region StyledComponents
 
@@ -38,26 +39,28 @@ function App() {
   const { currentTheme } = useThemeContext();
   return (
     <AppStyled theme={currentTheme}>
-      <WalletProvider>
-        <PageContextProvider>
-          <TransactionContextProvider>
-            <FilterContextProvider>
-              <Main
-                assetsUrl="/aragon-ui/"
-                layout={false}
-                scrollView={false}
-                theme={currentTheme ?? DEFAULT_THEME}
-              >
-                <HashRouter>
-                  <ErrorBoundary>
-                    <Routes />
-                  </ErrorBoundary>
-                </HashRouter>
-              </Main>
-            </FilterContextProvider>
-          </TransactionContextProvider>
-        </PageContextProvider>
-      </WalletProvider>
+      <NetworkContextProvider>
+        <WalletProvider>
+          <PageContextProvider>
+            <TransactionContextProvider>
+              <FilterContextProvider>
+                <Main
+                  assetsUrl="/aragon-ui/"
+                  layout={false}
+                  scrollView={false}
+                  theme={currentTheme ?? DEFAULT_THEME}
+                >
+                  <HashRouter>
+                    <ErrorBoundary>
+                      <Routes />
+                    </ErrorBoundary>
+                  </HashRouter>
+                </Main>
+              </FilterContextProvider>
+            </TransactionContextProvider>
+          </PageContextProvider>
+        </WalletProvider>
+      </NetworkContextProvider>
     </AppStyled>
   );
 }

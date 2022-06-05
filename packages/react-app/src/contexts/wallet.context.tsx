@@ -2,8 +2,10 @@ import { providers as EthersProviders } from 'ethers';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { getProviderFromUseWalletId } from 'src/ethereum-providers';
 import { useWallet, UseWalletProvider } from 'use-wallet';
-import { getNetwork } from '../networks';
+import { useNetworkContext } from 'src/contexts/network.context';
+import { setCurrentChain } from 'src/local-settings';
 import { getDefaultProvider, getUseWalletConnectors } from '../utils/web3.utils';
+import { EXPECTED_CHAIN_ID } from '../constants';
 
 export type WalletContextModel = {
   walletConnected: boolean;
@@ -32,6 +34,7 @@ function WalletAugmented({ children }: Props) {
   const [activationError, setActivationError] = useState<{ name: string; message: string }>();
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
+  const { chainId, networkId, name, changeNetwork } = useNetworkContext();
 
   useEffect(() => {
     const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
@@ -42,11 +45,15 @@ function WalletAugmented({ children }: Props) {
 
   const ethers = useMemo(() => {
     setIsConnected(false);
-    const { chainId, networkId, name } = getNetwork();
 
     if (ethereum) {
       window.ethereum = ethereum;
-      ethereum?.on('chainChanged', (_chainId: string) => window.location.reload());
+      ethereum?.on('chainChanged', (_chainId: string) => {
+        if (EXPECTED_CHAIN_ID.includes(+_chainId)) {
+          changeNetwork(+_chainId);
+        }
+        window.location.reload();
+      });
     }
 
     setActivating(undefined);
@@ -74,7 +81,7 @@ function WalletAugmented({ children }: Props) {
       chainId,
       ensAddress: ensRegistry,
     });
-  }, [ethereum]);
+  }, [ethereum, chainId]);
 
   const handleConnect = async (id: string) => {
     setActivating(id);

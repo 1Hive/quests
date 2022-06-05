@@ -22,6 +22,7 @@ import { useThemeContext } from 'src/contexts/theme.context';
 import { ThemeInterface } from 'src/styles/theme';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { useNetworkContext } from 'src/contexts/network.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -86,6 +87,7 @@ export default function QuestList() {
   const { transaction } = useTransactionContext();
   const { setPage } = usePageContext();
   const isMountedRef = useIsMountedRef();
+  const network = useNetworkContext();
 
   const skeletonQuests: any[] = useMemo(() => {
     const fakeQuests = [];
@@ -106,12 +108,12 @@ export default function QuestList() {
   useEffect(() => {
     debounceRefresh(filter);
     return () => debounceRefresh.cancel();
-  }, [filter]);
+  }, [filter, network.networkId]);
 
   useEffect(() => {
     debounceRefresh();
     return () => debounceRefresh.cancel();
-  }, [refreshed]);
+  }, [refreshed, network.networkId]);
 
   useEffect(() => {
     // Should not be nullish and not already exist in list

@@ -8,7 +8,7 @@ import { isDesktop, isMobile } from 'react-device-detect';
 import { getProvider } from 'src/ethereum-providers';
 import { TokenModel } from 'src/models/token.model';
 import env from '../environment';
-import { getDefaultChain } from '../local-settings';
+import { getCurrentChain } from '../local-settings';
 import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = 'custom';
@@ -71,7 +71,7 @@ export function getUseWalletProviders() {
   return providers as any[];
 }
 
-export function getNetworkId(chainId = getDefaultChain()) {
+export function getNetworkId(chainId = getCurrentChain()) {
   let key;
   if (+chainId === 1) key = 'mainnet';
   if (+chainId === 3) key = 'ropsten';
@@ -86,7 +86,7 @@ export function getNetworkId(chainId = getDefaultChain()) {
   return DEFAULT_LOCAL_CHAIN;
 }
 
-export function isLocalOrUnknownNetwork(chainId = getDefaultChain()) {
+export function isLocalOrUnknownNetwork(chainId = getCurrentChain()) {
   return chainId === 1337 || getNetworkId(chainId) === DEFAULT_LOCAL_CHAIN;
 }
 
@@ -99,7 +99,7 @@ export function getUseWalletConnectors() {
   }, {});
 }
 
-export function getNetworkName(chainId = getDefaultChain()) {
+export function getNetworkName(chainId = getCurrentChain()) {
   const chainIdStr = String(chainId);
 
   if (chainIdStr === '1') return 'Mainnet';
