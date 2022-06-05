@@ -1,7 +1,7 @@
-import { TextInput, Markdown, Button } from '@1hive/1hive-ui';
+import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { ReactNode, useEffect, useState } from 'react';
-import { CollapsableBlock } from 'src/collapsable-block';
+import React, { ReactNode } from 'react';
+import { CollapsableBlock } from 'src/components/collapsable-block';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
@@ -37,7 +37,7 @@ type Props = {
   id: string;
   isEdit?: boolean;
   isLoading?: boolean;
-  label?: string;
+  label?: ReactNode;
   onChange?: Function;
   placeHolder?: string;
   value?: string;
@@ -52,8 +52,7 @@ type Props = {
   ellipsis?: ReactNode;
   tooltip?: React.ReactNode;
   disableLinks?: boolean;
-  showBlocks?: boolean;
-
+  blockVisibility?: 'visible' | 'collapsed' | 'hidden';
   onBlur?: Function;
   error?: string | false;
 };
@@ -78,18 +77,8 @@ export default function TextFieldInput({
   onBlur = noop,
   error,
   disableLinks = false,
-  showBlocks = false,
+  blockVisibility = 'visible',
 }: Props) {
-  const [isEditState, setIsEdit] = useState(isEdit);
-
-  useEffect(() => {
-    setIsEdit(isEdit);
-  }, [isEdit]);
-
-  const handlePreview = () => {
-    setIsEdit(!isEditState);
-  };
-
   const readOnlyContent = (
     <>
       {isMarkDown ? (
@@ -108,7 +97,8 @@ export default function TextFieldInput({
                 component: CollapsableBlock,
                 props: {
                   label: 'block',
-                  visible: showBlocks,
+                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
+                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
                 },
               },
               code: {
@@ -116,7 +106,8 @@ export default function TextFieldInput({
                 props: {
                   label: 'code block',
                   type: 'code',
-                  visible: showBlocks,
+                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
+                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
                 },
               },
               img: {
@@ -124,7 +115,8 @@ export default function TextFieldInput({
                 props: {
                   label: 'image',
                   type: 'image',
-                  visible: showBlocks,
+                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
+                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
                 },
               },
               a: {
@@ -142,7 +134,7 @@ export default function TextFieldInput({
       )}
     </>
   );
-  const loadableContent = isEditState ? (
+  const loadableContent = isEdit ? (
     <BlockStyled wide={wide}>
       <TextInput
         id={id}
@@ -150,15 +142,14 @@ export default function TextFieldInput({
         wide={wide}
         onChange={onChange}
         onBlur={onBlur}
-        placeHolder={placeHolder}
+        placeholder={placeHolder}
         multiline={multiline}
         style={css}
         rows={rows}
       />
-      {isMarkDown && isEdit && <Button size="mini" label="Preview" onClick={handlePreview} />}
     </BlockStyled>
   ) : (
-    <BlockStyled>
+    <BlockStyled wide={wide}>
       <div style={{ ...css, fontSize }}>
         {maxLine ? (
           <TextFieldWrapperStyled>
@@ -169,7 +160,6 @@ export default function TextFieldInput({
           readOnlyContent
         )}
       </div>
-      {isMarkDown && isEdit && <Button size="mini" label="Edit" onClick={handlePreview} />}
     </BlockStyled>
   );
   return (
@@ -181,6 +171,7 @@ export default function TextFieldInput({
         error={error}
         compact={compact}
         isLoading={isLoading}
+        wide={wide}
       >
         {loadableContent}
       </FieldInput>

@@ -15,8 +15,8 @@ import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
-import { NETWORK_TOKENS } from 'src/constants';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { TOKENS } from 'src/tokens';
 import { FieldInput } from './field-input';
 import { ConditionalWrapper } from '../utils/util';
 
@@ -107,6 +107,7 @@ const TokenAmountBadge = React.memo(
     amount,
     usdValue,
   }: TokenBadgeProp) => {
+    const { isTestNetwork } = getNetwork();
     const copyCode = useCopyToClipboard();
     const label = useMemo(() => {
       let temp = '';
@@ -117,14 +118,19 @@ const TokenAmountBadge = React.memo(
         temp += `${amountFormat} `;
       }
       temp += `${token.symbol}`;
-      if (usdValue) {
-        const usdFormat = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 2,
-        }).format(usdValue);
-        temp += ` (${usdFormat})`;
+      if (amount) {
+        if (usdValue || isTestNetwork) {
+          const usdFormat = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+          }).format(usdValue || amount);
+          temp += ` (${usdFormat})`;
+        } else if (usdValue === undefined) {
+          temp += ' (*)';
+        }
       }
+
       return temp;
     }, [token, amount, usdValue]);
 
@@ -140,7 +146,7 @@ const TokenAmountBadge = React.memo(
         mode="strong"
         size="mini"
         label={label}
-        title={`Copy : ${token.token}`}
+        title={`Copy : ${token.token}\n* This token don't have pair with our stable list (see footer)`}
         onClick={onBadgeClick}
       />
     );
@@ -258,7 +264,7 @@ function AmountFieldInput({
   };
 
   const fetchAvailableTokens = async () => {
-    const networkDefaultTokens = (NETWORK_TOKENS[networkId] as TokenModel[]) ?? [];
+    const networkDefaultTokens = (Object.values(TOKENS[networkId]) as TokenModel[]) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
     if (isMountedRef.current) {
       setAvailableTokens(

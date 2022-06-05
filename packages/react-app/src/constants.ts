@@ -1,5 +1,4 @@
 import { FilterModel } from './models/filter.model';
-import { TokenModel } from './models/token.model';
 
 export const PCT_BASE = BigInt(1e18);
 
@@ -10,64 +9,6 @@ export const DEFAULT_THEME = 'dark';
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 export const REPO_ADDRESS = 'https://github.com/1Hive/quests/';
-
-// Cryptos
-export const TOKENS = Object.freeze({
-  // Native tokens
-  Ether: {
-    name: 'Ether',
-    symbol: 'ETH',
-    decimals: 18,
-  } as TokenModel,
-  xDAI: {
-    name: 'xDAI',
-    symbol: 'xDAI',
-    decimals: 18,
-  } as TokenModel,
-  // ERC20 tokens
-  Thether: {
-    name: 'Tether',
-    symbol: 'USDT',
-    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    decimals: 18,
-  } as TokenModel,
-  UsdCoin: {
-    name: 'USD Coin',
-    symbol: 'USDC',
-    token: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    decimals: 18,
-  } as TokenModel,
-  Honey: {
-    name: 'Honey',
-    symbol: 'HNY',
-    token: '0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9',
-    decimals: 18,
-  } as TokenModel,
-  RinkebyTheter: {
-    name: 'Tether',
-    symbol: 'USDT',
-    token: '0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02',
-    decimals: 18,
-  } as TokenModel,
-  HoneyTest: {
-    name: 'HoneyTest',
-    symbol: 'HNYT',
-    token: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
-    decimals: 18,
-  } as TokenModel,
-  RinkebyDai: {
-    name: 'Dai Stablecoin',
-    symbol: 'DAI',
-    token: '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735',
-    decimals: 18,
-  } as TokenModel,
-});
-
-export const NETWORK_TOKENS = Object.freeze({
-  rinkeby: [TOKENS.HoneyTest, TOKENS.RinkebyTheter, TOKENS.RinkebyDai],
-  xdai: [TOKENS.Honey],
-  mainnet: [TOKENS.Thether],
-});
 
 // Constants
 
@@ -113,7 +54,8 @@ export const ENUM_PAGES = Object.freeze({
 
 export const ENUM_CLAIM_STATE = Object.freeze({
   None: 'None',
-  Scheduled: 'Scheduled',
+  Scheduled: 'In review',
+  AvailableToExecute: 'Available to execute',
   Challenged: 'Challenged',
   // Final states
   Approved: 'Approved',

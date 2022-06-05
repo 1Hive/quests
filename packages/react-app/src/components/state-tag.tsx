@@ -25,6 +25,7 @@ const VISIBLE_STATES = [
   ENUM_QUEST_STATE.Expired,
   ENUM_QUEST_STATE.Archived,
   ENUM_CLAIM_STATE.Scheduled,
+  ENUM_CLAIM_STATE.AvailableToExecute,
   ENUM_CLAIM_STATE.Challenged,
   ENUM_CLAIM_STATE.Executed,
   ENUM_CLAIM_STATE.Cancelled,
@@ -60,7 +61,11 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
       // Claim states
       case ENUM_CLAIM_STATE.Scheduled:
         setMode('identifier');
-        setTooltip('The claim is active and may pass when delay is over');
+        setTooltip('The claim is in a review period');
+        break;
+      case ENUM_CLAIM_STATE.AvailableToExecute:
+        setMode('identifier');
+        setTooltip('The review period is over and the claim is available to execute');
         break;
       case ENUM_CLAIM_STATE.Challenged:
         setMode('indicator');

@@ -23,7 +23,6 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
-    "c_0xa706fae5(bytes32)": FunctionFragment;
     "claim(bytes,address,uint256,bool)": FunctionFragment;
     "claims(uint256)": FunctionFragment;
     "deposit()": FunctionFragment;
@@ -40,10 +39,6 @@ interface QuestInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "aragonGovernAddress",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xa706fae5",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "claim",
@@ -89,10 +84,6 @@ interface QuestInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "aragonGovernAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xa706fae5",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
@@ -149,16 +140,6 @@ export class Quest extends Contract {
     aragonGovernAddress(overrides?: CallOverrides): Promise<[string]>;
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
-
-    c_0xa706fae5(
-      c__0xa706fae5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xa706fae5(bytes32)"(
-      c__0xa706fae5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
 
     claim(
       _evidence: BytesLike,
@@ -245,16 +226,6 @@ export class Quest extends Contract {
 
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  c_0xa706fae5(
-    c__0xa706fae5: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xa706fae5(bytes32)"(
-    c__0xa706fae5: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   claim(
     _evidence: BytesLike,
     _player: string,
@@ -339,16 +310,6 @@ export class Quest extends Contract {
     aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
-
-    c_0xa706fae5(
-      c__0xa706fae5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xa706fae5(bytes32)"(
-      c__0xa706fae5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     claim(
       _evidence: BytesLike,
@@ -438,16 +399,6 @@ export class Quest extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    c_0xa706fae5(
-      c__0xa706fae5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xa706fae5(bytes32)"(
-      c__0xa706fae5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     claim(
       _evidence: BytesLike,
       _player: string,
@@ -514,16 +465,6 @@ export class Quest extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "aragonGovernAddress()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xa706fae5(
-      c__0xa706fae5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xa706fae5(bytes32)"(
-      c__0xa706fae5: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

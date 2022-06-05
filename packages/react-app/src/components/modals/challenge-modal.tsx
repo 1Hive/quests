@@ -18,6 +18,7 @@ import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
+import { FaEdit, FaEye } from 'react-icons/fa';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -41,6 +42,23 @@ const OpenButtonWrapperStyled = styled.div`
   flex-direction: column;
 `;
 
+const LineStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const ButtonLinkStyled = styled(Button)`
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  height: fit-content;
+  color: ${({ theme }: any) => theme.contentSecondary};
+  font-weight: bold;
+  background: transparent;
+  padding-top: 4px;
+`;
+
 // #endregion
 
 type Props = {
@@ -56,6 +74,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
@@ -263,8 +282,26 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             <Outset gu16>
               <TextFieldInput
                 id="reason"
-                isEdit
-                label="Challenge reason"
+                isEdit={!showPreview}
+                label={
+                  <LineStyled>
+                    Challenge reason
+                    <Outset horizontal>
+                      <ButtonLinkStyled
+                        size="mini"
+                        icon={showPreview ? <FaEdit /> : <FaEye />}
+                        display="icon"
+                        label={showPreview ? 'Edit' : 'Preview'}
+                        onClick={() => setShowPreview((old) => !old)}
+                        title={
+                          showPreview
+                            ? 'Back to edit mode'
+                            : 'Show a preview of the challenge reason'
+                        }
+                      />
+                    </Outset>
+                  </LineStyled>
+                }
                 tooltip="Reason why this claim should be challenged."
                 value={values.reason}
                 onChange={handleChange}

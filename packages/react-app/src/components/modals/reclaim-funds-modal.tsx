@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconCoin } from '@1hive/1hive-ui';
+import { Button, IconCoin, IconCaution, Info } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
@@ -35,6 +35,13 @@ const RowStyled = styled.div`
   align-items: center;
 `;
 
+const OnlyStackholderWarnStyled = styled(Info)`
+  padding: ${GUpx(1)};
+  margin-top: ${GUpx(4)};
+  display: flex;
+  align-items: center;
+`;
+
 // #endregion
 
 type Props = {
@@ -42,6 +49,7 @@ type Props = {
   bounty?: TokenAmountModel | null;
   isDepositReleased: boolean;
   onClose?: ModalCallback;
+  pendingClaims: boolean;
 };
 
 export default function ReclaimFundsModal({
@@ -49,6 +57,7 @@ export default function ReclaimFundsModal({
   bounty,
   onClose = noop,
   isDepositReleased,
+  pendingClaims,
 }: Props) {
   const [opened, setOpened] = useState(false);
   const { setTransaction } = useTransactionContext();
@@ -170,6 +179,15 @@ export default function ReclaimFundsModal({
               </FieldInput>
             </Outset>
           </RowStyled>
+        )}
+        {pendingClaims && (
+          <OnlyStackholderWarnStyled mode="warning">
+            <IconCaution />
+            <Outset>
+              There is pending claim in this quest that has not been executed. Are you sure that you
+              want to empty the bounty pool ?
+            </Outset>
+          </OnlyStackholderWarnStyled>
         )}
       </ModalBase>
     </>

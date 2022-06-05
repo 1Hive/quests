@@ -24,14 +24,23 @@ export const formatIpfsMarkdownLink = (ipfsHash: string, label: string) => {
   return `[${label}](${getIpfsBaseUri()}${ipfsHash})`;
 };
 
-export const pushObjectToIpfs = async (obj: Object): Promise<string> => {
-  const response = await ipfsTheGraph.add(obj.toString());
+export const pushObjectToIpfs = async (obj: Object | string): Promise<string> => {
+  let json;
+  if (!(typeof obj === 'string')) {
+    json = JSON.stringify(obj);
+  } else {
+    json = obj;
+  }
+  const response = await ipfsTheGraph.add(json);
   const cid = response.cid.toString();
   Logger.debug('New IPFS at address', cid);
   return toHex(cid);
 };
 
-export const getObjectFromIpfs = async (objHasHex: string, configOverride?: IPFSHTTPClient) => {
+export async function getObjectFromIpfs<TResult = string>(
+  objHasHex: string,
+  configOverride?: IPFSHTTPClient,
+) {
   // eslint-disable-next-line no-restricted-syntax
   for await (const value of (configOverride ?? ipfsInfura).cat(toAscii(objHasHex))) {
     const decodedSplit = new TextDecoder('utf-8')
@@ -40,24 +49,33 @@ export const getObjectFromIpfs = async (objHasHex: string, configOverride?: IPFS
       .split('\x00')
       .filter((x) => !!x); // Only one result
 
-    return decodedSplit[decodedSplit.length - 1];
+    const ipfsResult = decodedSplit[decodedSplit.length - 1];
+    try {
+      const parsed = JSON.parse(ipfsResult) as TResult;
+      if (typeof parsed === 'object') {
+        return parsed;
+      }
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
+    return ipfsResult; // Return the raw string
   }
   return undefined; // No result
-};
+}
 
 /**
  * This method will go through all IPFS configs until it finds one that works.
  * If no one, will result in a markdown link to the IPFS object.
  */
 export const getObjectFromIpfsSafe = async (evidenceIpfsHash: string) => {
-  let evidence: string | undefined;
+  let ipfsObject: string | Object | undefined;
   try {
-    evidence = await getObjectFromIpfs(evidenceIpfsHash);
+    ipfsObject = await getObjectFromIpfs(evidenceIpfsHash);
   } catch (error: any) {
     Logger.warn(error, 'Failed to get IPFS object when fetching claims');
-    evidence = await getObjectFromIpfs(evidenceIpfsHash, ipfsTheGraph);
+    ipfsObject = await getObjectFromIpfs(evidenceIpfsHash, ipfsTheGraph);
   }
   // If failed to fetch ipfs evidence
-  if (!evidence) evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
-  return evidence;
+  if (!ipfsObject) ipfsObject = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
+  return ipfsObject;
 };

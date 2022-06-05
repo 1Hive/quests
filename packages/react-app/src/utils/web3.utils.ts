@@ -6,6 +6,7 @@ import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { isDesktop, isMobile } from 'react-device-detect';
 import { getProvider } from 'src/ethereum-providers';
+import { TokenModel } from 'src/models/token.model';
 import env from '../environment';
 import { getDefaultChain } from '../local-settings';
 import { Logger } from './logger';
@@ -72,11 +73,11 @@ export function getUseWalletProviders() {
 
 export function getNetworkId(chainId = getDefaultChain()) {
   let key;
-  if (chainId === 1) key = 'mainnet';
-  if (chainId === 3) key = 'ropsten';
-  if (chainId === 4) key = 'rinkeby';
-  if (chainId === 100) key = 'xdai';
-  if (chainId === 1337) key = 'local';
+  if (+chainId === 1) key = 'mainnet';
+  if (+chainId === 3) key = 'ropsten';
+  if (+chainId === 4) key = 'rinkeby';
+  if (+chainId === 100) key = 'gnosis';
+  if (+chainId === 1337) key = 'local';
   if (key) {
     if (env('STAGING')) key += 'Staging';
     return key;
@@ -127,7 +128,15 @@ export function addressesEqualNoSum(first: string, second: string) {
   return first === second;
 }
 
-export function toBigNumber(amount: TokenAmountModel) {
+export function toBigNumber(amount: TokenAmountModel | string | number) {
+  if (typeof amount === 'string' || typeof amount === 'number') {
+    amount = {
+      parsedAmount: +amount,
+      token: {
+        decimals: 18,
+      } as TokenModel,
+    };
+  }
   return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
 

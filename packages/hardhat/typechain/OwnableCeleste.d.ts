@@ -33,6 +33,7 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "createDispute(uint256,bytes)": FunctionFragment;
     "rule(uint256)": FunctionFragment;
+    "getDisputeManager()": FunctionFragment;
     "currentId()": FunctionFragment;
   };
 
@@ -65,6 +66,10 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "rule", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "getDisputeManager",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "currentId", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
@@ -93,6 +98,10 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "rule", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getDisputeManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "currentId", data: BytesLike): Result;
 
   events: {};
@@ -210,6 +219,10 @@ export class OwnableCeleste extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    getDisputeManager(overrides?: CallOverrides): Promise<[string]>;
+
+    "getDisputeManager()"(overrides?: CallOverrides): Promise<[string]>;
+
     currentId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "currentId()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -309,6 +322,10 @@ export class OwnableCeleste extends Contract {
     _disputeId: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
+
+  getDisputeManager(overrides?: CallOverrides): Promise<string>;
+
+  "getDisputeManager()"(overrides?: CallOverrides): Promise<string>;
 
   currentId(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -410,6 +427,10 @@ export class OwnableCeleste extends Contract {
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { subject: string; ruling: BigNumber }>;
 
+    getDisputeManager(overrides?: CallOverrides): Promise<string>;
+
+    "getDisputeManager()"(overrides?: CallOverrides): Promise<string>;
+
     currentId(overrides?: CallOverrides): Promise<BigNumber>;
 
     "currentId()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -502,6 +523,10 @@ export class OwnableCeleste extends Contract {
       _disputeId: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    getDisputeManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getDisputeManager()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     currentId(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -603,6 +628,12 @@ export class OwnableCeleste extends Contract {
     "rule(uint256)"(
       _disputeId: BigNumberish,
       overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    getDisputeManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getDisputeManager()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     currentId(overrides?: CallOverrides): Promise<PopulatedTransaction>;

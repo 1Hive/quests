@@ -219,6 +219,7 @@ contract OwnableCeleste is IArbitrator {
     uint256 private constant DISPUTES_NOT_RULED = 0;
     uint256 private constant DISPUTES_RULING_CHALLENGER = 3;
     uint256 private constant DISPUTES_RULING_SUBMITTER = 4;
+    address private disputeManager;
 
     enum State {
         NOT_DISPUTED,
@@ -248,6 +249,11 @@ contract OwnableCeleste is IArbitrator {
         owner = msg.sender;
         feeToken = _feeToken;
         feeAmount = _feeAmount;
+        disputeManager = address(new DisputeManager(address(this)));
+    }
+
+    function getDisputeManager() external view returns (address) {
+        return disputeManager;
     }
 
     function setOwner(address _owner) public onlyOwner {
@@ -347,5 +353,39 @@ contract OwnableCeleste is IArbitrator {
         )
     {
         return (address(this), feeToken, feeAmount);
+    }
+}
+
+contract DisputeManager {
+    using SafeGovernERC20 for GovernERC20;
+
+    OwnableCeleste celeste;
+
+    constructor(address mockCelesteAddress) public {
+        celeste = OwnableCeleste(mockCelesteAddress);
+    }
+
+    function getDisputeFees() external view returns (GovernERC20, uint256) {
+        (address celeste, GovernERC20 feeToken, uint256 feeAmount) = celeste
+            .getDisputeFees();
+        return (feeToken, feeAmount);
+    }
+
+    function getDispute(uint256 _disputeId)
+        external
+        view
+        returns (
+            address subject,
+            uint8 possibleRulings,
+            OwnableCeleste.State state,
+            uint8 finalRuling,
+            uint256 lastRoundId,
+            uint64 createTermId
+        )
+    {
+        (address subject, OwnableCeleste.State state) = celeste.disputes(
+            _disputeId
+        );
+        return (subject, 0, state, 0, 0, 0);
     }
 }

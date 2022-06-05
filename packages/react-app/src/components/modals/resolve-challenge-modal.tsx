@@ -24,11 +24,11 @@ import { GUpx } from 'src/utils/style.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getNetwork } from 'src/networks';
-import { getObjectFromIpfs, ipfsTheGraph } from 'src/services/ipfs.service';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import Skeleton from 'react-loading-skeleton';
 import { ContainerModel } from 'src/models/govern.model';
+import { sleep } from 'src/utils/common.util';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -112,15 +112,22 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   }, []);
 
   useEffect(() => {
-    const fetchChallengeAndDispute = async (container: ContainerModel) => {
+    const fetchChallengeAndDispute = async (container: ContainerModel, retryCount: number = 2) => {
       const challengeResult = await QuestService.fetchChallenge(container);
       if (!isMountedRef.current) return;
-      if (!challengeResult)
-        throw new Error(`Failed to fetch challenge with container id ${container.id}`);
-      setChallenge(challengeResult);
-      if (challengeResult) {
-        const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
-        setDispute(disputeModel ?? undefined);
+      if (!challengeResult) {
+        if (retryCount > 0) {
+          sleep(1000);
+          await fetchChallengeAndDispute(container, retryCount - 1);
+        } else {
+          throw new Error(`Failed to fetch challenge with container id ${container.id}`);
+        }
+      } else {
+        setChallenge(challengeResult);
+        if (challengeResult) {
+          const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
+          setDispute(disputeModel ?? undefined);
+        }
       }
     };
     if (claim.container) {
@@ -129,7 +136,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   }, [claim.container]);
 
   useEffect(() => {
-    if (dispute?.state)
+    if (dispute?.state !== undefined)
       setRuled(
         dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForChallenger ||
           dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForSubmitter,
@@ -137,10 +144,11 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   }, [dispute?.state]);
 
   useEffect(() => {
-    if (challenge && claim)
+    if (challenge && claim) {
       setIsStackholder(
         challenge.challengerAddress === walletAddress || claim.playerAddress === walletAddress,
       );
+    }
   }, [claim, challenge, walletAddress]);
 
   const resolveChallengeTx = async () => {
@@ -192,11 +200,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   };
 
   const fetchEvidence = async () => {
-    const evidenceResult = claim.evidenceIpfsHash
-      ? await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph)
-      : 'No evidence';
+    const claimInfo = await QuestService.fetchClaimIpfsInfo(claim.claimInfoIpfsHash);
     if (isMountedRef.current) {
-      setEvidence(evidenceResult);
+      setEvidence(claimInfo.evidence);
     }
   };
 
@@ -230,7 +236,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   const finalRuling = useMemo(
     () => (
       <FinalRulingWrapper>
-        {dispute?.state && (
+        {dispute?.state !== undefined && (
           <RulingInfoStyled mode={isRuled ? 'info' : 'warning'}>
             <FinalRulingStyled>
               {isRuled ? (
@@ -238,7 +244,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
               ) : (
                 <>
                   Ruling in progress, please come back later...
-                  {networkId === 'gnosis' ? (
+                  {networkId === 'xdai' ? (
                     <LinkStyled
                       external
                       href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}
@@ -283,31 +289,33 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           />
         </OpenButtonWrapperStyled>
       }
-      buttons={[
-        <Fragment key="warnMessage">
-          {isRuled && !isStackholder && (
-            <OnlyStackholderWarnStyled mode="warning">
-              <IconCaution />
-              <span>Only a stackholder of this challenge may resolve it</span>
-            </OnlyStackholderWarnStyled>
-          )}
-        </Fragment>,
-        <Button
-          key="confirmButton"
-          icon={<IconFlag />}
-          label="Resolve"
-          mode="positive"
-          disabled={!walletAddress || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged}
-          onClick={resolveChallengeTx}
-          title={
-            !isRuled
-              ? 'Need to be ruled in celeste'
-              : !walletAddress
-              ? 'Not ready ...'
-              : 'Publish dispute result'
-          }
-        />,
-      ]}
+      buttons={
+        claim?.state === ENUM_CLAIM_STATE.Challenged && [
+          <Fragment key="warnMessage">
+            {isRuled && !isStackholder && (
+              <OnlyStackholderWarnStyled mode="warning">
+                <IconCaution />
+                <Outset>Only a stakeholder of this challenge should resolve it</Outset>
+              </OnlyStackholderWarnStyled>
+            )}
+          </Fragment>,
+          <Button
+            key="confirmButton"
+            icon={<IconFlag />}
+            label="Resolve"
+            mode="positive"
+            disabled={!walletAddress || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged}
+            onClick={resolveChallengeTx}
+            title={
+              !isRuled
+                ? 'Need to be ruled in celeste'
+                : !walletAddress
+                ? 'Not ready ...'
+                : 'Publish dispute result'
+            }
+          />,
+        ]
+      }
       onClose={closeModal}
       isOpen={opened}
     >

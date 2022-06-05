@@ -2,7 +2,7 @@ import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getDefaultChain } from './local-settings';
 import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel } from './models/network.model';
-import { TOKENS } from './constants';
+import { StableTokens } from './tokens';
 
 type StagingNetworkModel = Partial<NetworkModel> & {
   stagingOf: string;
@@ -16,14 +16,14 @@ export const networks = Object.freeze({
     explorerBase: 'etherscan',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
-    uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+    tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[4].rinkeby.contracts.GovernQueue.address,
     celesteAddress: HardhatDeployement[4].rinkeby.contracts.Celeste.address,
     rpcUri: 'https://rinkeby.infura.io/v3',
     rpcKeyEnvName: 'INFURA_API_KEY',
     isTestNetwork: true,
-    stableTokens: [TOKENS.RinkebyDai, TOKENS.RinkebyTheter],
+    stableTokens: StableTokens.rinkeby,
   },
   rinkebyStaging: {
     stagingOf: 'rinkeby',
@@ -31,18 +31,19 @@ export const networks = Object.freeze({
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby-staging',
   } as StagingNetworkModel,
   gnosis: {
-    networkId: 'gnosis',
+    networkId: 'xdai',
     chainId: 100,
     name: 'gnosis',
     explorerBase: 'blockscout',
-    questsSubgraph: 'TODO',
-    uniswapSubgraph: 'TODO',
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-gnosis',
+    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai',
+    tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/honeyswap-xdai',
     questFactoryAddress: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[100]?.xdai.contracts.GovernQueue.address,
-    celesteAddress: 'TODO',
+    celesteAddress: '0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85',
     rpcUri: 'https://rpc.gnosischain.com/',
     isTestNetwork: false,
-    stableTokens: [TOKENS.Thether, TOKENS.UsdCoin],
+    stableTokens: StableTokens.gnosis,
   } as NetworkModel,
   gnosisStaging: {
     stagingOf: 'gnosis',

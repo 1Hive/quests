@@ -22,7 +22,7 @@ export default async (
     ? { token: args.createDepositToken, amount: args.createDepositAmount }
     : defaultConfig.CreateQuestDeposit[network.name];
   const constructorArguments = [
-    args.governAddress ?? govern,
+    args?.governAddress ?? govern,
     deposit.token,
     ethers.utils.parseEther(deposit.amount.toString()),
     owner,
@@ -34,22 +34,24 @@ export default async (
   });
   await ethers.getContract("QuestFactory", deployResult.address);
 
-  try {
-    console.log("Verifying QuestFactory...");
-    await new Promise((res, rej) => {
-      setTimeout(
-        () =>
-          run("verify:verify", {
-            address: deployResult.address,
-            constructorArguments,
-          })
-            .then(res)
-            .catch(rej),
-        2000
-      ); // Wait for contract to be deployed
-    });
-  } catch (error) {
-    console.error("Failed when verifying the QuestFactory", error);
+  if (network.name === "rinkeby") {
+    try {
+      console.log("Verifying QuestFactory...");
+      await new Promise((res, rej) => {
+        setTimeout(
+          () =>
+            run("verify:verify", {
+              address: deployResult.address,
+              constructorArguments,
+            })
+              .then(res)
+              .catch(rej),
+          2000
+        ); // Wait for contract to be deployed
+      });
+    } catch (error) {
+      console.error("Failed when verifying the QuestFactory", error);
+    }
   }
 
   return deployResult;

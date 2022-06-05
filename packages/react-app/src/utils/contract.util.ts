@@ -8,7 +8,9 @@ import { cacheTokenInfo } from 'src/services/cache.service';
 import ERC20 from '../contracts/ERC20.json';
 import UniswapPair from '../contracts/UniswapPair.json';
 import contractsJson from '../contracts/hardhat_contracts.json';
+import CelesteDisputeManager from '../contracts/CelesteDisputeManager.json';
 import { getNetwork } from '../networks';
+import Celeste from '../contracts/Celeste.json';
 
 let contracts: any;
 const contractMap = new Map<string, Contract>();
@@ -27,9 +29,11 @@ export function getProviderOrSigner(ethersProvider: any, walletAddress?: string)
 function getContractsJson(network?: any) {
   network = network ?? getNetwork();
   return {
-    ...contractsJson[network.chainId][network.name.toLowerCase()].contracts,
+    Celeste, // Only when not rinkeby (hardhat_contracts.json Celeste will override this one only on rinkeby)
+    ...contractsJson[network.chainId][network.networkId].contracts,
     ERC20,
     UniswapPair,
+    CelesteDisputeManager,
   };
 }
 
@@ -116,9 +120,10 @@ export function getUniswapPairContract(pairAddress: string) {
   return getContract('UniswapPair', pairAddress);
 }
 
-export function getCelesteContract() {
+export async function getCelesteDisputeManagerContract() {
   const { celesteAddress } = getNetwork();
-  return getContract('Celeste', celesteAddress);
+  const disputeManagerAddress = await getContract('Celeste', celesteAddress).getDisputeManager();
+  return getContract('CelesteDisputeManager', disputeManagerAddress);
 }
 
 export function getQuestContractInterface() {

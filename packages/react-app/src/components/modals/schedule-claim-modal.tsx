@@ -19,6 +19,7 @@ import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
+import { FaEdit, FaEye } from 'react-icons/fa';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -48,6 +49,26 @@ const WrapperStyled = styled.div`
   align-content: center;
 `;
 
+const LineStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const ButtonLinkStyled = styled(Button)`
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  height: fit-content;
+  color: ${({ theme }: any) => theme.contentSecondary};
+  font-weight: bold;
+  background: transparent;
+  padding-top: 4px;
+`;
+const ContactInformationWrapperStyled = styled.div`
+  width: 406px;
+`;
+
 // #endregion
 
 type Props = {
@@ -67,6 +88,7 @@ export default function ScheduleClaimModal({
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
@@ -134,6 +156,7 @@ export default function ScheduleClaimModal({
         {
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
+          contactInformation: values.contactInformation,
           playerAddress: values.playerAddress ?? walletAddress,
           claimAll: values.claimAll,
           questAddress,
@@ -176,7 +199,7 @@ export default function ScheduleClaimModal({
         <OpenButtonStyled
           icon={<GiBroadsword />}
           onClick={() => setOpened(true)}
-          label="Schedule claim"
+          label="Claim this Quest"
           mode="positive"
           title={!questTotalBounty ? 'Loading ...' : 'Open schedule claim'}
           disabled={!questTotalBounty}
@@ -191,6 +214,7 @@ export default function ScheduleClaimModal({
             evidence: '',
             claimedAmount: { parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel,
             claimAll: false,
+            contactInformation: undefined,
             playerAddress: undefined,
           } as any
         }
@@ -233,12 +257,12 @@ export default function ScheduleClaimModal({
                   <Button
                     key="confirmButton"
                     icon={<GiBroadsword />}
-                    label="Schedule claim"
+                    label="Claim this Quest"
                     mode="positive"
                     type="submit"
                     form="form-claim"
                     className="m-8"
-                    title={!isFormValid ? 'Form not valid' : 'Schedule claim'}
+                    title={!isFormValid ? 'Form not valid' : 'Claim this Quest'}
                     disabled={!isEnoughBalance}
                   />
                 </>
@@ -246,9 +270,27 @@ export default function ScheduleClaimModal({
               steps={[
                 <TextFieldInput
                   id="evidence"
-                  isEdit
-                  label="Evidence of completion"
-                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                  isEdit={!showPreview}
+                  label={
+                    <LineStyled>
+                      Evidence of completion
+                      <Outset horizontal>
+                        <ButtonLinkStyled
+                          size="mini"
+                          icon={showPreview ? <FaEdit /> : <FaEye />}
+                          display="icon"
+                          label={showPreview ? 'Edit' : 'Preview'}
+                          onClick={() => setShowPreview((old) => !old)}
+                          title={
+                            showPreview
+                              ? 'Back to edit mode'
+                              : 'Show a preview of the evidence of completion'
+                          }
+                        />
+                      </Outset>
+                    </LineStyled>
+                  }
+                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future. And make sure to include contact information if you want the Creator to be able to contact you."
                   value={values.evidence}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -304,6 +346,22 @@ export default function ScheduleClaimModal({
                       onChange={handleChange}
                       wide
                     />
+                  </Outset>
+                  <Outset>
+                    <ContactInformationWrapperStyled>
+                      <TextFieldInput
+                        id="contactInformation"
+                        isEdit
+                        label="Contact information (optional)"
+                        tooltip="The necessary contact information that the creator will use to communicate with you."
+                        value={values.contactInformation}
+                        onChange={handleChange}
+                        placeHolder="e.g. discord, email, phone number, etc."
+                        compact
+                        wide
+                        isMarkDown
+                      />
+                    </ContactInformationWrapperStyled>
                   </Outset>
                 </WrapperStyled>,
               ]}

@@ -6,13 +6,12 @@ import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { QuestModel } from 'src/models/quest.model';
 import { useEffect, useMemo, useState } from 'react';
-import { getObjectFromIpfs, ipfsTheGraph } from 'src/services/ipfs.service';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
+import { noop } from 'lodash';
 import { HelpTooltip } from './field-input/help-tooltip';
 import * as QuestService from '../services/quest.service';
 import Claim from './claim';
-import { Outset } from './utils/spacer-util';
 import TextFieldInput from './field-input/text-field-input';
 
 // #region StyledComponents
@@ -39,46 +38,25 @@ const BoxStyled = styled(Box)`
   justify-content: space-around;
 `;
 
+const EvidenceWrapperStyled = styled.div`
+  padding: ${GUpx(2)};
+`;
+
 // #endregion
 
 type Props = {
   questData: QuestModel;
   challengeDeposit: TokenAmountModel;
   isLoading?: boolean;
+  onClaimsFetched?: (_claims: ClaimModel[]) => void;
 };
 
-const EvidenceRender = ({ claim, isLoading }: { claim: ClaimModel; isLoading: boolean }) => {
-  const [evidence, setEvidence] = useState<string>();
-  const isMountedRef = useIsMountedRef();
-
-  useEffect(() => {
-    if (!evidence) fetchEvidence();
-  }, [claim.evidenceIpfsHash, evidence]);
-
-  const fetchEvidence = async () => {
-    const evidenceResult = claim.evidenceIpfsHash
-      ? await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph)
-      : 'No evidence';
-    if (isMountedRef.current) {
-      setEvidence(evidenceResult);
-    }
-  };
-
-  return (
-    <Outset gu16>
-      <TextFieldInput
-        id="evidence"
-        value={evidence}
-        isMarkDown
-        wide
-        label="Evidence of completion"
-        isLoading={isLoading || !evidence}
-      />
-    </Outset>
-  );
-};
-
-export default function ClaimList({ questData, challengeDeposit, isLoading = false }: Props) {
+export default function ClaimList({
+  questData,
+  challengeDeposit,
+  isLoading = false,
+  onClaimsFetched = noop,
+}: Props) {
   const [claims, setClaims] = useState<ClaimModel[]>([]);
   const [loadingClaim, setLoadingClaim] = useState(true);
   const { transaction } = useTransactionContext();
@@ -92,7 +70,9 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
         questData={questData}
         challengeDeposit={challengeDeposit}
       />,
-      <EvidenceRender isLoading claim={fakeClaim} />,
+      <EvidenceWrapperStyled>
+        <TextFieldInput id="evidence" isLoading />
+      </EvidenceWrapperStyled>,
     ];
   }, []);
 
@@ -104,7 +84,23 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
         questData={questData}
         isLoading={isLoading}
       />,
-      <EvidenceRender claim={claim} isLoading={isLoading} />,
+      <EvidenceWrapperStyled>
+        <TextFieldInput
+          id="evidence"
+          value={claim.evidence}
+          isMarkDown
+          wide
+          label="Evidence of completion"
+        />
+        {claim.contactInformation && (
+          <TextFieldInput
+            id="contact"
+            value={claim.contactInformation}
+            wide
+            label="Contact information"
+          />
+        )}
+      </EvidenceWrapperStyled>,
     ]);
     if (loadingClaim) {
       items.unshift(skeletonClaim);
@@ -117,6 +113,10 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
       fetchClaims();
     }
   }, [questData.address]);
+
+  useEffect(() => {
+    onClaimsFetched(claims);
+  }, [claims]);
 
   useEffect(() => {
     // If tx completion impact Claims, update them
@@ -161,7 +161,7 @@ export default function ClaimList({ questData, challengeDeposit, isLoading = fal
         <HelpTooltip tooltip="A claim includes the proof of the quest's completion." />
       </ClaimHeaderStyled>
       {claims?.length || loadingClaim ? (
-        <Accordion items={accordionItems} />
+        <Accordion items={accordionItems} className="accordion-fit-content" />
       ) : (
         <BoxStyled>
           <i>No claims</i>
