@@ -24,7 +24,6 @@ import { GUpx } from 'src/utils/style.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { getNetwork } from 'src/networks';
-import { getObjectFromIpfs, ipfsTheGraph } from 'src/services/ipfs.service';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import Skeleton from 'react-loading-skeleton';
@@ -201,11 +200,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   };
 
   const fetchEvidence = async () => {
-    const evidenceResult = claim.evidenceIpfsHash
-      ? await getObjectFromIpfs(claim.evidenceIpfsHash, ipfsTheGraph)
-      : 'No evidence';
+    const claimInfo = await QuestService.fetchClaimIpfsInfo(claim.claimInfoIpfsHash);
     if (isMountedRef.current) {
-      setEvidence(evidenceResult);
+      setEvidence(claimInfo.evidence);
     }
   };
 

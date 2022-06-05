@@ -150,14 +150,14 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
 }
 
 function decodeClaimAction(payload: PayloadModel) {
-  const [evidenceIpfsHash, playerAddress, claimAmount, claimAll] =
+  const [claimInfoIpfsHash, playerAddress, claimAmount, claimAll] =
     getQuestContractInterface().decodeFunctionData('claim', payload.actions[0].data);
-  return { evidenceIpfsHash, playerAddress, claimAmount, claimAll };
+  return { claimInfoIpfsHash, playerAddress, claimAmount, claimAll };
 }
 
-function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
+function encodeClaimAction(claimData: ClaimModel, claimInfoIpfsHash: string) {
   return getQuestContractInterface().encodeFunctionData('claim', [
-    evidenceIpfsHash,
+    claimInfoIpfsHash,
     claimData.playerAddress,
     toBigNumber(claimData.claimedAmount),
     claimData.claimAll,
@@ -202,12 +202,12 @@ async function generateScheduleContainer(
     lastBlockTimestamp +
     erc3000Config.executionDelay +
     (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
-  const evidenceIpfsHash = await pushObjectToIpfs({
+  const claimInfoIpfsHash = await pushObjectToIpfs({
     evidence: claimData.evidence,
     contactInformation: claimData.contactInformation,
   });
 
-  const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
+  const claimCall = encodeClaimAction(claimData, claimInfoIpfsHash);
 
   return {
     config: erc3000Config,
@@ -224,7 +224,7 @@ async function generateScheduleContainer(
         },
       ],
       allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
-      proof: evidenceIpfsHash,
+      proof: claimInfoIpfsHash,
     },
   } as ContainerModel;
 }
@@ -257,7 +257,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
     res
       .filter((x) => x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase())
       .map(async (container) => {
-        const { evidenceIpfsHash, claimAmount, playerAddress, claimAll } = decodeClaimAction(
+        const { claimInfoIpfsHash, claimAmount, playerAddress, claimAll } = decodeClaimAction(
           container.payload,
         );
 
@@ -270,7 +270,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
             token: tokenModel,
             parsedAmount: fromBigNumber(BigNumber.from(claimAmount), tokenModel?.decimals),
           },
-          evidenceIpfsHash,
+          claimInfoIpfsHash,
           playerAddress,
           questAddress: quest.address,
           state: container.state ? ENUM_CLAIM_STATE[container.state] : undefined,
@@ -279,32 +279,36 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           container,
         } as ClaimModel;
 
-        if (claim.evidenceIpfsHash) {
-          try {
-            const obj = await getObjectFromIpfs<{ evidence: string; contactInformation: string }>(
-              claim.evidenceIpfsHash,
-              ipfsTheGraph,
-            );
-            if (!obj) throw new Error('Ipfs result is undefined');
-
-            if (typeof obj === 'string') {
-              claim.evidence = obj;
-            } else {
-              claim.evidence = obj.evidence;
-              claim.contactInformation = obj.contactInformation;
-            }
-          } catch (error) {
-            claim.evidence = formatIpfsMarkdownLink(evidenceIpfsHash, 'See evidence');
-          }
-        } else {
-          claim.evidence = 'No evidence submited from Player';
-        }
+        const { evidence, contactInformation } = await fetchClaimIpfsInfo(claimInfoIpfsHash);
+        claim.evidence = evidence;
+        claim.contactInformation = contactInformation;
 
         return claim;
       }),
   ).then((claims) =>
     claims.sort((a: ClaimModel, b: ClaimModel) => b.executionTimeMs! - a.executionTimeMs!),
   );
+}
+
+export async function fetchClaimIpfsInfo(claimInfoIpfsHash?: string) {
+  if (claimInfoIpfsHash) {
+    try {
+      const ipfsResult = await getObjectFromIpfs<{ evidence: string; contactInformation: string }>(
+        claimInfoIpfsHash,
+        ipfsTheGraph,
+      );
+      if (!ipfsResult) throw new Error('Ipfs result is undefined');
+
+      if (typeof ipfsResult === 'string') {
+        return { evidence: ipfsResult };
+      }
+      return { evidence: ipfsResult.evidence, contactInformation: ipfsResult.contactInformation };
+    } catch (error) {
+      return { evidence: formatIpfsMarkdownLink(claimInfoIpfsHash, 'See evidence') };
+    }
+  } else {
+    return { evidence: 'No evidence submited from Player' };
+  }
 }
 
 export async function fetchDeposits() {

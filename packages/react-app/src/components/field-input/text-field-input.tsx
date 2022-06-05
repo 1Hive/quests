@@ -97,8 +97,8 @@ export default function TextFieldInput({
                 component: CollapsableBlock,
                 props: {
                   label: 'block',
-                  visible: blockVisibility !== 'hidden',
-                  collapsed: blockVisibility === 'collapsed',
+                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
+                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
                 },
               },
               code: {
@@ -106,8 +106,8 @@ export default function TextFieldInput({
                 props: {
                   label: 'code block',
                   type: 'code',
-                  visible: blockVisibility !== 'hidden',
-                  collapsed: blockVisibility === 'collapsed',
+                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
+                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
                 },
               },
               img: {
@@ -115,8 +115,8 @@ export default function TextFieldInput({
                 props: {
                   label: 'image',
                   type: 'image',
-                  visible: blockVisibility !== 'hidden',
-                  collapsed: blockVisibility === 'collapsed',
+                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
+                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
                 },
               },
               a: {

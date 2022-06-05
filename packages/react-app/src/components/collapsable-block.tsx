@@ -51,6 +51,8 @@ type Props = {
   children: any;
   label?: string;
   visible?: boolean;
+  src?: string;
+  width?: number;
   collapsed?: boolean;
   type?: 'image' | 'code' | 'default';
   alt?: string;
@@ -64,8 +66,10 @@ export function CollapsableBlock(props: Props) {
   useEffect(() => setCollapsed(props.collapsed), [props.collapsed]);
 
   const content = useMemo(() => {
-    // eslint-disable-next-line jsx-a11y/alt-text
-    if (props.type === 'image') return <img {...props} />;
+    if (props.type === 'image') {
+      // eslint-disable-next-line jsx-a11y/alt-text
+      return <img {...props} />;
+    }
     return props.children?.props?.children ? props.children.props.children : props.children;
   }, [props, props.children]);
 
@@ -93,7 +97,7 @@ export function CollapsableBlock(props: Props) {
                 {props.label}
               </LabelStyled>
             </CollapseButtonStyled>
-            {!collapsed && (
+            {!collapsed && props.type !== 'image' && (
               <CopyButtonStyled
                 onClick={() => copyCode(content)}
                 icon={<IconCopy />}
