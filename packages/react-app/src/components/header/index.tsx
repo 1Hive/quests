@@ -32,10 +32,10 @@ const HeaderLayoutContentFlexStyled = styled.div`
   align-items: center;
 `;
 
-const HeaderRightPanelStyled = styled.div`
+const HeaderRightPanelStyled = styled.div<{ compact: boolean }>`
   display: flex;
   align-items: center;
-  margin-right: ${6 * GU}px;
+  margin-right: ${({ compact }) => (compact ? 0 : 6 * GU)}px;
 `;
 
 const BackButtonStyled = styled(BackButton)`
@@ -49,7 +49,6 @@ const BackButtonSpacerStyled = styled.span`
 `;
 
 const HeaderContentStyled = styled.div`
-  flex-grow: 1;
   display: flex;
   justify-content: flex-end;
   margin-left: ${GUpx(2)};
@@ -89,20 +88,22 @@ function Header({ children }: Props) {
           <HeaderTitle />
         </HeaderLayoutContentFlexStyled>
         <HeaderContentStyled>{children}</HeaderContentStyled>
-        <HeaderRightPanelStyled>
+        <HeaderRightPanelStyled compact={below('medium')}>
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
-          <DropDown
-            items={networkNames}
-            selected={networkNames.indexOf(name)}
-            onChange={(i: number) => {
-              changeNetwork(
-                Object.values(networks).find((network) => network.name === networkNames[i])!
-                  .chainId!,
-              );
-              window.location.reload();
-            }}
-          />
+          {!below('medium') && (
+            <DropDown
+              items={networkNames}
+              selected={networkNames.indexOf(name)}
+              onChange={(i: number) => {
+                changeNetwork(
+                  Object.values(networks).find((network) => network.name === networkNames[i])!
+                    .chainId!,
+                );
+                window.location.reload();
+              }}
+            />
+          )}
           {
             // TODO : Restore when light theme is implemented
             /* <ThemeButtonStyled

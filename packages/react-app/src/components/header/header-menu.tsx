@@ -35,9 +35,9 @@ export default function HeaderMenu({ below }: Props) {
   const { walletConnected } = useWallet();
 
   return (
-    <HeaderNavStyled>
-      {!below('medium') && (
-        <>
+    <>
+      {!below('large') && (
+        <HeaderNavStyled>
           <HeaderNavItemStyled
             color={theme.contentSecondary}
             href={
@@ -62,8 +62,8 @@ export default function HeaderMenu({ below }: Props) {
           {walletConnected && (
             <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="normal" />
           )}
-        </>
+        </HeaderNavStyled>
       )}
-    </HeaderNavStyled>
+    </>
   );
 }
