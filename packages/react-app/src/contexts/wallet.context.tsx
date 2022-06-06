@@ -2,7 +2,8 @@ import { providers as EthersProviders } from 'ethers';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { getProviderFromUseWalletId } from 'src/ethereum-providers';
 import { useWallet, UseWalletProvider } from 'use-wallet';
-import { useNetworkContext } from 'src/contexts/network.context';
+import { setCurrentChain } from 'src/local-settings';
+import { getNetwork } from 'src/networks';
 import { getDefaultProvider, getUseWalletConnectors } from '../utils/web3.utils';
 import { EXPECTED_CHAIN_ID } from '../constants';
 
@@ -14,6 +15,7 @@ export type WalletContextModel = {
   activatedId: string;
   activatingId: string;
   activationError: { name: string; message: string };
+  changeNetwork: Function;
 };
 
 const WalletAugmentedContext = React.createContext<WalletContextModel | undefined>(undefined);
@@ -33,7 +35,7 @@ function WalletAugmented({ children }: Props) {
   const [activationError, setActivationError] = useState<{ name: string; message: string }>();
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
-  const { chainId, networkId, name, changeNetwork } = useNetworkContext();
+  const { chainId, networkId, name } = getNetwork();
 
   useEffect(() => {
     const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
@@ -47,9 +49,9 @@ function WalletAugmented({ children }: Props) {
 
     if (ethereum) {
       window.ethereum = ethereum;
-      ethereum?.on('chainChanged', (_chainId: string) => {
-        if (EXPECTED_CHAIN_ID.includes(+_chainId)) {
-          changeNetwork(+_chainId);
+      ethereum?.on('chainChanged', (newChainId: string) => {
+        if (EXPECTED_CHAIN_ID.includes(+newChainId)) {
+          changeNetwork(+newChainId);
         }
         window.location.reload();
       });
@@ -93,6 +95,11 @@ function WalletAugmented({ children }: Props) {
     localStorage.removeItem('LAST_WALLET_CONNECTOR');
     setIsConnected(false);
   };
+
+  const changeNetwork = async (newChainId: number) => {
+    setCurrentChain(newChainId);
+  };
+
   const contextValue = useMemo(
     () => ({
       ...wallet,

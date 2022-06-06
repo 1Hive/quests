@@ -28,7 +28,7 @@ import { TransactionModel } from 'src/models/transaction.model';
 import Skeleton from 'react-loading-skeleton';
 import { ContainerModel } from 'src/models/govern.model';
 import { sleep } from 'src/utils/common.util';
-import { useNetworkContext } from 'src/contexts/network.context';
+import { getNetwork } from 'src/networks';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -96,7 +96,7 @@ type Props = {
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
-  const { networkId } = useNetworkContext();
+  const { networkId } = getNetwork();
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
   const [challenge, setChallenge] = useState<ChallengeModel | null>();

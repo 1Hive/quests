@@ -23,7 +23,7 @@ import { approveTokenTransaction, fundQuestTransaction } from 'src/services/tran
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
-import { useNetworkContext } from 'src/contexts/network.context';
+import { getNetwork } from 'src/networks';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -90,7 +90,7 @@ export default function QuestModal({
   const [showPreview, setShowPreview] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
   const { walletAddress } = useWallet();
-  const { questFactoryAddress } = useNetworkContext();
+  const { questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();

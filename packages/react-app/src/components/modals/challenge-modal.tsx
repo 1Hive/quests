@@ -18,7 +18,7 @@ import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
-import { useNetworkContext } from 'src/contexts/network.context';
+import { getNetwork } from 'src/networks';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -104,7 +104,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const challengeTx = async (values: Partial<ChallengeModel>) => {
     if (isFormValid) {
       try {
-        const { governQueueAddress } = useNetworkContext();
+        const { governQueueAddress } = getNetwork();
         if (
           challengeFee?.parsedAmount &&
           (!isFeeDepositSameToken || !+claim.container!.config.challengeDeposit.amount)

@@ -22,7 +22,7 @@ import { useThemeContext } from 'src/contexts/theme.context';
 import { ThemeInterface } from 'src/styles/theme';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
-import { useNetworkContext } from 'src/contexts/network.context';
+import { getNetwork } from 'src/networks';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -87,7 +87,7 @@ export default function QuestList() {
   const { transaction } = useTransactionContext();
   const { setPage } = usePageContext();
   const isMountedRef = useIsMountedRef();
-  const network = useNetworkContext();
+  const network = getNetwork();
 
   const skeletonQuests: any[] = useMemo(() => {
     const fakeQuests = [];

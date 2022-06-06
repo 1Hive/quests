@@ -5,11 +5,11 @@ import { usePageContext } from 'src/contexts/page.context';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
 import React, { useMemo } from 'react';
-import { useNetworkContext } from 'src/contexts/network.context';
+import { useWallet } from 'src/contexts/wallet.context';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
-import { networks } from '../../networks';
+import { getNetwork, networks } from '../../networks';
 
 // #region StyledComponents
 const HeaderWraperStyled = styled.header`
@@ -66,7 +66,8 @@ function Header({ children }: Props) {
   const { page } = usePageContext();
   const { below } = useViewport();
   const layoutSmall = below('medium');
-  const { name, changeNetwork } = useNetworkContext();
+  const { name } = getNetwork();
+  const { changeNetwork } = useWallet();
 
   const networkNames = useMemo(
     () =>

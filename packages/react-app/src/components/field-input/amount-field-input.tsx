@@ -16,7 +16,7 @@ import styled from 'styled-components';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TOKENS } from 'src/tokens';
-import { useNetworkContext } from 'src/contexts/network.context';
+import { getNetwork } from 'src/networks';
 import { FieldInput } from './field-input';
 import { ConditionalWrapper } from '../utils/util';
 
@@ -107,7 +107,7 @@ const TokenAmountBadge = React.memo(
     amount,
     usdValue,
   }: TokenBadgeProp) => {
-    const { isTestNetwork } = useNetworkContext();
+    const { isTestNetwork } = getNetwork();
     const copyCode = useCopyToClipboard();
     const label = useMemo(() => {
       let temp = '';
@@ -197,7 +197,7 @@ function AmountFieldInput({
   error,
 }: Props) {
   const isMountedRef = useIsMountedRef();
-  const { networkId } = useNetworkContext();
+  const { networkId } = getNetwork();
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount);
