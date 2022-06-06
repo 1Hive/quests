@@ -173,61 +173,63 @@ function AccountModule({ compact = false }: Props) {
           display={compact ? 'icon' : 'all'}
         />
       )}
-      <HeaderPopover
-        animateHeight={animate}
-        // heading={screen.title}
-        height={screen.height}
-        width={41 * GU}
-        onClose={handlePopoverClose}
-        opener={buttonRef.current}
-        visible={opened}
-      >
-        {/* @ts-ignore */}
-        <div ref={popoverFocusElement} tabIndex="0" css="outline: 0">
-          <Transition
-            native
-            immediate={!animate}
-            config={springs.smooth}
-            items={{
-              screen,
-              activatingId: wallet.activatingId,
-              wallet,
-            }}
-            keys={({ screen }) => screen.id + activatingDelayed}
-            from={{
-              opacity: 0,
-              transform: `translate3d(${3 * GU * direction}px, 0, 0)`,
-            }}
-            enter={{ opacity: 1, transform: 'translate3d(0, 0, 0)' }}
-            leave={{
-              opacity: 0,
-              transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
-            }}
-          >
-            {({ screen, activatingId, wallet }) =>
-              ({ opacity, transform }: any) =>
-                (
-                  <AnimatedDivStyled style={{ opacity, transform }}>
-                    {(() => {
-                      if (screen.id === 'connecting') {
-                        return (
-                          <AccountModuleConnectingScreen
-                            providerId={activatingId}
-                            onCancel={handleCancelConnection}
-                          />
-                        );
-                      }
-                      if (screen.id === 'connected') {
-                        return <AccountScreenConnected wallet={wallet} />;
-                      }
+      {!wallet.isWrongNetwork && (
+        <HeaderPopover
+          animateHeight={animate}
+          // heading={screen.title}
+          height={screen.height}
+          width={41 * GU}
+          onClose={handlePopoverClose}
+          opener={buttonRef.current}
+          visible={opened}
+        >
+          {/* @ts-ignore */}
+          <div ref={popoverFocusElement} tabIndex="0" css="outline: 0">
+            <Transition
+              native
+              immediate={!animate}
+              config={springs.smooth}
+              items={{
+                screen,
+                activatingId: wallet.activatingId,
+                wallet,
+              }}
+              keys={({ screen }) => screen.id + activatingDelayed}
+              from={{
+                opacity: 0,
+                transform: `translate3d(${3 * GU * direction}px, 0, 0)`,
+              }}
+              enter={{ opacity: 1, transform: 'translate3d(0, 0, 0)' }}
+              leave={{
+                opacity: 0,
+                transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
+              }}
+            >
+              {({ screen, activatingId, wallet }) =>
+                ({ opacity, transform }: any) =>
+                  (
+                    <AnimatedDivStyled style={{ opacity, transform }}>
+                      {(() => {
+                        if (screen.id === 'connecting') {
+                          return (
+                            <AccountModuleConnectingScreen
+                              providerId={activatingId}
+                              onCancel={handleCancelConnection}
+                            />
+                          );
+                        }
+                        if (screen.id === 'connected') {
+                          return <AccountScreenConnected wallet={wallet} />;
+                        }
 
-                      return <ScreenProviders onActivate={activate} />;
-                    })()}
-                  </AnimatedDivStyled>
-                )}
-          </Transition>
-        </div>
-      </HeaderPopover>
+                        return <ScreenProviders onActivate={activate} />;
+                      })()}
+                    </AnimatedDivStyled>
+                  )}
+            </Transition>
+          </div>
+        </HeaderPopover>
+      )}
     </AccountWrapperStyled>
   );
 }
