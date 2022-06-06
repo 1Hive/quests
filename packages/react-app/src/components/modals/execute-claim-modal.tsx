@@ -38,6 +38,10 @@ const OnlyStackholderWarnStyled = styled(Info)`
   align-items: center;
 `;
 
+const WarningIconContainerStyled = styled.div`
+  width: 32px;
+`;
+
 // #endregion
 
 type Props = {
@@ -154,13 +158,18 @@ export default function ExecuteClaimModal({
           <AmountFieldInput id="bounty" label="Claim amount" value={amount} />
           <AddressFieldInput
             id="playerAddress"
-            label="will be sent to"
+            label="will be sent to (Player)"
             value={claim.playerAddress}
           />
           {!compareCaseInsensitive(claim.playerAddress, walletAddress) && (
             <OnlyStackholderWarnStyled mode="warning">
-              <IconCaution />
-              <Outset>Consider contact the player after executing this Claim</Outset>
+              <WarningIconContainerStyled>
+                <IconCaution />
+              </WarningIconContainerStyled>
+              <Outset>
+                Anyone can execute this claim. If you didn&apos;t create the claim, consider
+                contacting the Player when executing to let them know they got their funds.
+              </Outset>
             </OnlyStackholderWarnStyled>
           )}
         </Outset>
