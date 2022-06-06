@@ -78,7 +78,7 @@ export function TransactionProgressComponent() {
         {transaction?.hash && (
           <TransactionBadge
             transaction={transaction.hash}
-            explorerProvider={network.explorerBase}
+            explorerProvider={network.explorer}
             networkType={network.networkId}
           />
         )}

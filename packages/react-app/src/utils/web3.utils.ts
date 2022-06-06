@@ -163,5 +163,19 @@ export function getRpcUrl(chainId?: number) {
   return `${rpcUri}${rpcKeyEnvName ? `/${env(rpcKeyEnvName)}` : ''}`;
 }
 
+export function getExplorerUrl(chainId?: number) {
+  const { explorer } = getNetwork(chainId);
+  switch (explorer) {
+    case 'etherscan':
+      return 'https://rinkeby.etherscan.io';
+    case 'blockscout':
+      return 'https://blockscout.com/xdai/mainnet/';
+    case 'polygonscan':
+      return 'https://polygonscan.com';
+    default:
+      return '';
+  }
+}
+
 // Re-export some web3-utils functions
 export { isAddress, soliditySha3, toBN, toHex, toUtf8, toChecksumAddress } from 'web3-utils';

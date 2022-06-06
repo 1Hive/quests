@@ -54,6 +54,10 @@ const HeaderContentStyled = styled.div`
   margin-left: ${GUpx(2)};
 `;
 
+const NetworkSelectorStyled = styled(DropDown)`
+  border-color: ${({ borderColor }: any) => borderColor};
+`;
+
 // #endregion
 
 type Props = {
@@ -93,7 +97,8 @@ function Header({ children }: Props) {
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
           {!below('medium') && (
-            <DropDown
+            <NetworkSelectorStyled
+              borderColor={theme.border}
               items={networkNames}
               selected={networkNames.indexOf(name)}
               onChange={(i: number) => {
@@ -101,7 +106,7 @@ function Header({ children }: Props) {
                   Object.values(networks).find((network) => network.name === networkNames[i])!
                     .chainId!,
                 );
-                window.location.reload();
+                // window.location.reload();
               }}
             />
           )}

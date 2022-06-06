@@ -264,7 +264,8 @@ function AmountFieldInput({
   };
 
   const fetchAvailableTokens = async () => {
-    const networkDefaultTokens = (Object.values(TOKENS[networkId]) as TokenModel[]) ?? [];
+    const networkDefaultTokens =
+      Object.values<TokenModel>(TOKENS[networkId]).filter((x) => !!x.token) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
     if (isMountedRef.current) {
       setAvailableTokens(
