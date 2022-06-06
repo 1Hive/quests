@@ -5,8 +5,6 @@ import { FilterModel } from 'src/models/filter.model';
 import { getNetwork } from 'src/networks';
 import { msToSec } from 'src/utils/date.utils';
 
-const { questsSubgraph } = getNetwork();
-
 const QuestEntityQuery = gql`
   query questEntity($ID: String) {
     questEntity(id: $ID, subgraphError: allow) {
@@ -84,16 +82,19 @@ const QuestEntitiesLight = gql`
   }
 `;
 
-export const fetchQuestEnity = (questAddress: string) =>
-  request(questsSubgraph, QuestEntityQuery, {
+export const fetchQuestEnity = (questAddress: string) => {
+  const { questsSubgraph } = getNetwork();
+  return request(questsSubgraph, QuestEntityQuery, {
     ID: questAddress.toLowerCase(), // Subgraph address are stored lowercase
   }).then((res) => res.questEntity);
+};
 
 export const fetchQuestEntities = async (
   currentIndex: number,
   count: number,
   filter: FilterModel,
 ) => {
+  const { questsSubgraph } = getNetwork();
   let expireTimeLowerMs = 0;
   let expireTimeUpperMs = GQL_MAX_INT_MS;
   if (filter.status === ENUM_QUEST_STATE.Active) {
@@ -115,12 +116,16 @@ export const fetchQuestEntities = async (
   return res.questEntities;
 };
 
-export const fetchQuestRewardTokens = () =>
-  request(questsSubgraph, QuestRewardTokens, { first: 100 }).then((res) =>
+export const fetchQuestRewardTokens = () => {
+  const { questsSubgraph } = getNetwork();
+  return request(questsSubgraph, QuestRewardTokens, { first: 100 }).then((res) =>
     res.questEntities.map((quest: any) => quest.questRewardTokenAddress),
   );
+};
 
-export const fetchActiveQuestEntitiesLight = () =>
-  request(questsSubgraph, QuestEntitiesLight, {
+export const fetchActiveQuestEntitiesLight = () => {
+  const { questsSubgraph } = getNetwork();
+  return request(questsSubgraph, QuestEntitiesLight, {
     expireTimeLower: msToSec(Date.now()),
   });
+};

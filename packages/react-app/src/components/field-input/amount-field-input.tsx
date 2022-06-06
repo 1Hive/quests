@@ -5,7 +5,6 @@ import { noop } from 'lodash-es';
 import React, { ReactNode, useEffect, useState, useRef, Fragment, useMemo } from 'react';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
-import { getNetwork } from 'src/networks';
 import { fetchRewardTokens } from 'src/services/quest.service';
 import { arrayDistinctBy } from 'src/utils/array.util';
 import { getTokenInfo } from 'src/utils/contract.util';
@@ -17,6 +16,7 @@ import styled from 'styled-components';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard.hook';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TOKENS } from 'src/tokens';
+import { getNetwork } from 'src/networks';
 import { FieldInput } from './field-input';
 import { ConditionalWrapper } from '../utils/util';
 
@@ -264,7 +264,8 @@ function AmountFieldInput({
   };
 
   const fetchAvailableTokens = async () => {
-    const networkDefaultTokens = (Object.values(TOKENS[networkId]) as TokenModel[]) ?? [];
+    const networkDefaultTokens =
+      Object.values<TokenModel>(TOKENS[networkId]).filter((x) => !!x.token) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
     if (isMountedRef.current) {
       setAvailableTokens(

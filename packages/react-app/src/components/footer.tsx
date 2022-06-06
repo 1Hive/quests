@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
-import { getNetwork } from 'src/networks';
 import { useEffect, useState } from 'react';
+import { getNetwork } from 'src/networks';
 import QuestModal from './modals/create-quest-modal';
 import { GenericTooltip } from './field-input/generic-tooltip';
 

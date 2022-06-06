@@ -1,9 +1,11 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable no-shadow */
 import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
+import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
@@ -11,7 +13,6 @@ import HeaderPopover from '../header/header-popover';
 import AccountButton from './account-button';
 import AccountScreenConnected from './screen-connected';
 import AccountModuleConnectingScreen from './screen-connecting';
-import AccountModuleErrorScreen from './screen-error';
 import ScreenProviders from './screen-providers';
 
 const AccountWrapperStyled = styled.div`
@@ -19,6 +20,7 @@ const AccountWrapperStyled = styled.div`
   align-items: center;
   justify-content: space-around;
   outline: 0;
+  margin-right: ${GUpx(2)};
 `;
 
 const AnimatedDivStyled = styled(animated.div)`
@@ -96,7 +98,7 @@ function AccountModule({ compact = false }: Props) {
 
   // Always show the “connecting…” screen, even if there are no delay
   useEffect(() => {
-    if (wallet.activationError) {
+    if (wallet.isWrongNetwork) {
       setActivatingDelayed(undefined);
     }
 
@@ -112,16 +114,12 @@ function AccountModule({ compact = false }: Props) {
     return () => {
       clearTimeout(timer);
     };
-  }, [activatingId, wallet.activationError]);
+  }, [activatingId, wallet.isWrongNetwork]);
 
   const previousScreenIndex = useRef(-1);
 
   const { screenIndex, direction } = useMemo(() => {
     const screenId = (() => {
-      if (wallet.activationError) {
-        setButtonLabel(wallet.activationError.name);
-        return 'error';
-      }
       if (activatingDelayed) {
         setButtonLabel('Connecting...');
         return 'connecting';
@@ -138,7 +136,7 @@ function AccountModule({ compact = false }: Props) {
     previousScreenIndex.current = screenIndex;
 
     return { direction, screenIndex };
-  }, [walletAddress, wallet.activationError, activatingDelayed]);
+  }, [walletAddress, activatingDelayed]);
 
   const screen = SCREENS[screenIndex];
   const screenId = screen.id;
@@ -162,7 +160,9 @@ function AccountModule({ compact = false }: Props) {
 
   return (
     <AccountWrapperStyled ref={buttonRef}>
-      {screen.id === 'connected' ? (
+      {wallet.isWrongNetwork ? (
+        <Button label="Switch network" onClick={() => wallet.changeNetwork()} mode="strong" />
+      ) : screen.id === 'connected' ? (
         <AccountButton onClick={toggle} />
       ) : (
         <Button
@@ -173,69 +173,63 @@ function AccountModule({ compact = false }: Props) {
           display={compact ? 'icon' : 'all'}
         />
       )}
+      {!wallet.isWrongNetwork && (
+        <HeaderPopover
+          animateHeight={animate}
+          // heading={screen.title}
+          height={screen.height}
+          width={41 * GU}
+          onClose={handlePopoverClose}
+          opener={buttonRef.current}
+          visible={opened}
+        >
+          {/* @ts-ignore */}
+          <div ref={popoverFocusElement} tabIndex="0" css="outline: 0">
+            <Transition
+              native
+              immediate={!animate}
+              config={springs.smooth}
+              items={{
+                screen,
+                activatingId: wallet.activatingId,
+                wallet,
+              }}
+              keys={({ screen }) => screen.id + activatingDelayed}
+              from={{
+                opacity: 0,
+                transform: `translate3d(${3 * GU * direction}px, 0, 0)`,
+              }}
+              enter={{ opacity: 1, transform: 'translate3d(0, 0, 0)' }}
+              leave={{
+                opacity: 0,
+                transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
+              }}
+            >
+              {({ screen, activatingId, wallet }) =>
+                ({ opacity, transform }: any) =>
+                  (
+                    <AnimatedDivStyled style={{ opacity, transform }}>
+                      {(() => {
+                        if (screen.id === 'connecting') {
+                          return (
+                            <AccountModuleConnectingScreen
+                              providerId={activatingId}
+                              onCancel={handleCancelConnection}
+                            />
+                          );
+                        }
+                        if (screen.id === 'connected') {
+                          return <AccountScreenConnected wallet={wallet} />;
+                        }
 
-      <HeaderPopover
-        animateHeight={animate}
-        // heading={screen.title}
-        height={screen.height}
-        width={41 * GU}
-        onClose={handlePopoverClose}
-        opener={buttonRef.current}
-        visible={opened}
-      >
-        {/* @ts-ignore */}
-        <div ref={popoverFocusElement} tabIndex="0" css="outline: 0">
-          <Transition
-            native
-            immediate={!animate}
-            config={springs.smooth}
-            items={{
-              screen,
-              activatingId: wallet.activatingId,
-              wallet,
-            }}
-            keys={({ screen }) => screen.id + activatingDelayed}
-            from={{
-              opacity: 0,
-              transform: `translate3d(${3 * GU * direction}px, 0, 0)`,
-            }}
-            enter={{ opacity: 1, transform: 'translate3d(0, 0, 0)' }}
-            leave={{
-              opacity: 0,
-              transform: `translate3d(${3 * GU * -direction}px, 0, 0)`,
-            }}
-          >
-            {({ screen, activatingId, wallet }) =>
-              ({ opacity, transform }: any) =>
-                (
-                  <AnimatedDivStyled style={{ opacity, transform }}>
-                    {(() => {
-                      if (screen.id === 'connecting') {
-                        return (
-                          <AccountModuleConnectingScreen
-                            providerId={activatingId}
-                            onCancel={handleCancelConnection}
-                          />
-                        );
-                      }
-                      if (screen.id === 'connected') {
-                        return <AccountScreenConnected wallet={wallet} />;
-                      }
-                      if (screen.id === 'error') {
-                        return (
-                          <AccountModuleErrorScreen
-                            error={wallet.activationError}
-                            onBack={() => wallet.deactivateWallet()}
-                          />
-                        );
-                      }
-                      return <ScreenProviders onActivate={activate} />;
-                    })()}
-                  </AnimatedDivStyled>
-                )}
-          </Transition>
-        </div>
-      </HeaderPopover>
+                        return <ScreenProviders onActivate={activate} />;
+                      })()}
+                    </AnimatedDivStyled>
+                  )}
+            </Transition>
+          </div>
+        </HeaderPopover>
+      )}
     </AccountWrapperStyled>
   );
 }

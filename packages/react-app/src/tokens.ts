@@ -2,6 +2,11 @@ import { TokenModel } from './models/token.model';
 
 export const TOKENS = Object.freeze({
   xdai: {
+    native: {
+      name: 'xDai',
+      symbol: 'XDAI',
+      decimals: 18,
+    } as TokenModel,
     Dai: {
       name: 'Dai Stablecoin',
       symbol: 'DAI',
@@ -28,6 +33,11 @@ export const TOKENS = Object.freeze({
     } as TokenModel,
   },
   rinkeby: {
+    native: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    } as TokenModel,
     HoneyTest: {
       name: 'HoneyTest',
       symbol: 'HNYT',

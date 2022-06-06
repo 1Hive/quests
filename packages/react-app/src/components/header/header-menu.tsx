@@ -35,21 +35,23 @@ export default function HeaderMenu({ below }: Props) {
   const { walletConnected } = useWallet();
 
   return (
-    <HeaderNavStyled>
+    <>
       {!below('medium') && (
-        <>
-          <HeaderNavItemStyled
-            color={theme.contentSecondary}
-            href={
-              networkId === 'rinkeby'
-                ? 'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'
-                : 'https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9'
-            }
-            external
-          >
-            <span>Get Honey</span>
-            <IconExternal />
-          </HeaderNavItemStyled>
+        <HeaderNavStyled>
+          {!below('large') && (
+            <HeaderNavItemStyled
+              color={theme.contentSecondary}
+              href={
+                networkId === 'rinkeby'
+                  ? 'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'
+                  : 'https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9'
+              }
+              external
+            >
+              <span>Get Honey</span>
+              <IconExternal />
+            </HeaderNavItemStyled>
+          )}
           <HeaderNavItemStyled
             href="https://wiki.1hive.org/projects/quests"
             external
@@ -62,8 +64,8 @@ export default function HeaderMenu({ below }: Props) {
           {walletConnected && (
             <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="normal" />
           )}
-        </>
+        </HeaderNavStyled>
       )}
-    </HeaderNavStyled>
+    </>
   );
 }

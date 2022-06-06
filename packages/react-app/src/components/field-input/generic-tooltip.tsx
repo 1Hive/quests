@@ -51,12 +51,6 @@ export const GenericTooltip = ({ tooltip, children, label }: Props) => {
 
   const isMountedRef = useIsMountedRef();
 
-  // TODO Click need be used to Mobile?
-  // const handleClick = (e: Event) => {
-  //   e.stopPropagation();
-  //   setVisible(true);
-  // };
-
   const showDelayed = () => {
     setIsHover(true);
     setTimeout(() => {
@@ -78,7 +72,6 @@ export const GenericTooltip = ({ tooltip, children, label }: Props) => {
       onMouseEnter={() => showDelayed()}
       ref={buttonElement}
       theme={theme}
-      // onClick={handleClick} // TODO Click need be used to Mobile?
       onMouseLeave={() => closeImediatly()}
     >
       <>

@@ -12,7 +12,6 @@ import {
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
-import { getNetwork } from 'src/networks';
 import { Form, Formik, FormikErrors } from 'formik';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { toChecksumAddress } from 'web3-utils';
@@ -24,6 +23,7 @@ import { approveTokenTransaction, fundQuestTransaction } from 'src/services/tran
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
+import { getNetwork } from 'src/networks';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';

@@ -1,13 +1,15 @@
-import { BackButton, GU, useTheme, useViewport } from '@1hive/1hive-ui';
+import { BackButton, GU, useTheme, useViewport, DropDown } from '@1hive/1hive-ui';
 import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useWallet } from 'src/contexts/wallet.context';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
+import { getNetwork, networks } from '../../networks';
 
 // #region StyledComponents
 const HeaderWraperStyled = styled.header`
@@ -30,10 +32,10 @@ const HeaderLayoutContentFlexStyled = styled.div`
   align-items: center;
 `;
 
-const HeaderRightPanelStyled = styled.div`
+const HeaderRightPanelStyled = styled.div<{ compact: boolean }>`
   display: flex;
   align-items: center;
-  margin-right: ${6 * GU}px;
+  margin-right: ${({ compact }) => (compact ? 0 : 6 * GU)}px;
 `;
 
 const BackButtonStyled = styled(BackButton)`
@@ -47,10 +49,13 @@ const BackButtonSpacerStyled = styled.span`
 `;
 
 const HeaderContentStyled = styled.div`
-  flex-grow: 1;
   display: flex;
   justify-content: flex-end;
   margin-left: ${GUpx(2)};
+`;
+
+const NetworkSelectorStyled = styled(DropDown)`
+  border-color: ${({ borderColor }: any) => borderColor};
 `;
 
 // #endregion
@@ -65,6 +70,16 @@ function Header({ children }: Props) {
   const { page } = usePageContext();
   const { below } = useViewport();
   const layoutSmall = below('medium');
+  const { name } = getNetwork();
+  const { changeNetwork } = useWallet();
+
+  const networkNames = useMemo(
+    () =>
+      Object.values(networks)
+        .filter((network) => !(network as any).stagingOf && network.networkId !== 'local')
+        .map((network) => network.name), // Skip staging networks
+    [networks],
+  );
 
   return (
     <HeaderWraperStyled theme={theme}>
@@ -78,9 +93,23 @@ function Header({ children }: Props) {
           <HeaderTitle />
         </HeaderLayoutContentFlexStyled>
         <HeaderContentStyled>{children}</HeaderContentStyled>
-        <HeaderRightPanelStyled>
+        <HeaderRightPanelStyled compact={below('medium')}>
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
+          {!below('medium') && (
+            <NetworkSelectorStyled
+              borderColor={theme.border}
+              items={networkNames}
+              selected={networkNames.indexOf(name)}
+              onChange={(i: number) => {
+                changeNetwork(
+                  Object.values(networks).find((network) => network.name === networkNames[i])!
+                    .chainId!,
+                );
+                // window.location.reload();
+              }}
+            />
+          )}
           {
             // TODO : Restore when light theme is implemented
             /* <ThemeButtonStyled
