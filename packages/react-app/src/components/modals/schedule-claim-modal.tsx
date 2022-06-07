@@ -2,7 +2,6 @@
 import { Button } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo } from 'react';
-import { GiBroadsword } from 'react-icons/gi';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { ENUM_TRANSACTION_STATUS, ENUM, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
@@ -19,7 +18,7 @@ import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
-import { FaEdit, FaEye } from 'react-icons/fa';
+import { FaEdit, FaEye, FaMoneyBillWave } from 'react-icons/fa';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -197,11 +196,11 @@ export default function ScheduleClaimModal({
       title="Schedule a Quest claim"
       openButton={
         <OpenButtonStyled
-          icon={<GiBroadsword />}
+          icon={<FaMoneyBillWave />}
           onClick={() => setOpened(true)}
-          label="Claim this Quest"
+          label="Claim Quest"
           mode="positive"
-          title={!questTotalBounty ? 'Loading ...' : 'Open schedule claim'}
+          title={!questTotalBounty ? 'Loading ...' : 'Open Quest claim'}
           disabled={!questTotalBounty}
         />
       }
@@ -256,13 +255,13 @@ export default function ScheduleClaimModal({
                   />
                   <Button
                     key="confirmButton"
-                    icon={<GiBroadsword />}
-                    label="Claim this Quest"
+                    icon={<FaMoneyBillWave />}
+                    label="Claim Quest"
                     mode="positive"
                     type="submit"
                     form="form-claim"
                     className="m-8"
-                    title={!isFormValid ? 'Form not valid' : 'Claim this Quest'}
+                    title={!isFormValid ? 'Form not valid' : 'Claim Quest'}
                     disabled={!isEnoughBalance}
                   />
                 </>
@@ -290,7 +289,7 @@ export default function ScheduleClaimModal({
                       </Outset>
                     </LineStyled>
                   }
-                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future. And make sure to include contact information if you want the Creator to be able to contact you."
+                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future. Also make sure to include contact information if you want the Creator to be able to communicate with you."
                   value={values.evidence}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -327,7 +326,7 @@ export default function ScheduleClaimModal({
                       id="claimedAmount"
                       isEdit
                       label="Claim amount"
-                      tooltip="The expected amount to claim considering the Quest agreement. Check all bounty if you want to claim all available bounty at the moment the claim is executed."
+                      tooltip='The expected amount to claim considering the Quest agreement. Check "Claim All" if you want to claim all available bounty at the moment the claim is executed.'
                       value={values.claimAll ? questTotalBounty : values.claimedAmount}
                       error={touched.claimedAmount && (errors.claimedAmount as string)}
                       disabled={values.claimAll}
@@ -339,7 +338,7 @@ export default function ScheduleClaimModal({
                       id="playerAddress"
                       label="Player address"
                       value={values.playerAddress ?? walletAddress}
-                      tooltip="Usually is the connected wallet but it can also be set to another address."
+                      tooltip="Usually set to the connected wallet but it can also be set to another address."
                       error={touched.playerAddress && errors.playerAddress}
                       onBlur={handleBlur}
                       isEdit
