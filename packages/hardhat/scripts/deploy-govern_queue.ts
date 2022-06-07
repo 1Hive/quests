@@ -19,11 +19,15 @@ export function generateQueueConfig(args: {
     executionDelay: args.executionDelay,
     scheduleDeposit: {
       token: args.scheduleDepositToken,
-      amount: ethers.utils.parseEther(args.scheduleDepositAmount.toString()),
+      amount: ethers.utils
+        .parseEther(args.scheduleDepositAmount.toString())
+        .toString(),
     },
     challengeDeposit: {
       token: args.challengeDepositToken,
-      amount: ethers.utils.parseEther(args.challengeDepositAmount.toString()),
+      amount: ethers.utils
+        .parseEther(args.challengeDepositAmount.toString())
+        .toString(),
     },
     resolver: args.resolver,
     rules: args.rules,

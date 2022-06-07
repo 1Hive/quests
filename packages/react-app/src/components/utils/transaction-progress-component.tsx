@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
-import { getNetwork } from 'src/networks';
 import { GUpx } from 'src/utils/style.util';
+import { getNetwork } from 'src/networks';
 import QuestLogo from '../../assets/quest-logo';
 import { Outset } from './spacer-util';
 
@@ -78,7 +78,7 @@ export function TransactionProgressComponent() {
         {transaction?.hash && (
           <TransactionBadge
             transaction={transaction.hash}
-            explorerProvider={network.explorerBase}
+            explorerProvider={network.explorer}
             networkType={network.networkId}
           />
         )}

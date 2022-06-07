@@ -6,8 +6,9 @@ import { getNetwork } from 'src/networks';
 import Web3 from 'web3';
 import { isDesktop, isMobile } from 'react-device-detect';
 import { getProvider } from 'src/ethereum-providers';
+import { TokenModel } from 'src/models/token.model';
 import env from '../environment';
-import { getDefaultChain } from '../local-settings';
+import { getCurrentChain } from '../local-settings';
 import { Logger } from './logger';
 
 const DEFAULT_LOCAL_CHAIN = 'custom';
@@ -70,13 +71,13 @@ export function getUseWalletProviders() {
   return providers as any[];
 }
 
-export function getNetworkId(chainId = getDefaultChain()) {
+export function getNetworkId(chainId = getCurrentChain()) {
   let key;
-  if (chainId === 1) key = 'mainnet';
-  if (chainId === 3) key = 'ropsten';
-  if (chainId === 4) key = 'rinkeby';
-  if (chainId === 100) key = 'xdai';
-  if (chainId === 1337) key = 'local';
+  if (+chainId === 1) key = 'mainnet';
+  if (+chainId === 3) key = 'ropsten';
+  if (+chainId === 4) key = 'rinkeby';
+  if (+chainId === 100) key = 'gnosis';
+  if (+chainId === 1337) key = 'local';
   if (key) {
     if (env('STAGING')) key += 'Staging';
     return key;
@@ -85,7 +86,7 @@ export function getNetworkId(chainId = getDefaultChain()) {
   return DEFAULT_LOCAL_CHAIN;
 }
 
-export function isLocalOrUnknownNetwork(chainId = getDefaultChain()) {
+export function isLocalOrUnknownNetwork(chainId = getCurrentChain()) {
   return chainId === 1337 || getNetworkId(chainId) === DEFAULT_LOCAL_CHAIN;
 }
 
@@ -98,7 +99,7 @@ export function getUseWalletConnectors() {
   }, {});
 }
 
-export function getNetworkName(chainId = getDefaultChain()) {
+export function getNetworkName(chainId = getCurrentChain()) {
   const chainIdStr = String(chainId);
 
   if (chainIdStr === '1') return 'Mainnet';
@@ -127,7 +128,15 @@ export function addressesEqualNoSum(first: string, second: string) {
   return first === second;
 }
 
-export function toBigNumber(amount: TokenAmountModel) {
+export function toBigNumber(amount: TokenAmountModel | string | number) {
+  if (typeof amount === 'string' || typeof amount === 'number') {
+    amount = {
+      parsedAmount: +amount,
+      token: {
+        decimals: 18,
+      } as TokenModel,
+    };
+  }
   return ethers.utils.parseUnits(amount.parsedAmount.toString(), amount.token.decimals);
 }
 
@@ -152,6 +161,20 @@ export function getDefaultProvider(): ethers.providers.Provider {
 export function getRpcUrl(chainId?: number) {
   const { rpcUri, rpcKeyEnvName } = getNetwork(chainId);
   return `${rpcUri}${rpcKeyEnvName ? `/${env(rpcKeyEnvName)}` : ''}`;
+}
+
+export function getExplorerUrl(chainId?: number) {
+  const { explorer } = getNetwork(chainId);
+  switch (explorer) {
+    case 'etherscan':
+      return 'https://rinkeby.etherscan.io';
+    case 'blockscout':
+      return 'https://blockscout.com/xdai/mainnet/';
+    case 'polygonscan':
+      return 'https://polygonscan.com';
+    default:
+      return '';
+  }
 }
 
 // Re-export some web3-utils functions

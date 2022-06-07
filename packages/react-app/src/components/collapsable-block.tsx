@@ -1,9 +1,9 @@
 /* eslint-disable react/destructuring-assignment */
 import { Button, IconDown, IconUp, IconCopy, useTheme } from '@1hive/1hive-ui';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useCopyToClipboard } from './hooks/use-copy-to-clipboard.hook';
-import { GUpx } from './utils/style.util';
+import { useCopyToClipboard } from '../hooks/use-copy-to-clipboard.hook';
+import { GUpx } from '../utils/style.util';
 
 // #region StyledComponents
 
@@ -51,6 +51,8 @@ type Props = {
   children: any;
   label?: string;
   visible?: boolean;
+  src?: string;
+  width?: number;
   collapsed?: boolean;
   type?: 'image' | 'code' | 'default';
   alt?: string;
@@ -59,16 +61,16 @@ type Props = {
 export function CollapsableBlock(props: Props) {
   const theme = useTheme();
   const [collapsed, setCollapsed] = useState(props.collapsed);
-  const [content, setContent] = useState<ReactNode | undefined>();
   const copyCode = useCopyToClipboard();
 
   useEffect(() => setCollapsed(props.collapsed), [props.collapsed]);
 
-  useEffect(() => {
-    // eslint-disable-next-line jsx-a11y/alt-text
-    if (props.type === 'image') setContent(<img {...props} />);
-    else
-      setContent(props.children?.props?.children ? props.children.props.children : props.children);
+  const content = useMemo(() => {
+    if (props.type === 'image') {
+      // eslint-disable-next-line jsx-a11y/alt-text
+      return <img {...props} />;
+    }
+    return props.children?.props?.children ? props.children.props.children : props.children;
   }, [props, props.children]);
 
   return (
@@ -95,7 +97,7 @@ export function CollapsableBlock(props: Props) {
                 {props.label}
               </LabelStyled>
             </CollapseButtonStyled>
-            {!collapsed && (
+            {!collapsed && props.type !== 'image' && (
               <CopyButtonStyled
                 onClick={() => copyCode(content)}
                 icon={<IconCopy />}

@@ -12,7 +12,6 @@ import {
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
-import { getNetwork } from 'src/networks';
 import { Form, Formik, FormikErrors } from 'formik';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
 import { toChecksumAddress } from 'web3-utils';
@@ -23,6 +22,8 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { approveTokenTransaction, fundQuestTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
+import { FaEdit, FaEye } from 'react-icons/fa';
+import { getNetwork } from 'src/networks';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -31,6 +32,7 @@ import { AddressFieldInput } from '../field-input/address-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { WalletBallance } from '../wallet-balance';
 import { feedDummyQuestData } from '../utils/debug-util';
+import { Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
 
@@ -42,6 +44,7 @@ const ButtonLinkStyled = styled(Button)`
   color: ${({ theme }: any) => theme.contentSecondary};
   font-weight: bold;
   background: transparent;
+  padding-top: 4px;
 `;
 
 const FormStyled = styled(Form)`
@@ -53,6 +56,12 @@ const FormStyled = styled(Form)`
   #description {
     height: 200px;
   }
+`;
+
+const LineStyled = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 // #endregion
@@ -77,6 +86,8 @@ export default function QuestModal({
 }: Props) {
   const theme = useTheme();
   const [opened, setOpened] = useState(false);
+  const [simulateSummary, setSimulateSummary] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
   const { walletAddress } = useWallet();
   const { questFactoryAddress } = getNetwork();
@@ -358,12 +369,48 @@ export default function QuestModal({
                       wide
                       error={touched.title && errors.title}
                     />
+
                     <TextFieldInput
                       id="description"
-                      label="Description"
+                      label={
+                        <>
+                          <LineStyled>
+                            Description
+                            <Outset horizontal>
+                              <ButtonLinkStyled
+                                size="mini"
+                                icon={showPreview ? <FaEdit /> : <FaEye />}
+                                display="icon"
+                                label={showPreview ? 'Edit' : 'Preview'}
+                                onClick={() => setShowPreview((old) => !old)}
+                                title={
+                                  showPreview
+                                    ? 'Back to edit mode'
+                                    : 'Show a preview of the description'
+                                }
+                              />
+                            </Outset>
+                            {showPreview && (
+                              <Button
+                                size="mini"
+                                label={simulateSummary ? 'Detail' : 'Summary'}
+                                onClick={() => setSimulateSummary((old) => !old)}
+                                title={
+                                  !showPreview
+                                    ? 'Enable preview first'
+                                    : `Simulate ${
+                                        simulateSummary ? 'detail' : 'summary'
+                                      } description view`
+                                }
+                              />
+                            )}
+                          </LineStyled>
+                        </>
+                      }
                       value={values.description}
-                      isEdit
+                      isEdit={!showPreview}
                       placeHolder="Quest description"
+                      blockVisibility={simulateSummary ? 'hidden' : 'visible'}
                       tooltip={
                         <>
                           <b>The quest description should include:</b>
@@ -387,6 +434,7 @@ export default function QuestModal({
                       wide
                       multiline
                       isMarkDown
+                      maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
                     />
                   </>,
                   <>

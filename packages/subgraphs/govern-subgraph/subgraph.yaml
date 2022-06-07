@@ -8,11 +8,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: GovernQueue
-    network: rinkeby
+    network: xdai
     source:
       abi: GovernQueue
-      address: "0xBf360A9be19A8467f10D97c63675Df4C87547694"
-      startBlock: 10661306
+      address: "0x9db80BE02a3Fd047B1b7F37D75C47F7CE7036D00"
+      startBlock: 22411541
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -1,13 +1,13 @@
 import { TokenModel } from './token.model';
 
 export type NetworkModel = {
-  networkId: 'rinkeby' | 'gnosis';
+  networkId: 'rinkeby' | 'xdai' | 'polygon' | 'mainnet' | 'local';
   chainId: number;
   name: string;
-  explorerBase: string;
+  explorer: string;
   questsSubgraph: string;
   governSubgraph: string;
-  uniswapSubgraph: string;
+  tokenPairSubgraph: string;
   questFactoryAddress: string;
   governQueueAddress: string;
   celesteAddress: string;
@@ -15,4 +15,5 @@ export type NetworkModel = {
   rpcKeyEnvName?: string;
   isTestNetwork: boolean;
   stableTokens: TokenModel[];
+  nativeToken: TokenModel;
 };

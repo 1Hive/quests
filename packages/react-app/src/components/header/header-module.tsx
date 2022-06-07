@@ -43,7 +43,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
       >
         <>
           {icon}
-          {above('medium') && (
+          {above('min') && (
             <>
               <div
                 // @ts-ignore

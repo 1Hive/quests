@@ -45,9 +45,9 @@ const LabelStyled = styled.label`
 
 const LineStyled = styled.div`
   display: flex;
-  align-items: top;
   max-width: 100%;
   margin-top: ${GUpx(0.5)};
+  align-items: center;
 `;
 
 const ContentWrapperStyled = styled.div<{

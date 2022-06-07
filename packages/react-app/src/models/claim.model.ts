@@ -6,9 +6,9 @@ export type ClaimModel = {
   playerAddress: string;
   claimedAmount: TokenAmountModel;
   evidence?: string;
-  evidenceIpfsHash?: string;
+  claimInfoIpfsHash?: string;
   claimAll?: boolean;
-
+  contactInformation?: string;
   // Only set when fetch
   executionTimeMs?: number;
   state?: string;

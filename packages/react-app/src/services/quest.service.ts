@@ -26,7 +26,7 @@ import {
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -42,7 +42,7 @@ import {
   getQuestFactoryContract,
   getQuestContract,
   getGovernQueueContract,
-  getCelesteContract,
+  getCelesteDisputeManagerContract,
 } from '../utils/contract.util';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 import { cacheFetchBalance, cacheFetchTokenPrice } from './cache.service';
@@ -150,14 +150,14 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
 }
 
 function decodeClaimAction(payload: PayloadModel) {
-  const [evidenceIpfsHash, playerAddress, claimAmount, claimAll] =
+  const [claimInfoIpfsHash, playerAddress, claimAmount, claimAll] =
     getQuestContractInterface().decodeFunctionData('claim', payload.actions[0].data);
-  return { evidenceIpfsHash, playerAddress, claimAmount, claimAll };
+  return { claimInfoIpfsHash, playerAddress, claimAmount, claimAll };
 }
 
-function encodeClaimAction(claimData: ClaimModel, evidenceIpfsHash: string) {
+function encodeClaimAction(claimData: ClaimModel, claimInfoIpfsHash: string) {
   return getQuestContractInterface().encodeFunctionData('claim', [
-    evidenceIpfsHash,
+    claimInfoIpfsHash,
     claimData.playerAddress,
     toBigNumber(claimData.claimedAmount),
     claimData.claimAll,
@@ -202,8 +202,11 @@ async function generateScheduleContainer(
     lastBlockTimestamp +
     erc3000Config.executionDelay +
     (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
-  const evidenceIpfsHash = await pushObjectToIpfs(claimData.evidence);
-  const claimCall = encodeClaimAction(claimData, evidenceIpfsHash);
+  const claimInfoIpfsHash = await pushObjectToIpfs(
+    `${claimData.evidence}\nContactInformation: ${claimData.contactInformation}`,
+  );
+
+  const claimCall = encodeClaimAction(claimData, claimInfoIpfsHash);
 
   return {
     config: erc3000Config,
@@ -220,7 +223,7 @@ async function generateScheduleContainer(
         },
       ],
       allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
-      proof: evidenceIpfsHash,
+      proof: claimInfoIpfsHash,
     },
   } as ContainerModel;
 }
@@ -253,7 +256,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
     res
       .filter((x) => x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase())
       .map(async (container) => {
-        const { evidenceIpfsHash, claimAmount, playerAddress, claimAll } = decodeClaimAction(
+        const { claimInfoIpfsHash, claimAmount, playerAddress, claimAll } = decodeClaimAction(
           container.payload,
         );
 
@@ -261,23 +264,53 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           typeof quest.rewardToken === 'string'
             ? ((await getTokenInfo(quest.rewardToken)) as TokenModel)
             : quest.rewardToken;
-        return {
+        const claim = {
           claimedAmount: {
             token: tokenModel,
             parsedAmount: fromBigNumber(BigNumber.from(claimAmount), tokenModel?.decimals),
           },
-          evidenceIpfsHash,
+          claimInfoIpfsHash,
           playerAddress,
           questAddress: quest.address,
-          state: container.state,
+          state: container.state ? ENUM_CLAIM_STATE[container.state] : undefined,
           claimAll,
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,
         } as ClaimModel;
+
+        const { evidence, contactInformation } = await fetchClaimIpfsInfo(claimInfoIpfsHash);
+        claim.evidence = evidence;
+        claim.contactInformation = contactInformation;
+
+        return claim;
       }),
   ).then((claims) =>
     claims.sort((a: ClaimModel, b: ClaimModel) => b.executionTimeMs! - a.executionTimeMs!),
   );
+}
+
+export async function fetchClaimIpfsInfo(claimInfoIpfsHash?: string) {
+  if (claimInfoIpfsHash) {
+    try {
+      const ipfsResult = await getObjectFromIpfs<string>(claimInfoIpfsHash, ipfsTheGraph);
+      if (!ipfsResult) throw new Error('Ipfs result is undefined');
+
+      if (ipfsResult.includes('ContactInformation: ')) {
+        const splitResult = ipfsResult.split('\n');
+        const contactInformation = splitResult[splitResult.length - 1].replace(
+          'ContactInformation: ',
+          '',
+        ); // Contact information is always the last line and remove the prefix
+        const evidence = splitResult.slice(0, splitResult.length - 1).join('\n'); // Evidence is everything but the last line
+        return { evidence, contactInformation };
+      }
+      return { evidence: ipfsResult };
+    } catch (error) {
+      return { evidence: formatIpfsMarkdownLink(claimInfoIpfsHash, 'See evidence') };
+    }
+  } else {
+    return { evidence: 'No evidence submited from Player' };
+  }
 }
 
 export async function fetchDeposits() {
@@ -335,6 +368,7 @@ export async function fetchRewardTokens(): Promise<TokenModel[]> {
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
+  const { isTestNetwork } = getNetwork();
   const result = await fetchActiveQuestEntitiesLight();
   const quests = result.questEntities as {
     id: string;
@@ -357,7 +391,14 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
       ),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
-  const totalFunds = funds.map((x) => x.usdValue).filter((x) => x !== undefined) as number[];
+  const totalFunds = funds
+    .map((x) => {
+      if (isTestNetwork && x.usdValue === undefined) {
+        return x.parsedAmount; // fallabck to 1$ value for rinkeby environment
+      }
+      return x.usdValue ?? 0;
+    })
+    .filter((x) => x !== undefined) as number[];
 
   BigNumber.prototype.toJSON = function toJSON() {
     return fromBigNumber(this, 18);
@@ -517,7 +558,8 @@ export async function getBalanceOf(
       return {
         token: tokenInfo,
         parsedAmount,
-        usdValue: parsedAmount * fromBigNumber(price, tokenInfo.decimals),
+        usdValue:
+          price === undefined ? undefined : parsedAmount * fromBigNumber(price, tokenInfo.decimals),
       };
     }
   } catch (error) {
@@ -605,9 +647,9 @@ export async function resolveClaimChallenge(
 // #region Celeste
 
 export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
-  const celesteContract = getCelesteContract();
+  const celesteContract = await getCelesteDisputeManagerContract();
   if (!celesteContract) return null;
-  const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  const [feeToken, feeAmount] = await celesteContract.getDisputeFees();
   const token = await getTokenInfo(feeToken);
   if (!token) return null;
   return toTokenAmountModel({
@@ -619,14 +661,17 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
 export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel | null> {
-  const celesteContract = getCelesteContract();
-  if (!celesteContract) return null;
-  if (challenge.disputeId === undefined)
+  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract();
+  if (!celesteDisputeManagerContract) {
+    return null;
+  }
+  if (!challenge.disputeId) {
     throw new Error('Dispute does not exist yet, please try again later');
-  const { state } = await celesteContract.disputes(challenge.disputeId);
+  }
+  const dispute = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
   return {
     id: challenge.disputeId,
-    state,
+    state: dispute.state,
   };
 }
 

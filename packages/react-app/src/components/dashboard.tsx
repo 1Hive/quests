@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
 import { DashboardModel } from 'src/models/dashboard.model';
+import { getNetwork } from 'src/networks';
 import { getDashboardInfo } from 'src/services/quest.service';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -48,6 +49,7 @@ export default function Dashboard() {
   const theme = useTheme();
   const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
   const { walletConnected } = useWallet();
+  const { networkId } = getNetwork();
 
   useEffect(() => {
     let isSubscribed = true;
@@ -59,7 +61,7 @@ export default function Dashboard() {
     return () => {
       isSubscribed = false;
     };
-  }, []);
+  }, [networkId]);
 
   return (
     <BoxStyled theme={theme}>

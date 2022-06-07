@@ -1,5 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import { TokenModel } from 'src/models/token.model';
+import { getNetwork } from 'src/networks';
 import { sleep } from 'src/utils/common.util';
 import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
@@ -11,13 +12,13 @@ let cacheMap: Map<
 > = retrieveCache();
 
 export async function cacheFetchTokenPrice(token: TokenModel) {
-  const price = await buildCache<string>(
+  const price = await buildCache<string | undefined>(
     'token-price',
     token.token,
     () => fetchRoutePairWithStable(token).then((x) => x.price),
     ONE_HOUR_IN_MS / 2, // 30 min
   );
-  return ethers.utils.parseEther(price);
+  return price === undefined ? undefined : ethers.utils.parseEther(price);
 }
 
 export async function cacheFetchBalance(
@@ -110,12 +111,14 @@ function reviver(key: string, value: any) {
 }
 
 function saveCacheAsync() {
-  localStorage.setItem('cache', JSON.stringify(cacheMap, replacer));
+  const { networkId } = getNetwork();
+  localStorage.setItem(`cache-${networkId}`, JSON.stringify(cacheMap, replacer));
 }
 
 function retrieveCache() {
   try {
-    const cacheJson = localStorage.getItem('cache');
+    const { networkId } = getNetwork();
+    const cacheJson = localStorage.getItem(`cache-${networkId}`);
     if (cacheJson) {
       const map = JSON.parse(cacheJson, reviver) as Map<string, Map<string, any>>;
       if (map.size > 0) {
