@@ -10,6 +10,7 @@ import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
 import { getNetwork, networks } from '../../networks';
+import env from '../../environment';
 
 // #region StyledComponents
 const HeaderWraperStyled = styled.header`
@@ -96,7 +97,7 @@ function Header({ children }: Props) {
         <HeaderRightPanelStyled compact={below('medium')}>
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
-          {!below('medium') && (
+          {!below('medium') && !env('FORCE_CHAIN_ID') && (
             <NetworkSelectorStyled
               borderColor={theme.border}
               items={networkNames}

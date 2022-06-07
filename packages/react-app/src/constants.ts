@@ -1,3 +1,4 @@
+import env from './environment';
 import { FilterModel } from './models/filter.model';
 
 export const PCT_BASE = BigInt(1e18);
@@ -16,7 +17,7 @@ export const GQL_MAX_INT_MS = (2 ** 31 - 1) * 1000;
 
 export const QUESTS_PAGE_SIZE = 4;
 
-export const EXPECTED_CHAIN_ID = [100, 4];
+export const EXPECTED_CHAIN_ID = +env('FORCE_CHAIN_ID') ? [+env('FORCE_CHAIN_ID')] : [100, 4];
 
 // Enums
 
