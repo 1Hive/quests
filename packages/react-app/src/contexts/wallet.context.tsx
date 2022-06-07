@@ -95,10 +95,14 @@ function WalletAugmented({ children }: Props) {
   };
 
   const changeNetwork = async (newChainId?: number) => {
+    if (newChainId === chainId) {
+      return;
+    }
+
     if (!newChainId) {
       newChainId = chainId;
     }
-    if (ethereum) {
+    if (ethereum && +ethereum.chainId !== newChainId) {
       try {
         await ethereum.request({
           method: 'wallet_switchEthereumChain',
@@ -129,6 +133,7 @@ function WalletAugmented({ children }: Props) {
       }
     }
     setCurrentChain(newChainId);
+    window.location.reload();
   };
 
   const contextValue = useMemo(
