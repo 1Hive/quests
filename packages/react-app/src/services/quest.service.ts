@@ -562,8 +562,11 @@ export async function getBalanceOf(
           price === undefined ? undefined : parsedAmount * fromBigNumber(price, tokenInfo.decimals),
       };
     }
-  } catch (error) {
-    Logger.exception(error);
+  } catch (error: any) {
+    Logger.exception(
+      error,
+      `Failed to fetch balance of ${(token as any).token ? (token as any).token : token}`,
+    );
   }
   return null;
 }
