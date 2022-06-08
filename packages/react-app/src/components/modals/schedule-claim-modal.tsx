@@ -1,10 +1,15 @@
 /* eslint-disable no-nested-ternary */
 import { Button } from '@1hive/1hive-ui';
-import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef, useMemo } from 'react';
+import { debounce, noop, uniqueId } from 'lodash-es';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { ENUM_TRANSACTION_STATUS, ENUM, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
+import {
+  ENUM_TRANSACTION_STATUS,
+  ENUM,
+  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
+  ENUM_QUEST_STATE,
+} from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -74,13 +79,17 @@ type Props = {
   questAddress: string;
   questTotalBounty?: TokenAmountModel | null;
   claimDeposit: TokenAmountModel;
+  claimData?: ClaimModel;
   onClose?: ModalCallback;
 };
-
+const emptyClaimData = {
+  state: ENUM_QUEST_STATE.Draft,
+} as ClaimModel;
 export default function ScheduleClaimModal({
   questAddress,
   questTotalBounty,
   claimDeposit,
+  claimData = emptyClaimData,
   onClose = noop,
 }: Props) {
   const { walletAddress } = useWallet();
@@ -88,6 +97,7 @@ export default function ScheduleClaimModal({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [claimDataState, setClaimDataState] = useState<ClaimModel>(claimData);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
@@ -97,8 +107,12 @@ export default function ScheduleClaimModal({
     setOpened(false);
     onClose(succeed);
   };
+  const debounceSave = useCallback(
+    debounce((data: ClaimModel) => setClaimDataState(data), 500),
+    [], // will be created only once initially
+  );
 
-  const validate = (values: ClaimModel & { claimAll: boolean }) => {
+  const validate = (values: ClaimModel) => {
     const errors = {} as FormErrors<ClaimModel>;
     if (!values.evidence) errors.evidence = 'Evidence of completion is required';
     if (!values.claimAll) {
@@ -114,11 +128,12 @@ export default function ScheduleClaimModal({
         errors.playerAddress = 'Player address is not valid';
       }
     }
+    debounceSave(values);
     setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
 
-  const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }) => {
+  const onClaimSubmit = (values: ClaimModel) => {
     validate(values); // Validate one last time before submitting
     if (isFormValid) {
       if (values.claimAll) {
@@ -210,11 +225,13 @@ export default function ScheduleClaimModal({
       <Formik
         initialValues={
           {
-            evidence: '',
-            claimedAmount: { parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel,
-            claimAll: false,
-            contactInformation: undefined,
-            playerAddress: undefined,
+            evidence: claimDataState.evidence ?? '',
+            claimedAmount:
+              claimDataState.claimedAmount ??
+              ({ parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel),
+            claimAll: claimDataState.claimAll ?? false,
+            contactInformation: claimDataState.contactInformation ?? undefined,
+            playerAddress: claimDataState.playerAddress ?? undefined,
           } as any
         }
         onSubmit={(values) => {

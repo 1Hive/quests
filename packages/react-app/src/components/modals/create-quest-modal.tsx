@@ -170,7 +170,6 @@ export default function QuestModal({
 
     if (data.expireTime.getTime() < Date.now())
       errors.expireTime = 'Expiration have to be later than now';
-
     debounceSave(data);
 
     setIsFormValid(Object.keys(errors).length === 0);
