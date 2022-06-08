@@ -161,7 +161,11 @@ function AccountModule({ compact = false }: Props) {
   return (
     <AccountWrapperStyled ref={buttonRef}>
       {wallet.isWrongNetwork ? (
-        <Button label="Switch network" onClick={() => wallet.changeNetwork()} mode="strong" />
+        <Button
+          label="Switch wallet network"
+          onClick={() => wallet.changeNetwork()}
+          mode="strong"
+        />
       ) : screen.id === 'connected' ? (
         <AccountButton onClick={toggle} />
       ) : (

@@ -102,7 +102,7 @@ function WalletAugmented({ children }: Props) {
     if (!newChainId) {
       newChainId = chainId;
     }
-    if (ethereum && +ethereum.chainId !== newChainId) {
+    if (ethereum && EXPECTED_CHAIN_ID.includes(newChainId) && +ethereum.chainId !== newChainId) {
       try {
         await ethereum.request({
           method: 'wallet_switchEthereumChain',
