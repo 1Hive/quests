@@ -6,6 +6,8 @@ import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import { fetchRoutePairWithStable } from './uniswap.service';
 
+const cacheVersion = 1;
+
 let cacheMap: Map<
   string,
   Map<string, { value: any; expirationMs?: number } | null>
@@ -112,21 +114,29 @@ function reviver(key: string, value: any) {
 
 function saveCacheAsync() {
   const { networkId } = getNetwork();
-  localStorage.setItem(`cache-${networkId}`, JSON.stringify(cacheMap, replacer));
+  localStorage.setItem(`cache-${networkId}`, JSON.stringify({ cacheVersion, cacheMap }, replacer));
 }
 
 function retrieveCache() {
+  const { networkId } = getNetwork();
+  const cacheId = `cache-${networkId}`;
   try {
-    const { networkId } = getNetwork();
-    const cacheJson = localStorage.getItem(`cache-${networkId}`);
+    const cacheJson = localStorage.getItem(cacheId);
     if (cacheJson) {
-      const map = JSON.parse(cacheJson, reviver) as Map<string, Map<string, any>>;
-      if (map.size > 0) {
-        return map;
+      const result = JSON.parse(cacheJson, reviver) as {
+        cacheVersion: number;
+        map: Map<string, Map<string, any>>;
+      };
+      if (result.cacheVersion !== cacheVersion) {
+        Logger.debug('Cache version mismatch, clearing cache');
+        localStorage.removeItem(cacheId);
+      } else if (result.map.size > 0) {
+        return result.map;
       }
     }
   } catch (error) {
-    Logger.debug('Error retrieving cache from storage', error);
+    Logger.debug('Error retrieving cache from storage, clearing cache', error);
+    localStorage.removeItem(cacheId);
   }
   return new Map<string, Map<string, any>>();
 }

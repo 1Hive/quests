@@ -35,6 +35,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
   const [isEnoughBalance, _setIsEnoughBalance] = useState(true);
   const { currentTheme } = useThemeContext();
   const isMountedRef = useIsMountedRef();
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     if (askedTokenAmount?.token && askedTokenAmount.token.token !== tokenBalance?.token.token) {
@@ -61,13 +62,17 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
     setTokenBalance(undefined);
     const balance = (await getBalanceOf({ ..._token }, walletAddress)) ?? undefined;
     if (isMountedRef.current) {
-      setTokenBalance(balance);
+      if (balance) {
+        setTokenBalance(balance);
+      } else {
+        setError('Token not found');
+      }
     }
   };
 
   return (
     <WrapperStyled theme={currentTheme} isEnoughBalance={isEnoughBalance}>
-      {askedTokenAmount?.token && askedTokenAmount !== null ? (
+      {askedTokenAmount?.token && askedTokenAmount !== null && !error ? (
         <AmountFieldInput
           isLoading={!tokenBalance || isLoading}
           id={`balance-${tokenBalance?.token.symbol}`}
@@ -84,7 +89,7 @@ export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading
           compact
           isLoading={isLoading}
         >
-          <i>No token selected</i>
+          <i>{error ?? 'No token selected'}</i>
         </FieldInput>
       )}
     </WrapperStyled>
