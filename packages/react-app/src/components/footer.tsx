@@ -75,6 +75,7 @@ const TitleLinkWrapperStyled = styled.div`
   display: flex;
   justify-content: center;
   margin-left: ${GUpx(1)};
+  align-items: flex-end;
 `;
 
 const IconStyled = styled.div`
