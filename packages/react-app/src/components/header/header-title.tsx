@@ -17,6 +17,7 @@ const TitleLinkWrapperStyled = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;
+  align-items: flex-end;
   margin-left: ${GUpx(1)};
 `;
 
