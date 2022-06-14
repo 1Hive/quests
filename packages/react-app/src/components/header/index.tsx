@@ -6,6 +6,7 @@ import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
 import React, { useMemo } from 'react';
 import { useWallet } from 'src/contexts/wallet.context';
+import { flags } from 'src/services/feature-flag.service';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
@@ -92,7 +93,7 @@ function Header({ children }: Props) {
           {children}
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
-          {!below(500) && !env('FORCE_CHAIN_ID') && (
+          {!below(500) && !env('FORCE_CHAIN_ID') && flags.SWITCH_CHAIN && (
             <NetworkSelectorStyled
               borderColor={theme.border}
               items={networkNames}

@@ -114,29 +114,37 @@ function reviver(key: string, value: any) {
 
 function saveCacheAsync() {
   const { networkId } = getNetwork();
-  localStorage.setItem(`cache-${networkId}`, JSON.stringify({ cacheVersion, cacheMap }, replacer));
+  localStorage.setItem(`${networkId}.cache`, JSON.stringify({ cacheVersion, cacheMap }, replacer));
 }
 
 function retrieveCache() {
   const { networkId } = getNetwork();
-  const cacheId = `cache-${networkId}`;
+  const cacheId = `${networkId}.cache`;
   try {
     const cacheJson = localStorage.getItem(cacheId);
     if (cacheJson) {
       const result = JSON.parse(cacheJson, reviver) as {
         cacheVersion: number;
-        map: Map<string, Map<string, any>>;
+        cacheMap: Map<string, Map<string, any>>;
       };
       if (result.cacheVersion !== cacheVersion) {
         Logger.debug('Cache version mismatch, clearing cache');
         localStorage.removeItem(cacheId);
-      } else if (result.map.size > 0) {
-        return result.map;
+      } else if (result.cacheMap.size > 0) {
+        return result.cacheMap;
       }
     }
   } catch (error) {
     Logger.debug('Error retrieving cache from storage, clearing cache', error);
     localStorage.removeItem(cacheId);
   }
+
+  // Clear old cache
+  Object.keys(localStorage).forEach((key) => {
+    if (key.includes(`cache`) && !key.endsWith(`.cache`)) {
+      localStorage.removeItem(key);
+    }
+  });
+
   return new Map<string, Map<string, any>>();
 }
