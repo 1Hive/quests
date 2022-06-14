@@ -1,13 +1,15 @@
-import { ButtonBase, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import { Button, IconDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import React from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
 // #region StyledComponents
 
-const HeaderAccountButtonStyled = styled(ButtonBase)`
-  height: 100%;
-  padding: ${GUpx(1)};
+const HeaderAccountButtonStyled = styled(Button)`
+  // Deault link button style override
+  color: unset !important;
+  padding-left: ${GUpx(1)} !important;
+  margin: ${GUpx(1)} 0;
   &:active {
     background: ${({ backgroundActive }: any) => backgroundActive};
   }
@@ -23,50 +25,54 @@ type Props = {
 };
 
 function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
-  const { above } = useViewport();
+  const { below } = useViewport();
   const theme = useTheme();
 
   return (
-    <HeaderAccountButtonStyled
-      onClick={onClick}
-      background={theme.surface}
-      backgroundActive={theme.surfacePressed}
+    <div
+      className="
+    btn-link"
     >
-      <div
-        // @ts-ignore
-        css={`
-          display: flex;
-          align-items: center;
-          text-align: left;
-          padding: 0 ${GUpx(1)};
-        `}
+      <HeaderAccountButtonStyled
+        onClick={onClick}
+        background={theme.surface}
+        backgroundActive={theme.surfacePressed}
       >
-        <>
-          {icon}
-          {above('min') && (
-            <>
-              <div
-                // @ts-ignore
-                css={`
-                  padding-left: ${GUpx(1)};
-                  padding-right: ${GUpx(0.5)};
-                `}
-              >
-                {content}
-              </div>
-              {hasPopover && (
-                <IconDown
-                  size="small"
+        <div
+          // @ts-ignore
+          css={`
+            display: flex;
+            align-items: center;
+            text-align: left;
+          `}
+        >
+          <>
+            {icon}
+            {!below('medium') && (
+              <>
+                <div
+                  // @ts-ignore
                   css={`
-                    color: ${theme.surfaceIcon};
+                    padding-left: ${GUpx(1)};
+                    padding-right: ${GUpx(0.5)};
                   `}
-                />
-              )}
-            </>
-          )}
-        </>
-      </div>
-    </HeaderAccountButtonStyled>
+                >
+                  {content}
+                </div>
+                {hasPopover && (
+                  <IconDown
+                    size="small"
+                    css={`
+                      color: ${theme.surfaceIcon};
+                    `}
+                  />
+                )}
+              </>
+            )}
+          </>
+        </div>
+      </HeaderAccountButtonStyled>
+    </div>
   );
 }
 

@@ -75,6 +75,7 @@ const TitleLinkWrapperStyled = styled.div`
   display: flex;
   justify-content: center;
   margin-left: ${GUpx(1)};
+  align-items: flex-end;
 `;
 
 const IconStyled = styled.div`
@@ -131,7 +132,7 @@ export default function footer() {
             </IconStyled>
             Follow Twitter
           </FooterNavItemStyled>
-          <FooterNavItemStyled href="https://discord.gg/4fm7pgB" external>
+          <FooterNavItemStyled href="https://discord.gg/g52FhMdnvs" external>
             <IconStyled>
               <FontAwesomeIcon icon={faDiscord} />
             </IconStyled>

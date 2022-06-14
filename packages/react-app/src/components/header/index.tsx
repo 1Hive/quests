@@ -1,4 +1,4 @@
-import { BackButton, GU, useTheme, useViewport, DropDown } from '@1hive/1hive-ui';
+import { BackButton, useTheme, useViewport, DropDown } from '@1hive/1hive-ui';
 import { useHistory } from 'react-router-dom';
 import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
@@ -36,7 +36,8 @@ const HeaderLayoutContentFlexStyled = styled.div`
 const HeaderRightPanelStyled = styled.div<{ compact: boolean }>`
   display: flex;
   align-items: center;
-  margin-right: ${({ compact }) => (compact ? 0 : 6 * GU)}px;
+  margin-right: ${GUpx(2)};
+  column-gap: ${GUpx(2)};
 `;
 
 const BackButtonStyled = styled(BackButton)`
@@ -47,12 +48,6 @@ const BackButtonStyled = styled(BackButton)`
 
 const BackButtonSpacerStyled = styled.span`
   width: 69px;
-`;
-
-const HeaderContentStyled = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-left: ${GUpx(2)};
 `;
 
 const NetworkSelectorStyled = styled(DropDown)`
@@ -93,11 +88,11 @@ function Header({ children }: Props) {
           )}
           <HeaderTitle />
         </HeaderLayoutContentFlexStyled>
-        <HeaderContentStyled>{children}</HeaderContentStyled>
         <HeaderRightPanelStyled compact={below('medium')}>
+          {children}
           <HeaderMenu below={below} />
           <AccountModule compact={layoutSmall} />
-          {!below('medium') && !env('FORCE_CHAIN_ID') && (
+          {!below(500) && !env('FORCE_CHAIN_ID') && (
             <NetworkSelectorStyled
               borderColor={theme.border}
               items={networkNames}
