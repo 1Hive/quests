@@ -88,7 +88,7 @@ export default function ModalBase({
     ) {
       setTransaction(undefined);
     }
-  }, [transaction?.status, txFailed]);
+  }, [transaction?.status, txFailed, isOpen]);
 
   const escFunction = (e: any) => {
     const modalDom = document.getElementById(id) as HTMLElement;

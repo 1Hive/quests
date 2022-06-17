@@ -5,6 +5,7 @@ import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
+import { getNetwork } from 'src/networks';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
@@ -58,6 +59,7 @@ type Props = {
 function AccountModule({ compact = false }: Props) {
   const buttonRef = useRef<any>();
   const wallet = useWallet();
+  const { name } = getNetwork();
   const { walletAddress, activatingId, deactivateWallet, activateWallet } = wallet;
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
@@ -161,7 +163,7 @@ function AccountModule({ compact = false }: Props) {
       {wallet.isWrongNetwork ? (
         <Button
           icon={<IconConnect />}
-          label="Switch wallet network"
+          label={`Switch wallet to ${name}`}
           onClick={() => wallet.changeNetwork()}
           display={compact ? 'icon' : 'all'}
           mode="strong"

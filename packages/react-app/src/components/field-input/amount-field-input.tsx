@@ -53,6 +53,7 @@ interface AmountTokenWrapperStyledProps {
   isEdit?: boolean;
   wide?: boolean;
 }
+
 const AmountTokenWrapperStyled = styled.div<AmountTokenWrapperStyledProps>`
   display: flex;
   justify-content: flex-end;
@@ -73,6 +74,10 @@ const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
   padding: 0 ${GUpx(1)};
   font-weight: bold;
   min-width: 0;
+
+  &:after {
+    border-radius: 4px !important;
+  }
 `;
 
 const AmountEllipsisWrapperStyled = styled.div`
@@ -145,7 +150,11 @@ const TokenAmountBadge = React.memo(
         mode="strong"
         size="mini"
         label={label}
-        title={`Copy : ${token.token}\n* This token don't have pair with our stable list (see footer)`}
+        title={`Copy : ${token.token}${
+          usdValue === undefined
+            ? `\n* This token don't have pair with our stable list (see footer)`
+            : ''
+        }`}
         onClick={onBadgeClick}
       />
     );

@@ -133,6 +133,12 @@ export default function QuestModal({
     }
   }, [questMode]);
 
+  useEffect(() => {
+    if (opened) {
+      setShowPreview(false);
+    }
+  }, [opened]);
+
   const onOpenButtonClick = () => {
     setOpened(true);
   };
