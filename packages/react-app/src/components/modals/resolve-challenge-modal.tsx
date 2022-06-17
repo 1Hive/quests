@@ -1,13 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import {
-  Button,
-  IconFlag,
-  Accordion,
-  IdentityBadge,
-  Info,
-  Link,
-  IconCaution,
-} from '@1hive/1hive-ui';
+import { Button, IconFlag, IdentityBadge, Info, Link, IconCaution } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useEffect, Fragment, useMemo } from 'react';
 import styled from 'styled-components';
@@ -35,6 +27,7 @@ import { Outset } from '../utils/spacer-util';
 import { DisputeModel } from '../../models/dispute.model';
 import TextFieldInput from '../field-input/text-field-input';
 import { HelpTooltip } from '../field-input/help-tooltip';
+import { CollapsableBlock } from '../collapsable-block';
 
 // #region StyledComponents
 
@@ -57,7 +50,7 @@ const OpenButtonWrapperStyled = styled.div`
 `;
 
 const LabelStyled = styled.span`
-  margin-left: ${GUpx(1)};
+  margin-left: ${GUpx(2)};
 `;
 
 const FinalRulingStyled = styled.span`
@@ -112,12 +105,12 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   }, []);
 
   useEffect(() => {
-    const fetchChallengeAndDispute = async (container: ContainerModel, retryCount: number = 2) => {
+    const fetchChallengeAndDispute = async (container: ContainerModel, retryCount: number = 5) => {
       const challengeResult = await QuestService.fetchChallenge(container);
       if (!isMountedRef.current) return;
       if (!challengeResult) {
         if (retryCount > 0) {
-          sleep(1000);
+          await sleep(1000);
           await fetchChallengeAndDispute(container, retryCount - 1);
         } else {
           throw new Error(`Failed to fetch challenge with container id ${container.id}`);
@@ -324,24 +317,38 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           {!challenge || !evidence ? (
             <Skeleton />
           ) : (
-            <Accordion
-              items={[
-                [
+            <>
+              <CollapsableBlock
+                hideState
+                visible
+                copyable={false}
+                collapsed
+                wide
+                header={
                   <>
                     {player}
                     <LabelStyled>Player evidence of completion</LabelStyled>
-                  </>,
-                  <TextFieldInput id="evidenceOfCompletion" value={evidence} isMarkDown />,
-                ],
-                [
+                  </>
+                }
+              >
+                <TextFieldInput id="evidenceOfCompletion" value={evidence} isMarkDown />
+              </CollapsableBlock>
+              <CollapsableBlock
+                hideState
+                visible
+                copyable={false}
+                collapsed
+                wide
+                header={
                   <>
                     {challenger}
                     <LabelStyled>Challenge reason</LabelStyled>
-                  </>,
-                  <TextFieldInput id="challengeReason" value={challenge.reason} isMarkDown />,
-                ],
-              ]}
-            />
+                  </>
+                }
+              >
+                <TextFieldInput id="challengeReason" value={challenge.reason} isMarkDown />
+              </CollapsableBlock>
+            </>
           )}
           {finalRuling}
         </>

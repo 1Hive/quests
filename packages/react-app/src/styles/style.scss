@@ -45,7 +45,7 @@ button {
   }
 }
 
-.bWAZMD {
+.bNEUIQ[style='height: 367px;'] + .bWAZMD {
   height: fit-content !important;
 }
 
@@ -98,7 +98,6 @@ button {
 .btn-link button {
   padding: 0;
   margin-top: 8px;
-  padding-right: 8px;
   background: transparent;
   border: none;
   box-shadow: none;
@@ -142,4 +141,8 @@ button {
 }
 *::-webkit-scrollbar-corner {
   background-color: #00000000;
+}
+
+button:focus:after {
+  margin: -4px !important;
 }

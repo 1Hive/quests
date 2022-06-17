@@ -130,7 +130,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
       setActionButton(
         <>
           <ChallengeModal
-            claim={claim}
+            claim={{ ...claim, state }}
             challengeDeposit={challengeDeposit}
             onClose={onActionClose}
           />

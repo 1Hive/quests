@@ -202,9 +202,11 @@ async function generateScheduleContainer(
     lastBlockTimestamp +
     erc3000Config.executionDelay +
     (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
-  const claimInfoIpfsHash = await pushObjectToIpfs(
-    `${claimData.evidence}\nContactInformation: ${claimData.contactInformation}`,
-  );
+  let { evidence } = claimData;
+  if (claimData.contactInformation) {
+    evidence += `\nContactInformation: ${claimData.contactInformation}`;
+  }
+  const claimInfoIpfsHash = await pushObjectToIpfs(evidence);
 
   const claimCall = encodeClaimAction(claimData, claimInfoIpfsHash);
 
