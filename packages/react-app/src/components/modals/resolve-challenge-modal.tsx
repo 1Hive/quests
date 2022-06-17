@@ -1,13 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import {
-  Button,
-  IconFlag,
-  Accordion,
-  IdentityBadge,
-  Info,
-  Link,
-  IconCaution,
-} from '@1hive/1hive-ui';
+import { Button, IconFlag, IdentityBadge, Info, Link, IconCaution } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useState, useEffect, Fragment, useMemo } from 'react';
 import styled from 'styled-components';

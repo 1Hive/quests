@@ -87,7 +87,6 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       if (feeAmount && isMountedRef.current) setChallengeFee(feeAmount);
     };
     fetchFee();
-    console.log({ claim });
   }, []);
 
   useEffect(() => {
