@@ -8,6 +8,8 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { noop } from 'lodash';
+import { ThemeInterface } from 'src/styles/theme';
+import { useThemeContext } from 'src/contexts/theme.context';
 import { HelpTooltip } from './field-input/help-tooltip';
 import * as QuestService from '../services/quest.service';
 import Claim from './claim';
@@ -43,6 +45,20 @@ const EvidenceWrapperStyled = styled.div`
   padding: ${GUpx(2)};
 `;
 
+const NoClaimBoxStyled = styled.div<{ theme: ThemeInterface }>`
+  background: ${({ theme }: any) => theme.surfaceUnder} !important;
+  padding: ${GUpx(2)};
+  border-radius: 8px;
+  width: 95%;
+  margin-left: ${GUpx(2)};
+  margin-top: ${GUpx(2)};
+  box-shadow: 10px 10px 15px 5px #00000029;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+`;
+
 // #endregion
 
 type Props = {
@@ -62,6 +78,7 @@ export default function ClaimList({
   const [loadingClaim, setLoadingClaim] = useState(true);
   const { transaction } = useTransactionContext();
   const isMountedRef = useIsMountedRef();
+  const { currentTheme } = useThemeContext();
 
   const skeletonClaim = useMemo(() => {
     const fakeClaim = {} as ClaimModel;
@@ -140,7 +157,6 @@ export default function ClaimList({
         <HelpTooltip tooltip="A claim includes the proof of the quest's completion." />
       </ClaimHeaderStyled>
       {claims?.length || loadingClaim ? (
-        // <Accordion items={accordionItems} className="accordion-fit-content" />
         <ClaimsWrapperStyled>
           {loadingClaim && skeletonClaim}
           {claims.map((claim) => (
@@ -182,7 +198,7 @@ export default function ClaimList({
         </ClaimsWrapperStyled>
       ) : (
         <ClaimsWrapperStyled>
-          <i>No claims</i>
+          <NoClaimBoxStyled theme={currentTheme}>No claims</NoClaimBoxStyled>
         </ClaimsWrapperStyled>
       )}
     </WrapperStyled>
