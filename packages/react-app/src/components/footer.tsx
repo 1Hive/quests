@@ -130,13 +130,13 @@ export default function footer() {
             <IconStyled>
               <FontAwesomeIcon icon={faTwitter} />
             </IconStyled>
-            Follow Twitter
+            Twitter
           </FooterNavItemStyled>
-          <FooterNavItemStyled href="https://discord.gg/g52FhMdnvs" external>
+          <FooterNavItemStyled href="https://discord.gg/JA6u95pHZn" external>
             <IconStyled>
               <FontAwesomeIcon icon={faDiscord} />
             </IconStyled>
-            Join Discord
+            Discord
           </FooterNavItemStyled>
         </FooterColumnStyled>
         <FooterColumnStyled>
