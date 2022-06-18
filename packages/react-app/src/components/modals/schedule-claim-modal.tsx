@@ -191,6 +191,9 @@ export default function ScheduleClaimModal({
       });
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
+      if (isMountedRef.current) {
+        setClaimDataState(emptyClaimData);
+      }
     } catch (e: any) {
       if (isMountedRef.current) {
         setTransaction(
@@ -230,8 +233,8 @@ export default function ScheduleClaimModal({
               claimDataState.claimedAmount ??
               ({ parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel),
             claimAll: claimDataState.claimAll ?? false,
-            contactInformation: claimDataState.contactInformation ?? undefined,
-            playerAddress: claimDataState.playerAddress ?? undefined,
+            contactInformation: claimDataState.contactInformation,
+            playerAddress: claimDataState.playerAddress,
           } as any
         }
         onSubmit={(values) => {

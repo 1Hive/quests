@@ -188,6 +188,9 @@ export default function ChallengeModal({
             : ENUM_TRANSACTION_STATUS.Failed,
         });
         if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
+        if (isMountedRef.current) {
+          setChallengeDataState(emptyChallengeData);
+        }
       } catch (e: any) {
         setTransaction(
           (oldTx) =>
