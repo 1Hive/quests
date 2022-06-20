@@ -24,6 +24,7 @@ import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
 import { getNetwork } from 'src/networks';
+import { flags } from 'src/services/feature-flag.service';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -133,6 +134,12 @@ export default function QuestModal({
     }
   }, [questMode]);
 
+  useEffect(() => {
+    if (opened) {
+      setShowPreview(false);
+    }
+  }, [opened]);
+
   const onOpenButtonClick = () => {
     setOpened(true);
   };
@@ -170,7 +177,6 @@ export default function QuestModal({
 
     if (data.expireTime.getTime() < Date.now())
       errors.expireTime = 'Expiration have to be later than now';
-
     debounceSave(data);
 
     setIsFormValid(Object.keys(errors).length === 0);
@@ -259,226 +265,230 @@ export default function QuestModal({
   };
 
   return (
-    <ModalBase
-      id={modalId}
-      title="Create quest"
-      openButton={
-        buttonMode === 'link' ? (
-          <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick} title="Create quest">
-            {buttonLabel}
-          </ButtonLinkStyled>
-        ) : (
-          <Button
-            icon={<IconPlus />}
-            label={buttonLabel}
-            wide
-            mode={buttonMode === 'strong' ? 'strong' : 'normal'}
-            display={buttonMode === 'icon' ? 'icon' : 'label'}
-            onClick={onOpenButtonClick}
-            title="Create quest"
-          />
-        )
-      }
-      isOpen={opened}
-      onClose={closeModal}
-    >
-      <Formik
-        initialValues={
-          {
-            ...questDataState,
-            fallbackAddress: questDataState?.fallbackAddress,
-          } as QuestModel
-        }
-        onSubmit={onQuestSubmit}
-        validateOnChange
-        validate={validate}
-      >
-        {({ values, handleChange, handleBlur, errors, touched, setTouched, handleSubmit }) => {
-          const onNext = (currentStep: number) => {
-            const stepErrors = validate(values);
-            if (currentStep === 0) {
-              setTouched({ title: true, description: true });
-              return !(stepErrors.title || stepErrors.description);
+    <>
+      {flags.CREATE_QUEST && (
+        <ModalBase
+          id={modalId}
+          title="Create quest"
+          openButton={
+            buttonMode === 'link' ? (
+              <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick} title="Create quest">
+                {buttonLabel}
+              </ButtonLinkStyled>
+            ) : (
+              <Button
+                icon={<IconPlus />}
+                label={buttonLabel}
+                wide
+                mode={buttonMode === 'strong' ? 'strong' : 'normal'}
+                display={buttonMode === 'icon' ? 'icon' : 'label'}
+                onClick={onOpenButtonClick}
+                title="Create quest"
+              />
+            )
+          }
+          isOpen={opened}
+          onClose={closeModal}
+        >
+          <Formik
+            initialValues={
+              {
+                ...questDataState,
+                fallbackAddress: questDataState?.fallbackAddress,
+              } as QuestModel
             }
-            if (currentStep === 1) {
-              return !(errors.bounty || errors.fallbackAddress || errors.expireTime);
-            }
-            return true;
-          };
-          return (
-            <FormStyled id="form-quest" onSubmit={handleSubmit} ref={formRef}>
-              <Stepper
-                submitButton={
-                  <>
-                    {questDeposit?.token?.token !== values.bounty?.token?.token && (
-                      <WalletBallance
-                        key="reward-token-balance"
-                        askedTokenAmount={values.bounty}
-                        setIsEnoughBalance={setIsEnoughBalance}
-                      />
-                    )}
-                    {questDeposit && questDeposit?.parsedAmount > 0 && (
+            onSubmit={onQuestSubmit}
+            validateOnChange
+            validate={validate}
+          >
+            {({ values, handleChange, handleBlur, errors, touched, setTouched, handleSubmit }) => {
+              const onNext = (currentStep: number) => {
+                const stepErrors = validate(values);
+                if (currentStep === 0) {
+                  setTouched({ title: true, description: true });
+                  return !(stepErrors.title || stepErrors.description);
+                }
+                if (currentStep === 1) {
+                  return !(errors.bounty || errors.fallbackAddress || errors.expireTime);
+                }
+                return true;
+              };
+              return (
+                <FormStyled id="form-quest" onSubmit={handleSubmit} ref={formRef}>
+                  <Stepper
+                    submitButton={
                       <>
-                        <WalletBallance
-                          key="collateral-token-balance"
-                          askedTokenAmount={questDeposit}
-                          setIsEnoughBalance={setIsEnoughBalance}
-                        />
-                        <AmountFieldInput
-                          key="questDeposit"
-                          id="questDeposit"
-                          label="Quest Deposit"
-                          tooltip="This amount will be hold by the Quest. It will be reclaimable from reclaim button once the Quest is expired."
-                          value={questDeposit}
-                          compact
-                          showUsd
+                        {questDeposit?.token?.token !== values.bounty?.token?.token && (
+                          <WalletBallance
+                            key="reward-token-balance"
+                            askedTokenAmount={values.bounty}
+                            setIsEnoughBalance={setIsEnoughBalance}
+                          />
+                        )}
+                        {questDeposit && questDeposit?.parsedAmount > 0 && (
+                          <>
+                            <WalletBallance
+                              key="collateral-token-balance"
+                              askedTokenAmount={questDeposit}
+                              setIsEnoughBalance={setIsEnoughBalance}
+                            />
+                            <AmountFieldInput
+                              key="questDeposit"
+                              id="questDeposit"
+                              label="Quest Deposit"
+                              tooltip="This amount will be hold by the Quest. It will be reclaimable from reclaim button once the Quest is expired."
+                              value={questDeposit}
+                              compact
+                              showUsd
+                            />
+                          </>
+                        )}
+                        <Button
+                          key="btn-save"
+                          label="Create"
+                          mode="positive"
+                          type="submit"
+                          form="form-quest"
+                          className="m-8"
+                          title={
+                            !questDeposit?.token
+                              ? 'Not ready ...'
+                              : !isFormValid
+                              ? 'Form not valid'
+                              : 'Schedule claim'
+                          }
+                          disabled={!questDeposit?.token || !isEnoughBalance || !isFormValid}
                         />
                       </>
-                    )}
-                    <Button
-                      key="btn-save"
-                      label="Create"
-                      mode="positive"
-                      type="submit"
-                      form="form-quest"
-                      className="m-8"
-                      title={
-                        !questDeposit?.token
-                          ? 'Not ready ...'
-                          : !isFormValid
-                          ? 'Form not valid'
-                          : 'Schedule claim'
-                      }
-                      disabled={!questDeposit?.token || !isEnoughBalance || !isFormValid}
-                    />
-                  </>
-                }
-                onNext={(currentStep) => onNext(currentStep)}
-                steps={[
-                  <>
-                    <TextFieldInput
-                      id="title"
-                      label="Title"
-                      isEdit
-                      placeHolder="Quest title"
-                      value={values.title}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      fontSize="24px"
-                      tooltip="Title should resume the Quest and be short and clear."
-                      wide
-                      error={touched.title && errors.title}
-                    />
+                    }
+                    onNext={(currentStep) => onNext(currentStep)}
+                    steps={[
+                      <>
+                        <TextFieldInput
+                          id="title"
+                          label="Title"
+                          isEdit
+                          placeHolder="Quest title"
+                          value={values.title}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          fontSize="24px"
+                          tooltip="Title should resume the Quest and be short and clear."
+                          wide
+                          error={touched.title && errors.title}
+                        />
 
-                    <TextFieldInput
-                      id="description"
-                      label={
-                        <>
-                          <LineStyled>
-                            Description
-                            <Outset horizontal>
-                              <ButtonLinkStyled
-                                size="mini"
-                                icon={showPreview ? <FaEdit /> : <FaEye />}
-                                display="icon"
-                                label={showPreview ? 'Edit' : 'Preview'}
-                                onClick={() => setShowPreview((old) => !old)}
-                                title={
-                                  showPreview
-                                    ? 'Back to edit mode'
-                                    : 'Show a preview of the description'
-                                }
-                              />
-                            </Outset>
-                            {showPreview && (
-                              <Button
-                                size="mini"
-                                label={simulateSummary ? 'Detail' : 'Summary'}
-                                onClick={() => setSimulateSummary((old) => !old)}
-                                title={
-                                  !showPreview
-                                    ? 'Enable preview first'
-                                    : `Simulate ${
-                                        simulateSummary ? 'detail' : 'summary'
-                                      } description view`
-                                }
-                              />
-                            )}
-                          </LineStyled>
-                        </>
-                      }
-                      value={values.description}
-                      isEdit={!showPreview}
-                      placeHolder="Quest description"
-                      blockVisibility={simulateSummary ? 'hidden' : 'visible'}
-                      tooltip={
-                        <>
-                          <b>The quest description should include:</b>
-                          <br />- Details about what the quest entails.
-                          <br />- What evidence must be submitted by users claiming a reward for
-                          completing the quest.
-                          <br />- The payout amount. This could be a constant amount for quests that
-                          payout multiple times, a range with reference to what determines what
-                          amount, the contracts balance at time of claim.
-                          <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed in
-                          main page. This is supposed to be an overview of the Quest. Try not to use
-                          styled text to prevent any overflow cutting due to oversize.
-                          <br />
-                          ⚠️<i>The description should not include any sensitive information.</i>
-                          <br />
-                        </>
-                      }
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.description && errors.description}
-                      wide
-                      multiline
-                      isMarkDown
-                      maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
-                    />
-                  </>,
-                  <>
-                    <AmountFieldInputFormik
-                      id="bounty"
-                      isEdit
-                      tooltip="The initial funding of this quest. A token needs to be picked. You can enter the token address directly."
-                      value={values?.bounty}
-                      error={touched.bounty && errors.bounty}
-                      tokenEditable
-                      tokenLabel="Funding token"
-                      amountLabel="Initial funding amount"
-                      reversed
-                      wide
-                    />
-                    <DateFieldInputFormik
-                      id="expireTime"
-                      label="Expire time"
-                      tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
-                      isEdit
-                      value={values.expireTime}
-                      wide
-                      onBlur={handleBlur}
-                      error={touched.expireTime && (errors.expireTime as string)}
-                      formik={formRef}
-                    />
-                    <AddressFieldInput
-                      id="fallbackAddress"
-                      label="Funds fallback address"
-                      value={values.fallbackAddress ?? walletAddress}
-                      tooltip="Unused funds at the specified expiry time can be returned to this address."
-                      isEdit
-                      onBlur={handleBlur}
-                      error={touched.fallbackAddress && errors.fallbackAddress}
-                      onChange={handleChange}
-                      wide
-                    />
-                  </>,
-                ]}
-              />
-            </FormStyled>
-          );
-        }}
-      </Formik>
-    </ModalBase>
+                        <TextFieldInput
+                          id="description"
+                          label={
+                            <>
+                              <LineStyled>
+                                Description
+                                <Outset horizontal>
+                                  <ButtonLinkStyled
+                                    size="mini"
+                                    icon={showPreview ? <FaEdit /> : <FaEye />}
+                                    display="icon"
+                                    label={showPreview ? 'Edit' : 'Preview'}
+                                    onClick={() => setShowPreview((old) => !old)}
+                                    title={
+                                      showPreview
+                                        ? 'Back to edit mode'
+                                        : 'Show a preview of the description'
+                                    }
+                                  />
+                                </Outset>
+                                {showPreview && (
+                                  <Button
+                                    size="mini"
+                                    label={simulateSummary ? 'Detail' : 'Summary'}
+                                    onClick={() => setSimulateSummary((old) => !old)}
+                                    title={
+                                      !showPreview
+                                        ? 'Enable preview first'
+                                        : `Simulate ${
+                                            simulateSummary ? 'detail' : 'summary'
+                                          } description view`
+                                    }
+                                  />
+                                )}
+                              </LineStyled>
+                            </>
+                          }
+                          value={values.description}
+                          isEdit={!showPreview}
+                          placeHolder="Quest description"
+                          blockVisibility={simulateSummary ? 'hidden' : 'visible'}
+                          tooltip={
+                            <>
+                              <b>The quest description should include:</b>
+                              <br />- Details about what the quest entails.
+                              <br />- What evidence must be submitted by users claiming a reward for
+                              completing the quest.
+                              <br />- The payout amount. This could be a constant amount for quests
+                              that payout multiple times, a range with reference to what determines
+                              what amount, the contracts balance at time of claim.
+                              <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed
+                              in main page. This is supposed to be an overview of the Quest. Try not
+                              to use styled text to prevent any overflow cutting due to oversize.
+                              <br />
+                              ⚠️<i>The description should not include any sensitive information.</i>
+                              <br />
+                            </>
+                          }
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.description && errors.description}
+                          wide
+                          multiline
+                          isMarkDown
+                          maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
+                        />
+                      </>,
+                      <>
+                        <AmountFieldInputFormik
+                          id="bounty"
+                          isEdit
+                          tooltip="The initial funding of this quest. A token needs to be picked. You can enter the token address directly."
+                          value={values?.bounty}
+                          error={touched.bounty && errors.bounty}
+                          tokenEditable
+                          tokenLabel="Funding token"
+                          amountLabel="Initial funding amount"
+                          reversed
+                          wide
+                        />
+                        <DateFieldInputFormik
+                          id="expireTime"
+                          label="Expire time"
+                          tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
+                          isEdit
+                          value={values.expireTime}
+                          wide
+                          onBlur={handleBlur}
+                          error={touched.expireTime && (errors.expireTime as string)}
+                          formik={formRef}
+                        />
+                        <AddressFieldInput
+                          id="fallbackAddress"
+                          label="Funds fallback address"
+                          value={values.fallbackAddress ?? walletAddress}
+                          tooltip="Unused funds at the specified expiry time can be returned to this address."
+                          isEdit
+                          onBlur={handleBlur}
+                          error={touched.fallbackAddress && errors.fallbackAddress}
+                          onChange={handleChange}
+                          wide
+                        />
+                      </>,
+                    ]}
+                  />
+                </FormStyled>
+              );
+            }}
+          </Formik>
+        </ModalBase>
+      )}
+    </>
   );
 }

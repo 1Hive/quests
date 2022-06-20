@@ -99,6 +99,8 @@ export default function TextFieldInput({
                   label: 'block',
                   visible: blockVisibility !== 'hidden' ? 'true' : undefined,
                   collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
+                  copyable: true,
+                  usePre: true,
                 },
               },
               code: {
@@ -108,6 +110,8 @@ export default function TextFieldInput({
                   type: 'code',
                   visible: blockVisibility !== 'hidden' ? 'true' : undefined,
                   collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
+                  copyable: true,
+                  usePre: true,
                 },
               },
               img: {

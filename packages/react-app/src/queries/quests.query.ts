@@ -1,6 +1,7 @@
 import request from 'graphql-request';
 import gql from 'graphql-tag';
 import { ENUM_QUEST_STATE, GQL_MAX_INT_MS } from 'src/constants';
+import env from 'src/environment';
 import { FilterModel } from 'src/models/filter.model';
 import { getNetwork } from 'src/networks';
 import { msToSec } from 'src/utils/date.utils';
@@ -24,7 +25,7 @@ const QuestEntityQuery = gql`
   }
 `;
 
-const QuestEntitiesQuery = gql`
+const QuestEntitiesQuery = (payload: any) => gql`
   query questEntities(
     $first: Int
     $skip: Int
@@ -33,6 +34,8 @@ const QuestEntitiesQuery = gql`
     $address: String
     $title: String
     $description: String
+    $blackList: [String]
+    $whiteList: [String]
   ) {
     questEntities(
       first: $first
@@ -40,8 +43,10 @@ const QuestEntitiesQuery = gql`
       where: {
         questExpireTimeSec_gte: $expireTimeLower
         questExpireTimeSec_lte: $expireTimeUpper
-        questTitle_contains: $title
-        questDescription_contains: $description
+        questTitle_contains_nocase: $title
+        questDescription_contains_nocase: $description
+        ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
+        ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
       }
       orderBy: creationTimestamp
       orderDirection: desc
@@ -105,14 +110,29 @@ export const fetchQuestEntities = async (
   } else {
     expireTimeLowerMs = filter.minExpireTime?.getTime() ?? 0;
   }
-  const res = await request(questsSubgraph, QuestEntitiesQuery, {
+
+  const whiteList = env('WHITE_LIST');
+  let blackList = env('BLACK_LIST');
+  if (blackList === '*') {
+    return [];
+  }
+  if (blackList === '') {
+    blackList = '*';
+  }
+
+  const payload = {
     skip: currentIndex,
     first: count,
     expireTimeLower: Math.round(expireTimeLowerMs / 1000),
     expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
     title: filter.title,
     description: filter.description,
-  });
+    blackList: blackList !== undefined ? blackList.toLowerCase().split(',') : undefined,
+    whiteList: whiteList && whiteList !== '*' ? whiteList.toLowerCase().split(',') : undefined,
+  };
+
+  const res = await request(questsSubgraph, QuestEntitiesQuery(payload), payload);
+
   return res.questEntities;
 };
 

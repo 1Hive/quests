@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 type Props = {
-  condition: boolean;
+  condition?: boolean;
   wrapper: (_children: ReactNode) => ReactNode;
   children: ReactNode;
 };

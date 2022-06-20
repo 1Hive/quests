@@ -1,6 +1,6 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   ADDRESS_ZERO,
   ENUM_CLAIM_STATE,
@@ -35,7 +35,7 @@ import { ConditionalWrapper } from './utils/util';
 
 // #region StyledComponents
 
-const ClickableDivStyled = styled.div`
+const ClickableDivStyled = styled(Link)`
   text-decoration: none;
   width: 100%;
   height: 100%;
@@ -118,7 +118,6 @@ export default function Quest({
   isSummary = false,
 }: Props) {
   const { walletConnected } = useWallet();
-  const history = useHistory();
   const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
   const [claims, setClaims] = useState<ClaimModel[]>();
@@ -289,7 +288,7 @@ export default function Quest({
           condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
-              onClick={() => history.push(`/${ENUM_PAGES.Detail}?id=${questData?.address}`)}
+              to={highlight ? `/${ENUM_PAGES.Detail}?id=${questData?.address}` : '#'}
               onMouseEnter={() => setHighlight(true)}
             >
               {children}

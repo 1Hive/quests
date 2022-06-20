@@ -202,9 +202,11 @@ async function generateScheduleContainer(
     lastBlockTimestamp +
     erc3000Config.executionDelay +
     (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
-  const claimInfoIpfsHash = await pushObjectToIpfs(
-    `${claimData.evidence}\nContactInformation: ${claimData.contactInformation}`,
-  );
+  let { evidence } = claimData;
+  if (claimData.contactInformation) {
+    evidence += `\nContactInformation: ${claimData.contactInformation}`;
+  }
+  const claimInfoIpfsHash = await pushObjectToIpfs(evidence);
 
   const claimCall = encodeClaimAction(claimData, claimInfoIpfsHash);
 
@@ -360,11 +362,10 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
 
 export async function fetchRewardTokens(): Promise<TokenModel[]> {
   const tokenAddresses = await fetchQuestRewardTokens();
-  return Promise.all(
-    arrayDistinct<string>(tokenAddresses)
-      .map(getTokenInfo)
-      .filter((x) => !!x),
-  ) as Promise<TokenModel[]>;
+  const tokensResult = await (Promise.all(
+    arrayDistinct<string>(tokenAddresses).map(getTokenInfo),
+  ) as Promise<TokenModel[]>);
+  return tokensResult.filter((token) => !!token); // Filter out not found tokens
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
@@ -562,8 +563,11 @@ export async function getBalanceOf(
           price === undefined ? undefined : parsedAmount * fromBigNumber(price, tokenInfo.decimals),
       };
     }
-  } catch (error) {
-    Logger.exception(error);
+  } catch (error: any) {
+    Logger.exception(
+      error,
+      `Failed to fetch balance of ${(token as any).token ? (token as any).token : token}`,
+    );
   }
   return null;
 }

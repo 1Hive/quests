@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // rinkeby
 const DEFAULT_CHAIN_ID = 100;
 
@@ -9,8 +11,15 @@ const ENV_VARS = {
   },
 };
 
-export default function env(name: string) {
+export default function env(name: string): string | undefined {
   const envVar = ENV_VARS[name];
-  if (!envVar) return process.env[`REACT_APP_${name}`];
-  return typeof envVar === 'function' ? envVar() : envVar;
+  let result;
+  if (!envVar) result = process.env[`REACT_APP_${name}`];
+  else {
+    result = typeof envVar === 'function' ? envVar() : envVar;
+  }
+  if (result) {
+    console.debug(`Using ${name}=${result}`);
+  }
+  return result;
 }
