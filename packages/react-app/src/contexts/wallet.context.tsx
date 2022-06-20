@@ -92,6 +92,7 @@ function WalletAugmented({ children }: Props) {
     wallet.reset();
     localStorage.removeItem('LAST_WALLET_CONNECTOR');
     localStorage.removeItem('walletconnect');
+    document.cookie = '';
     setIsConnected(false);
   };
 
