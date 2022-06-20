@@ -91,6 +91,7 @@ function WalletAugmented({ children }: Props) {
     setActivating(undefined);
     wallet.reset();
     localStorage.removeItem('LAST_WALLET_CONNECTOR');
+    localStorage.removeItem('walletconnect');
     setIsConnected(false);
   };
 
