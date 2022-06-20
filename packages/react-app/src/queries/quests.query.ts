@@ -99,7 +99,7 @@ export const fetchQuestEntities = async (
   count: number,
   filter: FilterModel,
 ) => {
-  const { questsSubgraph } = getNetwork();
+  const { questsSubgraph, networkId } = getNetwork();
   let expireTimeLowerMs = 0;
   let expireTimeUpperMs = GQL_MAX_INT_MS;
   if (filter.status === ENUM_QUEST_STATE.Active) {
@@ -111,8 +111,8 @@ export const fetchQuestEntities = async (
     expireTimeLowerMs = filter.minExpireTime?.getTime() ?? 0;
   }
 
-  const whiteList = env('WHITE_LIST');
-  let blackList = env('BLACK_LIST');
+  const whiteList = env(`${networkId.toUpperCase()}_WHITE_LIST`);
+  let blackList = env(`${networkId.toUpperCase()}_BLACK_LIST`);
   if (blackList === '*') {
     return [];
   }
