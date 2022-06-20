@@ -44,12 +44,6 @@ export const TOKENS = Object.freeze({
       token: '0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9',
       decimals: 18,
     } as TokenModel,
-    Theter: {
-      name: 'Tether',
-      symbol: 'USDT',
-      token: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-      decimals: 18,
-    } as TokenModel,
     Dai: {
       name: 'Dai Stablecoin',
       symbol: 'DAI',
@@ -67,5 +61,5 @@ export const TOKENS = Object.freeze({
 
 export const StableTokens = Object.freeze({
   gnosis: [TOKENS.xdai.Dai, TOKENS.xdai.Theter, TOKENS.xdai.UsdCoin],
-  rinkeby: [TOKENS.rinkeby.Dai, TOKENS.rinkeby.Theter, TOKENS.rinkeby.UsdCoin],
+  rinkeby: [TOKENS.rinkeby.Dai, TOKENS.rinkeby.UsdCoin],
 });
