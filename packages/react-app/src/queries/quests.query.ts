@@ -76,9 +76,16 @@ const QuestRewardTokens = gql`
   }
 `;
 
-const QuestEntitiesLight = gql`
-  query questEntities($expireTimeLower: Int) {
-    questEntities(where: { questExpireTimeSec_gt: $expireTimeLower }) {
+const QuestEntitiesLight = (payload: any) => gql`
+  query questEntities(
+    $expireTimeLower: Int
+    $blackList: [String]
+    $whiteList: [String]) {
+    questEntities(where: {
+      questExpireTimeSec_gt: $expireTimeLower
+      ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
+      ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
+     }) {
       id
       questRewardTokenAddress
       depositToken
@@ -144,8 +151,19 @@ export const fetchQuestRewardTokens = () => {
 };
 
 export const fetchActiveQuestEntitiesLight = () => {
-  const { questsSubgraph } = getNetwork();
-  return request(questsSubgraph, QuestEntitiesLight, {
+  const { questsSubgraph, networkId } = getNetwork();
+  const whiteList = env(`${networkId.toUpperCase()}_WHITE_LIST`);
+  let blackList = env(`${networkId.toUpperCase()}_BLACK_LIST`);
+  if (blackList === '*') {
+    return [];
+  }
+  if (blackList === '') {
+    blackList = '*';
+  }
+  const payload = {
     expireTimeLower: msToSec(Date.now()),
-  });
+    blackList: blackList !== undefined ? blackList.toLowerCase().split(',') : undefined,
+    whiteList: whiteList && whiteList !== '*' ? whiteList.toLowerCase().split(',') : undefined,
+  };
+  return request(questsSubgraph, QuestEntitiesLight(payload), payload);
 };
