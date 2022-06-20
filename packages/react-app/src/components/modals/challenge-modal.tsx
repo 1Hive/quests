@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, FormikErrors } from 'formik';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
+import { ENUM, ENUM_CLAIM_STATE, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
@@ -204,6 +204,7 @@ export default function ChallengeModal({
       }
     }
   };
+
   const validate = (values: ChallengeModel) => {
     const errors = {} as FormikErrors<ChallengeModel>;
     if (!values.reason) errors.reason = 'Challenge reason is required';
@@ -223,7 +224,12 @@ export default function ChallengeModal({
             onClick={() => setOpened(true)}
             label="Challenge"
             mode="negative"
-            title="Open challenge for this quest's claim"
+            title={
+              claim.state === ENUM_CLAIM_STATE.AvailableToExecute
+                ? 'Challenge period is over'
+                : "Open challenge for this quest's claim"
+            }
+            disabled={claim.state === ENUM_CLAIM_STATE.AvailableToExecute}
           />
         </OpenButtonWrapperStyled>
       }
