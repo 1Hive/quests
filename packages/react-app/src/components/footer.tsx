@@ -194,6 +194,14 @@ export default function footer() {
             <span>Request a feature</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
+          <FooterNavItemStyled
+            color={theme.contentSecondary}
+            href={`${REPO_ADDRESS}/issues/new?assignees=&labels=enhancement&template=enhancement-----enhancement_title-.md`}
+            external
+          >
+            <span>Request an enhancement</span>
+            <IconExternal size="small" />
+          </FooterNavItemStyled>
         </FooterColumnStyled>
       </FooterContainerStyledSide>
     </FooterContainerStyled>
