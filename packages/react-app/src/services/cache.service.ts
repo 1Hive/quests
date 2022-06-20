@@ -75,9 +75,10 @@ async function buildCache<TValue>(
         if (retryCount <= 0) {
           Logger.debug(`Failed to retrieve cache item, reseting cache ${cacheId}`);
           resetCache(cacheId);
+          break;
         }
       }
-      if (cached !== undefined && (!cached.expirationMs || cached.expirationMs > Date.now())) {
+      if (cached && (!cached.expirationMs || cached.expirationMs > Date.now())) {
         Logger.debug('Using cached version of', {
           cacheId,
           valueId,
@@ -158,7 +159,7 @@ function retrieveCache() {
 
 function resetCache(cacheId?: string) {
   if (cacheId) {
-    cacheMap.delete(cacheId);
+    cacheMap.get(cacheId)?.clear();
   } else {
     cacheMap.clear();
   }
