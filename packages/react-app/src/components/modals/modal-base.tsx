@@ -114,7 +114,7 @@ export default function ModalBase({
       ) {
         setTimeout(() => {
           setTransaction(undefined);
-        }, 750);
+        }, 1000);
       }
     }
   };
