@@ -362,11 +362,10 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
 
 export async function fetchRewardTokens(): Promise<TokenModel[]> {
   const tokenAddresses = await fetchQuestRewardTokens();
-  return Promise.all(
-    arrayDistinct<string>(tokenAddresses)
-      .map(getTokenInfo)
-      .filter((x) => !!x),
-  ) as Promise<TokenModel[]>;
+  const tokensResult = await (Promise.all(
+    arrayDistinct<string>(tokenAddresses).map(getTokenInfo),
+  ) as Promise<TokenModel[]>);
+  return tokensResult.filter((token) => !!token); // Filter out not found tokens
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
