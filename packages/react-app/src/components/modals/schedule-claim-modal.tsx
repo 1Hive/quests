@@ -69,8 +69,9 @@ const ButtonLinkStyled = styled(Button)`
   background: transparent;
   padding-top: 4px;
 `;
+
 const ContactInformationWrapperStyled = styled.div`
-  width: 406px;
+  max-width: 406px;
 `;
 
 // #endregion
