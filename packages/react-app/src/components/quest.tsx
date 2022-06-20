@@ -288,7 +288,7 @@ export default function Quest({
           condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
-              to={`/${ENUM_PAGES.Detail}?id=${questData?.address}`}
+              to={highlight ? `/${ENUM_PAGES.Detail}?id=${questData?.address}` : '#'}
               onMouseEnter={() => setHighlight(true)}
             >
               {children}

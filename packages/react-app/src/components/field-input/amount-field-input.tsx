@@ -138,9 +138,8 @@ const TokenAmountBadge = React.memo(
       return temp;
     }, [token, amount, usdValue]);
 
-    const onBadgeClick = (event: Event) => {
+    const onBadgeClick = () => {
       copyCode(token.token, `${token.symbol} address copied to clipboard`);
-      event.stopPropagation();
     };
 
     return (

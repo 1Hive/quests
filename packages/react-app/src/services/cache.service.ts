@@ -66,10 +66,16 @@ async function buildCache<TValue>(
     let cached = cache.get(valueId);
     if (cached !== undefined) {
       // Token is being fetched
+      let retryCount = 20;
       while (cached === null) {
         // eslint-disable-next-line no-await-in-loop
         await sleep(200);
         cached = cache.get(valueId);
+        retryCount -= 1;
+        if (retryCount <= 0) {
+          Logger.debug(`Failed to retrieve cache item, reseting cache ${cacheId}`);
+          resetCache(cacheId);
+        }
       }
       if (cached !== undefined && (!cached.expirationMs || cached.expirationMs > Date.now())) {
         Logger.debug('Using cached version of', {
@@ -89,7 +95,7 @@ async function buildCache<TValue>(
     expirationMs: cacheDurationMs ? Date.now() + cacheDurationMs : undefined,
   });
   Logger.debug('Building cached version of', { cacheId, valueId, value, cacheDurationMs });
-  saveCacheAsync(); // Save cache without waiting for it to be saved
+  saveCache(); // Save cache without waiting for it to be saved
   return value;
 }
 
@@ -112,7 +118,7 @@ function reviver(key: string, value: any) {
   return value;
 }
 
-function saveCacheAsync() {
+function saveCache() {
   const { networkId } = getNetwork();
   localStorage.setItem(`${networkId}.cache`, JSON.stringify({ cacheVersion, cacheMap }, replacer));
 }
@@ -148,3 +154,14 @@ function retrieveCache() {
 
   return new Map<string, Map<string, any>>();
 }
+
+function resetCache(cacheId?: string) {
+  if (cacheId) {
+    cacheMap.delete(cacheId);
+  } else {
+    cacheMap.clear();
+  }
+  saveCache();
+}
+
+(window as any).resetCache = resetCache;
