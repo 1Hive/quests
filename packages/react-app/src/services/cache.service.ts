@@ -126,6 +126,14 @@ function saveCache() {
 function retrieveCache() {
   const { networkId } = getNetwork();
   const cacheId = `${networkId}.cache`;
+
+  // Clear old cache
+  Object.keys(localStorage).forEach((key) => {
+    if (key.includes(`cache`) && !key.endsWith(`.cache`)) {
+      localStorage.removeItem(key);
+    }
+  });
+
   try {
     const cacheJson = localStorage.getItem(cacheId);
     if (cacheJson) {
@@ -144,13 +152,6 @@ function retrieveCache() {
     Logger.debug('Error retrieving cache from storage, clearing cache', error);
     localStorage.removeItem(cacheId);
   }
-
-  // Clear old cache
-  Object.keys(localStorage).forEach((key) => {
-    if (key.includes(`cache`) && !key.endsWith(`.cache`)) {
-      localStorage.removeItem(key);
-    }
-  });
 
   return new Map<string, Map<string, any>>();
 }
