@@ -54,6 +54,7 @@ dataSources:
     network: {{network}}
     source:
       abi: Govern
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.1

@@ -54,6 +54,7 @@ dataSources:
     network: xdai
     source:
       abi: Govern
+      startBlock: 22769097
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
