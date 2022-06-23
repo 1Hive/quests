@@ -24,6 +24,7 @@ import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye, FaMoneyBillWave } from 'react-icons/fa';
+import { QuestModel } from 'src/models/quest.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -81,6 +82,7 @@ type Props = {
   questTotalBounty?: TokenAmountModel | null;
   claimDeposit: TokenAmountModel;
   claimData?: ClaimModel;
+  questData: QuestModel;
   onClose?: ModalCallback;
 };
 const emptyClaimData = {
@@ -91,6 +93,7 @@ export default function ScheduleClaimModal({
   questTotalBounty,
   claimDeposit,
   claimData = emptyClaimData,
+  questData,
   onClose = noop,
 }: Props) {
   const { walletAddress } = useWallet();
@@ -157,7 +160,7 @@ export default function ScheduleClaimModal({
         walletAddress,
         setTransaction,
       );
-      const txPayload = {
+      let txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
@@ -168,6 +171,7 @@ export default function ScheduleClaimModal({
       setTransaction(txPayload);
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
+        questData,
         {
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
@@ -177,9 +181,9 @@ export default function ScheduleClaimModal({
           questAddress,
         },
         (txHash) => {
+          txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            hash: txHash,
             status: ENUM_TRANSACTION_STATUS.Pending,
           });
         },

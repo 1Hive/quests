@@ -156,7 +156,7 @@ export default function ChallengeModal({
         }
 
         if (!claim.container) throw new Error('Container is not defined');
-        const txPayload = {
+        let txPayload = {
           modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
@@ -174,9 +174,9 @@ export default function ChallengeModal({
           },
           claim.container,
           (txHash) => {
+            txPayload = { ...txPayload, hash: txHash };
             setTransaction({
               ...txPayload,
-              hash: txHash,
               status: ENUM_TRANSACTION_STATUS.Pending,
             });
           },

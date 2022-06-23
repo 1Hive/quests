@@ -224,8 +224,8 @@ function AmountFieldInput({
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
   useEffect(() => {
-    if (isEdit && !availableTokens.length) fetchAvailableTokens();
-  }, [isEdit]);
+    if (tokenEditable && !availableTokens.length && !isLoading) fetchAvailableTokens();
+  }, [isEdit, isLoading]);
 
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);

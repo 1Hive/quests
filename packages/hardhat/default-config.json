@@ -56,6 +56,7 @@
     "xdai": 604800
   },
   "CelesteResolver": {
-    "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85"
+    "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
+    "rinkeby": "0xC2224D785D4e4bc92D5be6767A82d026ca2813fD"
   }
 }

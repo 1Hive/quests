@@ -351,6 +351,7 @@ export default function Quest({
                   <FundModal quest={questData} />
                   {claimDeposit && (
                     <ScheduleClaimModal
+                      questData={questData}
                       questAddress={questData.address}
                       questTotalBounty={bounty}
                       claimDeposit={claimDeposit}

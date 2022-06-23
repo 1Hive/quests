@@ -22,7 +22,7 @@ export async function approveTokenTransaction(
     if (isDevelopement()) {
       return; // Skip only if development mode (having permanent allowance is a security risk see https://kalis.me/unlimited-erc20-allowances/#:~:text=several%20such%20exploits.-,bug%20exploits,-In%20early%202020)
     }
-    const txPayload = {
+    let txPayload = {
       modalId,
       estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
       message: 'Revoking already existing approval',
@@ -36,9 +36,9 @@ export async function approveTokenTransaction(
       spender,
       { ...token, amount: '0' },
       (txHash) => {
+        txPayload = { ...txPayload, hash: txHash };
         setTransaction({
           ...txPayload,
-          hash: txHash,
           status: ENUM_TRANSACTION_STATUS.Pending,
         });
       },
@@ -55,7 +55,7 @@ export async function approveTokenTransaction(
     }
   }
 
-  const txPayload = {
+  let txPayload = {
     modalId,
     estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
     message,
@@ -65,9 +65,9 @@ export async function approveTokenTransaction(
   setTransaction(txPayload);
   try {
     approveTxReceipt = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
+      txPayload = { ...txPayload, hash: txHash };
       setTransaction({
         ...txPayload,
-        hash: txHash,
         status: ENUM_TRANSACTION_STATUS.Pending,
       });
     });
@@ -99,7 +99,7 @@ export async function fundQuestTransaction(
   walletAddress: string,
   setTransaction: Dispatch<SetStateAction<TransactionModel | undefined>>,
 ) {
-  const txPayload = {
+  let txPayload = {
     modalId,
     estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
     message,
@@ -109,9 +109,9 @@ export async function fundQuestTransaction(
   } as TransactionModel;
   setTransaction(txPayload);
   const txReceipt = await fundQuest(walletAddress, questAddress, funds, (txHash) => {
+    txPayload = { ...txPayload, hash: txHash };
     setTransaction({
       ...txPayload,
-      hash: txHash,
       status: ENUM_TRANSACTION_STATUS.Pending,
     });
   });
