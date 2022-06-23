@@ -197,7 +197,7 @@ export default function QuestModal({
 
       let newQuestAddress: string;
       try {
-        const txPayload = {
+        let txPayload = {
           modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
           message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
@@ -216,9 +216,9 @@ export default function QuestModal({
           },
           undefined,
           (txHash) => {
+            txPayload = { ...txPayload, hash: txHash };
             setTransaction({
               ...txPayload,
-              hash: txHash,
               status: ENUM_TRANSACTION_STATUS.Pending,
             });
           },

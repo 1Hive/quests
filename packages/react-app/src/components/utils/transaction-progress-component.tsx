@@ -58,7 +58,7 @@ export function TransactionProgressComponent() {
         setMessageColor(positive);
         break;
       case ENUM_TRANSACTION_STATUS.Failed:
-        setMessage('Transaction failed');
+        setMessage('Transaction failed. Please try again in a few seconds.');
         setLogoColor(negativeSurface);
         setMessageColor(negative);
         break;

@@ -148,7 +148,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
     try {
       if (!claim.container) throw new Error('Container is not defined');
       const message = 'Resolving claim challenge';
-      const txPayload = {
+      let txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
         message,
@@ -166,9 +166,9 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         claim.container,
         dispute!,
         (txHash) => {
+          txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            hash: txHash,
             status: ENUM_TRANSACTION_STATUS.Pending,
           });
         },

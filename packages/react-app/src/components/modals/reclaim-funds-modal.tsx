@@ -84,7 +84,7 @@ export default function ReclaimFundsModal({
 
   const reclaimFundTx = async () => {
     try {
-      const txPayload = {
+      let txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
         message: 'Reclaiming funds and deposit',
@@ -97,9 +97,9 @@ export default function ReclaimFundsModal({
         walletAddress,
         questData,
         (txHash) => {
+          txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            hash: txHash,
             status: ENUM_TRANSACTION_STATUS.Pending,
           });
         },

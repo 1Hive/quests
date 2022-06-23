@@ -77,7 +77,7 @@ export default function ExecuteClaimModal({
 
   const claimTx = async () => {
     try {
-      const txPayload = {
+      let txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
         message: 'Claiming bounty',
@@ -87,9 +87,9 @@ export default function ExecuteClaimModal({
       } as TransactionModel;
       setTransaction(txPayload);
       const txReceipt = await QuestService.executeQuestClaim(walletAddress, claim, (txHash) => {
+        txPayload = { ...txPayload, hash: txHash };
         setTransaction({
           ...txPayload,
-          hash: txHash,
           status: ENUM_TRANSACTION_STATUS.Pending,
         });
       });
