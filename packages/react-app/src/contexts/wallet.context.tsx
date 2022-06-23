@@ -52,7 +52,11 @@ function WalletAugmented({ children }: Props) {
       window.ethereum = ethereum;
       ethereum?.on('chainChanged', (newChainId: string) => {
         const chainIdNumber = +newChainId;
-        if (EXPECTED_CHAIN_ID.includes(chainIdNumber) && chainIdNumber !== chainId) {
+        if (
+          !document.hidden &&
+          EXPECTED_CHAIN_ID.includes(chainIdNumber) &&
+          chainIdNumber !== chainId
+        ) {
           changeNetwork(chainIdNumber);
         }
         window.location.reload();

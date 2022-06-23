@@ -211,16 +211,12 @@ async function generateScheduleContainer(
     evidence,
     contactInformation: claimData.contactInformation,
     description: disputableDescription,
-    metadata: {
-      description: disputableDescription,
-      disputedActionText: 'Challenged Quest claim',
-      disputedActionURL: getIpfsBaseUri() + hexToAscii(claimInfoIpfsHash),
-      agreementTitle: '1Hive Community Covenant',
-      agreementText: 'QmfWppqC55Xc7PU48vei2XvVAuH76z2rNFF7JMUhjVM5xV',
-      disputedActionRadspec: `https://quests.1hive.org/#/detail?id=${questData.address}`,
-      organization: 'Quests',
-      defendant: claimData.playerAddress,
-    },
+    disputedActionText: 'Challenged Quest claim',
+    disputedActionURL: getIpfsBaseUri() + hexToAscii(claimInfoIpfsHash),
+    agreementTitle: '1Hive Community Covenant',
+    disputedActionRadspec: `https://quests.1hive.org/#/detail?id=${questData.address}`,
+    organization: 'Quests',
+    defendant: claimData.playerAddress,
   });
 
   const claimCall = encodeClaimAction(claimData, questPayloadIpfsHash);
