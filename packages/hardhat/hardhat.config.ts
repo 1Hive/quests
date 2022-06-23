@@ -659,7 +659,7 @@ task("generateGovernQueueConfig:rinkeby")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    defaultConfig.CelesteResolver.rinkeby
+    CelesteMock.address
   )
   .addOptionalParam(
     "rules",
