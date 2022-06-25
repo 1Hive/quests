@@ -214,7 +214,7 @@ async function generateScheduleContainer(
     disputedActionText: 'Challenged Quest claim',
     disputedActionURL: getIpfsBaseUri() + hexToAscii(claimInfoIpfsHash),
     agreementTitle: '1Hive Community Covenant',
-    disputedActionRadspec: `https://quests.1hive.org/#/detail?id=${questData.address}`,
+    agreementText: 'QmfWppqC55Xc7PU48vei2XvVAuH76z2rNFF7JMUhjVM5xV',
     organization: 'Quests',
     defendant: claimData.playerAddress,
   });
