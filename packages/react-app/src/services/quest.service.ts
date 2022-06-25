@@ -3,7 +3,7 @@ import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
-import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
+import { hexToBytes, toAscii, toChecksumAddress, hexToAscii } from 'web3-utils';
 import {
   GovernQueueChallengesQuery,
   GovernQueueEntityContainersQuery,
@@ -34,6 +34,7 @@ import {
   pushObjectToIpfs,
   formatIpfsMarkdownLink,
   ipfsTheGraph,
+  getIpfsBaseUri,
 } from './ipfs.service';
 import {
   getTokenInfo,
@@ -187,6 +188,7 @@ async function handleTransaction(
 async function generateScheduleContainer(
   walletAddress: string,
   claimData: ClaimModel,
+  questData: QuestModel,
   extraDelaySec?: number,
 ): Promise<ContainerModel> {
   const questContract = getQuestContract(claimData.questAddress);
@@ -202,11 +204,22 @@ async function generateScheduleContainer(
     lastBlockTimestamp +
     erc3000Config.executionDelay +
     (extraDelaySec || DEFAULT_CLAIM_EXECUTION_DELAY_MS / 1000); // Add 15 minutes by default
-  const claimInfoIpfsHash = await pushObjectToIpfs(
-    `${claimData.evidence}\nContactInformation: ${claimData.contactInformation}`,
-  );
+  const { evidence } = claimData;
+  const disputableDescription = `Claim action on ${questData.title}`;
+  const claimInfoIpfsHash = await pushObjectToIpfs(evidence);
+  const questPayloadIpfsHash = await pushObjectToIpfs({
+    evidence,
+    contactInformation: claimData.contactInformation,
+    description: disputableDescription,
+    disputedActionText: 'Challenged Quest claim',
+    disputedActionURL: getIpfsBaseUri() + hexToAscii(claimInfoIpfsHash),
+    agreementTitle: '1Hive Community Covenant',
+    disputedActionRadspec: `https://quests.1hive.org/#/detail?id=${questData.address}`,
+    organization: 'Quests',
+    defendant: claimData.playerAddress,
+  });
 
-  const claimCall = encodeClaimAction(claimData, claimInfoIpfsHash);
+  const claimCall = encodeClaimAction(claimData, questPayloadIpfsHash);
 
   return {
     config: erc3000Config,
@@ -249,7 +262,10 @@ export async function fetchQuest(questAddress: string) {
   return newQuest;
 }
 
-export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
+export async function fetchQuestClaims(
+  quest: QuestModel,
+  skipIpfs?: boolean,
+): Promise<ClaimModel[]> {
   const res = await fetchGovernQueueContainers();
 
   return Promise.all(
@@ -278,9 +294,13 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
           container,
         } as ClaimModel;
 
-        const { evidence, contactInformation } = await fetchClaimIpfsInfo(claimInfoIpfsHash);
-        claim.evidence = evidence;
-        claim.contactInformation = contactInformation;
+        if (skipIpfs) {
+          claim.evidence = formatIpfsMarkdownLink(claimInfoIpfsHash, 'See evidence');
+        } else {
+          const { evidence, contactInformation } = await fetchClaimIpfsInfo(claimInfoIpfsHash);
+          claim.evidence = evidence;
+          claim.contactInformation = contactInformation;
+        }
 
         return claim;
       }),
@@ -292,24 +312,37 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
 export async function fetchClaimIpfsInfo(claimInfoIpfsHash?: string) {
   if (claimInfoIpfsHash) {
     try {
-      const ipfsResult = await getObjectFromIpfs<string>(claimInfoIpfsHash, ipfsTheGraph);
-      if (!ipfsResult) throw new Error('Ipfs result is undefined');
+      const ipfsResult = await getObjectFromIpfs<{
+        evidence: string;
+        contactInformation?: string;
+      }>(claimInfoIpfsHash, ipfsTheGraph);
 
-      if (ipfsResult.includes('ContactInformation: ')) {
-        const splitResult = ipfsResult.split('\n');
-        const contactInformation = splitResult[splitResult.length - 1].replace(
-          'ContactInformation: ',
-          '',
-        ); // Contact information is always the last line and remove the prefix
-        const evidence = splitResult.slice(0, splitResult.length - 1).join('\n'); // Evidence is everything but the last line
-        return { evidence, contactInformation };
+      if (!ipfsResult) throw new Error('IPFS result is undefined');
+
+      //  Backward compatibility of only string format
+      if (typeof ipfsResult === 'string') {
+        if (ipfsResult.includes('ContactInformation: ')) {
+          const splitResult = ipfsResult.split('\n');
+          const contactInformation = splitResult[splitResult.length - 1].replace(
+            'ContactInformation: ',
+            '',
+          ); // Contact information is always the last line and remove the prefix
+          const evidence = splitResult.slice(0, splitResult.length - 1).join('\n'); // Evidence is everything but the last line
+          return { evidence, contactInformation };
+        }
+      } else {
+        return {
+          evidence: ipfsResult.evidence,
+          contactInformation: ipfsResult.contactInformation,
+        };
       }
+
       return { evidence: ipfsResult };
     } catch (error) {
       return { evidence: formatIpfsMarkdownLink(claimInfoIpfsHash, 'See evidence') };
     }
   } else {
-    return { evidence: 'No evidence submited from Player' };
+    return { evidence: 'No evidence submited from the Player' };
   }
 }
 
@@ -360,11 +393,10 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
 
 export async function fetchRewardTokens(): Promise<TokenModel[]> {
   const tokenAddresses = await fetchQuestRewardTokens();
-  return Promise.all(
-    arrayDistinct<string>(tokenAddresses)
-      .map(getTokenInfo)
-      .filter((x) => !!x),
-  ) as Promise<TokenModel[]>;
+  const tokensResult = await (Promise.all(
+    arrayDistinct<string>(tokenAddresses).map(getTokenInfo),
+  ) as Promise<TokenModel[]>);
+  return tokensResult.filter((token) => !!token); // Filter out not found tokens
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
@@ -562,8 +594,11 @@ export async function getBalanceOf(
           price === undefined ? undefined : parsedAmount * fromBigNumber(price, tokenInfo.decimals),
       };
     }
-  } catch (error) {
-    Logger.exception(error);
+  } catch (error: any) {
+    Logger.exception(
+      error,
+      `Failed to fetch balance of ${(token as any).token ? (token as any).token : token}`,
+    );
   }
   return null;
 }
@@ -574,12 +609,13 @@ export async function getBalanceOf(
 
 export async function scheduleQuestClaim(
   walletAddress: string,
+  questData: QuestModel,
   claimData: ClaimModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
-  const container = await generateScheduleContainer(walletAddress, claimData);
+  const container = await generateScheduleContainer(walletAddress, claimData, questData);
   Logger.debug('Scheduling quest claim...', { container });
   const tx = (await governQueueContract.schedule(container, {
     gasLimit: 500000,

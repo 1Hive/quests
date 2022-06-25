@@ -59,8 +59,7 @@ export const HelpTooltip = ({ tooltip, children }: Props) => {
 
   const isMountedRef = useIsMountedRef();
 
-  const handleClick = (e: Event) => {
-    e.stopPropagation();
+  const handleClick = () => {
     setVisible(true);
   };
 

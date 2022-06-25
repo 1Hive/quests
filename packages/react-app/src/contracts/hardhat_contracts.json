@@ -3683,7 +3683,7 @@
       "chainId": "100",
       "contracts": {
         "Govern": {
-          "address": "0xC6b74c1416eA7D76d4E4808c990F6fb91954Ff1C",
+          "address": "0xF7Ca580B38D60B00eaC495D6f932C5affa55A418",
           "abi": [
             {
               "inputs": [
@@ -4363,7 +4363,7 @@
           ]
         },
         "GovernQueue": {
-          "address": "0x9db80BE02a3Fd047B1b7F37D75C47F7CE7036D00",
+          "address": "0xd8D142f13E58dFEedaF96418C0B6843108d46B94",
           "abi": [
             {
               "inputs": [
@@ -6300,7 +6300,7 @@
           ]
         },
         "QuestFactory": {
-          "address": "0x4a3127598257B5A0404b858E134Cf5e1c3cAe137",
+          "address": "0x5Be5286FEFE6a44f394b551B6AC9255D42e974fe",
           "abi": [
             {
               "inputs": [

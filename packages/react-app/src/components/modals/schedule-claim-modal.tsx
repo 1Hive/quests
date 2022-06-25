@@ -1,10 +1,15 @@
 /* eslint-disable no-nested-ternary */
 import { Button } from '@1hive/1hive-ui';
-import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef, useMemo } from 'react';
+import { debounce, noop, uniqueId } from 'lodash-es';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import { ENUM_TRANSACTION_STATUS, ENUM, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
+import {
+  ENUM_TRANSACTION_STATUS,
+  ENUM,
+  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
+  ENUM_QUEST_STATE,
+} from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -19,6 +24,7 @@ import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye, FaMoneyBillWave } from 'react-icons/fa';
+import { QuestModel } from 'src/models/quest.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -64,8 +70,9 @@ const ButtonLinkStyled = styled(Button)`
   background: transparent;
   padding-top: 4px;
 `;
+
 const ContactInformationWrapperStyled = styled.div`
-  width: 406px;
+  max-width: 406px;
 `;
 
 // #endregion
@@ -74,13 +81,19 @@ type Props = {
   questAddress: string;
   questTotalBounty?: TokenAmountModel | null;
   claimDeposit: TokenAmountModel;
+  claimData?: ClaimModel;
+  questData: QuestModel;
   onClose?: ModalCallback;
 };
-
+const emptyClaimData = {
+  state: ENUM_QUEST_STATE.Draft,
+} as ClaimModel;
 export default function ScheduleClaimModal({
   questAddress,
   questTotalBounty,
   claimDeposit,
+  claimData = emptyClaimData,
+  questData,
   onClose = noop,
 }: Props) {
   const { walletAddress } = useWallet();
@@ -88,6 +101,7 @@ export default function ScheduleClaimModal({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [claimDataState, setClaimDataState] = useState<ClaimModel>(claimData);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
@@ -97,8 +111,12 @@ export default function ScheduleClaimModal({
     setOpened(false);
     onClose(succeed);
   };
+  const debounceSave = useCallback(
+    debounce((data: ClaimModel) => setClaimDataState(data), 500),
+    [], // will be created only once initially
+  );
 
-  const validate = (values: ClaimModel & { claimAll: boolean }) => {
+  const validate = (values: ClaimModel) => {
     const errors = {} as FormErrors<ClaimModel>;
     if (!values.evidence) errors.evidence = 'Evidence of completion is required';
     if (!values.claimAll) {
@@ -114,11 +132,12 @@ export default function ScheduleClaimModal({
         errors.playerAddress = 'Player address is not valid';
       }
     }
+    debounceSave(values);
     setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
 
-  const onClaimSubmit = (values: ClaimModel & { claimAll: boolean }) => {
+  const onClaimSubmit = (values: ClaimModel) => {
     validate(values); // Validate one last time before submitting
     if (isFormValid) {
       if (values.claimAll) {
@@ -141,7 +160,7 @@ export default function ScheduleClaimModal({
         walletAddress,
         setTransaction,
       );
-      const txPayload = {
+      let txPayload = {
         modalId,
         estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
@@ -152,6 +171,7 @@ export default function ScheduleClaimModal({
       setTransaction(txPayload);
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
+        questData,
         {
           claimedAmount: values.claimedAmount!,
           evidence: values.evidence!,
@@ -161,9 +181,9 @@ export default function ScheduleClaimModal({
           questAddress,
         },
         (txHash) => {
+          txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            hash: txHash,
             status: ENUM_TRANSACTION_STATUS.Pending,
           });
         },
@@ -176,6 +196,9 @@ export default function ScheduleClaimModal({
       });
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
+      if (isMountedRef.current) {
+        setClaimDataState(emptyClaimData);
+      }
     } catch (e: any) {
       if (isMountedRef.current) {
         setTransaction(
@@ -210,11 +233,13 @@ export default function ScheduleClaimModal({
       <Formik
         initialValues={
           {
-            evidence: '',
-            claimedAmount: { parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel,
-            claimAll: false,
-            contactInformation: undefined,
-            playerAddress: undefined,
+            evidence: claimDataState.evidence ?? '',
+            claimedAmount:
+              claimDataState.claimedAmount ??
+              ({ parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel),
+            claimAll: claimDataState.claimAll ?? false,
+            contactInformation: claimDataState.contactInformation,
+            playerAddress: claimDataState.playerAddress,
           } as any
         }
         onSubmit={(values) => {

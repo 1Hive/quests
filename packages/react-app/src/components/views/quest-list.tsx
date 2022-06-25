@@ -118,7 +118,6 @@ export default function QuestList() {
   useEffect(() => {
     // Should not be nullish and not already exist in list
     if (
-      filter.status === ENUM_QUEST_STATE.Active &&
       transaction?.type === 'QuestCreate' &&
       transaction.status === ENUM_TRANSACTION_STATUS.Confirmed &&
       filter.status !== ENUM_QUEST_STATE.Expired

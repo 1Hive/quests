@@ -64,7 +64,7 @@ export function AddressFieldInput({
   error,
 }: Props) {
   const loadableContent = (
-    <AddressWrapperStyled isEdit={isEdit} wide={wide} onClick={(e) => e.stopPropagation()}>
+    <AddressWrapperStyled isEdit={isEdit} wide={wide}>
       {isEdit ? (
         <TextInputStyled
           isEdit={isEdit}

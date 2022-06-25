@@ -6,6 +6,8 @@ import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import { fetchRoutePairWithStable } from './uniswap.service';
 
+const cacheVersion = 1;
+
 let cacheMap: Map<
   string,
   Map<string, { value: any; expirationMs?: number } | null>
@@ -64,12 +66,19 @@ async function buildCache<TValue>(
     let cached = cache.get(valueId);
     if (cached !== undefined) {
       // Token is being fetched
+      let retryCount = 20;
       while (cached === null) {
         // eslint-disable-next-line no-await-in-loop
         await sleep(200);
         cached = cache.get(valueId);
+        retryCount -= 1;
+        if (retryCount <= 0) {
+          Logger.debug(`Failed to retrieve cache item, reseting cache ${cacheId}`);
+          resetCache(cacheId);
+          break;
+        }
       }
-      if (cached !== undefined && (!cached.expirationMs || cached.expirationMs > Date.now())) {
+      if (cached && (!cached.expirationMs || cached.expirationMs > Date.now())) {
         Logger.debug('Using cached version of', {
           cacheId,
           valueId,
@@ -87,7 +96,7 @@ async function buildCache<TValue>(
     expirationMs: cacheDurationMs ? Date.now() + cacheDurationMs : undefined,
   });
   Logger.debug('Building cached version of', { cacheId, valueId, value, cacheDurationMs });
-  saveCacheAsync(); // Save cache without waiting for it to be saved
+  saveCache(); // Save cache without waiting for it to be saved
   return value;
 }
 
@@ -110,23 +119,51 @@ function reviver(key: string, value: any) {
   return value;
 }
 
-function saveCacheAsync() {
+function saveCache() {
   const { networkId } = getNetwork();
-  localStorage.setItem(`cache-${networkId}`, JSON.stringify(cacheMap, replacer));
+  localStorage.setItem(`${networkId}.cache`, JSON.stringify({ cacheVersion, cacheMap }, replacer));
 }
 
 function retrieveCache() {
+  const { networkId } = getNetwork();
+  const cacheId = `${networkId}.cache`;
+
+  // Clear old cache
+  Object.keys(localStorage).forEach((key) => {
+    if (key.includes(`cache`) && !key.endsWith(`.cache`)) {
+      localStorage.removeItem(key);
+    }
+  });
+
   try {
-    const { networkId } = getNetwork();
-    const cacheJson = localStorage.getItem(`cache-${networkId}`);
+    const cacheJson = localStorage.getItem(cacheId);
     if (cacheJson) {
-      const map = JSON.parse(cacheJson, reviver) as Map<string, Map<string, any>>;
-      if (map.size > 0) {
-        return map;
+      const result = JSON.parse(cacheJson, reviver) as {
+        cacheVersion: number;
+        cacheMap: Map<string, Map<string, any>>;
+      };
+      if (result.cacheVersion !== cacheVersion) {
+        Logger.debug('Cache version mismatch, clearing cache');
+        localStorage.removeItem(cacheId);
+      } else if (result.cacheMap.size > 0) {
+        return result.cacheMap;
       }
     }
   } catch (error) {
-    Logger.debug('Error retrieving cache from storage', error);
+    Logger.debug('Error retrieving cache from storage, clearing cache', error);
+    localStorage.removeItem(cacheId);
   }
+
   return new Map<string, Map<string, any>>();
 }
+
+function resetCache(cacheId?: string) {
+  if (cacheId) {
+    cacheMap.get(cacheId)?.clear();
+  } else {
+    cacheMap.clear();
+  }
+  saveCache();
+}
+
+(window as any).resetCache = resetCache;

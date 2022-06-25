@@ -19,7 +19,7 @@ export const networks = Object.freeze({
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[4].rinkeby.contracts.GovernQueue.address,
-    celesteAddress: HardhatDeployement[4].rinkeby.contracts.Celeste.address,
+    celesteAddress: '0xe772723b98E58F4b6217DeB381AA164f2b5FB33c',
     rpcUri: 'https://rinkeby.infura.io/v3',
     rpcKeyEnvName: 'INFURA_API_KEY',
     isTestNetwork: true,

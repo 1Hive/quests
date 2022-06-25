@@ -9,7 +9,6 @@ import { fetchRewardTokens } from 'src/services/quest.service';
 import { arrayDistinctBy } from 'src/utils/array.util';
 import { getTokenInfo } from 'src/utils/contract.util';
 import { GUpx } from 'src/utils/style.util';
-import { Logger } from 'src/utils/logger';
 import { includesCaseInsensitive } from 'src/utils/string.util';
 import { isAddress } from 'src/utils/web3.utils';
 import styled from 'styled-components';
@@ -54,6 +53,7 @@ interface AmountTokenWrapperStyledProps {
   isEdit?: boolean;
   wide?: boolean;
 }
+
 const AmountTokenWrapperStyled = styled.div<AmountTokenWrapperStyledProps>`
   display: flex;
   justify-content: flex-end;
@@ -74,6 +74,10 @@ const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
   padding: 0 ${GUpx(1)};
   font-weight: bold;
   min-width: 0;
+
+  &:after {
+    border-radius: 4px !important;
+  }
 `;
 
 const AmountEllipsisWrapperStyled = styled.div`
@@ -134,9 +138,8 @@ const TokenAmountBadge = React.memo(
       return temp;
     }, [token, amount, usdValue]);
 
-    const onBadgeClick = (event: Event) => {
+    const onBadgeClick = () => {
       copyCode(token.token, `${token.symbol} address copied to clipboard`);
-      event.stopPropagation();
     };
 
     return (
@@ -146,7 +149,11 @@ const TokenAmountBadge = React.memo(
         mode="strong"
         size="mini"
         label={label}
-        title={`Copy : ${token.token}\n* This token don't have pair with our stable list (see footer)`}
+        title={`Copy : ${token.token}${
+          usdValue === undefined
+            ? `\n* This token don't have pair with our stable list (see footer)`
+            : ''
+        }`}
         onClick={onBadgeClick}
       />
     );
@@ -197,7 +204,7 @@ function AmountFieldInput({
   error,
 }: Props) {
   const isMountedRef = useIsMountedRef();
-  const { networkId } = getNetwork();
+  const { networkId, name } = getNetwork();
   const [tokens, setTokens] = useState<TokenModel[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>();
   const [amount, setAmount] = useState<number | undefined>(value?.parsedAmount);
@@ -206,6 +213,7 @@ function AmountFieldInput({
   const [_hasFocused, _setHasFocused] = useState<boolean>();
   const tokenInputId = tokenEditable ? id : `token-${id}`; // Handle label for
   const amountInputId = !tokenEditable ? id : `amount-${id}`; // Handle label for
+  const [errorState, setErrorState] = useState<string | false | undefined>(error);
 
   // Needed since the access of state in event handlers is not working
   const hasFocusedRef = React.useRef(_hasFocused);
@@ -216,8 +224,8 @@ function AmountFieldInput({
   const autoCompleteRef: React.Ref<any> = useRef(null);
 
   useEffect(() => {
-    if (isEdit && !availableTokens.length) fetchAvailableTokens();
-  }, [isEdit]);
+    if (tokenEditable && !availableTokens.length && !isLoading) fetchAvailableTokens();
+  }, [isEdit, isLoading]);
 
   useEffect(() => {
     if (!token) document.addEventListener('focusin', handleFocusIn);
@@ -225,15 +233,22 @@ function AmountFieldInput({
   }, [isEdit, tokenEditable, token]);
 
   useEffect(() => {
-    if (availableTokens.length && _hasFocused) {
+    const handleSearch = async () => {
       if (searchTerm && isAddress(searchTerm)) {
         setTokens([]);
-        getTokenInfo(searchTerm)
-          .then((tokenInfo) => {
-            if (typeof tokenInfo !== 'string')
-              if (tokenInfo && isMountedRef.current) setTokens([tokenInfo]);
-          })
-          .catch(Logger.exception);
+        let tokenInfo;
+        try {
+          tokenInfo = await getTokenInfo(searchTerm);
+        } catch {
+          tokenInfo = null;
+        }
+        if (isMountedRef.current) {
+          if (tokenInfo) {
+            setTokens([tokenInfo]);
+          } else {
+            setErrorState(`No token found with this address on ${name}`);
+          }
+        }
       } else {
         setTokens(
           availableTokens.filter(
@@ -242,6 +257,9 @@ function AmountFieldInput({
           ),
         );
       }
+    };
+    if (availableTokens.length && _hasFocused) {
+      handleSearch();
     }
   }, [searchTerm, availableTokens, _hasFocused]);
 
@@ -267,6 +285,7 @@ function AmountFieldInput({
     const networkDefaultTokens =
       Object.values<TokenModel>(TOKENS[networkId]).filter((x) => !!x.token) ?? [];
     const questsUsedTokens = await fetchRewardTokens();
+
     if (isMountedRef.current) {
       setAvailableTokens(
         arrayDistinctBy([...networkDefaultTokens, ...questsUsedTokens], (x) => x.token),
@@ -404,7 +423,7 @@ function AmountFieldInput({
       wide={wide}
       compact={compact}
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
-      error={error}
+      error={errorState}
       className={!isEdit ? 'fit-content' : ''}
     >
       {reversed ? [tokenField, amountField] : [amountField, tokenField]}

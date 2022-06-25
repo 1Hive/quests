@@ -1,11 +1,11 @@
 /* eslint-disable no-nested-ternary */
 import { Button, useToast, IconFlag } from '@1hive/1hive-ui';
-import { noop, uniqueId } from 'lodash-es';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { debounce, noop, uniqueId } from 'lodash-es';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, FormikErrors } from 'formik';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
+import { ENUM, ENUM_CLAIM_STATE, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
@@ -64,10 +64,18 @@ const ButtonLinkStyled = styled(Button)`
 type Props = {
   claim: ClaimModel;
   challengeDeposit: TokenAmountModel;
+  challengeData?: ChallengeModel;
   onClose?: ModalCallback;
 };
 
-export default function ChallengeModal({ claim, challengeDeposit, onClose = noop }: Props) {
+const emptyChallengeData = {} as ChallengeModel;
+
+export default function ChallengeModal({
+  claim,
+  challengeData = emptyChallengeData,
+  challengeDeposit,
+  onClose = noop,
+}: Props) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
@@ -75,6 +83,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [challengeDataState, setChallengeDataState] = useState<ChallengeModel>(challengeData);
   const { setTransaction } = useTransactionContext();
   const formRef = useRef<HTMLFormElement>(null);
   const { walletAddress } = useWallet();
@@ -88,6 +97,10 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
     };
     fetchFee();
   }, []);
+  const debounceSave = useCallback(
+    debounce((data: ChallengeModel) => setChallengeDataState(data), 500),
+    [],
+  );
 
   useEffect(() => {
     if (challengeFee)
@@ -143,7 +156,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
         }
 
         if (!claim.container) throw new Error('Container is not defined');
-        const txPayload = {
+        let txPayload = {
           modalId,
           estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
@@ -161,9 +174,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
           },
           claim.container,
           (txHash) => {
+            txPayload = { ...txPayload, hash: txHash };
             setTransaction({
               ...txPayload,
-              hash: txHash,
               status: ENUM_TRANSACTION_STATUS.Pending,
             });
           },
@@ -175,6 +188,9 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             : ENUM_TRANSACTION_STATUS.Failed,
         });
         if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
+        if (isMountedRef.current) {
+          setChallengeDataState(emptyChallengeData);
+        }
       } catch (e: any) {
         setTransaction(
           (oldTx) =>
@@ -188,10 +204,11 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       }
     }
   };
+
   const validate = (values: ChallengeModel) => {
     const errors = {} as FormikErrors<ChallengeModel>;
     if (!values.reason) errors.reason = 'Challenge reason is required';
-
+    debounceSave(values);
     setIsFormValid(Object.keys(errors).length === 0);
     return errors;
   };
@@ -207,7 +224,12 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
             onClick={() => setOpened(true)}
             label="Challenge"
             mode="negative"
-            title="Open challenge for this quest's claim"
+            title={
+              claim.state === ENUM_CLAIM_STATE.AvailableToExecute
+                ? 'Challenge period is over'
+                : "Open challenge for this quest's claim"
+            }
+            disabled={claim.state === ENUM_CLAIM_STATE.AvailableToExecute}
           />
         </OpenButtonWrapperStyled>
       }
@@ -264,7 +286,7 @@ export default function ChallengeModal({ claim, challengeDeposit, onClose = noop
       isOpen={opened}
     >
       <Formik
-        initialValues={{ reason: '' } as any}
+        initialValues={{ reason: challengeDataState.reason ?? '' } as any}
         onSubmit={(values) => {
           validate(values); // validate one last time before submiting
           if (isFormValid) {
