@@ -3,7 +3,7 @@ import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
-import { hexToBytes, toAscii, toChecksumAddress, hexToAscii } from 'web3-utils';
+import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueChallengesQuery,
   GovernQueueEntityContainersQuery,
@@ -34,7 +34,6 @@ import {
   pushObjectToIpfs,
   formatIpfsMarkdownLink,
   ipfsTheGraph,
-  getIpfsBaseUri,
 } from './ipfs.service';
 import {
   getTokenInfo,
@@ -212,7 +211,7 @@ async function generateScheduleContainer(
     contactInformation: claimData.contactInformation,
     description: disputableDescription,
     disputedActionText: 'Challenged Quest claim',
-    disputedActionURL: getIpfsBaseUri() + hexToAscii(claimInfoIpfsHash),
+    disputedActionURL: `https://quests.1hive.org/#/detail?id=${claimData.questAddress}`,
     agreementTitle: '1Hive Community Covenant',
     agreementText: 'QmfWppqC55Xc7PU48vei2XvVAuH76z2rNFF7JMUhjVM5xV',
     organization: 'Quests',
