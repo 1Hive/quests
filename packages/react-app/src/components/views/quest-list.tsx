@@ -101,6 +101,7 @@ export default function QuestList() {
     return fakeQuests;
   }, []);
 
+  // Init
   useEffect(() => {
     setPage(ENUM_PAGES.List);
   }, []);

@@ -6,6 +6,7 @@ import { getNetwork } from 'src/networks';
 import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueChallengesQuery,
+  GovernQueueEntityClaimsLightQuery,
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
 } from 'src/queries/govern-queue-entity.query';
@@ -52,11 +53,12 @@ let questList: QuestModel[] = [];
 type onTxCallback = (_hash: string) => void;
 
 // #region Private
-async function mapQuest(questEntity: any) {
+async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
   if (!questEntity) return undefined;
   try {
+    const questAddress = toChecksumAddress(questEntity.questAddress);
     const quest = {
-      address: toChecksumAddress(questEntity.questAddress),
+      address: questAddress,
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
@@ -71,6 +73,7 @@ async function mapQuest(questEntity: any) {
         : undefined,
       fallbackAddress: toChecksumAddress(questEntity.questFundsRecoveryAddress),
       creatorAddress: toChecksumAddress(questEntity.questCreator),
+      activeClaimCount: claimCountMap.get(questAddress) ?? 0,
     } as QuestModel;
 
     if (!quest.detailsRefIpfs) quest.description = '[No description]';
@@ -84,8 +87,12 @@ async function mapQuest(questEntity: any) {
   }
 }
 
-function mapQuestList(quests: any[]): Promise<QuestModel[]> {
-  return Promise.all(quests.map(mapQuest).filter((quest) => !!quest)) as Promise<QuestModel[]>; // Filter out undefined quests (skiped)
+async function mapQuestList(quests: any[]): Promise<QuestModel[]> {
+  const claimsResult = await fetchGovernQueueClaimsCount();
+
+  return Promise.all(
+    quests.map((quest) => mapQuest(quest, claimsResult)).filter((quest) => !!quest),
+  ) as Promise<QuestModel[]>; // Filter out undefined quests (skiped)
 }
 
 async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
@@ -109,6 +116,22 @@ async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel 
       nonce: +nonce,
     }
   );
+}
+
+export async function fetchGovernQueueClaimsCount(): Promise<Map<string, number>> {
+  const { governSubgraph, governQueueAddress } = getNetwork();
+  const result = await request(governSubgraph, GovernQueueEntityClaimsLightQuery, {
+    ID: governQueueAddress.toLowerCase(),
+  });
+  if (!result?.governQueue)
+    throw new Error(`GovernQueue does not exist at this address : ${governQueueAddress}`);
+  // not sure if i can return result directly vu que cest juste des id et pas des models comme les claims
+  const countMap = new Map<string, number>();
+  result.governQueue.containers.forEach((claim: any) => {
+    const questAddress = toChecksumAddress(claim.payload.actions[0].to);
+    countMap.set(questAddress, (countMap.get(questAddress) ?? 0) + 1);
+  });
+  return countMap;
 }
 
 async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
@@ -257,7 +280,9 @@ export async function fetchQuestsPaging(
 
 export async function fetchQuest(questAddress: string) {
   const queryResult = await fetchQuestEnity(questAddress);
-  const newQuest = mapQuest(queryResult);
+  const claimResult = await fetchGovernQueueClaimsCount();
+
+  const newQuest = mapQuest(queryResult, claimResult);
   return newQuest;
 }
 
