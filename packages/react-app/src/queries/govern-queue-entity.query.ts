@@ -78,6 +78,7 @@ export const GovernQueueEntityContainersQuery = gql`
     }
   }
 `;
+
 export const GovernQueueEntityClaimsLightQuery = gql`
   query governQueue($ID: String) {
     governQueue(id: $ID) {
