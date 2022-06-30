@@ -9,8 +9,8 @@ export type QuestModel = {
   expireTime: Date;
   fallbackAddress: string;
   creatorAddress: string;
-
   // Computed
+  activeClaimCount?: number;
   creationTime?: Date;
   address?: string;
   bounty?: TokenAmountModel | null;
