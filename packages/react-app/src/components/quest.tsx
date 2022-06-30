@@ -239,7 +239,11 @@ export default function Quest({
         />
       </HighlightBlocker>
       {isSummary && (
-        <NumberFieldInput value={questData?.activeClaimCount} label="Claims" loading={isLoading} />
+        <NumberFieldInput
+          value={questData?.activeClaimCount}
+          label="Claims"
+          isLoading={isLoading}
+        />
       )}
       {!isSummary && (
         <>
