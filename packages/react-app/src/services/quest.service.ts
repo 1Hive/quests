@@ -280,7 +280,6 @@ export async function fetchQuestsPaging(
 export async function fetchQuest(questAddress: string) {
   const queryResult = await fetchQuestEnity(questAddress);
   const claimResult = await fetchGovernQueueClaimsCount();
-
   const newQuest = mapQuest(queryResult, claimResult);
   return newQuest;
 }
