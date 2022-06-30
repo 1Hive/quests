@@ -238,7 +238,7 @@ export default function Quest({
           value={questData?.address}
         />
       </HighlightBlocker>
-      {isSummary && <NumberFieldInput value={questData?.activeClaimCount} label="Claims" />}
+      {isSummary && <NumberFieldInput value={questData?.activeClaimCount} label="Claims" loading={isLoading}/>}
       {!isSummary && (
         <>
           <AddressFieldInputStyled
