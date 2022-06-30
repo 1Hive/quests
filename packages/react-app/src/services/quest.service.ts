@@ -125,7 +125,6 @@ export async function fetchGovernQueueClaimsCount(): Promise<Map<string, number>
   });
   if (!result?.governQueue)
     throw new Error(`GovernQueue does not exist at this address : ${governQueueAddress}`);
-  // not sure if i can return result directly vu que cest juste des id et pas des models comme les claims
   const countMap = new Map<string, number>();
   result.governQueue.containers.forEach((claim: any) => {
     const questAddress = toChecksumAddress(claim.payload.actions[0].to);
