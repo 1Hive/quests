@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconCoin, IconCaution, Info } from '@1hive/1hive-ui';
+import { Button, IconRotateLeft, IconCaution, Info } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
@@ -82,7 +82,7 @@ export default function ReclaimFundsModal({
     }
   }, []);
 
-  const reclaimFundTx = async () => {
+  const recoverFundTx = async () => {
     try {
       let txPayload = {
         modalId,
@@ -93,7 +93,7 @@ export default function ReclaimFundsModal({
         args: { questAddress: questData.address },
       } as TransactionModel;
       setTransaction(txPayload);
-      const txReceipt = await QuestService.reclaimQuestUnusedFunds(
+      const txReceipt = await QuestService.recoverFundsAndDeposit(
         walletAddress,
         questData,
         (txHash) => {
@@ -132,23 +132,23 @@ export default function ReclaimFundsModal({
     <>
       <ModalBase
         id={modalId}
-        title="Reclaim funds and deposit"
+        title="Recover remaining funds and deposit"
         openButton={
           <OpenButtonStyled
             onClick={() => setOpened(true)}
-            icon={<IconCoin />}
-            label="Reclaim"
+            icon={<IconRotateLeft />}
+            label="Recover"
             mode="strong"
-            title="Reclaim"
+            title="Recover remaining funds and deposit"
           />
         }
         buttons={
           <Button
-            onClick={reclaimFundTx}
-            icon={<IconCoin />}
-            label="Reclaim"
+            onClick={recoverFundTx}
+            icon={<IconRotateLeft />}
+            label="Recover"
             mode="strong"
-            title="Reclaim remaining funds and deposit"
+            title="Recover remaining funds and deposit"
           />
         }
         onClose={closeModal}
@@ -156,10 +156,10 @@ export default function ReclaimFundsModal({
       >
         <RowStyled>
           <Outset gu16>
-            <AmountFieldInputFormik id="bounty" label="Reclaimable funds" value={bounty} />
+            <AmountFieldInputFormik id="bounty" label="Funds" value={bounty} />
           </Outset>
           <Outset gu16>
-            <FieldInput label="will be send to">
+            <FieldInput label="Recover address">
               <IdentityBadge entity={questData.fallbackAddress} badgeOnly />
             </FieldInput>
           </Outset>
@@ -167,14 +167,10 @@ export default function ReclaimFundsModal({
         {depositTokenAmount && !isDepositReleased && (
           <RowStyled>
             <Outset gu16>
-              <AmountFieldInputFormik
-                id="bounty"
-                label="Reclaimable deposit"
-                value={depositTokenAmount}
-              />
+              <AmountFieldInputFormik id="bounty" label="Deposit" value={depositTokenAmount} />
             </Outset>
             <Outset gu16>
-              <FieldInput label="will be send to">
+              <FieldInput label="Recover address">
                 <IdentityBadge entity={questData.creatorAddress} badgeOnly />
               </FieldInput>
             </Outset>

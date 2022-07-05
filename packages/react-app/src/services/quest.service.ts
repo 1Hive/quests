@@ -509,15 +509,15 @@ export async function saveQuest(
 
 // #region Quest
 
-export async function reclaimQuestUnusedFunds(
+export async function recoverFundsAndDeposit(
   walletAddress: string,
   quest: QuestModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
-  if (!quest.address) throw new Error('Quest address is not defined when reclaiming');
+  if (!quest.address) throw new Error('Quest address is not defined when recovering funds');
   const questContract = getQuestContract(quest.address, walletAddress);
   if (!questContract) return null;
-  Logger.debug('Reclaiming quest unused funds...', { quest });
+  Logger.debug('Recovering quest unused funds and deposit...', { quest });
   const tx = await questContract.recoverFundsAndDeposit({
     gasLimit: 1000000,
   });

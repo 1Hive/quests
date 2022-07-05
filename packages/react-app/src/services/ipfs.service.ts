@@ -37,6 +37,8 @@ export const pushObjectToIpfs = async (obj: Object | string): Promise<string> =>
   return toHex(cid);
 };
 
+(window as any).pushObjectToIpfs = pushObjectToIpfs;
+
 export async function getObjectFromIpfs<TResult = string>(
   objHasHex: string,
   configOverride?: IPFSHTTPClient,

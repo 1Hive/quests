@@ -352,37 +352,34 @@ export default function Quest({
           )}
           {!isSummary && questData.address && walletConnected && (
             <QuestFooterStyled>
-              {questData?.state === ENUM_QUEST_STATE.Active ? (
-                <>
-                  <FundModal quest={questData} />
-                  {claimDeposit && (
-                    <ScheduleClaimModal
-                      questData={questData}
-                      questAddress={questData.address}
-                      questTotalBounty={bounty}
-                      claimDeposit={claimDeposit}
-                    />
-                  )}
-                </>
-              ) : (
-                <>
-                  {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
-                    <ReclaimFundsModal
-                      bounty={bounty}
-                      questData={questData}
-                      isDepositReleased={isDepositReleased}
-                      onClose={() => setWaitForClose(false)}
-                      pendingClaims={
-                        !!claims?.find(
-                          (claim) =>
-                            claim.state === ENUM_CLAIM_STATE.Scheduled ||
-                            claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
-                        )
-                      }
-                    />
-                  )}
-                </>
-              )}
+              <>
+                <FundModal quest={questData} />
+                {claimDeposit && (
+                  <ScheduleClaimModal
+                    questData={questData}
+                    questAddress={questData.address}
+                    questTotalBounty={bounty}
+                    claimDeposit={claimDeposit}
+                  />
+                )}
+              </>
+              <>
+                {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
+                  <ReclaimFundsModal
+                    bounty={bounty}
+                    questData={questData}
+                    isDepositReleased={isDepositReleased}
+                    onClose={() => setWaitForClose(false)}
+                    pendingClaims={
+                      !!claims?.find(
+                        (claim) =>
+                          claim.state === ENUM_CLAIM_STATE.Scheduled ||
+                          claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
+                      )
+                    }
+                  />
+                )}
+              </>
             </QuestFooterStyled>
           )}
         </ConditionalWrapper>
