@@ -32,6 +32,7 @@ import { isQuestExpired, processQuestState as computeQuestState } from '../servi
 import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
+import NumberFieldInput from './field-input/number-field-input';
 
 // #region StyledComponents
 
@@ -163,7 +164,7 @@ export default function Quest({
         transaction?.status === ENUM_TRANSACTION_STATUS.Pending &&
         transaction?.type === 'QuestReclaimFunds'
       ) {
-        // Should wait for close beecause changing the state will cause QuestReclaimFunds to be removed from DOM
+        // Should wait for close because changing the state will cause QuestReclaimFunds to be removed from DOM
         setWaitForClose(true);
       } else if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) {
         setBounty(null);
@@ -237,7 +238,13 @@ export default function Quest({
           value={questData?.address}
         />
       </HighlightBlocker>
-
+      {isSummary && (
+        <NumberFieldInput
+          value={questData?.activeClaimCount}
+          label="Claims"
+          isLoading={isLoading}
+        />
+      )}
       {!isSummary && (
         <>
           <AddressFieldInputStyled
@@ -274,7 +281,6 @@ export default function Quest({
       )}
     </RowStyled>
   );
-
   return (
     <CardWrapperStyed compact={below('medium')}>
       <CardStyled

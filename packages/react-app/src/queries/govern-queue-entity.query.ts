@@ -79,6 +79,21 @@ export const GovernQueueEntityContainersQuery = gql`
   }
 `;
 
+export const GovernQueueEntityClaimsLightQuery = gql`
+  query governQueue($ID: String) {
+    governQueue(id: $ID) {
+      containers {
+        payload {
+          actions {
+            to
+          }
+        }
+        state
+      }
+    }
+  }
+`;
+
 export const GovernQueueChallengesQuery = gql`
   query containerEventChallenges($containerId: String) {
     containerEventChallenges(
