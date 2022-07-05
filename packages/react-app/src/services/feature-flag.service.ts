@@ -8,7 +8,7 @@ const flagPrefix = `FLAG.${networkId.toUpperCase()}.`;
 
 export const flags = {
   DUMMY_QUEST: false,
-  CREATE_QUEST: false,
+  CREATE_QUEST: true,
   SWITCH_CHAIN: true,
 };
 
