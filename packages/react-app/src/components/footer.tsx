@@ -108,7 +108,11 @@ export default function footer() {
             </TitleLinkWrapperStyled>
           </TitleLinkStyled>
           <LineStyled>
-            Bounty board platform built on xDai <br /> and linked to the 1Hive project
+            Bounty board platform linked to the
+            <a href="https://1hive.org/" className="pl-4 pr-4" target="_blank" rel="noreferrer">
+              1Hive
+            </a>
+            project
           </LineStyled>
           <LineStyled>© {year} Quests</LineStyled>
           <LineStyled>All Rights Reserved</LineStyled>
