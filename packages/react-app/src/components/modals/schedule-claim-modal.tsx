@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button } from '@1hive/1hive-ui';
+import { Button, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
@@ -34,6 +34,7 @@ import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { WalletBallance } from '../wallet-balance';
 import Stepper from '../utils/stepper';
+import { HelpTooltip } from '../field-input/help-tooltip';
 
 // #region StyledComponents
 
@@ -106,6 +107,11 @@ export default function ScheduleClaimModal({
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
   const isMountedRef = useIsMountedRef();
+
+  const willExpireBeforeClaim = useMemo(
+    () => questData.expireTime.getTime() < Date.now() + DEFAULT_CLAIM_EXECUTION_DELAY_MS,
+    [questData.expireTime],
+  );
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -314,7 +320,7 @@ export default function ScheduleClaimModal({
                       </Outset>
                     </LineStyled>
                   }
-                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future. Also make sure to include contact information if you want the Creator to be able to communicate with you."
+                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
                   value={values.evidence}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -377,7 +383,7 @@ export default function ScheduleClaimModal({
                         id="contactInformation"
                         isEdit
                         label="Contact information (optional)"
-                        tooltip="The necessary contact information that the creator will use to communicate with you."
+                        tooltip="The necessary contact information that the creator will use to communicate with you. (Optional)"
                         value={values.contactInformation}
                         onChange={handleChange}
                         placeHolder="e.g. discord, email, phone number, etc."
@@ -387,6 +393,20 @@ export default function ScheduleClaimModal({
                       />
                     </ContactInformationWrapperStyled>
                   </Outset>
+                  {willExpireBeforeClaim && (
+                    <Outset vertical>
+                      <Info mode="warning">
+                        <LineStyled>
+                          The quest will expire before your claim can be executed.
+                          <HelpTooltip>
+                            The quest will expire before the claim validation period is over. It
+                            will still be executable past that point but the quest funds might be
+                            withdrawn.
+                          </HelpTooltip>
+                        </LineStyled>
+                      </Info>
+                    </Outset>
+                  )}
                 </WrapperStyled>,
               ]}
             />

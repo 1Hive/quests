@@ -344,7 +344,7 @@ export default function Quest({
           </ContentWrapperStyled>
           {!isSummary && challengeDeposit && (
             <ClaimList
-              questData={{ ...questData, bounty }}
+              questData={{ ...questData, bounty, state }}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
               onClaimsFetched={setClaims}
@@ -353,10 +353,10 @@ export default function Quest({
           {!isSummary && questData.address && walletConnected && (
             <QuestFooterStyled>
               <>
-                <FundModal quest={questData} />
+                {state === ENUM_QUEST_STATE.Active && <FundModal quest={questData} />}
                 {claimDeposit && (
                   <ScheduleClaimModal
-                    questData={questData}
+                    questData={{ ...questData, state }}
                     questAddress={questData.address}
                     questTotalBounty={bounty}
                     claimDeposit={claimDeposit}
@@ -367,7 +367,7 @@ export default function Quest({
                 {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
                   <ReclaimFundsModal
                     bounty={bounty}
-                    questData={questData}
+                    questData={{ ...questData, state }}
                     isDepositReleased={isDepositReleased}
                     onClose={() => setWaitForClose(false)}
                     pendingClaims={
