@@ -5,10 +5,12 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
+  GovernQueueChallengeReasonQuery,
   GovernQueueChallengesQuery,
   GovernQueueEntityClaimsLightQuery,
   GovernQueueEntityContainersQuery,
   GovernQueueEntityQuery,
+  GovernQueueVetoReasonsQuery,
 } from 'src/queries/govern-queue-entity.query';
 import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
@@ -27,6 +29,7 @@ import {
 } from 'src/queries/quests.query';
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
+import { VetoModel } from 'src/models/veto.model';
 import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -413,6 +416,33 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
   };
 }
 
+export async function fetchChallengeReason(container: ContainerModel): Promise<string | undefined> {
+  const { governSubgraph } = getNetwork();
+  const result = await request(governSubgraph, GovernQueueChallengeReasonQuery, {
+    containerId: container.id.toLowerCase(),
+  });
+
+  const reason = result.containerEventChallenges[0]?.reason;
+
+  if (!reason) return undefined;
+
+  const fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph);
+  return fetchedReason;
+}
+
+export async function fetchVetoReason(container: ContainerModel): Promise<string | undefined> {
+  const { governSubgraph } = getNetwork();
+  const result = await request(governSubgraph, GovernQueueVetoReasonsQuery, {
+    containerId: container.id.toLowerCase(),
+  });
+  const reason = result.containerEventVetos[0]?.reason;
+
+  if (!reason) return undefined;
+
+  const fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph);
+  return fetchedReason;
+}
+
 export async function fetchRewardTokens(): Promise<TokenModel[]> {
   const tokenAddresses = await fetchQuestRewardTokens();
   const tokensResult = await (Promise.all(
@@ -673,11 +703,31 @@ export async function challengeQuestClaim(
 ): Promise<ethers.ContractReceipt | null> {
   const governQueueContract = getGovernQueueContract(walletAddress);
   if (!governQueueContract) return null;
-  Logger.debug('Challenging quest...', { container, challenge });
+  Logger.debug('Challenging a quest claim...', { container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
   const tx = await governQueueContract.challenge(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
+    {
+      gasLimit: 1000000,
+    },
+  );
+  return handleTransaction(tx, onTx);
+}
+
+export async function vetoQuestClaim(
+  walletAddress: string,
+  veto: VetoModel,
+  container: ContainerModel,
+  onTx?: onTxCallback,
+): Promise<ethers.ContractReceipt | null> {
+  const governQueueContract = getGovernQueueContract(walletAddress);
+  if (!governQueueContract) return null;
+  Logger.debug('Vetoing a quest claim ...', { container, veto });
+  const vetoReasonIpfs = await pushObjectToIpfs(veto.reason ?? '');
+  const tx = await governQueueContract.veto(
+    { config: container.config, payload: container.payload },
+    vetoReasonIpfs,
     {
       gasLimit: 1000000,
     },

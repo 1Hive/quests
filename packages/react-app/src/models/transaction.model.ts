@@ -5,6 +5,7 @@ export type TransactionType =
   | 'QuestReclaimFunds'
   | 'ClaimSchedule'
   | 'ClaimExecute'
+  | 'ClaimVeto'
   | 'ClaimChallenge'
   | 'ClaimChallengeResolve';
 

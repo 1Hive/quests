@@ -123,3 +123,27 @@ export const GovernQueueChallengesQuery = gql`
     }
   }
 `;
+
+export const GovernQueueChallengeReasonQuery = gql`
+  query containerEventChallenges($containerId: String) {
+    containerEventChallenges(
+      where: { container_starts_with: $containerId }
+      orderBy: createdAt
+      orderDirection: desc
+    ) {
+      reason
+    }
+  }
+`;
+
+export const GovernQueueVetoReasonsQuery = gql`
+  query containerEventVetos($containerId: String) {
+    containerEventVetos(
+      where: { container_starts_with: $containerId }
+      orderBy: createdAt
+      orderDirection: desc
+    ) {
+      reason
+    }
+  }
+`;

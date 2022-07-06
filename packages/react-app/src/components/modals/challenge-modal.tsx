@@ -187,7 +187,7 @@ export default function ChallengeModal({
             ? ENUM_TRANSACTION_STATUS.Confirmed
             : ENUM_TRANSACTION_STATUS.Failed,
         });
-        if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
+        if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest claim');
         if (isMountedRef.current) {
           setChallengeDataState(emptyChallengeData);
         }
@@ -216,7 +216,7 @@ export default function ChallengeModal({
   return (
     <ModalBase
       id={modalId}
-      title="Challenge quests"
+      title="Challenge quest claim"
       openButton={
         <OpenButtonWrapperStyled>
           <OpenButtonStyled
