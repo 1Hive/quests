@@ -126,6 +126,11 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
               setState(ENUM_CLAIM_STATE.Challenged);
             }, 1000); // Wait for subgrapph to index challenge event
             break;
+          case 'ClaimVeto':
+            setTimeout(() => {
+              setState(ENUM_CLAIM_STATE.Vetoed);
+            }, 1000); // Wait for subgrapph to index veto event
+            break;
           default:
         }
       }

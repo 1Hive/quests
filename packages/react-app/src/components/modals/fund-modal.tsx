@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button } from '@1hive/1hive-ui';
+import { Button, Info } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop, uniqueId } from 'lodash-es';
 import { useMemo, useRef, useState } from 'react';
@@ -12,11 +12,13 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { FundModel } from 'src/models/fund.model';
 import { FormErrors } from 'src/models/form-errors';
 import { fundQuestTransaction } from 'src/services/transaction-handler';
+import { ENUM_QUEST_STATE } from 'src/constants';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { WalletBallance } from '../wallet-balance';
+import { HelpTooltip } from '../field-input/help-tooltip';
 
 const FormStyled = styled(Form)`
   width: 100%;
@@ -130,6 +132,11 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               />
             </Outset>
           </FormStyled>
+          {quest.state !== ENUM_QUEST_STATE.Active && (
+            <Outset vertical>
+              <Info mode="warning">The quest is expired, the funds might not be used.</Info>
+            </Outset>
+          )}
         </ModalBase>
       )}
     </Formik>

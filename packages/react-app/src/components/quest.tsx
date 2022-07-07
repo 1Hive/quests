@@ -353,7 +353,7 @@ export default function Quest({
           {!isSummary && questData.address && walletConnected && (
             <QuestFooterStyled>
               <>
-                {state === ENUM_QUEST_STATE.Active && <FundModal quest={questData} />}
+                <FundModal quest={questData} />
                 {claimDeposit && (
                   <ScheduleClaimModal
                     questData={{ ...questData, state }}
