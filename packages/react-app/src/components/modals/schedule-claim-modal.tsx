@@ -76,6 +76,10 @@ const ContactInformationWrapperStyled = styled.div`
   max-width: 406px;
 `;
 
+const DepositInfoStyled = styled(Info)`
+  padding: ${GUpx(1)};
+`;
+
 // #endregion
 
 type Props = {
@@ -285,19 +289,20 @@ export default function ScheduleClaimModal({
               }}
               submitButton={
                 <>
-                  <AmountFieldInput
-                    key="claimDeposit"
-                    id="claimDeposit"
-                    label="Claim Deposit"
-                    tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-                    value={claimDeposit}
-                    compact
-                  />
                   <WalletBallance
                     key="WalletBallance-claimDeposit"
                     askedTokenAmount={claimDeposit}
                     setIsEnoughBalance={setIsEnoughBalance}
                   />
+                  <DepositInfoStyled mode={isEnoughBalance ? 'info' : 'warning'} key="claimDeposit">
+                    <AmountFieldInput
+                      id="claimDeposit"
+                      label="Claim Deposit"
+                      tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
+                      value={claimDeposit}
+                      compact
+                    />
+                  </DepositInfoStyled>
                   <Button
                     key="confirmButton"
                     icon={<FaMoneyBillWave />}

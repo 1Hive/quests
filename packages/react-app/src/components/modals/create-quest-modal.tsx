@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconPlus, useTheme } from '@1hive/1hive-ui';
+import { Button, IconPlus, useTheme, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -25,6 +25,7 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
 import { getNetwork } from 'src/networks';
 import { flags } from 'src/services/feature-flag.service';
+import { GUpx } from 'src/utils/style.util';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -63,6 +64,10 @@ const LineStyled = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+const DepositInfoStyled = styled(Info)`
+  padding: ${GUpx(1)};
 `;
 
 // #endregion
@@ -332,15 +337,19 @@ export default function QuestModal({
                               askedTokenAmount={questDeposit}
                               setIsEnoughBalance={setIsEnoughBalance}
                             />
-                            <AmountFieldInput
+                            <DepositInfoStyled
+                              mode={isEnoughBalance ? 'info' : 'warning'}
                               key="questDeposit"
-                              id="questDeposit"
-                              label="Quest Deposit"
-                              tooltip="This amount will be hold by the Quest. It will be reclaimable from reclaim button once the Quest is expired."
-                              value={questDeposit}
-                              compact
-                              showUsd
-                            />
+                            >
+                              <AmountFieldInput
+                                id="questDeposit"
+                                label="Quest Deposit"
+                                tooltip="This amount will be hold by the Quest. It will be reclaimable from reclaim button once the Quest is expired."
+                                value={questDeposit}
+                                compact
+                                showUsd
+                              />
+                            </DepositInfoStyled>
                           </>
                         )}
                         <Button

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, useToast, IconFlag } from '@1hive/1hive-ui';
+import { Button, useToast, IconFlag, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
@@ -59,6 +59,10 @@ const ButtonLinkStyled = styled(Button)`
   padding-top: 4px;
 `;
 
+const DepositInfoStyled = styled(Info)`
+  padding: ${GUpx(1)};
+`;
+
 // #endregion
 
 type Props = {
@@ -78,7 +82,8 @@ export default function ChallengeModal({
 }: Props) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
-  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
+  const [isDepositEnoughBalance, setIsDepositEnoughBalance] = useState(false);
+  const [isFeesEnoughBalance, setIsFeeEnoughBalance] = useState(false);
   const [isFeeDepositSameToken, setIsFeeDepositSameToken] = useState<boolean>();
   const [challengeFee, setChallengeFee] = useState<TokenAmountModel | undefined>(undefined);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -244,32 +249,44 @@ export default function ChallengeModal({
                 }
               : challengeDeposit
           }
-          setIsEnoughBalance={setIsEnoughBalance}
+          setIsEnoughBalance={setIsDepositEnoughBalance}
         />,
         challengeFee && !isFeeDepositSameToken && (
           <WalletBallance
             key="WalletBallance-2"
             askedTokenAmount={challengeFee}
-            setIsEnoughBalance={setIsEnoughBalance}
+            setIsEnoughBalance={setIsFeeEnoughBalance}
           />
         ),
-        <AmountFieldInput
+        <DepositInfoStyled
+          mode={isDepositEnoughBalance ? 'info' : 'warning'}
           key="challengeDeposit"
-          id="challengeDeposit"
-          label="Challenge Deposit"
-          tooltip="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
-          value={challengeDeposit}
-          compact
-        />,
-        <AmountFieldInput
-          key="challengeFee"
-          id="challengeFee"
-          label="Challenge fee"
-          tooltip="This is the challenge cost defined by Celeste."
-          isLoading={challengeFee === undefined}
-          value={challengeFee}
-          compact
-        />,
+        >
+          <AmountFieldInput
+            id="challengeDeposit"
+            label="Challenge Deposit"
+            tooltip="This amount will be staked when challenging this claim. If this challenge is denied, you will lose this deposit."
+            value={challengeDeposit}
+            compact
+          />
+        </DepositInfoStyled>,
+        <DepositInfoStyled
+          mode={
+            isFeesEnoughBalance || (isFeeDepositSameToken && isDepositEnoughBalance)
+              ? 'info'
+              : 'warning'
+          }
+        >
+          <AmountFieldInput
+            key="challengeFee"
+            id="challengeFee"
+            label="Challenge fee"
+            tooltip="This is the challenge cost defined by Celeste."
+            isLoading={challengeFee === undefined}
+            value={challengeFee}
+            compact
+          />
+        </DepositInfoStyled>,
         <Button
           key="confirmButton"
           icon={<IconFlag />}
@@ -277,7 +294,10 @@ export default function ChallengeModal({
           mode="negative"
           type="submit"
           form="form-challenge"
-          disabled={!isEnoughBalance || !isFormValid}
+          disabled={
+            !((isFeesEnoughBalance && !isFeeDepositSameToken) || isDepositEnoughBalance) ||
+            !isFormValid
+          }
           title={!isFormValid ? 'Form not valid' : 'Challenge'}
           className="m-8"
         />,
