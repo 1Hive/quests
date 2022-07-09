@@ -133,7 +133,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           </FormStyled>
           {quest.state !== ENUM_QUEST_STATE.Active && (
             <Outset vertical>
-              <Info mode="warning">The quest is expired, the funds might not be used.</Info>
+              <Info mode="warning">⚠️ The quest is expired, the funds might not be used.</Info>
             </Outset>
           )}
         </ModalBase>

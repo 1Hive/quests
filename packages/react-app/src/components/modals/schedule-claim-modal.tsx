@@ -219,6 +219,20 @@ export default function ScheduleClaimModal({
     }
   };
 
+  const expirationWarning = (
+    <div className="pb-0 pt-32">
+      <Info mode="warning">
+        <LineStyled>
+          ⚠️ The quest will expire before your claim can be executed.
+          <HelpTooltip>
+            The quest will expire before the claim validation period is over. It will still be
+            executable past that point but the quest funds might be withdrawn.
+          </HelpTooltip>
+        </LineStyled>
+      </Info>
+    </div>
+  );
+
   return (
     <ModalBase
       id={modalId}
@@ -298,39 +312,42 @@ export default function ScheduleClaimModal({
                 </>
               }
               steps={[
-                <TextFieldInput
-                  id="evidence"
-                  isEdit={!showPreview}
-                  label={
-                    <LineStyled>
-                      Evidence of completion
-                      <Outset horizontal>
-                        <ButtonLinkStyled
-                          size="mini"
-                          icon={showPreview ? <FaEdit /> : <FaEye />}
-                          display="icon"
-                          label={showPreview ? 'Edit' : 'Preview'}
-                          onClick={() => setShowPreview((old) => !old)}
-                          title={
-                            showPreview
-                              ? 'Back to edit mode'
-                              : 'Show a preview of the evidence of completion'
-                          }
-                        />
-                      </Outset>
-                    </LineStyled>
-                  }
-                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
-                  value={values.evidence}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.evidence && errors.evidence}
-                  multiline
-                  wide
-                  rows={10}
-                  compact
-                  isMarkDown
-                />,
+                <>
+                  <TextFieldInput
+                    id="evidence"
+                    isEdit={!showPreview}
+                    label={
+                      <LineStyled>
+                        Evidence of completion
+                        <Outset horizontal>
+                          <ButtonLinkStyled
+                            size="mini"
+                            icon={showPreview ? <FaEdit /> : <FaEye />}
+                            display="icon"
+                            label={showPreview ? 'Edit' : 'Preview'}
+                            onClick={() => setShowPreview((old) => !old)}
+                            title={
+                              showPreview
+                                ? 'Back to edit mode'
+                                : 'Show a preview of the evidence of completion'
+                            }
+                          />
+                        </Outset>
+                      </LineStyled>
+                    }
+                    tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                    value={values.evidence}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.evidence && errors.evidence}
+                    multiline
+                    wide
+                    rows={10}
+                    compact
+                    isMarkDown
+                  />
+                  {willExpireBeforeClaim && expirationWarning}
+                </>,
                 <WrapperStyled>
                   <div className="inline-flex">
                     <Outset horizontal>
@@ -392,21 +409,8 @@ export default function ScheduleClaimModal({
                         isMarkDown
                       />
                     </ContactInformationWrapperStyled>
+                    {willExpireBeforeClaim && expirationWarning}
                   </Outset>
-                  {willExpireBeforeClaim && (
-                    <Outset vertical>
-                      <Info mode="warning">
-                        <LineStyled>
-                          The quest will expire before your claim can be executed.
-                          <HelpTooltip>
-                            The quest will expire before the claim validation period is over. It
-                            will still be executable past that point but the quest funds might be
-                            withdrawn.
-                          </HelpTooltip>
-                        </LineStyled>
-                      </Info>
-                    </Outset>
-                  )}
                 </WrapperStyled>,
               ]}
             />
