@@ -11,6 +11,7 @@ export type NetworkModel = {
   questFactoryAddress: string;
   governQueueAddress: string;
   celesteAddress: string;
+  managerAddress?: string;
   rpcUri: string;
   rpcKeyEnvName?: string;
   isTestNetwork: boolean;

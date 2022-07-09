@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button } from '@1hive/1hive-ui';
+import { Button, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
@@ -34,6 +34,7 @@ import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { WalletBallance } from '../wallet-balance';
 import Stepper from '../utils/stepper';
+import { HelpTooltip } from '../field-input/help-tooltip';
 
 // #region StyledComponents
 
@@ -75,6 +76,10 @@ const ContactInformationWrapperStyled = styled.div`
   max-width: 406px;
 `;
 
+const DepositInfoStyled = styled(Info)`
+  padding: ${GUpx(1)};
+`;
+
 // #endregion
 
 type Props = {
@@ -106,6 +111,11 @@ export default function ScheduleClaimModal({
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
   const isMountedRef = useIsMountedRef();
+
+  const willExpireBeforeClaim = useMemo(
+    () => questData.expireTime.getTime() < Date.now() + DEFAULT_CLAIM_EXECUTION_DELAY_MS,
+    [questData.expireTime],
+  );
 
   const closeModal = (succeed: any) => {
     setOpened(false);
@@ -213,6 +223,20 @@ export default function ScheduleClaimModal({
     }
   };
 
+  const expirationWarning = (
+    <div className="pb-0 pt-32">
+      <Info mode="warning">
+        <LineStyled>
+          ⚠️ The quest will expire before your claim can be executed.
+          <HelpTooltip>
+            The quest will expire before the claim validation period is over. It will still be
+            executable past that point but the quest funds might be withdrawn.
+          </HelpTooltip>
+        </LineStyled>
+      </Info>
+    </div>
+  );
+
   return (
     <ModalBase
       id={modalId}
@@ -265,19 +289,20 @@ export default function ScheduleClaimModal({
               }}
               submitButton={
                 <>
-                  <AmountFieldInput
-                    key="claimDeposit"
-                    id="claimDeposit"
-                    label="Claim Deposit"
-                    tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-                    value={claimDeposit}
-                    compact
-                  />
                   <WalletBallance
                     key="WalletBallance-claimDeposit"
                     askedTokenAmount={claimDeposit}
                     setIsEnoughBalance={setIsEnoughBalance}
                   />
+                  <DepositInfoStyled mode={isEnoughBalance ? 'info' : 'warning'} key="claimDeposit">
+                    <AmountFieldInput
+                      id="claimDeposit"
+                      label="Claim Deposit"
+                      tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
+                      value={claimDeposit}
+                      compact
+                    />
+                  </DepositInfoStyled>
                   <Button
                     key="confirmButton"
                     icon={<FaMoneyBillWave />}
@@ -292,39 +317,42 @@ export default function ScheduleClaimModal({
                 </>
               }
               steps={[
-                <TextFieldInput
-                  id="evidence"
-                  isEdit={!showPreview}
-                  label={
-                    <LineStyled>
-                      Evidence of completion
-                      <Outset horizontal>
-                        <ButtonLinkStyled
-                          size="mini"
-                          icon={showPreview ? <FaEdit /> : <FaEye />}
-                          display="icon"
-                          label={showPreview ? 'Edit' : 'Preview'}
-                          onClick={() => setShowPreview((old) => !old)}
-                          title={
-                            showPreview
-                              ? 'Back to edit mode'
-                              : 'Show a preview of the evidence of completion'
-                          }
-                        />
-                      </Outset>
-                    </LineStyled>
-                  }
-                  tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future. Also make sure to include contact information if you want the Creator to be able to communicate with you."
-                  value={values.evidence}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.evidence && errors.evidence}
-                  multiline
-                  wide
-                  rows={10}
-                  compact
-                  isMarkDown
-                />,
+                <>
+                  <TextFieldInput
+                    id="evidence"
+                    isEdit={!showPreview}
+                    label={
+                      <LineStyled>
+                        Evidence of completion
+                        <Outset horizontal>
+                          <ButtonLinkStyled
+                            size="mini"
+                            icon={showPreview ? <FaEdit /> : <FaEye />}
+                            display="icon"
+                            label={showPreview ? 'Edit' : 'Preview'}
+                            onClick={() => setShowPreview((old) => !old)}
+                            title={
+                              showPreview
+                                ? 'Back to edit mode'
+                                : 'Show a preview of the evidence of completion'
+                            }
+                          />
+                        </Outset>
+                      </LineStyled>
+                    }
+                    tooltip="The necessary evidence that will confirm the completion of the quest. Make sure there is enough evidence as it will be useful if this claim is challenged in the future."
+                    value={values.evidence}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.evidence && errors.evidence}
+                    multiline
+                    wide
+                    rows={10}
+                    compact
+                    isMarkDown
+                  />
+                  {willExpireBeforeClaim && expirationWarning}
+                </>,
                 <WrapperStyled>
                   <div className="inline-flex">
                     <Outset horizontal>
@@ -377,7 +405,7 @@ export default function ScheduleClaimModal({
                         id="contactInformation"
                         isEdit
                         label="Contact information (optional)"
-                        tooltip="The necessary contact information that the creator will use to communicate with you."
+                        tooltip="The necessary contact information that the creator will use to communicate with you. (Optional)"
                         value={values.contactInformation}
                         onChange={handleChange}
                         placeHolder="e.g. discord, email, phone number, etc."
@@ -386,6 +414,7 @@ export default function ScheduleClaimModal({
                         isMarkDown
                       />
                     </ContactInformationWrapperStyled>
+                    {willExpireBeforeClaim && expirationWarning}
                   </Outset>
                 </WrapperStyled>,
               ]}

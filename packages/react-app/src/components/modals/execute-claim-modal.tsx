@@ -21,8 +21,7 @@ import ModalBase, { ModalCallback } from './modal-base';
 // #region StyledComponents
 
 const OpenButtonStyled = styled(Button)`
-  margin: 0 ${GUpx(1)};
-  margin-bottom: ${GUpx(1)};
+  margin: ${GUpx(1)};
   width: fit-content;
 `;
 

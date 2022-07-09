@@ -11,7 +11,7 @@ const QuestActionButtonStyled = styled(Button)<{ visible: boolean }>`
 
 const ButtonWrapperStyled = styled.div`
   display: flex;
-  margin-top: ${GUpx(5)};
+  margin-top: ${GUpx(4)};
   margin-bottom: ${GUpx(0.5)};
   align-items: center;
   flex-wrap: wrap;

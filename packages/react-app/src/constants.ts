@@ -84,6 +84,7 @@ export const ENUM_ESTIMATED_TX_TIME_MS = Object.freeze({
   QuestFundsReclaiming: 15 * 1000,
   ClaimScheduling: 30 * 1000,
   ClaimChallenging: 30 * 1000,
+  ClaimVetoing: 30 * 1000,
   ClaimExecuting: 30 * 1000,
   ChallengeResolving: 20 * 1000,
   TokenAproval: 20 * 1000,

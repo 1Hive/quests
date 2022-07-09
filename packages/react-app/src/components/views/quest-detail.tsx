@@ -1,7 +1,7 @@
 import { useToast } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { ENUM_PAGES } from 'src/constants';
-import { useQuery } from 'src/hooks/use-query-params';
+import { useQueryParam } from 'src/hooks/use-query-params';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
@@ -11,7 +11,7 @@ import MainView from '../main-view';
 
 export default function QuestDetail() {
   const { setPage } = usePageContext();
-  const id = useQuery().get('id');
+  const queryParam = useQueryParam();
   const toast = useToast();
   const [quest, setQuest] = useState<QuestModel | undefined>(undefined);
   const [loading, setLoading] = useState(true);
@@ -28,11 +28,11 @@ export default function QuestDetail() {
         setLoading(false);
       }
     };
-    if (id) fetchQuestAsync(id);
+    if (queryParam?.has('id')) fetchQuestAsync(queryParam.get('id')!);
     return () => {
       isSubscribed = false;
     };
-  }, [id]);
+  }, [queryParam]);
 
   return (
     <MainView>

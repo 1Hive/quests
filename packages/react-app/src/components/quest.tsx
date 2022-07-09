@@ -21,6 +21,7 @@ import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { ClaimModel } from 'src/models/claim.model';
+import { getNetwork } from 'src/networks';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -130,6 +131,7 @@ export default function Quest({
   const { transaction } = useTransactionContext();
   const [waitForClose, setWaitForClose] = useState(false);
   const isMountedRef = useIsMountedRef();
+  const { chainId } = getNetwork();
 
   useEffect(() => {
     if (!isSummary) {
@@ -294,7 +296,11 @@ export default function Quest({
           condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
-              to={highlight ? `/${ENUM_PAGES.Detail}?id=${questData?.address}` : '#'}
+              to={
+                highlight
+                  ? `/${ENUM_PAGES.Detail}?id=${questData?.address}&chainId=${chainId}`
+                  : '#'
+              }
               onMouseEnter={() => setHighlight(true)}
             >
               {children}
@@ -344,7 +350,7 @@ export default function Quest({
           </ContentWrapperStyled>
           {!isSummary && challengeDeposit && (
             <ClaimList
-              questData={{ ...questData, bounty }}
+              questData={{ ...questData, bounty, state }}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
               onClaimsFetched={setClaims}
@@ -352,37 +358,34 @@ export default function Quest({
           )}
           {!isSummary && questData.address && walletConnected && (
             <QuestFooterStyled>
-              {questData?.state === ENUM_QUEST_STATE.Active ? (
-                <>
-                  <FundModal quest={questData} />
-                  {claimDeposit && (
-                    <ScheduleClaimModal
-                      questData={questData}
-                      questAddress={questData.address}
-                      questTotalBounty={bounty}
-                      claimDeposit={claimDeposit}
-                    />
-                  )}
-                </>
-              ) : (
-                <>
-                  {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
-                    <ReclaimFundsModal
-                      bounty={bounty}
-                      questData={questData}
-                      isDepositReleased={isDepositReleased}
-                      onClose={() => setWaitForClose(false)}
-                      pendingClaims={
-                        !!claims?.find(
-                          (claim) =>
-                            claim.state === ENUM_CLAIM_STATE.Scheduled ||
-                            claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
-                        )
-                      }
-                    />
-                  )}
-                </>
-              )}
+              <>
+                <FundModal quest={questData} />
+                {claimDeposit && (
+                  <ScheduleClaimModal
+                    questData={{ ...questData, state }}
+                    questAddress={questData.address}
+                    questTotalBounty={bounty}
+                    claimDeposit={claimDeposit}
+                  />
+                )}
+              </>
+              <>
+                {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
+                  <ReclaimFundsModal
+                    bounty={bounty}
+                    questData={{ ...questData, state }}
+                    isDepositReleased={isDepositReleased}
+                    onClose={() => setWaitForClose(false)}
+                    pendingClaims={
+                      !!claims?.find(
+                        (claim) =>
+                          claim.state === ENUM_CLAIM_STATE.Scheduled ||
+                          claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
+                      )
+                    }
+                  />
+                )}
+              </>
             </QuestFooterStyled>
           )}
         </ConditionalWrapper>

@@ -4,7 +4,7 @@ import { GUpx } from 'src/utils/style.util';
 import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { QuestModel } from 'src/models/quest.model';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { noop } from 'lodash';
@@ -13,8 +13,6 @@ import { useThemeContext } from 'src/contexts/theme.context';
 import { HelpTooltip } from './field-input/help-tooltip';
 import * as QuestService from '../services/quest.service';
 import Claim from './claim';
-import TextFieldInput from './field-input/text-field-input';
-import { CollapsableBlock } from './collapsable-block';
 
 // #region StyledComponents
 
@@ -39,10 +37,6 @@ const ClaimsWrapperStyled = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-`;
-
-const EvidenceWrapperStyled = styled.div`
-  padding: ${GUpx(2)};
 `;
 
 const NoClaimBoxStyled = styled.div<{ theme: ThemeInterface }>`
@@ -83,24 +77,12 @@ export default function ClaimList({
   const skeletonClaim = useMemo(() => {
     const fakeClaim = {} as ClaimModel;
     return (
-      <CollapsableBlock
-        hideState
-        visible
-        copyable={false}
-        collapsed
-        header={
-          <Claim
-            isLoading
-            claim={fakeClaim}
-            questData={questData}
-            challengeDeposit={challengeDeposit}
-          />
-        }
-      >
-        <EvidenceWrapperStyled>
-          <TextFieldInput id="evidence" isLoading />
-        </EvidenceWrapperStyled>
-      </CollapsableBlock>
+      <Claim
+        isLoading
+        claim={fakeClaim}
+        questData={questData}
+        challengeDeposit={challengeDeposit}
+      />
     );
   }, []);
 
@@ -160,40 +142,13 @@ export default function ClaimList({
         <ClaimsWrapperStyled>
           {loadingClaim && skeletonClaim}
           {claims.map((claim) => (
-            <Fragment key={claim.container?.id}>
-              <CollapsableBlock
-                hideState
-                visible
-                copyable={false}
-                collapsed
-                header={
-                  <Claim
-                    claim={claim}
-                    challengeDeposit={challengeDeposit}
-                    questData={questData}
-                    isLoading={isLoading}
-                  />
-                }
-              >
-                <EvidenceWrapperStyled>
-                  <TextFieldInput
-                    id="evidence"
-                    value={claim.evidence}
-                    isMarkDown
-                    wide
-                    label="Evidence of completion"
-                  />
-                  {claim.contactInformation && (
-                    <TextFieldInput
-                      id="contact"
-                      value={claim.contactInformation}
-                      wide
-                      label="Contact information"
-                    />
-                  )}
-                </EvidenceWrapperStyled>
-              </CollapsableBlock>
-            </Fragment>
+            <Claim
+              challengeDeposit={challengeDeposit}
+              claim={claim}
+              questData={questData}
+              isLoading={isLoading}
+              key={claim.container?.id}
+            />
           ))}
         </ClaimsWrapperStyled>
       ) : (
