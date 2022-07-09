@@ -86,9 +86,9 @@ function WalletAugmented({ children }: Props) {
     });
   }, [ethereum, chainId]);
 
-  const handleConnect = async (id?: string) => {
-    setActivating(id ?? activatingId);
-    await wallet.connect(id ?? activatingId);
+  const handleConnect = async (walletId?: string) => {
+    setActivating(walletId ?? activatingId);
+    await wallet.connect(walletId ?? activatingId);
   };
 
   const handleDisconnect = () => {

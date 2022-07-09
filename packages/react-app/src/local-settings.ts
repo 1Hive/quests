@@ -11,7 +11,7 @@ export function getCurrentChain() {
 }
 
 export function setCurrentChain(chainId: number) {
-  if (EXPECTED_CHAIN_ID.includes(chainId)) {
+  if (EXPECTED_CHAIN_ID.includes(chainId) && currentChain !== chainId) {
     currentChain = chainId;
     localStorage.setItem(CHAIN_ID, chainId.toString());
   }

@@ -99,6 +99,9 @@ function Header({ children }: Props) {
               items={networkNames}
               selected={networkNames.indexOf(name)}
               onChange={(i: number) => {
+                if (page === ENUM_PAGES.Detail) {
+                  window.history.pushState({}, '', ENUM_PAGES.List);
+                }
                 changeNetwork(
                   Object.values(networks).find((network) => network.name === networkNames[i])!
                     .chainId!,

@@ -38,8 +38,8 @@ function App() {
   const { currentTheme } = useThemeContext();
   return (
     <AppStyled theme={currentTheme}>
-      <WalletProvider>
-        <PageContextProvider>
+      <PageContextProvider>
+        <WalletProvider>
           <TransactionContextProvider>
             <FilterContextProvider>
               <Main
@@ -56,8 +56,8 @@ function App() {
               </Main>
             </FilterContextProvider>
           </TransactionContextProvider>
-        </PageContextProvider>
-      </WalletProvider>
+        </WalletProvider>
+      </PageContextProvider>
     </AppStyled>
   );
 }

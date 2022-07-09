@@ -21,6 +21,7 @@ import { IN_A_WEEK_IN_MS } from 'src/utils/date.utils';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { ClaimModel } from 'src/models/claim.model';
+import { getNetwork } from 'src/networks';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -130,6 +131,7 @@ export default function Quest({
   const { transaction } = useTransactionContext();
   const [waitForClose, setWaitForClose] = useState(false);
   const isMountedRef = useIsMountedRef();
+  const { chainId } = getNetwork();
 
   useEffect(() => {
     if (!isSummary) {
@@ -294,7 +296,11 @@ export default function Quest({
           condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
-              to={highlight ? `/${ENUM_PAGES.Detail}?id=${questData?.address}` : '#'}
+              to={
+                highlight
+                  ? `/${ENUM_PAGES.Detail}?id=${questData?.address}&chainId=${chainId}`
+                  : '#'
+              }
               onMouseEnter={() => setHighlight(true)}
             >
               {children}
