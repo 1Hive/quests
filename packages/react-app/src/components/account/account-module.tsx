@@ -60,7 +60,6 @@ function AccountModule({ compact = false }: Props) {
   const buttonRef = useRef<any>();
   const wallet = useWallet();
   const { name } = getNetwork();
-  const { walletAddress, activatingId, deactivateWallet, activateWallet } = wallet;
   const [opened, setOpened] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [activatingDelayed, setActivatingDelayed] = useState<boolean | undefined>(false);
@@ -70,16 +69,16 @@ function AccountModule({ compact = false }: Props) {
   const toggle = useCallback(() => setOpened((opened) => !opened), []);
 
   const handleCancelConnection = useCallback(() => {
-    deactivateWallet();
-  }, [walletAddress]);
+    wallet.deactivateWallet();
+  }, [wallet.walletAddress]);
 
   const activate = useCallback(
     async (id?: string) => {
       if (id || (await isConnected())) {
-        await activateWallet(id);
+        await wallet.activateWallet(id);
       }
     },
-    [walletAddress],
+    [wallet.walletAddress],
   );
 
   // Don’t animate the slider until the popover has opened
@@ -102,8 +101,8 @@ function AccountModule({ compact = false }: Props) {
       setActivatingDelayed(undefined);
     }
 
-    if (activatingId) {
-      setActivatingDelayed(!!activatingId);
+    if (wallet.activatingId) {
+      setActivatingDelayed(!!wallet.activatingId);
       return noop;
     }
 
@@ -114,7 +113,7 @@ function AccountModule({ compact = false }: Props) {
     return () => {
       clearTimeout(timer);
     };
-  }, [activatingId, wallet.isWrongNetwork]);
+  }, [wallet.activatingId, wallet.isWrongNetwork]);
 
   const previousScreenIndex = useRef(-1);
 
@@ -124,7 +123,7 @@ function AccountModule({ compact = false }: Props) {
         setButtonLabel('Connecting...');
         return 'connecting';
       }
-      if (walletAddress) return 'connected';
+      if (wallet.walletAddress) return 'connected';
 
       setButtonLabel('Connect wallet');
       return 'providers';
@@ -136,7 +135,7 @@ function AccountModule({ compact = false }: Props) {
     previousScreenIndex.current = screenIndex;
 
     return { direction, screenIndex };
-  }, [walletAddress, activatingDelayed]);
+  }, [wallet.walletAddress, activatingDelayed]);
 
   const screen = SCREENS[screenIndex];
   const screenId = screen.id;
@@ -157,7 +156,6 @@ function AccountModule({ compact = false }: Props) {
       (popoverFocusElement.current as any)?.focus();
     }
   }, [screenId]);
-
   return (
     <AccountWrapperStyled ref={buttonRef}>
       {wallet.isWrongNetwork ? (

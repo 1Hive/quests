@@ -1,9 +1,16 @@
 const child_process = require("child_process");
-const dotenv = require("dotenv");
-const path = require("path");
+import fs from "fs";
+import { resolve } from "path";
+import { config as dotenvConfig } from "dotenv";
 
-dotenv.config({ path: path.resolve(__dirname, "../../../../local.env") });
-
+dotenvConfig({
+  path: resolve(
+    __dirname,
+    fs
+      .readdirSync("../../../../")
+      .filter((allFilesPaths) => allFilesPaths.match(/\.env$/) !== null)[0]
+  ),
+});
 // Arguments
 const args = process.argv.slice(2);
 const user = args[0];

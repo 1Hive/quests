@@ -37,6 +37,7 @@ function WalletAugmented({ children }: Props) {
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
   const { chainId, networkId } = getNetwork();
+  let timeoutInstance: number | undefined;
 
   useEffect(() => {
     const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
@@ -89,6 +90,16 @@ function WalletAugmented({ children }: Props) {
   const handleConnect = async (walletId?: string) => {
     setActivating(walletId ?? activatingId);
     await wallet.connect(walletId ?? activatingId);
+    if (!timeoutInstance) {
+      timeoutInstance = window.setTimeout(() => {
+        if (!isConnected) {
+          setActivating(undefined);
+          wallet.reset();
+          setIsConnected(false);
+        }
+        timeoutInstance = undefined;
+      }, 2000);
+    }
   };
 
   const handleDisconnect = () => {

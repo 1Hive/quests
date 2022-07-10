@@ -169,7 +169,7 @@ export function getExplorerUrl(chainId?: number) {
     case 'etherscan':
       return 'https://rinkeby.etherscan.io';
     case 'blockscout':
-      return 'https://blockscout.com/xdai/mainnet/';
+      return 'https://blockscout.com/xdai/mainnet';
     case 'polygonscan':
       return 'https://polygonscan.com';
     default:
