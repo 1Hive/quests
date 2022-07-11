@@ -156,10 +156,10 @@ export default function ReclaimFundsModal({
       >
         <RowStyled>
           <Outset gu16>
-            <AmountFieldInputFormik id="bounty" label="Funds" value={bounty} />
+            <AmountFieldInputFormik id="bounty" label="Unused funds" value={bounty} />
           </Outset>
           <Outset gu16>
-            <FieldInput label="Recover address">
+            <FieldInput label="Recovery address">
               <IdentityBadge entity={questData.fallbackAddress} badgeOnly />
             </FieldInput>
           </Outset>
@@ -170,7 +170,7 @@ export default function ReclaimFundsModal({
               <AmountFieldInputFormik id="bounty" label="Deposit" value={depositTokenAmount} />
             </Outset>
             <Outset gu16>
-              <FieldInput label="Recover address">
+              <FieldInput label="Recovery address">
                 <IdentityBadge entity={questData.creatorAddress} badgeOnly />
               </FieldInput>
             </Outset>
