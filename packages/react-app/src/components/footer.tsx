@@ -59,6 +59,7 @@ const FooterNavItemStyled = styled(Link)`
   align-items: center;
   text-decoration: none;
   font-weight: bold;
+  color: ${({ color }) => color};
 `;
 
 const FooterInfoItemStyled = styled.div`
@@ -191,7 +192,7 @@ export default function footer() {
             <IconExternal size="small" />
           </FooterNavItemStyled>
           {window.ethereum && (
-            <FooterNavItemStyled onClick={addHnyToMetamask} external href="#">
+            <FooterNavItemStyled onClick={addHnyToMetamask} color={theme.contentSecondary}>
               <span className="inline-flex">
                 Add {networkId === 'rinkeby' ? 'HNYT' : 'HNY'} to
                 <img
