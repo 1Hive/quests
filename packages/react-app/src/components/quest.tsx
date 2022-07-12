@@ -34,6 +34,7 @@ import { StateTag } from './state-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
 import NumberFieldInput from './field-input/number-field-input';
+import { ActionsPlaceholder } from './actions-placeholder';
 
 // #region StyledComponents
 
@@ -356,36 +357,42 @@ export default function Quest({
               onClaimsFetched={setClaims}
             />
           )}
-          {!isSummary && questData.address && walletConnected && (
+          {!isSummary && questData.address && (
             <QuestFooterStyled>
-              <>
-                <FundModal quest={questData} />
-                {claimDeposit && (
-                  <ScheduleClaimModal
-                    questData={{ ...questData, state }}
-                    questAddress={questData.address}
-                    questTotalBounty={bounty}
-                    claimDeposit={claimDeposit}
-                  />
-                )}
-              </>
-              <>
-                {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
-                  <ReclaimFundsModal
-                    bounty={bounty}
-                    questData={{ ...questData, state }}
-                    isDepositReleased={isDepositReleased}
-                    onClose={() => setWaitForClose(false)}
-                    pendingClaims={
-                      !!claims?.find(
-                        (claim) =>
-                          claim.state === ENUM_CLAIM_STATE.Scheduled ||
-                          claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
-                      )
-                    }
-                  />
-                )}
-              </>
+              {walletConnected ? (
+                <>
+                  <>
+                    <FundModal quest={questData} />
+                    {claimDeposit && (
+                      <ScheduleClaimModal
+                        questData={{ ...questData, state }}
+                        questAddress={questData.address}
+                        questTotalBounty={bounty}
+                        claimDeposit={claimDeposit}
+                      />
+                    )}
+                  </>
+                  <>
+                    {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
+                      <ReclaimFundsModal
+                        bounty={bounty}
+                        questData={{ ...questData, state }}
+                        isDepositReleased={isDepositReleased}
+                        onClose={() => setWaitForClose(false)}
+                        pendingClaims={
+                          !!claims?.find(
+                            (claim) =>
+                              claim.state === ENUM_CLAIM_STATE.Scheduled ||
+                              claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
+                          )
+                        }
+                      />
+                    )}
+                  </>
+                </>
+              ) : (
+                <ActionsPlaceholder />
+              )}
             </QuestFooterStyled>
           )}
         </ConditionalWrapper>

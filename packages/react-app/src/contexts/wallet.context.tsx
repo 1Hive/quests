@@ -17,6 +17,8 @@ export type WalletContextModel = {
   activatingId: string;
   isWrongNetwork: boolean;
   changeNetwork: (_chainId?: number) => void;
+  openWalletConnect: React.Dispatch<React.SetStateAction<boolean>>;
+  walletConnectOpened: boolean;
 };
 
 const WalletAugmentedContext = React.createContext<WalletContextModel | undefined>(undefined);
@@ -36,6 +38,7 @@ function WalletAugmented({ children }: Props) {
   const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>();
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
+  const [walletConnectOpened, openWalletConnect] = useState<boolean>(false);
   const { chainId, networkId } = getNetwork();
   let timeoutInstance: number | undefined;
 
@@ -165,8 +168,10 @@ function WalletAugmented({ children }: Props) {
       activatingId,
       walletConnected: isConnected,
       changeNetwork,
+      walletConnectOpened,
+      openWalletConnect,
     }),
-    [wallet, ethers],
+    [wallet, ethers, walletConnectOpened],
   );
 
   return (

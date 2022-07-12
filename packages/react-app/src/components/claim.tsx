@@ -30,6 +30,7 @@ import VetoModal from './modals/veto-modal';
 import { StateTag } from './state-tag';
 import { Outset, ChildSpacer } from './utils/spacer-util';
 import * as QuestService from '../services/quest.service';
+import { ActionsPlaceholder } from './actions-placeholder';
 
 // #region StyledComponents
 
@@ -246,7 +247,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                     isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
                   />
                 )}
-                {walletConnected && state && (
+                {walletConnected && state ? (
                   <>
                     {actionButton}
                     {managerAddress === walletAddress &&
@@ -258,6 +259,8 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                         <VetoModal claim={claim} onClose={onActionClose} />
                       )}
                   </>
+                ) : (
+                  <ActionsPlaceholder />
                 )}
               </ChildSpacer>
             </Outset>

@@ -66,6 +66,10 @@ function AccountModule({ compact = false }: Props) {
   const popoverFocusElement = useRef<any>();
   const [buttonLabel, setButtonLabel] = useState<string>();
 
+  useEffect(() => {
+    setOpened(wallet.walletConnectOpened ?? false);
+  }, [wallet.walletConnectOpened]);
+
   const toggle = useCallback(() => setOpened((opened) => !opened), []);
 
   const handleCancelConnection = useCallback(() => {
@@ -84,6 +88,7 @@ function AccountModule({ compact = false }: Props) {
   // Don’t animate the slider until the popover has opened
   useEffect(() => {
     if (!opened) {
+      wallet.openWalletConnect(false);
       return noop;
     }
     setAnimate(false);
