@@ -108,7 +108,7 @@ export default function footer() {
         hnyToken = TOKENS.xdai.Honey;
         break;
       case 'rinkeby':
-        hnyToken = TOKENS.xdai.Honey;
+        hnyToken = TOKENS.rinkeby.HoneyTest;
         break;
       default:
         break;
