@@ -26,7 +26,16 @@ import exportContractResult from "./scripts/export-contract-result";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
 import CelesteMock from "./deployments/rinkeby/OwnableCeleste.json";
 
-dotenvConfig({ path: resolve(__dirname, "../../local.env") });
+dotenvConfig({
+  path: resolve(
+    __dirname,
+    fs
+      .readdirSync("../../")
+      .filter(
+        (allFilesPaths: string) => allFilesPaths.match(/\.env$/) !== null
+      )[0]
+  ),
+});
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 

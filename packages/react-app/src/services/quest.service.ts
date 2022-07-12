@@ -236,7 +236,9 @@ async function generateScheduleContainer(
     contactInformation: claimData.contactInformation,
     description: disputableDescription,
     disputedActionText: 'Challenged Quest claim',
-    disputedActionURL: `https://quests.1hive.org/#/detail?id=${claimData.questAddress}`,
+    disputedActionURL: `https://quests.1hive.org/detail?id=${claimData.questAddress}&chainId=${
+      getNetwork().chainId
+    }`,
     agreementTitle: '1Hive Community Covenant',
     agreementText: 'QmfWppqC55Xc7PU48vei2XvVAuH76z2rNFF7JMUhjVM5xV',
     organization: 'Quests',

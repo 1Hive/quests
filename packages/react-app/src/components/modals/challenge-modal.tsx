@@ -271,6 +271,7 @@ export default function ChallengeModal({
           />
         </DepositInfoStyled>,
         <DepositInfoStyled
+          key="challengeFee"
           mode={
             isFeesEnoughBalance || (isFeeDepositSameToken && isDepositEnoughBalance)
               ? 'info'
@@ -278,7 +279,6 @@ export default function ChallengeModal({
           }
         >
           <AmountFieldInput
-            key="challengeFee"
             id="challengeFee"
             label="Challenge fee"
             tooltip="This is the challenge cost defined by Celeste."
