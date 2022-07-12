@@ -8,6 +8,8 @@ import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
 import { useEffect, useState } from 'react';
 import { getNetwork } from 'src/networks';
+import { TOKENS } from 'src/tokens';
+import { LoggerOnce } from 'src/utils/logger';
 import QuestModal from './modals/create-quest-modal';
 import { GenericTooltip } from './field-input/generic-tooltip';
 
@@ -98,6 +100,38 @@ export default function footer() {
     setStableList(stableListText);
   }, [setStableList]);
 
+  const addHnyToMetamask = async () => {
+    let hnyToken;
+    switch (networkId) {
+      case 'xdai':
+        hnyToken = TOKENS.xdai.Honey;
+        break;
+      case 'rinkeby':
+        hnyToken = TOKENS.xdai.Honey;
+        break;
+      default:
+        break;
+    }
+    if (hnyToken && window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: hnyToken.token,
+              symbol: hnyToken.symbol,
+              decimals: hnyToken.decimals,
+              image: 'https://assets.coingecko.com/coins/images/12895/small/hnys.png?1614100588',
+            },
+          },
+        });
+      } catch (error) {
+        LoggerOnce.error('Something went wrong when adding token to metamask', { error });
+      }
+    }
+  };
+
   return (
     <FooterContainerStyled color={theme.contentSecondary}>
       <FooterContainerStyledSide>
@@ -156,6 +190,19 @@ export default function footer() {
             <span>{networkId === 'rinkeby' ? 'Get test Honey' : 'Get Honey'}</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
+          {window.ethereum && (
+            <FooterNavItemStyled onClick={addHnyToMetamask} external href="#">
+              <span className="inline-flex">
+                Add {networkId === 'rinkeby' ? 'HNYT' : 'HNY'} to
+                <img
+                  className="ml-4"
+                  width="20"
+                  alt="metamask"
+                  src="https://static.coingecko.com/s/metamask_fox-11b1aab7f9a07cbe8903d8d6eb1e6d42be66d1bdd838c10786c1c49a2efb36f0.svg"
+                />
+              </span>
+            </FooterNavItemStyled>
+          )}
           <FooterNavItemStyled href="https://forum.1hive.org/" external>
             <span>1Hive Forum</span>
             <IconExternal size="small" />
