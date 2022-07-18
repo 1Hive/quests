@@ -242,7 +242,7 @@ async function generateScheduleContainer(
     agreementTitle: '1Hive Community Covenant',
     agreementText: 'QmfWppqC55Xc7PU48vei2XvVAuH76z2rNFF7JMUhjVM5xV',
     organization: 'Quests',
-    defendant: claimData.playerAddress,
+    defendant: walletAddress,
   });
 
   const claimCall = encodeClaimAction(claimData, questPayloadIpfsHash);
