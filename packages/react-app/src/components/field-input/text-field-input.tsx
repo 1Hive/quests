@@ -1,6 +1,6 @@
 import { TextInput, Markdown } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { CollapsableBlock } from 'src/components/collapsable-block';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
@@ -79,16 +79,19 @@ export default function TextFieldInput({
   disableLinks = false,
   blockVisibility = 'visible',
 }: Props) {
+  const parsedValue = useMemo(
+    () => (isMarkDown ? value.replaceAll(/\n([^|])/g, '\n\n$1') : value),
+    [value, isMarkDown],
+  );
   const readOnlyContent = (
     <>
       {isMarkDown ? (
         <Markdown
           normalized
-          content={value}
+          content={parsedValue}
           markdownToJsxOptions={(o: any) => ({
             ...o,
             wrapper: 'div',
-
             overrides: {
               p: {
                 component: 'div',

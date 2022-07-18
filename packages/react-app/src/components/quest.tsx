@@ -74,6 +74,8 @@ const QuestFooterStyled = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  row-gap: ${GUpx(2)};
 `;
 
 const RowStyled = styled.div`

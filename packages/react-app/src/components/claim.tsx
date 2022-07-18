@@ -51,6 +51,11 @@ const TimerWrapperStyled = styled.div`
   display: flex;
 `;
 
+const TimeableActionWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
 // #endregion
 
 type Props = {
@@ -146,7 +151,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
         (claimable && questData.state !== ENUM_QUEST_STATE.Active)
       ) {
         setActionButton(
-          <>
+          <TimeableActionWrapper>
             <ExecuteClaimModal
               claim={claim}
               questTotalBounty={questData.bounty}
@@ -154,19 +159,19 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
               claimable={claimable}
             />
             {timer}
-          </>,
+          </TimeableActionWrapper>,
         );
         return;
       }
       setActionButton(
-        <>
+        <TimeableActionWrapper>
           <ChallengeModal
             claim={{ ...claim, state }}
             challengeDeposit={challengeDeposit}
             onClose={onActionClose}
           />
           {timer}
-        </>,
+        </TimeableActionWrapper>,
       );
       return;
     }
