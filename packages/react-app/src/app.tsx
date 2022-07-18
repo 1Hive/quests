@@ -1,6 +1,6 @@
 import { Main } from '@1hive/1hive-ui';
 import { hot } from 'react-hot-loader/root';
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import ErrorBoundary from './components/utils/error-boundary';
 import { DEFAULT_THEME } from './constants';
@@ -48,11 +48,11 @@ function App() {
                 scrollView={false}
                 theme={currentTheme ?? DEFAULT_THEME}
               >
-                <HashRouter>
+                <BrowserRouter>
                   <ErrorBoundary>
                     <Routes />
                   </ErrorBoundary>
-                </HashRouter>
+                </BrowserRouter>
               </Main>
             </FilterContextProvider>
           </TransactionContextProvider>
