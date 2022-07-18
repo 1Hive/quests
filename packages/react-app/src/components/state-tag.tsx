@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Tag } from '@1hive/1hive-ui';
 import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from 'src/constants';
 import { useEffect, useState } from 'react';
+import { GUpx } from 'src/utils/style.util';
 
 const StateTagStyled = styled(Tag)`
   width: ${(props: any) => (props.wide ? '100%' : 'fit-content')};
@@ -10,8 +11,9 @@ const StateTagStyled = styled(Tag)`
 const StateWrapperStyled = styled.div<{ visible: boolean }>`
   text-align: left;
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
+  margin-bottom: ${GUpx(1)};
 `;
 
 type Props = {
