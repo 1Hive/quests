@@ -288,7 +288,10 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             {isRuled && !isStackholder && (
               <OnlyStackholderWarnStyled mode="warning">
                 <IconCaution />
-                <Outset>Only a stakeholder of this challenge should resolve it</Outset>
+                <Outset>
+                  Anyone can apply the dispute ruling result. If you are not a stakeholder, consider
+                  contacting them.
+                </Outset>
               </OnlyStackholderWarnStyled>
             )}
           </Fragment>,

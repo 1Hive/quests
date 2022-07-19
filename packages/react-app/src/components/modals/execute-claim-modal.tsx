@@ -167,7 +167,7 @@ export default function ExecuteClaimModal({
               </WarningIconContainerStyled>
               <Outset>
                 Anyone can execute this claim. If you didn&apos;t create the claim, consider
-                contacting the Player when executing to let them know they got their funds.
+                contacting the Player after executing.
               </Outset>
             </OnlyStackholderWarnStyled>
           )}
