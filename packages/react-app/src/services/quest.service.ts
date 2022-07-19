@@ -781,7 +781,7 @@ export async function fetchChallengeDispute(
   const dispute = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
   return {
     id: challenge.disputeId,
-    state: dispute.state,
+    state: dispute.finalRuling,
   };
 }
 
