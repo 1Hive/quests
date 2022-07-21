@@ -672,7 +672,7 @@ export async function scheduleQuestClaim(
   const container = await generateScheduleContainer(walletAddress, claimData, questData);
   Logger.debug('Scheduling quest claim...', { container });
   const tx = (await governQueueContract.schedule(container, {
-    gasLimit: 500000,
+    gasLimit: 1000000,
   })) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
@@ -691,7 +691,7 @@ export async function executeQuestClaim(
       payload: claimData.container!.payload,
     },
     {
-      gasLimit: 500000,
+      gasLimit: 1000000,
     },
   );
   return handleTransaction(tx, onTx);
