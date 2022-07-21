@@ -19,7 +19,7 @@ export async function approveTokenTransaction(
 
   let success = false;
   // (having permanent allowance is a security risk see https://kalis.me/unlimited-erc20-allowances/#:~:text=several%20such%20exploits.-,bug%20exploits,-In%20early%202020)
-  if (allowance.eq(token.amount) || (allowance.gt(token.amount) && isDevelopement() && false)) {
+  if (allowance.eq(token.amount) || (allowance.gt(token.amount) && isDevelopement())) {
     Logger.info(`${token.symbol} allowance is already ${token.amount}`);
     return; // Skip only if development mode or allowance is already the required amount
   }
