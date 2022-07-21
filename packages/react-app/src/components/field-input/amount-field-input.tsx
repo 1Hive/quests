@@ -401,6 +401,7 @@ function AmountFieldInput({
               </LineStyled>
             )}
             tabIndex="-1"
+            disabled={!availableTokens.length}
           />
         </AutoCompleteWrapperStyled>
       )}

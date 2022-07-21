@@ -1,10 +1,10 @@
-import { ContractReceipt } from 'ethers';
 import { Dispatch, SetStateAction } from 'react';
 import { isDevelopement } from 'src/components/utils/debug-util';
 import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { TransactionModel } from 'src/models/transaction.model';
+import { Logger } from 'src/utils/logger';
 import { approveTokenAmount, fundQuest, getAllowanceOf } from './quest.service';
 
 export async function approveTokenTransaction(
@@ -17,12 +17,15 @@ export async function approveTokenTransaction(
 ) {
   const allowance = await getAllowanceOf(walletAddress, token, spender);
 
-  let approveTxReceipt: ContractReceipt | null = null;
+  let success = false;
+  // (having permanent allowance is a security risk see https://kalis.me/unlimited-erc20-allowances/#:~:text=several%20such%20exploits.-,bug%20exploits,-In%20early%202020)
+  if (allowance.eq(token.amount) || (allowance.gt(token.amount) && isDevelopement() && false)) {
+    Logger.info(`${token.symbol} allowance is already ${token.amount}`);
+    return; // Skip only if development mode or allowance is already the required amount
+  }
+
   if (!allowance.isZero()) {
-    if (isDevelopement()) {
-      return; // Skip only if development mode (having permanent allowance is a security risk see https://kalis.me/unlimited-erc20-allowances/#:~:text=several%20such%20exploits.-,bug%20exploits,-In%20early%202020)
-    }
-    let txPayload = {
+    let revokeTxPayload = {
       modalId,
       estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
       message: 'Revoking already existing approval',
@@ -30,23 +33,23 @@ export async function approveTokenTransaction(
       type: 'TokenApproval',
     } as TransactionModel;
     // Reset approval to 0 before approving again
-    setTransaction(txPayload);
-    approveTxReceipt = await approveTokenAmount(
+    setTransaction(revokeTxPayload);
+    success = await approveTokenAmount(
       walletAddress,
       spender,
       { ...token, amount: '0' },
       (txHash) => {
-        txPayload = { ...txPayload, hash: txHash };
+        revokeTxPayload = { ...revokeTxPayload, hash: txHash };
         setTransaction({
-          ...txPayload,
+          ...revokeTxPayload,
           status: ENUM_TRANSACTION_STATUS.Pending,
         });
       },
     );
 
-    if (!approveTxReceipt?.status) {
+    if (!success) {
       setTransaction({
-        ...txPayload,
+        ...revokeTxPayload,
         status: ENUM_TRANSACTION_STATUS.Failed,
       });
       throw new Error(
@@ -64,7 +67,7 @@ export async function approveTokenTransaction(
   } as TransactionModel;
   setTransaction(txPayload);
   try {
-    approveTxReceipt = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
+    success = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
       txPayload = { ...txPayload, hash: txHash };
       setTransaction({
         ...txPayload,
@@ -74,13 +77,11 @@ export async function approveTokenTransaction(
   } finally {
     setTransaction({
       ...txPayload,
-      status: approveTxReceipt?.status
-        ? ENUM_TRANSACTION_STATUS.Confirmed
-        : ENUM_TRANSACTION_STATUS.Failed,
+      status: success ? ENUM_TRANSACTION_STATUS.Confirmed : ENUM_TRANSACTION_STATUS.Failed,
     });
   }
 
-  if (!approveTxReceipt?.status) {
+  if (!success) {
     setTransaction({
       ...txPayload,
       status: ENUM_TRANSACTION_STATUS.Failed,

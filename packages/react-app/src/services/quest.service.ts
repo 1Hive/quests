@@ -594,7 +594,7 @@ export async function approveTokenAmount(
   toAddress: string,
   tokenAmount: TokenModel,
   onTx?: onTxCallback,
-): Promise<ethers.ContractReceipt | null> {
+): Promise<boolean> {
   Logger.debug('Approving token amount...', { toAddress, tokenAmount });
   const erc20Contract = getERC20Contract(tokenAmount.token, walletAddress);
   if (!erc20Contract)
@@ -609,13 +609,36 @@ export async function approveTokenAmount(
   const tx = await erc20Contract.approve(toAddress, tokenAmount.amount, {
     gasLimit: 1000000,
   });
-  return handleTransaction(tx, onTx);
+
+  let timer: number | undefined;
+  try {
+    return await Promise.any([
+      new Promise<boolean>((resolve, reject) => {
+        timer = window.setInterval(async () => {
+          try {
+            const newAllowance = await getAllowanceOf(walletAddress, tokenAmount, toAddress);
+            if (newAllowance.eq(tokenAmount.amount)) {
+              window.clearInterval(timer);
+              Logger.debug('Allowance already set');
+              resolve(true);
+            }
+          } catch (error) {
+            reject(error);
+          }
+        }, 5000);
+      }),
+      handleTransaction(tx, onTx).then((result) => !!result?.status),
+    ]);
+  } catch (error) {
+    Logger.error('Failed to approve token amount', { error });
+    return false;
+  }
 }
 
 export function getAllowanceOf(walletAddress: string, token: TokenModel, spender: string) {
   const erc20Contract = getERC20Contract(token.token, walletAddress);
   if (!erc20Contract) throw new Error('Fetching allowance : Erc20Contract is null');
-  return erc20Contract.allowance(walletAddress, spender);
+  return erc20Contract.allowance(walletAddress, spender) as Promise<BigNumber>;
 }
 
 export async function getBalanceOf(

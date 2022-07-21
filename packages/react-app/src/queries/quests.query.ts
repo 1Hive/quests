@@ -68,9 +68,16 @@ const QuestEntitiesQuery = (payload: any) => gql`
   }
 `;
 
-const QuestRewardTokens = gql`
-  query questEntities($first: Int) {
-    questEntities(first: $first, orderBy: creationTimestamp, orderDirection: desc) {
+const QuestRewardTokens = (payload: any) => gql`
+  query questEntities($first: Int, $blackList: [String], $whiteList: [String]) {
+    questEntities(first: $first, orderBy: creationTimestamp, orderDirection: desc, where: {
+        ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
+        ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
+      }
+      orderBy: creationTimestamp
+      orderDirection: desc
+      subgraphError: allow
+    ) {
       questRewardTokenAddress
     }
   }
@@ -144,8 +151,21 @@ export const fetchQuestEntities = async (
 };
 
 export const fetchQuestRewardTokens = () => {
-  const { questsSubgraph } = getNetwork();
-  return request(questsSubgraph, QuestRewardTokens, { first: 100 }).then((res) =>
+  const { questsSubgraph, networkId } = getNetwork();
+  const whiteList = env(`${networkId.toUpperCase()}_WHITE_LIST`);
+  let blackList = env(`${networkId.toUpperCase()}_BLACK_LIST`);
+  if (blackList === '*') {
+    return [];
+  }
+  if (blackList === '') {
+    blackList = '*';
+  }
+  const payload = {
+    first: 100,
+    blackList: blackList !== undefined ? blackList.toLowerCase().split(',') : undefined,
+    whiteList: whiteList && whiteList !== '*' ? whiteList.toLowerCase().split(',') : undefined,
+  };
+  return request(questsSubgraph, QuestRewardTokens(payload), payload).then((res) =>
     res.questEntities.map((quest: any) => quest.questRewardTokenAddress),
   );
 };
