@@ -222,7 +222,7 @@ export default function QuestList() {
               <Quest isSummary questData={questData} isLoading={!questData.address} />
             </QuestWrapperStyled>
           ))}
-          {/* {isLoading && skeletonQuests} */}
+          {isLoading && skeletonQuests}
         </FlexContainerStyled>
       </InfiniteScroll>
     </MainView>
