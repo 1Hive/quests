@@ -194,7 +194,6 @@ export default function QuestList() {
         next={loadMore}
         hasMore={hasMore}
         endMessage={
-          // quests.length || newQuestLoading ? (
           !newQuestLoading &&
           (quests.length ? (
             <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
