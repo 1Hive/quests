@@ -88,7 +88,7 @@ type Props = {
 };
 
 export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
-  const { walletAddress } = useWallet();
+  const { walletAddress, walletConnected } = useWallet();
   const { networkId } = getNetwork();
   const [opened, setOpened] = useState(false);
   const [isRuled, setRuled] = useState(false);
@@ -300,12 +300,12 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             icon={<IconFlag />}
             label="Resolve"
             mode="positive"
-            disabled={!walletAddress || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged}
+            disabled={!walletConnected || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged}
             onClick={resolveChallengeTx}
             title={
               !isRuled
                 ? 'Need to be ruled in celeste'
-                : !walletAddress
+                : !walletConnected
                 ? 'Not ready ...'
                 : 'Publish dispute result'
             }

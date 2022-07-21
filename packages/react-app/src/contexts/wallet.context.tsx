@@ -166,7 +166,7 @@ function WalletAugmented({ children }: Props) {
       deactivateWallet: handleDisconnect,
       activatedId: wallet.connector,
       activatingId,
-      walletConnected: !!wallet.account,
+      walletConnected: !!wallet.account && +ethereum.chainId === chainId,
       changeNetwork,
       walletConnectOpened,
       openWalletConnect,

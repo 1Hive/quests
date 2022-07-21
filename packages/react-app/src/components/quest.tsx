@@ -122,7 +122,7 @@ export default function Quest({
   isLoading = false,
   isSummary = false,
 }: Props) {
-  const { walletAddress } = useWallet();
+  const { walletConnected } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
   const [claims, setClaims] = useState<ClaimModel[]>();
@@ -361,7 +361,7 @@ export default function Quest({
           )}
           {!isSummary && questData.address && (
             <QuestFooterStyled>
-              {walletAddress ? (
+              {walletConnected ? (
                 <>
                   <>
                     <FundModal quest={questData} />
