@@ -66,7 +66,7 @@ type Props = {
 };
 
 export default function Claim({ claim, isLoading, challengeDeposit, questData }: Props) {
-  const { walletAddress } = useWallet();
+  const { walletAddress, walletConnected } = useWallet();
   const { transaction } = useTransactionContext();
   const [state, setState] = useState(claim.state);
   const { below } = useViewport();
@@ -252,7 +252,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                     isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
                   />
                 )}
-                {walletAddress && state ? (
+                {walletConnected && state ? (
                   <>
                     {actionButton}
                     {managerAddress === walletAddress &&
