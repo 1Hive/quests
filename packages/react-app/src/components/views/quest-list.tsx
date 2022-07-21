@@ -194,7 +194,9 @@ export default function QuestList() {
         next={loadMore}
         hasMore={hasMore}
         endMessage={
-          quests.length || newQuestLoading ? (
+          // quests.length || newQuestLoading ? (
+          !newQuestLoading &&
+          (quests.length ? (
             <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
             <Outset gu64 className="flex-center wide">
@@ -203,7 +205,7 @@ export default function QuestList() {
                 action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
               />
             </Outset>
-          )
+          ))
         }
         refreshFunction={refresh}
         pullDownToRefresh={isMobile}
@@ -220,7 +222,7 @@ export default function QuestList() {
               <Quest isSummary questData={questData} isLoading={!questData.address} />
             </QuestWrapperStyled>
           ))}
-          {isLoading && skeletonQuests}
+          {/* {isLoading && skeletonQuests} */}
         </FlexContainerStyled>
       </InfiniteScroll>
     </MainView>
