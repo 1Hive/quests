@@ -47,6 +47,7 @@ const ButtonLinkStyled = styled(Button)`
   font-weight: bold;
   background: transparent;
   padding-top: 4px;
+  justify-content: flex-start;
 `;
 
 const FormStyled = styled(Form)`
@@ -277,9 +278,12 @@ export default function QuestModal({
           title="Create quest"
           openButton={
             buttonMode === 'link' ? (
-              <ButtonLinkStyled theme={theme} onClick={onOpenButtonClick} title="Create quest">
-                {buttonLabel}
-              </ButtonLinkStyled>
+              <ButtonLinkStyled
+                theme={theme}
+                onClick={onOpenButtonClick}
+                title="Create quest"
+                label={buttonLabel}
+              />
             ) : (
               <Button
                 icon={<IconPlus />}

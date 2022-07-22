@@ -178,7 +178,10 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
 
     if (
       claim.container &&
-      (state === ENUM_CLAIM_STATE.Challenged || state === ENUM_CLAIM_STATE.Vetoed)
+      (state === ENUM_CLAIM_STATE.Challenged ||
+        state === ENUM_CLAIM_STATE.Rejected ||
+        state === ENUM_CLAIM_STATE.Executed ||
+        state === ENUM_CLAIM_STATE.Vetoed)
     ) {
       (async (_state: string, _container: ContainerModel) => {
         setChallengeReason(await QuestService.fetchChallengeReason(_container));

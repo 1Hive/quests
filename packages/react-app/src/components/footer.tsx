@@ -156,7 +156,7 @@ export default function footer() {
       <FooterContainerStyledSide>
         <FooterColumnStyled>
           <FooterTitleStyled>Quests</FooterTitleStyled>
-          <FooterNavItemStyled href="#" external={false}>
+          <FooterNavItemStyled href="/" external={false}>
             Quest List
           </FooterNavItemStyled>
           {walletConnected && (

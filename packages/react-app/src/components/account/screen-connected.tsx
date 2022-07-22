@@ -155,9 +155,8 @@ function AccountScreenConnected({ wallet }: Props) {
           margin-top: ${GUpx(2)};
         `}
         mode="negative"
-      >
-        Disconnect wallet
-      </Button>
+        label="Disconnect wallet"
+      />
     </div>
   );
 }
