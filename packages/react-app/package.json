@@ -55,7 +55,7 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "loglevel": "^1.7.1",
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "moment-timezone": "^0.5.33",
     "node-sass": "^7.0.0",
     "prop-types": "^15.7.2",
