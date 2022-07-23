@@ -113,7 +113,7 @@ function identifyProvider(ethers: any) {
 
 // Get a provider from its useWallet() identifier.
 function getProviderFromUseWalletId(id?: string) {
-  const ethers = (window as any).ethereum ?? (window as any).web3?.currentProvider;
+  const ethers = (window as any).eth ?? (window as any).web3?.currentProvider;
   let provider;
   if (id === 'injected' && !ethers) {
     return getProvider('unknown');

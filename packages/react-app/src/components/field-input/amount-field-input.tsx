@@ -62,11 +62,6 @@ const AmountTokenWrapperStyled = styled.div<AmountTokenWrapperStyledProps>`
   ${({ wide }) => (wide ? `width:100%;` : 'max-width:100%;')}
 `;
 
-const IconEditStyled = styled(IconEdit)`
-  cursor: pointer;
-  padding-left: ${GUpx(1)};
-`;
-
 const TokenAmountButtonStyled = styled(Button)<{ compact?: boolean }>`
   ${({ compact }) => (compact ? '' : `margin-left: ${GUpx(1)};`)}
   border-radius: 4px;
@@ -85,6 +80,16 @@ const AmountEllipsisWrapperStyled = styled.div`
   max-width: ${GUpx(15)};
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+const ButtonMiniIconStyled = styled(Button)`
+  width: 16px;
+  height: 16px;
+  margin-left: ${GUpx(1)};
+`;
+
+const IconEditStyled = styled(IconEdit)`
+  cursor: pointer;
 `;
 
 // #endregion
@@ -407,9 +412,14 @@ function AmountFieldInput({
       )}
       {tokenEditable && isEdit && token && (
         <div className="btn-link">
-          <Button size="mini" onClick={onTokenEditClick} tabIndex="-1">
-            <IconEditStyled size="medium" />
-          </Button>
+          <ButtonMiniIconStyled
+            size="mini"
+            onClick={onTokenEditClick}
+            label="edit"
+            display="icon"
+            title="Edit token"
+            icon={<IconEditStyled size="small" />}
+          />
         </div>
       )}
     </FieldInput>
