@@ -47,6 +47,9 @@ const FilterWrapperStyled = styled.div<{
 
 const ResetButtonStyled = styled(Button)`
   margin: ${GUpx(2)} ${GUpx(3)} 0 ${GUpx(3)};
+  :disabled {
+    border: 1px solid #5d5d52;
+  }
 `;
 
 // #endregion
@@ -61,6 +64,11 @@ export function Filter({ compact }: Props) {
   const { below } = useViewport();
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   const { isFilterShown } = useFilterContext();
+  const isFilteringOriginalState =
+    !filter.title &&
+    !filter.description &&
+    !filter.minExpireTime &&
+    filter.status === ENUM_QUEST_STATE.Active;
 
   return (
     <>
@@ -125,6 +133,7 @@ export function Filter({ compact }: Props) {
           <ResetButtonStyled
             label="Reset"
             mode="strong"
+            disabled={isFilteringOriginalState}
             wide={below('medium')}
             onClick={() => setFilter(DEFAULT_FILTER)}
           />
