@@ -32,7 +32,7 @@ import { DateFieldInputFormik } from '../field-input/date-field-input';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import TextFieldInput from '../field-input/text-field-input';
-import { WalletBallance } from '../wallet-balance';
+import { WalletBalance } from '../wallet-balance';
 import { feedDummyQuestData } from '../utils/debug-util';
 import { Outset } from '../utils/spacer-util';
 
@@ -328,7 +328,7 @@ export default function QuestModal({
                     submitButton={
                       <>
                         {questDeposit?.token?.token !== values.bounty?.token?.token && (
-                          <WalletBallance
+                          <WalletBalance
                             key="reward-token-balance"
                             askedTokenAmount={values.bounty}
                             setIsEnoughBalance={setIsEnoughBalance}
@@ -336,7 +336,7 @@ export default function QuestModal({
                         )}
                         {questDeposit && questDeposit?.parsedAmount > 0 && (
                           <>
-                            <WalletBallance
+                            <WalletBalance
                               key="collateral-token-balance"
                               askedTokenAmount={questDeposit}
                               setIsEnoughBalance={setIsEnoughBalance}

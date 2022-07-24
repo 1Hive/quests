@@ -29,7 +29,7 @@ type Props = {
   isLoading?: boolean;
 };
 
-export function WalletBallance({ askedTokenAmount, setIsEnoughBalance, isLoading = false }: Props) {
+export function WalletBalance({ askedTokenAmount, setIsEnoughBalance, isLoading = false }: Props) {
   const { walletAddress } = useWallet();
   const [tokenBalance, setTokenBalance] = useState<TokenAmountModel>();
   const [isEnoughBalance, _setIsEnoughBalance] = useState(true);
