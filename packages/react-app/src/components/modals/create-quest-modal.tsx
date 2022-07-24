@@ -101,7 +101,8 @@ export default function QuestModal({
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
-  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
+  const [isEnoughBalance, setIsEnoughBalance] = useState<boolean>(true);
+  const [isDepositEnoughBalance, setIsDepositEnoughBalance] = useState<boolean>(true);
   const [questDataState, setQuestDataState] = useState<QuestModel>(questData);
   const [questDeposit, setQuestDeposit] = useState<TokenAmountModel | null>();
   const isMountedRef = useIsMountedRef();
@@ -332,17 +333,21 @@ export default function QuestModal({
                             key="reward-token-balance"
                             askedTokenAmount={values.bounty}
                             setIsEnoughBalance={setIsEnoughBalance}
+                            label="Reward balance"
+                            tooltip="The balance of the reward token in the connected wallet"
                           />
                         )}
                         {questDeposit && questDeposit?.parsedAmount > 0 && (
                           <>
                             <WalletBallance
-                              key="collateral-token-balance"
+                              key="deposit-token-balance"
                               askedTokenAmount={questDeposit}
-                              setIsEnoughBalance={setIsEnoughBalance}
+                              setIsEnoughBalance={setIsDepositEnoughBalance}
+                              label="Deposit balance"
+                              tooltip="The balance of the deposit token in the connected wallet"
                             />
                             <DepositInfoStyled
-                              mode={isEnoughBalance ? 'info' : 'warning'}
+                              mode={isDepositEnoughBalance ? 'info' : 'warning'}
                               key="questDeposit"
                             >
                               <AmountFieldInput
@@ -368,9 +373,14 @@ export default function QuestModal({
                               ? 'Not ready ...'
                               : !isFormValid
                               ? 'Form not valid'
-                              : 'Schedule claim'
+                              : 'Create quest'
                           }
-                          disabled={!questDeposit?.token || !isEnoughBalance || !isFormValid}
+                          disabled={
+                            !questDeposit?.token ||
+                            !isEnoughBalance ||
+                            !isDepositEnoughBalance ||
+                            !isFormValid
+                          }
                         />
                       </>
                     }
