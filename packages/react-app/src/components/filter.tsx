@@ -1,4 +1,5 @@
 import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import { useEffect, useState } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
@@ -64,11 +65,11 @@ export function Filter({ compact }: Props) {
   const { below } = useViewport();
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   const { isFilterShown } = useFilterContext();
-  const isFilteringOriginalState =
-    !filter.title &&
-    !filter.description &&
-    !filter.minExpireTime &&
-    filter.status === ENUM_QUEST_STATE.Active;
+  const [isFilteringOriginalState, setIsFilteringOriginalState] = useState(false);
+
+  useEffect(() => {
+    setIsFilteringOriginalState(filter === DEFAULT_FILTER);
+  }, [filter]);
 
   return (
     <>
