@@ -17,7 +17,7 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
-import { WalletBallance } from '../wallet-balance';
+import { WalletBalance } from '../wallet-balance';
 
 const FormStyled = styled(Form)`
   width: 100%;
@@ -96,7 +96,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           }
           buttons={[
             quest.rewardToken && (
-              <WalletBallance
+              <WalletBalance
                 key="fundAmount"
                 askedTokenAmount={values.fundAmount}
                 setIsEnoughBalance={setIsEnoughBalance}

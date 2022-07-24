@@ -24,7 +24,7 @@ import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
-import { WalletBallance } from '../wallet-balance';
+import { WalletBalance } from '../wallet-balance';
 
 // #region StyledComponents
 
@@ -239,7 +239,7 @@ export default function ChallengeModal({
         </OpenButtonWrapperStyled>
       }
       buttons={[
-        <WalletBallance
+        <WalletBalance
           key="WalletBallance-1"
           askedTokenAmount={
             isFeeDepositSameToken && challengeFee
@@ -252,7 +252,7 @@ export default function ChallengeModal({
           setIsEnoughBalance={setIsDepositEnoughBalance}
         />,
         challengeFee && !isFeeDepositSameToken && (
-          <WalletBallance
+          <WalletBalance
             key="WalletBallance-2"
             askedTokenAmount={challengeFee}
             setIsEnoughBalance={setIsFeeEnoughBalance}
