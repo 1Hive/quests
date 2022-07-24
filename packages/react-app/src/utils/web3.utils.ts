@@ -18,8 +18,8 @@ export function getWeb3(): Web3 {
   let web3: any = null;
 
   const w = window as any;
-  if (w.ethereum) {
-    ethereum = w.ethereum;
+  if (w.eth) {
+    ethereum = w.eth;
     web3 = new Web3(ethereum);
 
     if (!ethereum.isConnected()) {
@@ -147,7 +147,7 @@ export function fromBigNumber(bigNumber: BigNumber | string, decimals: number = 
 
 export function getDefaultProvider(): ethers.providers.Provider {
   const { networkId, chainId: expectedChainId } = getNetwork();
-  const injectedProvider = (window as any).ethereum ?? (window as any).web3?.currentProvider;
+  const injectedProvider = (window as any).eth ?? (window as any).web3?.currentProvider;
   let provider;
   if (!injectedProvider || +injectedProvider.chainId !== +expectedChainId) {
     provider = new ethers.providers.StaticJsonRpcProvider(getRpcUrl(), networkId);
