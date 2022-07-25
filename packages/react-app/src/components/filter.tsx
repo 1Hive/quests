@@ -1,12 +1,4 @@
-import {
-  Button,
-  SearchInput,
-  DropDown,
-  useTheme,
-  useViewport,
-  IconUp,
-  IconClose,
-} from '@1hive/1hive-ui';
+import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState, useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { ThemeInterface } from 'src/styles/theme';
