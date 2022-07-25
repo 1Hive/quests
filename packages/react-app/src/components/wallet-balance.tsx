@@ -31,7 +31,7 @@ type Props = {
   tooltip?: string;
 };
 
-export function WalletBallance({
+export function WalletBalance({
   askedTokenAmount,
   setIsEnoughBalance,
   isLoading = false,

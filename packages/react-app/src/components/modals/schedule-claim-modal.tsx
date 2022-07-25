@@ -32,7 +32,7 @@ import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
-import { WalletBallance } from '../wallet-balance';
+import { WalletBalance } from '../wallet-balance';
 import Stepper from '../utils/stepper';
 import { HelpTooltip } from '../field-input/help-tooltip';
 
@@ -289,7 +289,7 @@ export default function ScheduleClaimModal({
               }}
               submitButton={
                 <>
-                  <WalletBallance
+                  <WalletBalance
                     key="WalletBallance-claimDeposit"
                     askedTokenAmount={claimDeposit}
                     setIsEnoughBalance={setIsEnoughBalance}
