@@ -16,6 +16,7 @@ export type WalletContextModel = {
   activatedId: string;
   activatingId: string;
   isWrongNetwork: boolean;
+  ethereum: any;
   changeNetwork: (_chainId?: number) => void;
   openWalletConnect: React.Dispatch<React.SetStateAction<boolean>>;
   walletConnectOpened: boolean;
@@ -53,7 +54,7 @@ function WalletAugmented({ children }: Props) {
     setIsConnected(false);
 
     if (ethereum) {
-      window.ethereum = ethereum;
+      (window as any).eth = ethereum;
       ethereum?.on('chainChanged', (newChainId: string) => {
         const chainIdNumber = +newChainId;
         if (
@@ -105,14 +106,14 @@ function WalletAugmented({ children }: Props) {
     }
   };
 
-  const handleDisconnect = () => {
+  function handleDisconnect() {
     setActivating(undefined);
     wallet.reset();
     localStorage.removeItem('LAST_WALLET_CONNECTOR');
     localStorage.removeItem('walletconnect');
     document.cookie = '';
     setIsConnected(false);
-  };
+  }
 
   const changeNetwork = async (newChainId?: number) => {
     if (newChainId === chainId) {
@@ -159,6 +160,7 @@ function WalletAugmented({ children }: Props) {
   const contextValue = useMemo(
     () => ({
       ...wallet,
+      ethereum,
       ethers,
       isWrongNetwork,
       walletAddress: wallet.account,

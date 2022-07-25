@@ -90,7 +90,7 @@ const IconStyled = styled.div`
 export default function footer() {
   const theme = useTheme();
   const year = new Date().getFullYear();
-  const { walletConnected } = useWallet();
+  const { walletConnected, ethereum } = useWallet();
   const { networkId } = getNetwork();
   const { stableTokens } = getNetwork();
   const [stableList, setStableList] = useState('');
@@ -113,9 +113,9 @@ export default function footer() {
       default:
         break;
     }
-    if (hnyToken && window.ethereum) {
+    if (hnyToken && ethereum) {
       try {
-        await window.ethereum.request({
+        await ethereum.request({
           method: 'wallet_watchAsset',
           params: {
             type: 'ERC20',
@@ -191,7 +191,7 @@ export default function footer() {
             <span>{networkId === 'rinkeby' ? 'Get test Honey' : 'Get Honey'}</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
-          {window.ethereum && (
+          {ethereum && (
             <FooterNavItemStyled onClick={addHnyToMetamask} color={theme.contentSecondary}>
               <span className="inline-flex">
                 Add {networkId === 'rinkeby' ? 'HNYT' : 'HNY'} to
