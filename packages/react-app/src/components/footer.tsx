@@ -171,7 +171,7 @@ export default function footer() {
             </IconStyled>
             Twitter
           </FooterNavItemStyled>
-          <FooterNavItemStyled href="https://discord.gg/JA6u95pHZn" external>
+          <FooterNavItemStyled href="https://discord.gg/g52FhMdnvs" external>
             <IconStyled>
               <FontAwesomeIcon icon={faDiscord} />
             </IconStyled>
