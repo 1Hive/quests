@@ -17,13 +17,13 @@ export const TOKENS = Object.freeze({
       name: 'USDCoin on xDai',
       symbol: 'USDC',
       token: '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83',
-      decimals: 18,
+      decimals: 6,
     } as TokenModel,
-    Theter: {
+    Tether: {
       name: 'Tether USD on xDai',
       symbol: 'USDT',
       token: '0x4ECaBa5870353805a9F068101A40E0f32ed605C6',
-      decimals: 18,
+      decimals: 6,
     } as TokenModel,
     Honey: {
       name: 'Honey',
@@ -53,13 +53,13 @@ export const TOKENS = Object.freeze({
     UsdCoin: {
       name: 'USDC Stablecoin',
       symbol: 'USDC',
-      token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      decimals: 18,
+      token: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
+      decimals: 6,
     } as TokenModel,
   },
 });
 
 export const StableTokens = Object.freeze({
-  gnosis: [TOKENS.xdai.Dai, TOKENS.xdai.Theter, TOKENS.xdai.UsdCoin],
-  rinkeby: [TOKENS.rinkeby.Dai, TOKENS.rinkeby.UsdCoin],
+  gnosis: [TOKENS.xdai.Dai, TOKENS.xdai.Tether, TOKENS.xdai.UsdCoin],
+  rinkeby: [TOKENS.rinkeby.UsdCoin, TOKENS.rinkeby.UsdCoin],
 });

@@ -1,6 +1,7 @@
 import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
+import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
 import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
@@ -16,6 +17,7 @@ const StatusDropdownStyled = styled(DropDown)`
 const FilterWrapperStyled = styled.div<{
   colDisplay?: boolean;
   isSmallResolution?: boolean;
+  theme: ThemeInterface;
 }>`
   display: flex;
   flex-direction: row;
@@ -29,8 +31,13 @@ const FilterWrapperStyled = styled.div<{
   ${({ isSmallResolution }) =>
     isSmallResolution
       ? css`
-          margin-right: 20px;
+          margin-right: ${GUpx(2.5)};
+          padding-top: ${GUpx(2)};
           padding-bottom: ${GUpx(2)};
+
+          border: 1px solid ${({ theme }) => theme.border};
+          border-radius: 16px;
+          margin: 0 28px 0 8px;
         `
       : css`
           height: 80px;
@@ -46,8 +53,19 @@ const FilterWrapperStyled = styled.div<{
   }
 `;
 
-const ResetButtonStyled = styled(Button)`
+const ButtonLineStyled = styled.div<{ isSmallResolution: boolean }>`
   margin: ${GUpx(2)} ${GUpx(3)} 0 ${GUpx(3)};
+  display: flex;
+  column-gap: ${GUpx(2)};
+
+  ${({ isSmallResolution }) =>
+    isSmallResolution &&
+    css`
+      width: 100%;
+      button {
+        width: 100%;
+      }
+    `}
   :disabled {
     border: 1px solid #5d5d52;
   }
@@ -60,11 +78,12 @@ type Props = {
 };
 
 export function Filter({ compact }: Props) {
-  const { filter, setFilter } = useFilterContext();
+  const { filter, setFilter, toggleFilter } = useFilterContext();
   const theme = useTheme();
-  const { below } = useViewport();
+  const { below, width } = useViewport();
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   const { isFilterShown } = useFilterContext();
+  const isSmallResolution = useMemo(() => below('medium'), [width]);
   const [isFilteringOriginalState, setIsFilteringOriginalState] = useState(false);
 
   useEffect(() => {
@@ -73,12 +92,12 @@ export function Filter({ compact }: Props) {
 
   return (
     <>
-      {(isFilterShown || !below('medium')) && (
-        <FilterWrapperStyled colDisplay={below('medium')} isSmallResolution={below('medium')}>
+      {(isFilterShown || !isSmallResolution) && (
+        <FilterWrapperStyled colDisplay={isSmallResolution} isSmallResolution={isSmallResolution}>
           <FieldInput
             className="flex-grow"
             label={!compact ? 'Title' : ''}
-            wide={below('medium')}
+            wide={isSmallResolution}
             id="filterTitle"
           >
             <SearchInput
@@ -93,7 +112,7 @@ export function Filter({ compact }: Props) {
           <FieldInput
             className="flex-grow"
             label={!compact ? 'Description' : ''}
-            wide={below('medium')}
+            wide={isSmallResolution}
             id="filterDescription"
           >
             <SearchInput
@@ -117,10 +136,10 @@ export function Filter({ compact }: Props) {
               });
             }}
             isEdit
-            wide={below('medium')}
+            wide={isSmallResolution}
             compact={compact}
           />
-          <FieldInput label={!compact ? 'Status' : ''} wide={below('medium')} id="filterStatus">
+          <FieldInput label={!compact ? 'Status' : ''} wide={isSmallResolution} id="filterStatus">
             <StatusDropdownStyled
               id="filterStatus"
               items={states}
@@ -131,13 +150,16 @@ export function Filter({ compact }: Props) {
               compact={compact}
             />
           </FieldInput>
-          <ResetButtonStyled
-            label="Reset"
-            mode="strong"
-            disabled={isFilteringOriginalState}
-            wide={below('medium')}
-            onClick={() => setFilter(DEFAULT_FILTER)}
-          />
+          <ButtonLineStyled isSmallResolution={isSmallResolution}>
+            <Button
+              label="Reset"
+              mode="strong"
+              disabled={isFilteringOriginalState}
+              wide={below('medium')}
+              onClick={() => setFilter(DEFAULT_FILTER)}
+            />
+            {isSmallResolution && <Button label="Close" onClick={() => toggleFilter(false)} />}
+          </ButtonLineStyled>
         </FilterWrapperStyled>
       )}
     </>
