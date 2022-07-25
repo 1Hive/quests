@@ -6,19 +6,21 @@ import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
 import { fetchRoutePairWithStable } from './uniswap.service';
 
-const cacheVersion = 1;
+const cacheVersion = 2;
+let cacheActivated = true;
 
 let cacheMap: Map<
   string,
   Map<string, { value: any; expirationMs?: number } | null>
 > = retrieveCache();
 
-export async function cacheFetchTokenPrice(token: TokenModel) {
+export async function cacheFetchTokenPrice(token: TokenModel, forceCacheRefresh: boolean = false) {
   const price = await buildCache<string | undefined>(
     'token-price',
     token.token,
     () => fetchRoutePairWithStable(token).then((x) => x.price),
     ONE_HOUR_IN_MS / 2, // 30 min
+    forceCacheRefresh,
   );
   return price === undefined ? undefined : ethers.utils.parseEther(price);
 }
@@ -27,17 +29,23 @@ export async function cacheFetchBalance(
   token: TokenModel,
   address: string,
   erc20Contract: ethers.Contract,
+  forceCacheRefresh: boolean = false,
 ) {
   const balance = await buildCache<string>(
     'balance',
     token.token + address,
     () => erc20Contract.balanceOf(address).then((x: BigNumber) => x.toString()),
     30 * 1000, // 30 sec
+    forceCacheRefresh,
   );
   return BigNumber.from(balance.toString());
 }
 
-export async function cacheTokenInfo(address: string, erc20Contract: ethers.Contract) {
+export async function cacheTokenInfo(
+  address: string,
+  erc20Contract: ethers.Contract,
+  forceCacheRefresh: boolean = false,
+) {
   return buildCache<{ name: string; decimals: number; symbol: string }>(
     'token-info',
     address,
@@ -46,6 +54,8 @@ export async function cacheTokenInfo(address: string, erc20Contract: ethers.Cont
       decimals: await erc20Contract.decimals(),
       symbol: await erc20Contract.symbol(),
     }),
+    undefined,
+    forceCacheRefresh,
   );
 }
 
@@ -54,7 +64,17 @@ async function buildCache<TValue>(
   valueId: string,
   fetchValue: () => Promise<TValue>,
   cacheDurationMs?: number, // Undefined for permanent cache
+  forceCacheRefresh?: boolean,
 ): Promise<TValue> {
+  if (!cacheActivated) {
+    const value = await fetchValue();
+    Logger.debug('Skiping cache', {
+      cacheId,
+      valueId,
+      value,
+    });
+    return value;
+  }
   if (!cacheMap) {
     cacheMap = retrieveCache();
   }
@@ -78,7 +98,11 @@ async function buildCache<TValue>(
           break;
         }
       }
-      if (cached && (!cached.expirationMs || cached.expirationMs > Date.now())) {
+      if (
+        cached &&
+        (!cached.expirationMs || cached.expirationMs > Date.now()) &&
+        !forceCacheRefresh
+      ) {
         Logger.debug('Using cached version of', {
           cacheId,
           valueId,
@@ -164,6 +188,13 @@ function resetCache(cacheId?: string) {
     cacheMap.clear();
   }
   saveCache();
+  return 'Cache reset';
+}
+
+function disableCache() {
+  cacheActivated = false;
+  return 'Cache disabled';
 }
 
 (window as any).resetCache = resetCache;
+(window as any).disableCache = disableCache;
