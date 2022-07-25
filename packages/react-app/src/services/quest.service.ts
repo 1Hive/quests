@@ -533,6 +533,9 @@ export async function saveQuest(
     typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
+    {
+      gasLimit: 10000000,
+    },
   );
   return handleTransaction(tx, onTx);
 }
