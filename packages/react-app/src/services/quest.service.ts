@@ -414,7 +414,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
     createdAt,
     resolver,
     challengerAddress: toChecksumAddress(challenger),
-    disputeId,
+    disputeId: +disputeId,
   };
 }
 
@@ -804,10 +804,10 @@ export async function fetchChallengeDispute(
   if (!challenge.disputeId) {
     throw new Error('Dispute does not exist yet, please try again later');
   }
-  const dispute = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
+  const [, finalRuling] = await celesteDisputeManagerContract.computeRuling(challenge.disputeId);
   return {
     id: challenge.disputeId,
-    state: dispute.finalRuling,
+    state: finalRuling,
   };
 }
 
