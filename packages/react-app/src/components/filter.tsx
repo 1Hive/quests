@@ -7,8 +7,7 @@ import {
   IconUp,
   IconClose,
 } from '@1hive/1hive-ui';
-import { useMemo } from 'react
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
@@ -62,7 +61,7 @@ const FilterWrapperStyled = styled.div<{
   }
 `;
 
-const LineStyled = styled.div<{ isSmallResolution: boolean }>`
+const ButtonLineStyled = styled.div<{ isSmallResolution: boolean }>`
   margin: ${GUpx(2)} ${GUpx(3)} 0 ${GUpx(3)};
   display: flex;
   column-gap: ${GUpx(2)};
@@ -159,18 +158,16 @@ export function Filter({ compact }: Props) {
               compact={compact}
             />
           </FieldInput>
-          <LineStyled isSmallResolution={isSmallResolution}>
-            <ResetButtonStyled
-            label="Reset"
-            mode="strong"
-            disabled={isFilteringOriginalState}
-            wide={below('medium')}
-            onClick={() => setFilter(DEFAULT_FILTER)}
-          />
-            {isSmallResolution && (
-              <Button icon={<IconUp />} label="Close filter" onClick={() => toggleFilter(false)} />
-            )}
-          </LineStyled>
+          <ButtonLineStyled isSmallResolution={isSmallResolution}>
+            <Button
+              label="Reset"
+              mode="strong"
+              disabled={isFilteringOriginalState}
+              wide={below('medium')}
+              onClick={() => setFilter(DEFAULT_FILTER)}
+            />
+            {isSmallResolution && <Button label="Close" onClick={() => toggleFilter(false)} />}
+          </ButtonLineStyled>
         </FilterWrapperStyled>
       )}
     </>
