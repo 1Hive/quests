@@ -648,7 +648,7 @@ export async function getBalanceOf(
   token: TokenModel | string,
   address: string,
   lockedFunds?: DepositModel,
-  useCache?: boolean,
+  forceCacheRefresh?: boolean,
 ): Promise<TokenAmountModel | null> {
   try {
     let tokenInfo: TokenModel;
@@ -657,9 +657,8 @@ export async function getBalanceOf(
     if (tokenInfo) {
       const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
-      let balance = useCache
-        ? await cacheFetchBalance(tokenInfo, address, erc20Contract)
-        : ((await erc20Contract.balanceOf(address)) as BigNumber);
+      let balance = await cacheFetchBalance(tokenInfo, address, erc20Contract, forceCacheRefresh);
+
       if (lockedFunds && compareCaseInsensitive(lockedFunds.token, tokenInfo.token)) {
         // Substract deposit from funds if both same token
         balance = balance.sub(BigNumber.from(lockedFunds.amount));

@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+import { LoggerOnce } from './utils/logger';
 
 // rinkeby
 const DEFAULT_CHAIN_ID = 100;
@@ -19,7 +19,7 @@ export default function env(name: string): string | undefined {
     result = typeof envVar === 'function' ? envVar() : envVar;
   }
   if (result) {
-    console.debug(`Using ${name}=${result}`);
+    LoggerOnce.debug(`Using ${name}=${result}`);
   }
   return result;
 }

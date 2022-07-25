@@ -175,7 +175,7 @@ export default function Quest({
         setBounty(null);
         setTimeout(() => {
           if (questData.address && questData.rewardToken) {
-            fetchBalanceOfQuest(questData.address, questData.rewardToken);
+            fetchBalanceOfQuest(questData.address, questData.rewardToken, true);
           }
         }, 500);
       }
@@ -194,7 +194,11 @@ export default function Quest({
     }
   }, [questData.address, questData.rewardToken]);
 
-  const fetchBalanceOfQuest = async (address: string, token: TokenModel | string) => {
+  const fetchBalanceOfQuest = async (
+    address: string,
+    token: TokenModel | string,
+    forceCacheRefresh: boolean = false,
+  ) => {
     try {
       if (questData.address) {
         let depositReleased = false;
@@ -205,7 +209,7 @@ export default function Quest({
           token,
           address,
           depositReleased ? undefined : questData.deposit,
-          true,
+          forceCacheRefresh,
         );
         if (isMountedRef.current) {
           questData.bounty = result;
