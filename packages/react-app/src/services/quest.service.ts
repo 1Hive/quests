@@ -414,7 +414,7 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
     createdAt,
     resolver,
     challengerAddress: toChecksumAddress(challenger),
-    disputeId,
+    disputeId: +disputeId,
   };
 }
 
@@ -533,6 +533,9 @@ export async function saveQuest(
     typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
+    {
+      gasLimit: 10000000,
+    },
   );
   return handleTransaction(tx, onTx);
 }
@@ -645,7 +648,7 @@ export async function getBalanceOf(
   token: TokenModel | string,
   address: string,
   lockedFunds?: DepositModel,
-  useCache?: boolean,
+  forceCacheRefresh?: boolean,
 ): Promise<TokenAmountModel | null> {
   try {
     let tokenInfo: TokenModel;
@@ -654,9 +657,8 @@ export async function getBalanceOf(
     if (tokenInfo) {
       const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
-      let balance = useCache
-        ? await cacheFetchBalance(tokenInfo, address, erc20Contract)
-        : ((await erc20Contract.balanceOf(address)) as BigNumber);
+      let balance = await cacheFetchBalance(tokenInfo, address, erc20Contract, forceCacheRefresh);
+
       if (lockedFunds && compareCaseInsensitive(lockedFunds.token, tokenInfo.token)) {
         // Substract deposit from funds if both same token
         balance = balance.sub(BigNumber.from(lockedFunds.amount));
@@ -801,10 +803,10 @@ export async function fetchChallengeDispute(
   if (!challenge.disputeId) {
     throw new Error('Dispute does not exist yet, please try again later');
   }
-  const dispute = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
+  const [, finalRuling] = await celesteDisputeManagerContract.computeRuling(challenge.disputeId);
   return {
     id: challenge.disputeId,
-    state: dispute.finalRuling,
+    state: finalRuling,
   };
 }
 

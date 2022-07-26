@@ -1,13 +1,5 @@
-import {
-  Button,
-  SearchInput,
-  DropDown,
-  useTheme,
-  useViewport,
-  IconUp,
-  IconClose,
-} from '@1hive/1hive-ui';
-import { useMemo } from 'react';
+import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import { useEffect, useState, useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
@@ -61,7 +53,7 @@ const FilterWrapperStyled = styled.div<{
   }
 `;
 
-const LineStyled = styled.div<{ isSmallResolution: boolean }>`
+const ButtonLineStyled = styled.div<{ isSmallResolution: boolean }>`
   margin: ${GUpx(2)} ${GUpx(3)} 0 ${GUpx(3)};
   display: flex;
   column-gap: ${GUpx(2)};
@@ -74,6 +66,9 @@ const LineStyled = styled.div<{ isSmallResolution: boolean }>`
         width: 100%;
       }
     `}
+  :disabled {
+    border: 1px solid #5d5d52;
+  }
 `;
 
 // #endregion
@@ -89,6 +84,11 @@ export function Filter({ compact }: Props) {
   const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   const { isFilterShown } = useFilterContext();
   const isSmallResolution = useMemo(() => below('medium'), [width]);
+  const [isFilteringOriginalState, setIsFilteringOriginalState] = useState(false);
+
+  useEffect(() => {
+    setIsFilteringOriginalState(filter === DEFAULT_FILTER);
+  }, [filter]);
 
   return (
     <>
@@ -150,18 +150,16 @@ export function Filter({ compact }: Props) {
               compact={compact}
             />
           </FieldInput>
-          <LineStyled isSmallResolution={isSmallResolution}>
+          <ButtonLineStyled isSmallResolution={isSmallResolution}>
             <Button
-              icon={<IconClose />}
               label="Reset"
               mode="strong"
-              wide={isSmallResolution}
+              disabled={isFilteringOriginalState}
+              wide={below('medium')}
               onClick={() => setFilter(DEFAULT_FILTER)}
             />
-            {isSmallResolution && (
-              <Button icon={<IconUp />} label="Close filter" onClick={() => toggleFilter(false)} />
-            )}
-          </LineStyled>
+            {isSmallResolution && <Button label="Close" onClick={() => toggleFilter(false)} />}
+          </ButtonLineStyled>
         </FilterWrapperStyled>
       )}
     </>

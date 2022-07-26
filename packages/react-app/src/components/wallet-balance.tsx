@@ -27,9 +27,17 @@ type Props = {
   askedTokenAmount?: TokenAmountModel | null;
   setIsEnoughBalance?: (_valid: boolean) => void;
   isLoading?: boolean;
+  label?: string;
+  tooltip?: string;
 };
 
-export function WalletBalance({ askedTokenAmount, setIsEnoughBalance, isLoading = false }: Props) {
+export function WalletBalance({
+  askedTokenAmount,
+  setIsEnoughBalance,
+  isLoading = false,
+  label = 'Wallet balance',
+  tooltip = 'The balance of the token for the connected wallet.',
+}: Props) {
   const { walletAddress } = useWallet();
   const [tokenBalance, setTokenBalance] = useState<TokenAmountModel>();
   const [isEnoughBalance, _setIsEnoughBalance] = useState(true);
@@ -78,17 +86,12 @@ export function WalletBalance({ askedTokenAmount, setIsEnoughBalance, isLoading 
           id={`balance-${tokenBalance?.token.symbol}`}
           key={`balance-${tokenBalance?.token.token}`}
           compact
-          label={isEnoughBalance ? 'Wallet balance' : 'Not enough'}
-          tooltip="The balance of the funding token for the connected wallet."
+          label={isEnoughBalance ? label : 'Not enough'}
+          tooltip={tooltip}
           value={tokenBalance}
         />
       ) : (
-        <FieldInput
-          id="balance-not-selected-token"
-          label="Wallet balance"
-          compact
-          isLoading={isLoading}
-        >
+        <FieldInput id="balance-not-selected-token" label={label} compact isLoading={isLoading}>
           <i>{error ?? 'No token selected'}</i>
         </FieldInput>
       )}
