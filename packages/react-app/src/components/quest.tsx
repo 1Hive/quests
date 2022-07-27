@@ -92,7 +92,7 @@ const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   min-height: 340px;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
 `;
 
 const BountyWrapperStyled = styled.div`
