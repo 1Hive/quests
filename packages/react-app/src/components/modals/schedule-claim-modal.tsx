@@ -237,6 +237,14 @@ export default function ScheduleClaimModal({
     </div>
   );
 
+  const archivedWarning = (
+    <div className="pb-0 pt-32">
+      <Info mode="warning">
+        <LineStyled>⚠️ The quest is archived and is not likely to be funded anymore.</LineStyled>
+      </Info>
+    </div>
+  );
+
   return (
     <ModalBase
       id={modalId}
@@ -351,7 +359,11 @@ export default function ScheduleClaimModal({
                     compact
                     isMarkDown
                   />
-                  {willExpireBeforeClaim && expirationWarning}
+                  {questData.state === ENUM_QUEST_STATE.Archived ? (
+                    archivedWarning
+                  ) : (
+                    <>{willExpireBeforeClaim && expirationWarning}</>
+                  )}
                 </>,
                 <WrapperStyled>
                   <div className="inline-flex">

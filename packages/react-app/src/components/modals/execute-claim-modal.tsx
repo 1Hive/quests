@@ -121,7 +121,7 @@ export default function ExecuteClaimModal({
             <OpenButtonStyled
               onClick={() => setOpened(true)}
               icon={<IconCoin />}
-              label="Claim"
+              label="Execute"
               mode="positive"
               title={
                 !claimable
@@ -143,7 +143,7 @@ export default function ExecuteClaimModal({
           <Button
             onClick={claimTx}
             icon={<IconCoin />}
-            label="Claim"
+            label="Execute"
             disabled={claim.state === ENUM_CLAIM_STATE.Challenged}
             title="Trigger claim operation in the chain"
             mode="positive"

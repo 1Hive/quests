@@ -19,8 +19,8 @@ import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
-import IdentityBadge from '../identity-badge';
 import { FieldInput } from '../field-input/field-input';
+import { AddressFieldInput } from '../field-input/address-field-input';
 
 // #region StyledComponents
 
@@ -40,6 +40,11 @@ const OnlyStackholderWarnStyled = styled(Info)`
   margin-top: ${GUpx(4)};
   display: flex;
   align-items: center;
+`;
+
+const AmoutWrapperStyled = styled.div`
+  padding: ${GUpx(2)};
+  min-width: 200px;
 `;
 
 // #endregion
@@ -155,23 +160,23 @@ export default function ReclaimFundsModal({
         isOpen={opened}
       >
         <RowStyled>
-          <Outset gu16>
+          <AmoutWrapperStyled>
             <AmountFieldInputFormik id="bounty" label="Unused funds" value={bounty} />
-          </Outset>
+          </AmoutWrapperStyled>
           <Outset gu16>
             <FieldInput label="Recovery address">
-              <IdentityBadge entity={questData.fallbackAddress} badgeOnly />
+              <AddressFieldInput id="RecoveryAddress" value={questData.fallbackAddress} />
             </FieldInput>
           </Outset>
         </RowStyled>
         {depositTokenAmount && !isDepositReleased && (
           <RowStyled>
-            <Outset gu16>
+            <AmoutWrapperStyled>
               <AmountFieldInputFormik id="bounty" label="Deposit" value={depositTokenAmount} />
-            </Outset>
+            </AmoutWrapperStyled>
             <Outset gu16>
-              <FieldInput label="Recovery address">
-                <IdentityBadge entity={questData.creatorAddress} badgeOnly />
+              <FieldInput label="Creator address">
+                <AddressFieldInput id="CreatorAddress" value={questData.creatorAddress} />
               </FieldInput>
             </Outset>
           </RowStyled>
