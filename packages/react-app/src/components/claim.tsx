@@ -47,13 +47,17 @@ const EvidenceWrapperStyled = styled.div`
 `;
 
 const TimerWrapperStyled = styled.div`
-  margin-right: ${GUpx(2)};
+  margin: 0 ${GUpx(2)};
   display: flex;
 `;
 
 const TimeableActionWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
+`;
+
+const LineSyled = styled.div`
+  display: flex;
 `;
 
 // #endregion
@@ -268,7 +272,10 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                       )}
                   </>
                 ) : (
-                  <ActionsPlaceholder />
+                  <LineSyled>
+                    <ActionsPlaceholder />
+                    {timer}
+                  </LineSyled>
                 )}
               </ChildSpacer>
             </Outset>
