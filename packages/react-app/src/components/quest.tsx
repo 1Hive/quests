@@ -104,6 +104,11 @@ const AddressFieldInputStyled = styled(AddressFieldInput)`
   z-index: 2;
 `;
 
+const HeaderWrapperStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 // #endregion
 
 type Props = {
@@ -315,43 +320,45 @@ export default function Quest({
           )}
         >
           <ContentWrapperStyled compact={below('medium')}>
-            <StateTag state={questData?.state ?? ''} />
-            <RowStyled className="pb-0">
+            <HeaderWrapperStyled>
+              <StateTag state={questData?.state ?? ''} />
+              <RowStyled className="pb-0">
+                <TextFieldInput
+                  id="title"
+                  isLoading={isLoading || !questData}
+                  value={questData?.title}
+                  fontSize="24px"
+                />
+                <BountyWrapperStyled>
+                  <HighlightBlocker>
+                    <AmountFieldInput
+                      id={`bounty-${questData?.address}`}
+                      key={`bounty-${questData?.address}`}
+                      compact
+                      tagOnly
+                      showUsd
+                      value={questData?.bounty}
+                      isLoading={isLoading || !bounty}
+                    />
+                  </HighlightBlocker>
+                </BountyWrapperStyled>
+              </RowStyled>
+
+              {!isSummary && fieldsRow}
+
               <TextFieldInput
-                id="title"
+                id="description"
+                label={isSummary ? undefined : 'Description'}
+                value={questData?.description}
                 isLoading={isLoading || !questData}
-                value={questData?.title}
-                fontSize="24px"
+                multiline
+                isMarkDown
+                disableLinks={isSummary}
+                blockVisibility={isSummary ? 'hidden' : 'visible'}
+                maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
+                wide
               />
-              <BountyWrapperStyled>
-                <HighlightBlocker>
-                  <AmountFieldInput
-                    id={`bounty-${questData?.address}`}
-                    key={`bounty-${questData?.address}`}
-                    compact
-                    tagOnly
-                    showUsd
-                    value={questData?.bounty}
-                    isLoading={isLoading || !bounty}
-                  />
-                </HighlightBlocker>
-              </BountyWrapperStyled>
-            </RowStyled>
-
-            {!isSummary && fieldsRow}
-
-            <TextFieldInput
-              id="description"
-              label={isSummary ? undefined : 'Description'}
-              value={questData?.description}
-              isLoading={isLoading || !questData}
-              multiline
-              isMarkDown
-              disableLinks={isSummary}
-              blockVisibility={isSummary ? 'hidden' : 'visible'}
-              maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
-              wide
-            />
+            </HeaderWrapperStyled>
 
             {isSummary && fieldsRow}
           </ContentWrapperStyled>
