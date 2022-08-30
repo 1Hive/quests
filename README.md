@@ -55,5 +55,5 @@ yarn start:rinkeby
 ### Additional Resources
 
 - [Kanban board](https://app.zenhub.com/workspaces/quests-6092dda4c272a5000e858266/board)
-- Discord : 1Hive (Quest Swarm channel)
+- Discord : 1Hive (Quests Swarm channel)
 - [Deployed app](https://quests.1hive.org/)
