@@ -38,10 +38,6 @@ const AppStyled = styled.div`
 function App() {
   const { currentTheme } = useThemeContext();
 
-  useEffect(() => {
-    document.title = APP_TITLE;
-  }, []);
-
   return (
     <AppStyled theme={currentTheme}>
       <PageContextProvider>
