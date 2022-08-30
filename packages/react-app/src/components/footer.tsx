@@ -209,7 +209,7 @@ export default function footer() {
             <IconExternal size="small" />
           </FooterNavItemStyled>
           <FooterNavItemStyled href="https://wiki.1hive.org/projects/quests" external>
-            <span>Quest Wiki</span>
+            <span>Quests Wiki</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
           <FooterNavItemStyled href="https://github.com/1Hive/quests" external>

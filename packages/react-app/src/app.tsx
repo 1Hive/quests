@@ -2,8 +2,9 @@ import { Main } from '@1hive/1hive-ui';
 import { hot } from 'react-hot-loader/root';
 import { BrowserRouter } from 'react-router-dom';
 import styled from 'styled-components';
+import { useEffect } from 'react';
 import ErrorBoundary from './components/utils/error-boundary';
-import { DEFAULT_THEME } from './constants';
+import { APP_TITLE, DEFAULT_THEME } from './constants';
 import { FilterContextProvider } from './contexts/filter.context';
 import { PageContextProvider } from './contexts/page.context';
 import { TransactionContextProvider } from './contexts/transaction.context';
@@ -36,6 +37,7 @@ const AppStyled = styled.div`
 
 function App() {
   const { currentTheme } = useThemeContext();
+
   return (
     <AppStyled theme={currentTheme}>
       <PageContextProvider>
