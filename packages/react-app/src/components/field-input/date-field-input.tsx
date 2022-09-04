@@ -1,11 +1,11 @@
 import { useTheme } from '@1hive/1hive-ui';
 import { connect } from 'formik';
 import { noop } from 'lodash-es';
-import { CSSProperties, FocusEventHandler, ReactNode } from 'react';
+import { CSSProperties, FocusEventHandler, ReactNode, useEffect } from 'react';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled, { css as _css } from 'styled-components';
-import { addTime, dateFormat, ONE_HOUR_IN_MS } from '../../utils/date.utils';
+import { addTime, dateFormat, IN_A_WEEK_IN_MS, ONE_HOUR_IN_MS } from '../../utils/date.utils';
 import { FieldInput } from './field-input';
 
 // #region StyledComponents
@@ -55,6 +55,7 @@ type Props = {
   css?: CSSProperties;
   tooltip?: ReactNode;
   compact?: boolean;
+  minDate?: Date | null;
   wide?: boolean;
   formik?: any;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -71,12 +72,16 @@ function DateFieldInput({
   css,
   tooltip,
   compact = false,
+  minDate,
   wide = false,
   formik,
   onBlur = noop,
   error,
 }: Props) {
   const theme = useTheme();
+  useEffect(() => {
+    console.log(minDate?.getUTCDate());
+  });
 
   const handleChange = (e: any) => {
     e.preventDefault();
@@ -100,6 +105,7 @@ function DateFieldInput({
       style={css}
       wide={wide}
       theme={theme}
+      min={minDate ? dateFormat(minDate, 'ISO') : undefined}
       // eslint-disable-next-line no-underscore-dangle
       isDarkTheme={isDarkTheme(theme)}
     />

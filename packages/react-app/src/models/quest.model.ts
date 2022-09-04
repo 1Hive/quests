@@ -13,6 +13,7 @@ export type QuestModel = {
   activeClaimCount?: number;
   creationTime?: Date;
   address?: string;
+  executionDelay?: Date;
   bounty?: TokenAmountModel | null;
   rewardToken?: TokenModel | string;
   detailsRefIpfs?: string;

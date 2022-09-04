@@ -98,7 +98,7 @@ async function mapQuestList(quests: any[]): Promise<QuestModel[]> {
   ) as Promise<QuestModel[]>; // Filter out undefined quests (skiped)
 }
 
-async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
+export async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
   const { governSubgraph, governQueueAddress } = getNetwork();
 
   const result = await request(governSubgraph, GovernQueueEntityQuery, {

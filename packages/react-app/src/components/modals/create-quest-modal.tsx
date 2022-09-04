@@ -9,6 +9,7 @@ import {
   ENUM_TRANSACTION_STATUS,
   MAX_LINE_DESCRIPTION,
 } from 'src/constants';
+
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
@@ -96,6 +97,7 @@ export default function QuestModal({
   const [simulateSummary, setSimulateSummary] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
+  const [governDelay, setGovernDelay] = useState<number | undefined>();
   const { walletAddress } = useWallet();
   const { questFactoryAddress } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
@@ -144,6 +146,9 @@ export default function QuestModal({
   useEffect(() => {
     if (opened) {
       setShowPreview(false);
+      QuestService.fetchGovernQueue().then((governQueue) =>
+        setGovernDelay(governQueue.config.executionDelay),
+      );
     }
   }, [opened]);
 
@@ -490,6 +495,20 @@ export default function QuestModal({
                           wide
                           onBlur={handleBlur}
                           error={touched.expireTime && (errors.expireTime as string)}
+                          formik={formRef}
+                        />
+                        <DateFieldInputFormik
+                          id="claimDelay"
+                          label="Claim Delay"
+                          tooltip="The desired claim delay"
+                          isEdit
+                          minDate={
+                            governDelay ? new Date(Date.now() + governDelay * 1000) : undefined
+                          }
+                          value={values.executionDelay}
+                          wide
+                          onBlur={handleBlur}
+                          // error={touched.claimDelay && (errors.claimDelay as string)}
                           formik={formRef}
                         />
                         <AddressFieldInput
