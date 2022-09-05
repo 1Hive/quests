@@ -24,7 +24,7 @@ import governGnosis from "./deployments/xdai/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
-import CelesteMock from "./deployments/rinkeby/OwnableCeleste.json";
+import CelesteMockRinkeby from "./deployments/rinkeby/OwnableCeleste.json";
 
 dotenvConfig({
   path: resolve(
@@ -123,8 +123,11 @@ const hardhatConfig: HardhatUserConfig = {
       },
     },
     goerli: {
-      url: "https://goerli.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
+      chainId: 5,
+      url: "https://goerli.infura.io/v3/74dcdd771e514bdf88cf139f93b3eae2", // <---- YOUR INFURA ID! (or it won't work)
       accounts: getAccounts(),
+      // gasPrice: 40000000000,
+      // blockGasLimit: 90000000000000000000,
     },
     xdai: {
       chainId: 100,
@@ -238,7 +241,7 @@ const hardhatConfig: HardhatUserConfig = {
     solcVersion: "0.7.6",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: "T9TBCSVNRMIEWMH9C4RKZ7YV3F9BDCDXEM",
   },
   namedAccounts: {
     deployer: {
@@ -668,7 +671,66 @@ task("generateGovernQueueConfig:rinkeby")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    CelesteMock.address
+    CelesteMockRinkeby.address
+  )
+  .addOptionalParam(
+    "rules",
+    "Rules of how DAO should be managed",
+    "0x0000000000000000000000000000000000000000"
+  )
+  .addOptionalParam(
+    "maxCalldataSize",
+    "Max calldatasize for the schedule",
+    100000,
+    types.int
+  )
+  .setAction(async (taskArgs) => {
+    const config = generateQueueConfig(taskArgs);
+    const tupple = [
+      config.executionDelay,
+      [config.scheduleDeposit.token, config.scheduleDeposit.amount],
+      [config.challengeDeposit.token, config.challengeDeposit.amount],
+      config.resolver,
+      config.rules,
+      config.maxCalldataSize,
+    ];
+    console.log("Config tupple : ", JSON.stringify(tupple));
+  });
+
+task("generateGovernQueueConfig:goerli")
+  .setDescription("Generate GovernQueue config tupple")
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 7 days)",
+    defaultConfig.ClaimDelay.goerli,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token (default is HNY)",
+    defaultConfig.ScheduleDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.goerli.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token (default is HNY)",
+    defaultConfig.ChallengeDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.goerli.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    defaultConfig.CelesteResolver.goerli
   )
   .addOptionalParam(
     "rules",
@@ -737,6 +799,53 @@ task("newGovernQueue:gnosis")
   )
   .setAction(deployGovernQueue);
 
+task("newGovernQueue:goerli")
+  .setDescription("Deploy a new GovernQueue and export it to front end")
+  .addParam(
+    "aclRoot",
+    "Address that will be granted Root ACL role",
+    defaultConfig.RootOwner.goerli
+  )
+  .addOptionalParam(
+    "governQueueFactoryAddress",
+    "Address of the govern queue factory",
+    defaultConfig.GovernQueueFactory.goerli
+  )
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    defaultConfig.CelesteResolver.goerli
+  )
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 5 min)",
+    defaultConfig.ClaimDelay.goerli,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token (default is HNYT)",
+    defaultConfig.ScheduleDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.goerli.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token (default is HNYT)",
+    defaultConfig.ChallengeDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.goerli.amount,
+    types.float
+  )
+  .setAction(deployGovernQueue);
+
 task("newGovernQueue:rinkeby")
   .setDescription("Deploy a new GovernQueue and export it to front end")
   .addParam("aclRoot", "Address that will be granted Root ACL role")
@@ -748,7 +857,7 @@ task("newGovernQueue:rinkeby")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    CelesteMock.address
+    CelesteMockRinkeby.address
   )
   .addOptionalParam(
     "executionDelay",
@@ -806,6 +915,19 @@ task("newGovern:rinkeby")
   )
   .setAction(deployGovern);
 
+task("newGovern:goerli")
+  .setDescription("Deploy a new Govern and export it to front end")
+  .addParam(
+    "initialExecutorAddress",
+    "Address of the initial executor (should usually be the GovernQueue)"
+  )
+  .addOptionalParam(
+    "governFactoryAddress",
+    "Address of the govern factory",
+    defaultConfig.GovernFactory.goerli
+  )
+  .setAction(deployGovern);
+
 task("newQuestFactory:gnosis")
   .setDescription("Deploy a new QuestFactory and export it to front end")
   .addOptionalParam(
@@ -838,6 +960,43 @@ task("newQuestFactory:gnosis")
       address: deployResult.address,
       abi: deployResult.abi,
     });
+  });
+
+task("newQuestFactory:goerli")
+  .setDescription("Deploy a new QuestFactory and export it to front end")
+  .addOptionalParam(
+    "governAddress",
+    "Address of the govern",
+    "0xe43217F71e496475660a3391FFbD1367e354e002"
+  )
+  .addOptionalParam(
+    "initialOwner",
+    "Initial owner of the QuestFactory (will be able to change deposits)",
+    defaultConfig.RootOwner.goerli
+  )
+  .addOptionalParam(
+    "createDepositToken",
+    "Address of the create quest deposit",
+    defaultConfig.CreateQuestDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "createDepositAmount",
+    "Address of the govern",
+    defaultConfig.CreateQuestDeposit.goerli.amount,
+    types.float
+  )
+  .setAction(async (args, hre) => {
+    console.log("Deploying QuestFactory...");
+    const deployResult = await deployQuestFactory(hre, args);
+
+    exportContractResult(hre.network, "QuestFactory", {
+      address: deployResult.address,
+      abi: deployResult.abi,
+    });
+    console.log(
+      "Deployed QuestFactory (" + hre.network.name + "):",
+      deployResult.address
+    );
   });
 
 task("newQuestFactory:rinkeby")
@@ -984,6 +1143,71 @@ task("deployAll:gnosis")
   )
   .setAction(deployAll);
 
+task("deployAll:goerli")
+  .setDescription(
+    "Deploy all the needed Govern and Quest contracts and export them to frontend"
+  )
+  .addOptionalParam(
+    "ownerAddress",
+    "Address that will be granted Root ACL role and owner for QuestFactory",
+    defaultConfig.RootOwner.goerli
+  )
+  .addOptionalParam(
+    "governQueueFactoryAddress",
+    "Address of the govern queue factory",
+    defaultConfig.GovernQueueFactory.goerli
+  )
+  .addOptionalParam(
+    "governFactoryAddress",
+    "Address of the govern factory",
+    defaultConfig.GovernFactory.goerli
+  )
+  .addOptionalParam(
+    "resolver",
+    "Address of Celeste(IArbitrator)",
+    CelesteMockRinkeby.address
+  )
+  .addOptionalParam(
+    "executionDelay",
+    "Execution delay for claims in seconds (default is 5 min)",
+    defaultConfig.ClaimDelay.goerli,
+    types.int
+  )
+  .addOptionalParam(
+    "scheduleDepositToken",
+    "Address of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "scheduleDepositAmount",
+    "Amount of the schedule deposit token",
+    defaultConfig.ScheduleDeposit.goerli.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "challengeDepositToken",
+    "Address of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "challengeDepositAmount",
+    "Amount of the challenge deposit token",
+    defaultConfig.ChallengeDeposit.goerli.amount,
+    types.float
+  )
+  .addOptionalParam(
+    "createQuestDepositToken",
+    "Address of the create quest deposit token",
+    defaultConfig.CreateQuestDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "createQuestDepositAmount",
+    "Amount of the create quest deposit token",
+    defaultConfig.CreateQuestDeposit.goerli.amount,
+    types.float
+  )
+  .setAction(deployAll);
+
 task("deployAll:rinkeby")
   .setDescription(
     "Deploy all the needed Govern and Quest contracts and export them to frontend"
@@ -1006,7 +1230,7 @@ task("deployAll:rinkeby")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    CelesteMock.address
+    CelesteMockRinkeby.address
   )
   .addOptionalParam(
     "executionDelay",
@@ -1083,6 +1307,54 @@ task("sigAbi").setAction(async (_args, { web3 }) => {
   console.log("Grant all user", "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF");
 });
 
+task("deployCeleste:goerli")
+  .setDescription("Deploy a mock version of Celeste on goerli")
+  .addOptionalParam(
+    "feeToken",
+    "Address of the challenge fee token",
+    defaultConfig.ChallengeFee.goerli.token
+  )
+  .addOptionalParam(
+    "feeAmount",
+    "Amount of the challenge fee",
+    defaultConfig.ChallengeFee.goerli.amount,
+    types.float
+  )
+  .setAction(
+    async (args, { deployments, ethers, getNamedAccounts, network, run }) => {
+      const { deployer, owner } = await getNamedAccounts();
+      const constructorArguments = [
+        args.feeToken,
+        ethers.utils.parseEther(args.feeAmount.toString()),
+      ];
+      const result = await deployments.deploy("OwnableCeleste", {
+        from: deployer,
+        args: constructorArguments,
+        gasLimit: 10000000,
+      });
+      console.log("Deployed Celeste (" + network.name + "):", result.address);
+      const contract = await ethers.getContractAt(result.abi, result.address);
+      await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
+      console.log("Ownership transfered to: ", owner);
+      exportContractResult(network, "Celeste", result);
+
+      try {
+        console.log("Verifying OwnableCeleste...");
+        await new Promise((res, rej) => {
+          setTimeout(
+            () =>
+              run("verify:verify", {
+                address: result.address,
+                constructorArguments,
+              }).then,
+            2000
+          ); // Wait for contract to be deployed
+        });
+      } catch (error) {
+        console.error("Failed when verifying OwnableCeleste contract", error);
+      }
+    }
+  );
 task("deployCeleste:rinkeby")
   .setDescription("Deploy a mock version of Celeste on rinkeby")
   .addOptionalParam(

@@ -1,11 +1,13 @@
 {
   "GovernQueueFactory": {
     "rinkeby": "0x3383032F06BB4Bc4c9DfE08c564cde467c2f725e",
-    "xdai": "0xA6591419f78C044979bf63Aa81edD5e100C0E957"
+    "xdai": "0xA6591419f78C044979bf63Aa81edD5e100C0E957",
+    "goerli": "0xC7ADACbA47a02E1Ec3431f67eB33f31012f164Af"
   },
   "GovernFactory": {
     "rinkeby": "0x3ddc3e8bbf3f6987e4008a7d6f486dae4d0f120f",
-    "xdai": "0x8De393cd9F84D7989A1164191a1f6CDd5D2a7F9B"
+    "xdai": "0x8De393cd9F84D7989A1164191a1f6CDd5D2a7F9B",
+    "goerli": "0xd439D35257a5Ff51c7d98Cf2b932e9096bbeAb63"
   },
   "CreateQuestDeposit": {
     "rinkeby": {
@@ -15,6 +17,10 @@
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
       "amount": 0.1
+    },
+    "goerli": {
+      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "amount": 0.01
     }
   },
   "ScheduleDeposit": {
@@ -25,6 +31,10 @@
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
       "amount": 0.1
+    },
+    "goerli": {
+      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "amount": 0.01
     }
   },
   "ChallengeDeposit": {
@@ -35,6 +45,10 @@
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
       "amount": 0.05
+    },
+    "goerli": {
+      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "amount": 0.01
     }
   },
   "ChallengeFee": {
@@ -45,18 +59,25 @@
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
       "amount": 0.05
+    },
+    "goerli": {
+      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "amount": 0.05
     }
   },
   "RootOwner": {
     "rinkeby": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
-    "xdai": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0"
+    "xdai": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
+    "goerli": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0"
   },
   "ClaimDelay": {
     "rinkeby": 300,
-    "xdai": 604800
+    "xdai": 604800,
+    "goerli": 300
   },
   "CelesteResolver": {
     "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
-    "rinkeby": "0xC2224D785D4e4bc92D5be6767A82d026ca2813fD"
+    "rinkeby": "0xC2224D785D4e4bc92D5be6767A82d026ca2813fD",
+    "goerli": "0x6b81e57848A75369cC5F13ED98c62412a40F19E7"
   }
 }

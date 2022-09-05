@@ -1,7 +1,7 @@
 import { TokenModel } from './token.model';
 
 export type NetworkModel = {
-  networkId: 'rinkeby' | 'xdai' | 'polygon' | 'mainnet' | 'local';
+  networkId: 'rinkeby' | 'xdai' | 'polygon' | 'mainnet' | 'local' | 'goerli';
   chainId: number;
   name: string;
   explorer: string;
