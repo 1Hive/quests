@@ -123,11 +123,8 @@ const hardhatConfig: HardhatUserConfig = {
       },
     },
     goerli: {
-      chainId: 5,
-      url: "https://goerli.infura.io/v3/74dcdd771e514bdf88cf139f93b3eae2", // <---- YOUR INFURA ID! (or it won't work)
+      url: "https://goerli.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: getAccounts(),
-      // gasPrice: 40000000000,
-      // blockGasLimit: 90000000000000000000,
     },
     xdai: {
       chainId: 100,
@@ -241,7 +238,7 @@ const hardhatConfig: HardhatUserConfig = {
     solcVersion: "0.7.6",
   },
   etherscan: {
-    apiKey: "T9TBCSVNRMIEWMH9C4RKZ7YV3F9BDCDXEM",
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   namedAccounts: {
     deployer: {

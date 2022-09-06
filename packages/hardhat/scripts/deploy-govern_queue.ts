@@ -68,7 +68,6 @@ export default async function deployGovernQueue(
     ethers.constants.HashZero,
     {
       gasPrice: "5000000000",
-      // gasLimit: "9000000000000000000",
     }
   );
   console.log("Deploying GovernQueue... tx:", tx.hash);
