@@ -800,7 +800,7 @@ export async function fetchChallengeDispute(
   if (!celesteDisputeManagerContract) {
     return null;
   }
-  if (!challenge.disputeId) {
+  if (challenge.disputeId === undefined) {
     throw new Error('Dispute does not exist yet, please try again later');
   }
   const [, finalRuling] = await celesteDisputeManagerContract.computeRuling(challenge.disputeId);
