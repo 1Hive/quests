@@ -2,7 +2,7 @@ import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getCurrentChain } from './local-settings';
 import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel } from './models/network.model';
-import { StableTokens, TOKENS } from './tokens';
+import { StableTokens } from './tokens';
 
 type StagingNetworkModel = Partial<NetworkModel> & {
   stagingOf: string;
