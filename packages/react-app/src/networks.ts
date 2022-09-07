@@ -48,6 +48,9 @@ export const networks = Object.freeze({
     isTestNetwork: true,
     stableTokens: StableTokens.goerli,
   },
+  goerliStaging: {
+    stagingOf: 'goerli',
+  } as StagingNetworkModel,
   gnosis: {
     networkId: 'xdai',
     chainId: 100,
