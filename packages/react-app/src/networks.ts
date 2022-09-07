@@ -43,7 +43,7 @@ export const networks = Object.freeze({
     governQueueAddress: HardhatDeployement[5].goerli.contracts.GovernQueue.address,
     celesteAddress: HardhatDeployement[5].goerli.contracts.Celeste.address,
     managerAddress: '0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0',
-    rpcUri: 'https://eth-goerli.g.alchemy.com/v2/',
+    rpcUri: 'https://eth-goerli.g.alchemy.com/v2',
     rpcKeyEnvName: 'ALCHEMY_API_KEY',
     isTestNetwork: true,
     stableTokens: StableTokens.goerli,
