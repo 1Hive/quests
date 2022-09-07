@@ -1,9 +1,9 @@
 const child_process = require("child_process");
-import fs from "fs";
-import { resolve } from "path";
-import { config as dotenvConfig } from "dotenv";
+const fs = require("fs");
+const { resolve } = require("path");
+const { config } = require("dotenv");
 
-dotenvConfig({
+config({
   path: resolve(
     __dirname,
     fs

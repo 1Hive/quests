@@ -1,7 +1,7 @@
 import { TokenModel } from './token.model';
 
 export type NetworkModel = {
-  networkId: 'rinkeby' | 'xdai' | 'polygon' | 'mainnet' | 'local' | 'goerli';
+  networkId: 'rinkeby' | 'goerli' | 'xdai' | 'polygon' | 'mainnet' | 'local';
   chainId: number;
   name: string;
   explorer: string;
@@ -16,5 +16,4 @@ export type NetworkModel = {
   rpcKeyEnvName?: string;
   isTestNetwork: boolean;
   stableTokens: TokenModel[];
-  nativeToken: TokenModel;
 };

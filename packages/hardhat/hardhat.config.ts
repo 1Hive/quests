@@ -21,6 +21,7 @@ import deployGovernQueue, {
 import deployGovern from "./scripts/deploy-govern";
 import governRinkeby from "./deployments/rinkeby/Govern.json";
 import governGnosis from "./deployments/xdai/Govern.json";
+import governGoerli from "./deployments/goerli/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
@@ -123,8 +124,11 @@ const hardhatConfig: HardhatUserConfig = {
       },
     },
     goerli: {
-      url: "https://goerli.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: getAccounts(),
+      chainId: 5,
+      url: "https://eth-goerli.g.alchemy.com/v2/"  + process.env.ALCHEMY_API_KEY,
+      accounts: {
+        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
+      },
     },
     xdai: {
       chainId: 100,
@@ -238,23 +242,26 @@ const hardhatConfig: HardhatUserConfig = {
     solcVersion: "0.7.6",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: "MXZSHPHKD1J7MGGSW9124C61G3PJZQVK2W",
   },
   namedAccounts: {
     deployer: {
       default: 0,
       100: process.env.DEPLOYER_ADDRESS,
-      rinkeby: process.env.DEPLOYER_ADDRESS, // Static address for test purposes
+      rinkeby: process.env.DEPLOYER_ADDRESS,
+      goerli: process.env.DEPLOYER_ADDRESS,
     },
     govern: {
       default: 1,
       xdai: governGnosis.address,
       rinkeby: governRinkeby.address, // Govern address on rinkeby
+      goerli: governGoerli.address, // Govern address on rinkeby
     },
     owner: {
       default: 1,
       xdai: defaultConfig.RootOwner.xdai,
       rinkeby: defaultConfig.RootOwner.rinkeby,
+      goerli: defaultConfig.RootOwner.goerli,
     }, // Rinkeby Gnosis Safe address
   },
 };

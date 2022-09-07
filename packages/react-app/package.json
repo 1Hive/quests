@@ -125,6 +125,7 @@
     "start": "cross-env HTTPS=true npm run sync-assets && react-app-rewired start",
     "start:local": "cross-env REACT_APP_DEFAULT_CHAIN_ID=1337 yarn start",
     "start:rinkeby": "cross-env REACT_APP_CHAIN_ID=4 yarn start",
+    "start:goerli": "cross-env REACT_APP_CHAIN_ID=5 yarn start",
     "start:rinkeby-staging": "cross-env REACT_APP_DEFAULT_CHAIN_ID=4 REACT_APP_STAGING=true yarn start",
     "start:gnosis": "cross-env REACT_APP_DEFAULT_CHAIN_ID=100 yarn start",
     "build": "npm run sync-assets && react-app-rewired build",
