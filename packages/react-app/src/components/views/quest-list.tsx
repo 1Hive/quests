@@ -141,6 +141,7 @@ export default function QuestList() {
       if (newQuest) {
         setQuests([newQuest, ...quests]);
         setNewQuestLoading(false);
+        refresh(filter);
       } else {
         fetchQuestUntilNew(newQuestAddress);
       }

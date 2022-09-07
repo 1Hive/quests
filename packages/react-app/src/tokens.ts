@@ -62,7 +62,7 @@ export const TOKENS = Object.freeze({
       name: 'Dai Stablecoin',
       symbol: 'DAI',
       token: '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60',
-      decimals: 6,
+      decimals: 18,
     } as TokenModel,
   },
 });
