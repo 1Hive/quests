@@ -126,9 +126,9 @@ const hardhatConfig: HardhatUserConfig = {
     goerli: {
       chainId: 5,
       url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
-      accounts: [
-        "0x82bb4bda025a053c3667217e498b75a5ffbb7e295597737523a35969b7ec2de8",
-      ],
+      accounts: {
+        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
+      },
     },
     xdai: {
       chainId: 100,
@@ -1332,16 +1332,16 @@ task("deployCeleste:goerli")
         ethers.utils.parseEther(args.feeAmount.toString()),
       ];
       const result = await deployments.deploy("OwnableCeleste", {
-        from: "0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E",
+        from: deployer,
         args: constructorArguments,
         gasLimit: 10000000,
       });
       console.log("Deployed Celeste (" + network.name + "):", result.address);
       const contract = await ethers.getContractAt(result.abi, result.address);
-      //   await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
+      await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
       const [disputeManager] = await contract.getDisputeManager();
       console.log("Ownership transfered to: ", owner);
-      //   exportContractResult(network, "Celeste", result);
+      exportContractResult(network, "Celeste", result);
 
       try {
         console.log("Verifying OwnableCeleste...");

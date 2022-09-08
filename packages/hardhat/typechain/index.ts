@@ -2,10 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { Ownable } from "./Ownable";
+export type { ERC20 } from "./ERC20";
 export type { IERC20Permit } from "./IERC20Permit";
 export type { IERC20Metadata } from "./IERC20Metadata";
 export type { IERC20 } from "./IERC20";
-export type { ERC20 } from "./ERC20";
+export type { DepositLib } from "./DepositLib";
+export type { Models } from "./Models";
+export type { GovernERC20 } from "./GovernERC20";
 export type { IArbitrator } from "./IArbitrator";
 export type { OwnableCeleste } from "./OwnableCeleste";
 export type { TokenMock } from "./TokenMock";
@@ -13,10 +16,13 @@ export type { Quest } from "./Quest";
 export type { QuestFactory } from "./QuestFactory";
 
 export { Ownable__factory } from "./factories/Ownable__factory";
+export { ERC20__factory } from "./factories/ERC20__factory";
 export { IERC20Permit__factory } from "./factories/IERC20Permit__factory";
 export { IERC20Metadata__factory } from "./factories/IERC20Metadata__factory";
 export { IERC20__factory } from "./factories/IERC20__factory";
-export { ERC20__factory } from "./factories/ERC20__factory";
+export { DepositLib__factory } from "./factories/DepositLib__factory";
+export { Models__factory } from "./factories/Models__factory";
+export { GovernERC20__factory } from "./factories/GovernERC20__factory";
 export { IArbitrator__factory } from "./factories/IArbitrator__factory";
 export { OwnableCeleste__factory } from "./factories/OwnableCeleste__factory";
 export { TokenMock__factory } from "./factories/TokenMock__factory";

@@ -2,16 +2,16 @@
  *Submitted for verification at Etherscan.io on 2022-01-07
  */
 
-// Brought from https://github.com/aragon/aragonOS/blob/v4.3.0/contracts/lib/token/ERC20.sol
+// Brought from https://github.com/aragon/aragonOS/blob/v4.3.0/contracts/lib/token/GovernERC20.sol
 // Adapted to use pragma ^0.5.8 and satisfy our linter rules
 
 pragma solidity ^0.5.8;
 
 /**
- * @title ERC20 interface
+ * @title GovernERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract ERC20 {
+contract GovernERC20 {
     function totalSupply() public view returns (uint256);
 
     function balanceOf(address _who) public view returns (uint256);
@@ -86,33 +86,37 @@ interface IArbitrator {
     /**
      * @dev Tell the dispute fees information to create a dispute
      * @return recipient Address where the corresponding dispute fees must be transferred to
-     * @return feeToken ERC20 token used for the fees
+     * @return feeToken GovernERC20 token used for the fees
      * @return feeAmount Total amount of fees that must be allowed to the recipient
      */
     function getDisputeFees()
         external
         view
-        returns (ERC20 feeToken, uint256 feeAmount);
+        returns (
+            address recipient,
+            GovernERC20 feeToken,
+            uint256 feeAmount
+        );
 }
 
-// File: contracts/lib/os/SafeERC20.sol
+// File: contracts/lib/os/SafeGovernERC20.sol
 
-// Brought from https://github.com/aragon/aragonOS/blob/v4.3.0/contracts/common/SafeERC20.sol
+// Brought from https://github.com/aragon/aragonOS/blob/v4.3.0/contracts/common/SafeGovernERC20.sol
 // Adapted to use pragma ^0.5.8 and satisfy our linter rules
 
 pragma solidity ^0.5.8;
 
-library SafeERC20 {
+library SafeGovernERC20 {
     // Before 0.5, solidity has a mismatch between `address.transfer()` and `token.transfer()`:
     // https://github.com/ethereum/solidity/issues/3544
     bytes4 private constant TRANSFER_SELECTOR = 0xa9059cbb;
 
     /**
-     * @dev Same as a standards-compliant ERC20.transfer() that never reverts (returns false).
+     * @dev Same as a standards-compliant GovernERC20.transfer() that never reverts (returns false).
      *      Note that this makes an external call to the token.
      */
     function safeTransfer(
-        ERC20 _token,
+        GovernERC20 _token,
         address _to,
         uint256 _amount
     ) internal returns (bool) {
@@ -125,11 +129,11 @@ library SafeERC20 {
     }
 
     /**
-     * @dev Same as a standards-compliant ERC20.transferFrom() that never reverts (returns false).
+     * @dev Same as a standards-compliant GovernERC20.transferFrom() that never reverts (returns false).
      *      Note that this makes an external call to the token.
      */
     function safeTransferFrom(
-        ERC20 _token,
+        GovernERC20 _token,
         address _from,
         address _to,
         uint256 _amount
@@ -144,11 +148,11 @@ library SafeERC20 {
     }
 
     /**
-     * @dev Same as a standards-compliant ERC20.approve() that never reverts (returns false).
+     * @dev Same as a standards-compliant GovernERC20.approve() that never reverts (returns false).
      *      Note that this makes an external call to the token.
      */
     function safeApprove(
-        ERC20 _token,
+        GovernERC20 _token,
         address _spender,
         uint256 _amount
     ) internal returns (bool) {
@@ -206,7 +210,7 @@ library SafeERC20 {
 pragma solidity ^0.5.8;
 
 contract OwnableCeleste is IArbitrator {
-    using SafeERC20 for ERC20;
+    using SafeGovernERC20 for GovernERC20;
 
     // Note that Aragon Court treats the possible outcomes as arbitrary numbers, leaving the Arbitrable (us) to define how to understand them.
     // Some outcomes [0, 1, and 2] are reserved by Aragon Court: "missing", "leaked", and "refused", respectively.
@@ -229,7 +233,7 @@ contract OwnableCeleste is IArbitrator {
         State state;
     }
 
-    ERC20 public feeToken;
+    GovernERC20 public feeToken;
     uint256 public feeAmount;
     uint256 public currentId;
     address public owner;
@@ -240,7 +244,7 @@ contract OwnableCeleste is IArbitrator {
         _;
     }
 
-    constructor(ERC20 _feeToken, uint256 _feeAmount) public {
+    constructor(GovernERC20 _feeToken, uint256 _feeAmount) public {
         owner = msg.sender;
         feeToken = _feeToken;
         feeAmount = _feeAmount;
@@ -330,11 +334,19 @@ contract OwnableCeleste is IArbitrator {
     /**
      * @dev Tell the dispute fees information to create a dispute
      * @return recipient Address where the corresponding dispute fees must be transferred to
-     * @return feeToken ERC20 token used for the fees
+     * @return feeToken GovernERC20 token used for the fees
      * @return feeAmount Total amount of fees that must be allowed to the recipient
      */
-    function getDisputeFees() external view returns (ERC20, uint256) {
-        return (feeToken, feeAmount);
+    function getDisputeFees()
+        external
+        view
+        returns (
+            address,
+            GovernERC20,
+            uint256
+        )
+    {
+        return (address(this), feeToken, feeAmount);
     }
 
     function getDisputeManager() external view returns (address) {
