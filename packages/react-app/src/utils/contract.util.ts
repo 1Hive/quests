@@ -120,13 +120,15 @@ export function getUniswapPairContract(pairAddress: string) {
   return getContract('UniswapPair', pairAddress);
 }
 
-export async function getCelesteContract() {
+export async function getCelesteContract(celesteAddressOverride?: string) {
   const { celesteAddress } = getNetwork();
-  return getContract('Celeste', celesteAddress);
+  return getContract('Celeste', celesteAddressOverride ?? celesteAddress);
 }
 
-export async function getCelesteDisputeManagerContract() {
-  const disputeManagerAddress = (await getCelesteContract()).getDisputeManager();
+export async function getCelesteDisputeManagerContract(celesteAddressOverride?: string) {
+  const disputeManagerAddress = (
+    await getCelesteContract(celesteAddressOverride)
+  ).getDisputeManager();
   return getContract('CelesteDisputeManager', disputeManagerAddress);
 }
 

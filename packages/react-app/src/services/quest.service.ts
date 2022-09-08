@@ -782,8 +782,10 @@ export async function resolveClaimChallenge(
 
 // #region Celeste
 
-export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
-  const celesteContract = await getCelesteContract();
+export async function fetchChallengeFee(
+  celesteAddressOverride?: string,
+): Promise<TokenAmountModel | null> {
+  const celesteContract = await getCelesteContract(celesteAddressOverride);
   if (!celesteContract) return null;
   const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
   const token = await getTokenInfo(feeToken);
@@ -797,7 +799,7 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
 export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel | null> {
-  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract();
+  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract(challenge.resolver);
   if (!celesteDisputeManagerContract) {
     return null;
   }
