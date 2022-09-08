@@ -2,7 +2,7 @@ import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getCurrentChain } from './local-settings';
 import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel } from './models/network.model';
-import { StableTokens, TOKENS } from './tokens';
+import { StableTokens } from './tokens';
 
 type StagingNetworkModel = Partial<NetworkModel> & {
   stagingOf: string;
@@ -19,18 +19,37 @@ export const networks = Object.freeze({
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     questFactoryAddress: HardhatDeployement[4].rinkeby.contracts.QuestFactory.address,
     governQueueAddress: HardhatDeployement[4].rinkeby.contracts.GovernQueue.address,
-    celesteAddress: '0xe772723b98E58F4b6217DeB381AA164f2b5FB33c',
+    celesteAddress: HardhatDeployement[4].rinkeby.contracts.Celeste.address,
     managerAddress: '0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0',
     rpcUri: 'https://rinkeby.infura.io/v3',
     rpcKeyEnvName: 'INFURA_API_KEY',
     isTestNetwork: true,
     stableTokens: StableTokens.rinkeby,
-    nativeToken: TOKENS.rinkeby.native,
   },
   rinkebyStaging: {
     stagingOf: 'rinkeby',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby-staging',
+  } as StagingNetworkModel,
+  goerli: {
+    networkId: 'goerli',
+    chainId: 5,
+    name: 'Goerli',
+    explorer: 'etherscan',
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-goerli',
+    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli',
+    tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+    questFactoryAddress: HardhatDeployement[5].goerli.contracts.QuestFactory.address,
+    governQueueAddress: HardhatDeployement[5].goerli.contracts.GovernQueue.address,
+    celesteAddress: HardhatDeployement[5].goerli.contracts.Celeste.address,
+    managerAddress: '0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0',
+    rpcUri: 'https://eth-goerli.g.alchemy.com/v2',
+    rpcKeyEnvName: 'ALCHEMY_API_KEY',
+    isTestNetwork: true,
+    stableTokens: StableTokens.goerli,
+  },
+  goerliStaging: {
+    stagingOf: 'goerli',
   } as StagingNetworkModel,
   gnosis: {
     networkId: 'xdai',
@@ -47,7 +66,6 @@ export const networks = Object.freeze({
     rpcUri: 'https://rpc.gnosischain.com/',
     isTestNetwork: false,
     stableTokens: StableTokens.gnosis,
-    nativeToken: TOKENS.xdai.native,
   } as NetworkModel,
   gnosisStaging: {
     stagingOf: 'gnosis',

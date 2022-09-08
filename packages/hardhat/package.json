@@ -29,7 +29,7 @@
     "@eth-optimism/hardhat-ovm": "0.2.2",
     "@ethersproject/hardware-wallets": "^5.0.14",
     "@ethersproject/solidity": "^5.0.9",
-    "@nomiclabs/hardhat-etherscan": "^2.1.2",
+    "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@nomiclabs/hardhat-waffle": "^2.0.0",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/contracts": "^4.7.1",
@@ -40,6 +40,7 @@
     "dotenv": "^10.0.0",
     "dotenv-cli": "^4.0.0",
     "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.6",
     "hardhat": "^2.6.2",
     "hardhat-deploy": "^0.9.0",
     "hardhat-typechain": "^0.3.5",
@@ -47,8 +48,7 @@
     "qrcode-terminal": "^0.12.0",
     "ramda": "^0.27.1",
     "solidity-coverage": "^0.7.16",
-    "typechain": "^4.0.0",
-    "ethers": "^5.4.6"
+    "typechain": "^4.0.0"
   },
   "scripts": {
     "chain": "hardhat node --hostname 0.0.0.0 --network hardhat --no-deploy --show-accounts",

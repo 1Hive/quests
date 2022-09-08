@@ -5,7 +5,10 @@ import { getNetwork } from 'src/networks';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
+import { useMemo } from 'react';
+import { TOKENS } from 'src/tokens';
 import QuestModal from '../modals/create-quest-modal';
+
 // #region StyledComponents
 
 const HeaderNavStyled = styled.nav<{ theme: ThemeInterface }>`
@@ -37,22 +40,25 @@ export default function HeaderMenu({ below }: Props) {
   const theme = useTheme();
   const { networkId } = getNetwork();
   const { walletConnected } = useWallet();
-
+  const swapLink = useMemo(() => {
+    switch (networkId) {
+      case 'xdai':
+        return `https://app.honeyswap.org/#/swap?inputCurrency=${TOKENS.xdai.Honey.token}`;
+      case 'goerli':
+        return `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=eth&outputCurrency=${TOKENS.goerli.Dai.token}`;
+      case 'rinkeby':
+        return `https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=${TOKENS.rinkeby.HoneyTest.token}`;
+      default:
+        return undefined;
+    }
+  }, [networkId]);
   return (
     <>
       {!below('medium') && (
         <HeaderNavStyled theme={theme}>
           {!below('large') && (
             <>
-              <HeaderNavItemStyled
-                color={theme.contentSecondary}
-                href={
-                  networkId === 'rinkeby'
-                    ? 'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'
-                    : 'https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9'
-                }
-                external
-              >
+              <HeaderNavItemStyled color={theme.contentSecondary} href={swapLink} external>
                 <span>Get Honey</span>
                 <IconExternal />
               </HeaderNavItemStyled>

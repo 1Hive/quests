@@ -1,6 +1,6 @@
 import { LoggerOnce } from './utils/logger';
 
-// rinkeby
+// xdai
 const DEFAULT_CHAIN_ID = 100;
 
 const ENV_VARS = {
