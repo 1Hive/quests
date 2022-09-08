@@ -58,6 +58,12 @@ export const TOKENS = Object.freeze({
     } as TokenModel,
   },
   goerli: {
+    HoneyTest: {
+      name: 'HoneyTest',
+      symbol: 'HNYT',
+      token: '0xbc74d76abB7FA2311eab46A31273452aAFD98DB1',
+      decimals: 18,
+    } as TokenModel,
     Dai: {
       name: 'Dai Stablecoin',
       symbol: 'DAI',
