@@ -45,7 +45,7 @@ export default function HeaderMenu({ below }: Props) {
       case 'xdai':
         return `https://app.honeyswap.org/#/swap?inputCurrency=${TOKENS.xdai.Honey.token}`;
       case 'goerli':
-        return `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=eth&outputCurrency=${TOKENS.goerli.Dai.token}`;
+        return `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=eth&outputCurrency=${TOKENS.goerli.HoneyTest.token}`;
       case 'rinkeby':
         return `https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=${TOKENS.rinkeby.HoneyTest.token}`;
       default:

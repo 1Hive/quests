@@ -2355,16 +2355,11 @@
           ]
         },
         "Celeste": {
-          "address": "0xe772723b98E58F4b6217DeB381AA164f2b5FB33c",
+          "address": "0xeec9bf3ff552d8ff43954669601f2f483ea45116",
           "abi": [
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_owner",
-                  "type": "address"
-                }
-              ],
+              "inputs": [{ "name": "_owner", "type": "address" }],
               "name": "setOwner",
               "outputs": [],
               "payable": false,
@@ -2374,14 +2369,8 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_state",
-                  "type": "uint8"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_state", "type": "uint8" }
               ],
               "name": "decideDispute",
               "outputs": [],
@@ -2391,22 +2380,11 @@
             },
             {
               "constant": true,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "", "type": "uint256" }],
               "name": "disputes",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "state",
-                  "type": "uint8"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "state", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -2416,12 +2394,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeToken",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -2430,12 +2403,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeAmount",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -2445,18 +2413,9 @@
               "inputs": [],
               "name": "getDisputeFees",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
+                { "name": "", "type": "address" },
+                { "name": "", "type": "address" },
+                { "name": "", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -2465,18 +2424,9 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_submitter",
-                  "type": "address"
-                },
-                {
-                  "name": "_evidence",
-                  "type": "bytes"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_submitter", "type": "address" },
+                { "name": "_evidence", "type": "bytes" }
               ],
               "name": "submitEvidence",
               "outputs": [],
@@ -2486,12 +2436,7 @@
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "closeEvidencePeriod",
               "outputs": [],
               "payable": false,
@@ -2502,34 +2447,18 @@
               "constant": true,
               "inputs": [],
               "name": "owner",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_possibleRulings",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_metadata",
-                  "type": "bytes"
-                }
-              ],
-              "name": "createDispute",
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "computeRuling",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "finalRuling", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -2538,21 +2467,22 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
+                { "name": "_possibleRulings", "type": "uint256" },
+                { "name": "_metadata", "type": "bytes" }
               ],
+              "name": "createDispute",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "rule",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "ruling",
-                  "type": "uint256"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "ruling", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -2562,12 +2492,7 @@
               "constant": true,
               "inputs": [],
               "name": "getDisputeManager",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -2576,26 +2501,15 @@
               "constant": true,
               "inputs": [],
               "name": "currentId",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
             },
             {
               "inputs": [
-                {
-                  "name": "_feeToken",
-                  "type": "address"
-                },
-                {
-                  "name": "_feeAmount",
-                  "type": "uint256"
-                }
+                { "name": "_feeToken", "type": "address" },
+                { "name": "_feeAmount", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -3122,304 +3036,6 @@
               ],
               "name": "transferOwnership",
               "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            }
-          ]
-        },
-        "TokenMock": {
-          "address": "0x86E3f333Bb2AfE4b3da62e4DD8eeB0F8bFfa5FBe",
-          "abi": [
-            {
-              "inputs": [],
-              "stateMutability": "payable",
-              "type": "constructor"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "Approval",
-              "type": "event"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "from",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "to",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "Transfer",
-              "type": "event"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                }
-              ],
-              "name": "allowance",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "approve",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "account",
-                  "type": "address"
-                }
-              ],
-              "name": "balanceOf",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "decimals",
-              "outputs": [
-                {
-                  "internalType": "uint8",
-                  "name": "",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "subtractedValue",
-                  "type": "uint256"
-                }
-              ],
-              "name": "decreaseAllowance",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "addedValue",
-                  "type": "uint256"
-                }
-              ],
-              "name": "increaseAllowance",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "initialBalance",
-                  "type": "uint256"
-                }
-              ],
-              "name": "mint",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "name",
-              "outputs": [
-                {
-                  "internalType": "string",
-                  "name": "",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "symbol",
-              "outputs": [
-                {
-                  "internalType": "string",
-                  "name": "",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "totalSupply",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "recipient",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "transfer",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "sender",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "recipient",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
-                }
-              ],
-              "name": "transferFrom",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
               "stateMutability": "nonpayable",
               "type": "function"
             }
@@ -5784,16 +5400,11 @@
           ]
         },
         "Celeste": {
-          "address": "0xEc6e5548aD968220E659e34d30a7d76DF68FFB64",
+          "address": "0x5D775285F343e84cf325D54cCcC70742ed711019",
           "abi": [
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_owner",
-                  "type": "address"
-                }
-              ],
+              "inputs": [{ "name": "_owner", "type": "address" }],
               "name": "setOwner",
               "outputs": [],
               "payable": false,
@@ -5803,14 +5414,8 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_state",
-                  "type": "uint8"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_state", "type": "uint8" }
               ],
               "name": "decideDispute",
               "outputs": [],
@@ -5820,22 +5425,11 @@
             },
             {
               "constant": true,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "", "type": "uint256" }],
               "name": "disputes",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "state",
-                  "type": "uint8"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "state", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -5845,12 +5439,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeToken",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -5859,12 +5448,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeAmount",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -5874,18 +5458,9 @@
               "inputs": [],
               "name": "getDisputeFees",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
+                { "name": "", "type": "address" },
+                { "name": "", "type": "address" },
+                { "name": "", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -5894,18 +5469,9 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_submitter",
-                  "type": "address"
-                },
-                {
-                  "name": "_evidence",
-                  "type": "bytes"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_submitter", "type": "address" },
+                { "name": "_evidence", "type": "bytes" }
               ],
               "name": "submitEvidence",
               "outputs": [],
@@ -5915,12 +5481,7 @@
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "closeEvidencePeriod",
               "outputs": [],
               "payable": false,
@@ -5931,34 +5492,18 @@
               "constant": true,
               "inputs": [],
               "name": "owner",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_possibleRulings",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_metadata",
-                  "type": "bytes"
-                }
-              ],
-              "name": "createDispute",
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "computeRuling",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "finalRuling", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -5967,21 +5512,22 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
+                { "name": "_possibleRulings", "type": "uint256" },
+                { "name": "_metadata", "type": "bytes" }
               ],
+              "name": "createDispute",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "rule",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "ruling",
-                  "type": "uint256"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "ruling", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -5991,12 +5537,7 @@
               "constant": true,
               "inputs": [],
               "name": "getDisputeManager",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -6005,26 +5546,15 @@
               "constant": true,
               "inputs": [],
               "name": "currentId",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
             },
             {
               "inputs": [
-                {
-                  "name": "_feeToken",
-                  "type": "address"
-                },
-                {
-                  "name": "_feeAmount",
-                  "type": "uint256"
-                }
+                { "name": "_feeToken", "type": "address" },
+                { "name": "_feeAmount", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",

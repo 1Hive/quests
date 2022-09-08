@@ -19,7 +19,7 @@
       "amount": 0.1
     },
     "goerli": {
-      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
       "amount": 0.01
     }
   },
@@ -33,7 +33,7 @@
       "amount": 0.1
     },
     "goerli": {
-      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
       "amount": 0.01
     }
   },
@@ -47,21 +47,21 @@
       "amount": 0.05
     },
     "goerli": {
-      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
       "amount": 0.01
     }
   },
   "ChallengeFee": {
     "rinkeby": {
       "token": "0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9",
-      "amount": 0.05
+      "amount": 0.01
     },
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
       "amount": 0.05
     },
     "goerli": {
-      "token": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
+      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
       "amount": 0.05
     }
   },
@@ -77,7 +77,7 @@
   },
   "CelesteResolver": {
     "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
-    "rinkeby": "0xC2224D785D4e4bc92D5be6767A82d026ca2813fD",
-    "goerli": "0xEc6e5548aD968220E659e34d30a7d76DF68FFB64"
+    "rinkeby": "0xeec9bf3ff552d8ff43954669601f2f483ea45116",
+    "goerli": "0x5D775285F343e84cf325D54cCcC70742ed711019"
   }
 }

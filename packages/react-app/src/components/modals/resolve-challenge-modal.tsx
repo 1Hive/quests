@@ -21,6 +21,7 @@ import Skeleton from 'react-loading-skeleton';
 import { ContainerModel } from 'src/models/govern.model';
 import { sleep } from 'src/utils/common.util';
 import { getNetwork } from 'src/networks';
+import { Logger } from 'src/utils/logger';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -113,13 +114,20 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           await sleep(1000);
           await fetchChallengeAndDispute(container, retryCount - 1);
         } else {
-          throw new Error(`Failed to fetch challenge with container id ${container.id}`);
+          throw new Error(`Failed to fetch challenge with container id : ${container.id}\n`);
         }
       } else {
         setChallenge(challengeResult);
         if (challengeResult) {
-          const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
-          setDispute(disputeModel ?? undefined);
+          try {
+            const disputeModel = await QuestService.fetchChallengeDispute(challengeResult);
+            setDispute(disputeModel ?? undefined);
+          } catch (error) {
+            Logger.error(
+              `Failed to fetch challenge dispute with id : ${challengeResult.disputeId}\n`,
+              error,
+            );
+          }
         }
       }
     };

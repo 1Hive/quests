@@ -47,6 +47,7 @@ import {
   getQuestContract,
   getGovernQueueContract,
   getCelesteDisputeManagerContract,
+  getCelesteContract,
 } from '../utils/contract.util';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 import { cacheFetchBalance, cacheFetchTokenPrice } from './cache.service';
@@ -781,10 +782,12 @@ export async function resolveClaimChallenge(
 
 // #region Celeste
 
-export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
-  const celesteContract = await getCelesteDisputeManagerContract();
+export async function fetchChallengeFee(
+  celesteAddressOverride?: string,
+): Promise<TokenAmountModel | null> {
+  const celesteContract = await getCelesteContract(celesteAddressOverride);
   if (!celesteContract) return null;
-  const [feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
   const token = await getTokenInfo(feeToken);
   if (!token) return null;
   return toTokenAmountModel({
@@ -796,7 +799,7 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
 export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel | null> {
-  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract();
+  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract(challenge.resolver);
   if (!celesteDisputeManagerContract) {
     return null;
   }
