@@ -111,7 +111,7 @@ export default function footer() {
         hnyToken = TOKENS.rinkeby.HoneyTest;
         break;
       case 'goerli':
-        hnyToken = TOKENS.goerli.Dai;
+        hnyToken = TOKENS.goerli.HoneyTest;
         break;
       default:
         break;
@@ -141,7 +141,7 @@ export default function footer() {
       case 'xdai':
         return `https://app.honeyswap.org/#/swap?inputCurrency=${TOKENS.xdai.Honey.token}`;
       case 'goerli':
-        return `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=eth&outputCurrency=${TOKENS.goerli.Dai.token}`;
+        return `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=eth&outputCurrency=${TOKENS.goerli.HoneyTest.token}`;
       case 'rinkeby':
         return `https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=${TOKENS.rinkeby.HoneyTest.token}`;
       default:

@@ -125,10 +125,10 @@ const hardhatConfig: HardhatUserConfig = {
     },
     goerli: {
       chainId: 5,
-      url: "https://eth-goerli.g.alchemy.com/v2/"  + process.env.ALCHEMY_API_KEY,
-      accounts: {
-        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
-      },
+      url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
+      accounts: [
+        "0x82bb4bda025a053c3667217e498b75a5ffbb7e295597737523a35969b7ec2de8",
+      ],
     },
     xdai: {
       chainId: 100,
@@ -1332,27 +1332,30 @@ task("deployCeleste:goerli")
         ethers.utils.parseEther(args.feeAmount.toString()),
       ];
       const result = await deployments.deploy("OwnableCeleste", {
-        from: deployer,
+        from: "0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E",
         args: constructorArguments,
         gasLimit: 10000000,
       });
       console.log("Deployed Celeste (" + network.name + "):", result.address);
       const contract = await ethers.getContractAt(result.abi, result.address);
-      await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
+      //   await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
+      const [disputeManager] = await contract.getDisputeManager();
       console.log("Ownership transfered to: ", owner);
-      exportContractResult(network, "Celeste", result);
+      //   exportContractResult(network, "Celeste", result);
 
       try {
         console.log("Verifying OwnableCeleste...");
         await new Promise((res, rej) => {
-          setTimeout(
-            () =>
+          setTimeout(async () => {
+            Promise.all([
               run("verify:verify", {
-                address: result.address,
-                constructorArguments,
-              }).then,
-            2000
-          ); // Wait for contract to be deployed
+                address: disputeManager,
+                constructorArguments: [result.address],
+              }),
+            ])
+              .then(res)
+              .catch(rej);
+          }, 2000); // Wait for contract to be deployed
         });
       } catch (error) {
         console.error("Failed when verifying OwnableCeleste contract", error);

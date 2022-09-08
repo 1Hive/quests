@@ -31,6 +31,7 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     "submitEvidence(uint256,address,bytes)": FunctionFragment;
     "closeEvidencePeriod(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
+    "computeRuling(uint256)": FunctionFragment;
     "createDispute(uint256,bytes)": FunctionFragment;
     "rule(uint256)": FunctionFragment;
     "getDisputeManager()": FunctionFragment;
@@ -61,6 +62,10 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "computeRuling",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "createDispute",
     values: [BigNumberish, BytesLike]
@@ -93,6 +98,10 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "computeRuling",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "createDispute",
     data: BytesLike
@@ -196,6 +205,16 @@ export class OwnableCeleste extends Contract {
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
+
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     createDispute(
       _possibleRulings: BigNumberish,
@@ -301,6 +320,16 @@ export class OwnableCeleste extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
+  computeRuling(
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "computeRuling(uint256)"(
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   createDispute(
     _possibleRulings: BigNumberish,
     _metadata: BytesLike,
@@ -405,6 +434,16 @@ export class OwnableCeleste extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+
     createDispute(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
@@ -504,6 +543,16 @@ export class OwnableCeleste extends Contract {
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     createDispute(
       _possibleRulings: BigNumberish,
@@ -607,6 +656,16 @@ export class OwnableCeleste extends Contract {
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
     createDispute(
       _possibleRulings: BigNumberish,

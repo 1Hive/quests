@@ -13,6 +13,7 @@ import {
 import {
   Contract,
   ContractTransaction,
+  Overrides,
   CallOverrides,
 } from "@ethersproject/contracts";
 import { BytesLike } from "@ethersproject/bytes";
@@ -22,6 +23,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface DisputeManagerInterface extends ethers.utils.Interface {
   functions: {
     "getDisputeFees()": FunctionFragment;
+    "computeRuling(uint256)": FunctionFragment;
     "getDispute(uint256)": FunctionFragment;
   };
 
@@ -30,12 +32,20 @@ interface DisputeManagerInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "computeRuling",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getDispute",
     values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(
     functionFragment: "getDisputeFees",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "computeRuling",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getDispute", data: BytesLike): Result;
@@ -60,6 +70,16 @@ export class DisputeManager extends Contract {
     getDisputeFees(overrides?: CallOverrides): Promise<[string, BigNumber]>;
 
     "getDisputeFees()"(overrides?: CallOverrides): Promise<[string, BigNumber]>;
+
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     getDispute(
       _disputeId: BigNumberish,
@@ -94,6 +114,16 @@ export class DisputeManager extends Contract {
 
   "getDisputeFees()"(overrides?: CallOverrides): Promise<[string, BigNumber]>;
 
+  computeRuling(
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "computeRuling(uint256)"(
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   getDispute(
     _disputeId: BigNumberish,
     overrides?: CallOverrides
@@ -126,6 +156,16 @@ export class DisputeManager extends Contract {
     getDisputeFees(overrides?: CallOverrides): Promise<[string, BigNumber]>;
 
     "getDisputeFees()"(overrides?: CallOverrides): Promise<[string, BigNumber]>;
+
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
 
     getDispute(
       _disputeId: BigNumberish,
@@ -163,6 +203,16 @@ export class DisputeManager extends Contract {
 
     "getDisputeFees()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getDispute(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
@@ -179,6 +229,16 @@ export class DisputeManager extends Contract {
 
     "getDisputeFees()"(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    computeRuling(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "computeRuling(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     getDispute(
