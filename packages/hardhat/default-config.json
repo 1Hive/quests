@@ -77,7 +77,7 @@
   },
   "CelesteResolver": {
     "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
-    "rinkeby": "0x7D7B304ae26d257cD3fbcf951C89C67C379db557",
+    "rinkeby": "0xeec9bf3ff552d8ff43954669601f2f483ea45116",
     "goerli": "0x5D775285F343e84cf325D54cCcC70742ed711019"
   }
 }
