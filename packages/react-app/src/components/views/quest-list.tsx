@@ -139,9 +139,15 @@ export default function QuestList() {
         return;
       }
       if (newQuest) {
-        setQuests([newQuest, ...quests]);
         setNewQuestLoading(false);
-        refresh(filter);
+        if (
+          (filter.status === ENUM_QUEST_STATE.All || filter.status === ENUM_QUEST_STATE.Active) &&
+          (!filter.title || filter.title.includes(newQuest.title!)) &&
+          (!filter.description || filter.description.includes(newQuest.description!)) &&
+          (!filter.minExpireTime || filter.minExpireTime <= newQuest.expireTime)
+        ) {
+          setQuests([newQuest, ...quests]);
+        }
       } else {
         fetchQuestUntilNew(newQuestAddress);
       }
