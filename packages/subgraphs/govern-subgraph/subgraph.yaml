@@ -8,11 +8,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: GovernQueue
-    network: xdai
+    network: goerli
     source:
       abi: GovernQueue
-      address: "0xd8D142f13E58dFEedaF96418C0B6843108d46B94"
-      startBlock: 22769097
+      address: "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E"
+      startBlock: 7543552
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -51,10 +51,10 @@ dataSources:
       file: ./src/GovernQueue.ts
   - kind: ethereum/contract
     name: Govern
-    network: xdai
+    network: goerli
     source:
       abi: Govern
-      startBlock: 22769097
+      startBlock: 7543552
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -57,9 +57,24 @@ export const TOKENS = Object.freeze({
       decimals: 6,
     } as TokenModel,
   },
+  goerli: {
+    HoneyTest: {
+      name: 'HoneyTest',
+      symbol: 'HNYT',
+      token: '0xbc74d76abB7FA2311eab46A31273452aAFD98DB1',
+      decimals: 18,
+    } as TokenModel,
+    Dai: {
+      name: 'Dai Stablecoin',
+      symbol: 'DAI',
+      token: '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60',
+      decimals: 6,
+    } as TokenModel,
+  },
 });
 
 export const StableTokens = Object.freeze({
   gnosis: [TOKENS.xdai.Dai, TOKENS.xdai.Tether, TOKENS.xdai.UsdCoin],
-  rinkeby: [TOKENS.rinkeby.UsdCoin, TOKENS.rinkeby.UsdCoin],
+  rinkeby: [TOKENS.rinkeby.UsdCoin],
+  goerli: [TOKENS.goerli.Dai],
 });

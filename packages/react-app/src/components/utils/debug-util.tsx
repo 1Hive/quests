@@ -19,5 +19,5 @@ export const feedDummyQuestData = async (questData: QuestModel): Promise<QuestMo
 
 export const isDevelopement = () => {
   const { networkId } = getNetwork();
-  return networkId === 'rinkeby';
+  return networkId === 'rinkeby' || networkId === 'local' || networkId === 'goerli';
 };

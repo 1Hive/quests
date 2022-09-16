@@ -4,255 +4,6 @@
       "name": "rinkeby",
       "chainId": "4",
       "contracts": {
-        "Celeste": {
-          "address": "0xe772723b98E58F4b6217DeB381AA164f2b5FB33c",
-          "abi": [
-            {
-              "constant": false,
-              "inputs": [
-                {
-                  "name": "_owner",
-                  "type": "address"
-                }
-              ],
-              "name": "setOwner",
-              "outputs": [],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_state",
-                  "type": "uint8"
-                }
-              ],
-              "name": "decideDispute",
-              "outputs": [],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "constant": true,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "disputes",
-              "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "state",
-                  "type": "uint8"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "constant": true,
-              "inputs": [],
-              "name": "feeToken",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "constant": true,
-              "inputs": [],
-              "name": "feeAmount",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "constant": true,
-              "inputs": [],
-              "name": "getDisputeFees",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_submitter",
-                  "type": "address"
-                },
-                {
-                  "name": "_evidence",
-                  "type": "bytes"
-                }
-              ],
-              "name": "submitEvidence",
-              "outputs": [],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
-              "name": "closeEvidencePeriod",
-              "outputs": [],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "constant": true,
-              "inputs": [],
-              "name": "owner",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "constant": false,
-              "inputs": [
-                {
-                  "name": "_possibleRulings",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_metadata",
-                  "type": "bytes"
-                }
-              ],
-              "name": "createDispute",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
-              "name": "rule",
-              "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "ruling",
-                  "type": "uint256"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "constant": true,
-              "inputs": [],
-              "name": "getDisputeManager",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "constant": true,
-              "inputs": [],
-              "name": "currentId",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "name": "_feeToken",
-                  "type": "address"
-                },
-                {
-                  "name": "_feeAmount",
-                  "type": "uint256"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            }
-          ]
-        },
         "Govern": {
           "address": "0x7881C66Fa323eabE8470b3c6Fa14259B9918baEA",
           "abi": [
@@ -2603,17 +2354,12 @@
             }
           ]
         },
-        "OwnableCeleste": {
-          "address": "0xe772723b98E58F4b6217DeB381AA164f2b5FB33c",
+        "Celeste": {
+          "address": "0xeec9bf3ff552d8ff43954669601f2f483ea45116",
           "abi": [
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_owner",
-                  "type": "address"
-                }
-              ],
+              "inputs": [{ "name": "_owner", "type": "address" }],
               "name": "setOwner",
               "outputs": [],
               "payable": false,
@@ -2623,14 +2369,8 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_state",
-                  "type": "uint8"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_state", "type": "uint8" }
               ],
               "name": "decideDispute",
               "outputs": [],
@@ -2640,22 +2380,11 @@
             },
             {
               "constant": true,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "", "type": "uint256" }],
               "name": "disputes",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "state",
-                  "type": "uint8"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "state", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -2665,12 +2394,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeToken",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -2679,12 +2403,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeAmount",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -2694,18 +2413,9 @@
               "inputs": [],
               "name": "getDisputeFees",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
+                { "name": "", "type": "address" },
+                { "name": "", "type": "address" },
+                { "name": "", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -2714,18 +2424,9 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_submitter",
-                  "type": "address"
-                },
-                {
-                  "name": "_evidence",
-                  "type": "bytes"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_submitter", "type": "address" },
+                { "name": "_evidence", "type": "bytes" }
               ],
               "name": "submitEvidence",
               "outputs": [],
@@ -2735,12 +2436,7 @@
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "closeEvidencePeriod",
               "outputs": [],
               "payable": false,
@@ -2751,34 +2447,18 @@
               "constant": true,
               "inputs": [],
               "name": "owner",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_possibleRulings",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_metadata",
-                  "type": "bytes"
-                }
-              ],
-              "name": "createDispute",
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "computeRuling",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "finalRuling", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -2787,21 +2467,22 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
+                { "name": "_possibleRulings", "type": "uint256" },
+                { "name": "_metadata", "type": "bytes" }
               ],
+              "name": "createDispute",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "rule",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "ruling",
-                  "type": "uint256"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "ruling", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -2811,12 +2492,7 @@
               "constant": true,
               "inputs": [],
               "name": "getDisputeManager",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -2825,26 +2501,15 @@
               "constant": true,
               "inputs": [],
               "name": "currentId",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
             },
             {
               "inputs": [
-                {
-                  "name": "_feeToken",
-                  "type": "address"
-                },
-                {
-                  "name": "_feeAmount",
-                  "type": "uint256"
-                }
+                { "name": "_feeToken", "type": "address" },
+                { "name": "_feeAmount", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -3375,13 +3040,27 @@
               "type": "function"
             }
           ]
-        },
-        "TokenMock": {
-          "address": "0x86E3f333Bb2AfE4b3da62e4DD8eeB0F8bFfa5FBe",
+        }
+      }
+    }
+  },
+  "5": {
+    "goerli": {
+      "name": "goerli",
+      "chainId": "5",
+      "contracts": {
+        "Govern": {
+          "address": "0xd4a5b36e48a8b03DC05e3421623825c8E3f5D872",
           "abi": [
             {
-              "inputs": [],
-              "stateMutability": "payable",
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_initialExecutor",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
               "type": "constructor"
             },
             {
@@ -3390,23 +3069,48 @@
                 {
                   "indexed": true,
                   "internalType": "address",
-                  "name": "owner",
+                  "name": "sender",
                   "type": "address"
                 },
                 {
                   "indexed": true,
                   "internalType": "address",
-                  "name": "spender",
+                  "name": "token",
                   "type": "address"
                 },
                 {
                   "indexed": false,
                   "internalType": "uint256",
-                  "name": "value",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "string",
+                  "name": "_reference",
+                  "type": "string"
+                }
+              ],
+              "name": "Deposited",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "sender",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "amount",
                   "type": "uint256"
                 }
               ],
-              "name": "Approval",
+              "name": "ETHDeposited",
               "type": "event"
             },
             {
@@ -3415,7 +3119,200 @@
                 {
                   "indexed": true,
                   "internalType": "address",
-                  "name": "from",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "to",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "value",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "data",
+                      "type": "bytes"
+                    }
+                  ],
+                  "indexed": false,
+                  "internalType": "struct ERC3000Data.Action[]",
+                  "name": "actions",
+                  "type": "tuple[]"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes32",
+                  "name": "memo",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes32",
+                  "name": "failureMap",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes[]",
+                  "name": "execResults",
+                  "type": "bytes[]"
+                }
+              ],
+              "name": "Executed",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "role",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                }
+              ],
+              "name": "Frozen",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "role",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "who",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "contract IACLOracle",
+                  "name": "oracle",
+                  "type": "address"
+                }
+              ],
+              "name": "Granted",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "string",
+                  "name": "key",
+                  "type": "string"
+                }
+              ],
+              "name": "Initialized",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "sig",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "name": "ReceivedCallback",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "bytes4",
+                  "name": "sig",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes4",
+                  "name": "magicNumber",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "RegisteredCallback",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "bytes4",
+                  "name": "interfaceId",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "RegisteredStandard",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "role",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "who",
+                  "type": "address"
+                }
+              ],
+              "name": "Revoked",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "token",
                   "type": "address"
                 },
                 {
@@ -3426,33 +3323,38 @@
                 },
                 {
                   "indexed": false,
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
-                }
-              ],
-              "name": "Transfer",
-              "type": "event"
-            },
-            {
-              "inputs": [
-                {
                   "internalType": "address",
-                  "name": "owner",
+                  "name": "from",
                   "type": "address"
                 },
                 {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "string",
+                  "name": "_reference",
+                  "type": "string"
                 }
               ],
-              "name": "allowance",
+              "name": "Withdrawn",
+              "type": "event"
+            },
+            {
+              "stateMutability": "nonpayable",
+              "type": "fallback"
+            },
+            {
+              "inputs": [],
+              "name": "ROOT_ROLE",
               "outputs": [
                 {
-                  "internalType": "uint256",
+                  "internalType": "bytes4",
                   "name": "",
-                  "type": "uint256"
+                  "type": "bytes4"
                 }
               ],
               "stateMutability": "view",
@@ -3461,22 +3363,102 @@
             {
               "inputs": [
                 {
+                  "components": [
+                    {
+                      "internalType": "enum ACLData.BulkOp",
+                      "name": "op",
+                      "type": "uint8"
+                    },
+                    {
+                      "internalType": "bytes4",
+                      "name": "role",
+                      "type": "bytes4"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "who",
+                      "type": "address"
+                    }
+                  ],
+                  "internalType": "struct ACLData.BulkItem[]",
+                  "name": "items",
+                  "type": "tuple[]"
+                }
+              ],
+              "name": "bulk",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
                   "internalType": "address",
-                  "name": "spender",
+                  "name": "_token",
                   "type": "address"
                 },
                 {
                   "internalType": "uint256",
-                  "name": "amount",
+                  "name": "_amount",
                   "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "_reference",
+                  "type": "string"
                 }
               ],
-              "name": "approve",
+              "name": "deposit",
+              "outputs": [],
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "to",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "value",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "data",
+                      "type": "bytes"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Action[]",
+                  "name": "actions",
+                  "type": "tuple[]"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "allowFailuresMap",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "memo",
+                  "type": "bytes32"
+                }
+              ],
+              "name": "exec",
               "outputs": [
                 {
-                  "internalType": "bool",
+                  "internalType": "bytes32",
                   "name": "",
-                  "type": "bool"
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes[]",
+                  "name": "",
+                  "type": "bytes[]"
                 }
               ],
               "stateMutability": "nonpayable",
@@ -3485,12 +3467,66 @@
             {
               "inputs": [
                 {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "freeze",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                },
+                {
                   "internalType": "address",
-                  "name": "account",
+                  "name": "_who",
                   "type": "address"
                 }
               ],
-              "name": "balanceOf",
+              "name": "grant",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_who",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IACLOracle",
+                  "name": "_oracle",
+                  "type": "address"
+                }
+              ],
+              "name": "grantWithOracle",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "name": "initBlocks",
               "outputs": [
                 {
                   "internalType": "uint256",
@@ -3502,12 +3538,1366 @@
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "decimals",
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_initialExecutor",
+                  "type": "address"
+                }
+              ],
+              "name": "initialize",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "isFrozen",
               "outputs": [
                 {
-                  "internalType": "uint8",
+                  "internalType": "bool",
                   "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "_hash",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_signature",
+                  "type": "bytes"
+                }
+              ],
+              "name": "isValidSignature",
+              "outputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "",
+                  "type": "bytes4"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_interfaceId",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "bytes4",
+                  "name": "_callbackSig",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "bytes4",
+                  "name": "_magicNumber",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "registerStandardAndCallback",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_who",
+                  "type": "address"
+                }
+              ],
+              "name": "revoke",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "name": "roles",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "contract ERC1271",
+                  "name": "_signatureValidator",
+                  "type": "address"
+                }
+              ],
+              "name": "setSignatureValidator",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_interfaceId",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "supportsInterface",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_from",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "_reference",
+                  "type": "string"
+                }
+              ],
+              "name": "withdraw",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
+            }
+          ]
+        },
+        "GovernQueue": {
+          "address": "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_aclRoot",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "executionDelay",
+                      "type": "uint256"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "scheduleDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "challengeDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "resolver",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "rules",
+                      "type": "bytes"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "maxCalldataSize",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Config",
+                  "name": "_initialConfig",
+                  "type": "tuple"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes32",
+                  "name": "containerHash",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes",
+                  "name": "reason",
+                  "type": "bytes"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "resolverId",
+                  "type": "uint256"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "token",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "amount",
+                      "type": "uint256"
+                    }
+                  ],
+                  "indexed": false,
+                  "internalType": "struct ERC3000Data.Collateral",
+                  "name": "collateral",
+                  "type": "tuple"
+                }
+              ],
+              "name": "Challenged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes32",
+                  "name": "configHash",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "executionDelay",
+                      "type": "uint256"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "scheduleDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "challengeDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "resolver",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "rules",
+                      "type": "bytes"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "maxCalldataSize",
+                      "type": "uint256"
+                    }
+                  ],
+                  "indexed": false,
+                  "internalType": "struct ERC3000Data.Config",
+                  "name": "config",
+                  "type": "tuple"
+                }
+              ],
+              "name": "Configured",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes32",
+                  "name": "containerHash",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                }
+              ],
+              "name": "Executed",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "role",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                }
+              ],
+              "name": "Frozen",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "role",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "who",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "contract IACLOracle",
+                  "name": "oracle",
+                  "type": "address"
+                }
+              ],
+              "name": "Granted",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "string",
+                  "name": "key",
+                  "type": "string"
+                }
+              ],
+              "name": "Initialized",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "sig",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "name": "ReceivedCallback",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "bytes4",
+                  "name": "sig",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes4",
+                  "name": "magicNumber",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "RegisteredCallback",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "bytes4",
+                  "name": "interfaceId",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "RegisteredStandard",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes32",
+                  "name": "containerHash",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bool",
+                  "name": "approved",
+                  "type": "bool"
+                }
+              ],
+              "name": "Resolved",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes4",
+                  "name": "role",
+                  "type": "bytes4"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "who",
+                  "type": "address"
+                }
+              ],
+              "name": "Revoked",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "contract IArbitrator",
+                  "name": "arbitrator",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "uint256",
+                  "name": "disputeId",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "ruling",
+                  "type": "uint256"
+                }
+              ],
+              "name": "Ruled",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes32",
+                  "name": "containerHash",
+                  "type": "bytes32"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "executionTime",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "submitter",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "contract IERC3000Executor",
+                      "name": "executor",
+                      "type": "address"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "to",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "value",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "data",
+                          "type": "bytes"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Action[]",
+                      "name": "actions",
+                      "type": "tuple[]"
+                    },
+                    {
+                      "internalType": "bytes32",
+                      "name": "allowFailuresMap",
+                      "type": "bytes32"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "proof",
+                      "type": "bytes"
+                    }
+                  ],
+                  "indexed": false,
+                  "internalType": "struct ERC3000Data.Payload",
+                  "name": "payload",
+                  "type": "tuple"
+                }
+              ],
+              "name": "Scheduled",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "bytes32",
+                  "name": "containerHash",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "actor",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes",
+                  "name": "reason",
+                  "type": "bytes"
+                }
+              ],
+              "name": "Vetoed",
+              "type": "event"
+            },
+            {
+              "inputs": [],
+              "name": "ROOT_ROLE",
+              "outputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "",
+                  "type": "bytes4"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "internalType": "enum ACLData.BulkOp",
+                      "name": "op",
+                      "type": "uint8"
+                    },
+                    {
+                      "internalType": "bytes4",
+                      "name": "role",
+                      "type": "bytes4"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "who",
+                      "type": "address"
+                    }
+                  ],
+                  "internalType": "struct ACLData.BulkItem[]",
+                  "name": "items",
+                  "type": "tuple[]"
+                }
+              ],
+              "name": "bulk",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "nonce",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "executionTime",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "submitter",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "contract IERC3000Executor",
+                          "name": "executor",
+                          "type": "address"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "value",
+                              "type": "uint256"
+                            },
+                            {
+                              "internalType": "bytes",
+                              "name": "data",
+                              "type": "bytes"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Action[]",
+                          "name": "actions",
+                          "type": "tuple[]"
+                        },
+                        {
+                          "internalType": "bytes32",
+                          "name": "allowFailuresMap",
+                          "type": "bytes32"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "proof",
+                          "type": "bytes"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Payload",
+                      "name": "payload",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "executionDelay",
+                          "type": "uint256"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "scheduleDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "challengeDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "resolver",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "rules",
+                          "type": "bytes"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "maxCalldataSize",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Config",
+                      "name": "config",
+                      "type": "tuple"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Container",
+                  "name": "_container",
+                  "type": "tuple"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_reason",
+                  "type": "bytes"
+                }
+              ],
+              "name": "challenge",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "disputeId",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
+                }
+              ],
+              "name": "challengerCache",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "configHash",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "executionDelay",
+                      "type": "uint256"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "scheduleDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "challengeDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "resolver",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "rules",
+                      "type": "bytes"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "maxCalldataSize",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Config",
+                  "name": "_config",
+                  "type": "tuple"
+                }
+              ],
+              "name": "configure",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "contract IArbitrator",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "name": "disputeItemCache",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "nonce",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "executionTime",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "submitter",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "contract IERC3000Executor",
+                          "name": "executor",
+                          "type": "address"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "value",
+                              "type": "uint256"
+                            },
+                            {
+                              "internalType": "bytes",
+                              "name": "data",
+                              "type": "bytes"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Action[]",
+                          "name": "actions",
+                          "type": "tuple[]"
+                        },
+                        {
+                          "internalType": "bytes32",
+                          "name": "allowFailuresMap",
+                          "type": "bytes32"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "proof",
+                          "type": "bytes"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Payload",
+                      "name": "payload",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "executionDelay",
+                          "type": "uint256"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "scheduleDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "challengeDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "resolver",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "rules",
+                          "type": "bytes"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "maxCalldataSize",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Config",
+                      "name": "config",
+                      "type": "tuple"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Container",
+                  "name": "_container",
+                  "type": "tuple"
+                }
+              ],
+              "name": "execute",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "failureMap",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes[]",
+                  "name": "",
+                  "type": "bytes[]"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "freeze",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_who",
+                  "type": "address"
+                }
+              ],
+              "name": "grant",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_who",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IACLOracle",
+                  "name": "_oracle",
+                  "type": "address"
+                }
+              ],
+              "name": "grantWithOracle",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "name": "initBlocks",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_aclRoot",
+                  "type": "address"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "executionDelay",
+                      "type": "uint256"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "scheduleDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "address",
+                          "name": "token",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "amount",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Collateral",
+                      "name": "challengeDeposit",
+                      "type": "tuple"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "resolver",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "rules",
+                      "type": "bytes"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "maxCalldataSize",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Config",
+                  "name": "_initialConfig",
+                  "type": "tuple"
+                }
+              ],
+              "name": "initialize",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "isFrozen",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "nonce",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
+                }
+              ],
+              "name": "queue",
+              "outputs": [
+                {
+                  "internalType": "enum GovernQueueStateLib.State",
+                  "name": "state",
                   "type": "uint8"
                 }
               ],
@@ -3517,22 +4907,149 @@
             {
               "inputs": [
                 {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "nonce",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "executionTime",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "submitter",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "contract IERC3000Executor",
+                          "name": "executor",
+                          "type": "address"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "value",
+                              "type": "uint256"
+                            },
+                            {
+                              "internalType": "bytes",
+                              "name": "data",
+                              "type": "bytes"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Action[]",
+                          "name": "actions",
+                          "type": "tuple[]"
+                        },
+                        {
+                          "internalType": "bytes32",
+                          "name": "allowFailuresMap",
+                          "type": "bytes32"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "proof",
+                          "type": "bytes"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Payload",
+                      "name": "payload",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "executionDelay",
+                          "type": "uint256"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "scheduleDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "challengeDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "resolver",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "rules",
+                          "type": "bytes"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "maxCalldataSize",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Config",
+                      "name": "config",
+                      "type": "tuple"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Container",
+                  "name": "_container",
+                  "type": "tuple"
                 },
                 {
                   "internalType": "uint256",
-                  "name": "subtractedValue",
+                  "name": "_disputeId",
                   "type": "uint256"
                 }
               ],
-              "name": "decreaseAllowance",
+              "name": "resolve",
               "outputs": [
                 {
-                  "internalType": "bool",
+                  "internalType": "bytes32",
+                  "name": "failureMap",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes[]",
                   "name": "",
-                  "type": "bool"
+                  "type": "bytes[]"
                 }
               ],
               "stateMutability": "nonpayable",
@@ -3541,22 +5058,181 @@
             {
               "inputs": [
                 {
-                  "internalType": "address",
-                  "name": "spender",
-                  "type": "address"
+                  "internalType": "bytes4",
+                  "name": "_role",
+                  "type": "bytes4"
                 },
                 {
-                  "internalType": "uint256",
-                  "name": "addedValue",
-                  "type": "uint256"
+                  "internalType": "address",
+                  "name": "_who",
+                  "type": "address"
                 }
               ],
-              "name": "increaseAllowance",
+              "name": "revoke",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes4",
+                  "name": "",
+                  "type": "bytes4"
+                },
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "name": "roles",
               "outputs": [
                 {
-                  "internalType": "bool",
+                  "internalType": "address",
                   "name": "",
-                  "type": "bool"
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "nonce",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "executionTime",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "submitter",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "contract IERC3000Executor",
+                          "name": "executor",
+                          "type": "address"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "value",
+                              "type": "uint256"
+                            },
+                            {
+                              "internalType": "bytes",
+                              "name": "data",
+                              "type": "bytes"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Action[]",
+                          "name": "actions",
+                          "type": "tuple[]"
+                        },
+                        {
+                          "internalType": "bytes32",
+                          "name": "allowFailuresMap",
+                          "type": "bytes32"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "proof",
+                          "type": "bytes"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Payload",
+                      "name": "payload",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "executionDelay",
+                          "type": "uint256"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "scheduleDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "challengeDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "resolver",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "rules",
+                          "type": "bytes"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "maxCalldataSize",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Config",
+                      "name": "config",
+                      "type": "tuple"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Container",
+                  "name": "_container",
+                  "type": "tuple"
+                }
+              ],
+              "name": "schedule",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "containerHash",
+                  "type": "bytes32"
                 }
               ],
               "stateMutability": "nonpayable",
@@ -3565,55 +5241,736 @@
             {
               "inputs": [
                 {
-                  "internalType": "address",
-                  "name": "owner",
+                  "internalType": "bytes4",
+                  "name": "_interfaceId",
+                  "type": "bytes4"
+                }
+              ],
+              "name": "supportsInterface",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "nonce",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "executionTime",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "submitter",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "contract IERC3000Executor",
+                          "name": "executor",
+                          "type": "address"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "value",
+                              "type": "uint256"
+                            },
+                            {
+                              "internalType": "bytes",
+                              "name": "data",
+                              "type": "bytes"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Action[]",
+                          "name": "actions",
+                          "type": "tuple[]"
+                        },
+                        {
+                          "internalType": "bytes32",
+                          "name": "allowFailuresMap",
+                          "type": "bytes32"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "proof",
+                          "type": "bytes"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Payload",
+                      "name": "payload",
+                      "type": "tuple"
+                    },
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "executionDelay",
+                          "type": "uint256"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "scheduleDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "components": [
+                            {
+                              "internalType": "address",
+                              "name": "token",
+                              "type": "address"
+                            },
+                            {
+                              "internalType": "uint256",
+                              "name": "amount",
+                              "type": "uint256"
+                            }
+                          ],
+                          "internalType": "struct ERC3000Data.Collateral",
+                          "name": "challengeDeposit",
+                          "type": "tuple"
+                        },
+                        {
+                          "internalType": "address",
+                          "name": "resolver",
+                          "type": "address"
+                        },
+                        {
+                          "internalType": "bytes",
+                          "name": "rules",
+                          "type": "bytes"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "maxCalldataSize",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct ERC3000Data.Config",
+                      "name": "config",
+                      "type": "tuple"
+                    }
+                  ],
+                  "internalType": "struct ERC3000Data.Container",
+                  "name": "_container",
+                  "type": "tuple"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_reason",
+                  "type": "bytes"
+                }
+              ],
+              "name": "veto",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            }
+          ]
+        },
+        "Celeste": {
+          "address": "0x5D775285F343e84cf325D54cCcC70742ed711019",
+          "abi": [
+            {
+              "constant": false,
+              "inputs": [{ "name": "_owner", "type": "address" }],
+              "name": "setOwner",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_state", "type": "uint8" }
+              ],
+              "name": "decideDispute",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [{ "name": "", "type": "uint256" }],
+              "name": "disputes",
+              "outputs": [
+                { "name": "subject", "type": "address" },
+                { "name": "state", "type": "uint8" }
+              ],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "feeToken",
+              "outputs": [{ "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "feeAmount",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "getDisputeFees",
+              "outputs": [
+                { "name": "", "type": "address" },
+                { "name": "", "type": "address" },
+                { "name": "", "type": "uint256" }
+              ],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_submitter", "type": "address" },
+                { "name": "_evidence", "type": "bytes" }
+              ],
+              "name": "submitEvidence",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "closeEvidencePeriod",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "owner",
+              "outputs": [{ "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "computeRuling",
+              "outputs": [
+                { "name": "subject", "type": "address" },
+                { "name": "finalRuling", "type": "uint8" }
+              ],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_possibleRulings", "type": "uint256" },
+                { "name": "_metadata", "type": "bytes" }
+              ],
+              "name": "createDispute",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "rule",
+              "outputs": [
+                { "name": "subject", "type": "address" },
+                { "name": "ruling", "type": "uint256" }
+              ],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "getDisputeManager",
+              "outputs": [{ "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "currentId",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                { "name": "_feeToken", "type": "address" },
+                { "name": "_feeAmount", "type": "uint256" }
+              ],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            }
+          ]
+        },
+        "Quest": {
+          "address": "0xE2fE4075536D77ab49c0e3B1eD2e128A49De6dCF",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "_questTitle",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_questDetailsRef",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_rewardToken",
                   "type": "address"
                 },
                 {
                   "internalType": "uint256",
-                  "name": "initialBalance",
+                  "name": "_expireTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_aragonGovernAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address payable",
+                  "name": "_fundsRecoveryAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_depositToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_depositAmount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_questCreator",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "bytes",
+                  "name": "evidence",
+                  "type": "bytes"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "player",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "amount",
                   "type": "uint256"
                 }
               ],
-              "name": "mint",
+              "name": "QuestClaimed",
+              "type": "event"
+            },
+            {
+              "inputs": [],
+              "name": "aragonGovernAddress",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "_evidence",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_player",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "_claimAll",
+                  "type": "bool"
+                }
+              ],
+              "name": "claim",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "name": "claims",
+              "outputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "evidence",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "address",
+                  "name": "player",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "deposit",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "expireTime",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "fundsRecoveryAddress",
+              "outputs": [
+                {
+                  "internalType": "address payable",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "isDepositReleased",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "questCreator",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "questDetailsRef",
+              "outputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "",
+                  "type": "bytes"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "questTitle",
+              "outputs": [
+                {
+                  "internalType": "string",
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "recoverFundsAndDeposit",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
             },
             {
               "inputs": [],
-              "name": "name",
+              "name": "rewardToken",
               "outputs": [
                 {
-                  "internalType": "string",
+                  "internalType": "contract IERC20",
                   "name": "",
-                  "type": "string"
+                  "type": "address"
                 }
               ],
               "stateMutability": "view",
               "type": "function"
-            },
+            }
+          ]
+        },
+        "QuestFactory": {
+          "address": "0x4DfE6C03132BD14D95b87803e232AcA352a715b4",
+          "abi": [
             {
-              "inputs": [],
-              "name": "symbol",
-              "outputs": [
+              "inputs": [
                 {
-                  "internalType": "string",
-                  "name": "",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "totalSupply",
-              "outputs": [
+                  "internalType": "address",
+                  "name": "_aragonGovernAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_depositToken",
+                  "type": "address"
+                },
                 {
                   "internalType": "uint256",
-                  "name": "",
+                  "name": "_depositAmount",
                   "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_initialOwner",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "DepositChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "previousOwner",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "newOwner",
+                  "type": "address"
+                }
+              ],
+              "name": "OwnershipTransferred",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "questAddress",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "string",
+                  "name": "questTitle",
+                  "type": "string"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "bytes",
+                  "name": "questDetailsRef",
+                  "type": "bytes"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "rewardTokenAddress",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "expireTime",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "fundsRecoveryAddress",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "depositToken",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "depositAmount",
+                  "type": "uint256"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "creator",
+                  "type": "address"
+                }
+              ],
+              "name": "QuestCreated",
+              "type": "event"
+            },
+            {
+              "inputs": [],
+              "name": "aragonGovernAddress",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
                 }
               ],
               "stateMutability": "view",
@@ -3622,8 +5979,49 @@
             {
               "inputs": [
                 {
+                  "internalType": "string",
+                  "name": "_questTitle",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "_questDetailsRef",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "contract IERC20",
+                  "name": "_rewardToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "_expireTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address payable",
+                  "name": "_fundsRecoveryAddress",
+                  "type": "address"
+                }
+              ],
+              "name": "createQuest",
+              "outputs": [
+                {
                   "internalType": "address",
-                  "name": "recipient",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "deposit",
+              "outputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "token",
                   "type": "address"
                 },
                 {
@@ -3632,14 +6030,44 @@
                   "type": "uint256"
                 }
               ],
-              "name": "transfer",
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "owner",
               "outputs": [
                 {
-                  "internalType": "bool",
+                  "internalType": "address",
                   "name": "",
-                  "type": "bool"
+                  "type": "address"
                 }
               ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "renounceOwnership",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "name": "setDeposit",
+              "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
             },
@@ -3647,28 +6075,12 @@
               "inputs": [
                 {
                   "internalType": "address",
-                  "name": "sender",
+                  "name": "newOwner",
                   "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "recipient",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amount",
-                  "type": "uint256"
                 }
               ],
-              "name": "transferFrom",
-              "outputs": [
-                {
-                  "internalType": "bool",
-                  "name": "",
-                  "type": "bool"
-                }
-              ],
+              "name": "transferOwnership",
+              "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
             }

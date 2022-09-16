@@ -141,7 +141,6 @@ function WalletAugmented({ children }: Props) {
                   chainId: Web3.utils.toHex(newChainId),
                   chainName: network.name,
                   rpcUrls: [network.rpcUri],
-                  nativeCurrency: network.nativeToken,
                   blockExplorerUrls: getExplorerUrl(newChainId),
                 },
               ],

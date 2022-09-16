@@ -19,6 +19,7 @@ import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
 import { getNetwork } from 'src/networks';
+import { Logger } from 'src/utils/logger';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -97,8 +98,16 @@ export default function ChallengeModal({
 
   useEffect(() => {
     const fetchFee = async () => {
-      const feeAmount = await QuestService.fetchChallengeFee();
-      if (feeAmount && isMountedRef.current) setChallengeFee(feeAmount);
+      const celesteAddress = claim?.container?.config.resolver;
+      try {
+        const feeAmount = await QuestService.fetchChallengeFee(celesteAddress);
+        if (feeAmount && isMountedRef.current) setChallengeFee(feeAmount);
+      } catch (error) {
+        Logger.error(
+          `Failed to fetch challenge fees with celeste address : ${celesteAddress}\n`,
+          error,
+        );
+      }
     };
     fetchFee();
   }, []);

@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { LogoTitle } from 'src/assets/logo-title';
 import { useWallet } from 'src/contexts/wallet.context';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getNetwork } from 'src/networks';
 import { TOKENS } from 'src/tokens';
 import { LoggerOnce } from 'src/utils/logger';
@@ -91,7 +91,7 @@ export default function footer() {
   const theme = useTheme();
   const year = new Date().getFullYear();
   const { walletConnected, ethereum } = useWallet();
-  const { networkId } = getNetwork();
+  const { networkId, isTestNetwork } = getNetwork();
   const { stableTokens } = getNetwork();
   const [stableList, setStableList] = useState('');
 
@@ -109,6 +109,9 @@ export default function footer() {
         break;
       case 'rinkeby':
         hnyToken = TOKENS.rinkeby.HoneyTest;
+        break;
+      case 'goerli':
+        hnyToken = TOKENS.goerli.HoneyTest;
         break;
       default:
         break;
@@ -132,6 +135,19 @@ export default function footer() {
       }
     }
   };
+
+  const swapLink = useMemo(() => {
+    switch (networkId) {
+      case 'xdai':
+        return `https://app.honeyswap.org/#/swap?inputCurrency=${TOKENS.xdai.Honey.token}`;
+      case 'goerli':
+        return `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=eth&outputCurrency=${TOKENS.goerli.HoneyTest.token}`;
+      case 'rinkeby':
+        return `https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=${TOKENS.rinkeby.HoneyTest.token}`;
+      default:
+        return undefined;
+    }
+  }, [networkId]);
 
   return (
     <FooterContainerStyled color={theme.contentSecondary}>
@@ -180,21 +196,14 @@ export default function footer() {
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Links & Info</FooterTitleStyled>
-          <FooterNavItemStyled
-            href={
-              networkId === 'rinkeby'
-                ? 'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=eth&outputCurrency=0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9'
-                : 'https://app.honeyswap.org/#/swap?inputCurrency=0x71850b7e9ee3f13ab46d67167341e4bdc905eef9'
-            }
-            external
-          >
-            <span>{networkId === 'rinkeby' ? 'Get test Honey' : 'Get Honey'}</span>
+          <FooterNavItemStyled href={swapLink} external>
+            <span>{isTestNetwork ? 'Get test Honey' : 'Get Honey'}</span>
             <IconExternal size="small" />
           </FooterNavItemStyled>
           {ethereum && (
             <FooterNavItemStyled onClick={addHnyToMetamask} color={theme.contentSecondary}>
               <span className="inline-flex">
-                Add {networkId === 'rinkeby' ? 'HNYT' : 'HNY'} to
+                Add {isTestNetwork ? 'HNYT' : 'HNY'} to
                 <img
                   className="ml-4"
                   width="20"
