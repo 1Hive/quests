@@ -178,6 +178,7 @@ function AccountModule({ compact = false }: Props) {
           mode="strong"
           icon={<IconConnect />}
           label={buttonLabel}
+          id="account-button"
           onClick={toggle}
           display={compact ? 'icon' : 'all'}
         />
@@ -193,7 +194,7 @@ function AccountModule({ compact = false }: Props) {
           visible={opened}
         >
           {/* @ts-ignore */}
-          <div ref={popoverFocusElement} tabIndex="0" css="outline: 0">
+          <div ref={popoverFocusElement} tabIndex="0" css="outline: 0" id="account-wrapper">
             <Transition
               native
               immediate={!animate}

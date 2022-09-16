@@ -100,6 +100,7 @@ function ProviderButton({ id, provider, onActivate }: ProviderButtonProps) {
 
   return (
     <ButtonBase
+      id={id}
       key={id}
       onClick={handleClick}
       css={`
