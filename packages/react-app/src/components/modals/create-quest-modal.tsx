@@ -132,10 +132,6 @@ export default function QuestModal({
         setButtonLabel('Update quest');
         break;
 
-      case ENUM_QUEST_VIEW_MODE.ReadDetail:
-        setButtonLabel('Details');
-        break;
-
       default:
         break;
     }
@@ -280,6 +276,7 @@ export default function QuestModal({
           openButton={
             buttonMode === 'link' ? (
               <ButtonLinkStyled
+                data-testid="open-create-quest-btn"
                 theme={theme}
                 onClick={onOpenButtonClick}
                 title="Create quest"
@@ -287,6 +284,7 @@ export default function QuestModal({
               />
             ) : (
               <Button
+                data-testid="open-create-quest-btn"
                 icon={<IconPlus />}
                 label={buttonLabel}
                 wide
@@ -362,6 +360,7 @@ export default function QuestModal({
                           </>
                         )}
                         <Button
+                          data-testid="complete-create-quest-btn"
                           key="btn-save"
                           label="Create"
                           mode="positive"
@@ -389,6 +388,7 @@ export default function QuestModal({
                       <>
                         <TextFieldInput
                           id="title"
+                          data-testid="title"
                           label="Title"
                           isEdit
                           placeHolder="Quest title"

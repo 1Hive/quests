@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import { HelpTooltip } from './help-tooltip';
 
 const FieldStyled = styled.div<{
+  id?: string;
   compact?: boolean;
   isLoading?: boolean;
   wide?: boolean;
@@ -111,7 +112,14 @@ export function FieldInput({
     </LineStyled>
   );
   return (
-    <FieldStyled key={id} compact={compact} isLoading={isLoading} wide={wide} className={className}>
+    <FieldStyled
+      id={`${id}-wrapper`}
+      key={id}
+      compact={compact}
+      isLoading={isLoading}
+      wide={wide}
+      className={className}
+    >
       {labelComponent}
       <>
         {isLoading ? (
