@@ -26,7 +26,7 @@ async function main() {
   });
   //   const browser = await puppeteer.launch();
   //   const page = await browser.newPage();
-  await page.goto('http://localhost:3000');
+  await page.goto('http://localhost:3000/home?chainId=5');
   await metamask.switchNetwork('goerli');
   await page.bringToFront();
   const accountButton = await page.waitForSelector('#account-button');
@@ -34,6 +34,7 @@ async function main() {
   const metamaskButton = await page.waitForSelector('#injected');
   await metamaskButton.click();
   await metamask.approve();
+  await page.bringToFront();
 }
 
 main();

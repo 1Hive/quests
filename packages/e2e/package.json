@@ -2,7 +2,7 @@
   "name": "e2e",
   "version": "1.0.0",
   "description": "e2e",
-  "main": "index.cjs",
+  "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "test": "node ."
