@@ -102,22 +102,13 @@ function AccountModule({ compact = false }: Props) {
 
   // Always show the “connecting…” screen, even if there are no delay
   useEffect(() => {
-    if (wallet.isWrongNetwork) {
+    if (wallet.isWrongNetwork && activatingDelayed !== undefined) {
       setActivatingDelayed(undefined);
-    }
-
-    if (wallet.activatingId) {
+    } else if (wallet.activatingId) {
       setActivatingDelayed(!!wallet.activatingId);
-      return noop;
-    }
-
-    const timer = setTimeout(() => {
+    } else {
       setActivatingDelayed(undefined);
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
+    }
   }, [wallet.activatingId, wallet.isWrongNetwork]);
 
   const previousScreenIndex = useRef(-1);
