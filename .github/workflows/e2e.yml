@@ -16,6 +16,10 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: yarn ci
+      - name: set-env
+        uses: allenevans/set-env@v2.0.0
+        with:
+          E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
       - uses: UnlyEd/github-action-await-vercel@v1.2.14
         id: wait-vercel
         env:
