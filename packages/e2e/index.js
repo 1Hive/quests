@@ -121,6 +121,7 @@ async function main() {
   await page.bringToFront();
   console.info('✔️ Page brought to front');
   await createQuest({ page, metamask, browser });
+  await browser.close();
 }
 
 async function createQuest({ page, metamask, browser }) {
