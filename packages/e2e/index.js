@@ -43,10 +43,10 @@ async function expectTextExistsInPage(page, text) {
     if (!el) {
       throw new Error();
     }
-    console.log(`✅ Text found: "${text}"`);
+    console.log(`Text found: "${text}"`);
   } catch (error) {
     if (error) console.error(error);
-    throw new Error(`❌ Text not found: "${text}"`);
+    throw new Error(`Text not found: "${text}"`);
   }
 }
 
@@ -61,8 +61,8 @@ function fillInputBySelector(page, selector, value) {
   );
 }
 
-const wsChromeEndpointurl =
-  'ws://127.0.0.1:9222/devtools/browser/a97436d8-bc3d-49c0-80b8-1a4de5903224';
+// const wsChromeEndpointurl =
+//   'ws://127.0.0.1:9222/devtools/browser/a97436d8-bc3d-49c0-80b8-1a4de5903224';
 
 // This setup is for opening a new tab in an already opened browser and use already existing metamask extension
 // async function main() {
@@ -94,39 +94,48 @@ async function main() {
     password: '12345678',
     showTestNets: true,
   });
-  await page.goto('http://localhost:3000/home?&chainId=5');
+  await page.goto('https://quests-55n3stz76-1hive.vercel.app/home?&chainId=5');
   await metamask.switchNetwork('goerli');
   await page.bringToFront();
   const accountButton = await page.waitForSelector('#account-button');
   await accountButton?.click();
   const metamaskButton = await page.waitForSelector('#injected');
   await metamaskButton?.click();
+  await sleep(1000);
   await metamask.approve();
+  await sleep(1000);
   await page.bringToFront();
+
   await createQuest({ page, metamask, browser });
 }
 
 async function createQuest({ page, metamask, browser }) {
-  await page.evaluate(`
+  try {
+    await page.evaluate(`
     localStorage.setItem('FLAG.GOERLI.DUMMY_QUEST', true);
     window.location.reload();
   `);
-  await sleep(2000);
-  await waitForTestIdAndClick(page, 'open-create-quest-btn');
-  const questTitle = await page.$eval('#title', (element) => element.value);
-  await waitForTestIdAndClick(page, 'next-step-btn');
-  await page.evaluate(`
+    await sleep(2000);
+    await waitForTestIdAndClick(page, 'open-create-quest-btn');
+    const questTitle = await page.$eval('#title', (element) => element.value);
+    await waitForTestIdAndClick(page, 'next-step-btn');
+    await page.evaluate(`
          document.querySelector('#bounty-wrapper input')?.focus();
          document.dispatchEvent(new FocusEvent('focusin'));
      `);
-  await sleep(200);
-  await waitForSelectorAndClick(page, '#bounty-wrapper li button');
-  await fillInputBySelector(page, '#amount-bounty', '1');
-  await waitForTestIdAndClick(page, 'complete-create-quest-btn');
-  await approveTransaction({ page, metamask });
-  await approveTransaction({ page, metamask });
-  await waitForSelectorAndClick(page, '[title="Close"]');
-  await expectTextExistsInPage(page, questTitle);
+    await sleep(200);
+    await waitForSelectorAndClick(page, '#bounty-wrapper li button');
+    await fillInputBySelector(page, '#amount-bounty', '1');
+    await waitForTestIdAndClick(page, 'complete-create-quest-btn');
+    await approveTransaction({ page, metamask });
+    await approveTransaction({ page, metamask });
+    await waitForSelectorAndClick(page, '[title="Close"]');
+    await expectTextExistsInPage(page, questTitle);
+  } catch (error) {
+    console.error(error);
+    throw new Error('❌ Failed to create quest');
+  }
+  console.log('✅ Quest created');
 }
 
 main();
