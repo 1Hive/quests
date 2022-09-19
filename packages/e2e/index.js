@@ -88,24 +88,37 @@ async function main() {
   if (!process.env.E2E_SECRET_WORDS) {
     throw new Error('E2E_SECRET_WORDS not set in .env file');
   }
+  console.log('🚀 Starting browser');
   const [metamask, page, browser] = await dappeteer.bootstrap(puppeteer, {
     metamaskVersion: 'v10.15.0',
     seed: process.env.E2E_SECRET_WORDS,
     password: '12345678',
     showTestNets: true,
+    headless: true,
   });
+  console.log('✔️ Broser launched & Metamask imported');
   await page.goto('https://quests-55n3stz76-1hive.vercel.app/home?&chainId=5');
+  console.log('✔️ Page loaded');
   await metamask.switchNetwork('goerli');
+  console.log('✔️ Switched to Goerli');
   await page.bringToFront();
+  console.log('✔️ Page brought to front');
   const accountButton = await page.waitForSelector('#account-button');
+  console.log('✔️ Account button found');
   await accountButton?.click();
+  console.log('✔️ Account button clicked');
   const metamaskButton = await page.waitForSelector('#injected');
+  console.log('✔️ Metamask button found');
   await metamaskButton?.click();
+  console.log('✔️ Metamask button clicked');
   await sleep(1000);
+  console.log('✔️ Sleep 1s');
   await metamask.approve();
+  console.log('✔️ Metamask approved');
   await sleep(1000);
+  console.log('✔️ Sleep 1s');
   await page.bringToFront();
-
+  console.log('✔️ Page brought to front');
   await createQuest({ page, metamask, browser });
 }
 
@@ -115,21 +128,34 @@ async function createQuest({ page, metamask, browser }) {
     localStorage.setItem('FLAG.GOERLI.DUMMY_QUEST', true);
     window.location.reload();
   `);
+    console.log('✔️ Dummy flag set');
     await sleep(2000);
+    console.log('✔️ Sleep 2s');
     await waitForTestIdAndClick(page, 'open-create-quest-btn');
+    console.log('✔️ Open create quest button clicked');
     const questTitle = await page.$eval('#title', (element) => element.value);
+    console.log('✔️ Quest title found');
     await waitForTestIdAndClick(page, 'next-step-btn');
+    console.log('✔️ Next step button clicked');
     await page.evaluate(`
          document.querySelector('#bounty-wrapper input')?.focus();
          document.dispatchEvent(new FocusEvent('focusin'));
      `);
+    console.log('✔️ Bounty input focused');
     await sleep(200);
+    console.log('✔️ Sleep 200ms');
     await waitForSelectorAndClick(page, '#bounty-wrapper li button');
+    console.log('✔️ Bounty selected');
     await fillInputBySelector(page, '#amount-bounty', '1');
+    console.log('✔️ Bounty amount filled');
     await waitForTestIdAndClick(page, 'complete-create-quest-btn');
+    console.log('✔️ Complete create quest button clicked');
     await approveTransaction({ page, metamask });
+    console.log('✔️ Aprove transaction completed');
     await approveTransaction({ page, metamask });
+    console.log('✔️ Create quest transaction completed');
     await waitForSelectorAndClick(page, '[title="Close"]');
+    console.log('✔️ Modale closed');
     await expectTextExistsInPage(page, questTitle);
   } catch (error) {
     console.error(error);
