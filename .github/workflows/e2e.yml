@@ -26,4 +26,5 @@ jobs:
       - name: Run E2E test
         env:
           E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
-        run: yarn e2e
+        run: sudo apt-get install xvfb
+        run: xvfb-run --auto-servernum yarn e2e
