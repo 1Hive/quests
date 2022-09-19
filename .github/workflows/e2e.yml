@@ -14,12 +14,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Install dependencies
-        run: yarn ci
-      - name: set-env
-        uses: allenevans/set-env@v2.0.0
-        with:
-          E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
       - uses: UnlyEd/github-action-await-vercel@v1.2.14
         id: wait-vercel
         env:
@@ -28,4 +22,6 @@ jobs:
           deployment-url: quests-git-end-to-end-automated-tests-1hive.vercel.app
           timeout: 900 # Wait for 15 minutes before failing
       - name: Run E2E test
+        env:
+          E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
         run: yarn e2e
