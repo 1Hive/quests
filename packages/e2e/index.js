@@ -19,13 +19,13 @@ async function sleep(timeout) {
   return new Promise((res) => setTimeout(res, timeout));
 }
 
-async function approveTransaction({ page, metamask }) {
+async function executeTransaction({ page, metamask }) {
   await page.waitForSelector('[data-testid="TX_WAITING_FOR_SIGNATURE"]');
   await sleep(5000);
   await metamask.confirmTransaction();
   await page.bringToFront();
   await page.waitForSelector('[data-testid="TX_STATUS_CONFIRMED"]', {
-    timeout: 60000,
+    timeout: 120000,
   });
 }
 
@@ -62,46 +62,54 @@ function fillInputBySelector(page, selector, value) {
 }
 
 // This setup is for opening a new browser and importing the metamask extension as well as the test account
-async function main() {
+async function main(tries) {
   if (!process.env.E2E_SECRET_WORDS) {
     throw new Error('E2E_SECRET_WORDS not set in .env file');
   }
-  console.info('🚀 Starting browser');
-  const [metamask, page, browser] = await dappeteer.bootstrap(puppeteer, {
-    metamaskVersion: 'v10.15.0',
-    seed: process.env.E2E_SECRET_WORDS,
-    password: '12345678',
-    showTestNets: true,
-    headless: false,
-    args: [`--no-sandbox`, `--disable-setuid-sandbox`],
-  });
-  console.info('✔️ Broser launched & Metamask imported');
-  const pageUrl = `${process.env.VERCEL_DEPLOYMENT_URL}/home?&chainId=5`;
-  console.log(`Opening page ${pageUrl} ...`);
-  await page.goto(pageUrl);
-  console.info(`✔️ Page loaded`);
-  await metamask.switchNetwork('goerli');
-  console.info('✔️ Switched to Goerli');
-  await page.bringToFront();
-  console.info('✔️ Page brought to front');
-  const accountButton = await page.waitForSelector('#account-button');
-  console.info('✔️ Account button found');
-  await accountButton?.click();
-  console.info('✔️ Account button clicked');
-  const metamaskButton = await page.waitForSelector('#injected');
-  console.info('✔️ Metamask button found');
-  await metamaskButton?.click();
-  console.info('✔️ Metamask button clicked');
-  console.info('Sleeping 2s...');
-  await sleep(2000);
-  await metamask.approve();
-  console.info('✔️ Metamask approved');
-  console.info('Sleeping 2s...');
-  await sleep(2000);
-  await page.bringToFront();
-  console.info('✔️ Page brought to front');
-  await createQuest({ page, metamask, browser });
-  await browser.close();
+  try {
+    console.info('🚀 Starting browser');
+    const [metamask, page, browser] = await dappeteer.bootstrap(puppeteer, {
+      metamaskVersion: 'v10.15.0',
+      seed: process.env.E2E_SECRET_WORDS,
+      password: '12345678',
+      showTestNets: true,
+      headless: false,
+      args: [`--no-sandbox`, `--disable-setuid-sandbox`],
+    });
+    console.info('✔️ Broser launched & Metamask imported');
+    const pageUrl = `${process.env.VERCEL_DEPLOYMENT_URL}/home?&chainId=5`;
+    console.log(`Opening page ${pageUrl} ...`);
+    await page.goto(pageUrl);
+    console.info(`✔️ Page loaded`);
+    await metamask.switchNetwork('goerli');
+    console.info('✔️ Switched to Goerli');
+    await page.bringToFront();
+    console.info('✔️ Page brought to front');
+    const accountButton = await page.waitForSelector('#account-button');
+    console.info('✔️ Account button found');
+    await accountButton?.click();
+    console.info('✔️ Account button clicked');
+    const metamaskButton = await page.waitForSelector('#injected');
+    console.info('✔️ Metamask button found');
+    await metamaskButton?.click();
+    console.info('✔️ Metamask button clicked');
+    console.info('Sleeping 2s...');
+    await sleep(2000);
+    await metamask.approve();
+    console.info('✔️ Metamask approved');
+    console.info('Sleeping 2s...');
+    await sleep(2000);
+    await page.bringToFront();
+    console.info('✔️ Page brought to front');
+    await createQuest({ page, metamask, browser });
+    await browser.close();
+  } catch (error) {
+    console.error(`Try #${tries} failed : `, error);
+    if (tries > 0) {
+      console.log(`Retrying...`);
+      main(tries - 1);
+    }
+  }
 }
 
 async function createQuest({ page, metamask, browser }) {
@@ -134,13 +142,13 @@ async function createQuest({ page, metamask, browser }) {
     try {
       await expectTextExistsInPage(page, 'Approving quest deposit');
       console.info('✔️ Complete create quest button clicked');
-      await approveTransaction({ page, metamask });
+      await executeTransaction({ page, metamask });
       console.info('✔️ Aprove transaction completed');
     } catch (error) {
       // Aproving already done so we expect the second step to pop up
       await expectTextExistsInPage(page, 'Creating Quest');
     }
-    await approveTransaction({ page, metamask });
+    await executeTransaction({ page, metamask });
     console.info('✔️ Create quest transaction completed');
     await waitForSelectorAndClick(page, '[title="Close"]');
     console.info('✔️ Modale closed');
