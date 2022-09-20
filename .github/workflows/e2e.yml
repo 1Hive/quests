@@ -20,6 +20,14 @@ jobs:
       #   shell: bash
       # - name: Install xvfb
       #   run: sudo apt-get install xvfb
+      - name: DNSControl check
+        uses: koenrh/dnscontrol-action@v3
+        with:
+          args: check
+
+          # Optionally, if your DNSConfig files are in a non-default location,
+          # you could specify the paths to the config and credentials file.
+          config_file: "dns/dnsconfig.js"
       - name: Resolving deployment url from Vercel
         # Workflow overview:
         #   - Resolve customer to deploy from github event input (falls back to resolving it from vercel.json file)
