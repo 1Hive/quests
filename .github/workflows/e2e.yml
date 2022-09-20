@@ -20,46 +20,14 @@ jobs:
       #   shell: bash
       # - name: Install xvfb
       #   run: sudo apt-get install xvfb
-      - name: DNSControl check
-        uses: koenrh/dnscontrol-action@v3
-        with:
-          args: check
-
-          # Optionally, if your DNSConfig files are in a non-default location,
-          # you could specify the paths to the config and credentials file.
-          config_file: "dns/dnsconfig.js"
       - name: Resolving deployment url from Vercel
-        # Workflow overview:
-        #   - Resolve customer to deploy from github event input (falls back to resolving it from vercel.json file)
-        #   - Resolve $VERCEL_DEPLOYMENT_URL
-        #     - Fetch all deployments data (by using the scope in `vercel.json`)
-        #     - Resolve the last url (from `response.deployments[0].url`)
-        #     - Remove the `"` character to pre-format url
-        # We need to set env the url for next step, formatted as `https://${$VERCEL_DEPLOYMENT}`
-        # XXX You can use https://jqplay.org/ if you want to play around with "jq" to manipulate JSON
+        uses: wei/curl@v1
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          apt update -y >/dev/null && apt install -y jq >/dev/null
-          # Resolve Vercel team ID
-          echo "Vercel team ID: " $VERCEL_TEAM_ID
-          echo "Vercel project id: " $VERCEL_PROJECT_ID
-          echo "VERCEL_TEAM_ID=$VERCEL_TEAM_ID" >> $GITHUB_ENV
-          # Resolve Vercel project name
-          # Build Vercel API endpoint used to fetch deployments
-          VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT="https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID&projectId=$VERCEL_PROJECT_ID"
-          echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
-          # Fetch all Vercel deployment from this project
-          ALL_VERCEL_DEPLOYMENTS=`curl $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer' $VERCEL_TOKEN`
-          echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
-          # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
-          VERCEL_DEPLOYMENT=`echo $ALL_VERCEL_DEPLOYMENTS | jq '.deployments [0].url'`
-          VERCEL_DEPLOYMENT_URL="https://$VERCEL_DEPLOYMENT"
-          echo "Url where to run E2E tests (VERCEL_DEPLOYMENT_URL): " $VERCEL_DEPLOYMENT_URL
-          echo "VERCEL_DEPLOYMENT_URL=$VERCEL_DEPLOYMENT_URL" >> $GITHUB_ENV
-          echo "VERCEL_DEPLOYMENT=$VERCEL_DEPLOYMENT" >> $GITHUB_ENV
+        with:
+          args: -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $VERCEL_TOKEN' https://api.zeit.co/v5/now/deployments?teamId=VERCEL_TEAM_ID$&projectId=VERCEL_PROJECT_ID
       # Wait for deployment to be ready, before running E2E (otherwise Cypress might start testing too early, and gets redirected to Vercel's "Login page", and tests fail)
       - name: Awaiting Vercel deployment to be ready
         uses: UnlyEd/github-action-await-vercel@v1.1.1
