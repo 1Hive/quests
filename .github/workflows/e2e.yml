@@ -1,23 +1,10 @@
-name: Deploy & E2E
+name: E2E
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main, dev]
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Deploy to Vercel Action
-        uses: BetaHuhn/deploy-to-vercel-action@v1
-        with:
-          VERCEL_SCOPE: "1hive"
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   e2e:
     runs-on: ubuntu-latest
     steps:
@@ -33,6 +20,14 @@ jobs:
         shell: bash
       - name: Install xvfb
         run: sudo apt-get install xvfb
+      - name: Wait for deploy to finish
+        uses: lewagon/wait-on-check-action@v1.0.0
+        with:
+          ref: ${{ github.ref }}
+          check-name: "deploy"
+          repo-token: ${{ secrets.GH_PAT }}
+          wait-interval: 10
+          allowed-conclusions: success,cancelled
       - name: Run E2E test
         env:
           E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
