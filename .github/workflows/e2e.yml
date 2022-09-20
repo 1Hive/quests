@@ -38,11 +38,11 @@ jobs:
           echo "Customer that was deployed: " $CUSTOMER_REF_TO_DEPLOY
           echo "CUSTOMER_REF_TO_DEPLOY=$CUSTOMER_REF_TO_DEPLOY" >> $GITHUB_ENV
           # Resolve Vercel team ID
-          VERCEL_TEAM_ID=`cat vercel.$CUSTOMER_REF_TO_DEPLOY.staging.json | jq --raw-output '.scope'`
+          VERCEL_TEAM_ID=${{ secrets.VERCEL_TEAM_ID }}
           echo "Vercel team ID: " $VERCEL_TEAM_ID
           echo "VERCEL_TEAM_ID=$VERCEL_TEAM_ID" >> $GITHUB_ENV
           # Resolve Vercel project name
-          VERCEL_PROJECT_NAME=`cat vercel.$CUSTOMER_REF_TO_DEPLOY.staging.json | jq --raw-output '.name'`
+          VERCEL_PROJECT_NAME=${{ secrets.VERCEL_PROJECT_NAME }}
           echo "Vercel project name: " $VERCEL_PROJECT_NAME
           echo "VERCEL_PROJECT_NAME=$VERCEL_PROJECT_NAME" >> $GITHUB_ENV
           # Build Vercel API endpoint used to fetch deployments
@@ -73,5 +73,5 @@ jobs:
       - name: Run E2E test
         env:
           E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
-          VERCEL_DEPLOYMENT_URL: ${{ env.VERCEL_DEPLOYMENT_URL }}
+          VERCEL_DEPLOYMENT_DOMAIN: ${{ env.VERCEL_DEPLOYMENT }}
         run: xvfb-run --auto-servernum yarn e2e
