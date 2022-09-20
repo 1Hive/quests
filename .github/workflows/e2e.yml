@@ -1,14 +1,27 @@
-name: E2E
+name: Deploy & E2E
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
   pull_request:
-    branches: [main, dev]
+    branches: [main]
 jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Deploy to Vercel Action
+      uses: BetaHuhn/deploy-to-vercel-action@v1
+      with:
+        VERCEL_SCOPE: '1hive'
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
   e2e:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -16,13 +29,7 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: yarn ci
-      - uses: UnlyEd/github-action-await-vercel@v1.2.14
-        id: wait-vercel
-        env:
-          VERCEL_TOKEN: ${{secrets.VERCEL_TOKEN}}
-        with:
-          deployment-url: quests-git-end-to-end-automated-tests-1hive.vercel.app
-          timeout: 900 # Wait for 15 minutes before failing
+        shell: bash
       - name: Install xvfb
         run: sudo apt-get install xvfb
       - name: Run E2E test
