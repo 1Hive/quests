@@ -40,10 +40,10 @@ jobs:
           echo "VERCEL_TEAM_ID=$VERCEL_TEAM_ID" >> $GITHUB_ENV
           # Resolve Vercel project name
           # Build Vercel API endpoint used to fetch deployments
-          VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT=""
+          VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT="https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID&projectId=$VERCEL_PROJECT_ID"
           echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
           # Fetch all Vercel deployment from this project
-          ALL_VERCEL_DEPLOYMENTS="curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer '"$VERCEL_TOKEN" https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID&projectId=$VERCEL_PROJECT_ID"
+          ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer '$VERCEL_TOKEN $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT`
           echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
           # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
           VERCEL_DEPLOYMENT=`echo $ALL_VERCEL_DEPLOYMENTS | jq '.deployments [0].url'`
