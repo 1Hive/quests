@@ -44,7 +44,7 @@ jobs:
           VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT="https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID&projectId=$VERCEL_PROJECT_ID"
           echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
           # Fetch all Vercel deployment from this project
-          ALL_VERCEL_DEPLOYMENTS=`curl $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $VERCEL_TOKEN'`
+          ALL_VERCEL_DEPLOYMENTS=`curl $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer' $VERCEL_TOKEN`
           echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
           # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
           VERCEL_DEPLOYMENT=`echo $ALL_VERCEL_DEPLOYMENTS | jq '.deployments [0].url'`
