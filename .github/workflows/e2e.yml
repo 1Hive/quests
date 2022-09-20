@@ -15,11 +15,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Install dependencies
-        run: yarn ci
-        shell: bash
-      - name: Install xvfb
-        run: sudo apt-get install xvfb
+      # - name: Install dependencies
+      #   run: yarn ci
+      #   shell: bash
+      # - name: Install xvfb
+      #   run: sudo apt-get install xvfb
       - name: Resolving deployment url from Vercel
         # Workflow overview:
         #   - Resolve customer to deploy from github event input (falls back to resolving it from vercel.json file)
@@ -30,26 +30,24 @@ jobs:
         # We need to set env the url for next step, formatted as `https://${$VERCEL_DEPLOYMENT}`
         # XXX You can use https://jqplay.org/ if you want to play around with "jq" to manipulate JSON
         env:
-          VERCEL_PROJECT_NAME: ${{ secrets.VERCEL_PROJECT_NAME }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           apt update -y >/dev/null && apt install -y jq >/dev/null
           # Resolve Vercel team ID
           echo "Vercel team ID: " $VERCEL_TEAM_ID
+          echo "Vercel project id: " $VERCEL_PROJECT_ID
           echo "VERCEL_TEAM_ID=$VERCEL_TEAM_ID" >> $GITHUB_ENV
           # Resolve Vercel project name
-          echo "Vercel project name: " $VERCEL_PROJECT_NAME
-          echo "VERCEL_PROJECT_NAME=$VERCEL_PROJECT_NAME" >> $GITHUB_ENV
           # Build Vercel API endpoint used to fetch deployments
-          VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT="https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID"
+          VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT="https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID&projectId=$VERCEL_PROJECT_ID"
           echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
           # Fetch all Vercel deployment from this project
-          ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ' $VERCEL_TOKEN ' ' $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT`
+          ALL_VERCEL_DEPLOYMENTS=`curl $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $VERCEL_TOKEN'`
           echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
           # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
-          # TODO Do not use '.deployments [0].url' blindly, but filter the deployments array first to make sure to consider only the deployments where "name" is equal to $VERCEL_PROJECT_NAME
-          VERCEL_DEPLOYMENT=`echo $ALL_VERCEL_DEPLOYMENTS | jq '.deployments [0].url' | tr -d \"`
+          VERCEL_DEPLOYMENT=`echo $ALL_VERCEL_DEPLOYMENTS | jq '.deployments [0].url'`
           VERCEL_DEPLOYMENT_URL="https://$VERCEL_DEPLOYMENT"
           echo "Url where to run E2E tests (VERCEL_DEPLOYMENT_URL): " $VERCEL_DEPLOYMENT_URL
           echo "VERCEL_DEPLOYMENT_URL=$VERCEL_DEPLOYMENT_URL" >> $GITHUB_ENV
@@ -69,5 +67,5 @@ jobs:
       - name: Run E2E test
         env:
           E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
-          VERCEL_DEPLOYMENT_DOMAIN: ${{ env.VERCEL_DEPLOYMENT }}
+          VERCEL_DEPLOYMENT_URL: ${{ env.VERCEL_DEPLOYMENT }}
         run: xvfb-run --auto-servernum yarn e2e
