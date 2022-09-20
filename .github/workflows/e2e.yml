@@ -20,11 +20,6 @@ jobs:
         shell: bash
       - name: Install xvfb
         run: sudo apt-get install xvfb
-      await-for-vercel-deployment:
-    name: Await current deployment to be ready (Ubuntu 18.04)
-    runs-on: ubuntu-18.04
-    needs: start-staging-deployment
-    steps:
       - name: Resolving deployment url from Vercel
         # Workflow overview:
         #   - Resolve customer to deploy from github event input (falls back to resolving it from vercel.json file)
@@ -71,10 +66,10 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEl_TOKEN }}
         with:
           deployment-url: ${{ env.VERCEL_DEPLOYMENT }} # Must only contain the domain name (no http prefix, etc.)
-          timeout: 90 # Wait for 90 seconds before failing
-
+          timeout: 900 # Wait for 15 minutes before failing
       - name: Display deployment status
         run: "echo My deployment is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}"
+
       - name: Run E2E test
         env:
           E2E_SECRET_WORDS: ${{secrets.E2E_SECRET_WORDS}}
