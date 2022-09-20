@@ -1,0 +1,55 @@
+{
+  "env": {
+    "es2020": true,
+    "jest": true,
+    "browser": true,
+    "node": true
+  },
+  "extends": ["plugin:react/recommended", "airbnb", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
+    "radix": 0,
+    "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "react/require-default-props": "off",
+    "import/prefer-default-export": "off",
+    "no-use-before-define": "off",
+    "no-param-reassign": "off",
+    "no-unused-expressions": "off",
+    "react/react-in-jsx-scope": "off",
+    "class-methods-use-this": "off",
+    "react/no-unused-prop-types": "warn",
+    "jsx-props-no-spreading": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/state-in-constructor": "off",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-debugger": "warn",
+    "no-underscore-dangle": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  }
+}

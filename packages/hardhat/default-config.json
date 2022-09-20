@@ -21,7 +21,7 @@
     "goerli": {
       "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
       "amount": 0.01
-    }
+    }   
   },
   "ScheduleDeposit": {
     "rinkeby": {

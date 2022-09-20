@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": ["es2015", "dom"],
+    "target": "ESNext"
+  },
+  "include": [
+    "src",
+    "../../node_modules/@types/puppeteer/index.d.ts",
+    "types.d.ts"
+  ]
+}

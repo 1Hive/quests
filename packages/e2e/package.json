@@ -1,0 +1,23 @@
+{
+  "name": "@1hive/e2e",
+  "version": "1.0.0",
+  "description": "e2e",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@chainsafe/dappeteer": "^3.0.0-rc.0",
+    "dotenv": "^16.0.2",
+    "puppeteer": "^17.1.3",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^5.4.6",
+    "dotenv": "^16.0.2",
+    "typescript": "^4.8.3"
+  }
+}
