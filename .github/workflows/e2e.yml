@@ -43,7 +43,7 @@ jobs:
           VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT=""
           echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
           # Fetch all Vercel deployment from this project
-          ALL_VERCEL_DEPLOYMENTS=` curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $VERCEL_TOKEN' https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID&projectId=$VERCEL_PROJECT_ID`
+          ALL_VERCEL_DEPLOYMENTS=` curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${$VERCEL_TOKEN}' https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID&projectId=$VERCEL_PROJECT_ID`
           echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
           # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
           VERCEL_DEPLOYMENT=`echo $ALL_VERCEL_DEPLOYMENTS | jq '.deployments [0].url'`
@@ -53,7 +53,7 @@ jobs:
           echo "VERCEL_DEPLOYMENT=$VERCEL_DEPLOYMENT" >> $GITHUB_ENV
       # Wait for deployment to be ready, before running E2E
       - name: Awaiting Vercel deployment to be ready
-        uses: UnlyEd/github-action-await-vercel@v1.1.1
+        uses: UnlyEd/github-action-await-vercel@v1.1.2
         id: await-vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEl_TOKEN }}
