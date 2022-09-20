@@ -98,10 +98,9 @@ async function main() {
     args: [`--no-sandbox`, `--disable-setuid-sandbox`],
   });
   console.info('✔️ Broser launched & Metamask imported');
-  await page.goto(
-    'https://quests-git-end-to-end-automated-tests-1hive.vercel.app/home?&chainId=5',
-  );
-  console.info('✔️ Page loaded');
+  const pageUrl = `${process.env.VERCEL_DEPLOYMENT_URL}/home?&chainId=5`;
+  await page.goto(pageUrl);
+  console.info(`✔️ Page loaded : ${pageUrl}`);
   await metamask.switchNetwork('goerli');
   console.info('✔️ Switched to Goerli');
   await page.bringToFront();
