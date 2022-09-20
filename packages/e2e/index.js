@@ -66,9 +66,10 @@ async function main(tries) {
   if (!process.env.E2E_SECRET_WORDS) {
     throw new Error('E2E_SECRET_WORDS not set in .env file');
   }
+  let page;
   try {
     console.info('🚀 Starting browser');
-    const [metamask, page, browser] = await dappeteer.bootstrap(puppeteer, {
+    const [metamask, _page, browser] = await dappeteer.bootstrap(puppeteer, {
       metamaskVersion: 'v10.15.0',
       seed: process.env.E2E_SECRET_WORDS,
       password: '12345678',
@@ -76,6 +77,7 @@ async function main(tries) {
       headless: false,
       args: [`--no-sandbox`, `--disable-setuid-sandbox`],
     });
+    page = _page;
     console.info('✔️ Broser launched & Metamask imported');
     const pageUrl = `${process.env.VERCEL_DEPLOYMENT_URL}/home?&chainId=5`;
     console.log(`Opening page ${pageUrl} ...`);
@@ -104,6 +106,12 @@ async function main(tries) {
     await createQuest({ page, metamask, browser });
     await browser.close();
   } catch (error) {
+    if (page) {
+      await page.screenshot({
+        path: `./e2e_try_n${tries}.png`,
+        fullPage: true,
+      });
+    }
     console.error(`Try #${tries} failed : `, error);
     if (tries > 0) {
       console.log(`Retrying...`);
