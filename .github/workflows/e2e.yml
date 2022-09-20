@@ -29,27 +29,23 @@ jobs:
         #     - Remove the `"` character to pre-format url
         # We need to set env the url for next step, formatted as `https://${$VERCEL_DEPLOYMENT}`
         # XXX You can use https://jqplay.org/ if you want to play around with "jq" to manipulate JSON
+        env:
+          VERCEL_PROJECT_NAME: ${{ secrets.VERCEL_PROJECT_NAME }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           apt update -y >/dev/null && apt install -y jq >/dev/null
-          MANUAL_TRIGGER_CUSTOMER="${{ github.event.inputs.customer}}"
-          echo "MANUAL_TRIGGER_CUSTOMER: " $MANUAL_TRIGGER_CUSTOMER
-          echo "MANUAL_TRIGGER_CUSTOMER=$MANUAL_TRIGGER_CUSTOMER" >> $GITHUB_ENV
-          CUSTOMER_REF_TO_DEPLOY="${MANUAL_TRIGGER_CUSTOMER:-$(cat vercel.json | jq --raw-output '.build.env.NEXT_PUBLIC_CUSTOMER_REF')}"
-          echo "Customer that was deployed: " $CUSTOMER_REF_TO_DEPLOY
-          echo "CUSTOMER_REF_TO_DEPLOY=$CUSTOMER_REF_TO_DEPLOY" >> $GITHUB_ENV
           # Resolve Vercel team ID
-          VERCEL_TEAM_ID=${{ secrets.VERCEL_TEAM_ID }}
           echo "Vercel team ID: " $VERCEL_TEAM_ID
           echo "VERCEL_TEAM_ID=$VERCEL_TEAM_ID" >> $GITHUB_ENV
           # Resolve Vercel project name
-          VERCEL_PROJECT_NAME=${{ secrets.VERCEL_PROJECT_NAME }}
           echo "Vercel project name: " $VERCEL_PROJECT_NAME
           echo "VERCEL_PROJECT_NAME=$VERCEL_PROJECT_NAME" >> $GITHUB_ENV
           # Build Vercel API endpoint used to fetch deployments
           VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT="https://api.zeit.co/v5/now/deployments?teamId=$VERCEL_TEAM_ID"
           echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
           # Fetch all Vercel deployment from this project
-          ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT`
+          ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ' $VERCEL_TOKEN ' ' $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT`
           echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
           # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
           # TODO Do not use '.deployments [0].url' blindly, but filter the deployments array first to make sure to consider only the deployments where "name" is equal to $VERCEL_PROJECT_NAME
