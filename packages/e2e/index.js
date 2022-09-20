@@ -99,8 +99,9 @@ async function main() {
   });
   console.info('✔️ Broser launched & Metamask imported');
   const pageUrl = `${process.env.VERCEL_DEPLOYMENT_URL}/home?&chainId=5`;
+  console.log(`Opening page ${pageUrl} ...`);
   await page.goto(pageUrl);
-  console.info(`✔️ Page loaded : ${pageUrl}`);
+  console.info(`✔️ Page loaded`);
   await metamask.switchNetwork('goerli');
   console.info('✔️ Switched to Goerli');
   await page.bringToFront();
