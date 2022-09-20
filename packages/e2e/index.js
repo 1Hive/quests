@@ -160,4 +160,4 @@ async function createQuest({ page, metamask, browser }) {
   console.info('✅ Quest created');
 }
 
-main();
+main(process.env.E2E_TRIES || 3);
