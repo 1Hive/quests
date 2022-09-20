@@ -98,7 +98,7 @@ async function main() {
     args: [`--no-sandbox`, `--disable-setuid-sandbox`],
   });
   console.info('✔️ Broser launched & Metamask imported');
-  const pageUrl = `${process.env.VERCEL_DEPLOYMENT_DOMAIN}/home?&chainId=5`;
+  const pageUrl = `https://${process.env.VERCEL_DEPLOYMENT_DOMAIN}/home?&chainId=5`;
   console.log(`Opening page ${pageUrl} ...`);
   await page.goto(pageUrl);
   console.info(`✔️ Page loaded`);
