@@ -22,12 +22,8 @@ jobs:
       #   run: sudo apt-get install xvfb
       - name: Resolving deployment url from Vercel
         uses: wei/curl@v1
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         with:
-          args: -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $VERCEL_TOKEN' https://api.zeit.co/v5/now/deployments?teamId=VERCEL_TEAM_ID$&projectId=VERCEL_PROJECT_ID
+          args: -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' https://api.zeit.co/v5/now/deployments?teamId=${{ secrets.VERCEL_TEAM_ID }}$&projectId=${{ secrets.VERCEL_PROJECT_ID }}
       # Wait for deployment to be ready, before running E2E (otherwise Cypress might start testing too early, and gets redirected to Vercel's "Login page", and tests fail)
       - name: Awaiting Vercel deployment to be ready
         uses: UnlyEd/github-action-await-vercel@v1.1.1
