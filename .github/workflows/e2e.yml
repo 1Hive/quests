@@ -15,11 +15,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Install dependencies
-        run: yarn ci
-        shell: bash
-      - name: Install xvfb
-        run: sudo apt-get install xvfb
+      # - name: Install dependencies
+      #   run: yarn ci
+      #   shell: bash
+      # - name: Install xvfb
+      #   run: sudo apt-get install xvfb
       - name: Resolving deployment url from Vercel
         # Workflow overview:
         #   - Resolve customer to deploy from github event input (falls back to resolving it from vercel.json file)
