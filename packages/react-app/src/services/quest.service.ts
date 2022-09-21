@@ -803,7 +803,14 @@ export async function fetchChallengeDispute(
   if (!challenge.disputeId) {
     throw new Error('Dispute does not exist yet, please try again later');
   }
-  const [, finalRuling] = await celesteDisputeManagerContract.computeRuling(challenge.disputeId);
+  let finalRuling;
+  try {
+    const result = await celesteDisputeManagerContract.computeRuling(challenge.disputeId);
+    finalRuling = result.finalRuling;
+  } catch (error) {
+    const result = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
+    finalRuling = result.finalRuling;
+  }
   return {
     id: challenge.disputeId,
     state: finalRuling,
