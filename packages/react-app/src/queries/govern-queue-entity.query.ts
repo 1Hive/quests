@@ -133,6 +133,7 @@ export const GovernQueueChallengeReasonQuery = gql`
     ) {
       reason
       challenger
+      disputeId
     }
   }
 `;

@@ -429,7 +429,7 @@ export async function fetchChallengeReason(container: ContainerModel): Promise<s
   if (!challenge?.reason) return undefined;
 
   const fetchedReason = await getObjectFromIpfs(challenge.reason, ipfsTheGraph);
-  return `[Challenger:${challenge.challenger}]\n${fetchedReason}`;
+  return `[ Dispute#${challenge.disputeId} / Challenger:${challenge.challenger} ]\n${fetchedReason}`;
 }
 
 export async function fetchVetoReason(container: ContainerModel): Promise<string | undefined> {
