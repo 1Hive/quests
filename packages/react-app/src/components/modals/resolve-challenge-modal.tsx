@@ -250,7 +250,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
                       external
                       href={`https://celeste.1hive.org/#/disputes/${dispute.id}`}
                     >
-                      See dispute
+                      See dispute #{dispute.id}
                     </LinkStyled>
                   ) : (
                     <HelpTooltip
