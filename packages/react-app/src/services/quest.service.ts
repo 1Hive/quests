@@ -425,12 +425,12 @@ export async function fetchChallengeReason(container: ContainerModel): Promise<s
     containerId: container.id.toLowerCase(),
   });
 
-  const reason = result.containerEventChallenges[0]?.reason;
+  const challenge = result.containerEventChallenges?.[0];
 
-  if (!reason) return undefined;
+  if (!challenge?.reason) return undefined;
 
-  const fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph);
-  return fetchedReason;
+  const fetchedReason = await getObjectFromIpfs(challenge.reason, ipfsTheGraph);
+  return `[ Dispute#${challenge.disputeId} / Challenger:${challenge.challenger} ]\n${fetchedReason}`;
 }
 
 export async function fetchVetoReason(container: ContainerModel): Promise<string | undefined> {

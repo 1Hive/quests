@@ -132,6 +132,8 @@ export const GovernQueueChallengeReasonQuery = gql`
       orderDirection: desc
     ) {
       reason
+      challenger
+      disputeId
     }
   }
 `;
