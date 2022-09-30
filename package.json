@@ -22,7 +22,8 @@
     "deploy:rinkeby": "yarn workspace @1hive/quests-hardhat deploy:rinkeby",
     "deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local",
     "graph-run-node": "cd docker/graph-node && docker-compose up",
-    "graph-remove-node": "cd docker/graph-node && docker-compose down"
+    "graph-remove-node": "cd docker/graph-node && docker-compose down",
+    "e2e": "yarn workspace @1hive/e2e test"
   },
   "workspaces": {
     "packages": [

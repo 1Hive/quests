@@ -19,13 +19,13 @@ async function sleep(timeout) {
   return new Promise((res) => setTimeout(res, timeout));
 }
 
-async function approveTransaction({ page, metamask }) {
+async function executeTransaction({ page, metamask }) {
   await page.waitForSelector('[data-testid="TX_WAITING_FOR_SIGNATURE"]');
   await sleep(5000);
   await metamask.confirmTransaction();
   await page.bringToFront();
   await page.waitForSelector('[data-testid="TX_STATUS_CONFIRMED"]', {
-    timeout: 60000,
+    timeout: 120000,
   });
 }
 
@@ -33,20 +33,20 @@ async function approveTransaction({ page, metamask }) {
  * @param {puppeteer.Page} page
  * @param {string} text
  */
-async function expectTextExistsInPage(page, text) {
+async function expectTextExistsInPage(page, text, timeout = 2000) {
   const xp = `//*[contains(text(),'${text}')]`;
   try {
-    console.log(`Looking for text "${text}" ...`);
+    console.info(`Looking for text "${text}" ...`);
     const el = await page.waitForXPath(xp, {
-      timeout: 60000,
+      timeout,
     });
     if (!el) {
       throw new Error();
     }
-    console.log(`✅ Text found: "${text}"`);
+    console.info(`Text found: "${text}"`);
   } catch (error) {
     if (error) console.error(error);
-    throw new Error(`❌ Text not found: "${text}"`);
+    throw new Error(`Text not found: "${text}"`);
   }
 }
 
@@ -61,72 +61,111 @@ function fillInputBySelector(page, selector, value) {
   );
 }
 
-const wsChromeEndpointurl =
-  'ws://127.0.0.1:9222/devtools/browser/a97436d8-bc3d-49c0-80b8-1a4de5903224';
-
-// This setup is for opening a new tab in an already opened browser and use already existing metamask extension
-// async function main() {
-//   try {
-//     const browser = await puppeteer.connect({
-//       browserWSEndpoint: wsChromeEndpointurl,
-//       slowMo: 150, // slow down by 250ms
-//     });
-//     const page = await browser.newPage();
-//     await page.goto('http://localhost:3000/home?&chainId=5', {
-//       waitUntil: 'networkidle0',
-//     });
-
-//     const metamask = await dappeteer.getMetamask(page);
-//     await createQuest({ page, metamask, browser });
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
-
 // This setup is for opening a new browser and importing the metamask extension as well as the test account
-async function main() {
+async function main(tries) {
   if (!process.env.E2E_SECRET_WORDS) {
     throw new Error('E2E_SECRET_WORDS not set in .env file');
   }
-  const [metamask, page, browser] = await dappeteer.bootstrap(puppeteer, {
-    metamaskVersion: 'v10.15.0',
-    seed: process.env.E2E_SECRET_WORDS,
-    password: '12345678',
-    showTestNets: true,
-  });
-  await page.goto('http://localhost:3000/home?&chainId=5');
-  await metamask.switchNetwork('goerli');
-  await page.bringToFront();
-  const accountButton = await page.waitForSelector('#account-button');
-  await accountButton?.click();
-  const metamaskButton = await page.waitForSelector('#injected');
-  await metamaskButton?.click();
-  await metamask.approve();
-  await page.bringToFront();
-  await createQuest({ page, metamask, browser });
+  let page;
+  try {
+    console.info('🚀 Starting browser');
+    const [metamask, _page, browser] = await dappeteer.bootstrap(puppeteer, {
+      metamaskVersion: 'v10.15.0',
+      seed: process.env.E2E_SECRET_WORDS,
+      password: '12345678',
+      showTestNets: true,
+      headless: false,
+      args: [`--no-sandbox`, `--disable-setuid-sandbox`],
+    });
+    page = _page;
+    console.info('✔️ Broser launched & Metamask imported');
+    const pageUrl = `${process.env.VERCEL_DEPLOYMENT_URL}/home?&chainId=5`;
+    console.log(`Opening page ${pageUrl} ...`);
+    await page.goto(pageUrl);
+    console.info(`✔️ Page loaded`);
+    await metamask.switchNetwork('goerli');
+    console.info('✔️ Switched to Goerli');
+    await page.bringToFront();
+    console.info('✔️ Page brought to front');
+    const accountButton = await page.waitForSelector('#account-button');
+    console.info('✔️ Account button found');
+    await accountButton?.click();
+    console.info('✔️ Account button clicked');
+    const metamaskButton = await page.waitForSelector('#injected');
+    console.info('✔️ Metamask button found');
+    await metamaskButton?.click();
+    console.info('✔️ Metamask button clicked');
+    console.info('Sleeping 2s...');
+    await sleep(2000);
+    await metamask.approve();
+    console.info('✔️ Metamask approved');
+    console.info('Sleeping 2s...');
+    await sleep(2000);
+    await page.bringToFront();
+    console.info('✔️ Page brought to front');
+    await createQuest({ page, metamask, browser });
+    await browser.close();
+  } catch (error) {
+    if (page) {
+      await page.screenshot({
+        path: `./e2e_try_n${tries}.png`,
+        fullPage: true,
+      });
+    }
+    console.error(`Try #${tries} failed : `, error);
+    if (tries > 0) {
+      console.log(`Retrying...`);
+      main(tries - 1);
+    }
+  }
 }
 
 async function createQuest({ page, metamask, browser }) {
-  await page.evaluate(`
+  try {
+    await page.evaluate(`
     localStorage.setItem('FLAG.GOERLI.DUMMY_QUEST', true);
     window.location.reload();
   `);
-  await sleep(2000);
-  await waitForTestIdAndClick(page, 'open-create-quest-btn');
-  const questTitle = await page.$eval('#title', (element) => element.value);
-  await waitForTestIdAndClick(page, 'next-step-btn');
-  await page.evaluate(`
+    console.info('✔️ Dummy flag set');
+    await sleep(3000);
+    console.info('✔️ Sleep 2s');
+    await waitForTestIdAndClick(page, 'open-create-quest-btn');
+    console.info('✔️ Open create quest button clicked');
+    const questTitle = await page.$eval('#title', (element) => element.value);
+    console.info('✔️ Quest title found');
+    await waitForTestIdAndClick(page, 'next-step-btn');
+    console.info('✔️ Next step button clicked');
+    await page.evaluate(`
          document.querySelector('#bounty-wrapper input')?.focus();
          document.dispatchEvent(new FocusEvent('focusin'));
      `);
-  await sleep(200);
-  await waitForSelectorAndClick(page, '#bounty-wrapper li button');
-  await fillInputBySelector(page, '#amount-bounty', '1');
-  await waitForTestIdAndClick(page, 'complete-create-quest-btn');
-  await approveTransaction({ page, metamask });
-  await approveTransaction({ page, metamask });
-  await waitForSelectorAndClick(page, '[title="Close"]');
-  await expectTextExistsInPage(page, questTitle);
+    console.info('✔️ Bounty input focused');
+    await sleep(200);
+    console.info('✔️ Sleep 200ms');
+    await waitForSelectorAndClick(page, '#bounty-wrapper li button');
+    console.info('✔️ Bounty selected');
+    await fillInputBySelector(page, '#amount-bounty', '1');
+    console.info('✔️ Bounty amount filled');
+    await waitForTestIdAndClick(page, 'complete-create-quest-btn');
+    try {
+      await expectTextExistsInPage(page, 'Approving quest deposit');
+      console.info('✔️ Complete create quest button clicked');
+      await executeTransaction({ page, metamask });
+      console.info('✔️ Aprove transaction completed');
+    } catch (error) {
+      // Aproving already done so we expect the second step to pop up
+      await expectTextExistsInPage(page, 'Creating Quest');
+    }
+    await executeTransaction({ page, metamask });
+    console.info('✔️ Create quest transaction completed');
+    await waitForSelectorAndClick(page, '[title="Close"]');
+    console.info('✔️ Modale closed');
+    await expectTextExistsInPage(page, questTitle, 60000);
+  } catch (error) {
+    console.error(error);
+    throw new Error('❌ Failed to create quest');
+  }
+  console.info('✅ Quest created');
 }
 
-main();
+main(process.env.E2E_TRIES || 3);
