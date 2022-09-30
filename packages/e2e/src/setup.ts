@@ -21,7 +21,6 @@ export async function setup(tries = MAX_TRIES) {
       seed: process.env.E2E_SECRET_WORDS,
       password: '12345678',
       showTestNets: true,
-      headless: false,
       args: [`--no-sandbox`, `--disable-setuid-sandbox`],
     });
     browser = _browser;
