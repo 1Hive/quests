@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { main } from './main';
+import { setup } from './setup';
 
 config();
-main();
+setup();

@@ -5,7 +5,7 @@ import { createQuest } from './create-quest';
 import { connectWithMetamask } from './utils';
 
 // This setup is for opening a new browser and importing the metamask extension as well as the test account
-export async function main(tries = MAX_TRIES) {
+export async function setup(tries = MAX_TRIES) {
   if (!process.env.E2E_DEPLOYMENT_URL_BASE) {
     throw new Error('E2E_DEPLOYMENT_URL not set in env variables');
   }
@@ -54,7 +54,7 @@ export async function main(tries = MAX_TRIES) {
     if (tries > 0) {
       console.log(`Retrying...`);
       await browser?.close();
-      main(tries - 1);
+      setup(tries - 1);
     } else {
       throw error; // Rethrow error
     }
