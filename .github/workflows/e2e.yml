@@ -34,3 +34,7 @@ jobs:
           E2E_DEPLOYMENT_URL_BASE: ${{ steps.waitForVercel.outputs.url }}
           E2E_TRIES: ${{ secrets.E2E_TRIES }}
         run: xvfb-run --auto-servernum yarn e2e
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Screenshots
+          path: screenshots/
