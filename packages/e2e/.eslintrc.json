@@ -23,15 +23,6 @@
       }
     ],
     "radix": 0,
-    "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      {
-        "ts": "never",
-        "tsx": "never"
-      }
-    ],
     "react/require-default-props": "off",
     "import/prefer-default-export": "off",
     "no-use-before-define": "off",
@@ -39,13 +30,25 @@
     "no-unused-expressions": "off",
     "react/react-in-jsx-scope": "off",
     "class-methods-use-this": "off",
-    "react/no-unused-prop-types": "warn",
+    "react/no-unused-prop-types": "off",
     "jsx-props-no-spreading": "off",
     "react/jsx-props-no-spreading": "off",
     "react/state-in-constructor": "off",
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "no-debugger": "warn",
-    "no-underscore-dangle": "off"
+    "no-unused-vars": "off",
+    "no-debugger": "off",
+    "no-underscore-dangle": "off",
+    "no-console": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "": "never",
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ]
   },
   "settings": {
     "import/resolver": {

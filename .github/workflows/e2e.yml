@@ -1,0 +1,36 @@
+name: E2E
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, dev]
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - name: Install dependencies
+        run: yarn ci
+        shell: bash
+      - name: Install xvfb
+        run: sudo apt-get install xvfb
+      # Wait for deployment to be ready, before running E2E
+      - name: Wait for deployment to be ready
+        uses: patrickedqvist/wait-for-vercel-preview@v1.2.0
+        id: waitForVercel
+        with:
+          token: ${{ secrets.GH_PAT }}
+          max_timeout: 900 # 15 minutes
+          check_interval: 10 # 10 seconds
+      - name: Run E2E test
+        env:
+          E2E_SECRET_WORDS: ${{ secrets.E2E_SECRET_WORDS }}
+          E2E_DEPLOYMENT_URL_BASE: ${{ steps.waitForVercel.outputs.url }}
+          E2E_TRIES: ${{ secrets.E2E_TRIES }}
+        run: xvfb-run --auto-servernum yarn e2e
