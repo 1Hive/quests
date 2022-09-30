@@ -10,11 +10,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          node-version: 16
+          cache: "yarn"
       - name: Install dependencies
         run: yarn ci
         shell: bash
