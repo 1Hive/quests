@@ -30,7 +30,7 @@ jobs:
         id: waitForVercel
         with:
           token: ${{ secrets.GH_PAT }}
-          max_timeout: 900 # 15 minutes
+          max_timeout: 1800 # 30 minutes
           check_interval: 10 # 10 seconds
       - name: Run E2E test
         env:
