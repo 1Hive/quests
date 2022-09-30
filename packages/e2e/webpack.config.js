@@ -20,6 +20,7 @@ module.exports = {
       },
     ],
   },
+  externalsPresets: { node: true },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
