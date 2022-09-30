@@ -2,7 +2,7 @@
   "name": "@1hive/e2e",
   "version": "1.0.0",
   "description": "e2e",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "webpack",
     "test": "yarn build && node ."
