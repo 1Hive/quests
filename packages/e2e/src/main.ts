@@ -55,6 +55,8 @@ export async function main(tries = MAX_TRIES) {
       console.log(`Retrying...`);
       await browser?.close();
       main(tries - 1);
+    } else {
+      throw error; // Rethrow error
     }
   }
 }
