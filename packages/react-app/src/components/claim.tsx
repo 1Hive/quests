@@ -158,25 +158,25 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
       ) {
         setActionButton(
           <TimeableActionWrapper>
+            {timer}
             <ExecuteClaimModal
               claim={claim}
               questTotalBounty={questData.bounty}
               onClose={onActionClose}
               claimable={claimable}
             />
-            {timer}
           </TimeableActionWrapper>,
         );
         return;
       }
       setActionButton(
         <TimeableActionWrapper>
+          {timer}
           <ChallengeModal
             claim={{ ...claim, state }}
             challengeDeposit={challengeDeposit}
             onClose={onActionClose}
           />
-          {timer}
         </TimeableActionWrapper>,
       );
       return;
@@ -275,8 +275,8 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                   </>
                 ) : (
                   <LineSyled>
-                    <ActionsPlaceholder />
                     {timer}
+                    <ActionsPlaceholder />
                   </LineSyled>
                 )}
               </ChildSpacer>
