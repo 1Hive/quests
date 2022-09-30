@@ -58,6 +58,8 @@ const TimeableActionWrapper = styled.div`
 
 const LineSyled = styled.div`
   display: flex;
+  flex-wrap: wrap;
+  grid-gap: 8px;
 `;
 
 // #endregion
