@@ -20,12 +20,11 @@ module.exports = {
       },
     ],
   },
-  externals: nodeExternals(),
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
     filename: 'bundle.js',
-    path: __dirname,
+    path: path.resolve(__dirname, 'dist'),
   },
 };

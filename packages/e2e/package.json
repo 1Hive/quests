@@ -2,10 +2,10 @@
   "name": "@1hive/e2e",
   "version": "1.0.0",
   "description": "e2e",
-  "main": "index.js",
+  "main": "dist/bundle.js",
   "scripts": {
     "build": "webpack",
-    "test": "yarn build && node ."
+    "test": "yarn build && node dist/bundle.js"
   },
   "author": "",
   "license": "ISC",
