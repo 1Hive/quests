@@ -34,9 +34,9 @@ export async function createQuest({ page, metamask, browser }) {
     await fillInputBySelector(page, '#amount-bounty', '1');
     console.info('Bounty amount filled');
     await waitForTestIdAndClick(page, 'complete-create-quest-btn');
+    console.info('Complete create quest button clicked');
     try {
       await expectTextExistsInPage(page, 'Approving quest deposit');
-      console.info('Complete create quest button clicked');
       await executeTransaction({ page, metamask });
       console.info('Aprove transaction completed');
     } catch (error) {
