@@ -1,4 +1,4 @@
-dist/**
+bundle.js
 screenshots/
 package-lock.json
 .env
