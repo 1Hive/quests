@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "lib": ["es2015", "dom"],
-    "target": "ESNext"
-  },
-  "include": [
-    "src",
-    "../../node_modules/@types/puppeteer/index.d.ts",
-    "types.d.ts"
-  ]
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "module": "ESNext",
+    "target": "es5",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  }
 }

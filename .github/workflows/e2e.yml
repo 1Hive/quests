@@ -31,6 +31,6 @@ jobs:
       - name: Run E2E test
         env:
           E2E_SECRET_WORDS: ${{ secrets.E2E_SECRET_WORDS }}
-          VERCEL_DEPLOYMENT_URL: ${{ steps.waitForVercel.outputs.url }}
+          E2E_DEPLOYMENT_URL_BASE: ${{ steps.waitForVercel.outputs.url }}
           E2E_TRIES: ${{ secrets.E2E_TRIES }}
         run: xvfb-run --auto-servernum yarn e2e
