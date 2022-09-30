@@ -203,7 +203,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
           <ResolveChallengeModal claim={claim} onClose={onActionClose} />
         </>,
       );
-      return; 
+      return;
     }
 
     setActionButton(undefined);
