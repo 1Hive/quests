@@ -93,6 +93,10 @@ const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  .UjkFY a {
+    word-wrap: break-word;
+  }
 `;
 
 const BountyWrapperStyled = styled.div`
