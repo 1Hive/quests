@@ -358,6 +358,16 @@ export default function Quest({
                 maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
                 wide
               />
+              {!isSummary && (
+                <TextFieldInput
+                  id="communication-link"
+                  label={isSummary ? undefined : 'Communication method'}
+                  value={questData?.communicationLink}
+                  isLoading={isLoading || !questData}
+                  isMarkDown
+                  wide
+                />
+              )}
             </HeaderWrapperStyled>
 
             {isSummary && fieldsRow}

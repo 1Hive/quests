@@ -65,6 +65,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       address: questAddress,
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
+      communicationLink: questEntity.questCommunicationLink,
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
