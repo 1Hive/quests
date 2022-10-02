@@ -511,6 +511,7 @@ export default function QuestModal({
                           isEdit
                           onBlur={handleBlur}
                           onChange={handleChange}
+                          placeHolder="Quest communication link"
                           wide
                         />
                       </>,
