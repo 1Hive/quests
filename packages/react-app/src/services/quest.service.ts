@@ -526,7 +526,9 @@ export async function saveQuest(
 ): Promise<ethers.ContractReceipt | null> {
   if (address) throw Error('Saving existing quest is not yet implemented');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
-  const ipfsHash = await pushObjectToIpfs(data.description ?? '');
+  const ipfsHash = await pushObjectToIpfs(
+    { description: data.description, communicationLink: data.communicationLink } ?? '',
+  );
   const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
   const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,

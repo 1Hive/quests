@@ -49,7 +49,8 @@ export const networks = Object.freeze({
     stableTokens: StableTokens.goerli,
   },
   goerliStaging: {
-    stagingOf: 'goerli',
+    stagingOf: 'rinkeby',
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-goerli-staging',
   } as StagingNetworkModel,
   gnosis: {
     networkId: 'xdai',
