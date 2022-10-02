@@ -59,9 +59,9 @@ export default function ModalBase({
       case 'small':
         return 500;
       case 'large':
-        return 1200;
+        return 1500;
       default:
-        return 800;
+        return 900;
     }
   }, [size]);
 
