@@ -48,7 +48,8 @@
         "ts": "never",
         "tsx": "never"
       }
-    ]
+    ],
+    "no-undef": ["error", { "argsIgnorePattern": "page" }]
   },
   "settings": {
     "import/resolver": {

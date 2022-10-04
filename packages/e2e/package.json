@@ -4,21 +4,30 @@
   "description": "e2e",
   "main": "dist/bundle.js",
   "scripts": {
-    "build": "webpack",
-    "test": "yarn build && node dist/bundle.js"
+    "test": "jest --runInBand"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@chainsafe/dappeteer": "3.0.0",
+    "chalk": "^5.0.1",
     "dotenv": "^16.0.2",
+    "expect-puppeteer": "^6.1.1",
+    "jest-environment-node": "^29.1.2",
     "puppeteer": "^17.1.3"
   },
   "devDependencies": {
+    "@types/expect-puppeteer": "^5.0.1",
+    "@types/jest": "^29.1.1",
+    "@types/jest-environment-puppeteer": "^5.0.2",
     "@types/puppeteer": "^5.4.6",
     "dotenv": "^16.0.2",
+    "jest": "^29.1.2",
+    "jest-puppeteer": "^6.1.1",
     "source-map-loader": "^4.0.0",
+    "ts-jest": "^29.0.3",
     "ts-loader": "^8.0.3",
+    "ts-node": "^10.9.1",
     "typescript": "^4.8.3",
     "webpack": "^5.74.0",
     "webpack-cli": "^3.3.12"
