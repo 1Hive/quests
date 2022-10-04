@@ -9,10 +9,14 @@ import {
   waitForTestIdAndClick,
 } from '../helpers/utils';
 
-fdescribe('Create quest', () => {
+describe('Create quest', () => {
   beforeAll(async () => {
     await gotoApp();
     await connectWithMetamask();
+  });
+
+  beforeEach(async () => {
+    await page.bringToFront();
   });
 
   it('should have the quest created', async () => {
@@ -58,5 +62,9 @@ fdescribe('Create quest', () => {
     await waitForSelectorAndClick('[title="Close"]');
     console.info('Modale closed');
     await expectTextExistsInPage(questTitle, 60000);
+  });
+
+  afterAll(async () => {
+    await page.close();
   });
 });

@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+
 config();
 
 export async function gotoApp() {
@@ -6,31 +7,28 @@ export async function gotoApp() {
 }
 
 export async function connectWithMetamask() {
-  await metamask.switchNetwork('goerli');
-  await page.bringToFront();
-  console.info('Page brought to front');
-  const accountButton = await page.waitForSelector('#account-button');
-  if (!accountButton) {
-    const accountConnected = await page.waitForSelector('.connected');
-    if (!accountConnected) {
-      throw new Error('Error finding connect button');
-    }
-    console.info('Already connected');
-    return; // Already connected so return directly
+  try {
+    await metamask.switchNetwork('goerli');
+    await page.bringToFront();
+    console.info('Page brought to front');
+    const accountButton = await page.waitForSelector('#account-button');
+    console.info('Account button found');
+    await accountButton?.click();
+    console.info(' Account button clicked');
+    const metamaskButton = await page.waitForSelector('#injected');
+    console.info('Metamask button found');
+    await metamaskButton?.click();
+    console.info('Metamask button clicked');
+    console.info('Sleeping 2s...');
+    await sleep(2000);
+    await metamask.approve();
+    console.info('Metamask approved');
+    console.info('Sleeping 2s...');
+    await sleep(2000);
+  } catch (error) {
+    // Skip if already connected
+    console.warn(error);
   }
-  console.info('Account button found');
-  await accountButton?.click();
-  console.info(' Account button clicked');
-  const metamaskButton = await page.waitForSelector('#injected');
-  console.info('Metamask button found');
-  await metamaskButton?.click();
-  console.info('Metamask button clicked');
-  console.info('Sleeping 2s...');
-  await sleep(2000);
-  await metamask.approve();
-  console.info('Metamask approved');
-  console.info('Sleeping 2s...');
-  await sleep(2000);
   await page.bringToFront();
   console.info('Page brought to front');
 }
