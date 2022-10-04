@@ -65,6 +65,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       address: questAddress,
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
+      communicationLink: questEntity.questCommunicationLink,
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
@@ -526,7 +527,10 @@ export async function saveQuest(
 ): Promise<ethers.ContractReceipt | null> {
   if (address) throw Error('Saving existing quest is not yet implemented');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
-  const ipfsHash = await pushObjectToIpfs(data.description ?? '');
+  const ipfsHash = await pushObjectToIpfs({
+    description: data.description ?? '',
+    communicationLink: data.communicationLink,
+  });
   const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
   const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,

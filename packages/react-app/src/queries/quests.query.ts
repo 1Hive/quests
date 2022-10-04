@@ -13,6 +13,7 @@ const QuestEntityQuery = gql`
       questAddress
       questTitle
       questDescription
+      questCommunicationLink
       questExpireTimeSec
       questDetailsRef
       questRewardTokenAddress

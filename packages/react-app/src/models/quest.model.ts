@@ -6,6 +6,7 @@ export type QuestModel = {
   // User defined
   title?: string;
   description?: string;
+  communicationLink?: string;
   expireTime: Date;
   fallbackAddress: string;
   creatorAddress: string;

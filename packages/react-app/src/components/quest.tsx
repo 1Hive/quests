@@ -77,7 +77,9 @@ const QuestFooterStyled = styled.div`
   flex-wrap: wrap;
   row-gap: ${GUpx(2)};
 `;
-
+const LinkWrapperStyled = styled.div`
+  padding-top: ${GUpx(2)};
+`;
 const RowStyled = styled.div`
   display: flex;
   width: 100%;
@@ -362,6 +364,19 @@ export default function Quest({
                 maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
                 wide
               />
+              {!isSummary && (
+                <LinkWrapperStyled>
+                  <TextFieldInput
+                    id="communication-link"
+                    label={isSummary ? undefined : 'Communication method'}
+                    value={questData?.communicationLink ?? '*No communication link provided*'}
+                    isLoading={isLoading || !questData}
+                    isMarkDown
+                    wide
+                    compact
+                  />
+                </LinkWrapperStyled>
+              )}
             </HeaderWrapperStyled>
 
             {isSummary && fieldsRow}

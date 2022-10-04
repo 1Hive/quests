@@ -503,6 +503,17 @@ export default function QuestModal({
                           onChange={handleChange}
                           wide
                         />
+                        <TextFieldInput
+                          id="communicationLink"
+                          label="Communication link"
+                          value={values.communicationLink}
+                          tooltip="The link to the discussion platform. It could be a forum, a discord username or any desired communication platform"
+                          isEdit
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          placeHolder="Quest communication link"
+                          wide
+                        />
                       </>,
                     ]}
                   />
