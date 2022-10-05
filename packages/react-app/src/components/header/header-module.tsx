@@ -29,10 +29,7 @@ function HeaderModule({ content, hasPopover = true, icon, onClick }: Props) {
   const theme = useTheme();
 
   return (
-    <div
-      className="
-    btn-link"
-    >
+    <div className="btn-link connected">
       <HeaderAccountButtonStyled
         onClick={onClick}
         background={theme.surface}

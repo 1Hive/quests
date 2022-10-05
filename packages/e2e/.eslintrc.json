@@ -37,7 +37,12 @@
     "no-unused-vars": "off",
     "no-debugger": "off",
     "no-underscore-dangle": "off",
-    "no-console": "off",
+    "no-console": [
+      "warn",
+      {
+        "allow": ["info", "warn", "error"]
+      }
+    ],
     "import/extensions": [
       "error",
       "ignorePackages",
@@ -54,5 +59,9 @@
     "import/resolver": {
       "typescript": {}
     }
+  },
+  "globals": {
+    "page": "writable",
+    "metamask": "writable"
   }
 }
