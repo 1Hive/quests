@@ -76,13 +76,7 @@ export async function expectTextExistsInPage(text: string, timeout = 2000) {
   }
 }
 
-export function fillInputBySelector(selector: string, value: string) {
-  return page.$eval(
-    selector,
-    (el: HTMLInputElement, _value: any) => {
-      el.value = _value;
-      el.dispatchEvent(new Event('change'));
-    },
-    value,
-  );
+export async function fillInputBySelector(selector: string, value: string) {
+  await page.focus(selector);
+  await page.keyboard.type(value);
 }
