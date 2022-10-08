@@ -6,7 +6,6 @@ import {
   gotoApp,
   sleep,
   waitForSelectorAndClick,
-  waitForTestIdAndClick,
 } from '../helpers/utils';
 
 describe('Fund quest', () => {
