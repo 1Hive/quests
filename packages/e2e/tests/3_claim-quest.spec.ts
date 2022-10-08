@@ -52,9 +52,14 @@ describe('Claim quest', () => {
     console.info('Create quest transaction completed');
     await waitForSelectorAndClick('[title="Close"]');
     console.info('Modale closed');
-    sleep(1000);
-    await waitForSelectorAndClick('.claim-wrapper .btn-link button');
-    console.info('Claim button clicked');
+    await page.waitForSelector('.claim-wrapper.loading', {
+      hidden: true,
+    });
+    console.info('Claim loaded');
+    await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
+    console.info('Page reloaded');
+    await page.click('.claim-wrapper button.toggle-collapse-button');
+    console.info('Claim expanded');
     await expectTextExistsInPage(claimPayload.evidence, 30000);
     await expectTextExistsInPage(claimPayload.contact, 0);
   });
