@@ -43,15 +43,12 @@ describe('Create quest', () => {
     await sleep(200);
     console.info('Sleep 200ms');
     await waitForSelectorAndClick('#bounty-wrapper li button');
-    console.info('Bounty selected');
-    await fillInputBySelector('#amount-bounty', '1');
-    console.info('Bounty amount filled');
     await waitForSelectorAndClick('.complete-create-quest-btn');
     console.info('Complete create quest button clicked');
     try {
       await expectTextExistsInPage('Approving quest deposit');
       await executeTransaction();
-      console.info('Aprove transaction completed');
+      console.info('Approve transaction completed');
     } catch (error) {
       // Aproving already done so we expect the second step to pop up
       await expectTextExistsInPage('Creating Quest');
