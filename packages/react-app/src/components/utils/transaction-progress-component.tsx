@@ -73,7 +73,7 @@ export function TransactionProgressComponent() {
           animated={transaction?.status === ENUM_TRANSACTION_STATUS.Pending}
           color={logoColor}
         />
-        <TransactionTitleStyled data-testId={transaction?.status}>
+        <TransactionTitleStyled className={transaction?.status}>
           {transaction?.message}
         </TransactionTitleStyled>
         <MessageStyled messageColor={messageColor}>{message}</MessageStyled>

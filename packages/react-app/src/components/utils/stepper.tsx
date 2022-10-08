@@ -94,7 +94,7 @@ export default function Stepper({ steps, submitButton, onNext, onBack }: Props) 
         />
         {!isSubmitStep ? (
           <QuestActionButtonStyled
-            data-testid="next-step-btn"
+            className="next-step-btn"
             visible
             label="Next"
             mode="positive"

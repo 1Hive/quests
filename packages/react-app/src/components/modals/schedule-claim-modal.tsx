@@ -251,6 +251,7 @@ export default function ScheduleClaimModal({
       title="Schedule a Quest claim"
       openButton={
         <OpenButtonStyled
+          className="open-claim-button"
           icon={<FaMoneyBillWave />}
           onClick={() => setOpened(true)}
           label="Claim Quest"
