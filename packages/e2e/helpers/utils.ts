@@ -38,23 +38,16 @@ export async function waitForSelectorAndClick(queryOverride: string) {
   await elementToClick.click();
 }
 
-export async function waitForTestIdAndClick(testid: string) {
-  const elementToClick = await page.waitForSelector(
-    `[data-testid="${testid}"]`,
-  );
-  await elementToClick.click();
-}
-
 export async function sleep(timeout: number) {
   return new Promise((res) => setTimeout(res, timeout));
 }
 
 export async function executeTransaction() {
-  await page.waitForSelector('[data-testid="TX_WAITING_FOR_SIGNATURE"]');
+  await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
   await sleep(5000);
   await metamask.confirmTransaction();
   await page.bringToFront();
-  await page.waitForSelector('[data-testid="TX_STATUS_CONFIRMED"]', {
+  await page.waitForSelector('.TX_STATUS_CONFIRMED', {
     timeout: 120000,
   });
 }

@@ -6,7 +6,6 @@ import {
   gotoApp,
   sleep,
   waitForSelectorAndClick,
-  waitForTestIdAndClick,
 } from '../helpers/utils';
 
 describe('Create quest', () => {
@@ -27,14 +26,14 @@ describe('Create quest', () => {
     console.info('Dummy flag set');
     await sleep(3000);
     console.info('Sleep 2s');
-    await waitForTestIdAndClick('open-create-quest-btn');
+    await waitForSelectorAndClick('.open-create-quest-btn');
     console.info('Open create quest button clicked');
     const questTitle = await page.$eval(
       '#title',
       (element: HTMLInputElement) => element.value,
     );
     console.info('Quest title found');
-    await waitForTestIdAndClick('next-step-btn');
+    await waitForSelectorAndClick('.next-step-btn');
     console.info('Next step button clicked');
     await page.evaluate(`
                  document.querySelector('#bounty-wrapper input')?.focus();
@@ -47,7 +46,7 @@ describe('Create quest', () => {
     console.info('Bounty selected');
     await fillInputBySelector('#amount-bounty', '1');
     console.info('Bounty amount filled');
-    await waitForTestIdAndClick('complete-create-quest-btn');
+    await waitForSelectorAndClick('.complete-create-quest-btn');
     console.info('Complete create quest button clicked');
     try {
       await expectTextExistsInPage('Approving quest deposit');

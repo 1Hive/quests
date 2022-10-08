@@ -276,15 +276,15 @@ export default function QuestModal({
           openButton={
             buttonMode === 'link' ? (
               <ButtonLinkStyled
-                data-testid="open-create-quest-btn"
                 theme={theme}
                 onClick={onOpenButtonClick}
                 title="Create quest"
                 label={buttonLabel}
+                className="open-create-quest-btn"
               />
             ) : (
               <Button
-                data-testid="open-create-quest-btn"
+                className="open-create-quest-btn"
                 icon={<IconPlus />}
                 label={buttonLabel}
                 wide
@@ -360,13 +360,12 @@ export default function QuestModal({
                           </>
                         )}
                         <Button
-                          data-testid="complete-create-quest-btn"
                           key="btn-save"
                           label="Create"
                           mode="positive"
                           type="submit"
                           form="form-quest"
-                          className="m-8"
+                          className="m-8 complete-create-quest-btn"
                           title={
                             !questDeposit?.token
                               ? 'Not ready ...'
@@ -388,7 +387,6 @@ export default function QuestModal({
                       <>
                         <TextFieldInput
                           id="title"
-                          data-testid="title"
                           label="Title"
                           isEdit
                           placeHolder="Quest title"
