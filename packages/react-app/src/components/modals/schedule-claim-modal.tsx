@@ -319,7 +319,7 @@ export default function ScheduleClaimModal({
                     mode="positive"
                     type="submit"
                     form="form-claim"
-                    className="m-8"
+                    className="m-8 submit-claim-button"
                     title={!isFormValid ? 'Form not valid' : 'Claim Quest'}
                     disabled={!isEnoughBalance}
                   />

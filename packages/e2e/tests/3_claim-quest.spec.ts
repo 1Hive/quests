@@ -38,7 +38,10 @@ describe('Claim quest', () => {
     console.info('Claim amount filled');
     await fillInputBySelector('#contactInformation', claimPayload.contact);
     console.info('Contact filled');
-    await waitForSelectorAndClick('[type="submit"]');
+    await sleep(1000);
+    console.info('Slept 1000ms');
+    await waitForSelectorAndClick('.submit-claim-button:not([disabled])');
+    await sleep(1000000);
     console.info('Submit button clicked');
     try {
       await expectTextExistsInPage('Approving claim deposit');

@@ -41,8 +41,9 @@ describe('Create quest', () => {
              `);
     console.info('Bounty input focused');
     await sleep(200);
-    console.info('Sleep 200ms');
+    console.info('Slept 200ms');
     await waitForSelectorAndClick('#bounty-wrapper li button');
+    console.info('Bounty token selected');
     await waitForSelectorAndClick('.complete-create-quest-btn');
     console.info('Complete create quest button clicked');
     try {
