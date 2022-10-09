@@ -1,9 +1,14 @@
 import { config } from 'dotenv';
+import { WaitForSelectorOptions } from 'puppeteer';
 
 config();
 
-export async function gotoApp() {
-  return page.goto(process.env.E2E_DEPLOYMENT_URL_BASE);
+export async function gotoApp(chainId?: string) {
+  return page.goto(
+    `${process.env.E2E_DEPLOYMENT_URL_BASE}/chainId=${
+      chainId ?? process.env.E2E_CHAIN_ID ?? ''
+    }`,
+  );
 }
 
 export async function connectWithMetamask() {
@@ -11,20 +16,18 @@ export async function connectWithMetamask() {
     await metamask.switchNetwork('goerli');
     await page.bringToFront();
     console.info('Page brought to front');
-    const accountButton = await page.waitForSelector('#account-button');
-    console.info('Account button found');
-    await accountButton?.click();
-    console.info(' Account button clicked');
-    const metamaskButton = await page.waitForSelector('#injected');
-    console.info('Metamask button found');
-    await metamaskButton?.click();
+    await waitForSelectorAndClick('#account-button', {
+      timeout: 5000,
+    });
+    console.info('Account button clicked');
+    await waitForSelectorAndClick('#injected');
     console.info('Metamask button clicked');
-    console.info('Sleeping 2s...');
     await sleep(2000);
-    await metamask.approve();
+    console.info('Slept 2 sec');
+    await Promise.race([metamask.approve(), sleep(5000)]); // Wait for max 5 seconds
     console.info('Metamask approved');
-    console.info('Sleeping 2s...');
     await sleep(2000);
+    console.info('Slept 2 sec');
   } catch (error) {
     // Skip if already connected
     console.warn(error);
@@ -33,9 +36,13 @@ export async function connectWithMetamask() {
   console.info('Page brought to front');
 }
 
-export async function waitForSelectorAndClick(queryOverride: string) {
-  const elementToClick = await page.waitForSelector(queryOverride);
+export async function waitForSelectorAndClick(
+  cssSelector: string,
+  options?: WaitForSelectorOptions & { waitForNavigation?: boolean },
+) {
+  const elementToClick = await page.waitForSelector(cssSelector, options);
   await elementToClick.click();
+  await sleep(500);
 }
 
 export async function sleep(timeout: number) {
@@ -70,6 +77,15 @@ export async function expectTextExistsInPage(text: string, timeout = 2000) {
 }
 
 export async function fillInputBySelector(selector: string, value: string) {
-  await page.focus(selector);
-  await page.keyboard.type(value);
+  await page.type(selector, value);
+}
+
+/**
+ * Need to set {devtools: true} in jest-puppeteer.config.js
+ * @returns
+ */
+export function debug() {
+  return page.evaluate(() => {
+    debugger;
+  });
 }
