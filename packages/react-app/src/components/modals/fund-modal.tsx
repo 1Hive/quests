@@ -104,6 +104,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               />
             ),
             <Button
+              className="submit-fund-button"
               key="buttonFund"
               icon={<GiTwoCoins />}
               type="submit"

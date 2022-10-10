@@ -185,6 +185,7 @@ type Props = {
   error?: string | false;
   tagOnly?: boolean;
   showUsd?: boolean;
+  className?: string;
 };
 
 function AmountFieldInput({
@@ -206,6 +207,7 @@ function AmountFieldInput({
   reversed = false,
   tagOnly = false,
   showUsd = false,
+  className = '',
   error,
 }: Props) {
   const isMountedRef = useIsMountedRef();
@@ -435,7 +437,7 @@ function AmountFieldInput({
       compact={compact}
       direction={!!amountLabel || !!tokenLabel ? 'column' : 'row'}
       error={errorState}
-      className={!isEdit ? 'fit-content' : ''}
+      className={`${!isEdit ? 'fit-content' : ''} ${className}`}
     >
       {reversed ? [tokenField, amountField] : [amountField, tokenField]}
     </FieldInput>

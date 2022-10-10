@@ -341,6 +341,7 @@ export default function Quest({
                     <AmountFieldInput
                       id={`bounty-${questData?.address}`}
                       key={`bounty-${questData?.address}`}
+                      className="bounty"
                       compact
                       tagOnly
                       showUsd

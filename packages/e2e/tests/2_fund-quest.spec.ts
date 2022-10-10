@@ -4,7 +4,6 @@ import {
   expectTextExistsInPage,
   fillInputBySelector,
   gotoApp,
-  sleep,
   waitForSelectorAndClick,
 } from '../helpers/utils';
 
@@ -21,9 +20,30 @@ describe('Fund quest', () => {
   it('should have funded the quest', async () => {
     await waitForSelectorAndClick('.quest');
     console.info('Quest clicked');
+    const bountyText = await page.$eval(
+      '.bounty button',
+      (el) => el.textContent,
+    );
+    const bountyTextSplit = bountyText.split(' ');
+    const initialBounty = parseFloat(bountyTextSplit[0]);
+    const bountyToken = bountyTextSplit[1];
+    console.info('Initial bounty', initialBounty);
+    console.info('Bounty token', bountyToken);
     await page.waitForSelector('#title-wrapper');
     console.info('Quest loaded');
     await waitForSelectorAndClick('.open-fund-button');
-    await fillInputBySelector('#fundAmount', '2');
+    console.info('Fund button clicked');
+    const fundAmount = 1;
+    await fillInputBySelector('#fundAmount', fundAmount.toString());
+    console.info('Fund amount filled');
+    await waitForSelectorAndClick('.submit-fund-button:not([disabled])');
+    console.info('Submit button clicked');
+    await executeTransaction();
+    console.info('Fund transaction completed');
+    await waitForSelectorAndClick('[title="Close"]');
+    console.info('Modale closed');
+    await expectTextExistsInPage(
+      `${initialBounty + fundAmount} ${bountyToken}`,
+    );
   });
 });

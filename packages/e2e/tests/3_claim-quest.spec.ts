@@ -29,7 +29,9 @@ describe('Claim quest', () => {
         claimAmount: '1',
         contact: `Tester${Math.round(Math.random() * 1000000)}@gmail.com`,
       };
-      await waitForSelectorAndClick('.quest', { waitForNavigation: true });
+      await waitForSelectorAndClick('.quest', {
+        waitForNavigation: true,
+      });
       console.info('Quest clicked');
       await waitForSelectorAndClick('.open-claim-button');
       console.info('Open claim button clicked');
@@ -65,7 +67,9 @@ describe('Claim quest', () => {
         hidden: true,
       });
       console.info('Claim loaded');
-      await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
+      await page.reload({
+        waitUntil: ['networkidle0', 'domcontentloaded'],
+      });
       console.info('Page reloaded');
       await page.click('.claim-wrapper button.toggle-collapse-button');
       console.info('Claim expanded');
