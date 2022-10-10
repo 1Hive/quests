@@ -219,7 +219,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
   ]);
 
   return (
-    <>
+    <div className={`claim-wrapper ${isLoading ? 'loading' : ''}`}>
       <CollapsableBlock
         hideState
         visible
@@ -315,6 +315,6 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
           )}
         </EvidenceWrapperStyled>
       </CollapsableBlock>
-    </>
+    </div>
   );
 }

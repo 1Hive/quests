@@ -116,7 +116,10 @@ export function CollapsableBlock(props: Props) {
           >
             <LineStyled>
               <div className="btn-link">
-                <CollapseButtonStyled onClick={() => setCollapsed(!collapsed)}>
+                <CollapseButtonStyled
+                  onClick={() => setCollapsed(!collapsed)}
+                  className="toggle-collapse-button"
+                >
                   <CollapseButtonContentStyled theme={theme}>
                     <IconColumnStyled>
                       {collapsed ? (

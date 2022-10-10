@@ -111,7 +111,6 @@ export default function ScheduleClaimModal({
   const { setTransaction } = useTransactionContext();
   const modalId = useMemo(() => uniqueId('schedule-claim-modal'), []);
   const isMountedRef = useIsMountedRef();
-
   const willExpireBeforeClaim = useMemo(
     () => questData.expireTime.getTime() < Date.now() + DEFAULT_CLAIM_EXECUTION_DELAY_MS,
     [questData.expireTime],
@@ -129,19 +128,20 @@ export default function ScheduleClaimModal({
   const validate = (values: ClaimModel) => {
     const errors = {} as FormErrors<ClaimModel>;
     if (!values.evidence) errors.evidence = 'Evidence of completion is required';
-    if (!values.claimAll) {
-      if (values.claimedAmount.parsedAmount < 0) errors.claimedAmount = 'Claim amount is invalid';
-      else if (values.claimedAmount.parsedAmount > questTotalBounty!.parsedAmount)
-        errors.claimedAmount = 'Claim amount should not be higher than available bounty';
+    if (!values.claimAll && values.claimedAmount.parsedAmount < 0) {
+      errors.claimedAmount = 'Claim amount is invalid';
     }
 
     if (values.playerAddress) {
       try {
         values.playerAddress = toChecksumAddress(values.playerAddress);
       } catch (error) {
-        errors.playerAddress = 'Player address is not valid';
+        errors.playerAddress = 'Target wallet address is not valid';
       }
+    } else {
+      errors.playerAddress = 'Target wallet address is required';
     }
+
     debounceSave(values);
     setIsFormValid(Object.keys(errors).length === 0);
     return errors;
@@ -251,6 +251,7 @@ export default function ScheduleClaimModal({
       title="Schedule a Quest claim"
       openButton={
         <OpenButtonStyled
+          className="open-claim-button"
           icon={<FaMoneyBillWave />}
           onClick={() => setOpened(true)}
           label="Claim Quest"
@@ -271,7 +272,7 @@ export default function ScheduleClaimModal({
               ({ parsedAmount: 0, token: questTotalBounty?.token } as TokenAmountModel),
             claimAll: claimDataState.claimAll ?? false,
             contactInformation: claimDataState.contactInformation,
-            playerAddress: claimDataState.playerAddress,
+            playerAddress: claimDataState.playerAddress ?? walletAddress,
           } as any
         }
         onSubmit={(values) => {
@@ -318,9 +319,9 @@ export default function ScheduleClaimModal({
                     mode="positive"
                     type="submit"
                     form="form-claim"
-                    className="m-8"
+                    className="m-8 submit-claim-button"
                     title={!isFormValid ? 'Form not valid' : 'Claim Quest'}
-                    disabled={!isEnoughBalance}
+                    disabled={!isEnoughBalance || !isFormValid}
                   />
                 </>
               }
@@ -401,9 +402,9 @@ export default function ScheduleClaimModal({
                   <Outset horizontal>
                     <AddressFieldInput
                       id="playerAddress"
-                      label="Player address"
+                      label="Target wallet address"
                       value={values.playerAddress ?? walletAddress}
-                      tooltip="Usually set to the connected wallet but it can also be set to another address."
+                      tooltip="Its the wallet where the bounty should be sent. It could be a wallet address or any other valid Ethereum address."
                       error={touched.playerAddress && errors.playerAddress}
                       onBlur={handleBlur}
                       isEdit

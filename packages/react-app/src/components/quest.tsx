@@ -314,6 +314,7 @@ export default function Quest({
           condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
+              className="quest"
               to={
                 highlight
                   ? `/${ENUM_PAGES.Detail}?id=${questData?.address}&chainId=${chainId}`
@@ -340,6 +341,7 @@ export default function Quest({
                     <AmountFieldInput
                       id={`bounty-${questData?.address}`}
                       key={`bounty-${questData?.address}`}
+                      className="bounty"
                       compact
                       tagOnly
                       showUsd
