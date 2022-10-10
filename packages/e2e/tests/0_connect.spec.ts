@@ -4,8 +4,6 @@ import {
   waitForSelectorAndClick,
 } from '../helpers/utils';
 
-jest.retryTimes(3); // set maximum retries number
-
 describe('Goto app', () => {
   beforeAll(async () => {
     await gotoApp();

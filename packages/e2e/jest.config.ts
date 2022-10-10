@@ -9,5 +9,6 @@ const config: Config.InitialOptions = {
   testTimeout: 300000, // 5 minutes
   setupFilesAfterEnv: ['expect-puppeteer'],
   testSequencer: './helpers/test-sequencer.js',
+  testRunner: 'jest-circus/runner',
 };
 export default config;

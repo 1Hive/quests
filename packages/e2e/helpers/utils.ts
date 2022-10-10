@@ -3,6 +3,10 @@ import { WaitForSelectorOptions } from 'puppeteer';
 
 config();
 
+jest.retryTimes(
+  process.env.E2E_RETRY_TIMES ? parseInt(process.env.E2E_RETRY_TIMES, 10) : 1,
+);
+
 export async function gotoApp(chainId?: string) {
   return page.goto(
     `${process.env.E2E_DEPLOYMENT_URL_BASE}/chainId=${
@@ -55,7 +59,7 @@ export async function executeTransaction() {
   await metamask.confirmTransaction();
   await page.bringToFront();
   await page.waitForSelector('.TX_STATUS_CONFIRMED', {
-    timeout: 120000,
+    timeout: 300000, // 5 minutes
   });
 }
 
