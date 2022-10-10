@@ -39,6 +39,8 @@ jobs:
           E2E_RETRY_TIMES: ${{ secrets.E2E_RETRY_TIMES }}
         run: xvfb-run --auto-servernum yarn e2e
       - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
         with:
           name: Screenshots
           path: screenshots/
+          retention-days: 5

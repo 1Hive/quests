@@ -30,12 +30,13 @@ class DappeteerEnvironment extends NodeEnvironment {
   async handleTestEvent(event, state) {
     if (event.name === 'test_fn_failure') {
       const dir = './screenshots';
-      console.log({ state });
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
       this.global.page.screenshot({
-        path: `${dir}/${state.currentlyRunningTest.name}.png`,
+        path: `${dir}/${new Date().toTimeString()}-${
+          state.currentlyRunningTest.name
+        }.png`,
         type: 'png',
         fullPage: true,
       });
