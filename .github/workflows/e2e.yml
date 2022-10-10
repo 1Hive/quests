@@ -33,11 +33,15 @@ jobs:
           max_timeout: 1800 # 30 minutes
           check_interval: 10 # 10 seconds
       - name: Run E2E test
+        uses: nick-fields/retry@v2
         env:
           E2E_SECRET_WORDS: ${{ secrets.E2E_SECRET_WORDS }}
           E2E_DEPLOYMENT_URL_BASE: ${{ steps.waitForVercel.outputs.url }}
-          E2E_TRIES: ${{ secrets.E2E_TRIES }}
-        run: xvfb-run --auto-servernum yarn e2e
+        with:
+          timeout_minutes: 30
+          max_attempts: ${{ secrets.E2E_TRIES }}
+          shell: bash
+          command: xvfb-run --auto-servernum yarn e2e
       - uses: actions/upload-artifact@v3
         with:
           name: Screenshots
