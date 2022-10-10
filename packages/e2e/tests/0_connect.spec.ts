@@ -29,4 +29,8 @@ describe('Goto app', () => {
     await waitForSelectorAndClick('#deactivate-button');
     await expect(page).toMatchElement('#account-button');
   });
+
+  afterAll(async () => {
+    await page.close();
+  });
 });

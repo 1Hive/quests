@@ -81,4 +81,8 @@ describe('Claim quest', () => {
       throw error;
     }
   });
+
+  afterAll(async () => {
+    await page.close();
+  });
 });

@@ -46,4 +46,8 @@ describe('Fund quest', () => {
       `${initialBounty + fundAmount} ${bountyToken}`,
     );
   });
+
+  afterAll(async () => {
+    await page.close();
+  });
 });
