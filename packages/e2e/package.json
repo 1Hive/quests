@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "@chainsafe/dappeteer": "3.0.0",
+    "@jest/test-result": "^29.1.2",
+    "@jest/test-sequencer": "^29.1.2",
     "chalk": "^5.0.1",
     "dotenv": "^16.0.2",
     "expect-puppeteer": "^6.1.1",

@@ -10,5 +10,7 @@ const config: Config.InitialOptions = {
   setupFilesAfterEnv: ['expect-puppeteer'],
   testSequencer: './helpers/test-sequencer.js',
   testRunner: 'jest-circus/runner',
+  testEnvironment: './helpers/dappeteer-screenshot-on-failure-test-env.js',
+  globalTeardown: './helpers/keep-browser-open-teardown.js',
 };
 export default config;
