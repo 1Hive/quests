@@ -82,12 +82,9 @@ export async function expectTextExistsInPage(text: string, timeout = 2000) {
   const xp = `//*[contains(text(),'${text}')]`;
   try {
     console.info(`Looking for text "${text}" ...`);
-    const el = await page.waitForXPath(xp, {
+    await page.waitForXPath(xp, {
       timeout,
     });
-    if (!el) {
-      throw new Error();
-    }
     console.info(`Text found: "${text}"`);
   } catch (error) {
     if (error) console.error(error);
