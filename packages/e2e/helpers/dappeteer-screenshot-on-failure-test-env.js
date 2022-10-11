@@ -37,7 +37,10 @@ class DappeteerEnvironment extends NodeEnvironment {
         path: `${dir}/${state.currentlyRunningTest.name.replace(
           ' ',
           '-',
-        )}-${new Date().toLocaleTimeString().replace(/[ .]/gm, '')}.png`,
+        )}-${new Date()
+          .toLocaleTimeString()
+          .replace(/[ .]/gm, '')
+          .replace(':', '_')}.png`,
         type: 'png',
         fullPage: true,
       });
