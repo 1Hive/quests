@@ -38,9 +38,9 @@ class DappeteerEnvironment extends NodeEnvironment {
           ' ',
           '-',
         )}-${new Date()
-          .toLocaleTimeString()
-          .replace(/[ .]/gm, '')
-          .replace(':', '_')}.png`,
+          .toLocaleTimeString('fr')
+          .substring(0, 5)
+          .replace(':', 'h')}.png`,
         type: 'png',
         fullPage: true,
       });
