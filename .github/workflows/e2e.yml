@@ -42,5 +42,5 @@ jobs:
         if: ${{ failure() }}
         with:
           name: Screenshots
-          path: screenshots/
+          path: ./**/screenshots/*.png
           retention-days: 5
