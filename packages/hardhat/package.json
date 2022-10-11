@@ -68,6 +68,7 @@
     "send": "hardhat send",
     "generate": "hardhat generate",
     "account": "hardhat account",
-    "verify:rinkeby": "hardhat verify-quests-contracts --network rinkeby"
+    "verify:rinkeby": "hardhat verify-quests-contracts --network rinkeby",
+    "ci": "yarn install --pure-lockfile --immutable --skip-builds"
   }
 }

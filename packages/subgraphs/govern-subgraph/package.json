@@ -2,6 +2,7 @@
   "name": "@aragon/govern-subgraph",
   "version": "1.0.0-beta.12",
   "scripts": {
+    "ci": "yarn install --pure-lockfile --immutable --skip-builds",
     "prepare-goerli": "node ./scripts/sync-with-last-deploy.js goerli",
     "prepare-rinkeby": "node ./scripts/sync-with-last-deploy.js rinkeby",
     "prepare-gnosis": "node ./scripts/sync-with-last-deploy.js xdai",

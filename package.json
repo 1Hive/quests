@@ -10,7 +10,7 @@
   ],
   "private": true,
   "scripts": {
-    "ci": "yarn install --pure-lockfile --immutable",
+    "ci": "yarn install --pure-lockfile --immutable --skip-builds",
     "lint": "yarn workspace @1hive/quests-react-app lint",
     "chain": "yarn workspace @1hive/quests-hardhat chain",
     "test": "yarn workspace @1hive/quests-hardhat test",

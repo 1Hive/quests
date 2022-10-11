@@ -4,7 +4,8 @@
   "description": "e2e",
   "main": "dist/bundle.js",
   "scripts": {
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "ci": "yarn install --pure-lockfile --immutable --skip-builds"
   },
   "author": "",
   "license": "ISC",
