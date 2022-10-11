@@ -33,14 +33,14 @@ class DappeteerEnvironment extends NodeEnvironment {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
+      const date = new Date();
+      const timeFormated = `${date.getHours()}h${date.getMinutes()}m${date.getSeconds()}s`;
+
       this.global.page.screenshot({
         path: `${dir}/${state.currentlyRunningTest.name.replace(
           ' ',
           '-',
-        )}-${new Date()
-          .toLocaleTimeString('fr')
-          .substring(0, 5)
-          .replace(':', 'h')}.png`,
+        )}-${timeFormated}.png`,
         type: 'png',
         fullPage: true,
       });
