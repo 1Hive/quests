@@ -13,7 +13,6 @@ describe('Claim quest', () => {
   beforeAll(async () => {
     await gotoApp();
     await connectWithMetamask();
-    await connectWithMetamask();
   });
 
   beforeEach(async () => {
