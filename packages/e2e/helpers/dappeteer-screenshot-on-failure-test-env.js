@@ -34,9 +34,9 @@ class DappeteerEnvironment extends NodeEnvironment {
         fs.mkdirSync(dir);
       }
       this.global.page.screenshot({
-        path: `${dir}/${
-          state.currentlyRunningTest.name
-        }-${new Date().toLocaleTimeString()}.png`,
+        path: `${dir}/${state.currentlyRunningTest.name}-${new Date()
+          .toLocaleTimeString()
+          .replace(' ', '')}.png`,
         type: 'png',
         fullPage: true,
       });
