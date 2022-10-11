@@ -45,8 +45,23 @@ export async function waitForSelectorAndClick(
   options?: WaitForSelectorOptions & { waitForNavigation?: boolean },
 ) {
   const elementToClick = await page.waitForSelector(cssSelector, options);
+  if (!elementToClick) {
+    throw new Error(`Element not found with: ${cssSelector}`);
+  }
   await elementToClick.click();
   await sleep(500);
+}
+
+export async function waitForSelectorAndEval<TResult = any>(
+  cssSelector: string,
+  evalFunction: (element: Element) => TResult,
+  options?: WaitForSelectorOptions & { waitForNavigation?: boolean },
+) {
+  const elementToClick = await page.waitForSelector(cssSelector, options);
+  if (!elementToClick) {
+    throw new Error(`Element not found with: ${cssSelector}`);
+  }
+  return page.$eval(cssSelector, evalFunction);
 }
 
 export async function sleep(timeout: number) {

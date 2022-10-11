@@ -1,3 +1,4 @@
+import { ElementHandle } from 'puppeteer';
 import {
   connectWithMetamask,
   executeTransaction,
@@ -6,6 +7,7 @@ import {
   gotoApp,
   sleep,
   waitForSelectorAndClick,
+  waitForSelectorAndEval,
 } from '../helpers/utils';
 
 describe('Create quest', () => {
@@ -28,9 +30,9 @@ describe('Create quest', () => {
     console.info('Sleep 2s');
     await waitForSelectorAndClick('.open-create-quest-btn');
     console.info('Open create quest button clicked');
-    const questTitle = await page.$eval(
+    const questTitle = await waitForSelectorAndEval(
       '#title',
-      (element: HTMLInputElement) => element.value,
+      (element) => (element as HTMLInputElement).value,
     );
     console.info('Quest title found');
     await waitForSelectorAndClick('.next-step-btn');
@@ -59,9 +61,5 @@ describe('Create quest', () => {
     await waitForSelectorAndClick('[title="Close"]');
     console.info('Modale closed');
     await expectTextExistsInPage(questTitle, 60000);
-  });
-
-  afterAll(async () => {
-    await page.close();
   });
 });

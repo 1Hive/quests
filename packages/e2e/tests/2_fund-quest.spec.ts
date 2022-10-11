@@ -5,6 +5,7 @@ import {
   fillInputBySelector,
   gotoApp,
   waitForSelectorAndClick,
+  waitForSelectorAndEval,
 } from '../helpers/utils';
 
 describe('Fund quest', () => {
@@ -20,9 +21,9 @@ describe('Fund quest', () => {
   it('should have funded the quest', async () => {
     await waitForSelectorAndClick('.quest');
     console.info('Quest clicked');
-    const bountyText = await page.$eval(
+    const bountyText = await waitForSelectorAndEval(
       '.bounty button',
-      (el) => el.textContent,
+      (el) => el.textContent!,
     );
     const bountyTextSplit = bountyText.split(' ');
     const initialBounty = parseFloat(bountyTextSplit[0]);
@@ -45,9 +46,5 @@ describe('Fund quest', () => {
     await expectTextExistsInPage(
       `${initialBounty + fundAmount} ${bountyToken}`,
     );
-  });
-
-  afterAll(async () => {
-    await page.close();
   });
 });
