@@ -16,6 +16,7 @@ describe('Fund quest', () => {
 
   beforeEach(async () => {
     await page.bringToFront();
+    await page.reload(); // Reload the page to reset the state
   });
 
   it('should have funded the quest', async () => {

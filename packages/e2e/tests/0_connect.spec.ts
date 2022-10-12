@@ -11,6 +11,7 @@ describe('Goto app', () => {
 
   beforeEach(async () => {
     await page.bringToFront();
+    await page.reload(); // Reload the page to reset the state
   });
 
   it('should be titled "Quests"', async () => {

@@ -17,6 +17,7 @@ describe('Claim quest', () => {
 
   beforeEach(async () => {
     await page.bringToFront();
+    await page.reload(); // Reload the page to reset the state
   });
 
   it('should claim quest', async () => {
