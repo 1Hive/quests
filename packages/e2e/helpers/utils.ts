@@ -85,7 +85,7 @@ export async function executeTransaction() {
   await page.bringToFront();
   try {
     await page.waitForSelector('.TX_STATUS_CONFIRMED', {
-      timeout: 300000, // 5 minutes
+      timeout: 600000, // 10 minutes
     });
   } catch (error) {
     console.error(error);
