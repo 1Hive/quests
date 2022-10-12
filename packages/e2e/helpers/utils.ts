@@ -69,6 +69,7 @@ export async function sleep(timeout: number) {
 }
 
 export async function executeTransaction() {
+  console.info('Executing transaction...');
   await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
   await sleep(5000);
   try {
