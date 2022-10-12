@@ -42,7 +42,7 @@ jobs:
       - uses: tanmen/jest-reporter@v1
         if: always()
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           result-file: packages/e2e/output/jest-reporter.json
           action-name: Run E2E test
       - uses: actions/upload-artifact@v3
