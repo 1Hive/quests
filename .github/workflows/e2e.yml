@@ -8,12 +8,12 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
       - name: Use Node.js 16
         uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Cache yarn modules
         uses: actions/cache@v2
         with:
@@ -39,9 +39,15 @@ jobs:
           E2E_DEPLOYMENT_URL_BASE: https://quests-git-dev-1hive.vercel.app/
           E2E_RETRY_TIMES: ${{ secrets.E2E_RETRY_TIMES }}
         run: xvfb-run --auto-servernum yarn e2e
+      - uses: tanmen/jest-reporter@v1
+        if: always()
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          result-file: packages/e2e/output/jest-reporter.json
+          action-name: Run E2E test
       - uses: actions/upload-artifact@v3
         if: ${{ failure() }}
         with:
           name: Screenshots
-          path: ./**/screenshots/*.png
+          path: ./**/output/screenshots/*.png
           retention-days: 5

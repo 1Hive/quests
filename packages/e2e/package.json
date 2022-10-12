@@ -4,7 +4,7 @@
   "description": "e2e",
   "main": "dist/bundle.js",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --json --outputFile=output/jest-reporter.json --testLocationInResults",
     "ci": "yarn install --pure-lockfile --immutable --skip-builds"
   },
   "author": "",

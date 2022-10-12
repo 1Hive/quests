@@ -29,18 +29,20 @@ class DappeteerEnvironment extends NodeEnvironment {
 
   async handleTestEvent(event, state) {
     if (event.name === 'test_fn_failure') {
-      const dir = './screenshots';
+      const dir = './output/screenshots';
       if (!fs.existsSync(dir)) {
+        if (!fs.existsSync('./output')) {
+          fs.mkdirSync('./output');
+        }
         fs.mkdirSync(dir);
       }
       const date = new Date();
       const timeFormated = `${date.getHours()}h${date.getMinutes()}m${date.getSeconds()}s`;
 
       this.global.page.screenshot({
-        path: `${dir}/${state.currentlyRunningTest.name.replace(
-          ' ',
-          '-',
-        )}-${timeFormated}.png`,
+        path: `${dir}/${state.currentlyRunningTest.name
+          .replaceAll(' ', '-')
+          .replaceAll('"', '')}-${timeFormated}.png`,
         type: 'png',
         fullPage: true,
       });
