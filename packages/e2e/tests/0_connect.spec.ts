@@ -15,7 +15,7 @@ describe('Goto app', () => {
   });
 
   it('should be titled "Quests"', async () => {
-    await expect(page.title()).resolves.toMatch('Quests');
+    await expect(page.title()).toMatch('Quests');
   });
 
   it('should connect with metamask', async () => {
@@ -24,7 +24,7 @@ describe('Goto app', () => {
   });
 
   it('should disconnect', async () => {
-    await waitForSelectorAndClick('.connected');
+    await waitForSelectorAndClick('.connected button');
     await waitForSelectorAndClick('#deactivate-button');
     await expect(page).toMatchElement('#account-button');
   });
