@@ -1,31 +1,35 @@
 {
-  "name": "@1hive/quests-subgraph",
-  "license": "UNLICENSED",
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "prepare:test": "mustache config/test.json src/test.template.yaml > test.yaml -p src/questFactory.yaml",
-    "prepare:rinkeby": "node ./sync-with-last-deploy.js rinkeby V2 && mustache config/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
-    "prepare:local": "node ./sync-with-last-deploy.js localhost V2 && mustache config/localhost.json src/subgraph.template.yaml > subgraph.yaml",
-    "prepare:gnosis": "node ./sync-with-last-deploy.js xdai V2 && mustache config/gnosis.json src/subgraph.template.yaml > subgraph.yaml",
-    "codegen": "graph codegen",
-    "build": "graph codegen && graph build",
-    "create-local": "graph create --node http://0.0.0.0:8020/ corantin/quests-subgraph",
-    "remove-local": "graph remove --node http://0.0.0.0:8020/ corantin/quests-subgraph",
-    "deploy:p:rinkeby": "yarn prepare:rinkeby && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph",
-    "deploy:rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph",
-    "deploy:staging-rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
-    "deploy:gnosis": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-gnosis",
-    "deploy:local": "graph deploy --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020 corantin/quests-subgraph",
-    "hardhat:deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local && yarn workspace @1hive/quests-hardhat postdeploy"
-  },
-  "dependencies": {
-    "@graphprotocol/graph-cli": "^0.23.2",
-    "@graphprotocol/graph-ts": "^0.23.1",
-    "configstore": "^6.0.0",
-    "inquirer": "^8.2.4",
-    "js-yaml": "^4.1.0",
-    "minimist": "^1.2.6",
-    "mustache": "^4.2.0"
-  }
+    "name": "@1hive/quests-subgraph",
+    "license": "UNLICENSED",
+    "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "ci": "yarn install --pure-lockfile --immutable --skip-builds",
+        "prepare:test": "mustache config/test.json src/test.template.yaml > test.yaml -p src/questFactory.yaml",
+        "prepare:goerli": "node ./sync-with-last-deploy.js goerli V1 && mustache config/goerli.json src/subgraph.template.yaml > subgraph.yaml",
+        "prepare:rinkeby": "node ./sync-with-last-deploy.js rinkeby V2 && mustache config/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
+        "prepare:local": "node ./sync-with-last-deploy.js localhost V2 && mustache config/localhost.json src/subgraph.template.yaml > subgraph.yaml",
+        "prepare:gnosis": "node ./sync-with-last-deploy.js xdai V2 && mustache config/gnosis.json src/subgraph.template.yaml > subgraph.yaml",
+        "codegen": "graph codegen",
+        "build": "graph codegen && graph build",
+        "create-local": "graph create --node http://0.0.0.0:8020/ corantin/quests-subgraph",
+        "remove-local": "graph remove --node http://0.0.0.0:8020/ corantin/quests-subgraph",
+        "deploy:p:rinkeby": "yarn prepare:rinkeby && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph",
+        "deploy:rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph",
+        "deploy:goerli": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-goerli",
+        "deploy:staging-goerli": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-goerli-staging",
+        "deploy:staging-rinkeby": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
+        "deploy:gnosis": "graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-gnosis",
+        "deploy:local": "graph deploy --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020 corantin/quests-subgraph",
+        "hardhat:deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local && yarn workspace @1hive/quests-hardhat postdeploy"
+    },
+    "dependencies": {
+        "@graphprotocol/graph-cli": "^0.23.2",
+        "@graphprotocol/graph-ts": "^0.23.1",
+        "configstore": "^6.0.0",
+        "inquirer": "^8.2.4",
+        "js-yaml": "^4.1.0",
+        "minimist": "^1.2.6",
+        "mustache": "^4.2.0"
+    }
 }

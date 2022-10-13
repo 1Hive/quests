@@ -47,6 +47,7 @@ import {
   getQuestContract,
   getGovernQueueContract,
   getCelesteDisputeManagerContract,
+  getCelesteContract,
 } from '../utils/contract.util';
 import { getLastBlockTimestamp } from '../utils/date.utils';
 import { cacheFetchBalance, cacheFetchTokenPrice } from './cache.service';
@@ -64,6 +65,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       address: questAddress,
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
+      communicationLink: questEntity.questCommunicationLink,
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
@@ -525,7 +527,10 @@ export async function saveQuest(
 ): Promise<ethers.ContractReceipt | null> {
   if (address) throw Error('Saving existing quest is not yet implemented');
   Logger.debug('Saving quest...', { fallbackAddress, data, address });
-  const ipfsHash = await pushObjectToIpfs(data.description ?? '');
+  const ipfsHash = await pushObjectToIpfs({
+    description: data.description ?? '',
+    communicationLink: data.communicationLink,
+  });
   const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
   const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,
@@ -781,10 +786,12 @@ export async function resolveClaimChallenge(
 
 // #region Celeste
 
-export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
-  const celesteContract = await getCelesteDisputeManagerContract();
+export async function fetchChallengeFee(
+  celesteAddressOverride?: string,
+): Promise<TokenAmountModel | null> {
+  const celesteContract = await getCelesteContract(celesteAddressOverride);
   if (!celesteContract) return null;
-  const [feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
   const token = await getTokenInfo(feeToken);
   if (!token) return null;
   return toTokenAmountModel({
@@ -796,11 +803,11 @@ export async function fetchChallengeFee(): Promise<TokenAmountModel | null> {
 export async function fetchChallengeDispute(
   challenge: ChallengeModel,
 ): Promise<DisputeModel | null> {
-  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract();
+  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract(challenge.resolver);
   if (!celesteDisputeManagerContract) {
     return null;
   }
-  if (!challenge.disputeId) {
+  if (challenge.disputeId === undefined) {
     throw new Error('Dispute does not exist yet, please try again later');
   }
   let finalRuling;

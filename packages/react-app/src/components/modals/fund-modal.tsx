@@ -88,6 +88,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           openButton={
             <OpenButtonStyled
               icon={<GiTwoCoins />}
+              className="open-fund-button"
               onClick={() => setOpened(true)}
               label="Fund"
               mode="strong"
@@ -103,6 +104,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               />
             ),
             <Button
+              className="submit-fund-button"
               key="buttonFund"
               icon={<GiTwoCoins />}
               type="submit"

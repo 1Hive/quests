@@ -1,0 +1,47 @@
+name: E2E
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, dev]
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-v${{ secrets.YARN_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}
+      - name: Install dependencies
+        run: yarn ci
+        shell: bash
+      - name: Install xvfb
+        run: sudo apt-get install xvfb
+      # Wait for deployment to be ready, before running E2E
+      # - name: Wait for deployment to be ready
+      #   uses: patrickedqvist/wait-for-vercel-preview@v1.2.0
+      #   id: waitForVercel
+      #   with:
+      #     token: ${{ secrets.GH_PAT }}
+      #     max_timeout: 1800 # 30 minutes
+      #     check_interval: 10 # 10 seconds
+      - name: Run E2E test
+        env:
+          E2E_SECRET_WORDS: ${{ secrets.E2E_SECRET_WORDS }}
+          # E2E_DEPLOYMENT_URL_BASE: ${{ steps.waitForVercel.outputs.url }}
+          E2E_DEPLOYMENT_URL_BASE: https://quests-git-dev-1hive.vercel.app/
+          E2E_RETRY_TIMES: ${{ secrets.E2E_RETRY_TIMES }}
+        run: xvfb-run --auto-servernum yarn e2e
+      - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: Screenshots
+          path: ./**/output/screenshots/*.png
+          retention-days: 5

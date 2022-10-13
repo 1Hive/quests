@@ -93,7 +93,13 @@ export default function Stepper({ steps, submitButton, onNext, onBack }: Props) 
           onClick={previousStep}
         />
         {!isSubmitStep ? (
-          <QuestActionButtonStyled visible label="Next" mode="positive" onClick={nextStep} />
+          <QuestActionButtonStyled
+            className="next-step-btn"
+            visible
+            label="Next"
+            mode="positive"
+            onClick={nextStep}
+          />
         ) : (
           <ConditionalWrapper
             condition={below('medium')}

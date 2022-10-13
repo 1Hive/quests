@@ -6,29 +6,36 @@ on:
     branches: [main, dev]
 jobs:
   LintBuild:
-    name: Lint and build
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-v${{ secrets.YARN_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}
       - name: Case Sensitivity Checker
         uses: credfeto/action-case-checker@v1.1
       - name: Install
         run: yarn ci
       - name: Lint
         run: yarn lint
-      - name: Build
-        run: yarn build
 
   coverage:
     name: Contract coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: 14.17.0
+          node-version: 16
 
       - name: Cache yarn modules
         uses: actions/cache@v2

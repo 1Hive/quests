@@ -4,8 +4,7 @@
 
 /* eslint-disable consistent-return */
 
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 export const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;

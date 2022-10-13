@@ -18,6 +18,7 @@ export class QuestEntity extends Entity {
 
     this.set("questAddress", Value.fromString(""));
     this.set("questTitle", Value.fromString(""));
+    this.set("questDescription", Value.fromString(""));
     this.set("questDetailsRef", Value.fromBytes(Bytes.empty()));
     this.set("questRewardTokenAddress", Value.fromBytes(Bytes.empty()));
     this.set("creationTimestamp", Value.fromBigInt(BigInt.zero()));
@@ -71,8 +72,17 @@ export class QuestEntity extends Entity {
     this.set("questTitle", Value.fromString(value));
   }
 
-  get questDescription(): string | null {
+  get questDescription(): string {
     let value = this.get("questDescription");
+    return value!.toString();
+  }
+
+  set questDescription(value: string) {
+    this.set("questDescription", Value.fromString(value));
+  }
+
+  get questCommunicationLink(): string | null {
+    let value = this.get("questCommunicationLink");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -80,11 +90,11 @@ export class QuestEntity extends Entity {
     }
   }
 
-  set questDescription(value: string | null) {
+  set questCommunicationLink(value: string | null) {
     if (!value) {
-      this.unset("questDescription");
+      this.unset("questCommunicationLink");
     } else {
-      this.set("questDescription", Value.fromString(<string>value));
+      this.set("questCommunicationLink", Value.fromString(<string>value));
     }
   }
 

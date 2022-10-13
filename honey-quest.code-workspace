@@ -4,6 +4,7 @@
     { "name": "Hardhat", "path": "./packages/hardhat" },
     { "name": "Subgraph", "path": "./packages/subgraphs" },
     { "name": "Services", "path": "./packages/services" },
+    { "name": "E2E", "path": "./packages/e2e" },
     { "name": "Root", "path": "." }
   ],
   "settings": {

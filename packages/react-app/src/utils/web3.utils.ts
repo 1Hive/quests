@@ -76,6 +76,7 @@ export function getNetworkId(chainId = getCurrentChain()) {
   if (+chainId === 1) key = 'mainnet';
   if (+chainId === 3) key = 'ropsten';
   if (+chainId === 4) key = 'rinkeby';
+  if (+chainId === 5) key = 'goerli';
   if (+chainId === 100) key = 'gnosis';
   if (+chainId === 1337) key = 'local';
   if (key) {
@@ -105,6 +106,7 @@ export function getNetworkName(chainId = getCurrentChain()) {
   if (chainIdStr === '1') return 'Mainnet';
   if (chainIdStr === '3') return 'Ropsten';
   if (chainIdStr === '4') return 'Rinkeby';
+  if (chainIdStr === '5') return 'Goerli';
   if (chainIdStr === '100') return 'Gnosis';
 
   return 'unknown';
@@ -164,10 +166,10 @@ export function getRpcUrl(chainId?: number) {
 }
 
 export function getExplorerUrl(chainId?: number) {
-  const { explorer } = getNetwork(chainId);
+  const { explorer, networkId } = getNetwork(chainId);
   switch (explorer) {
     case 'etherscan':
-      return 'https://rinkeby.etherscan.io';
+      return `https://${networkId}.etherscan.io`;
     case 'blockscout':
       return 'https://blockscout.com/xdai/mainnet';
     case 'polygonscan':

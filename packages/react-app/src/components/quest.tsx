@@ -77,7 +77,9 @@ const QuestFooterStyled = styled.div`
   flex-wrap: wrap;
   row-gap: ${GUpx(2)};
 `;
-
+const LinkWrapperStyled = styled.div`
+  padding-top: ${GUpx(2)};
+`;
 const RowStyled = styled.div`
   display: flex;
   width: 100%;
@@ -93,6 +95,10 @@ const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  .UjkFY a {
+    word-wrap: break-word;
+  }
 `;
 
 const BountyWrapperStyled = styled.div`
@@ -308,6 +314,7 @@ export default function Quest({
           condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
+              className="quest"
               to={
                 highlight
                   ? `/${ENUM_PAGES.Detail}?id=${questData?.address}&chainId=${chainId}`
@@ -334,6 +341,7 @@ export default function Quest({
                     <AmountFieldInput
                       id={`bounty-${questData?.address}`}
                       key={`bounty-${questData?.address}`}
+                      className="bounty"
                       compact
                       tagOnly
                       showUsd
@@ -358,6 +366,19 @@ export default function Quest({
                 maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
                 wide
               />
+              {!isSummary && (
+                <LinkWrapperStyled>
+                  <TextFieldInput
+                    id="communication-link"
+                    label={isSummary ? undefined : 'Communication method'}
+                    value={questData?.communicationLink ?? '*No communication link provided*'}
+                    isLoading={isLoading || !questData}
+                    isMarkDown
+                    wide
+                    compact
+                  />
+                </LinkWrapperStyled>
+              )}
             </HeaderWrapperStyled>
 
             {isSummary && fieldsRow}

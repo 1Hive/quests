@@ -1,38 +1,35 @@
 type _Schema_
-  @fulltext(
-    name: "questSearch"
-    language: en
-    algorithm: rank
-    include: [
-      {
-        entity: "QuestEntity"
-        fields: [
-          { name: "questAddress" }
-          { name: "questTitle" }
-          { name: "questDescription" }
+    @fulltext(
+        name: "questSearch"
+        language: en
+        algorithm: rank
+        include: [
+            {
+                entity: "QuestEntity"
+                fields: [{ name: "questAddress" }, { name: "questTitle" }, { name: "questDescription" }]
+            }
         ]
-      }
-    ]
-  )
+    )
 
 type QuestEntity @entity(immutable: true) {
-  id: ID!
-  questAddress: String!
-  questTitle: String!
-  questDescription: String
-  questExpireTimeSec: BigInt
-  questDetailsRef: Bytes!
-  questRewardTokenAddress: Bytes!
-  creationTimestamp: BigInt!
-  questFundsRecoveryAddress: Bytes!
-  questCreator: Bytes!
-  depositToken: Bytes!
-  depositAmount: BigInt!
+    id: ID!
+    questAddress: String!
+    questTitle: String!
+    questDescription: String!
+    questCommunicationLink: String
+    questExpireTimeSec: BigInt
+    questDetailsRef: Bytes!
+    questRewardTokenAddress: Bytes!
+    creationTimestamp: BigInt!
+    questFundsRecoveryAddress: Bytes!
+    questCreator: Bytes!
+    depositToken: Bytes!
+    depositAmount: BigInt!
 }
 
 type DepositEntity @entity(immutable: true) {
-  id: ID!
-  timestamp: BigInt!
-  depositToken: Bytes!
-  depositAmount: BigInt!
+    id: ID!
+    timestamp: BigInt!
+    depositToken: Bytes!
+    depositAmount: BigInt!
 }

@@ -34,7 +34,7 @@ export default async (
   });
   await ethers.getContract("QuestFactory", deployResult.address);
 
-  if (network.name === "rinkeby") {
+  if (network.name === "rinkeby" || network.name === "goerli") {
     try {
       console.log("Verifying QuestFactory...");
       await new Promise((res, rej) => {

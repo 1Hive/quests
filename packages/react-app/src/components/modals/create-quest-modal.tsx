@@ -132,10 +132,6 @@ export default function QuestModal({
         setButtonLabel('Update quest');
         break;
 
-      case ENUM_QUEST_VIEW_MODE.ReadDetail:
-        setButtonLabel('Details');
-        break;
-
       default:
         break;
     }
@@ -284,9 +280,11 @@ export default function QuestModal({
                 onClick={onOpenButtonClick}
                 title="Create quest"
                 label={buttonLabel}
+                className="open-create-quest-btn"
               />
             ) : (
               <Button
+                className="open-create-quest-btn"
                 icon={<IconPlus />}
                 label={buttonLabel}
                 wide
@@ -367,7 +365,7 @@ export default function QuestModal({
                           mode="positive"
                           type="submit"
                           form="form-quest"
-                          className="m-8"
+                          className="m-8 complete-create-quest-btn"
                           title={
                             !questDeposit?.token
                               ? 'Not ready ...'
@@ -501,6 +499,17 @@ export default function QuestModal({
                           onBlur={handleBlur}
                           error={touched.fallbackAddress && errors.fallbackAddress}
                           onChange={handleChange}
+                          wide
+                        />
+                        <TextFieldInput
+                          id="communicationLink"
+                          label="Communication link"
+                          value={values.communicationLink}
+                          tooltip="The link to the discussion platform. It could be a forum, a discord username or any desired communication platform"
+                          isEdit
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          placeHolder="Quest communication link"
                           wide
                         />
                       </>,

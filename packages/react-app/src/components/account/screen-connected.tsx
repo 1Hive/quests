@@ -149,6 +149,7 @@ function AccountScreenConnected({ wallet }: Props) {
       </div>
 
       <Button
+        id="deactivate-button"
         onClick={handleDeactivate}
         wide
         css={`

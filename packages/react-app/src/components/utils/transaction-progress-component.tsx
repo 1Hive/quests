@@ -73,7 +73,9 @@ export function TransactionProgressComponent() {
           animated={transaction?.status === ENUM_TRANSACTION_STATUS.Pending}
           color={logoColor}
         />
-        <TransactionTitleStyled>{transaction?.message}</TransactionTitleStyled>
+        <TransactionTitleStyled className={transaction?.status}>
+          {transaction?.message}
+        </TransactionTitleStyled>
         <MessageStyled messageColor={messageColor}>{message}</MessageStyled>
         {transaction?.hash && (
           <TransactionBadge
