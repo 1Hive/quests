@@ -39,12 +39,6 @@ jobs:
           E2E_DEPLOYMENT_URL_BASE: https://quests-git-dev-1hive.vercel.app/
           E2E_RETRY_TIMES: ${{ secrets.E2E_RETRY_TIMES }}
         run: xvfb-run --auto-servernum yarn e2e
-      - uses: tanmen/jest-reporter@v1
-        if: always()
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          result-file: packages/e2e/output/jest-reporter.json
-          action-name: Run E2E test
       - uses: actions/upload-artifact@v3
         if: ${{ failure() }}
         with:
