@@ -4,6 +4,7 @@ import {
   expectTextExistsInPage,
   fillInputBySelector,
   gotoApp,
+  sleep,
   waitForSelectorAndClick,
   waitForSelectorAndEval,
 } from '../helpers/utils';
@@ -17,6 +18,7 @@ describe('Fund quest', () => {
   beforeEach(async () => {
     await page.bringToFront();
     await page.reload(); // Reload the page to reset the state
+    await page.waitForNetworkIdle();
   });
 
   it('should have funded the quest', async () => {
@@ -44,6 +46,7 @@ describe('Fund quest', () => {
     console.info('Fund transaction completed');
     await waitForSelectorAndClick('[title="Close"]');
     console.info('Modale closed');
+    await sleep(1000); // Waiting for balance to be fetched
     await expectTextExistsInPage(
       `${initialBounty + fundAmount} ${bountyToken}`,
     );

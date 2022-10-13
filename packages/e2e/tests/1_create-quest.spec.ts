@@ -19,6 +19,7 @@ describe('Create quest', () => {
   beforeEach(async () => {
     await page.bringToFront();
     await page.reload(); // Reload the page to reset the state
+    await page.waitForNetworkIdle();
   });
 
   it('should have the quest created', async () => {

@@ -12,10 +12,11 @@ describe('Goto app', () => {
   beforeEach(async () => {
     await page.bringToFront();
     await page.reload(); // Reload the page to reset the state
+    await page.waitForNetworkIdle();
   });
 
   it('should be titled "Quests"', async () => {
-    await expect(page.title()).toMatch('Quests');
+    await expect(page.title()).resolves.toMatch('Quests');
   });
 
   it('should connect with metamask', async () => {

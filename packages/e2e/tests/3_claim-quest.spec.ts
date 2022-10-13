@@ -18,6 +18,7 @@ describe('Claim quest', () => {
   beforeEach(async () => {
     await page.bringToFront();
     await page.reload(); // Reload the page to reset the state
+    await page.waitForNetworkIdle();
   });
 
   it('should claim quest', async () => {
