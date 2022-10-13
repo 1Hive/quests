@@ -18,7 +18,7 @@ describe('Create quest', () => {
 
   beforeEach(async () => {
     await page.bringToFront();
-    await page.reload(); // Reload the page to reset the state
+    await gotoApp(); // Make sure start from home page
     await page.waitForNetworkIdle();
   });
 
