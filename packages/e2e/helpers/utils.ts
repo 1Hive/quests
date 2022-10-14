@@ -71,24 +71,25 @@ export async function sleep(timeout: number) {
 }
 
 export async function executeTransaction() {
-  console.info('Executing transaction...');
   await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
-  let timeout = 5000; // 5 seconds
+  let timeout = 10000; // 5 seconds
   await sleep(timeout); // Wait for gas suggestion to be fetched
   try {
     await metamask.confirmTransaction();
   } catch (error) {
     console.warn(
-      `Timeout ${timeout}ms: Metamask confirm transaction failed, retrying...`,
+      `Timeout: Metamask confirm transaction failed, retrying...`,
       error.message || error,
     );
     try {
+      await page.bringToFront();
       await metamask.confirmTransaction();
     } catch (err) {
       console.error(err);
-      throw new Error('Metamask confirm transaction failed');
+      throw new Error('Metamask confirm transaction failed.');
     }
   }
+  console.info('Executing transaction...');
   await page.bringToFront();
   timeout = 300000; // 10 minutes
   try {
@@ -128,3 +129,13 @@ export function debug() {
     debugger;
   });
 }
+
+// async function confirmTransactionForce() {
+//   const newPage = await browser.newPage();
+//   await page.goto(
+//     'chrome-extension://nloekkhijkhcemdonjgjhpfckgnbegln/home.html', // Open metamask in a new tab
+//   );
+//   await sleep(3000);
+//   await Promise.race([metamask.confirmTransaction(), sleep(5000)]); // Wait for max 5 seconds
+//   await page.bringToFront();
+// }
