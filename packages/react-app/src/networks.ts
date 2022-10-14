@@ -12,7 +12,7 @@ export const networks = Object.freeze({
   rinkeby: {
     networkId: 'rinkeby',
     chainId: 4,
-    name: 'Rinkeby',
+    name: 'Rinkeby (deprecated)',
     explorer: 'etherscan',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-rinkeby',
@@ -25,6 +25,7 @@ export const networks = Object.freeze({
     rpcKeyEnvName: 'INFURA_API_KEY',
     isTestNetwork: true,
     stableTokens: StableTokens.rinkeby,
+    isDeprecated: true,
   },
   rinkebyStaging: {
     stagingOf: 'rinkeby',
@@ -34,7 +35,7 @@ export const networks = Object.freeze({
   goerli: {
     networkId: 'goerli',
     chainId: 5,
-    name: 'Goerli',
+    name: 'Goerli tesnet',
     explorer: 'etherscan',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-goerli',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli',
