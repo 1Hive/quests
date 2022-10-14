@@ -1,4 +1,3 @@
-import { ElementHandle } from 'puppeteer';
 import {
   connectWithMetamask,
   executeTransaction,

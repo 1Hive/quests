@@ -25,15 +25,16 @@ class DappeteerEnvironment extends NodeEnvironment {
     this.global.browser = browser;
     this.global.metamask = await getMetamaskWindow(browser);
     this.global.page = await browser.newPage();
+
+    if (!fs.existsSync('./output')) {
+      fs.mkdirSync('./output');
+    }
   }
 
   async handleTestEvent(event, state) {
     if (event.name === 'test_fn_failure') {
       const dir = './output/screenshots';
       if (!fs.existsSync(dir)) {
-        if (!fs.existsSync('./output')) {
-          fs.mkdirSync('./output');
-        }
         fs.mkdirSync(dir);
       }
       const date = new Date();

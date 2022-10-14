@@ -15,10 +15,6 @@ describe('Goto app', () => {
     await page.waitForNetworkIdle();
   });
 
-  it('should be titled "Quests"', async () => {
-    await expect(page.title()).resolves.toMatch('Quests');
-  });
-
   it('should connect with metamask', async () => {
     await connectWithMetamask();
     await expect(page).toMatchElement('.connected');

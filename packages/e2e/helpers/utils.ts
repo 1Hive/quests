@@ -1,10 +1,13 @@
 import { config } from 'dotenv';
 import { WaitForSelectorOptions } from 'puppeteer';
+import { confirmTransaction } from './metamas-override';
 
 config();
 
 jest.retryTimes(
-  process.env.E2E_RETRY_TIMES ? parseInt(process.env.E2E_RETRY_TIMES, 10) : 1,
+  process.env.E2E_RETRY_TIMES === undefined
+    ? 0
+    : parseInt(process.env.E2E_RETRY_TIMES, 10),
 );
 
 export async function gotoApp(chainId?: string) {
@@ -69,30 +72,34 @@ export async function sleep(timeout: number) {
 }
 
 export async function executeTransaction() {
-  console.info('Executing transaction...');
   await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
-  await sleep(5000);
+  let timeout = 5000; // 5 seconds
+  await sleep(timeout); // Wait for gas suggestion to be fetched
   try {
     await metamask.confirmTransaction();
   } catch (error) {
-    console.warn('Metamask confirm transaction failed, retrying...', error);
+    console.warn(
+      `Timeout: Metamask confirm transaction failed, retrying...`,
+      error.message || error,
+    );
     try {
-      await metamask.confirmTransaction();
+      await page.bringToFront();
+      await confirmTransaction();
     } catch (err) {
       console.error(err);
-      throw new Error('Metamask confirm transaction failed');
+      throw new Error('Metamask confirm transaction failed.');
     }
   }
+  console.info('Executing transaction...');
   await page.bringToFront();
+  timeout = 300000; // 10 minutes
   try {
     await page.waitForSelector('.TX_STATUS_CONFIRMED', {
-      timeout: 600000, // 10 minutes
+      timeout,
     });
   } catch (error) {
     console.error(error);
-    throw new Error(
-      'The transaction timed out before reaching the state confirmed',
-    );
+    throw new Error(`Timeout ${timeout}ms: Failed to complete transaction.`);
   }
 }
 
@@ -106,7 +113,7 @@ export async function expectTextExistsInPage(text: string, timeout = 2000) {
     console.info(`Text found: "${text}"`);
   } catch (error) {
     if (error) console.error(error);
-    throw new Error(`Text not found: "${text}"`);
+    throw new Error(`Timeout ${timeout}ms: Text not found: "${text}"`);
   }
 }
 
@@ -123,3 +130,13 @@ export function debug() {
     debugger;
   });
 }
+
+// async function confirmTransactionForce() {
+//   const newPage = await browser.newPage();
+//   await page.goto(
+//     'chrome-extension://nloekkhijkhcemdonjgjhpfckgnbegln/home.html', // Open metamask in a new tab
+//   );
+//   await sleep(3000);
+//   await Promise.race([metamask.confirmTransaction(), sleep(5000)]); // Wait for max 5 seconds
+//   await page.bringToFront();
+// }

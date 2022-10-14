@@ -61,7 +61,8 @@
     }
   },
   "globals": {
-    "page": "writable",
-    "metamask": "writable"
+    "page": "readonly",
+    "metamask": "readonly",
+    "browser": "readonly"
   }
 }

@@ -6,12 +6,12 @@ const config: Config.InitialOptions = {
     '^.+\\.ts?$': 'ts-jest',
   },
   preset: '@chainsafe/dappeteer',
-  testTimeout: 300000, // 5 minutes
+  testTimeout: 300000, // 10 minutes
   setupFilesAfterEnv: ['expect-puppeteer'],
   testSequencer: './helpers/test-sequencer.js',
   testRunner: 'jest-circus/runner',
   testEnvironment: './helpers/dappeteer-screenshot-on-failure-test-env.js',
   globalTeardown: './helpers/keep-browser-open-teardown.js',
-  reporters: ['default', 'jest-github-reporter'],
+  reporters: ['default'],
 };
 export default config;
