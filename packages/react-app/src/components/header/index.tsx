@@ -73,8 +73,11 @@ function Header({ children }: Props) {
   const networkNames = useMemo(
     () =>
       Object.values(networks)
-        .filter((network) => !(network as any).stagingOf && network.networkId !== 'local')
-        .map((network) => network.name), // Skip staging networks
+        .filter(
+          (network) =>
+            !(network as any).stagingOf && network.networkId !== 'local' && !network.isDeprecated, // Skip staging and deprecated networks
+        )
+        .map((network) => network.name),
     [networks],
   );
 

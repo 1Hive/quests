@@ -16,4 +16,5 @@ export type NetworkModel = {
   rpcKeyEnvName?: string;
   isTestNetwork: boolean;
   stableTokens: TokenModel[];
+  isDeprecated?: boolean;
 };
