@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import { WaitForSelectorOptions } from 'puppeteer';
+import { confirmTransaction } from './metamas-override';
 
 config();
 
@@ -72,7 +73,7 @@ export async function sleep(timeout: number) {
 
 export async function executeTransaction() {
   await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
-  let timeout = 10000; // 5 seconds
+  let timeout = 5000; // 5 seconds
   await sleep(timeout); // Wait for gas suggestion to be fetched
   try {
     await metamask.confirmTransaction();
@@ -83,7 +84,7 @@ export async function executeTransaction() {
     );
     try {
       await page.bringToFront();
-      await metamask.confirmTransaction();
+      await confirmTransaction();
     } catch (err) {
       console.error(err);
       throw new Error('Metamask confirm transaction failed.');
