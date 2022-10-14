@@ -73,16 +73,15 @@ export async function sleep(timeout: number) {
 export async function executeTransaction() {
   console.info('Executing transaction...');
   await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
-  await sleep(5000);
+  let timeout = 5000; // 5 seconds
+  await sleep(timeout); // Wait for gas suggestion to be fetched
   try {
-    await Promise.race([
-      metamask.confirmTransaction(),
-      sleep(5000).then(() => {
-        throw new Error('Timeout'); // Go to catch block
-      }),
-    ]); // Wait for max 5 seconds before throwing
+    await metamask.confirmTransaction();
   } catch (error) {
-    console.warn('Metamask confirm transaction failed, retrying...', error);
+    console.warn(
+      `Timeout ${timeout}ms: Metamask confirm transaction failed, retrying...`,
+      error.message || error,
+    );
     try {
       await metamask.confirmTransaction();
     } catch (err) {
@@ -91,15 +90,14 @@ export async function executeTransaction() {
     }
   }
   await page.bringToFront();
+  timeout = 300000; // 10 minutes
   try {
     await page.waitForSelector('.TX_STATUS_CONFIRMED', {
-      timeout: 600000, // 10 minutes
+      timeout,
     });
   } catch (error) {
     console.error(error);
-    throw new Error(
-      'The transaction timed out before reaching the state confirmed',
-    );
+    throw new Error(`Timeout ${timeout}ms: Failed to complete transaction.`);
   }
 }
 
@@ -113,7 +111,7 @@ export async function expectTextExistsInPage(text: string, timeout = 2000) {
     console.info(`Text found: "${text}"`);
   } catch (error) {
     if (error) console.error(error);
-    throw new Error(`Text not found: "${text}"`);
+    throw new Error(`Timeout ${timeout}ms: Text not found: "${text}"`);
   }
 }
 

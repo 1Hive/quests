@@ -4,8 +4,9 @@
   "description": "e2e",
   "main": "dist/bundle.js",
   "scripts": {
+    "webapp:start": "yarn workspace @1hive/quests-react-app start",
     "test": "jest --runInBand --json --outputFile=output/jest-reporter.json --testLocationInResults",
-    "test:headless" : "xvfb-run --auto-servernum yarn test",
+    "test:headless": "xvfb-run --auto-servernum yarn test",
     "ci": "yarn install --pure-lockfile --immutable --skip-builds"
   },
   "author": "",
