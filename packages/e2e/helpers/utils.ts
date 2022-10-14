@@ -75,7 +75,12 @@ export async function executeTransaction() {
   await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
   await sleep(5000);
   try {
-    await metamask.confirmTransaction();
+    await Promise.race([
+      metamask.confirmTransaction(),
+      sleep(5000).then(() => {
+        throw new Error('Timeout'); // Go to catch block
+      }),
+    ]); // Wait for max 5 seconds before throwing
   } catch (error) {
     console.warn('Metamask confirm transaction failed, retrying...', error);
     try {
