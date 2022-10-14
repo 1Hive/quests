@@ -4,7 +4,9 @@ import { WaitForSelectorOptions } from 'puppeteer';
 config();
 
 jest.retryTimes(
-  process.env.E2E_RETRY_TIMES ? parseInt(process.env.E2E_RETRY_TIMES, 10) : 1,
+  process.env.E2E_RETRY_TIMES === undefined
+    ? 0
+    : parseInt(process.env.E2E_RETRY_TIMES, 10),
 );
 
 export async function gotoApp(chainId?: string) {
