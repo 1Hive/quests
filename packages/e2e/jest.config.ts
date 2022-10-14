@@ -6,7 +6,7 @@ const config: Config.InitialOptions = {
     '^.+\\.ts?$': 'ts-jest',
   },
   preset: '@chainsafe/dappeteer',
-  testTimeout: 300000, // 5 minutes
+  testTimeout: 600000, // 10 minutes
   setupFilesAfterEnv: ['expect-puppeteer'],
   testSequencer: './helpers/test-sequencer.js',
   testRunner: 'jest-circus/runner',
