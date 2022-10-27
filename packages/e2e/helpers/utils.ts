@@ -1,6 +1,10 @@
 import { config } from 'dotenv';
-import { WaitForSelectorOptions } from 'puppeteer';
-import { confirmTransaction } from './metamas-override';
+import { ElementHandle, Page, WaitForSelectorOptions } from 'puppeteer';
+import {
+  confirmTransaction,
+  disconnectAccountInMetamask,
+  getMetamaskPage,
+} from './metamask-override';
 
 config();
 
@@ -18,20 +22,35 @@ export async function gotoApp(chainId?: string) {
   );
 }
 
-export async function connectWithMetamask() {
+export async function connectWithMetamask(secondAccount?: boolean) {
   try {
-    await metamask.switchNetwork('goerli');
+    if (!secondAccount) {
+      await metamask.switchNetwork('goerli');
+      console.info('Network switched');
+    }
     await page.bringToFront();
     console.info('Page brought to front');
-    await waitForSelectorAndClick('#account-button', {
-      timeout: 5000,
-    });
-    console.info('Account button clicked');
-    await waitForSelectorAndClick('#injected');
-    console.info('Metamask button clicked');
+    try {
+      await waitForSelectorAndClick('#account-button', {
+        timeout: 2000,
+      });
+      console.info('Account button clicked');
+      await waitForSelectorAndClick('#injected');
+      console.info('Metamask button clicked');
+    } catch (error) {
+      console.warn('Already connected', error);
+    }
     await sleep(2000);
     console.info('Slept 2 sec');
-    await Promise.race([metamask.approve(), sleep(5000)]); // Wait for max 5 seconds
+    if (secondAccount) {
+      console.log('Second account');
+      const metamaskPage = await getMetamaskPage();
+      await waitForElementByTextAndClick('Next', metamaskPage);
+      await waitForElementByTextAndClick('Connect', metamaskPage);
+    } else {
+      await Promise.race([metamask.approve(), sleep(5000)]); // Wait for max 5 seconds
+    }
+    await metamask.approve();
     console.info('Metamask approved');
     await sleep(2000);
     console.info('Slept 2 sec');
@@ -41,6 +60,29 @@ export async function connectWithMetamask() {
   }
   await page.bringToFront();
   console.info('Page brought to front');
+}
+
+export async function importAndSwitchOtherAccount() {
+  try {
+    try {
+      await disconnectAccountInMetamask();
+    } catch (error) {
+      console.warn('Already disconnected', error);
+    }
+    await Promise.race([
+      metamask.importPK(
+        '123cd73e0313b8253b913310b047858403f11e3f0837431acf5a2dfdb2166cd0',
+      ),
+      sleep(3000),
+    ]);
+    console.info('2nd account imported');
+    await metamask.switchAccount(2);
+    console.info('Account switched');
+  } catch (error) {
+    // Skip if already connected
+    console.warn(error);
+  }
+  await page.bringToFront();
 }
 
 export async function waitForSelectorAndClick(
@@ -101,6 +143,18 @@ export async function executeTransaction() {
     console.error(error);
     throw new Error(`Timeout ${timeout}ms: Failed to complete transaction.`);
   }
+}
+
+export async function waitForElementByTextAndClick(
+  text: string,
+  _page?: Page,
+  timeout = 2000,
+) {
+  _page = _page ?? page;
+  const element = (await page.waitForXPath(`//*[contains(text(),'${text}')]`, {
+    timeout,
+  })) as ElementHandle<HTMLElement>;
+  element.click();
 }
 
 export async function expectTextExistsInPage(text: string, timeout = 2000) {
