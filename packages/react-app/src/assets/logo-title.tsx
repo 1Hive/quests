@@ -6,8 +6,9 @@ import { ThemeInterface } from '../styles/theme';
 const TestNetworkNameStyled = styled.span<{ theme: ThemeInterface }>`
   font-style: italic;
   color: ${({ theme }) => theme.contentSecondary};
-  margin-left: -60px;
+  margin-left: -75px;
   margin-bottom: -5px;
+  white-space: nowrap;
 `;
 
 export const LogoTitle = () => {
