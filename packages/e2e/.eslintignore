@@ -1,0 +1,8 @@
+dist/
+node_modules/
+.eslintrc
+.gitignore
+package.json
+README.md
+tsconfig.json
+output

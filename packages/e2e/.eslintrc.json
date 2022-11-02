@@ -5,16 +5,14 @@
     "browser": true,
     "node": true
   },
-  "extends": ["plugin:react/recommended", "airbnb", "prettier"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
     "ecmaVersion": 12,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
   },
-  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "plugins": ["prettier", "@typescript-eslint"],
   "rules": {
     "prettier/prettier": [
       "error",
@@ -23,16 +21,11 @@
       }
     ],
     "radix": 0,
-    "react/require-default-props": "off",
     "import/prefer-default-export": "off",
     "no-use-before-define": "off",
     "no-param-reassign": "off",
     "no-unused-expressions": "off",
-    "react/react-in-jsx-scope": "off",
     "class-methods-use-this": "off",
-    "react/no-unused-prop-types": "off",
-    "jsx-props-no-spreading": "off",
-    "react/jsx-props-no-spreading": "off",
     "react/state-in-constructor": "off",
     "no-unused-vars": "off",
     "no-debugger": "off",
@@ -43,17 +36,7 @@
         "allow": ["info", "warn", "error"]
       }
     ],
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      {
-        "": "never",
-        "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
-      }
-    ]
+    "@typescript-eslint/no-floating-promises": "error"
   },
   "settings": {
     "import/resolver": {
