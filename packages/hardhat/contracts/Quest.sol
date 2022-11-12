@@ -40,7 +40,7 @@ contract Quest is IExecutable {
         address payable _fundsRecoveryAddress,
         IERC20 _createDepositToken,
         uint256 _createDepositAmount,
-        uint256 _playDepositToken,
+        IERC20 _playDepositToken,
         uint256 _playDepositAmount,
         address _questCreator,
         uint32 _maxPlayers
@@ -58,7 +58,7 @@ contract Quest is IExecutable {
         );
         playDeposit = Models.Deposit(_playDepositToken, _playDepositAmount);
 
-        isDepositReleased = false;
+        isCreateDepositReleased = false;
         maxPlayers = _maxPlayers;
     }
 
@@ -70,9 +70,9 @@ contract Quest is IExecutable {
         require(block.timestamp > expireTime, "ERROR: Not expired");
 
         // Restore deposit if not already released
-        if (!isDepositReleased) {
-            deposit.releaseTo(questCreator);
-            isDepositReleased = true;
+        if (!isCreateDepositReleased) {
+            createDeposit.releaseTo(questCreator);
+            isCreateDepositReleased = true;
         }
 
         rewardToken.safeTransfer(
@@ -81,8 +81,8 @@ contract Quest is IExecutable {
         );
     }
 
-    function canExecute() external {
-        return findIndexOfPlayer(_player) != -1;
+    function canExecute() external override returns (bool) {
+        return findIndexOfPlayer(msg.sender) != -1;
     }
 
     /*
@@ -100,24 +100,17 @@ contract Quest is IExecutable {
         emit QuestPlayed(_player);
     }
 
-    /*
-     * Unplay a quest.
-     * @param _player Player address.
-     * requires sender to be the player of the questCreator
-     * requires player to be part of the current player list
-     */
-
     function unplay(address _player) external {
         require(
             msg.sender == _player || msg.sender == questCreator,
             "Sender must be creator or player"
         );
-        uint32 playerIndex = findIndexOfPlayer(_player);
+        int256 playerIndex = findIndexOfPlayer(_player);
         require(
             playerIndex != -1,
             "Given player address is not part of player list"
         );
-        delete playerList[playerIndex];
+        delete playerList[uint256(playerIndex)];
     }
 
     /*
@@ -142,18 +135,18 @@ contract Quest is IExecutable {
 
         if (_claimAll) {
             // Claim all but let deposit if they are same token
-            if (address(rewardToken) == address(deposit.token)) {
-                (, uint256 result) = balance.trySub(deposit.amount);
+            if (address(rewardToken) == address(createDeposit.token)) {
+                (, uint256 result) = balance.trySub(createDeposit.amount);
                 _amount = result;
             } else {
                 _amount = balance;
             }
         }
 
-        if (address(rewardToken) == address(deposit.token)) {
+        if (address(rewardToken) == address(createDeposit.token)) {
             (, uint256 result) = balance.trySub(_amount);
             require(
-                result >= deposit.amount,
+                result >= createDeposit.amount,
                 "ERROR: Should not exceed allowed bounty"
             );
         }
@@ -167,10 +160,10 @@ contract Quest is IExecutable {
         emit QuestClaimed(_evidence, _player, _amount);
     }
 
-    function findIndexOfPlayer(address _player) private {
+    function findIndexOfPlayer(address _player) private view returns (int256) {
         for (uint256 i = 0; i < playerList.length; i++) {
             if (playerList[i] == _player) {
-                return i;
+                return int256(i);
             }
         }
         return -1;
