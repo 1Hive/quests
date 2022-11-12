@@ -81,6 +81,10 @@ contract Quest is IExecutable {
         );
     }
 
+    function canExecute() external {
+        return findIndexOfPlayer(_player) != -1;
+    }
+
     /*
      * Play a quest.
      *
@@ -96,20 +100,24 @@ contract Quest is IExecutable {
         emit QuestPlayed(_player);
     }
 
-    function canExecute() external {
-        return true;
-    }
+    /*
+     * Unplay a quest.
+     * @param _player Player address.
+     * requires sender to be the player of the questCreator
+     * requires player to be part of the current player list
+     */
 
     function unplay(address _player) external {
         require(
             msg.sender == _player || msg.sender == questCreator,
             "Sender must be creator or player"
         );
-        for (uint256 i = 0; i < playerList.length; i++) {
-            if (playerList[i] == _player) {
-                delete playerList[i];
-            }
-        }
+        uint32 playerIndex = findIndexOfPlayer(_player);
+        require(
+            playerIndex != -1,
+            "Given player address is not part of player list"
+        );
+        delete playerList[playerIndex];
     }
 
     /*
@@ -157,5 +165,14 @@ contract Quest is IExecutable {
         claims.push(Models.Claim(_evidence, _player, _amount));
 
         emit QuestClaimed(_evidence, _player, _amount);
+    }
+
+    function findIndexOfPlayer(address _player) private {
+        for (uint256 i = 0; i < playerList.length; i++) {
+            if (playerList[i] == _player) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
