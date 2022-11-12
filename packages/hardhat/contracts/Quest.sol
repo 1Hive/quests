@@ -7,8 +7,9 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./QuestFactory.sol";
+import "./IExecutable.sol";
 
-contract Quest {
+contract Quest is IExecutable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using DepositLib for Models.Deposit;
@@ -21,10 +22,14 @@ contract Quest {
     address public aragonGovernAddress;
     address payable public fundsRecoveryAddress;
     Models.Claim[] public claims;
-    Models.Deposit public deposit;
-    bool public isDepositReleased;
+    Models.Deposit public createDeposit;
+    Models.Deposit public playDeposit;
+    bool public isCreateDepositReleased;
+    uint32 public maxPlayers;
+    address[] public playerList;
 
     event QuestClaimed(bytes evidence, address player, uint256 amount);
+    event QuestPlayed(address player);
 
     constructor(
         string memory _questTitle,
@@ -33,9 +38,12 @@ contract Quest {
         uint256 _expireTime,
         address _aragonGovernAddress,
         address payable _fundsRecoveryAddress,
-        IERC20 _depositToken,
-        uint256 _depositAmount,
-        address _questCreator
+        IERC20 _createDepositToken,
+        uint256 _createDepositAmount,
+        uint256 _playDepositToken,
+        uint256 _playDepositAmount,
+        address _questCreator,
+        uint32 _maxPlayers
     ) {
         questTitle = _questTitle;
         questDetailsRef = _questDetailsRef;
@@ -44,8 +52,14 @@ contract Quest {
         aragonGovernAddress = _aragonGovernAddress;
         fundsRecoveryAddress = _fundsRecoveryAddress;
         questCreator = _questCreator;
-        deposit = Models.Deposit(_depositToken, _depositAmount);
+        createDeposit = Models.Deposit(
+            _createDepositToken,
+            _createDepositAmount
+        );
+        playDeposit = Models.Deposit(_playDepositToken, _playDepositAmount);
+
         isDepositReleased = false;
+        maxPlayers = _maxPlayers;
     }
 
     /*
@@ -65,6 +79,37 @@ contract Quest {
             fundsRecoveryAddress,
             rewardToken.balanceOf(address(this))
         );
+    }
+
+    /*
+     * Play a quest.
+     *
+     * @param _player Player address.
+     *
+     * requires sender to put a deposit
+     * requires playerMap length to be less than maxPlayers
+     */
+    function play(address _player) external {
+        require(playerList.length < maxPlayers);
+        playDeposit.collectFrom(_player, address(this));
+        playerList.push(_player);
+        emit QuestPlayed(_player);
+    }
+
+    function canExecute() external {
+        return true;
+    }
+
+    function unplay(address _player) external {
+        require(
+            msg.sender == _player || msg.sender == questCreator,
+            "Sender must be creator or player"
+        );
+        for (uint256 i = 0; i < playerList.length; i++) {
+            if (playerList[i] == _player) {
+                delete playerList[i];
+            }
+        }
     }
 
     /*
