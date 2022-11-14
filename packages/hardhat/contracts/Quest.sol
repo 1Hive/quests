@@ -6,14 +6,15 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
+import "./libraries/IExecutable.sol";
 import "./QuestFactory.sol";
-import "./IExecutable.sol";
 
 contract Quest is IExecutable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using DepositLib for Models.Deposit;
 
+    // Quest payload
     address public questCreator;
     string public questTitle;
     bytes public questDetailsRef;
@@ -21,15 +22,17 @@ contract Quest is IExecutable {
     uint256 public expireTime;
     address public aragonGovernAddress;
     address payable public fundsRecoveryAddress;
+    uint32 public maxPlayers; // 0 for infinite
+
     Models.Claim[] public claims;
     Models.Deposit public createDeposit;
     Models.Deposit public playDeposit;
     bool public isCreateDepositReleased;
-    uint32 public maxPlayers;
     address[] public playerList;
 
     event QuestClaimed(bytes evidence, address player, uint256 amount);
-    event QuestPlayed(address player);
+    event QuestPlayed(address player, uint256 timestamp);
+    event QuestUnplayed(address player, uint256 timestamp);
 
     constructor(
         string memory _questTitle,
@@ -38,10 +41,8 @@ contract Quest is IExecutable {
         uint256 _expireTime,
         address _aragonGovernAddress,
         address payable _fundsRecoveryAddress,
-        IERC20 _createDepositToken,
-        uint256 _createDepositAmount,
-        IERC20 _playDepositToken,
-        uint256 _playDepositAmount,
+        Models.Deposit memory _createDeposit,
+        Models.Deposit memory _playDeposit,
         address _questCreator,
         uint32 _maxPlayers
     ) {
@@ -52,75 +53,24 @@ contract Quest is IExecutable {
         aragonGovernAddress = _aragonGovernAddress;
         fundsRecoveryAddress = _fundsRecoveryAddress;
         questCreator = _questCreator;
-        createDeposit = Models.Deposit(
-            _createDepositToken,
-            _createDepositAmount
-        );
-        playDeposit = Models.Deposit(_playDepositToken, _playDepositAmount);
+        createDeposit = _createDeposit;
+        playDeposit = _playDeposit;
 
         isCreateDepositReleased = false;
         maxPlayers = _maxPlayers;
     }
 
     /*
-     * Release deposit to creator and send unused funds to fundsRecoveryAddress.
-     * requires quests to have expired
-     */
-    function recoverFundsAndDeposit() external {
-        require(block.timestamp > expireTime, "ERROR: Not expired");
-
-        // Restore deposit if not already released
-        if (!isCreateDepositReleased) {
-            createDeposit.releaseTo(questCreator);
-            isCreateDepositReleased = true;
-        }
-
-        rewardToken.safeTransfer(
-            fundsRecoveryAddress,
-            rewardToken.balanceOf(address(this))
-        );
-    }
-
-    function canExecute() external override returns (bool) {
-        return findIndexOfPlayer(msg.sender) != -1;
-    }
-
-    /*
-     * Play a quest.
-     *
-     * @param _player Player address.
-     *
-     * requires sender to put a deposit
-     * requires playerMap length to be less than maxPlayers
-     */
-    function play(address _player) external {
-        require(playerList.length < maxPlayers);
-        playDeposit.collectFrom(_player, address(this));
-        playerList.push(_player);
-        emit QuestPlayed(_player);
-    }
-
-    function unplay(address _player) external {
-        require(
-            msg.sender == _player || msg.sender == questCreator,
-            "Sender must be creator or player"
-        );
-        int256 playerIndex = findIndexOfPlayer(_player);
-        require(
-            playerIndex != -1,
-            "Given player address is not part of player list"
-        );
-        delete playerList[uint256(playerIndex)];
-    }
-
-    /*
      * Claim a quest reward.
+     *
      * @param _evidence Evidence of the claim.
      * @param _player Player address.
      * @param _amount Amount of the reward.
+     *
      * requires sender to be aragonGovernAddress
      * requires evidence to not be empty
      * requires claim amount to not exceed available deposit when same token
+     *
      * emit QuestClaimed
      */
     function claim(
@@ -131,6 +81,7 @@ contract Quest is IExecutable {
     ) external {
         require(msg.sender == aragonGovernAddress, "ERROR: Sender not govern");
         require(_evidence.length != 0, "ERROR: No evidence");
+
         uint256 balance = rewardToken.balanceOf(address(this));
 
         if (_claimAll) {
@@ -159,6 +110,96 @@ contract Quest is IExecutable {
 
         emit QuestClaimed(_evidence, _player, _amount);
     }
+
+    /*
+     * Release deposit to creator and send unused funds to fundsRecoveryAddress.
+     * requires quests to have expired
+     *
+     * requires quest to be expired
+     */
+    function recoverFundsAndDeposit() external {
+        require(block.timestamp >= expireTime, "ERROR: Not expired");
+
+        // Restore deposit if not already released
+        if (!isCreateDepositReleased) {
+            createDeposit.releaseTo(questCreator);
+            isCreateDepositReleased = true;
+        }
+
+        rewardToken.safeTransfer(
+            fundsRecoveryAddress,
+            rewardToken.balanceOf(address(this))
+        );
+    }
+
+    /**
+     * Verify given executer can execute this quest.
+     * @param executer The player to verify
+     */
+    function canExecute(address executer)
+        external
+        view
+        override
+        returns (bool)
+    {
+        return findIndexOfPlayer(executer) != -1;
+    }
+
+    /**
+     * Register a player to the quest. (sender could be the player or quest creator)
+     *
+     * @param _player Player address.
+     *
+     * requires sender to be the quest creator or the player
+     * requires sender to put a deposit (if its creator, deposit will be released to player)
+     * requires player list is not full
+     * requires quest is not expired
+     * requires player is not already registered
+     *
+     * emit QuestPlayed with player and timestamp
+     */
+    function play(address _player) external {
+        require(
+            msg.sender == _player || msg.sender == questCreator,
+            "ERROR: Sender not player nor creator"
+        );
+        require(
+            maxPlayers == 0 || playerList.length < maxPlayers,
+            "ERROR: Max players reached"
+        );
+        require(block.timestamp < expireTime, "ERROR: Quest expired");
+        int256 playerIndex = findIndexOfPlayer(_player);
+        require(playerIndex == -1, "ERROR: Player already exists");
+
+        playDeposit.collectFrom(msg.sender, address(this));
+
+        playerList.push(_player);
+        emit QuestPlayed(_player, block.timestamp);
+    }
+
+    /**
+     * Unregister a player from the quest. (sender could be the player or quest creator)
+     * @param _player Player address.
+     *
+     * requires sender to be the quest creator or the player
+     * requires player is registered
+     *
+     * emit QuestUnplayed with player and timestamp
+     */
+    function unplay(address _player) external {
+        require(
+            msg.sender == _player || msg.sender == questCreator,
+            "ERROR: Sender not player nor creator"
+        );
+        int256 playerIndex = findIndexOfPlayer(_player);
+        require(playerIndex != -1, "ERROR: player not in list");
+
+        delete playerList[uint256(playerIndex)];
+        playDeposit.releaseTo(_player);
+        emit QuestUnplayed(_player, block.timestamp);
+    }
+
+    // Private functions
 
     function findIndexOfPlayer(address _player) private view returns (int256) {
         for (uint256 i = 0; i < playerList.length; i++) {

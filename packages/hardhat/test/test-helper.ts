@@ -16,9 +16,12 @@ export const deployQuest = async (
   aragonGovernAddress: Address,
   fundsRecoveryAddress: Address,
   initialBalance: BigNumber,
-  depositToken: TokenMock,
-  depositAmount: BigNumber,
-  creator: SignerWithAddress
+  createDepositToken: TokenMock,
+  createDepositAmount: BigNumber,
+  playDepositToken: TokenMock,
+  playDepositAmount: BigNumber,
+  creator: SignerWithAddress,
+  maxPlayers: number = 0
 ) => {
   const quest = await new Quest__factory(creator).deploy(
     title,
@@ -27,13 +30,16 @@ export const deployQuest = async (
     expireTime,
     aragonGovernAddress,
     fundsRecoveryAddress,
-    depositToken.address,
-    depositAmount,
-    creator.address
+    { token: createDepositToken.address, amount: createDepositAmount },
+    { token: playDepositToken.address, amount: playDepositAmount },
+    creator.address,
+    maxPlayers
   );
   await quest.deployed();
   await rewardToken.connect(quest.signer).mint(quest.address, initialBalance);
-  await depositToken.connect(quest.signer).mint(quest.address, depositAmount);
+  await createDepositToken
+    .connect(quest.signer)
+    .mint(quest.address, createDepositAmount);
   return quest;
 };
 

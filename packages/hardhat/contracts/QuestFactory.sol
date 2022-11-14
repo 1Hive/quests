@@ -103,10 +103,8 @@ contract QuestFactory is Ownable {
             _expireTime,
             aragonGovernAddress,
             _fundsRecoveryAddress,
-            createDeposit.token,
-            createDeposit.amount,
-            playDeposit.token,
-            playDeposit.amount,
+            Models.Deposit(createDeposit.token, createDeposit.amount),
+            Models.Deposit(playDeposit.token, playDeposit.amount),
             msg.sender,
             _maxPlayers
         );
