@@ -954,6 +954,17 @@ task("newQuestFactory:gnosis")
     defaultConfig.CreateQuestDeposit.xdai.amount,
     types.float
   )
+  .addOptionalParam(
+    "playDepositToken",
+    "Address of the play quest deposit (default is HNY)",
+    defaultConfig.PlayQuestDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "playDepositAmount",
+    "Amount of the quest play deposit token",
+    defaultConfig.PlayQuestDeposit.xdai.amount,
+    types.float
+  )
   .setAction(async (args, hre) => {
     const deployResult = await deployQuestFactory(hre, args);
     console.log(
@@ -989,41 +1000,15 @@ task("newQuestFactory:goerli")
     defaultConfig.CreateQuestDeposit.goerli.amount,
     types.float
   )
-  .setAction(async (args, hre) => {
-    console.log("Deploying QuestFactory...");
-    const deployResult = await deployQuestFactory(hre, args);
-
-    exportContractResult(hre.network, "QuestFactory", {
-      address: deployResult.address,
-      abi: deployResult.abi,
-    });
-    console.log(
-      "Deployed QuestFactory (" + hre.network.name + "):",
-      deployResult.address
-    );
-  });
-
-task("newQuestFactory:rinkeby")
-  .setDescription("Deploy a new QuestFactory and export it to front end")
   .addOptionalParam(
-    "governAddress",
+    "playDepositToken",
+    "Address of the play quest deposit",
+    defaultConfig.PlayQuestDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "playDepositAmount",
     "Address of the govern",
-    governRinkeby.address
-  )
-  .addOptionalParam(
-    "initialOwner",
-    "Initial owner of the QuestFactory (will be able to change deposits)",
-    defaultConfig.RootOwner.rinkeby
-  )
-  .addOptionalParam(
-    "createDepositToken",
-    "Address of the create quest deposit",
-    defaultConfig.CreateQuestDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "createDepositAmount",
-    "Address of the govern",
-    defaultConfig.CreateQuestDeposit.rinkeby.amount,
+    defaultConfig.PlayQuestDeposit.goerli.amount,
     types.float
   )
   .setAction(async (args, hre) => {

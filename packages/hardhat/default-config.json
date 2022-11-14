@@ -21,7 +21,21 @@
     "goerli": {
       "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
       "amount": 0.01
-    }   
+    }
+  },
+  "PlayQuestDeposit": {
+    "rinkeby": {
+      "token": "0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9",
+      "amount": 0.01
+    },
+    "xdai": {
+      "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+      "amount": 0.1
+    },
+    "goerli": {
+      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "amount": 0.01
+    }
   },
   "ScheduleDeposit": {
     "rinkeby": {
