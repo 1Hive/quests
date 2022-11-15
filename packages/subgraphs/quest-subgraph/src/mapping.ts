@@ -29,7 +29,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questCreateDepositToken = event.params.depositToken;
   questEntity.questCreateDepositAmount = event.params.depositAmount;
   questEntity.questCreator = event.params.creator;
-  questEntity.questMaxPlayers = BigInt.fromI32(0);
+  questEntity.questMaxPlayers = null;
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = '';

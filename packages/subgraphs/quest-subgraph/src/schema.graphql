@@ -27,7 +27,7 @@ type QuestEntity @entity(immutable: true) {
   creationTimestamp: BigInt!
   questFundsRecoveryAddress: Bytes!
   questCreator: Bytes!
-  questMaxPlayers: BigInt!
+  questMaxPlayers: BigInt
   questCreateDepositToken: Bytes!
   questCreateDepositAmount: BigInt!
   questPlayDepositToken: Bytes!
