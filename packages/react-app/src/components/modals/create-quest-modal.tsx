@@ -30,10 +30,13 @@ import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import NumberFieldInput from '../field-input/number-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { WalletBalance } from '../wallet-balance';
 import { feedDummyQuestData } from '../utils/debug-util';
+import CheckboxFieldInput from '../field-input/checkbox-field-input';
+import { FieldInput } from '../field-input/field-input';
 import { Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
@@ -65,6 +68,15 @@ const LineStyled = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+const MaxPlayerLineStyled = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const PlayerWrapperStyled = styled.div`
+  padding-right: ${GUpx(2)};
 `;
 
 const DepositInfoStyled = styled(Info)`
@@ -173,7 +185,10 @@ export default function QuestModal({
         errors.fallbackAddress = 'Player address is not valid';
       }
     }
-
+    if ((!data.maxPlayers || data.maxPlayers <= 0) && !data.unlimited) {
+      console.log('error');
+      errors.maxPlayers = 'Max players needs to be set or check as unlimited';
+    }
     // If bounty is not set then amount can't be invalid because disabled
     if (!data.bounty?.token) errors.bounty = 'Bounty token is required';
     else if (data.bounty.parsedAmount < 0) errors.bounty = ' Invalid initial bounty';
@@ -216,6 +231,7 @@ export default function QuestModal({
             expireTime: values.expireTime,
             creatorAddress: walletAddress,
             rewardToken: values.bounty!.token,
+            maxPlayers: values.unlimited ? 0 : values.maxPlayers,
           },
           undefined,
           (txHash) => {
@@ -302,11 +318,13 @@ export default function QuestModal({
             initialValues={
               {
                 ...questDataState,
+                unlimited: true,
                 fallbackAddress: questDataState?.fallbackAddress,
               } as QuestModel
             }
             onSubmit={onQuestSubmit}
-            validateOnChange
+            validateOnBlur
+            // validateOnChange
             validate={validate}
           >
             {({ values, handleChange, handleBlur, errors, touched, setTouched, handleSubmit }) => {
@@ -512,6 +530,31 @@ export default function QuestModal({
                           placeHolder="Quest communication link"
                           wide
                         />
+                        <FieldInput error={touched.maxPlayers && errors.maxPlayers}>
+                          <MaxPlayerLineStyled>
+                            <PlayerWrapperStyled>
+                              <NumberFieldInput
+                                id="maxPlayers"
+                                label="Max players"
+                                isEdit
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.maxPlayers}
+                                tooltip="The max amount of players that can simultaneously work on this quest"
+                                disabled={values.unlimited}
+                              />
+                            </PlayerWrapperStyled>
+                            <CheckboxFieldInput
+                              id="unlimited"
+                              label="Unlimited"
+                              onChange={handleChange}
+                              handleBlur={handleBlur}
+                              value={values.unlimited}
+                              isEdit
+                              tooltip="Select for unlimited amount of players"
+                            />
+                          </MaxPlayerLineStyled>
+                        </FieldInput>
                       </>,
                     ]}
                   />
