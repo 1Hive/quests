@@ -10,6 +10,8 @@ export type QuestModel = {
   expireTime: Date;
   fallbackAddress: string;
   creatorAddress: string;
+  maxPlayers?: number;
+
   // Computed
   activeClaimCount?: number;
   creationTime?: Date;

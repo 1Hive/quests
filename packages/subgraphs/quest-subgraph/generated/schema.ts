@@ -24,8 +24,11 @@ export class QuestEntity extends Entity {
     this.set("creationTimestamp", Value.fromBigInt(BigInt.zero()));
     this.set("questFundsRecoveryAddress", Value.fromBytes(Bytes.empty()));
     this.set("questCreator", Value.fromBytes(Bytes.empty()));
-    this.set("depositToken", Value.fromBytes(Bytes.empty()));
-    this.set("depositAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("questMaxPlayers", Value.fromBigInt(BigInt.zero()));
+    this.set("questCreateDepositToken", Value.fromBytes(Bytes.empty()));
+    this.set("questCreateDepositAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("questPlayDepositToken", Value.fromBytes(Bytes.empty()));
+    this.set("questPlayDepositAmount", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -160,6 +163,99 @@ export class QuestEntity extends Entity {
     this.set("questCreator", Value.fromBytes(value));
   }
 
+  get questMaxPlayers(): BigInt {
+    let value = this.get("questMaxPlayers");
+    return value!.toBigInt();
+  }
+
+  set questMaxPlayers(value: BigInt) {
+    this.set("questMaxPlayers", Value.fromBigInt(value));
+  }
+
+  get questCreateDepositToken(): Bytes {
+    let value = this.get("questCreateDepositToken");
+    return value!.toBytes();
+  }
+
+  set questCreateDepositToken(value: Bytes) {
+    this.set("questCreateDepositToken", Value.fromBytes(value));
+  }
+
+  get questCreateDepositAmount(): BigInt {
+    let value = this.get("questCreateDepositAmount");
+    return value!.toBigInt();
+  }
+
+  set questCreateDepositAmount(value: BigInt) {
+    this.set("questCreateDepositAmount", Value.fromBigInt(value));
+  }
+
+  get questPlayDepositToken(): Bytes {
+    let value = this.get("questPlayDepositToken");
+    return value!.toBytes();
+  }
+
+  set questPlayDepositToken(value: Bytes) {
+    this.set("questPlayDepositToken", Value.fromBytes(value));
+  }
+
+  get questPlayDepositAmount(): BigInt {
+    let value = this.get("questPlayDepositAmount");
+    return value!.toBigInt();
+  }
+
+  set questPlayDepositAmount(value: BigInt) {
+    this.set("questPlayDepositAmount", Value.fromBigInt(value));
+  }
+}
+
+export class CreateDepositEntity extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("depositToken", Value.fromBytes(Bytes.empty()));
+    this.set("depositAmount", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save CreateDepositEntity entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save CreateDepositEntity entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("CreateDepositEntity", id.toString(), this);
+    }
+  }
+
+  static load(id: string): CreateDepositEntity | null {
+    return changetype<CreateDepositEntity | null>(
+      store.get("CreateDepositEntity", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
   get depositToken(): Bytes {
     let value = this.get("depositToken");
     return value!.toBytes();
@@ -179,7 +275,7 @@ export class QuestEntity extends Entity {
   }
 }
 
-export class DepositEntity extends Entity {
+export class PlayDepositEntity extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -191,19 +287,21 @@ export class DepositEntity extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save DepositEntity entity without an ID");
+    assert(id != null, "Cannot save PlayDepositEntity entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save DepositEntity entity with non-string ID. " +
+        "Cannot save PlayDepositEntity entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("DepositEntity", id.toString(), this);
+      store.set("PlayDepositEntity", id.toString(), this);
     }
   }
 
-  static load(id: string): DepositEntity | null {
-    return changetype<DepositEntity | null>(store.get("DepositEntity", id));
+  static load(id: string): PlayDepositEntity | null {
+    return changetype<PlayDepositEntity | null>(
+      store.get("PlayDepositEntity", id)
+    );
   }
 
   get id(): string {

@@ -18,8 +18,11 @@ const QuestEntityQuery = gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
-      depositToken
-      depositAmount
+      questCreateDepositToken
+      questCreateDepositAmount
+      questPlayDepositToken
+      questPlayDepositAmount
+      questMaxPlayers
       questCreator
       questFundsRecoveryAddress
     }
@@ -61,8 +64,11 @@ const QuestEntitiesQuery = (payload: any) => gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
-      depositToken
-      depositAmount
+      questCreateDepositToken
+      questCreateDepositAmount
+      questPlayDepositToken
+      questPlayDepositAmount
+      questMaxPlayers
       questCreator
       questFundsRecoveryAddress
     }
@@ -96,8 +102,10 @@ const QuestEntitiesLight = (payload: any) => gql`
      }) {
       id
       questRewardTokenAddress
-      depositToken
-      depositAmount
+      questCreateDepositToken
+      questCreateDepositAmount
+      questPlayDepositToken
+      questPlayDepositAmount
     }
   }
 `;

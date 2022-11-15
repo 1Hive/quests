@@ -273,6 +273,12 @@ export default function Quest({
             isLoading={isLoading || !questData}
             value={questData?.creatorAddress}
           />
+          <TextFieldInput
+            id="maxPlayers"
+            label="Max players"
+            isLoading={isLoading || !questData}
+            value={questData.maxPlayers?.toString() ?? 'Unlimited'}
+          />
           <DateFieldInput
             id="creationTime"
             label="Creation time"

@@ -1,13 +1,31 @@
 import {
   QuestCreated,
-  DepositChanged,
-} from '../generated/QuestFactory/QuestFactory';
-import { CreateDepositEntity, QuestEntity } from '../generated/schema';
-import { BigInt, Bytes, ipfs } from '@graphprotocol/graph-ts';
+  PlayDepositChanged,
+  CreateDepositChanged,
+} from '../generated/QuestFactoryV2/QuestFactory';
+import {
+  CreateDepositEntity,
+  PlayDepositEntity,
+  QuestEntity,
+} from '../generated/schema';
+import { Bytes, ipfs } from '@graphprotocol/graph-ts';
 import { json } from '@graphprotocol/graph-ts';
-export function handleDepositChanged(event: DepositChanged): void {
+
+export function handleCreateDepositChanged(event: CreateDepositChanged): void {
   let depositEntity = new CreateDepositEntity(
     `Create_${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
+  );
+
+  depositEntity.timestamp = event.params.timestamp;
+  depositEntity.depositToken = event.params.token;
+  depositEntity.depositAmount = event.params.amount;
+
+  depositEntity.save();
+}
+
+export function handlePlayDepositChanged(event: PlayDepositChanged): void {
+  let depositEntity = new PlayDepositEntity(
+    `Play_${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
   );
 
   depositEntity.timestamp = event.params.timestamp;
@@ -26,10 +44,12 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questExpireTimeSec = event.params.expireTime;
   questEntity.creationTimestamp = event.block.timestamp;
   questEntity.questFundsRecoveryAddress = event.params.fundsRecoveryAddress;
-  questEntity.questCreateDepositToken = event.params.depositToken;
-  questEntity.questCreateDepositAmount = event.params.depositAmount;
+  questEntity.questCreateDepositToken = event.params.createDepositToken;
+  questEntity.questCreateDepositAmount = event.params.createDepositAmount;
+  questEntity.questPlayDepositToken = event.params.playDepositToken;
+  questEntity.questPlayDepositAmount = event.params.playDepositAmount;
   questEntity.questCreator = event.params.creator;
-  questEntity.questMaxPlayers = BigInt.fromI32(0);
+  questEntity.questMaxPlayers = event.params.maxPlayers;
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = '';

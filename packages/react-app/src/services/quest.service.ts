@@ -461,8 +461,8 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   const quests = result.questEntities as {
     id: string;
     questRewardTokenAddress: string;
-    depositToken: string;
-    depositAmount: string;
+    questCreateDepositToken: string;
+    questCreateDepositAmount: string;
   }[];
   const funds = (
     await Promise.all(
@@ -471,8 +471,8 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
           quest.questRewardTokenAddress,
           quest.id,
           {
-            amount: BigNumber.from(quest.depositAmount),
-            token: quest.depositToken,
+            amount: BigNumber.from(quest.questCreateDepositAmount),
+            token: quest.questCreateDepositToken,
           },
           true,
         ),
@@ -503,7 +503,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
 
 export async function fetchCreateQuestDeposit(walletAddress: string) {
   const questFactoryContract = getQuestFactoryContract(walletAddress);
-  const res = await questFactoryContract.deposit();
+  const res = await questFactoryContract.createDeposit();
   const token = await getTokenInfo(res.token);
   if (!token) {
     return null;

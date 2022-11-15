@@ -350,7 +350,7 @@ export default function QuestModal({
                             >
                               <AmountFieldInput
                                 id="questDeposit"
-                                label="Quest Deposit"
+                                label="Create Deposit"
                                 tooltip="This amount will be hold by the Quest. It will be reclaimable from reclaim button once the Quest is expired."
                                 value={questDeposit}
                                 compact
