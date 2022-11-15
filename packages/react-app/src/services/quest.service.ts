@@ -79,6 +79,8 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       fallbackAddress: toChecksumAddress(questEntity.questFundsRecoveryAddress),
       creatorAddress: toChecksumAddress(questEntity.questCreator),
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
+      maxPlayers: questEntity.questMaxPlayers,
+      unlimited: !questEntity.questMaxPlayers,
     } as QuestModel;
 
     if (!quest.detailsRefIpfs) quest.description = '[No description]';
@@ -531,6 +533,7 @@ export async function saveQuest(
     description: data.description ?? '',
     communicationLink: data.communicationLink,
   });
+
   const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
   const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,
@@ -538,6 +541,7 @@ export async function saveQuest(
     typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
+    data.maxPlayers,
     {
       gasLimit: 10000000,
     },

@@ -11,6 +11,7 @@ export type QuestModel = {
   fallbackAddress: string;
   creatorAddress: string;
   maxPlayers?: number;
+  unlimited?: boolean;
 
   // Computed
   activeClaimCount?: number;
