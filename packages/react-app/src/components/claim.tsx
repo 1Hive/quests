@@ -1,6 +1,7 @@
 import { useViewport, Timer } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import {
+  ClaimState,
   ENUM_CLAIM_STATE,
   ENUM_DISPUTE_STATES,
   ENUM_QUEST_STATE,
@@ -74,7 +75,7 @@ type Props = {
 export default function Claim({ claim, isLoading, challengeDeposit, questData }: Props) {
   const { walletAddress, walletConnected } = useWallet();
   const { transaction } = useTransactionContext();
-  const [state, setState] = useState(claim.state);
+  const [state, setState] = useState<ClaimState | undefined>(claim.state);
   const { below } = useViewport();
   const [waitForClose, setWaitForClose] = useState(false);
   const [actionButton, setActionButton] = useState<ReactNode>();
@@ -235,9 +236,14 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                 buttonEnd
                 vertical={below('medium')}
               >
-                <FieldInput label="Status" isLoading={isLoading || state === ENUM_CLAIM_STATE.None}>
-                  <StateTag state={state ?? ''} className="pl-0" />
-                </FieldInput>
+                {state && (
+                  <FieldInput
+                    label="Status"
+                    isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
+                  >
+                    <StateTag state={state} className="pl-0" />
+                  </FieldInput>
+                )}
                 <AddressWrapperStyled isSmallScreen={below('medium')}>
                   <AddressFieldInput
                     id="playerAddress"

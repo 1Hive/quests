@@ -34,7 +34,7 @@ const VISIBLE_STATES = [
   ENUM_CLAIM_STATE.Approved,
   ENUM_CLAIM_STATE.Rejected,
   ENUM_CLAIM_STATE.Vetoed,
-];
+] as (QuestState | ClaimState)[];
 
 export function StateTag({ state, size = 'normal', wide = false, className }: Props) {
   const [mode, setMode] = useState<string>();

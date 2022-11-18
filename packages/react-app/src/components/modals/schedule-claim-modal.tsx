@@ -9,6 +9,7 @@ import {
   ENUM,
   DEFAULT_CLAIM_EXECUTION_DELAY_MS,
   ENUM_QUEST_STATE,
+  ClaimState,
 } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
@@ -91,7 +92,7 @@ type Props = {
   onClose?: ModalCallback;
 };
 const emptyClaimData = {
-  state: ENUM_QUEST_STATE.Draft,
+  state: ENUM_QUEST_STATE.Draft as ClaimState,
 } as ClaimModel;
 export default function ScheduleClaimModal({
   questAddress,
