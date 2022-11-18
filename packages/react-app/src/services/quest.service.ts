@@ -30,7 +30,7 @@ import {
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import { VetoModel } from 'src/models/veto.model';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from '../constants';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -70,23 +70,34 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
       creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
-      deposit: +questEntity.depositToken
+      createDeposit: +questEntity.questCreateDepositToken
         ? ({
-            amount: BigNumber.from(questEntity.depositAmount),
-            token: toChecksumAddress(questEntity.depositToken),
+            amount: BigNumber.from(questEntity.questCreateDepositAmount),
+            token: toChecksumAddress(questEntity.questCreateDepositToken),
+          } as DepositModel)
+        : undefined,
+      playDeposit: +questEntity.questPlayDepositToken
+        ? ({
+            amount: BigNumber.from(questEntity.questPlayDepositAmount),
+            token: toChecksumAddress(questEntity.questPlayDepositToken),
           } as DepositModel)
         : undefined,
       fallbackAddress: toChecksumAddress(questEntity.questFundsRecoveryAddress),
       creatorAddress: toChecksumAddress(questEntity.questCreator),
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
-      maxPlayers: questEntity.questMaxPlayers,
-      unlimited: !questEntity.questMaxPlayers,
+      maxPlayers: +questEntity.questMaxPlayers ?? undefined, // If null put undefined
+      unlimited: +questEntity.questMaxPlayers === 0,
+      state: ENUM_QUEST_STATE.Active,
+      players: [],
     } as QuestModel;
 
-    if (!quest.detailsRefIpfs) quest.description = '[No description]';
-    // If failed to fetch ipfs description
-    else if (!quest.description)
+    if (!quest.detailsRefIpfs) {
+      quest.description = '[No description]';
+    } else if (!quest.description) {
+      // If failed to fetch ipfs description
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
+    }
+
     return quest;
   } catch (error) {
     Logger.exception(error, `Failed to map quest :\n${JSON.stringify(questEntity)}`);
@@ -289,8 +300,11 @@ export async function fetchQuestsPaging(
 export async function fetchQuest(questAddress: string) {
   const queryResult = await fetchQuestEnity(questAddress);
   const claimResult = await fetchGovernQueueClaimsCount();
-  const newQuest = mapQuest(queryResult, claimResult);
-  return newQuest;
+  const questData = await mapQuest(queryResult, claimResult);
+  if (questData?.maxPlayers !== undefined) {
+    questData.players = await getQuestContract(questData.address!).getPlayers();
+  }
+  return questData;
 }
 
 export async function fetchQuestClaims(
@@ -461,24 +475,35 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   const { isTestNetwork } = getNetwork();
   const result = await fetchActiveQuestEntitiesLight();
   const quests = result.questEntities as {
-    id: string;
+    questAddress: string;
     questRewardTokenAddress: string;
     questCreateDepositToken: string;
     questCreateDepositAmount: string;
+    questPlayDepositToken: string;
+    questPlayDepositAmount: string;
+    questMaxPlayers: string;
   }[];
   const funds = (
     await Promise.all(
-      quests.map(async (quest) =>
-        getBalanceOf(
-          quest.questRewardTokenAddress,
-          quest.id,
+      quests.map(async (quest) => {
+        const lockedFunds = [
           {
             amount: BigNumber.from(quest.questCreateDepositAmount),
             token: quest.questCreateDepositToken,
           },
-          true,
-        ),
-      ),
+        ];
+
+        // If max player is not null then the quest is playable
+        if (quest.questMaxPlayers) {
+          const questPlayers = await getQuestContract(quest.questAddress!).getPlayers();
+          lockedFunds.push({
+            amount: BigNumber.from(quest.questPlayDepositAmount).mul(questPlayers.length),
+            token: quest.questPlayDepositToken,
+          });
+        }
+
+        return getBalanceOf(quest.questRewardTokenAddress, quest.questAddress, lockedFunds, true);
+      }),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
   const totalFunds = funds
@@ -543,7 +568,7 @@ export async function saveQuest(
     fallbackAddress,
     data.maxPlayers,
     {
-      gasLimit: 10000000,
+      // gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -572,10 +597,10 @@ export async function getQuestRecoveryAddress(questAddress: string): Promise<str
   return getQuestContract(questAddress)?.fundsRecoveryAddress() ?? null;
 }
 
-export async function isQuestDepositReleased(questAddress: string): Promise<boolean> {
+export async function isCreateQuestDepositReleased(questAddress: string): Promise<boolean> {
   try {
     const quest = getQuestContract(questAddress);
-    return await quest.isDepositReleased();
+    return await quest.isCreateDepositReleased();
   } catch (error) {
     Logger.debug('Failed to get quest deposit status', { questAddress, error });
     return false;
@@ -656,22 +681,26 @@ export function getAllowanceOf(walletAddress: string, token: TokenModel, spender
 export async function getBalanceOf(
   token: TokenModel | string,
   address: string,
-  lockedFunds?: DepositModel,
+  lockedFunds?: DepositModel[],
   forceCacheRefresh?: boolean,
 ): Promise<TokenAmountModel | null> {
   try {
     let tokenInfo: TokenModel;
-    if (typeof token === 'string') tokenInfo = (await getTokenInfo(token)) as TokenModel;
-    else tokenInfo = token;
+    if (typeof token === 'string') {
+      tokenInfo = (await getTokenInfo(token)) as TokenModel;
+    } else {
+      tokenInfo = token;
+    }
     if (tokenInfo) {
       const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
       let balance = await cacheFetchBalance(tokenInfo, address, erc20Contract, forceCacheRefresh);
-
-      if (lockedFunds && compareCaseInsensitive(lockedFunds.token, tokenInfo.token)) {
-        // Substract deposit from funds if both same token
-        balance = balance.sub(BigNumber.from(lockedFunds.amount));
-      }
+      lockedFunds?.forEach((lockedFund) => {
+        if (compareCaseInsensitive(lockedFund.token, tokenInfo.token)) {
+          // Substract deposit from funds if both same token
+          balance = balance.sub(BigNumber.from(lockedFund.amount));
+        }
+      });
       tokenInfo.amount = balance.toString();
       const price = await cacheFetchTokenPrice(tokenInfo);
       const parsedAmount = fromBigNumber(balance, tokenInfo.decimals);

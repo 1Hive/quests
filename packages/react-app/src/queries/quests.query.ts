@@ -22,9 +22,9 @@ const QuestEntityQuery = gql`
       questCreateDepositAmount
       questPlayDepositToken
       questPlayDepositAmount
-      questMaxPlayers
       questCreator
       questFundsRecoveryAddress
+      questMaxPlayers
     }
   }
 `;
@@ -68,9 +68,9 @@ const QuestEntitiesQuery = (payload: any) => gql`
       questCreateDepositAmount
       questPlayDepositToken
       questPlayDepositAmount
-      questMaxPlayers
       questCreator
       questFundsRecoveryAddress
+      questMaxPlayers
     }
   }
 `;
@@ -101,11 +101,13 @@ const QuestEntitiesLight = (payload: any) => gql`
       ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
      }) {
       id
+      questAddress
       questRewardTokenAddress
       questCreateDepositToken
       questCreateDepositAmount
       questPlayDepositToken
       questPlayDepositAmount
+      questMaxPlayers
     }
   }
 `;

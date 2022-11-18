@@ -1,3 +1,4 @@
+import { QuestState } from 'src/constants';
 import { TokenModel } from './token.model';
 import { TokenAmountModel } from './token-amount.model';
 import { DepositModel } from './deposit-model';
@@ -20,6 +21,8 @@ export type QuestModel = {
   bounty?: TokenAmountModel | null;
   rewardToken?: TokenModel | string;
   detailsRefIpfs?: string;
-  state: string;
-  deposit?: DepositModel;
+  state: QuestState;
+  createDeposit?: DepositModel;
+  playDeposit?: DepositModel;
+  players?: string[];
 };

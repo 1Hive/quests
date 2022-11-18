@@ -34,11 +34,12 @@ export default async (
     ethers.utils.parseEther(playDeposit.amount.toString()),
     owner,
   ];
+  console.log({ constructorArguments });
   const deployResult = await deploy("QuestFactory", {
     from: deployer,
     args: constructorArguments,
     log: true,
-    gasLimit: 4000000,
+    // gasLimit: 4000000,
   });
   await ethers.getContract("QuestFactory", deployResult.address);
 

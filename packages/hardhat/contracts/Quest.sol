@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./libraries/IExecutable.sol";
-import "./QuestFactory.sol";
 
 contract Quest is IExecutable {
     using SafeMath for uint256;
@@ -22,13 +21,14 @@ contract Quest is IExecutable {
     uint256 public expireTime;
     address public aragonGovernAddress;
     address payable public fundsRecoveryAddress;
-    uint32 public maxPlayers; // 0 for infinite
+    uint32 public maxPlayers; // 0 for unlimited players
 
     Models.Claim[] public claims;
     Models.Deposit public createDeposit;
     Models.Deposit public playDeposit;
     bool public isCreateDepositReleased;
-    address[] public playerList;
+
+    address[] private playerList;
 
     event QuestClaimed(bytes evidence, address player, uint256 amount);
     event QuestPlayed(address player, uint256 timestamp);
@@ -85,12 +85,19 @@ contract Quest is IExecutable {
         uint256 balance = rewardToken.balanceOf(address(this));
 
         if (_claimAll) {
-            // Claim all but let deposit if they are same token
+            // Claim all but let the create deposit if they are same token
             if (address(rewardToken) == address(createDeposit.token)) {
                 (, uint256 result) = balance.trySub(createDeposit.amount);
                 _amount = result;
             } else {
                 _amount = balance;
+            }
+            // Claim all but let play deposits of each player if they are same token
+            if (address(rewardToken) == address(playDeposit.token)) {
+                (, uint256 result) = _amount.trySub(
+                    playDeposit.amount * playerList.length
+                );
+                _amount = result;
             }
         }
 
@@ -194,9 +201,20 @@ contract Quest is IExecutable {
         int256 playerIndex = findIndexOfPlayer(_player);
         require(playerIndex != -1, "ERROR: player not in list");
 
-        delete playerList[uint256(playerIndex)];
+        // We put the last player in the place of the player to remove
+        playerList[uint256(playerIndex)] = playerList[playerList.length - 1];
+        // And then we can remove the last element to have the actual lenght updated
+        playerList.pop();
+
         playDeposit.releaseTo(_player);
         emit QuestUnplayed(_player, block.timestamp);
+    }
+
+    /**
+      Simply return the player list as the entire array
+    */
+    function getPlayers() external view returns (address[] memory) {
+        return playerList;
     }
 
     // Private functions

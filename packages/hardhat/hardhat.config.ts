@@ -57,7 +57,8 @@ const mainnetGwei = 21;
 
 function mnemonic() {
   try {
-    if (!process.env.MNEMONIC) throw new Error("No mnemonic detected");
+    if (!process.env.MNEMONIC || !process.env.PRIVATE_KEY)
+      throw new Error("No mnemonic detected");
     return process.env.MNEMONIC;
   } catch (e) {
     if (defaultNetwork !== "localhost") {
@@ -71,8 +72,8 @@ function mnemonic() {
 }
 
 function getAccounts(): HardhatNetworkAccountsUserConfig {
-  if (process.env.ETH_KEY) {
-    return [process.env.ETH_KEY as any];
+  if (process.env.PRIVATE_KEY) {
+    return [process.env.PRIVATE_KEY as any];
   }
 
   return {
@@ -112,23 +113,16 @@ const hardhatConfig: HardhatUserConfig = {
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        // gasPrice: mainnetGwei * 1000000000, TODO : Consider uncoment if using mainnet
-        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     ropsten: {
       url: "https://ropsten.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     goerli: {
       chainId: 5,
       url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
-      accounts: {
-        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     xdai: {
       chainId: 100,
@@ -232,7 +226,7 @@ const hardhatConfig: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 20000,
           },
         },
       },
@@ -242,7 +236,7 @@ const hardhatConfig: HardhatUserConfig = {
     solcVersion: "0.7.6",
   },
   etherscan: {
-    apiKey: "MXZSHPHKD1J7MGGSW9124C61G3PJZQVK2W",
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   namedAccounts: {
     deployer: {

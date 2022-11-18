@@ -29,11 +29,11 @@ interface QuestInterface extends ethers.utils.Interface {
     "createDeposit()": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
+    "getPlayers()": FunctionFragment;
     "isCreateDepositReleased()": FunctionFragment;
     "maxPlayers()": FunctionFragment;
     "play(address)": FunctionFragment;
     "playDeposit()": FunctionFragment;
-    "playerList(uint256)": FunctionFragment;
     "questCreator()": FunctionFragment;
     "questDetailsRef()": FunctionFragment;
     "questTitle()": FunctionFragment;
@@ -68,6 +68,10 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getPlayers",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "isCreateDepositReleased",
     values?: undefined
   ): string;
@@ -79,10 +83,6 @@ interface QuestInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "playDeposit",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "playerList",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "questCreator",
@@ -122,6 +122,7 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "fundsRecoveryAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getPlayers", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isCreateDepositReleased",
     data: BytesLike
@@ -132,7 +133,6 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "playDeposit",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "playerList", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "questCreator",
     data: BytesLike
@@ -242,6 +242,10 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
+    getPlayers(overrides?: CallOverrides): Promise<[string[]]>;
+
+    "getPlayers()"(overrides?: CallOverrides): Promise<[string[]]>;
+
     isCreateDepositReleased(overrides?: CallOverrides): Promise<[boolean]>;
 
     "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<[boolean]>;
@@ -264,16 +268,6 @@ export class Quest extends Contract {
     "playDeposit()"(
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
-
-    playerList(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "playerList(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
 
     questCreator(overrides?: CallOverrides): Promise<[string]>;
 
@@ -373,6 +367,10 @@ export class Quest extends Contract {
 
   "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
+  getPlayers(overrides?: CallOverrides): Promise<string[]>;
+
+  "getPlayers()"(overrides?: CallOverrides): Promise<string[]>;
+
   isCreateDepositReleased(overrides?: CallOverrides): Promise<boolean>;
 
   "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
@@ -395,13 +393,6 @@ export class Quest extends Contract {
   "playDeposit()"(
     overrides?: CallOverrides
   ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
-
-  playerList(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  "playerList(uint256)"(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   questCreator(overrides?: CallOverrides): Promise<string>;
 
@@ -498,6 +489,10 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
+    getPlayers(overrides?: CallOverrides): Promise<string[]>;
+
+    "getPlayers()"(overrides?: CallOverrides): Promise<string[]>;
+
     isCreateDepositReleased(overrides?: CallOverrides): Promise<boolean>;
 
     "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
@@ -517,13 +512,6 @@ export class Quest extends Contract {
     "playDeposit()"(
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
-
-    playerList(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    "playerList(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     questCreator(overrides?: CallOverrides): Promise<string>;
 
@@ -608,6 +596,10 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getPlayers(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getPlayers()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     isCreateDepositReleased(overrides?: CallOverrides): Promise<BigNumber>;
 
     "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -623,16 +615,6 @@ export class Quest extends Contract {
     playDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
     "playDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    playerList(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "playerList(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     questCreator(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -723,6 +705,10 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getPlayers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getPlayers()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     isCreateDepositReleased(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -745,16 +731,6 @@ export class Quest extends Contract {
     playDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "playDeposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    playerList(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "playerList(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     questCreator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

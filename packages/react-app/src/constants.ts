@@ -1,5 +1,6 @@
 import env from './environment';
 import { FilterModel } from './models/filter.model';
+import { ValueOf } from './utils/typescripts.util';
 
 export const PCT_BASE = BigInt(1e18);
 
@@ -29,6 +30,7 @@ export const ENUM_QUEST_STATE = Object.freeze({
   Expired: 'Expired', // When expireTime is past
   Archived: 'Archived', // When no more funds
 });
+export type QuestState = ValueOf<typeof ENUM_QUEST_STATE>;
 
 export const ENUM_QUEST_VIEW_MODE = Object.freeze({
   Create: 'CREATE',
@@ -36,6 +38,7 @@ export const ENUM_QUEST_VIEW_MODE = Object.freeze({
   ReadSummary: 'SUMMARY',
   ReadDetail: 'DETAIL',
 });
+export type QuestViewMode = ValueOf<typeof ENUM_QUEST_STATE>;
 
 export const ENUM_BREAKPOINTS = Object.freeze({
   4: '4',
@@ -49,11 +52,13 @@ export const ENUM_BREAKPOINTS = Object.freeze({
   64: '64',
   72: '72',
 });
+export type GUBreakpoint = ValueOf<typeof ENUM_BREAKPOINTS>;
 
 export const ENUM_PAGES = Object.freeze({
   List: 'list',
   Detail: 'detail',
 });
+export type Page = ValueOf<typeof ENUM_PAGES>;
 
 export const ENUM_CLAIM_STATE = Object.freeze({
   None: 'None',
@@ -67,6 +72,7 @@ export const ENUM_CLAIM_STATE = Object.freeze({
   Vetoed: 'Vetoed',
   Rejected: 'Rejected',
 });
+export type ClaimState = ValueOf<typeof ENUM_CLAIM_STATE>;
 
 export const ENUM_TRANSACTION_STATUS = Object.freeze({
   Confirmed: 'TX_STATUS_CONFIRMED',
@@ -76,6 +82,7 @@ export const ENUM_TRANSACTION_STATUS = Object.freeze({
   Signed: 'TX_STATUS_SIGNED',
   WaitingForSignature: 'TX_WAITING_FOR_SIGNATURE',
 });
+export type TRANSACTIONStatus = ValueOf<typeof ENUM_TRANSACTION_STATUS>;
 
 export const ENUM_ESTIMATED_TX_TIME_MS = Object.freeze({
   Default: 15 * 1000,

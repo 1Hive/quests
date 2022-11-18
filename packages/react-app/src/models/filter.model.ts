@@ -1,3 +1,4 @@
+import { QuestState } from 'src/constants';
 import { TokenAmountModel } from './token-amount.model';
 
 export type FilterModel = {
@@ -5,5 +6,5 @@ export type FilterModel = {
   description: string;
   minExpireTime?: Date | null;
   bounty?: TokenAmountModel;
-  status: string;
+  status: QuestState;
 };

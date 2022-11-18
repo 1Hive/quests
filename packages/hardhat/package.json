@@ -62,7 +62,6 @@
     "deploy:xdai": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json --network xdai",
     "deploy:local": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json",
     "console": "hardhat console",
-    "postdeploy": "hardhat run scripts/publish.js",
     "watch": "node scripts/watch.js",
     "accounts": "hardhat accounts",
     "balance": "hardhat balance",

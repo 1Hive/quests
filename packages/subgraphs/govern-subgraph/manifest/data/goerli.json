@@ -1,5 +1,13 @@
 {
   "network": "goerli",
-  "startBlock": 7543552,
-  "governQueueAddress": "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E"
+  "dataSources": [
+    {
+      "startBlock": 7543552,
+      "governQueueAddress": "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E"
+    },
+    {
+      "startBlock": 7961041,
+      "governQueueAddress": "0x9455535155f3c062d83bf51f85ca7e1f0b8deb6e"
+    }
+  ]
 }

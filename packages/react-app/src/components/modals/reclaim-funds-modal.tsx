@@ -72,9 +72,9 @@ export default function ReclaimFundsModal({
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    if (questData.deposit) {
-      const depositAmount = questData.deposit;
-      getTokenInfo(questData.deposit?.token).then((token) => {
+    if (questData.createDeposit) {
+      const depositAmount = questData.createDeposit;
+      getTokenInfo(questData.createDeposit?.token).then((token) => {
         if (isMountedRef.current) {
           setDepositTokenAmount(
             toTokenAmountModel({

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Tag } from '@1hive/1hive-ui';
-import { ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from 'src/constants';
+import { ClaimState, ENUM_CLAIM_STATE, ENUM_QUEST_STATE, QuestState } from 'src/constants';
 import { useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/style.util';
 
@@ -17,7 +17,7 @@ const StateWrapperStyled = styled.div<{ visible: boolean }>`
 `;
 
 type Props = {
-  state: string;
+  state: QuestState | ClaimState;
   size?: 'normal' | 'small';
   wide?: boolean;
   className?: string;

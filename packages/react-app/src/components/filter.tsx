@@ -4,7 +4,7 @@ import { useFilterContext } from 'src/contexts/filter.context';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
-import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
+import { DEFAULT_FILTER, ENUM_QUEST_STATE, QuestState } from '../constants';
 import DateFieldInput from './field-input/date-field-input';
 import { FieldInput } from './field-input/field-input';
 
@@ -81,7 +81,11 @@ export function Filter({ compact }: Props) {
   const { filter, setFilter, toggleFilter } = useFilterContext();
   const theme = useTheme();
   const { below, width } = useViewport();
-  const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
+  const states = [
+    ENUM_QUEST_STATE.All,
+    ENUM_QUEST_STATE.Active,
+    ENUM_QUEST_STATE.Expired,
+  ] as QuestState[];
   const { isFilterShown } = useFilterContext();
   const isSmallResolution = useMemo(() => below('medium'), [width]);
   const [isFilteringOriginalState, setIsFilteringOriginalState] = useState(false);

@@ -186,7 +186,6 @@ export default function QuestModal({
       }
     }
     if ((!data.maxPlayers || data.maxPlayers <= 0) && !data.unlimited) {
-      console.log('error');
       errors.maxPlayers = 'Max players needs to be set or check as unlimited';
     }
     // If bounty is not set then amount can't be invalid because disabled

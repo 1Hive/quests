@@ -13,7 +13,7 @@ module.exports = async ({
     "ASDF",
     "0x00",
     "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
-    0,
+    1700122574,
     "0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd",
     "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
     {
@@ -31,8 +31,10 @@ module.exports = async ({
     from: deployer,
     args: constructorArguments,
     log: true,
-    gasLimit: 4000000,
+    // gasLimit: 4000000,
   });
+
+  console.log({ constructorArguments });
 
   if (network.name === "rinkeby" || network.name === "goerli") {
     try {

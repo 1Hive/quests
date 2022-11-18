@@ -373,7 +373,7 @@ describe("[Contract] Quest", function () {
       );
     });
 
-    it("SHOULD let deposit WHEN deposit and rewardToken the same and claim all", async () => {
+    it("SHOULD let deposit WHEN claiming all but create deposit and rewardToken the same", async () => {
       // Arrange
       const sameToken = rewardToken;
       const quest = await deployQuest(
@@ -383,7 +383,7 @@ describe("[Contract] Quest", function () {
         epoch0,
         govern.address,
         creator.address,
-        fromNumber(1),
+        depositAmount,
         sameToken,
         depositAmount,
         playDepositToken,
@@ -398,6 +398,78 @@ describe("[Contract] Quest", function () {
 
       // Assert
       expect(await rewardToken.balanceOf(quest.address)).to.eq(depositAmount);
+    });
+
+    it("SHOULD let deposit WHEN claiming all but play deposit and rewardToken the same and 2 player", async () => {
+      // Arrange
+      const sameToken = rewardToken;
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        sameToken,
+        epochNow + 3600, // 1 hour from now
+        govern.address,
+        creator.address,
+        depositAmount,
+        createDepositToken,
+        depositAmount,
+        sameToken,
+        depositAmount,
+        creator
+      );
+      await sameToken.connect(creator).mint(creator.address, fromNumber(1000));
+      await sameToken
+        .connect(creator)
+        .approve(quest.address, depositAmount.mul(2));
+      // Add 2 player
+      await quest.connect(creator).play(player.address);
+      await quest.connect(creator).play(other.address);
+
+      // Act
+      await quest
+        .connect(govern)
+        .claim(hashToBytes("evidence1"), player.address, 0, true);
+
+      // Assert
+      expect(await rewardToken.balanceOf(quest.address)).to.eq(
+        depositAmount.mul(2)
+      );
+    });
+
+    it("SHOULD let deposit WHEN claiming all but  both deposit and rewardToken the same and 2 player", async () => {
+      // Arrange
+      const sameToken = rewardToken;
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        sameToken,
+        epochNow + 3600, // 1 hour from now
+        govern.address,
+        creator.address,
+        fromNumber(1),
+        sameToken,
+        depositAmount,
+        sameToken,
+        depositAmount,
+        creator
+      );
+      await sameToken.connect(creator).mint(creator.address, fromNumber(1000));
+      await sameToken
+        .connect(creator)
+        .approve(quest.address, depositAmount.mul(2));
+      // Add 2 player
+      await quest.connect(creator).play(player.address);
+      await quest.connect(creator).play(other.address);
+
+      // Act
+      await quest
+        .connect(govern)
+        .claim(hashToBytes("evidence1"), player.address, 0, true);
+
+      // Assert
+      expect(await rewardToken.balanceOf(quest.address)).to.eq(
+        depositAmount.mul(3) // 1 create and 2 player deposits
+      );
     });
   });
 
@@ -431,7 +503,7 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.emit(quest, "QuestPlayed");
-      expect(await quest.playerList(0)).to.eq(player.address);
+      expect(await quest.getPlayers()).to.deep.eq([player.address]);
       expect(await quest.canExecute(player.address)).to.eq(true);
     });
 
@@ -463,7 +535,7 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.emit(quest, "QuestPlayed");
-      expect(await quest.playerList(0)).to.eq(player.address);
+      expect(await quest.getPlayers()).to.deep.eq([player.address]);
     });
 
     it("SHOULD revert WHEN given player is not the sender nor creator", async () => {
@@ -653,9 +725,7 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.emit(quest, "QuestUnplayed");
-      expect(await quest.playerList(0)).to.eq(
-        "0x0000000000000000000000000000000000000000"
-      );
+      expect(await quest.getPlayers()).to.deep.eq([]);
       expect(await quest.canExecute(player.address)).to.eq(false);
       expect(await playDepositToken.balanceOf(quest.address)).to.eq(
         fromNumber(0)
@@ -691,9 +761,7 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.emit(quest, "QuestUnplayed");
-      expect(await quest.playerList(0)).to.eq(
-        "0x0000000000000000000000000000000000000000"
-      );
+      expect(await quest.getPlayers()).to.deep.eq([]);
       expect(await quest.canExecute(player.address)).to.eq(false);
       expect(await playDepositToken.balanceOf(player.address)).to.eq(
         depositAmount
@@ -759,6 +827,41 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: player not in list");
+    });
+  });
+
+  describe("getPlayers()", () => {
+    it("SHOULD return the player list AFTER adding a player", async () => {
+      // Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epochNow + 3600, // in 1 hour
+        govern.address,
+        creator.address,
+        fromNumber(0),
+        createDepositToken,
+        depositAmount,
+        playDepositToken,
+        depositAmount,
+        creator
+      );
+      const playerInitialBalance = fromNumber(1000);
+      await playDepositToken
+        .connect(player)
+        .mint(player.address, playerInitialBalance);
+      await playDepositToken
+        .connect(player)
+        .approve(quest.address, depositAmount);
+
+      await quest.connect(player).play(player.address); // First registration
+
+      // Act
+      const act = () => quest.getPlayers();
+
+      // Assert
+      expect(await act()).to.deep.eq([player.address]);
     });
   });
 });

@@ -10,7 +10,7 @@
     {
       "nameContract": "QuestFactoryV2",
       "startBlock": 7949788,
-      "questFactoryAddress": "0x81AF972C86e55E45db1971fDe2549bEC0C7C8d70",
+      "questFactoryAddress": "0xBE88dBF504dC58075B5A33093f9b76d08D18cE31",
       "customTemplate": "questFactoryV2.yaml"
     }
   ]

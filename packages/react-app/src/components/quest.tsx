@@ -8,6 +8,7 @@ import {
   ENUM_QUEST_STATE,
   ENUM_TRANSACTION_STATUS,
   MAX_LINE_DESCRIPTION,
+  QuestState,
 } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -22,6 +23,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { ClaimModel } from 'src/models/claim.model';
 import { getNetwork } from 'src/networks';
+import { DepositModel } from 'src/models/deposit-model';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -140,7 +142,7 @@ export default function Quest({
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
-  const [state, setState] = useState(questData.state);
+  const [state, setState] = useState<QuestState>(questData.state);
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   const [waitForClose, setWaitForClose] = useState(false);
@@ -203,7 +205,7 @@ export default function Quest({
     } else if (questData.address) {
       fetchBalanceOfQuest(questData.address, questData.rewardToken);
     }
-  }, [questData.address, questData.rewardToken]);
+  }, [questData.address, questData.rewardToken, questData.playDeposit, questData.playDeposit]);
 
   const fetchBalanceOfQuest = async (
     address: string,
@@ -212,20 +214,31 @@ export default function Quest({
   ) => {
     try {
       if (questData.address) {
-        let depositReleased = false;
+        let createDepositReleased = false;
         if (isQuestExpired(questData)) {
-          depositReleased = await QuestService.isQuestDepositReleased(questData.address);
+          createDepositReleased = await QuestService.isCreateQuestDepositReleased(
+            questData.address,
+          );
+        }
+        const depositLocked: DepositModel[] = [];
+        if (!createDepositReleased && questData.createDeposit) {
+          depositLocked.push(questData.createDeposit);
+        }
+        if (questData.players?.length && questData.playDeposit) {
+          // Multiply by the number of players (each one has a deposit locked)
+          questData.playDeposit.amount = questData.playDeposit.amount.mul(questData.players.length);
+          depositLocked.push(questData.playDeposit);
         }
         const result = await QuestService.getBalanceOf(
           token,
           address,
-          depositReleased ? undefined : questData.deposit,
+          depositLocked,
           forceCacheRefresh,
         );
         if (isMountedRef.current) {
           questData.bounty = result;
-          setIsDepositReleased(depositReleased);
-          computeQuestState(questData, depositReleased);
+          setIsDepositReleased(createDepositReleased);
+          computeQuestState(questData, createDepositReleased);
           setState(questData.state);
           setBounty(result);
         }
@@ -273,12 +286,16 @@ export default function Quest({
             isLoading={isLoading || !questData}
             value={questData?.creatorAddress}
           />
-          <TextFieldInput
-            id="maxPlayers"
-            label="Max players"
-            isLoading={isLoading || !questData}
-            value={questData.maxPlayers?.toString() ?? 'Unlimited'}
-          />
+          {questData?.maxPlayers != null && (
+            <TextFieldInput
+              id="players"
+              label="Players"
+              isLoading={isLoading || !questData}
+              value={`${questData?.players?.length ?? 0} / ${
+                questData.unlimited ? '∞' : questData.maxPlayers
+              }`}
+            />
+          )}
           <DateFieldInput
             id="creationTime"
             label="Creation time"
