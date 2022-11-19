@@ -30,6 +30,7 @@ import {
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import { VetoModel } from 'src/models/veto.model';
+import { PlayModel } from 'src/models/play.model';
 import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -96,6 +97,10 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     } else if (!quest.description) {
       // If failed to fetch ipfs description
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
+    }
+
+    if (quest?.maxPlayers !== undefined) {
+      quest.players = await getQuestContract(quest.address!).getPlayers();
     }
 
     return quest;
@@ -300,11 +305,7 @@ export async function fetchQuestsPaging(
 export async function fetchQuest(questAddress: string) {
   const queryResult = await fetchQuestEnity(questAddress);
   const claimResult = await fetchGovernQueueClaimsCount();
-  const questData = await mapQuest(queryResult, claimResult);
-  if (questData?.maxPlayers !== undefined) {
-    questData.players = await getQuestContract(questData.address!).getPlayers();
-  }
-  return questData;
+  return mapQuest(queryResult, claimResult);
 }
 
 export async function fetchQuestClaims(
@@ -605,6 +606,38 @@ export async function isCreateQuestDepositReleased(questAddress: string): Promis
     Logger.debug('Failed to get quest deposit status', { questAddress, error });
     return false;
   }
+}
+
+export async function playQuest(
+  walletAddress: string,
+  quest: QuestModel,
+  data: PlayModel,
+  onTx?: onTxCallback,
+): Promise<ethers.ContractReceipt | null> {
+  if (!quest.address) throw new Error('Quest address is not defined when playing a quest');
+  const questContract = getQuestContract(quest.address, walletAddress);
+  if (!questContract) return null;
+  Logger.debug('Playing quest...', { quest });
+  const tx = await questContract.play(data.player || walletAddress, {
+    gasLimit: 1000000,
+  });
+  return handleTransaction(tx, onTx);
+}
+
+export async function leaveQuest(
+  walletAddress: string,
+  quest: QuestModel,
+  data: PlayModel,
+  onTx?: onTxCallback,
+): Promise<ethers.ContractReceipt | null> {
+  if (!quest.address) throw new Error('Quest address is not defined when leaving a quest');
+  const questContract = getQuestContract(quest.address, walletAddress);
+  if (!questContract) return null;
+  Logger.debug('Playing quest...', { quest });
+  const tx = await questContract.unplay(data.player || walletAddress, {
+    gasLimit: 1000000,
+  });
+  return handleTransaction(tx, onTx);
 }
 
 // #endregion

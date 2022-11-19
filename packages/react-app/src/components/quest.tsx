@@ -1,5 +1,5 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ADDRESS_ZERO,
@@ -37,6 +37,7 @@ import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
 import NumberFieldInput from './field-input/number-field-input';
 import { ActionsPlaceholder } from './actions-placeholder';
+import PlayModal from './modals/play-modal';
 
 // #region StyledComponents
 
@@ -135,6 +136,7 @@ export default function Quest({
   isLoading = false,
   isSummary = false,
 }: Props) {
+  const { walletAddress } = useWallet();
   const { walletConnected } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
@@ -148,6 +150,12 @@ export default function Quest({
   const [waitForClose, setWaitForClose] = useState(false);
   const isMountedRef = useIsMountedRef();
   const { chainId } = getNetwork();
+  const [players, setPlayers] = useState<string[]>(questData.players ?? []);
+
+  const isPlayingQuest = useMemo(
+    () => players.some((player) => player === walletAddress),
+    [players.length],
+  );
 
   useEffect(() => {
     if (!isSummary) {
@@ -171,26 +179,41 @@ export default function Quest({
 
   useEffect(() => {
     // If tx completion impact Quest bounty, update it
-    if (
-      transaction?.args?.questAddress === questData.address &&
-      (transaction?.type === 'ClaimChallengeResolve' ||
-        transaction?.type === 'ClaimExecute' ||
-        transaction?.type === 'QuestFund' ||
-        transaction?.type === 'QuestReclaimFunds')
-    ) {
-      if (
+    if (transaction?.args?.questAddress === questData.address) {
+      if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) {
+        switch (transaction?.type) {
+          case 'QuestPlay':
+          case 'QuestLeave':
+            if (transaction.args?.player) {
+              if (transaction.type === 'QuestPlay') {
+                setPlayers((prev) => [...prev, transaction.args!.player!]);
+              } else {
+                setPlayers((prev) =>
+                  prev?.filter((_player) => _player !== transaction.args!.player),
+                );
+              }
+            }
+            break;
+          case 'ClaimChallengeResolve':
+          case 'ClaimExecute':
+          case 'QuestFund':
+          case 'QuestReclaimFunds':
+            setBounty(null);
+            setTimeout(() => {
+              if (questData.address && questData.rewardToken) {
+                fetchBalanceOfQuest(questData.address, questData.rewardToken, true);
+              }
+            }, 500);
+            break;
+          default:
+            break;
+        }
+      } else if (
         transaction?.status === ENUM_TRANSACTION_STATUS.Pending &&
         transaction?.type === 'QuestReclaimFunds'
       ) {
         // Should wait for close because changing the state will cause QuestReclaimFunds to be removed from DOM
         setWaitForClose(true);
-      } else if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) {
-        setBounty(null);
-        setTimeout(() => {
-          if (questData.address && questData.rewardToken) {
-            fetchBalanceOfQuest(questData.address, questData.rewardToken, true);
-          }
-        }, 500);
       }
     }
   }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
@@ -224,9 +247,9 @@ export default function Quest({
         if (!createDepositReleased && questData.createDeposit) {
           depositLocked.push(questData.createDeposit);
         }
-        if (questData.players?.length && questData.playDeposit) {
+        if (players.length && questData.playDeposit) {
           // Multiply by the number of players (each one has a deposit locked)
-          questData.playDeposit.amount = questData.playDeposit.amount.mul(questData.players.length);
+          questData.playDeposit.amount = questData.playDeposit.amount.mul(players.length);
           depositLocked.push(questData.playDeposit);
         }
         const result = await QuestService.getBalanceOf(
@@ -291,9 +314,7 @@ export default function Quest({
               id="players"
               label="Players"
               isLoading={isLoading || !questData}
-              value={`${questData?.players?.length ?? 0} / ${
-                questData.unlimited ? '∞' : questData.maxPlayers
-              }`}
+              value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
             />
           )}
           <DateFieldInput
@@ -420,7 +441,8 @@ export default function Quest({
                 <>
                   <>
                     <FundModal quest={questData} />
-                    {claimDeposit && (
+                    <PlayModal quest={questData} />
+                    {claimDeposit && isPlayingQuest && (
                       <ScheduleClaimModal
                         questData={{ ...questData, state }}
                         questAddress={questData.address}

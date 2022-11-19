@@ -57,7 +57,7 @@ export default function ModalBase({
   const width = useMemo(() => {
     switch (size) {
       case 'small':
-        return 500;
+        return 600;
       case 'large':
         return 1500;
       default:

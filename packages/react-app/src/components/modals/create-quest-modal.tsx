@@ -182,7 +182,7 @@ export default function QuestModal({
       try {
         data.fallbackAddress = toChecksumAddress(data.fallbackAddress);
       } catch (error) {
-        errors.fallbackAddress = 'Player address is not valid';
+        errors.fallbackAddress = 'Fallback address is not valid';
       }
     }
     if ((!data.maxPlayers || data.maxPlayers <= 0) && !data.unlimited) {
@@ -202,7 +202,9 @@ export default function QuestModal({
 
   const onQuestSubmit = async (values: QuestModel) => {
     validate(values); // Validate one last time before submitting
-    if (isFormValid && questDeposit?.token) {
+    if (isFormValid) {
+      if (!questDeposit?.token) throw new Error('Quest deposit token is not set');
+
       await approveTokenTransaction(
         modalId,
         questDeposit?.token,

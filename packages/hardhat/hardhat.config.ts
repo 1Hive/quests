@@ -1256,20 +1256,6 @@ task("deployAll:rinkeby")
   )
   .setAction(deployAll);
 
-task("sig")
-  .addOptionalParam(
-    "func",
-    "function signature without variables names",
-    "schedule(ERC3000Data.Container)"
-  )
-  .setAction(async (args: { func: string }, _b) => {
-    const { func } = args;
-    const keccak = utils
-      .keccak256(utils.toUtf8Bytes(func))
-      .substring(0, (4 + 1) * 2);
-    console.log(keccak);
-  });
-
 task("sigAbi").setAction(async (_args, { web3 }) => {
   const aclFunctions = [
     "schedule",
