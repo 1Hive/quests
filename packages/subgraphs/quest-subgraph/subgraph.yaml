@@ -10,7 +10,7 @@ dataSources:
     name: QuestFactory
     network: goerli
     source:
-      address: '0x4DfE6C03132BD14D95b87803e232AcA352a715b4'
+      address: "0x4DfE6C03132BD14D95b87803e232AcA352a715b4"
       abi: QuestFactory
       startBlock: 7543619
     mapping:
@@ -32,9 +32,9 @@ dataSources:
     name: QuestFactoryV2
     network: goerli
     source:
-      address: '0xBE88dBF504dC58075B5A33093f9b76d08D18cE31'
+      address: "0xeFE59A6215961aE91a39309A0331976c8a862A1f"
       abi: QuestFactory
-      startBlock: 7949788
+      startBlock: 7985688
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

@@ -2,12 +2,12 @@
   "GovernQueueFactory": {
     "rinkeby": "0x3383032F06BB4Bc4c9DfE08c564cde467c2f725e",
     "xdai": "0xA6591419f78C044979bf63Aa81edD5e100C0E957",
-    "goerli": "0xC7ADACbA47a02E1Ec3431f67eB33f31012f164Af"
+    "goerli": "0xEA6015008c7926E84C76b70344EbD31a48A6fd2c"
   },
   "GovernFactory": {
     "rinkeby": "0x3ddc3e8bbf3f6987e4008a7d6f486dae4d0f120f",
     "xdai": "0x8De393cd9F84D7989A1164191a1f6CDd5D2a7F9B",
-    "goerli": "0xd439D35257a5Ff51c7d98Cf2b932e9096bbeAb63"
+    "goerli": "0xd0A50194CeFf1A33E2a831F80EBfa2b11aC44B78"
   },
   "CreateQuestDeposit": {
     "rinkeby": {

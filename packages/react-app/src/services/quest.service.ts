@@ -31,7 +31,12 @@ import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import { VetoModel } from 'src/models/veto.model';
 import { PlayModel } from 'src/models/play.model';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE, ENUM_QUEST_STATE } from '../constants';
+import {
+  ADDRESS_ZERO,
+  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
+  ENUM_CLAIM_STATE,
+  ENUM_QUEST_STATE,
+} from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -86,8 +91,8 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       fallbackAddress: toChecksumAddress(questEntity.questFundsRecoveryAddress),
       creatorAddress: toChecksumAddress(questEntity.questCreator),
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
-      maxPlayers: +questEntity.questMaxPlayers ?? undefined, // If null put undefined
-      unlimited: +questEntity.questMaxPlayers === 0,
+      maxPlayers: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers : undefined, // If null put undefined
+      unlimited: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers === 0 : undefined,
       state: ENUM_QUEST_STATE.Active,
       players: [],
     } as QuestModel;
@@ -181,6 +186,7 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
           executor: toChecksumAddress(x.payload.executor.id),
           submitter: toChecksumAddress(x.payload.submitter),
           allowFailuresMap: x.payload.allowFailuresMap,
+          challenger: ADDRESS_ZERO,
         },
         state: x.state,
         config: {
@@ -283,6 +289,7 @@ async function generateScheduleContainer(
       ],
       allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
       proof: claimInfoIpfsHash,
+      challenger: ADDRESS_ZERO,
     },
   } as ContainerModel;
 }

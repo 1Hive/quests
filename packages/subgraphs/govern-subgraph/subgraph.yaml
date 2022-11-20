@@ -11,7 +11,7 @@ dataSources:
     network: goerli
     source:
       abi: GovernQueue
-      address: '0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E'
+      address: "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E"
       startBlock: 7543552
     mapping:
       kind: ethereum/events
@@ -54,8 +54,8 @@ dataSources:
     network: goerli
     source:
       abi: GovernQueue
-      address: '0x9455535155f3c062d83bf51f85ca7e1f0b8deb6e'
-      startBlock: 7961041
+      address: "0xc73BCDc0FF18Fb903FCd34de4BFfE37BE66b4E8f"
+      startBlock: 7985656
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -59,8 +59,13 @@
     "deploy": "hardhat deploy",
     "deploy:rinkeby": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json --network rinkeby",
     "deploy:goerli": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json --network goerli",
-    "deploy:xdai": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json --network xdai",
+    "deploy:gnosis": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json --network xdai",
     "deploy:local": "hardhat deploy --export-all ../react-app/src/contracts/hardhat_contracts.json",
+    "deploy-all:goerli": "hardhat deployAll:goerli --network goerli",
+    "deploy-all:gnosis": "hardhat deployAll:goerli --network xdai",
+    "queue-config:goerli": "hardhat generateGovernQueueConfig:goerli",
+    "queue-config:gnosis": "hardhat generateGovernQueueConfig:gnosis",
+    "deploy-all:local": "hardhat deployAll:goerli",
     "console": "hardhat console",
     "watch": "node scripts/watch.js",
     "accounts": "hardhat accounts",
@@ -69,6 +74,8 @@
     "generate": "hardhat generate",
     "account": "hardhat account",
     "verify:rinkeby": "hardhat verify-quests-contracts --network rinkeby",
+    "verify:goerli": "hardhat verify-quests-contracts --network goerli",
+    "sig": "hardhat sigAbi",
     "ci": "yarn install --pure-lockfile --immutable --skip-builds"
   }
 }

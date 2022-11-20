@@ -387,7 +387,8 @@
             "name": "allowFailuresMap",
             "type": "bytes32"
           },
-          { "internalType": "bytes", "name": "proof", "type": "bytes" }
+          { "internalType": "bytes", "name": "proof", "type": "bytes" },
+          { "internalType": "address", "name": "challenger", "type": "address" }
         ],
         "indexed": false,
         "internalType": "struct ERC3000Data.Payload",
@@ -497,7 +498,12 @@
                 "name": "allowFailuresMap",
                 "type": "bytes32"
               },
-              { "internalType": "bytes", "name": "proof", "type": "bytes" }
+              { "internalType": "bytes", "name": "proof", "type": "bytes" },
+              {
+                "internalType": "address",
+                "name": "challenger",
+                "type": "address"
+              }
             ],
             "internalType": "struct ERC3000Data.Payload",
             "name": "payload",
@@ -688,7 +694,12 @@
                 "name": "allowFailuresMap",
                 "type": "bytes32"
               },
-              { "internalType": "bytes", "name": "proof", "type": "bytes" }
+              { "internalType": "bytes", "name": "proof", "type": "bytes" },
+              {
+                "internalType": "address",
+                "name": "challenger",
+                "type": "address"
+              }
             ],
             "internalType": "struct ERC3000Data.Payload",
             "name": "payload",
@@ -922,7 +933,12 @@
                 "name": "allowFailuresMap",
                 "type": "bytes32"
               },
-              { "internalType": "bytes", "name": "proof", "type": "bytes" }
+              { "internalType": "bytes", "name": "proof", "type": "bytes" },
+              {
+                "internalType": "address",
+                "name": "challenger",
+                "type": "address"
+              }
             ],
             "internalType": "struct ERC3000Data.Payload",
             "name": "payload",
@@ -1065,7 +1081,12 @@
                 "name": "allowFailuresMap",
                 "type": "bytes32"
               },
-              { "internalType": "bytes", "name": "proof", "type": "bytes" }
+              { "internalType": "bytes", "name": "proof", "type": "bytes" },
+              {
+                "internalType": "address",
+                "name": "challenger",
+                "type": "address"
+              }
             ],
             "internalType": "struct ERC3000Data.Payload",
             "name": "payload",
@@ -1195,7 +1216,12 @@
                 "name": "allowFailuresMap",
                 "type": "bytes32"
               },
-              { "internalType": "bytes", "name": "proof", "type": "bytes" }
+              { "internalType": "bytes", "name": "proof", "type": "bytes" },
+              {
+                "internalType": "address",
+                "name": "challenger",
+                "type": "address"
+              }
             ],
             "internalType": "struct ERC3000Data.Payload",
             "name": "payload",
