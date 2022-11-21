@@ -10,7 +10,11 @@ import { GUpx } from 'src/utils/style.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { FormErrors } from 'src/models/form-errors';
-import { ENUM_TRANSACTION_STATUS, ENUM_ESTIMATED_TX_TIME_MS } from 'src/constants';
+import {
+  ENUM_TRANSACTION_STATUS,
+  ENUM_ESTIMATED_TX_TIME_MS,
+  ENUM_QUEST_STATE,
+} from 'src/constants';
 import { PlayModel } from 'src/models/play.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
@@ -210,13 +214,20 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
               label="Play"
               mode="positive"
               title={
-                maxPlayerReached
+                quest.state !== ENUM_QUEST_STATE.Active
+                  ? 'Quest expired'
+                  : maxPlayerReached
                   ? 'Max player reached'
                   : !isFormValid
                   ? 'Form not valid'
                   : 'Play quest'
               }
-              disabled={maxPlayerReached || !isDepositEnoughBalance || !isFormValid}
+              disabled={
+                quest.state !== ENUM_QUEST_STATE.Active ||
+                maxPlayerReached ||
+                !isDepositEnoughBalance ||
+                !isFormValid
+              }
             />,
           ]}
           onClose={closeModal}
@@ -242,6 +253,13 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
           {maxPlayerReached && (
             <Outset vertical>
               <Info mode="warning">❌ The maximum number of player has been reached</Info>
+            </Outset>
+          )}
+          {quest.state !== ENUM_QUEST_STATE.Active && (
+            <Outset vertical>
+              <Info mode="warning">
+                ❌ This quest is expired and will no longer accept new players
+              </Info>
             </Outset>
           )}
         </ModalBase>
