@@ -113,7 +113,7 @@ export default function ClaimList({
       claimsCount = claims.length;
     }
     setTimeout(async () => {
-      const results = await QuestService.fetchQuestClaims(questData, true);
+      const results = await QuestService.fetchQuestClaims(questData, false);
       if (!isMountedRef.current) return;
       if (results.length === claimsCount) {
         fetchClaimsUntilNew(claimsCount);
