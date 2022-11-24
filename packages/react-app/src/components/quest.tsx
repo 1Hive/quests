@@ -154,7 +154,7 @@ export default function Quest({
 
   const isPlayingQuest = useMemo(
     () => players.some((player) => player === walletAddress),
-    [players.length],
+    [players.length, walletAddress],
   );
 
   useEffect(() => {
@@ -441,7 +441,9 @@ export default function Quest({
                 <>
                   <>
                     <FundModal quest={questData} />
-                    <PlayModal quest={questData} />
+                    {(!isPlayingQuest || questData.creatorAddress === walletAddress) && (
+                      <PlayModal quest={questData} />
+                    )}
                     {claimDeposit && isPlayingQuest && (
                       <ScheduleClaimModal
                         questData={{ ...questData, state }}

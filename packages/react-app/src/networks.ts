@@ -52,6 +52,7 @@ export const networks = Object.freeze({
   goerliStaging: {
     stagingOf: 'goerli',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-goerli-staging',
+    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli-staging',
   } as StagingNetworkModel,
   gnosis: {
     networkId: 'xdai',

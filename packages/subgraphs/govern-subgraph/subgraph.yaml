@@ -11,7 +11,7 @@ dataSources:
     network: goerli
     source:
       abi: GovernQueue
-      address: "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E"
+      address: '0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E'
       startBlock: 7543552
     mapping:
       kind: ethereum/events
@@ -54,7 +54,7 @@ dataSources:
     network: goerli
     source:
       abi: GovernQueue
-      address: "0xc73BCDc0FF18Fb903FCd34de4BFfE37BE66b4E8f"
+      address: '0xc73BCDc0FF18Fb903FCd34de4BFfE37BE66b4E8f'
       startBlock: 7985656
     mapping:
       kind: ethereum/events
@@ -69,7 +69,7 @@ dataSources:
         - Role
       abis:
         - name: GovernQueue
-          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueueV2.json
         - name: ERC20
           file: ./govern-contract-utils/abi/contracts/erc20/ERC20.sol/ERC20.json
       eventHandlers:
@@ -79,7 +79,7 @@ dataSources:
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address,address)
           handler: handleGranted
-        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes))
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes,address))
           handler: handleScheduled
         - event: Executed(indexed bytes32,indexed address)
           handler: handleExecuted
