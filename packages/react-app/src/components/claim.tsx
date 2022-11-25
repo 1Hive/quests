@@ -1,11 +1,5 @@
 import { useViewport, Timer } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
-import {
-  ENUM_CLAIM_STATE,
-  ENUM_DISPUTE_STATES,
-  ENUM_QUEST_STATE,
-  ENUM_TRANSACTION_STATUS,
-} from 'src/constants';
 import { GUpx } from 'src/utils/style.util';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
@@ -18,6 +12,10 @@ import { getNetwork } from 'src/networks';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import styled, { css } from 'styled-components';
 import { ContainerModel } from 'src/models/govern.model';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { DisputeStatus } from 'src/enums/dispute-status.enum';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { CollapsableBlock } from './collapsable-block';
 import { AddressFieldInput } from './field-input/address-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
@@ -27,7 +25,7 @@ import ChallengeModal from './modals/challenge-modal';
 import ExecuteClaimModal from './modals/execute-claim-modal';
 import ResolveChallengeModal from './modals/resolve-challenge-modal';
 import VetoModal from './modals/veto-modal';
-import { StateTag } from './state-tag';
+import { StatusTag } from './status-tag';
 import { Outset, ChildSpacer } from './utils/spacer-util';
 import * as QuestService from '../services/quest.service';
 import { ActionsPlaceholder } from './actions-placeholder';
@@ -74,7 +72,7 @@ type Props = {
 export default function Claim({ claim, isLoading, challengeDeposit, questData }: Props) {
   const { walletAddress, walletConnected } = useWallet();
   const { transaction } = useTransactionContext();
-  const [state, setState] = useState(claim.state);
+  const [state, setState] = useState<ClaimStatus | undefined>(claim.state);
   const { below } = useViewport();
   const [waitForClose, setWaitForClose] = useState(false);
   const [actionButton, setActionButton] = useState<ReactNode>();
@@ -87,8 +85,8 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
 
   useEffect(() => {
     setState(
-      claim.state === ENUM_CLAIM_STATE.Scheduled && claimable
-        ? ENUM_CLAIM_STATE.AvailableToExecute
+      claim.state === ClaimStatus.Scheduled && claimable
+        ? ClaimStatus.AvailableToExecute
         : claim.state,
     );
   }, [claim.state, claimable]);
@@ -116,31 +114,31 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
       transaction?.args?.containerId === claim.container.id
     ) {
       // Little hack here but if the tx is in this state, modal is probably open
-      if (transaction?.status === ENUM_TRANSACTION_STATUS.WaitingForSignature) {
+      if (transaction?.status === TransactionStatus.WaitingForSignature) {
         setWaitForClose(true);
-      } else if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) {
+      } else if (transaction?.status === TransactionStatus.Confirmed) {
         switch (transaction.type) {
           case 'ClaimChallengeResolve':
             {
               // Second arg is the dispute resolution result
               const newState =
-                transaction.args.disputeState === ENUM_DISPUTE_STATES.DisputeRuledForChallenger
-                  ? ENUM_CLAIM_STATE.Rejected
-                  : ENUM_CLAIM_STATE.Executed;
+                transaction.args.disputeState === DisputeStatus.DisputeRuledForChallenger
+                  ? ClaimStatus.Rejected
+                  : ClaimStatus.Executed;
               setState(newState);
             }
             break;
           case 'ClaimExecute':
-            setState(ENUM_CLAIM_STATE.Executed);
+            setState(ClaimStatus.Executed);
             break;
           case 'ClaimChallenge':
             setTimeout(() => {
-              setState(ENUM_CLAIM_STATE.Challenged);
+              setState(ClaimStatus.Challenged);
             }, 1000); // Wait for subgrapph to index challenge event
             break;
           case 'ClaimVeto':
             setTimeout(() => {
-              setState(ENUM_CLAIM_STATE.Vetoed);
+              setState(ClaimStatus.Vetoed);
             }, 1000); // Wait for subgrapph to index veto event
             break;
           default:
@@ -151,10 +149,10 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
 
   useEffect(() => {
     if (waitForClose || !state || !isMountedRef.current) return;
-    if (state === ENUM_CLAIM_STATE.Scheduled || state === ENUM_CLAIM_STATE.AvailableToExecute) {
+    if (state === ClaimStatus.Scheduled || state === ClaimStatus.AvailableToExecute) {
       if (
         compareCaseInsensitive(walletAddress, claim.playerAddress) ||
-        (claimable && questData.state !== ENUM_QUEST_STATE.Active)
+        (claimable && questData.status !== QuestStatus.Active)
       ) {
         setActionButton(
           <TimeableActionWrapper>
@@ -184,20 +182,20 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
 
     if (
       claim.container &&
-      (state === ENUM_CLAIM_STATE.Challenged ||
-        state === ENUM_CLAIM_STATE.Rejected ||
-        state === ENUM_CLAIM_STATE.Executed ||
-        state === ENUM_CLAIM_STATE.Vetoed)
+      (state === ClaimStatus.Challenged ||
+        state === ClaimStatus.Rejected ||
+        state === ClaimStatus.Executed ||
+        state === ClaimStatus.Vetoed)
     ) {
       (async (_state: string, _container: ContainerModel) => {
         setChallengeReason(await QuestService.fetchChallengeReason(_container));
-        if (_state === ENUM_CLAIM_STATE.Vetoed) {
+        if (_state === ClaimStatus.Vetoed) {
           setVetoReason(await QuestService.fetchVetoReason(_container));
         }
       })(state, claim.container);
     }
 
-    if (state === ENUM_CLAIM_STATE.Challenged) {
+    if (state === ClaimStatus.Challenged) {
       setActionButton(
         <>
           <ResolveChallengeModal claim={claim} onClose={onActionClose} />
@@ -235,8 +233,8 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                 buttonEnd
                 vertical={below('medium')}
               >
-                <FieldInput label="Status" isLoading={isLoading || state === ENUM_CLAIM_STATE.None}>
-                  <StateTag state={state ?? ''} className="pl-0" />
+                <FieldInput label="Status" isLoading={isLoading || state === ClaimStatus.None}>
+                  <StatusTag status={state} className="pl-0" />
                 </FieldInput>
                 <AddressWrapperStyled isSmallScreen={below('medium')}>
                   <AddressFieldInput
@@ -249,7 +247,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                 {claim.claimAll ? (
                   <FieldInput
                     label="Claimed amount"
-                    isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
+                    isLoading={isLoading || state === ClaimStatus.None}
                   >
                     All available
                   </FieldInput>
@@ -258,18 +256,18 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                     id="amount"
                     label="Claimed amount"
                     value={claim.claimedAmount}
-                    isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
+                    isLoading={isLoading || state === ClaimStatus.None}
                   />
                 )}
                 {walletConnected && state ? (
                   <>
                     {actionButton}
                     {managerAddress === walletAddress &&
-                      claim.state !== ENUM_CLAIM_STATE.Cancelled &&
-                      claim.state !== ENUM_CLAIM_STATE.Executed &&
-                      claim.state !== ENUM_CLAIM_STATE.Vetoed &&
-                      claim.state !== ENUM_CLAIM_STATE.Rejected &&
-                      claim.state !== ENUM_CLAIM_STATE.Approved && (
+                      claim.state !== ClaimStatus.Cancelled &&
+                      claim.state !== ClaimStatus.Executed &&
+                      claim.state !== ClaimStatus.Vetoed &&
+                      claim.state !== ClaimStatus.Rejected &&
+                      claim.state !== ClaimStatus.Approved && (
                         <VetoModal claim={claim} onClose={onActionClose} />
                       )}
                   </>
@@ -288,7 +286,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
           <TextFieldInput
             id="evidence"
             value={claim.evidence}
-            isLoading={isLoading || state === ENUM_CLAIM_STATE.None}
+            isLoading={isLoading || state === ClaimStatus.None}
             isMarkDown
             wide
             label="Evidence of completion"

@@ -2,9 +2,10 @@
 import { Button, IconCaution, IconCoin, Info } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
-import { ENUM, ENUM_CLAIM_STATE, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimModel } from 'src/models/claim.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TransactionModel } from 'src/models/transaction.model';
@@ -78,9 +79,8 @@ export default function ExecuteClaimModal({
     try {
       let txPayload = {
         modalId,
-        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimExecuting,
         message: 'Claiming bounty',
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        status: TransactionStatus.WaitingForSignature,
         type: 'ClaimExecute',
         args: { questAddress: claim.questAddress, containerId: claim.container!.id },
       } as TransactionModel;
@@ -89,14 +89,12 @@ export default function ExecuteClaimModal({
         txPayload = { ...txPayload, hash: txHash };
         setTransaction({
           ...txPayload,
-          status: ENUM_TRANSACTION_STATUS.Pending,
+          status: TransactionStatus.Pending,
         });
       });
       setTransaction({
         ...txPayload,
-        status: txReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+        status: txReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
       });
       if (!txReceipt?.status) throw new Error('Failed to execute claim');
     } catch (e: any) {
@@ -104,7 +102,7 @@ export default function ExecuteClaimModal({
         (oldTx) =>
           oldTx && {
             ...oldTx,
-            status: ENUM_TRANSACTION_STATUS.Failed,
+            status: TransactionStatus.Failed,
             message: computeTransactionErrorMessage(e),
           },
       );
@@ -144,7 +142,7 @@ export default function ExecuteClaimModal({
             onClick={claimTx}
             icon={<IconCoin />}
             label="Execute"
-            disabled={claim.state === ENUM_CLAIM_STATE.Challenged}
+            disabled={claim.state === ClaimStatus.Challenged}
             title="Trigger claim operation in the chain"
             mode="positive"
           />

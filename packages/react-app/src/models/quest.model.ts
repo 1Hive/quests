@@ -1,3 +1,4 @@
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { TokenModel } from './token.model';
 import { TokenAmountModel } from './token-amount.model';
 import { DepositModel } from './deposit-model';
@@ -17,6 +18,6 @@ export type QuestModel = {
   bounty?: TokenAmountModel | null;
   rewardToken?: TokenModel | string;
   detailsRefIpfs?: string;
-  state: string;
+  status: QuestStatus;
   deposit?: DepositModel;
 };

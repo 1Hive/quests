@@ -5,9 +5,9 @@ import { usePageContext } from 'src/contexts/page.context';
 import Skeleton from 'react-loading-skeleton';
 import { GUpx } from 'src/utils/style.util';
 import { useFilterContext } from 'src/contexts/filter.context';
-import { ENUM_PAGES } from 'src/constants';
 import { useQueryParam } from 'src/hooks/use-query-params';
 import { setCurrentChain } from 'src/local-settings';
+import { Pages } from 'src/enums/pages.enum';
 import Header from './header';
 import Footer from './footer';
 import { BackToTop } from './back-to-top';
@@ -55,7 +55,7 @@ function MainView({ children }: Props) {
     <Root.Provider>
       <HeaderWrapperStyled>
         <Header>
-          {below('medium') && page === ENUM_PAGES.List && (
+          {below('medium') && page === Pages.List && (
             <Button
               icon={<IconFilter />}
               display="icon"

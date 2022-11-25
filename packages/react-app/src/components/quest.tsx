@@ -1,14 +1,7 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
 import { ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ADDRESS_ZERO,
-  ENUM_CLAIM_STATE,
-  ENUM_PAGES,
-  ENUM_QUEST_STATE,
-  ENUM_TRANSACTION_STATUS,
-  MAX_LINE_DESCRIPTION,
-} from 'src/constants';
+import { ADDRESS_ZERO, MAX_LINE_DESCRIPTION } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import * as QuestService from 'src/services/quest.service';
@@ -22,6 +15,10 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { ClaimModel } from 'src/models/claim.model';
 import { getNetwork } from 'src/networks';
+import { QuestStatus } from 'src/enums/quest-status.enum';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { Pages } from 'src/enums/pages.enum';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -30,7 +27,7 @@ import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
 import ClaimList from './claim-list';
 import { isQuestExpired, processQuestState as computeQuestState } from '../services/state-machine';
-import { StateTag } from './state-tag';
+import { StatusTag } from './status-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
 import NumberFieldInput from './field-input/number-field-input';
@@ -126,7 +123,7 @@ type Props = {
 export default function Quest({
   questData = {
     expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
-    state: ENUM_QUEST_STATE.Draft,
+    status: QuestStatus.Draft,
     fallbackAddress: ADDRESS_ZERO,
     creatorAddress: ADDRESS_ZERO,
   },
@@ -140,7 +137,7 @@ export default function Quest({
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
   const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
-  const [state, setState] = useState(questData.state);
+  const [state, setState] = useState(questData.status);
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   const [waitForClose, setWaitForClose] = useState(false);
@@ -150,7 +147,7 @@ export default function Quest({
   useEffect(() => {
     if (!isSummary) {
       // Don't show deposit of expired
-      if (state === ENUM_QUEST_STATE.Archived || state === ENUM_QUEST_STATE.Expired) {
+      if (state === QuestStatus.Archived || state === QuestStatus.Expired) {
         setClaimDeposit(undefined);
       } else {
         try {
@@ -177,12 +174,12 @@ export default function Quest({
         transaction?.type === 'QuestReclaimFunds')
     ) {
       if (
-        transaction?.status === ENUM_TRANSACTION_STATUS.Pending &&
+        transaction?.status === TransactionStatus.Pending &&
         transaction?.type === 'QuestReclaimFunds'
       ) {
         // Should wait for close because changing the state will cause QuestReclaimFunds to be removed from DOM
         setWaitForClose(true);
-      } else if (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) {
+      } else if (transaction?.status === TransactionStatus.Confirmed) {
         setBounty(null);
         setTimeout(() => {
           if (questData.address && questData.rewardToken) {
@@ -194,8 +191,8 @@ export default function Quest({
   }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
   useEffect(() => {
-    setState(questData.state);
-  }, [questData.state]);
+    setState(questData.status);
+  }, [questData.status]);
 
   useEffect(() => {
     if (!questData.rewardToken) {
@@ -226,7 +223,7 @@ export default function Quest({
           questData.bounty = result;
           setIsDepositReleased(depositReleased);
           computeQuestState(questData, depositReleased);
-          setState(questData.state);
+          setState(questData.status);
           setBounty(result);
         }
       }
@@ -290,7 +287,7 @@ export default function Quest({
         value={questData?.expireTime}
       />
 
-      {!isSummary && state === ENUM_QUEST_STATE.Active && (
+      {!isSummary && state === QuestStatus.Active && (
         <AmountFieldInput
           id="claimDeposit"
           label="Claim deposit"
@@ -315,11 +312,7 @@ export default function Quest({
           wrapper={(children) => (
             <ClickableDivStyled
               className="quest"
-              to={
-                highlight
-                  ? `/${ENUM_PAGES.Detail}?id=${questData?.address}&chainId=${chainId}`
-                  : '#'
-              }
+              to={highlight ? `/${Pages.Detail}?id=${questData?.address}&chainId=${chainId}` : '#'}
               onMouseEnter={() => setHighlight(true)}
             >
               {children}
@@ -328,7 +321,7 @@ export default function Quest({
         >
           <ContentWrapperStyled compact={below('medium')}>
             <HeaderWrapperStyled>
-              <StateTag state={questData?.state ?? ''} />
+              <StatusTag status={questData?.status} />
               <RowStyled className="pb-0">
                 <TextFieldInput
                   id="title"
@@ -385,7 +378,7 @@ export default function Quest({
           </ContentWrapperStyled>
           {!isSummary && challengeDeposit && (
             <ClaimList
-              questData={{ ...questData, bounty, state }}
+              questData={{ ...questData, bounty, status: state }}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
               onClaimsFetched={setClaims}
@@ -399,7 +392,7 @@ export default function Quest({
                     <FundModal quest={questData} />
                     {claimDeposit && (
                       <ScheduleClaimModal
-                        questData={{ ...questData, state }}
+                        questData={{ ...questData, status: state }}
                         questAddress={questData.address}
                         questTotalBounty={bounty}
                         claimDeposit={claimDeposit}
@@ -407,17 +400,17 @@ export default function Quest({
                     )}
                   </>
                   <>
-                    {(state === ENUM_QUEST_STATE.Expired || waitForClose) && (
+                    {(state === QuestStatus.Expired || waitForClose) && (
                       <ReclaimFundsModal
                         bounty={bounty}
-                        questData={{ ...questData, state }}
+                        questData={{ ...questData, status: state }}
                         isDepositReleased={isDepositReleased}
                         onClose={() => setWaitForClose(false)}
                         pendingClaims={
                           !!claims?.find(
                             (claim) =>
-                              claim.state === ENUM_CLAIM_STATE.Scheduled ||
-                              claim.state === ENUM_CLAIM_STATE.AvailableToExecute,
+                              claim.state === ClaimStatus.Scheduled ||
+                              claim.state === ClaimStatus.AvailableToExecute,
                           )
                         }
                       />
