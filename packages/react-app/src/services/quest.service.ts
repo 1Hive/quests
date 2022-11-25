@@ -30,7 +30,8 @@ import {
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import { VetoModel } from 'src/models/veto.model';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from '../constants';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -317,7 +318,7 @@ export async function fetchQuestClaims(
           claimInfoIpfsHash,
           playerAddress,
           questAddress: quest.address,
-          state: container.state ? ENUM_CLAIM_STATE[container.state] : undefined,
+          state: container.state ? ClaimStatus[container.state] : undefined,
           claimAll,
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,

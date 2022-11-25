@@ -4,12 +4,6 @@ import { noop, uniqueId } from 'lodash-es';
 import { useState, useEffect, Fragment, useMemo } from 'react';
 import styled from 'styled-components';
 import { ClaimModel } from 'src/models/claim.model';
-import {
-  ENUM,
-  ENUM_CLAIM_STATE,
-  ENUM_DISPUTE_STATES,
-  ENUM_TRANSACTION_STATUS,
-} from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
@@ -22,6 +16,9 @@ import { ContainerModel } from 'src/models/govern.model';
 import { sleep } from 'src/utils/common.util';
 import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
+import { DisputeStatus } from 'src/enums/dispute-status.enum';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -139,8 +136,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
   useEffect(() => {
     if (dispute?.state !== undefined)
       setRuled(
-        dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForChallenger ||
-          dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForSubmitter,
+        dispute.state === DisputeStatus.DisputeRuledForChallenger ||
+          dispute.state === DisputeStatus.DisputeRuledForSubmitter,
       );
   }, [dispute?.state]);
 
@@ -158,9 +155,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       const message = 'Resolving claim challenge';
       let txPayload = {
         modalId,
-        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ChallengeResolving,
         message,
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        status: TransactionStatus.WaitingForSignature,
         type: 'ClaimChallengeResolve',
         args: {
           questAddress: claim.questAddress,
@@ -177,15 +173,13 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
           txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            status: ENUM_TRANSACTION_STATUS.Pending,
+            status: TransactionStatus.Pending,
           });
         },
       );
       setTransaction({
         ...txPayload,
-        status: challengeTxReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+        status: challengeTxReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
       });
       if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest');
     } catch (e: any) {
@@ -193,7 +187,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         (oldTx) =>
           oldTx && {
             ...oldTx,
-            status: ENUM_TRANSACTION_STATUS.Failed,
+            status: TransactionStatus.Failed,
             message: computeTransactionErrorMessage(e),
           },
       );
@@ -261,8 +255,8 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
                 </>
               )}
             </FinalRulingStyled>
-            {dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForChallenger && challenger}
-            {dispute.state === ENUM_DISPUTE_STATES.DisputeRuledForSubmitter && player}
+            {dispute.state === DisputeStatus.DisputeRuledForChallenger && challenger}
+            {dispute.state === DisputeStatus.DisputeRuledForSubmitter && player}
           </RulingInfoStyled>
         )}
       </FinalRulingWrapper>
@@ -291,7 +285,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
         </OpenButtonWrapperStyled>
       }
       buttons={
-        claim?.state === ENUM_CLAIM_STATE.Challenged && [
+        claim?.state === ClaimStatus.Challenged && [
           <Fragment key="warnMessage">
             {isRuled && !isStackholder && (
               <OnlyStackholderWarnStyled mode="warning">
@@ -308,7 +302,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
             icon={<IconFlag />}
             label="Resolve"
             mode="positive"
-            disabled={!walletConnected || !isRuled || claim.state !== ENUM_CLAIM_STATE.Challenged}
+            disabled={!walletConnected || !isRuled || claim.state !== ClaimStatus.Challenged}
             onClick={resolveChallengeTx}
             title={
               !isRuled

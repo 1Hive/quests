@@ -1,5 +1,4 @@
 import { Link, useTheme, IconExternal } from '@1hive/1hive-ui';
-import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
 import { getNetwork } from 'src/networks';
 import { ThemeInterface } from 'src/styles/theme';
@@ -7,6 +6,7 @@ import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { useMemo } from 'react';
 import { TOKENS } from 'src/tokens';
+import { QuestViewMode } from 'src/enums/quest-view-mode.enum';
 import QuestModal from '../modals/create-quest-modal';
 
 // #region StyledComponents
@@ -73,9 +73,7 @@ export default function HeaderMenu({ below }: Props) {
             </>
           )}
 
-          {walletConnected && (
-            <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="normal" />
-          )}
+          {walletConnected && <QuestModal questMode={QuestViewMode.Create} buttonMode="normal" />}
         </HeaderNavStyled>
       )}
     </>

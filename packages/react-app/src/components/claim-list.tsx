@@ -1,7 +1,6 @@
 import { ClaimModel } from 'src/models/claim.model';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/style.util';
-import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { QuestModel } from 'src/models/quest.model';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,6 +9,7 @@ import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { noop } from 'lodash';
 import { ThemeInterface } from 'src/styles/theme';
 import { useThemeContext } from 'src/contexts/theme.context';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { HelpTooltip } from './field-input/help-tooltip';
 import * as QuestService from '../services/quest.service';
 import Claim from './claim';
@@ -99,7 +99,7 @@ export default function ClaimList({
   useEffect(() => {
     // If tx completion impact Claims, update them
     if (
-      transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed &&
+      transaction?.status === TransactionStatus.Confirmed &&
       transaction?.args?.questAddress === questData.address &&
       transaction?.type === 'ClaimSchedule'
     ) {

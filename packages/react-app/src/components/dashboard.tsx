@@ -1,7 +1,7 @@
 import { useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
-import { ENUM_QUEST_VIEW_MODE } from 'src/constants';
 import { useWallet } from 'src/contexts/wallet.context';
+import { QuestViewMode } from 'src/enums/quest-view-mode.enum';
 import { DashboardModel } from 'src/models/dashboard.model';
 import { getNetwork } from 'src/networks';
 import { getDashboardInfo } from 'src/services/quest.service';
@@ -86,7 +86,7 @@ export default function Dashboard() {
           <TextStyled theme={theme}>{dashboardModel?.questCount.toLocaleString()}</TextStyled>
         </FieldInput>
         <SpacerStyled>
-          {walletConnected && <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} />}
+          {walletConnected && <QuestModal questMode={QuestViewMode.Create} />}
         </SpacerStyled>
       </ChildSpacer>
     </BoxStyled>
