@@ -20,6 +20,7 @@ import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { Pages } from 'src/enums/pages.enum';
 import { DepositModel } from 'src/models/deposit-model';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
 import ReclaimFundsModal from './modals/reclaim-funds-modal';
@@ -132,8 +133,7 @@ export default function Quest({
   isLoading = false,
   isSummary = false,
 }: Props) {
-  const { walletAddress } = useWallet();
-  const { walletConnected } = useWallet();
+  const { walletAddress, walletConnected } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
   const [claims, setClaims] = useState<ClaimModel[]>();
@@ -178,22 +178,20 @@ export default function Quest({
     if (transaction?.args?.questAddress === questData.address) {
       if (transaction?.status === TransactionStatus.Confirmed) {
         switch (transaction?.type) {
-          case 'QuestPlay':
-          case 'QuestLeave':
+          case TransactionType.QuestPlay:
             if (transaction.args?.player) {
-              if (transaction.type === 'QuestPlay') {
-                setPlayers((prev) => [...prev, transaction.args!.player!]);
-              } else {
-                setPlayers((prev) =>
-                  prev?.filter((_player) => _player !== transaction.args!.player),
-                );
-              }
+              setPlayers((prev) => [...prev, transaction.args!.player!]);
             }
             break;
-          case 'ClaimChallengeResolve':
-          case 'ClaimExecute':
-          case 'QuestFund':
-          case 'QuestReclaimFunds':
+          case TransactionType.QuestLeave:
+            if (transaction.args?.player) {
+              setPlayers((prev) => prev?.filter((_player) => _player !== transaction.args!.player));
+            }
+            break;
+          case TransactionType.ClaimChallengeResolve:
+          case TransactionType.ClaimExecute:
+          case TransactionType.QuestFund:
+          case TransactionType.QuestReclaimFunds:
             setBounty(null);
             setTimeout(() => {
               if (questData.address && questData.rewardToken) {
@@ -206,7 +204,7 @@ export default function Quest({
         }
       } else if (
         transaction?.status === TransactionStatus.Pending &&
-        transaction?.type === 'QuestReclaimFunds'
+        transaction?.type === TransactionType.QuestReclaimFunds
       ) {
         // Should wait for close because changing the state will cause QuestReclaimFunds to be removed from DOM
         setWaitForClose(true);
@@ -431,17 +429,21 @@ export default function Quest({
                 <>
                   <>
                     <FundModal quest={questData} />
-                    {(!isPlayingQuest || questData.creatorAddress === walletAddress) && (
-                      <PlayModal quest={questData} />
-                    )}
-                    {claimDeposit && isPlayingQuest && (
-                      <ScheduleClaimModal
-                        questData={{ ...questData, status }}
-                        questAddress={questData.address}
-                        questTotalBounty={bounty}
-                        claimDeposit={claimDeposit}
-                      />
-                    )}
+                    {(!isPlayingQuest ||
+                      questData.creatorAddress === walletAddress ||
+                      waitForClose) &&
+                      questData.maxPlayers && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                        <PlayModal quest={questData} onClose={() => setWaitForClose(false)} />
+                      )}
+                    {claimDeposit &&
+                      (isPlayingQuest || !questData.maxPlayers) && ( // Bypass play feature if maxPlayers is not set
+                        <ScheduleClaimModal
+                          questData={{ ...questData, status }}
+                          questAddress={questData.address}
+                          questTotalBounty={bounty}
+                          claimDeposit={claimDeposit}
+                        />
+                      )}
                   </>
                   <>
                     {(status === QuestStatus.Expired || waitForClose) && (

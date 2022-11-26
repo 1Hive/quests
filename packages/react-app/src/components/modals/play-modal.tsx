@@ -10,11 +10,6 @@ import { GUpx } from 'src/utils/style.util';
 import { QuestModel } from 'src/models/quest.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { FormErrors } from 'src/models/form-errors';
-import {
-  ENUM_TRANSACTION_STATUS,
-  ENUM_ESTIMATED_TX_TIME_MS,
-  ENUM_QUEST_STATE,
-} from 'src/constants';
 import { PlayModel } from 'src/models/play.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
@@ -23,6 +18,9 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getTokenInfo } from 'src/utils/contract.util';
 import { toTokenAmountModel } from 'src/utils/data.utils';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
@@ -83,7 +81,7 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
         setDeposit(tokenModel);
       })();
     }
-  }, [quest.playDeposit]);
+  }, [quest.playDeposit?.token]);
 
   const closeModal = (success: boolean) => {
     setOpened(false);
@@ -106,10 +104,9 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
     try {
       let txPayload = {
         modalId,
-        estimatedDuration: ENUM_ESTIMATED_TX_TIME_MS.QuestPlay,
         message: 'Playing quest (2/2)',
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        type: 'QuestPlay',
+        status: TransactionStatus.WaitingForSignature,
+        type: TransactionType.QuestPlay,
         args: { questAddress: quest.address, player: values.player || walletAddress },
       } as TransactionModel;
       setTransaction(txPayload);
@@ -117,14 +114,12 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
         txPayload = { ...txPayload, hash: txHash };
         setTransaction({
           ...txPayload,
-          status: ENUM_TRANSACTION_STATUS.Pending,
+          status: TransactionStatus.Pending,
         });
       });
       setTransaction({
         ...txPayload,
-        status: txReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+        status: txReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
       });
       if (!txReceipt?.status) throw new Error('Failed to play quest');
     } catch (e: any) {
@@ -132,7 +127,7 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
         (oldTx) =>
           oldTx && {
             ...oldTx,
-            status: ENUM_TRANSACTION_STATUS.Failed,
+            status: TransactionStatus.Failed,
             message: computeTransactionErrorMessage(e),
           },
       );
@@ -214,7 +209,7 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
               label="Play"
               mode="positive"
               title={
-                quest.state !== ENUM_QUEST_STATE.Active
+                quest.status !== QuestStatus.Active
                   ? 'Quest expired'
                   : maxPlayerReached
                   ? 'Max player reached'
@@ -223,7 +218,7 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
                   : 'Play quest'
               }
               disabled={
-                quest.state !== ENUM_QUEST_STATE.Active ||
+                quest.status !== QuestStatus.Active ||
                 maxPlayerReached ||
                 !isDepositEnoughBalance ||
                 !isFormValid
@@ -255,7 +250,7 @@ export default function PlayModal({ quest, onClose = noop }: Props) {
               <Info mode="warning">❌ The maximum number of player has been reached</Info>
             </Outset>
           )}
-          {quest.state !== ENUM_QUEST_STATE.Active && (
+          {quest.status !== QuestStatus.Active && (
             <Outset vertical>
               <Info mode="warning">
                 ❌ This quest is expired and will no longer accept new players

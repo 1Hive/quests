@@ -12,10 +12,11 @@ import { getNetwork } from 'src/networks';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import styled, { css } from 'styled-components';
 import { ContainerModel } from 'src/models/govern.model';
-import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { DisputeStatus } from 'src/enums/dispute-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import { CollapsableBlock } from './collapsable-block';
 import { AddressFieldInput } from './field-input/address-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
@@ -118,7 +119,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
         setWaitForClose(true);
       } else if (transaction?.status === TransactionStatus.Confirmed) {
         switch (transaction.type) {
-          case 'ClaimChallengeResolve':
+          case TransactionType.ClaimChallengeResolve:
             {
               // Second arg is the dispute resolution result
               const newState =
@@ -128,15 +129,15 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
               setStatus(newState);
             }
             break;
-          case 'ClaimExecute':
+          case TransactionType.ClaimExecute:
             setStatus(ClaimStatus.Executed);
             break;
-          case 'ClaimChallenge':
+          case TransactionType.ClaimChallenge:
             setTimeout(() => {
               setStatus(ClaimStatus.Challenged);
             }, 1000); // Wait for subgrapph to index challenge event
             break;
-          case 'ClaimVeto':
+          case TransactionType.ClaimVeto:
             setTimeout(() => {
               setStatus(ClaimStatus.Vetoed);
             }, 1000); // Wait for subgrapph to index veto event
