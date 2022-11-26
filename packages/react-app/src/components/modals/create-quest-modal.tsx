@@ -2,13 +2,7 @@
 import { Button, IconPlus, useTheme, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ENUM,
-  ENUM_QUEST_STATE,
-  ENUM_QUEST_VIEW_MODE,
-  ENUM_TRANSACTION_STATUS,
-  MAX_LINE_DESCRIPTION,
-} from 'src/constants';
+import { MAX_LINE_DESCRIPTION } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
@@ -26,6 +20,9 @@ import { FaEdit, FaEye } from 'react-icons/fa';
 import { getNetwork } from 'src/networks';
 import { flags } from 'src/services/feature-flag.service';
 import { GUpx } from 'src/utils/style.util';
+import { QuestStatus } from 'src/enums/quest-status.enum';
+import { QuestViewMode } from 'src/enums/quest-view-mode.enum';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -94,13 +91,13 @@ type Props = {
 
 const emptyQuestData = {
   expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
-  state: ENUM_QUEST_STATE.Draft,
+  status: QuestStatus.Draft,
 } as QuestModel;
 
 export default function QuestModal({
   questData = emptyQuestData,
   onClose = noop,
-  questMode = ENUM_QUEST_VIEW_MODE.ReadSummary,
+  questMode = QuestViewMode.ReadSummary,
   buttonMode = 'normal',
 }: Props) {
   const theme = useTheme();
@@ -136,11 +133,11 @@ export default function QuestModal({
 
   useEffect(() => {
     switch (questMode) {
-      case ENUM_QUEST_VIEW_MODE.Create:
+      case QuestViewMode.Create:
         setButtonLabel('Create quest');
         break;
 
-      case ENUM_QUEST_VIEW_MODE.Update:
+      case QuestViewMode.Update:
         setButtonLabel('Update quest');
         break;
 
@@ -218,9 +215,8 @@ export default function QuestModal({
       try {
         let txPayload = {
           modalId,
-          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
           message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
-          status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          status: TransactionStatus.WaitingForSignature,
           type: 'QuestCreate',
         } as TransactionModel;
         setTransaction(txPayload);
@@ -239,7 +235,7 @@ export default function QuestModal({
             txPayload = { ...txPayload, hash: txHash };
             setTransaction({
               ...txPayload,
-              status: ENUM_TRANSACTION_STATUS.Pending,
+              status: TransactionStatus.Pending,
             });
           },
         );
@@ -250,8 +246,8 @@ export default function QuestModal({
         setTransaction({
           ...txPayload,
           status: txReceiptSaveQuest?.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
+            ? TransactionStatus.Confirmed
+            : TransactionStatus.Failed,
           args: { questAddress: newQuestAddress },
         });
         if (!txReceiptSaveQuest?.status || !newQuestAddress) {
@@ -276,7 +272,7 @@ export default function QuestModal({
           (oldTx) =>
             oldTx && {
               ...oldTx,
-              status: ENUM_TRANSACTION_STATUS.Failed,
+              status: TransactionStatus.Failed,
               message: computeTransactionErrorMessage(e),
             },
         );

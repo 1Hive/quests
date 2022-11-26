@@ -30,13 +30,10 @@ import {
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import { VetoModel } from 'src/models/veto.model';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { PlayModel } from 'src/models/play.model';
-import {
-  ADDRESS_ZERO,
-  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
-  ENUM_CLAIM_STATE,
-  ENUM_QUEST_STATE,
-} from '../constants';
+import { ADDRESS_ZERO, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -93,7 +90,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
       maxPlayers: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers : undefined, // If null put undefined
       unlimited: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers === 0 : undefined,
-      state: ENUM_QUEST_STATE.Active,
+      status: QuestStatus.Active,
       players: [],
     } as QuestModel;
 
@@ -341,7 +338,7 @@ export async function fetchQuestClaims(
           claimInfoIpfsHash,
           playerAddress,
           questAddress: quest.address,
-          state: container.state ? ENUM_CLAIM_STATE[container.state] : undefined,
+          state: container.state ? ClaimStatus[container.state] : undefined,
           claimAll,
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,

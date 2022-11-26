@@ -1,4 +1,4 @@
-import { ClaimState } from 'src/constants';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { ContainerModel } from './govern.model';
 import { TokenAmountModel } from './token-amount.model';
 
@@ -12,6 +12,6 @@ export type ClaimModel = {
   contactInformation?: string;
   // Only set when fetch
   executionTimeMs?: number;
-  state?: ClaimState;
+  state?: ClaimStatus;
   container?: ContainerModel;
 };

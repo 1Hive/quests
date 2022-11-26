@@ -1,21 +1,9 @@
-export type TransactionType =
-  | 'TokenApproval'
-  | 'QuestCreate'
-  | 'QuestFund'
-  | 'QuestReclaimFunds'
-  | 'QuestPlay'
-  | 'QuestLeave'
-  | 'ClaimSchedule'
-  | 'ClaimExecute'
-  | 'ClaimVeto'
-  | 'ClaimChallenge'
-  | 'ClaimChallengeResolve';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 
 export type TransactionModel = {
   hash?: string;
   modalId: string;
   message?: string;
-  estimatedDuration?: number;
   status: string;
   progress?: number;
   args?: {

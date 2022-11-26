@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 import { Tag } from '@1hive/1hive-ui';
-import { ClaimState, ENUM_CLAIM_STATE, ENUM_QUEST_STATE, QuestState } from 'src/constants';
 import { useEffect, useState } from 'react';
 import { GUpx } from 'src/utils/style.util';
+import { QuestStatus } from 'src/enums/quest-status.enum';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
 
 const StateTagStyled = styled(Tag)`
   width: ${(props: any) => (props.wide ? '100%' : 'fit-content')};
@@ -17,78 +18,78 @@ const StateWrapperStyled = styled.div<{ visible: boolean }>`
 `;
 
 type Props = {
-  state: QuestState | ClaimState;
+  status: QuestStatus | ClaimStatus | undefined;
   size?: 'normal' | 'small';
   wide?: boolean;
   className?: string;
 };
 
 const VISIBLE_STATES = [
-  ENUM_QUEST_STATE.Expired,
-  ENUM_QUEST_STATE.Archived,
-  ENUM_CLAIM_STATE.Scheduled,
-  ENUM_CLAIM_STATE.AvailableToExecute,
-  ENUM_CLAIM_STATE.Challenged,
-  ENUM_CLAIM_STATE.Executed,
-  ENUM_CLAIM_STATE.Cancelled,
-  ENUM_CLAIM_STATE.Approved,
-  ENUM_CLAIM_STATE.Rejected,
-  ENUM_CLAIM_STATE.Vetoed,
-] as (QuestState | ClaimState)[];
+  QuestStatus.Expired,
+  QuestStatus.Archived,
+  ClaimStatus.Scheduled,
+  ClaimStatus.AvailableToExecute,
+  ClaimStatus.Challenged,
+  ClaimStatus.Executed,
+  ClaimStatus.Cancelled,
+  ClaimStatus.Approved,
+  ClaimStatus.Rejected,
+  ClaimStatus.Vetoed,
+];
 
-export function StateTag({ state, size = 'normal', wide = false, className }: Props) {
+export function StatusTag({ status, size = 'normal', wide = false, className }: Props) {
   const [mode, setMode] = useState<string>();
   const [tooltip, setTooltip] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    switch (state) {
+    switch (status) {
       // Quest states
-      case ENUM_QUEST_STATE.Draft:
+      case QuestStatus.Draft:
         setMode('new');
         setTooltip('Not saved yet');
         break;
-      case ENUM_QUEST_STATE.Active:
+      case QuestStatus.Active:
         setMode('identifier');
         setTooltip('Active');
         break;
-      case ENUM_QUEST_STATE.Expired:
+      case QuestStatus.Expired:
         setMode('indicator');
         setTooltip('Expired but still have actions remaining');
         break;
-      case ENUM_QUEST_STATE.Archived:
+      case QuestStatus.Archived:
         setMode('activity');
         setTooltip('Expired and no more actions to do');
         break;
       // Claim states
-      case ENUM_CLAIM_STATE.Scheduled:
+      case ClaimStatus.Scheduled:
         setMode('identifier');
         setTooltip('The claim is in a review period');
         break;
-      case ENUM_CLAIM_STATE.AvailableToExecute:
+      case ClaimStatus.AvailableToExecute:
         setMode('identifier');
         setTooltip('The review period is over and the claim is available to execute');
         break;
-      case ENUM_CLAIM_STATE.Challenged:
+      case ClaimStatus.Challenged:
         setMode('indicator');
         setTooltip('A dispute has been raised to Celeste');
         break;
-      case ENUM_CLAIM_STATE.Cancelled:
-      case ENUM_CLAIM_STATE.Rejected:
-      case ENUM_CLAIM_STATE.Vetoed:
+      case ClaimStatus.Cancelled:
+      case ClaimStatus.Rejected:
+      case ClaimStatus.Vetoed:
         setMode('activity');
         setTooltip('The claim has been denied');
         break;
-      case ENUM_CLAIM_STATE.Executed:
-      case ENUM_CLAIM_STATE.Approved:
+      case ClaimStatus.Executed:
+      case ClaimStatus.Approved:
         setMode('new');
         setTooltip('The player has successfully claimed the bounty');
         break;
       default:
         break;
     }
-    setVisible(VISIBLE_STATES.includes(state));
-  }, [state]);
+    setVisible(status ? VISIBLE_STATES.includes(status) : false);
+  }, [status]);
   return (
     <>
       {/* <Tag mode="indicator">indicator</Tag>
@@ -97,7 +98,7 @@ export function StateTag({ state, size = 'normal', wide = false, className }: Pr
       <Tag mode="activity">activity</Tag> */}
       {visible && (
         <StateWrapperStyled className={className} visible={visible}>
-          <StateTagStyled wide={wide} title={tooltip} label={state} mode={mode} size={size} />
+          <StateTagStyled wide={wide} title={tooltip} label={status} mode={mode} size={size} />
         </StateWrapperStyled>
       )}
     </>

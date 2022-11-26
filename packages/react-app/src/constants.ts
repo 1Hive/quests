@@ -1,6 +1,7 @@
+import { Pages } from './enums/pages.enum';
+import { QuestStatus } from './enums/quest-status.enum';
 import env from './environment';
 import { FilterModel } from './models/filter.model';
-import { ValueOf } from './utils/typescripts.util';
 
 export const PCT_BASE = BigInt(1e18);
 
@@ -20,106 +21,9 @@ export const QUESTS_PAGE_SIZE = 4;
 
 export const EXPECTED_CHAIN_ID = env('FORCE_CHAIN_ID') ? [+env('FORCE_CHAIN_ID')!] : [100, 4, 5];
 
-// Enums
-
-export const ENUM_QUEST_STATE = Object.freeze({
-  All: 'All',
-  Draft: 'Draft', // Not yet saved
-  Active: 'Active', // Contract created
-  // Played: 'Played', // At least one active claim
-  Expired: 'Expired', // When expireTime is past
-  Archived: 'Archived', // When no more funds
-});
-export type QuestState = ValueOf<typeof ENUM_QUEST_STATE>;
-
-export const ENUM_QUEST_VIEW_MODE = Object.freeze({
-  Create: 'CREATE',
-  Update: 'UPDATE',
-  ReadSummary: 'SUMMARY',
-  ReadDetail: 'DETAIL',
-});
-export type QuestViewMode = ValueOf<typeof ENUM_QUEST_STATE>;
-
-export const ENUM_BREAKPOINTS = Object.freeze({
-  4: '4',
-  8: '8',
-  16: '16',
-  24: '24',
-  32: '32',
-  40: '40',
-  48: '48',
-  56: '56',
-  64: '64',
-  72: '72',
-});
-export type GUBreakpoint = ValueOf<typeof ENUM_BREAKPOINTS>;
-
-export const ENUM_PAGES = Object.freeze({
-  List: 'list',
-  Detail: 'detail',
-});
-export type Page = ValueOf<typeof ENUM_PAGES>;
-
-export const ENUM_CLAIM_STATE = Object.freeze({
-  None: 'None',
-  Scheduled: 'In review',
-  AvailableToExecute: 'Available to execute',
-  Challenged: 'Challenged',
-  // Final states
-  Approved: 'Approved',
-  Cancelled: 'Cancelled',
-  Executed: 'Executed',
-  Vetoed: 'Vetoed',
-  Rejected: 'Rejected',
-});
-export type ClaimState = ValueOf<typeof ENUM_CLAIM_STATE>;
-
-export const ENUM_TRANSACTION_STATUS = Object.freeze({
-  Confirmed: 'TX_STATUS_CONFIRMED',
-  Failed: 'TX_STATUS_FAILED',
-  Pending: 'TX_STATUS_PENDING',
-  SignatureFailed: 'TX_STATUS_SIGNATURE_FAILED',
-  Signed: 'TX_STATUS_SIGNED',
-  WaitingForSignature: 'TX_WAITING_FOR_SIGNATURE',
-});
-export type TRANSACTIONStatus = ValueOf<typeof ENUM_TRANSACTION_STATUS>;
-
-export const ENUM_ESTIMATED_TX_TIME_MS = Object.freeze({
-  Default: 15 * 1000,
-  QuestCreating: 20 * 1000,
-  QuestFunding: 20 * 1000,
-  QuestFundsReclaiming: 15 * 1000,
-  QuestPlay: 15 * 1000,
-  QuestLeave: 15 * 1000,
-  ClaimScheduling: 30 * 1000,
-  ClaimChallenging: 30 * 1000,
-  ClaimVetoing: 30 * 1000,
-  ClaimExecuting: 30 * 1000,
-  ChallengeResolving: 20 * 1000,
-  TokenAproval: 20 * 1000,
-});
-
-export const ENUM_DISPUTE_STATES = Object.freeze({
-  NotDisputed: 0,
-  Disputed: 1,
-  DisputeNotRuled: 2,
-  DisputeRuledForChallenger: 3,
-  DisputeRuledForSubmitter: 4,
-});
-
-export const ENUM = Object.freeze({
-  ENUM_QUEST_VIEW_MODE,
-  ENUM_BREAKPOINTS,
-  ENUM_PAGES,
-  ENUM_CLAIM_STATE,
-  ENUM_TRANSACTION_STATE: ENUM_TRANSACTION_STATUS,
-  ENUM_ESTIMATED_TX_TIME_MS,
-  ENUM_DISPUTE_STATES,
-});
-
 // Default values
 
-export const DEFAULT_PAGE = ENUM_PAGES.List;
+export const DEFAULT_PAGE = Pages.List;
 
 export const DEFAULT_FILTER = Object.freeze({
   address: '',
@@ -127,7 +31,7 @@ export const DEFAULT_FILTER = Object.freeze({
   description: '',
   minExpireTime: null,
   bounty: undefined,
-  status: ENUM_QUEST_STATE.Active,
+  status: QuestStatus.Active,
 } as FilterModel);
 
 export const DEFAULT_CLAIM_EXECUTION_DELAY_MS = 1 * 60 * 1000; // Add 15 minutes by default

@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-/* eslint-disable no-shadow */
 import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';

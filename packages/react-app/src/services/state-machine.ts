@@ -1,4 +1,4 @@
-import { ENUM_QUEST_STATE } from 'src/constants';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { QuestModel } from 'src/models/quest.model';
 
 export function isQuestExpired(quest: QuestModel) {
@@ -6,12 +6,12 @@ export function isQuestExpired(quest: QuestModel) {
 }
 
 export function processQuestState(quest: QuestModel, isDepositReleased: boolean) {
-  quest.state = ENUM_QUEST_STATE.Active;
+  quest.status = QuestStatus.Active;
   if (isQuestExpired(quest)) {
-    quest.state =
+    quest.status =
       quest.bounty?.parsedAmount || (quest.createDeposit && !isDepositReleased)
-        ? ENUM_QUEST_STATE.Expired
-        : ENUM_QUEST_STATE.Archived;
+        ? QuestStatus.Expired
+        : QuestStatus.Archived;
   }
   return quest;
 }

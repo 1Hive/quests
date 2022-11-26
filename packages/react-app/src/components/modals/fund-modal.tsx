@@ -12,7 +12,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { FundModel } from 'src/models/fund.model';
 import { FormErrors } from 'src/models/form-errors';
 import { fundQuestTransaction } from 'src/services/transaction-handler';
-import { ENUM_QUEST_STATE } from 'src/constants';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
@@ -133,7 +133,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               />
             </Outset>
           </FormStyled>
-          {quest.state !== ENUM_QUEST_STATE.Active && (
+          {quest.status !== QuestStatus.Active && (
             <Outset vertical>
               <Info mode="warning">⚠️ The quest is expired, the funds might not be used.</Info>
             </Outset>

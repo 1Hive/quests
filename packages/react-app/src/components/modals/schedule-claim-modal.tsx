@@ -4,13 +4,6 @@ import { debounce, noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import {
-  ENUM_TRANSACTION_STATUS,
-  ENUM,
-  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
-  ENUM_QUEST_STATE,
-  ClaimState,
-} from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -26,6 +19,10 @@ import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye, FaMoneyBillWave } from 'react-icons/fa';
 import { QuestModel } from 'src/models/quest.model';
+import { QuestStatus } from 'src/enums/quest-status.enum';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -91,9 +88,11 @@ type Props = {
   questData: QuestModel;
   onClose?: ModalCallback;
 };
+
 const emptyClaimData = {
-  state: ENUM_QUEST_STATE.Draft as ClaimState,
+  state: ClaimStatus.None,
 } as ClaimModel;
+
 export default function ScheduleClaimModal({
   questAddress,
   questTotalBounty,
@@ -173,9 +172,8 @@ export default function ScheduleClaimModal({
       );
       let txPayload = {
         modalId,
-        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+        status: TransactionStatus.WaitingForSignature,
         type: 'ClaimSchedule',
         args: { questAddress },
       } as TransactionModel;
@@ -195,15 +193,13 @@ export default function ScheduleClaimModal({
           txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            status: ENUM_TRANSACTION_STATUS.Pending,
+            status: TransactionStatus.Pending,
           });
         },
       );
       setTransaction({
         ...txPayload,
-        status: scheduleReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+        status: scheduleReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
       });
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
@@ -216,7 +212,7 @@ export default function ScheduleClaimModal({
           (oldTx) =>
             oldTx && {
               ...oldTx,
-              status: ENUM_TRANSACTION_STATUS.Failed,
+              status: TransactionStatus.Failed,
               message: computeTransactionErrorMessage(e),
             },
         );
@@ -361,7 +357,7 @@ export default function ScheduleClaimModal({
                     compact
                     isMarkDown
                   />
-                  {questData.state === ENUM_QUEST_STATE.Archived ? (
+                  {questData.status === QuestStatus.Archived ? (
                     archivedWarning
                   ) : (
                     <>{willExpireBeforeClaim && expirationWarning}</>
