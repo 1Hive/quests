@@ -24,6 +24,7 @@ import governGnosis from "./deployments/xdai/Govern.json";
 import governGoerli from "./deployments/goerli/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
+import GovernAbi from "./abi/contracts/Externals/Govern.json";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
 import CelesteMockRinkeby from "./deployments/rinkeby/OwnableCeleste.json";
 
@@ -1257,7 +1258,7 @@ task("deployAll:rinkeby")
   .setAction(deployAll);
 
 task("sigAbi").setAction(async (_args, { web3 }) => {
-  const aclFunctions = [
+  const aclQueueFunctions = [
     "schedule",
     "resolve",
     "challenge",
@@ -1265,8 +1266,23 @@ task("sigAbi").setAction(async (_args, { web3 }) => {
     "veto",
     "configure",
   ];
+  const aclGovernFunctions = [
+    "withdraw",
+    "exec",
+    "registerStandardAndCallback",
+    "setSignatureValidator",
+  ];
+  console.log("GovernQueue roles:");
   for (const obj of GovernQueueAbi) {
-    if (obj.type !== "function" || !aclFunctions.includes(obj.name)) {
+    if (obj.type !== "function" || !aclQueueFunctions.includes(obj.name)) {
+      continue;
+    }
+    let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+    console.log(`${obj.name}:`, signature);
+  }
+  console.log("Govern roles:");
+  for (const obj of GovernAbi) {
+    if (obj.type !== "function" || !aclGovernFunctions.includes(obj.name)) {
       continue;
     }
     let signature = web3.eth.abi.encodeFunctionSignature(obj as any);

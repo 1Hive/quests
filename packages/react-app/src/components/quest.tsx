@@ -154,13 +154,13 @@ export default function Quest({
   );
 
   useEffect(() => {
-    if (!isSummary) {
+    if (!isSummary && questData.status) {
       // Don't show deposit of expired
       if (status === QuestStatus.Archived || status === QuestStatus.Expired) {
         setClaimDeposit(undefined);
       } else {
         try {
-          QuestService.fetchDeposits().then(({ challenge, claim }) => {
+          QuestService.fetchDeposits(questData).then(({ challenge, claim }) => {
             if (isMountedRef.current) {
               setClaimDeposit(claim);
               setChallengeDeposit(challenge);
@@ -171,7 +171,7 @@ export default function Quest({
         }
       }
     }
-  }, []);
+  }, [questData.status]);
 
   useEffect(() => {
     // If tx completion impact Quest bounty, update it

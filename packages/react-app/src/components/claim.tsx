@@ -160,6 +160,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
             {timer}
             <ExecuteClaimModal
               claim={claim}
+              questData={questData}
               questTotalBounty={questData.bounty}
               onClose={onActionClose}
               claimable={claimable}
@@ -172,6 +173,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
         <TimeableActionWrapper>
           {timer}
           <ChallengeModal
+            questData={questData}
             claim={{ ...claim, state: status }}
             challengeDeposit={challengeDeposit}
             onClose={onActionClose}
@@ -199,7 +201,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
     if (status === ClaimStatus.Challenged) {
       setActionButton(
         <>
-          <ResolveChallengeModal claim={claim} onClose={onActionClose} />
+          <ResolveChallengeModal questData={questData} claim={claim} onClose={onActionClose} />
         </>,
       );
       return;
@@ -271,7 +273,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
                       claim.state !== ClaimStatus.Vetoed &&
                       claim.state !== ClaimStatus.Rejected &&
                       claim.state !== ClaimStatus.Approved && (
-                        <VetoModal claim={claim} onClose={onActionClose} />
+                        <VetoModal claim={claim} questData={questData} onClose={onActionClose} />
                       )}
                   </>
                 ) : (

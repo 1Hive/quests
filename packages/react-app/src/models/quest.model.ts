@@ -14,7 +14,7 @@ export type QuestModel = {
   maxPlayers?: number;
   unlimited?: boolean;
 
-  // Computed
+  // Loaded from subgraph
   activeClaimCount?: number;
   creationTime?: Date;
   address?: string;

@@ -14,6 +14,7 @@ import { FaEdit, FaEye } from 'react-icons/fa';
 import { VetoModel } from 'src/models/veto.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { QuestModel } from 'src/models/quest.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import TextFieldInput from '../field-input/text-field-input';
@@ -56,13 +57,19 @@ const ButtonLinkStyled = styled(Button)`
 
 type Props = {
   claim: ClaimModel;
+  questData: QuestModel;
   vetoData?: VetoModel;
   onClose?: ModalCallback;
 };
 
 const emptyVetoData = {} as VetoModel;
 
-export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = noop }: Props) {
+export default function VetoModal({
+  claim,
+  questData,
+  vetoData = emptyVetoData,
+  onClose = noop,
+}: Props) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -98,6 +105,7 @@ export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = n
         setTransaction(txPayload);
         const vetoTxReceipt = await QuestService.vetoQuestClaim(
           walletAddress,
+          questData,
           {
             reason: values.reason!,
           },

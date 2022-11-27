@@ -17,10 +17,10 @@ import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
-import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { QuestModel } from 'src/models/quest.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -68,6 +68,7 @@ const DepositInfoStyled = styled(Info)`
 // #endregion
 
 type Props = {
+  questData: QuestModel;
   claim: ClaimModel;
   challengeDeposit: TokenAmountModel;
   challengeData?: ChallengeModel;
@@ -77,6 +78,7 @@ type Props = {
 const emptyChallengeData = {} as ChallengeModel;
 
 export default function ChallengeModal({
+  questData,
   claim,
   challengeData = emptyChallengeData,
   challengeDeposit,
@@ -132,7 +134,7 @@ export default function ChallengeModal({
   const challengeTx = async (values: Partial<ChallengeModel>) => {
     if (isFormValid) {
       try {
-        const { governQueueAddress } = getNetwork();
+        const governQueueAddress = await QuestService.getGovernQueueAddressFromQuest(questData);
         if (
           challengeFee?.parsedAmount &&
           (!isFeeDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
@@ -181,6 +183,7 @@ export default function ChallengeModal({
         setTransaction(txPayload);
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
+          questData,
           {
             reason: values.reason!,
             deposit: challengeDeposit,
