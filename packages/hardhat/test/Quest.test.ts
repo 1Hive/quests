@@ -167,14 +167,15 @@ describe("[Contract] Quest", function () {
         creator
       );
 
-      if (network.name !== "hardhat") {
-        console.warn("Non hardhat network, skipping non supported fast foward");
+      if (network.name === "hardhat") {
         await sameToken.mint(player.address, depositAmount);
         await sameToken.connect(player).approve(quest.address, depositAmount);
         await quest.connect(player).play(player.address);
 
         // Set next block timestamp to 10 minutes later (quest will be expired)
         await time.setNextBlockTimestamp(epochNow + 60 * 10);
+      } else {
+        console.warn("Non hardhat network, skipping non supported fast foward");
       }
 
       // Act
