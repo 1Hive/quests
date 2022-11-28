@@ -150,18 +150,13 @@ describe("[Contract] Quest", function () {
     });
 
     it("SHOULD only return remaining funds WHEN same reward token and play deposit and 1 player", async () => {
-      if (network.name !== "hardhat") {
-        console.warn("Skipping test for non-hardhat network ↓");
-        return;
-      }
-
       // Arrange
       const sameToken = rewardToken;
       const quest = await deployQuest(
         "fakeTitle",
         "0x",
         sameToken,
-        epochNow + 60 * 5, // expired in 5 min
+        network.name === "hardhat" ? epochNow + 60 * 5 : epoch0, // expired in 5 min
         govern.address,
         other.address,
         questFunds,
@@ -171,12 +166,16 @@ describe("[Contract] Quest", function () {
         depositAmount,
         creator
       );
-      await sameToken.mint(player.address, depositAmount);
-      await sameToken.connect(player).approve(quest.address, depositAmount);
-      await quest.connect(player).play(player.address);
 
-      // Set next block timestamp to 10 minutes later (quest will be expired)
-      await time.setNextBlockTimestamp(epochNow + 60 * 10);
+      if (network.name !== "hardhat") {
+        console.warn("Non hardhat network, skipping non supported fast foward");
+        await sameToken.mint(player.address, depositAmount);
+        await sameToken.connect(player).approve(quest.address, depositAmount);
+        await quest.connect(player).play(player.address);
+
+        // Set next block timestamp to 10 minutes later (quest will be expired)
+        await time.setNextBlockTimestamp(epochNow + 60 * 10);
+      }
 
       // Act
       await quest.recoverFundsAndDeposit();
