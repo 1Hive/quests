@@ -10,6 +10,7 @@ import {
 } from "./test-helper";
 import { TokenMock, TokenMock__factory } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 use(solidity);
 
@@ -149,13 +150,18 @@ describe("[Contract] Quest", function () {
     });
 
     it("SHOULD only return remaining funds WHEN same reward token and play deposit and 1 player", async () => {
+      if (network.name !== "hardhat") {
+        console.warn("Skipping test for non-hardhat network ↓");
+        return;
+      }
+
       // Arrange
       const sameToken = rewardToken;
       const quest = await deployQuest(
         "fakeTitle",
         "0x",
         sameToken,
-        epochNow + 60, // expired in 1 hour
+        epochNow + 60 * 5, // expired in 5 min
         govern.address,
         other.address,
         questFunds,
@@ -169,11 +175,8 @@ describe("[Contract] Quest", function () {
       await sameToken.connect(player).approve(quest.address, depositAmount);
       await quest.connect(player).play(player.address);
 
-      // Set next block timestamp to 2 hours later (quest is now expired)
-      await network.provider.send("evm_setNextBlockTimestamp", [
-        epochNow + 120,
-      ]);
-      await network.provider.send("evm_mine"); // this one will have 2021-07-01 12:00 AM as its timestamp, no matter what the previous block has
+      // Set next block timestamp to 10 minutes later (quest will be expired)
+      await time.setNextBlockTimestamp(epochNow + 60 * 10);
 
       // Act
       await quest.recoverFundsAndDeposit();
