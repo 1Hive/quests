@@ -175,14 +175,16 @@ describe("[Contract] Quest", function () {
         // Set next block timestamp to 10 minutes later (quest will be expired)
         await time.setNextBlockTimestamp(epochNow + 60 * 10);
       } else {
-        console.warn("Non hardhat network, skipping non supported fast foward");
+        console.warn("Non hardhat network, skipping not supported fast foward");
       }
 
       // Act
       await quest.recoverFundsAndDeposit();
 
       // Assert
-      expect(await sameToken.balanceOf(quest.address)).to.eq(depositAmount); // Only play deposit remains
+      expect(await sameToken.balanceOf(quest.address)).to.eq(
+        network.name === "hardhat" ? depositAmount : 0
+      ); // Only play deposit remains
       expect(await createDepositToken.balanceOf(creator.address)).to.eq(
         depositAmount
       );
