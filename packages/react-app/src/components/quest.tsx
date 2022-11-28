@@ -23,7 +23,7 @@ import { DepositModel } from 'src/models/deposit-model';
 import { TransactionType } from 'src/enums/transaction-type.enum';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
-import ReclaimFundsModal from './modals/reclaim-funds-modal';
+import RecoverFundsModal from './modals/reclaim-funds-modal';
 import DateFieldInput from './field-input/date-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
@@ -35,6 +35,7 @@ import { ConditionalWrapper } from './utils/util';
 import NumberFieldInput from './field-input/number-field-input';
 import { ActionsPlaceholder } from './actions-placeholder';
 import PlayModal from './modals/play-modal';
+import OptoutModal from './modals/optout-modal';
 
 // #region StyledComponents
 
@@ -183,7 +184,7 @@ export default function Quest({
               setPlayers((prev) => [...prev, transaction.args!.player!]);
             }
             break;
-          case TransactionType.QuestLeave:
+          case TransactionType.QuestUnplay:
             if (transaction.args?.player) {
               setPlayers((prev) => prev?.filter((_player) => _player !== transaction.args!.player));
             }
@@ -432,11 +433,23 @@ export default function Quest({
                     {(!isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||
                       waitForClose) &&
-                      questData.maxPlayers && ( // Make sure maxPlayers is set (play feature is available on this quest)
-                        <PlayModal quest={questData} onClose={() => setWaitForClose(false)} />
+                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                        <PlayModal
+                          questData={{ ...questData, players }}
+                          onClose={() => setWaitForClose(false)}
+                        />
+                      )}
+                    {(isPlayingQuest ||
+                      questData.creatorAddress === walletAddress ||
+                      waitForClose) &&
+                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                        <OptoutModal
+                          questData={{ ...questData, players }}
+                          onClose={() => setWaitForClose(false)}
+                        />
                       )}
                     {claimDeposit &&
-                      (isPlayingQuest || !questData.maxPlayers) && ( // Bypass play feature if maxPlayers is not set
+                      (isPlayingQuest || questData.maxPlayers === undefined) && ( // Bypass play feature if maxPlayers is not set
                         <ScheduleClaimModal
                           questData={{ ...questData, status }}
                           questAddress={questData.address}
@@ -447,7 +460,7 @@ export default function Quest({
                   </>
                   <>
                     {(status === QuestStatus.Expired || waitForClose) && (
-                      <ReclaimFundsModal
+                      <RecoverFundsModal
                         bounty={bounty}
                         questData={{ ...questData, status }}
                         isDepositReleased={isCreateDepositReleased}

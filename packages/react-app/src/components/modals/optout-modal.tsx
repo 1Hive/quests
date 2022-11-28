@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, Info } from '@1hive/1hive-ui';
+import { Button } from '@1hive/1hive-ui';
 import { Form, Formik } from 'formik';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -17,17 +17,14 @@ import { toChecksumAddress } from 'web3-utils';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getTokenInfo } from 'src/utils/contract.util';
 import { toTokenAmountModel } from 'src/utils/data.utils';
-import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { TransactionType } from 'src/enums/transaction-type.enum';
-import { QuestStatus } from 'src/enums/quest-status.enum';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
-import { WalletBalance } from '../wallet-balance';
 import * as QuestService from '../../services/quest.service';
-import AmountFieldInput from '../field-input/amount-field-input';
+import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 
 const FormStyled = styled(Form)`
   width: 100%;
@@ -38,9 +35,10 @@ const OpenButtonStyled = styled(Button)`
   width: fit-content;
 `;
 
-const DepositInfoStyled = styled(Info)`
-  padding: ${GUpx(1)};
-  margin-left: ${GUpx(2)};
+const RowStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 type Props = {
@@ -48,21 +46,15 @@ type Props = {
   questData: QuestModel;
 };
 
-export default function PlayModal({ questData, onClose = noop }: Props) {
+export default function OptoutModal({ questData, onClose = noop }: Props) {
   const { walletAddress } = useWallet();
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(true);
   const formRef = useRef<HTMLFormElement>(null);
   const { setTransaction } = useTransactionContext();
-  const [isDepositEnoughBalance, setIsDepositEnoughBalance] = useState<boolean>(true);
-  const modalId = useMemo(() => uniqueId('play-modal'), []);
+  const modalId = useMemo(() => uniqueId('unplay-modal'), []);
   const [deposit, setDeposit] = useState<TokenAmountModel>();
   const isMountedRef = useIsMountedRef();
-
-  const maxPlayerReached = useMemo(() => {
-    if (!questData.players || !questData.maxPlayers) return false;
-    return questData.players.length >= questData.maxPlayers;
-  }, [questData.players?.length, questData.maxPlayers]);
 
   useEffect(() => {
     if (questData.playDeposit) {
@@ -85,43 +77,38 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
     onClose(success);
   };
 
-  const playQuest = async (values: PlayModel) => {
+  const unplayQuest = async (values: PlayModel) => {
     if (!deposit?.token || !questData.address)
       throw new Error("Deposit or quest's address not defined");
-
-    await approveTokenTransaction(
-      modalId,
-      deposit.token,
-      questData.address,
-      `Approving play deposit (1/2)`,
-      walletAddress,
-      setTransaction,
-    );
 
     try {
       let txPayload = {
         modalId,
-        message: 'Playing quest (2/2)',
+        message: 'Opting out quest',
         status: TransactionStatus.WaitingForSignature,
-        type: TransactionType.QuestPlay,
+        type: TransactionType.QuestUnplay,
         args: { questAddress: questData.address, player: values.player || walletAddress },
       } as TransactionModel;
-      if (!isMountedRef.current) return;
       setTransaction(txPayload);
-      const txReceipt = await QuestService.playQuest(walletAddress, questData, values, (txHash) => {
-        txPayload = { ...txPayload, hash: txHash };
-        setTransaction({
-          ...txPayload,
-          status: TransactionStatus.Pending,
-        });
-      });
+      const txReceipt = await QuestService.unplayQuest(
+        walletAddress,
+        questData,
+        values,
+        (txHash) => {
+          txPayload = { ...txPayload, hash: txHash };
+          setTransaction({
+            ...txPayload,
+            status: TransactionStatus.Pending,
+          });
+        },
+      );
       if (isMountedRef.current) {
         setTransaction({
           ...txPayload,
           status: txReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
         });
-        if (!txReceipt?.status) throw new Error('Failed to play quest');
       }
+      if (!txReceipt?.status) throw new Error('Failed to opting out quest');
     } catch (e: any) {
       setTransaction(
         (oldTx) =>
@@ -137,7 +124,7 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
   const onSubmit = async (values: PlayModel) => {
     validate(values); // validate one last time before submiting
     if (isFormValid) {
-      await playQuest(values);
+      await unplayQuest(values);
     }
   };
 
@@ -148,11 +135,11 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
       if (values.player) {
         values.player = toChecksumAddress(values.player);
       }
-      // If user register a different address than connected but is not the quest creator
+      // If user unregister a different address than connected but is not the quest creator
       if (values.player !== walletAddress && questData.creatorAddress === values.player) {
-        errors.player = 'Only the quest creator can register another player';
-      } else if (questData.players?.includes(values.player || walletAddress)) {
-        errors.player = 'Player is already playing this quest';
+        errors.player = 'Only the quest creator can unregister another player';
+      } else if (!questData.players?.includes(values.player || walletAddress)) {
+        errors.player = 'Player is not part of the quest players';
       }
     } catch (error) {
       errors.player = 'Player address is not valid';
@@ -167,75 +154,40 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
       {({ values, handleSubmit, handleChange, handleBlur, touched, errors }) => (
         <ModalBase
           id={modalId}
-          title="Play quest"
+          title="Opt out quest"
           openButton={
             <OpenButtonStyled
               icon={<GiCrossedSwords />}
-              className="open-play-button"
+              className="open-unplay-button"
               onClick={() => setOpened(true)}
-              label="Play"
-              mode="positive"
+              label="Opt out"
+              mode="negative"
             />
           }
           buttons={[
-            deposit && (
-              <WalletBalance
-                key="playDeposit"
-                askedTokenAmount={deposit}
-                setIsEnoughBalance={setIsDepositEnoughBalance}
-              />
-            ),
-            deposit && (
-              <DepositInfoStyled
-                mode={isDepositEnoughBalance ? 'info' : 'warning'}
-                key="playDeposit"
-              >
-                <AmountFieldInput
-                  id="playDeposit"
-                  label="Play Deposit"
-                  tooltip="This amount will be hold by the Quest. Just leave the quest to recover it."
-                  value={deposit}
-                  compact
-                  showUsd
-                />
-              </DepositInfoStyled>
-            ),
             <Button
-              className="submit-play-button"
-              key="buttonPlay"
+              className="submit-unplay-button"
+              key="buttonUnplay"
               icon={<GiCrossedSwords />}
               type="submit"
-              form="play-form"
-              label="Play"
-              mode="positive"
-              title={
-                questData.status !== QuestStatus.Active
-                  ? 'Quest expired'
-                  : maxPlayerReached
-                  ? 'Max player reached'
-                  : !isFormValid
-                  ? 'Form not valid'
-                  : 'Play quest'
-              }
-              disabled={
-                questData.status !== QuestStatus.Active ||
-                maxPlayerReached ||
-                !isDepositEnoughBalance ||
-                !isFormValid
-              }
+              form="unplay-form"
+              label="Opt out"
+              mode="negative"
+              title={!isFormValid ? 'Form not valid' : 'Opt out quest'}
+              disabled={!isFormValid}
             />,
           ]}
           onClose={closeModal}
           isOpen={opened}
           size="small"
         >
-          <FormStyled id="play-form" onSubmit={handleSubmit} ref={formRef}>
+          <FormStyled id="unplay-form" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu32 vertical>
               <AddressFieldInput
                 id="player"
                 isEdit
                 label="Player"
-                tooltip="The address of the player to register (only creator can register another player than connected one)"
+                tooltip="The address of the player to unregister (only creator can unregister another player than connected one)"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.player || walletAddress}
@@ -243,20 +195,18 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
                 wide
                 disabled={walletAddress !== questData.creatorAddress}
               />
+              {deposit && (
+                <RowStyled>
+                  <AmountFieldInputFormik
+                    id="bounty"
+                    label="Deposit recover"
+                    value={deposit}
+                    tooltip="Will be transfer to the player's wallet"
+                  />
+                </RowStyled>
+              )}
             </Outset>
           </FormStyled>
-          {maxPlayerReached && (
-            <Outset vertical>
-              <Info mode="warning">❌ The maximum number of player has been reached</Info>
-            </Outset>
-          )}
-          {questData.status !== QuestStatus.Active && (
-            <Outset vertical>
-              <Info mode="warning">
-                ❌ This quest is expired and will no longer accept new players
-              </Info>
-            </Outset>
-          )}
         </ModalBase>
       )}
     </Formik>

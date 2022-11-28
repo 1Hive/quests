@@ -1,5 +1,5 @@
 // @ts-ignore
-import { ethers, deployments } from "hardhat";
+import { ethers, network } from "hardhat";
 import { use, expect } from "chai";
 import { solidity } from "ethereum-waffle";
 import {
@@ -7,11 +7,9 @@ import {
   hashToBytes,
   getNowAsUnixEpoch,
   fromNumber,
-  fromBigNumber,
 } from "./test-helper";
 import { TokenMock, TokenMock__factory } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
-import { BigNumber } from "ethers";
 
 use(solidity);
 
@@ -124,7 +122,7 @@ describe("[Contract] Quest", function () {
       await expect(act()).to.be.revertedWith("ERROR: Not expired");
     });
 
-    it("SHOULD return deposit and remaining funds separately WHEN same reward token than deposit", async () => {
+    it("SHOULD return create deposit and remaining funds separately WHEN same reward token and create deposit", async () => {
       // Arrange
       const sameToken = rewardToken;
       const quest = await deployQuest(
@@ -147,6 +145,44 @@ describe("[Contract] Quest", function () {
       // Assert
       expect(await sameToken.balanceOf(quest.address)).to.eq(0);
       expect(await sameToken.balanceOf(creator.address)).to.eq(depositAmount);
+      expect(await sameToken.balanceOf(other.address)).to.eq(questFunds);
+    });
+
+    it("SHOULD only return remaining funds WHEN same reward token and play deposit and 1 player", async () => {
+      // Arrange
+      const sameToken = rewardToken;
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        sameToken,
+        epochNow + 60, // expired in 1 hour
+        govern.address,
+        other.address,
+        questFunds,
+        createDepositToken,
+        depositAmount,
+        sameToken,
+        depositAmount,
+        creator
+      );
+      await sameToken.mint(player.address, depositAmount);
+      await sameToken.connect(player).approve(quest.address, depositAmount);
+      await quest.connect(player).play(player.address);
+
+      // Set next block timestamp to 2 hours later (quest is now expired)
+      await network.provider.send("evm_setNextBlockTimestamp", [
+        epochNow + 120,
+      ]);
+      await network.provider.send("evm_mine"); // this one will have 2021-07-01 12:00 AM as its timestamp, no matter what the previous block has
+
+      // Act
+      await quest.recoverFundsAndDeposit();
+
+      // Assert
+      expect(await sameToken.balanceOf(quest.address)).to.eq(depositAmount); // Only play deposit remains
+      expect(await createDepositToken.balanceOf(creator.address)).to.eq(
+        depositAmount
+      );
       expect(await sameToken.balanceOf(other.address)).to.eq(questFunds);
     });
   });

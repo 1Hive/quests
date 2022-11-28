@@ -647,16 +647,16 @@ export async function playQuest(
   return handleTransaction(tx, onTx);
 }
 
-export async function leaveQuest(
+export async function unplayQuest(
   walletAddress: string,
   quest: QuestModel,
   data: PlayModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
-  if (!quest.address) throw new Error('Quest address is not defined when leaving a quest');
+  if (!quest.address) throw new Error('Quest address is not defined when unplaying a quest');
   const questContract = getQuestContract(quest.address, walletAddress);
   if (!questContract) return null;
-  Logger.debug('Playing quest...', { quest });
+  Logger.debug('Unplaying quest...', { quest });
   const tx = await questContract.unplay(data.player || walletAddress, {
     gasLimit: 1000000,
   });

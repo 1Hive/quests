@@ -57,7 +57,7 @@ type Props = {
   pendingClaims: boolean;
 };
 
-export default function ReclaimFundsModal({
+export default function RecoverFundsModal({
   questData,
   bounty,
   onClose = noop,
@@ -91,7 +91,7 @@ export default function ReclaimFundsModal({
     try {
       let txPayload = {
         modalId,
-        message: 'Reclaiming funds and deposit',
+        message: 'Recovering funds and deposit',
         status: TransactionStatus.WaitingForSignature,
         type: 'QuestReclaimFunds',
         args: { questAddress: questData.address },

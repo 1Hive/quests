@@ -119,7 +119,7 @@ contract Quest is IExecutable {
     }
 
     /*
-     * Release deposit to creator and send unused funds to fundsRecoveryAddress.
+     * Release create deposit to creator and send unused funds to fundsRecoveryAddress.
      * requires quests to have expired
      *
      * requires quest to be expired
@@ -133,22 +133,25 @@ contract Quest is IExecutable {
             isCreateDepositReleased = true;
         }
 
-        rewardToken.safeTransfer(
-            fundsRecoveryAddress,
-            rewardToken.balanceOf(address(this))
-        );
+        uint256 balance = rewardToken.balanceOf(address(this));
+
+        // Claim all but let the create deposit if they are same token
+        if (address(rewardToken) == address(playDeposit.token)) {
+            (, balance) = balance.trySub(
+                playDeposit.amount * playerList.length
+            );
+        }
+
+        rewardToken.safeTransfer(fundsRecoveryAddress, balance);
     }
 
     /**
      * Verify given executer can execute this quest.
      * @param executer The player to verify
      */
-    function canExecute(address executer)
-        external
-        view
-        override
-        returns (bool)
-    {
+    function canExecute(
+        address executer
+    ) external view override returns (bool) {
         return findIndexOfPlayer(executer) != -1;
     }
 
