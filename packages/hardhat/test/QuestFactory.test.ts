@@ -17,7 +17,8 @@ describe("[Contract] QuestFactory", function () {
   let owner: SignerWithAddress;
   let stranger: SignerWithAddress;
   let rewardToken: TokenMock;
-  let depositToken: TokenMock;
+  let createDepositToken: TokenMock;
+  let playDepositToken: TokenMock;
   let otherToken: TokenMock;
   let questFactoryContract: QuestFactory;
   const depositAmount = fromNumber(1);
@@ -31,7 +32,9 @@ describe("[Contract] QuestFactory", function () {
     // Act
     questFactoryContract = await new QuestFactory__factory(owner).deploy(
       owner.address,
-      depositToken.address,
+      createDepositToken.address,
+      depositAmount,
+      playDepositToken.address,
       depositAmount,
       stranger.address
     );
@@ -42,15 +45,26 @@ describe("[Contract] QuestFactory", function () {
   beforeEach(async function () {
     const tokenMockFactory = new TokenMock__factory(owner);
     rewardToken = await tokenMockFactory.deploy("Reward Token", "RTOKEN");
-    depositToken = await tokenMockFactory.deploy("Deposit Token", "DTOKEN");
+    createDepositToken = await tokenMockFactory.deploy(
+      "Create Deposit Token",
+      "CDTOKEN"
+    );
+    playDepositToken = await tokenMockFactory.deploy(
+      "Play Deposit Token",
+      "PDTOKEN"
+    );
     otherToken = await tokenMockFactory.deploy("Other Token", "OTOKEN");
     questFactoryContract = await new QuestFactory__factory(owner).deploy(
       owner.address,
-      depositToken.address,
+      createDepositToken.address,
+      depositAmount,
+      playDepositToken.address,
       depositAmount,
       owner.address
     );
-    await depositToken.connect(owner).mint(owner.address, fromNumber(1000));
+    await createDepositToken
+      .connect(owner)
+      .mint(owner.address, fromNumber(1000));
   });
 
   it("SHOULD set the owner address correctly", async function () {
@@ -63,7 +77,8 @@ describe("[Contract] QuestFactory", function () {
       const title = "title";
       const detailIPFS = "0x";
       const expireTime = 0; // Unix Epoch 0
-      await depositToken
+      const maxPlayers = 1;
+      await createDepositToken
         .connect(owner)
         .approve(questFactoryContract.address, depositAmount);
 
@@ -75,7 +90,8 @@ describe("[Contract] QuestFactory", function () {
           detailIPFS,
           rewardToken.address,
           expireTime,
-          owner.address
+          owner.address,
+          maxPlayers
         )
       ).to.emit(questFactoryContract, "QuestCreated");
     });
@@ -85,8 +101,9 @@ describe("[Contract] QuestFactory", function () {
       const title = "title";
       const detailIPFS = "0x";
       const expireTime = 0; // Unix Epoch 0
+      const maxPlayers = 1;
 
-      await depositToken
+      await createDepositToken
         .connect(owner)
         .approve(questFactoryContract.address, depositAmount);
 
@@ -97,12 +114,13 @@ describe("[Contract] QuestFactory", function () {
           detailIPFS,
           rewardToken.address,
           expireTime,
-          owner.address
+          owner.address,
+          maxPlayers
         )
       );
 
       // Assert
-      expect(await depositToken.balanceOf(newQuestAddress)).to.eq(
+      expect(await createDepositToken.balanceOf(newQuestAddress)).to.eq(
         depositAmount
       );
     });
@@ -112,8 +130,9 @@ describe("[Contract] QuestFactory", function () {
       const title = "title";
       const detailIPFS = "0x";
       const expireTime = 0; // Unix Epoch 0
+      const maxPlayers = 1;
 
-      await depositToken
+      await createDepositToken
         .connect(owner)
         .approve(questFactoryContract.address, depositAmount.div(2));
       // Act
@@ -123,7 +142,8 @@ describe("[Contract] QuestFactory", function () {
           detailIPFS,
           rewardToken.address,
           expireTime,
-          owner.address
+          owner.address,
+          maxPlayers
         );
 
       // Assert
@@ -131,18 +151,18 @@ describe("[Contract] QuestFactory", function () {
     });
   });
 
-  describe("setDeposit()", function () {
-    it("SHOULD emit DepositChanged WHEN valid", async () => {
+  describe("setCreateDeposit()", function () {
+    it("SHOULD emit CreateDepositChanged WHEN valid", async () => {
       // Arrange
       // Act
       const act = () =>
         questFactoryContract
           .connect(owner)
-          .setDeposit(otherToken.address, depositAmount);
+          .setCreateDeposit(otherToken.address, depositAmount);
 
       // Assert
-      expect(await act()).to.emit(questFactoryContract, "DepositChanged");
-      const [token, amount] = await questFactoryContract.deposit();
+      expect(await act()).to.emit(questFactoryContract, "CreateDepositChanged");
+      const [token, amount] = await questFactoryContract.createDeposit();
       expect(token).to.eq(otherToken.address);
       expect(amount.eq(depositAmount)).to.eq(true);
     });
@@ -153,7 +173,7 @@ describe("[Contract] QuestFactory", function () {
       const act = () =>
         questFactoryContract
           .connect(stranger)
-          .setDeposit(otherToken.address, depositAmount);
+          .setCreateDeposit(otherToken.address, depositAmount);
       // Assert
       await expect(act()).to.be.revertedWith(
         "Ownable: caller is not the owner"
@@ -162,23 +182,91 @@ describe("[Contract] QuestFactory", function () {
 
     it("already created quests SHOULD keep old deposit WHEN change deposit", async () => {
       // Arrange
-      await depositToken
+      const maxPlayers = 1;
+      await createDepositToken
         .connect(owner)
         .approve(questFactoryContract.address, depositAmount);
       const questAddress = await extractQuestAddressFromTransaction(
         await questFactoryContract
           .connect(owner)
-          .createQuest("title", "0x", rewardToken.address, 0, owner.address)
+          .createQuest(
+            "title",
+            "0x",
+            rewardToken.address,
+            0,
+            owner.address,
+            maxPlayers
+          )
       );
       const quest = new Quest__factory(owner).attach(questAddress);
       const otherDepositAmount = fromNumber(2);
       // Act
       await questFactoryContract
         .connect(owner)
-        .setDeposit(otherToken.address, otherDepositAmount);
+        .setCreateDeposit(otherToken.address, otherDepositAmount);
       // Assert
-      const [token, amount] = await quest.deposit();
-      expect(token).to.eq(depositToken.address);
+      const [token, amount] = await quest.createDeposit();
+      expect(token).to.eq(createDepositToken.address);
+      expect(amount.eq(depositAmount)).to.eq(true);
+    });
+  });
+
+  describe("setPlayDeposit()", function () {
+    it("SHOULD emit PlayDepositChanged WHEN valid", async () => {
+      // Arrange
+      // Act
+      const act = () =>
+        questFactoryContract
+          .connect(owner)
+          .setPlayDeposit(otherToken.address, depositAmount);
+
+      // Assert
+      expect(await act()).to.emit(questFactoryContract, "PlayDepositChanged");
+      const [token, amount] = await questFactoryContract.playDeposit();
+      expect(token).to.eq(otherToken.address);
+      expect(amount.eq(depositAmount)).to.eq(true);
+    });
+
+    it("SHOULD revert WHEN not owner", async () => {
+      // Arrange
+      // Act
+      const act = () =>
+        questFactoryContract
+          .connect(stranger)
+          .setPlayDeposit(otherToken.address, depositAmount);
+      // Assert
+      await expect(act()).to.be.revertedWith(
+        "Ownable: caller is not the owner"
+      );
+    });
+
+    it("already created quests SHOULD keep old deposit WHEN change deposit", async () => {
+      // Arrange
+      const maxPlayers = 1;
+      await createDepositToken
+        .connect(owner)
+        .approve(questFactoryContract.address, depositAmount);
+      const questAddress = await extractQuestAddressFromTransaction(
+        await questFactoryContract
+          .connect(owner)
+          .createQuest(
+            "title",
+            "0x",
+            rewardToken.address,
+            0,
+            owner.address,
+            maxPlayers
+          )
+      );
+      const quest = new Quest__factory(owner).attach(questAddress);
+      const otherDepositAmount = fromNumber(2);
+      // Act
+      await questFactoryContract
+        .connect(owner)
+        .setPlayDeposit(otherToken.address, otherDepositAmount);
+      // Assert
+      const [token, amount] = await quest.playDeposit();
+      expect(token).to.eq(playDepositToken.address);
       expect(amount.eq(depositAmount)).to.eq(true);
     });
   });

@@ -11,7 +11,10 @@ export type QuestModel = {
   expireTime: Date;
   fallbackAddress: string;
   creatorAddress: string;
-  // Computed
+  maxPlayers?: number;
+  unlimited?: boolean;
+
+  // Loaded from subgraph
   activeClaimCount?: number;
   creationTime?: Date;
   address?: string;
@@ -19,5 +22,7 @@ export type QuestModel = {
   rewardToken?: TokenModel | string;
   detailsRefIpfs?: string;
   status: QuestStatus;
-  deposit?: DepositModel;
+  createDeposit?: DepositModel;
+  playDeposit?: DepositModel;
+  players?: string[];
 };

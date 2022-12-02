@@ -21,19 +21,6 @@ export const QUESTS_PAGE_SIZE = 4;
 
 export const EXPECTED_CHAIN_ID = env('FORCE_CHAIN_ID') ? [+env('FORCE_CHAIN_ID')!] : [100, 4, 5];
 
-export const STYLE_BREAKPOINTS = Object.freeze({
-  4: '4',
-  8: '8',
-  16: '16',
-  24: '24',
-  32: '32',
-  40: '40',
-  48: '48',
-  56: '56',
-  64: '64',
-  72: '72',
-});
-
 // Default values
 
 export const DEFAULT_PAGE = Pages.List;

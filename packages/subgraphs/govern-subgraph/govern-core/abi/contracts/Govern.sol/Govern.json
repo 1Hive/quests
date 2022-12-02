@@ -71,21 +71,9 @@
       },
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "to",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "value",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "data",
-            "type": "bytes"
-          }
+          { "internalType": "address", "name": "to", "type": "address" },
+          { "internalType": "uint256", "name": "value", "type": "uint256" },
+          { "internalType": "bytes", "name": "data", "type": "bytes" }
         ],
         "indexed": false,
         "internalType": "struct ERC3000Data.Action[]",
@@ -290,20 +278,11 @@
     "name": "Withdrawn",
     "type": "event"
   },
-  {
-    "stateMutability": "nonpayable",
-    "type": "fallback"
-  },
+  { "stateMutability": "nonpayable", "type": "fallback" },
   {
     "inputs": [],
     "name": "ROOT_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes4",
-        "name": "",
-        "type": "bytes4"
-      }
-    ],
+    "outputs": [{ "internalType": "bytes4", "name": "", "type": "bytes4" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -316,16 +295,8 @@
             "name": "op",
             "type": "uint8"
           },
-          {
-            "internalType": "bytes4",
-            "name": "role",
-            "type": "bytes4"
-          },
-          {
-            "internalType": "address",
-            "name": "who",
-            "type": "address"
-          }
+          { "internalType": "bytes4", "name": "role", "type": "bytes4" },
+          { "internalType": "address", "name": "who", "type": "address" }
         ],
         "internalType": "struct ACLData.BulkItem[]",
         "name": "items",
@@ -339,21 +310,9 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "_reference",
-        "type": "string"
-      }
+      { "internalType": "address", "name": "_token", "type": "address" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" },
+      { "internalType": "string", "name": "_reference", "type": "string" }
     ],
     "name": "deposit",
     "outputs": [],
@@ -364,21 +323,9 @@
     "inputs": [
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "to",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "value",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "data",
-            "type": "bytes"
-          }
+          { "internalType": "address", "name": "to", "type": "address" },
+          { "internalType": "uint256", "name": "value", "type": "uint256" },
+          { "internalType": "bytes", "name": "data", "type": "bytes" }
         ],
         "internalType": "struct ERC3000Data.Action[]",
         "name": "actions",
@@ -389,36 +336,18 @@
         "name": "allowFailuresMap",
         "type": "bytes32"
       },
-      {
-        "internalType": "bytes32",
-        "name": "memo",
-        "type": "bytes32"
-      }
+      { "internalType": "bytes32", "name": "memo", "type": "bytes32" }
     ],
     "name": "exec",
     "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes[]",
-        "name": "",
-        "type": "bytes[]"
-      }
+      { "internalType": "bytes32", "name": "", "type": "bytes32" },
+      { "internalType": "bytes[]", "name": "", "type": "bytes[]" }
     ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "_role",
-        "type": "bytes4"
-      }
-    ],
+    "inputs": [{ "internalType": "bytes4", "name": "_role", "type": "bytes4" }],
     "name": "freeze",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -426,16 +355,8 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "_role",
-        "type": "bytes4"
-      },
-      {
-        "internalType": "address",
-        "name": "_who",
-        "type": "address"
-      }
+      { "internalType": "bytes4", "name": "_role", "type": "bytes4" },
+      { "internalType": "address", "name": "_who", "type": "address" }
     ],
     "name": "grant",
     "outputs": [],
@@ -444,16 +365,8 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "_role",
-        "type": "bytes4"
-      },
-      {
-        "internalType": "address",
-        "name": "_who",
-        "type": "address"
-      },
+      { "internalType": "bytes4", "name": "_role", "type": "bytes4" },
+      { "internalType": "address", "name": "_who", "type": "address" },
       {
         "internalType": "contract IACLOracle",
         "name": "_oracle",
@@ -466,21 +379,9 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
+    "inputs": [{ "internalType": "string", "name": "", "type": "string" }],
     "name": "initBlocks",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -498,65 +399,27 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "_role",
-        "type": "bytes4"
-      }
-    ],
+    "inputs": [{ "internalType": "bytes4", "name": "_role", "type": "bytes4" }],
     "name": "isFrozen",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "_hash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes",
-        "name": "_signature",
-        "type": "bytes"
-      }
+      { "internalType": "bytes32", "name": "_hash", "type": "bytes32" },
+      { "internalType": "bytes", "name": "_signature", "type": "bytes" }
     ],
     "name": "isValidSignature",
-    "outputs": [
-      {
-        "internalType": "bytes4",
-        "name": "",
-        "type": "bytes4"
-      }
-    ],
+    "outputs": [{ "internalType": "bytes4", "name": "", "type": "bytes4" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "_interfaceId",
-        "type": "bytes4"
-      },
-      {
-        "internalType": "bytes4",
-        "name": "_callbackSig",
-        "type": "bytes4"
-      },
-      {
-        "internalType": "bytes4",
-        "name": "_magicNumber",
-        "type": "bytes4"
-      }
+      { "internalType": "bytes4", "name": "_interfaceId", "type": "bytes4" },
+      { "internalType": "bytes4", "name": "_callbackSig", "type": "bytes4" },
+      { "internalType": "bytes4", "name": "_magicNumber", "type": "bytes4" }
     ],
     "name": "registerStandardAndCallback",
     "outputs": [],
@@ -565,16 +428,8 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "_role",
-        "type": "bytes4"
-      },
-      {
-        "internalType": "address",
-        "name": "_who",
-        "type": "address"
-      }
+      { "internalType": "bytes4", "name": "_role", "type": "bytes4" },
+      { "internalType": "address", "name": "_who", "type": "address" }
     ],
     "name": "revoke",
     "outputs": [],
@@ -583,25 +438,11 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "",
-        "type": "bytes4"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+      { "internalType": "bytes4", "name": "", "type": "bytes4" },
+      { "internalType": "address", "name": "", "type": "address" }
     ],
     "name": "roles",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -620,58 +461,25 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "_interfaceId",
-        "type": "bytes4"
-      }
+      { "internalType": "bytes4", "name": "_interfaceId", "type": "bytes4" }
     ],
     "name": "supportsInterface",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "_reference",
-        "type": "string"
-      }
+      { "internalType": "address", "name": "_token", "type": "address" },
+      { "internalType": "address", "name": "_from", "type": "address" },
+      { "internalType": "address", "name": "_to", "type": "address" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" },
+      { "internalType": "string", "name": "_reference", "type": "string" }
     ],
     "name": "withdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
-  }
+  { "stateMutability": "payable", "type": "receive" }
 ]

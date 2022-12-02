@@ -8,7 +8,6 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
-import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
@@ -160,8 +159,8 @@ export default function ScheduleClaimModal({
 
   const scheduleClaimTx = async (values: Partial<ClaimModel>) => {
     try {
-      const { governQueueAddress } = getNetwork();
-      const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
+      const governQueueAddress = await QuestService.getGovernQueueAddressFromQuest(questData);
+      const scheduleDeposit = (await QuestService.fetchDeposits(questData)).claim;
       await approveTokenTransaction(
         modalId,
         scheduleDeposit.token,

@@ -1,5 +1,5 @@
 import { Card, useViewport } from '@1hive/1hive-ui';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ADDRESS_ZERO, MAX_LINE_DESCRIPTION } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
@@ -19,9 +19,11 @@ import { QuestStatus } from 'src/enums/quest-status.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { Pages } from 'src/enums/pages.enum';
+import { DepositModel } from 'src/models/deposit-model';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ScheduleClaimModal from './modals/schedule-claim-modal';
 import FundModal from './modals/fund-modal';
-import ReclaimFundsModal from './modals/reclaim-funds-modal';
+import RecoverFundsModal from './modals/reclaim-funds-modal';
 import DateFieldInput from './field-input/date-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import TextFieldInput from './field-input/text-field-input';
@@ -32,6 +34,8 @@ import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
 import NumberFieldInput from './field-input/number-field-input';
 import { ActionsPlaceholder } from './actions-placeholder';
+import PlayModal from './modals/play-modal';
+import OptoutModal from './modals/optout-modal';
 
 // #region StyledComponents
 
@@ -130,28 +134,34 @@ export default function Quest({
   isLoading = false,
   isSummary = false,
 }: Props) {
-  const { walletConnected } = useWallet();
+  const { walletAddress, walletConnected } = useWallet();
   const [bounty, setBounty] = useState<TokenAmountModel | undefined | null>(questData?.bounty);
   const [highlight, setHighlight] = useState<boolean>(true);
   const [claims, setClaims] = useState<ClaimModel[]>();
   const [claimDeposit, setClaimDeposit] = useState<TokenAmountModel | undefined>();
-  const [isDepositReleased, setIsDepositReleased] = useState<boolean>(false);
+  const [isCreateDepositReleased, setIsCreateDepositReleased] = useState<boolean>(false);
   const [challengeDeposit, setChallengeDeposit] = useState<TokenAmountModel | null>();
-  const [state, setState] = useState(questData.status);
+  const [status, setStatus] = useState(questData.status);
   const { below } = useViewport();
   const { transaction } = useTransactionContext();
   const [waitForClose, setWaitForClose] = useState(false);
   const isMountedRef = useIsMountedRef();
   const { chainId } = getNetwork();
+  const [players, setPlayers] = useState<string[]>(questData.players ?? []);
+
+  const isPlayingQuest = useMemo(
+    () => players.some((player) => player === walletAddress),
+    [players.length, walletAddress],
+  );
 
   useEffect(() => {
-    if (!isSummary) {
+    if (!isSummary && questData.status) {
       // Don't show deposit of expired
-      if (state === QuestStatus.Archived || state === QuestStatus.Expired) {
+      if (status === QuestStatus.Archived || status === QuestStatus.Expired) {
         setClaimDeposit(undefined);
       } else {
         try {
-          QuestService.fetchDeposits().then(({ challenge, claim }) => {
+          QuestService.fetchDeposits(questData).then(({ challenge, claim }) => {
             if (isMountedRef.current) {
               setClaimDeposit(claim);
               setChallengeDeposit(challenge);
@@ -162,36 +172,49 @@ export default function Quest({
         }
       }
     }
-  }, []);
+  }, [questData.status]);
 
   useEffect(() => {
     // If tx completion impact Quest bounty, update it
-    if (
-      transaction?.args?.questAddress === questData.address &&
-      (transaction?.type === 'ClaimChallengeResolve' ||
-        transaction?.type === 'ClaimExecute' ||
-        transaction?.type === 'QuestFund' ||
-        transaction?.type === 'QuestReclaimFunds')
-    ) {
-      if (
+    if (transaction?.args?.questAddress === questData.address) {
+      if (transaction?.status === TransactionStatus.Confirmed) {
+        switch (transaction?.type) {
+          case TransactionType.QuestPlay:
+            if (transaction.args?.player) {
+              setPlayers((prev) => [...prev, transaction.args!.player!]);
+            }
+            break;
+          case TransactionType.QuestUnplay:
+            if (transaction.args?.player) {
+              setPlayers((prev) => prev?.filter((_player) => _player !== transaction.args!.player));
+            }
+            break;
+          case TransactionType.ClaimChallengeResolve:
+          case TransactionType.ClaimExecute:
+          case TransactionType.QuestFund:
+          case TransactionType.QuestReclaimFunds:
+            setBounty(null);
+            setTimeout(() => {
+              if (questData.address && questData.rewardToken) {
+                fetchBalanceOfQuest(questData.address, questData.rewardToken, true);
+              }
+            }, 500);
+            break;
+          default:
+            break;
+        }
+      } else if (
         transaction?.status === TransactionStatus.Pending &&
-        transaction?.type === 'QuestReclaimFunds'
+        transaction?.type === TransactionType.QuestReclaimFunds
       ) {
         // Should wait for close because changing the state will cause QuestReclaimFunds to be removed from DOM
         setWaitForClose(true);
-      } else if (transaction?.status === TransactionStatus.Confirmed) {
-        setBounty(null);
-        setTimeout(() => {
-          if (questData.address && questData.rewardToken) {
-            fetchBalanceOfQuest(questData.address, questData.rewardToken, true);
-          }
-        }, 500);
       }
     }
   }, [transaction?.type, transaction?.status, transaction?.args?.questAddress]);
 
   useEffect(() => {
-    setState(questData.status);
+    setStatus(questData.status);
   }, [questData.status]);
 
   useEffect(() => {
@@ -200,7 +223,7 @@ export default function Quest({
     } else if (questData.address) {
       fetchBalanceOfQuest(questData.address, questData.rewardToken);
     }
-  }, [questData.address, questData.rewardToken]);
+  }, [questData.address, questData.rewardToken, questData.playDeposit, questData.playDeposit]);
 
   const fetchBalanceOfQuest = async (
     address: string,
@@ -211,19 +234,28 @@ export default function Quest({
       if (questData.address) {
         let depositReleased = false;
         if (isQuestExpired(questData)) {
-          depositReleased = await QuestService.isQuestDepositReleased(questData.address);
+          depositReleased = await QuestService.isCreateQuestDepositReleased(questData.address);
+        }
+        const depositLocked: DepositModel[] = [];
+        if (!depositReleased && questData.createDeposit) {
+          depositLocked.push(questData.createDeposit);
+        }
+        if (players.length && questData.playDeposit) {
+          // Multiply by the number of players (each one has a deposit locked)
+          questData.playDeposit.amount = questData.playDeposit.amount.mul(players.length);
+          depositLocked.push(questData.playDeposit);
         }
         const result = await QuestService.getBalanceOf(
           token,
           address,
-          depositReleased ? undefined : questData.deposit,
+          depositLocked,
           forceCacheRefresh,
         );
         if (isMountedRef.current) {
           questData.bounty = result;
-          setIsDepositReleased(depositReleased);
+          setIsCreateDepositReleased(depositReleased);
           computeQuestState(questData, depositReleased);
-          setState(questData.status);
+          setStatus(questData.status);
           setBounty(result);
         }
       }
@@ -270,6 +302,14 @@ export default function Quest({
             isLoading={isLoading || !questData}
             value={questData?.creatorAddress}
           />
+          {questData?.maxPlayers != null && (
+            <TextFieldInput
+              id="players"
+              label="Players"
+              isLoading={isLoading || !questData}
+              value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+            />
+          )}
           <DateFieldInput
             id="creationTime"
             label="Creation time"
@@ -287,7 +327,7 @@ export default function Quest({
         value={questData?.expireTime}
       />
 
-      {!isSummary && state === QuestStatus.Active && (
+      {!isSummary && status === QuestStatus.Active && (
         <AmountFieldInput
           id="claimDeposit"
           label="Claim deposit"
@@ -378,7 +418,7 @@ export default function Quest({
           </ContentWrapperStyled>
           {!isSummary && challengeDeposit && (
             <ClaimList
-              questData={{ ...questData, bounty, status: state }}
+              questData={{ ...questData, bounty, status }}
               challengeDeposit={challengeDeposit}
               isLoading={isLoading}
               onClaimsFetched={setClaims}
@@ -390,21 +430,40 @@ export default function Quest({
                 <>
                   <>
                     <FundModal quest={questData} />
-                    {claimDeposit && (
-                      <ScheduleClaimModal
-                        questData={{ ...questData, status: state }}
-                        questAddress={questData.address}
-                        questTotalBounty={bounty}
-                        claimDeposit={claimDeposit}
-                      />
-                    )}
+                    {(!isPlayingQuest ||
+                      questData.creatorAddress === walletAddress ||
+                      waitForClose) &&
+                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                        <PlayModal
+                          questData={{ ...questData, players }}
+                          onClose={() => setWaitForClose(false)}
+                        />
+                      )}
+                    {(isPlayingQuest ||
+                      questData.creatorAddress === walletAddress ||
+                      waitForClose) &&
+                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                        <OptoutModal
+                          questData={{ ...questData, players }}
+                          onClose={() => setWaitForClose(false)}
+                        />
+                      )}
+                    {claimDeposit &&
+                      (isPlayingQuest || questData.maxPlayers === undefined) && ( // Bypass play feature if maxPlayers is not set
+                        <ScheduleClaimModal
+                          questData={{ ...questData, status }}
+                          questAddress={questData.address}
+                          questTotalBounty={bounty}
+                          claimDeposit={claimDeposit}
+                        />
+                      )}
                   </>
                   <>
-                    {(state === QuestStatus.Expired || waitForClose) && (
-                      <ReclaimFundsModal
+                    {(status === QuestStatus.Expired || waitForClose) && (
+                      <RecoverFundsModal
                         bounty={bounty}
-                        questData={{ ...questData, status: state }}
-                        isDepositReleased={isDepositReleased}
+                        questData={{ ...questData, status }}
+                        isDepositReleased={isCreateDepositReleased}
                         onClose={() => setWaitForClose(false)}
                         pendingClaims={
                           !!claims?.find(

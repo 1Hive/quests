@@ -108,7 +108,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               key="buttonFund"
               icon={<GiTwoCoins />}
               type="submit"
-              form="form-fund"
+              form="fund-form"
               label="Fund"
               mode="strong"
               title={!isFormValid ? 'Form not valid' : 'Fund'}
@@ -119,7 +119,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           isOpen={opened}
           size="small"
         >
-          <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
+          <FormStyled id="fund-form" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
               <AddressFieldInput id="address" label="Quest address" value={quest.address} />
               <AmountFieldInputFormik

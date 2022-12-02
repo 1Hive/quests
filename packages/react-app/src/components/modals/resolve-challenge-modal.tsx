@@ -19,6 +19,7 @@ import { Logger } from 'src/utils/logger';
 import { DisputeStatus } from 'src/enums/dispute-status.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { QuestModel } from 'src/models/quest.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -81,11 +82,12 @@ const LinkStyled = styled(Link)`
 // #endregion
 
 type Props = {
+  questData: QuestModel;
   claim: ClaimModel;
   onClose?: ModalCallback;
 };
 
-export default function ResolveChallengeModal({ claim, onClose = noop }: Props) {
+export default function ResolveChallengeModal({ claim, questData, onClose = noop }: Props) {
   const { walletAddress, walletConnected } = useWallet();
   const { networkId } = getNetwork();
   const [opened, setOpened] = useState(false);
@@ -104,7 +106,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
 
   useEffect(() => {
     const fetchChallengeAndDispute = async (container: ContainerModel, retryCount: number = 5) => {
-      const challengeResult = await QuestService.fetchChallenge(container);
+      const challengeResult = await QuestService.fetchChallenge(container, questData);
       if (!isMountedRef.current) return;
       if (!challengeResult) {
         if (retryCount > 0) {
@@ -167,6 +169,7 @@ export default function ResolveChallengeModal({ claim, onClose = noop }: Props) 
       setTransaction(txPayload);
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,
+        questData,
         claim.container,
         dispute!,
         (txHash) => {
