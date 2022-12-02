@@ -1,9 +1,13 @@
 import { BigNumber, ethers } from 'ethers';
+import { QuestModel } from 'src/models/quest.model';
 import { TokenModel } from 'src/models/token.model';
 import { getNetwork } from 'src/networks';
 import { sleep } from 'src/utils/common.util';
 import { ONE_HOUR_IN_MS } from 'src/utils/date.utils';
 import { Logger } from 'src/utils/logger';
+import request from 'graphql-request';
+import { getQuestContract } from 'src/utils/contract.util';
+import { GovernEntity } from 'src/queries/govern-queue-entity.query';
 import { fetchRoutePairWithStable } from './uniswap.service';
 
 const cacheVersion = 2;
@@ -13,6 +17,8 @@ let cacheMap: Map<
   string,
   Map<string, { value: any; expirationMs?: number } | null>
 > = retrieveCache();
+
+// #region Cache definitions
 
 export async function cacheFetchTokenPrice(token: TokenModel, forceCacheRefresh: boolean = false) {
   const price = await buildCache<string | undefined>(
@@ -59,9 +65,37 @@ export async function cacheTokenInfo(
   );
 }
 
+export async function cacheGovernQueueAddressForQuest(
+  questData: QuestModel,
+  forceCacheRefresh: boolean = false,
+) {
+  return buildCache<string>(
+    'queue-address-for-quest',
+    questData.address,
+    async () => {
+      // Retrieve governAddress from Quest contract
+      const quest = getQuestContract(questData.address!);
+      const governAddress = await quest.aragonGovernAddress();
+
+      // Fetch who have the exec role for this govern (who being the bound governQueue)
+      const { governSubgraph } = getNetwork();
+      const result = await request(governSubgraph, GovernEntity, {
+        id: governAddress.toLowerCase(),
+      });
+      return result.govern.roles.find((gov: any) => gov.selector === '0xc2d85afc').who as string;
+    },
+    undefined,
+    forceCacheRefresh,
+  );
+}
+
+// #endregion
+
+// #region Cache helpers
+
 async function buildCache<TValue>(
   cacheId: string,
-  valueId: string,
+  valueId: string | undefined,
   fetchValue: () => Promise<TValue>,
   cacheDurationMs?: number, // Undefined for permanent cache
   forceCacheRefresh?: boolean,
@@ -82,8 +116,8 @@ async function buildCache<TValue>(
   if (!cache) {
     cache = new Map<string, { value: TValue; expirationMs: number } | null>();
     cacheMap.set(cacheId, cache);
-  } else {
-    let cached = cache.get(valueId);
+  } else if (valueId) {
+    let cached = cache.get(valueId); // Will set cache to undefined if valueId is undefined
     if (cached !== undefined) {
       // Token is being fetched
       let retryCount = 20;
@@ -113,8 +147,21 @@ async function buildCache<TValue>(
       }
     }
   }
-  cache.set(valueId, null); // Set to null to indicate that it is being fetched
+
+  if (valueId) {
+    cache.set(valueId, null); // Set to null to indicate that it is being fetched
+  }
   const value = await fetchValue();
+  if (!valueId) {
+    // Only build the cache if the valueId is defined
+    Logger.debug('Skiping caching result because valueId is not defined', {
+      cacheId,
+      valueId,
+      value,
+      cacheDurationMs,
+    });
+    return value;
+  }
   cache.set(valueId, {
     value,
     expirationMs: cacheDurationMs ? Date.now() + cacheDurationMs : undefined,
@@ -198,3 +245,5 @@ function disableCache() {
 
 (window as any).resetCache = resetCache;
 (window as any).disableCache = disableCache;
+
+// #endregion

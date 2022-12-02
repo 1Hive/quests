@@ -20,6 +20,7 @@ type Props = {
   compact?: boolean;
   onBlur?: Function;
   error?: string | false;
+  disabled?: boolean;
 };
 
 export default function NumberFieldInput({
@@ -39,6 +40,7 @@ export default function NumberFieldInput({
   compact = false,
   onBlur = noop,
   error,
+  disabled = false,
 }: Props) {
   return (
     <FieldInput
@@ -57,6 +59,7 @@ export default function NumberFieldInput({
           onChange={onChange}
           placeHolder={placeHolder}
           onBlur={onBlur}
+          disabled={disabled}
           max={max}
           min={min}
           isRequired={isRequired}

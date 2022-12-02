@@ -9,7 +9,6 @@ export type NetworkModel = {
   governSubgraph: string;
   tokenPairSubgraph: string;
   questFactoryAddress: string;
-  governQueueAddress: string;
   celesteAddress: string;
   managerAddress?: string;
   rpcUri: string;

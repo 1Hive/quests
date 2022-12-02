@@ -1,13 +1,13 @@
-const child_process = require("child_process");
-const fs = require("fs");
-const { resolve } = require("path");
-const { config } = require("dotenv");
-
-config({
+const child_process = require('child_process');
+const fs = require('fs');
+const { resolve } = require('path');
+const { config: dotenvConfig } = require('dotenv');
+console.log({ dir: __dirname });
+dotenvConfig({
   path: resolve(
     __dirname,
     fs
-      .readdirSync("../../../../")
+      .readdirSync('../../../../')
       .filter((allFilesPaths) => allFilesPaths.match(/\.env$/) !== null)[0]
   ),
 });
@@ -17,8 +17,8 @@ const user = args[0];
 const name = args[1];
 const network = args[2];
 // Deploy subgraph
-let command = "";
-if (network === "local" || network === "localhost")
+let command = '';
+if (network === 'local' || network === 'localhost')
   command = `graph deploy ${user}/${name} --ipfs http://localhost:5001 --node http://localhost:8020`;
 else
   command = `graph deploy ${user}/${name} --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token ${process.env.THE_GRAPH_ACCESS_TOKEN}`;

@@ -10,6 +10,7 @@ export type TransactionModel = {
     questAddress?: string;
     containerId?: string;
     disputeState?: number;
+    player?: string;
   };
   type: TransactionType;
 };
