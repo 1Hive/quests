@@ -312,10 +312,7 @@ export async function fetchQuest(questAddress: string) {
   return mapQuest(queryResult, claimResult);
 }
 
-export async function fetchQuestClaims(
-  quest: QuestModel,
-  skipIpfs?: boolean,
-): Promise<ClaimModel[]> {
+export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
   const res = await fetchClaimContainers();
 
   return Promise.all(
@@ -330,7 +327,7 @@ export async function fetchQuestClaims(
           typeof quest.rewardToken === 'string'
             ? ((await getTokenInfo(quest.rewardToken)) as TokenModel)
             : quest.rewardToken;
-        const claim = {
+        return {
           claimedAmount: {
             token: tokenModel,
             parsedAmount: fromBigNumber(BigNumber.from(claimAmount), tokenModel?.decimals),
@@ -343,16 +340,6 @@ export async function fetchQuestClaims(
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,
         } as ClaimModel;
-
-        if (skipIpfs) {
-          claim.evidence = formatIpfsMarkdownLink(claimInfoIpfsHash, 'See evidence');
-        } else {
-          const { evidence, contactInformation } = await fetchClaimIpfsInfo(claimInfoIpfsHash);
-          claim.evidence = evidence;
-          claim.contactInformation = contactInformation;
-        }
-
-        return claim;
       }),
   ).then((claims) =>
     claims.sort((a: ClaimModel, b: ClaimModel) => b.executionTimeMs! - a.executionTimeMs!),

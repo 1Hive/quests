@@ -13,6 +13,7 @@ import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { HelpTooltip } from './field-input/help-tooltip';
 import * as QuestService from '../services/quest.service';
 import Claim from './claim';
+import { fetchClaimIpfsInfo } from '../services/quest.service';
 
 // #region StyledComponents
 
@@ -113,12 +114,12 @@ export default function ClaimList({
       claimsCount = claims.length;
     }
     setTimeout(async () => {
-      const results = await QuestService.fetchQuestClaims(questData, true);
+      const results = await QuestService.fetchQuestClaims(questData);
       if (!isMountedRef.current) return;
       if (results.length === claimsCount) {
         fetchClaimsUntilNew(claimsCount);
       } else {
-        setClaims(results);
+        setClaims(await fetchClaimsIpfsInfo(results));
         setLoadingClaim(false);
       }
     }, 1000);
@@ -128,9 +129,19 @@ export default function ClaimList({
     setLoadingClaim(true);
     const results = await QuestService.fetchQuestClaims(questData);
     if (!isMountedRef.current) return;
-    setClaims(results); // Fetch visible data
+    setClaims(await fetchClaimsIpfsInfo(results)); // Fetch visible data
     setLoadingClaim(false);
   };
+
+  const fetchClaimsIpfsInfo = async (_claims: ClaimModel[]) =>
+    Promise.all(
+      _claims.map(async (claim) => {
+        const { evidence, contactInformation } = await fetchClaimIpfsInfo(claim.claimInfoIpfsHash);
+        claim.evidence = evidence;
+        claim.contactInformation = contactInformation;
+        return claim;
+      }),
+    );
 
   return (
     <WrapperStyled>
