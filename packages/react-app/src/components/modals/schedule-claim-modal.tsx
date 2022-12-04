@@ -274,7 +274,6 @@ export default function ScheduleClaimModal({
         onSubmit={(values) => {
           onClaimSubmit(values);
         }}
-        validateOnChange
         validate={validate}
       >
         {({ values, handleSubmit, handleChange, handleBlur, errors, touched, setTouched }) => (

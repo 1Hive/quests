@@ -328,7 +328,6 @@ export default function ChallengeModal({
             });
           }
         }}
-        validateOnChange
         validate={validate}
       >
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (

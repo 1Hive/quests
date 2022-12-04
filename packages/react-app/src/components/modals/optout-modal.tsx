@@ -150,7 +150,7 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
   };
 
   return (
-    <Formik initialValues={{ player: '' }} onSubmit={onSubmit} validateOnChange validate={validate}>
+    <Formik initialValues={{ player: '' }} onSubmit={onSubmit} validate={validate}>
       {({ values, handleSubmit, handleChange, handleBlur, touched, errors }) => (
         <ModalBase
           id={modalId}

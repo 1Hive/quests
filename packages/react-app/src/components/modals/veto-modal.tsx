@@ -189,7 +189,6 @@ export default function VetoModal({
             });
           }
         }}
-        validateOnChange
         validate={validate}
       >
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (

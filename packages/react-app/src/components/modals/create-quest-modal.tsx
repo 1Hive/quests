@@ -320,8 +320,6 @@ export default function QuestModal({
               } as QuestModel
             }
             onSubmit={onQuestSubmit}
-            validateOnBlur
-            // validateOnChange
             validate={validate}
           >
             {({ values, handleChange, handleBlur, errors, touched, setTouched, handleSubmit }) => {
@@ -341,7 +339,6 @@ export default function QuestModal({
                   <Stepper
                     submitButton={
                       <>
-                        {/* {questDeposit?.token?.token !== values.bounty?.token?.token && ( */}
                         <div
                           className={
                             questDeposit?.token?.token !== values.bounty?.token?.token
@@ -357,7 +354,6 @@ export default function QuestModal({
                             tooltip="The balance of the reward token in the connected wallet"
                           />
                         </div>
-                        {/* )} */}
                         {questDeposit && questDeposit?.parsedAmount > 0 && (
                           <>
                             <WalletBalance

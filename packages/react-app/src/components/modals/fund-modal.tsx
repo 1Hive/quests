@@ -78,7 +78,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         } as FundModel
       }
       onSubmit={onSubmit}
-      validateOnChange
       validate={validate}
     >
       {({ values, handleSubmit, handleChange, touched, errors }) => (
