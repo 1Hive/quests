@@ -203,10 +203,7 @@ export default function Quest({
           default:
             break;
         }
-      } else if (
-        transaction?.status === TransactionStatus.Pending &&
-        transaction?.type === TransactionType.QuestReclaimFunds
-      ) {
+      } else if (transaction?.status === TransactionStatus.Pending) {
         // Should wait for close because changing the state will cause QuestReclaimFunds to be removed from DOM
         setWaitForClose(true);
       }
@@ -432,7 +429,7 @@ export default function Quest({
                     <FundModal quest={questData} />
                     {(!isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||
-                      waitForClose) &&
+                      (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
                       questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
                         <PlayModal
                           questData={{ ...questData, players }}
@@ -441,7 +438,7 @@ export default function Quest({
                       )}
                     {(isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||
-                      waitForClose) &&
+                      (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
                       questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
                         <OptoutModal
                           questData={{ ...questData, players }}
@@ -459,7 +456,9 @@ export default function Quest({
                       )}
                   </>
                   <>
-                    {(status === QuestStatus.Expired || waitForClose) && (
+                    {(status === QuestStatus.Expired ||
+                      (waitForClose &&
+                        transaction?.type === TransactionType.QuestReclaimFunds)) && (
                       <RecoverFundsModal
                         bounty={bounty}
                         questData={{ ...questData, status }}
