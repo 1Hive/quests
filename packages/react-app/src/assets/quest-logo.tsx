@@ -1,11 +1,6 @@
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 
-type Props = {
-  color?: string;
-  animated?: boolean;
-};
-
 const DivStyled = styled.div<{
   animated?: boolean;
 }>`
@@ -24,12 +19,18 @@ const DivStyled = styled.div<{
   margin-bottom: ${GUpx(1)};
 `;
 
-export default function QuestLogo({ color, animated }: Props) {
+type Props = {
+  color?: string;
+  animated?: boolean;
+  small?: boolean;
+};
+
+export default function QuestLogo({ color, animated, small = false }: Props) {
   return (
     <DivStyled animated={animated}>
       <svg
-        width="150"
-        height="206"
+        width={small ? '64' : '150'}
+        height={small ? '64' : '206'}
         viewBox="0 0 150 206"
         fill={color || 'none'}
         xmlns="http://www.w3.org/2000/svg"

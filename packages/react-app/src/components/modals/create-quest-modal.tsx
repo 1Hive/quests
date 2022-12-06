@@ -156,7 +156,7 @@ export default function QuestModal({
     setOpened(true);
   };
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -308,8 +308,8 @@ export default function QuestModal({
               />
             )
           }
-          isOpen={opened}
-          onClose={closeModal}
+          isOpened={opened}
+          onModalClosed={onModalClosed}
         >
           <Formik
             initialValues={

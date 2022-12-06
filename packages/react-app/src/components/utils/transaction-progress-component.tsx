@@ -7,6 +7,9 @@ import { getNetwork } from 'src/networks';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import QuestLogo from '../../assets/quest-logo';
 import { Outset } from './spacer-util';
+import { ConditionalWrapper } from './util';
+
+// #region StyledComponents
 
 const WrapperStyled = styled.div`
   justify-content: center;
@@ -25,7 +28,21 @@ const TransactionTitleStyled = styled.div`
   ${textStyle('title3')};
 `;
 
-export function TransactionProgressComponent() {
+const ClickableDivStyled = styled.a`
+  text-decoration: none;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+`;
+
+// #endregion
+
+type Props = {
+  isReduced?: boolean;
+  onClick?: () => void;
+};
+
+export function TransactionProgressComponent({ isReduced = false, onClick }: Props) {
   const network = getNetwork();
   const { transaction } = useTransactionContext();
   const [message, setMessage] = useState<string | undefined>();
@@ -69,17 +86,32 @@ export function TransactionProgressComponent() {
   return (
     <Outset horizontal>
       <WrapperStyled>
-        <QuestLogo animated={transaction?.status === TransactionStatus.Pending} color={logoColor} />
-        <TransactionTitleStyled className={transaction?.status}>
-          {transaction?.message}
-        </TransactionTitleStyled>
-        <MessageStyled messageColor={messageColor}>{message}</MessageStyled>
-        {transaction?.hash && (
-          <TransactionBadge
-            transaction={transaction.hash}
-            explorerProvider={network.explorer}
-            networkType={network.networkId}
+        <ConditionalWrapper
+          condition={!!onClick}
+          wrapper={(children) => (
+            <ClickableDivStyled onClick={onClick}>{children}</ClickableDivStyled>
+          )}
+        >
+          <QuestLogo
+            animated={transaction?.status === TransactionStatus.Pending}
+            color={logoColor}
+            small={isReduced}
           />
+        </ConditionalWrapper>
+        {!isReduced && (
+          <>
+            <TransactionTitleStyled className={transaction?.status}>
+              {transaction?.message}
+            </TransactionTitleStyled>
+            <MessageStyled messageColor={messageColor}>{message}</MessageStyled>
+            {transaction?.hash && (
+              <TransactionBadge
+                transaction={transaction.hash}
+                explorerProvider={network.explorer}
+                networkType={network.networkId}
+              />
+            )}
+          </>
         )}
       </WrapperStyled>
     </Outset>

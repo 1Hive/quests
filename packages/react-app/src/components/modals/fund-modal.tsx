@@ -42,7 +42,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
   const modalId = useMemo(() => uniqueId('fund-modal'), []);
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -114,8 +114,8 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               disabled={!isEnoughBalance || !isFormValid}
             />,
           ]}
-          onClose={closeModal}
-          isOpen={opened}
+          onModalClosed={onModalClosed}
+          isOpened={opened}
           size="small"
         >
           <FormStyled id="fund-form" onSubmit={handleSubmit} ref={formRef}>

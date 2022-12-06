@@ -125,7 +125,7 @@ export default function RecoverFundsModal({
     }
   };
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -153,8 +153,8 @@ export default function RecoverFundsModal({
             title="Recover remaining funds and deposit"
           />
         }
-        onClose={closeModal}
-        isOpen={opened}
+        onModalClosed={onModalClosed}
+        isOpened={opened}
       >
         <RowStyled>
           <AmoutWrapperStyled>

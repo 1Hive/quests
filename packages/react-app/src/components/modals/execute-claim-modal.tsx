@@ -73,7 +73,7 @@ export default function ExecuteClaimModal({
     }
   }, [claim.claimedAmount, questTotalBounty]);
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -155,8 +155,8 @@ export default function ExecuteClaimModal({
             mode="positive"
           />
         }
-        onClose={closeModal}
-        isOpen={opened}
+        onModalClosed={onModalClosed}
+        isOpened={opened}
         size="small"
       >
         <Outset gu16>
