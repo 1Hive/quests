@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import QuestDetail from './components/views/quest-detail';
 import QuestList from './components/views/quest-list';
-import { ENUM_PAGES } from './constants';
+import { Pages } from './enums/pages.enum';
 
 export default function Routes() {
   useEffect(() => {
@@ -19,9 +19,9 @@ export default function Routes() {
   return (
     <>
       <Switch>
-        <Redirect exact from={`/${ENUM_PAGES.List}`} to="/home" />
+        <Redirect exact from={`/${Pages.List}`} to="/home" />
         <Route path="/home" component={QuestList} />
-        <Route path={`/${ENUM_PAGES.Detail}`} component={QuestDetail} />
+        <Route path={`/${Pages.Detail}`} component={QuestDetail} />
         <Route path="/" component={QuestList} />
         <Redirect to="/home" />
       </Switch>

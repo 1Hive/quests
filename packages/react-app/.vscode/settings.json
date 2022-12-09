@@ -4,5 +4,11 @@
     "source.fixAll.eslint": true,
     "source.organizeImports": false
   },
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "editor.quickSuggestionsDelay": 10,
   "files.eol": "\r\n"
 }

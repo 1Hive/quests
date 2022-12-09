@@ -56,11 +56,11 @@ button {
 }
 
 .hide {
-  visibility: hidden;
+  display: none;
 }
 
 .show {
-  visibility: visible;
+  display: unset;
 }
 
 .collapsed {

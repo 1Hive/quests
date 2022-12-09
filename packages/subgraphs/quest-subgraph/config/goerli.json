@@ -1,5 +1,17 @@
 {
   "network": "goerli",
-  "startBlock": 7543619,
-  "questFactoryAddress": "0x4DfE6C03132BD14D95b87803e232AcA352a715b4"
+  "dataSources": [
+    {
+      "nameContract": "QuestFactory",
+      "startBlock": 7543619,
+      "questFactoryAddress": "0x4DfE6C03132BD14D95b87803e232AcA352a715b4",
+      "customTemplate": "questFactory.yaml"
+    },
+    {
+      "nameContract": "QuestFactoryV2",
+      "startBlock": 8033717,
+      "questFactoryAddress": "0xd380b80D23b25B7fE6339b94B1Adb82Ed9180053",
+      "customTemplate": "questFactoryV2.yaml"
+    }
+  ]
 }

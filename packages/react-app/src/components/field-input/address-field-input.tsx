@@ -49,6 +49,7 @@ type Props = {
   wide?: boolean;
   onBlur?: Function;
   error?: string | false;
+  disabled?: boolean;
 };
 export function AddressFieldInput({
   id,
@@ -61,6 +62,7 @@ export function AddressFieldInput({
   tooltip,
   wide = false,
   onBlur = noop,
+  disabled = false,
   error,
 }: Props) {
   const loadableContent = (
@@ -71,7 +73,7 @@ export function AddressFieldInput({
           wide={wide}
           id={id}
           value={value}
-          disabled={!isEdit}
+          disabled={!isEdit || disabled}
           onChange={onChange}
           onBlur={onBlur}
           adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
@@ -85,7 +87,7 @@ export function AddressFieldInput({
           message="Address copied to clipboard"
           id={id}
           value={value}
-          disabled={!isEdit}
+          disabled={!isEdit || disabled}
           onChange={onChange}
           onBlur={onBlur}
           adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}

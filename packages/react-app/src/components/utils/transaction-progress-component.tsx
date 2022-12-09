@@ -1,10 +1,10 @@
 import { TransactionBadge, useTheme, textStyle } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
-import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import styled from 'styled-components';
 import { GUpx } from 'src/utils/style.util';
 import { getNetwork } from 'src/networks';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import QuestLogo from '../../assets/quest-logo';
 import { Outset } from './spacer-util';
 
@@ -42,22 +42,22 @@ export function TransactionProgressComponent() {
   const [messageColor, setMessageColor] = useState<string>(content);
   useEffect(() => {
     switch (transaction?.status) {
-      case ENUM_TRANSACTION_STATUS.WaitingForSignature:
+      case TransactionStatus.WaitingForSignature:
         setMessage('Waiting for your signature');
         setLogoColor(content);
         setMessageColor(content);
         break;
-      case ENUM_TRANSACTION_STATUS.Pending:
+      case TransactionStatus.Pending:
         setMessage('Transaction is pending');
         setLogoColor(warning);
         setMessageColor(warningSurfaceContent);
         break;
-      case ENUM_TRANSACTION_STATUS.Confirmed:
+      case TransactionStatus.Confirmed:
         setMessage('Transaction is confirmed. You can close this window.');
         setLogoColor(positiveSurface);
         setMessageColor(positive);
         break;
-      case ENUM_TRANSACTION_STATUS.Failed:
+      case TransactionStatus.Failed:
         setMessage('Transaction failed. Please try again in a few seconds.');
         setLogoColor(negativeSurface);
         setMessageColor(negative);
@@ -69,10 +69,7 @@ export function TransactionProgressComponent() {
   return (
     <Outset horizontal>
       <WrapperStyled>
-        <QuestLogo
-          animated={transaction?.status === ENUM_TRANSACTION_STATUS.Pending}
-          color={logoColor}
-        />
+        <QuestLogo animated={transaction?.status === TransactionStatus.Pending} color={logoColor} />
         <TransactionTitleStyled className={transaction?.status}>
           {transaction?.message}
         </TransactionTitleStyled>

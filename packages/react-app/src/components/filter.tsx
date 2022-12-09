@@ -1,10 +1,11 @@
 import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState, useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
-import { DEFAULT_FILTER, ENUM_QUEST_STATE } from '../constants';
+import { DEFAULT_FILTER } from '../constants';
 import DateFieldInput from './field-input/date-field-input';
 import { FieldInput } from './field-input/field-input';
 
@@ -77,11 +78,12 @@ type Props = {
   compact?: boolean;
 };
 
+const QuestStatusOptions = [QuestStatus.Active, QuestStatus.Expired, QuestStatus.All];
+
 export function Filter({ compact }: Props) {
   const { filter, setFilter, toggleFilter } = useFilterContext();
   const theme = useTheme();
   const { below, width } = useViewport();
-  const states = [ENUM_QUEST_STATE.All, ENUM_QUEST_STATE.Active, ENUM_QUEST_STATE.Expired];
   const { isFilterShown } = useFilterContext();
   const isSmallResolution = useMemo(() => below('medium'), [width]);
   const [isFilteringOriginalState, setIsFilteringOriginalState] = useState(false);
@@ -142,10 +144,10 @@ export function Filter({ compact }: Props) {
           <FieldInput label={!compact ? 'Status' : ''} wide={isSmallResolution} id="filterStatus">
             <StatusDropdownStyled
               id="filterStatus"
-              items={states}
+              items={QuestStatusOptions}
               borderColor={theme.border}
-              selected={states.indexOf(filter.status)}
-              onChange={(i: number) => setFilter({ ...filter, status: states[i] })}
+              selected={QuestStatusOptions.indexOf(filter.status)}
+              onChange={(i: number) => setFilter({ ...filter, status: QuestStatusOptions[i] })}
               wide
               compact={compact}
             />
