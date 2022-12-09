@@ -12,7 +12,7 @@ import { useWallet } from 'src/contexts/wallet.context';
 import { FundModel } from 'src/models/fund.model';
 import { FormErrors } from 'src/models/form-errors';
 import { fundQuestTransaction } from 'src/services/transaction-handler';
-import { ENUM_QUEST_STATE } from 'src/constants';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
@@ -78,7 +78,6 @@ export default function FundModal({ quest, onClose = noop }: Props) {
         } as FundModel
       }
       onSubmit={onSubmit}
-      validateOnChange
       validate={validate}
     >
       {({ values, handleSubmit, handleChange, touched, errors }) => (
@@ -108,7 +107,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               key="buttonFund"
               icon={<GiTwoCoins />}
               type="submit"
-              form="form-fund"
+              form="fund-form"
               label="Fund"
               mode="strong"
               title={!isFormValid ? 'Form not valid' : 'Fund'}
@@ -119,7 +118,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
           isOpen={opened}
           size="small"
         >
-          <FormStyled id="form-fund" onSubmit={handleSubmit} ref={formRef}>
+          <FormStyled id="fund-form" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
               <AddressFieldInput id="address" label="Quest address" value={quest.address} />
               <AmountFieldInputFormik
@@ -133,7 +132,7 @@ export default function FundModal({ quest, onClose = noop }: Props) {
               />
             </Outset>
           </FormStyled>
-          {quest.state !== ENUM_QUEST_STATE.Active && (
+          {quest.status !== QuestStatus.Active && (
             <Outset vertical>
               <Info mode="warning">⚠️ The quest is expired, the funds might not be used.</Info>
             </Outset>

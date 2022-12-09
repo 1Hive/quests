@@ -1,8 +1,8 @@
 import { Modal, textStyle, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect, useMemo } from 'react';
-import { ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
@@ -50,14 +50,14 @@ export default function ModalBase({
   const { transaction, setTransaction } = useTransactionContext();
 
   const txFailed = useMemo(
-    () => transaction?.status === ENUM_TRANSACTION_STATUS.Failed,
+    () => transaction?.status === TransactionStatus.Failed,
     [transaction?.status],
   );
 
   const width = useMemo(() => {
     switch (size) {
       case 'small':
-        return 500;
+        return 600;
       case 'large':
         return 1500;
       default:
@@ -82,7 +82,7 @@ export default function ModalBase({
 
   useEffect(() => {
     if (
-      (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed) &&
+      (transaction?.status === TransactionStatus.Confirmed || txFailed) &&
       transaction?.modalId === id &&
       !isOpen
     ) {
@@ -104,12 +104,9 @@ export default function ModalBase({
 
   const handleOnClose = (e: any) => {
     if (e) {
-      onClose(
-        transaction?.modalId === id && transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed,
-      );
+      onClose(transaction?.modalId === id && transaction?.status === TransactionStatus.Confirmed);
       if (
-        (transaction?.modalId === id &&
-          transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) ||
+        (transaction?.modalId === id && transaction?.status === TransactionStatus.Confirmed) ||
         txFailed
       ) {
         setTimeout(() => {

@@ -1,6 +1,7 @@
 import request from 'graphql-request';
 import gql from 'graphql-tag';
-import { ENUM_QUEST_STATE, GQL_MAX_INT_MS } from 'src/constants';
+import { GQL_MAX_INT_MS } from 'src/constants';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import env from 'src/environment';
 import { FilterModel } from 'src/models/filter.model';
 import { getNetwork } from 'src/networks';
@@ -18,10 +19,13 @@ const QuestEntityQuery = gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
-      depositToken
-      depositAmount
+      questCreateDepositToken
+      questCreateDepositAmount
+      questPlayDepositToken
+      questPlayDepositAmount
       questCreator
       questFundsRecoveryAddress
+      questMaxPlayers
     }
   }
 `;
@@ -61,10 +65,13 @@ const QuestEntitiesQuery = (payload: any) => gql`
       questDetailsRef
       questRewardTokenAddress
       creationTimestamp
-      depositToken
-      depositAmount
+      questCreateDepositToken
+      questCreateDepositAmount
+      questPlayDepositToken
+      questPlayDepositAmount
       questCreator
       questFundsRecoveryAddress
+      questMaxPlayers
     }
   }
 `;
@@ -95,9 +102,13 @@ const QuestEntitiesLight = (payload: any) => gql`
       ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
      }) {
       id
+      questAddress
       questRewardTokenAddress
-      depositToken
-      depositAmount
+      questCreateDepositToken
+      questCreateDepositAmount
+      questPlayDepositToken
+      questPlayDepositAmount
+      questMaxPlayers
     }
   }
 `;
@@ -117,9 +128,9 @@ export const fetchQuestEntities = async (
   const { questsSubgraph, networkId } = getNetwork();
   let expireTimeLowerMs = 0;
   let expireTimeUpperMs = GQL_MAX_INT_MS;
-  if (filter.status === ENUM_QUEST_STATE.Active) {
+  if (filter.status === QuestStatus.Active) {
     expireTimeLowerMs = Math.max(filter.minExpireTime?.getTime() ?? 0, Date.now());
-  } else if (filter.status === ENUM_QUEST_STATE.Expired) {
+  } else if (filter.status === QuestStatus.Expired) {
     expireTimeLowerMs = Math.min(filter.minExpireTime?.getTime() ?? 0, Date.now());
     expireTimeUpperMs = Date.now();
   } else {

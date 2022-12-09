@@ -2,13 +2,7 @@
 import { Button, IconPlus, useTheme, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ENUM,
-  ENUM_QUEST_STATE,
-  ENUM_QUEST_VIEW_MODE,
-  ENUM_TRANSACTION_STATUS,
-  MAX_LINE_DESCRIPTION,
-} from 'src/constants';
+import { MAX_LINE_DESCRIPTION } from 'src/constants';
 import { QuestModel } from 'src/models/quest.model';
 import styled from 'styled-components';
 import * as QuestService from 'src/services/quest.service';
@@ -26,14 +20,20 @@ import { FaEdit, FaEye } from 'react-icons/fa';
 import { getNetwork } from 'src/networks';
 import { flags } from 'src/services/feature-flag.service';
 import { GUpx } from 'src/utils/style.util';
+import { QuestStatus } from 'src/enums/quest-status.enum';
+import { QuestViewMode } from 'src/enums/quest-view-mode.enum';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
+import NumberFieldInput from '../field-input/number-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { WalletBalance } from '../wallet-balance';
 import { feedDummyQuestData } from '../utils/debug-util';
+import CheckboxFieldInput from '../field-input/checkbox-field-input';
+import { FieldInput } from '../field-input/field-input';
 import { Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
@@ -67,6 +67,15 @@ const LineStyled = styled.div`
   align-items: center;
 `;
 
+const MaxPlayerLineStyled = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const PlayerWrapperStyled = styled.div`
+  padding-right: ${GUpx(2)};
+`;
+
 const DepositInfoStyled = styled(Info)`
   padding: ${GUpx(1)};
 `;
@@ -82,13 +91,13 @@ type Props = {
 
 const emptyQuestData = {
   expireTime: new Date(IN_A_WEEK_IN_MS + 24 * 36000),
-  state: ENUM_QUEST_STATE.Draft,
+  status: QuestStatus.Draft,
 } as QuestModel;
 
 export default function QuestModal({
   questData = emptyQuestData,
   onClose = noop,
-  questMode = ENUM_QUEST_VIEW_MODE.ReadSummary,
+  questMode = QuestViewMode.ReadSummary,
   buttonMode = 'normal',
 }: Props) {
   const theme = useTheme();
@@ -124,11 +133,11 @@ export default function QuestModal({
 
   useEffect(() => {
     switch (questMode) {
-      case ENUM_QUEST_VIEW_MODE.Create:
+      case QuestViewMode.Create:
         setButtonLabel('Create quest');
         break;
 
-      case ENUM_QUEST_VIEW_MODE.Update:
+      case QuestViewMode.Update:
         setButtonLabel('Update quest');
         break;
 
@@ -170,10 +179,12 @@ export default function QuestModal({
       try {
         data.fallbackAddress = toChecksumAddress(data.fallbackAddress);
       } catch (error) {
-        errors.fallbackAddress = 'Player address is not valid';
+        errors.fallbackAddress = 'Fallback address is not valid';
       }
     }
-
+    if ((!data.maxPlayers || data.maxPlayers <= 0) && !data.unlimited) {
+      errors.maxPlayers = 'Max players needs to be set or check as unlimited';
+    }
     // If bounty is not set then amount can't be invalid because disabled
     if (!data.bounty?.token) errors.bounty = 'Bounty token is required';
     else if (data.bounty.parsedAmount < 0) errors.bounty = ' Invalid initial bounty';
@@ -188,7 +199,9 @@ export default function QuestModal({
 
   const onQuestSubmit = async (values: QuestModel) => {
     validate(values); // Validate one last time before submitting
-    if (isFormValid && questDeposit?.token) {
+    if (isFormValid) {
+      if (!questDeposit?.token) throw new Error('Quest deposit token is not set');
+
       await approveTokenTransaction(
         modalId,
         questDeposit?.token,
@@ -202,9 +215,8 @@ export default function QuestModal({
       try {
         let txPayload = {
           modalId,
-          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestCreating,
           message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
-          status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          status: TransactionStatus.WaitingForSignature,
           type: 'QuestCreate',
         } as TransactionModel;
         setTransaction(txPayload);
@@ -216,13 +228,14 @@ export default function QuestModal({
             expireTime: values.expireTime,
             creatorAddress: walletAddress,
             rewardToken: values.bounty!.token,
+            maxPlayers: values.unlimited ? 0 : values.maxPlayers,
           },
           undefined,
           (txHash) => {
             txPayload = { ...txPayload, hash: txHash };
             setTransaction({
               ...txPayload,
-              status: ENUM_TRANSACTION_STATUS.Pending,
+              status: TransactionStatus.Pending,
             });
           },
         );
@@ -233,8 +246,8 @@ export default function QuestModal({
         setTransaction({
           ...txPayload,
           status: txReceiptSaveQuest?.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
+            ? TransactionStatus.Confirmed
+            : TransactionStatus.Failed,
           args: { questAddress: newQuestAddress },
         });
         if (!txReceiptSaveQuest?.status || !newQuestAddress) {
@@ -259,7 +272,7 @@ export default function QuestModal({
           (oldTx) =>
             oldTx && {
               ...oldTx,
-              status: ENUM_TRANSACTION_STATUS.Failed,
+              status: TransactionStatus.Failed,
               message: computeTransactionErrorMessage(e),
             },
         );
@@ -302,11 +315,11 @@ export default function QuestModal({
             initialValues={
               {
                 ...questDataState,
+                unlimited: true,
                 fallbackAddress: questDataState?.fallbackAddress,
               } as QuestModel
             }
             onSubmit={onQuestSubmit}
-            validateOnChange
             validate={validate}
           >
             {({ values, handleChange, handleBlur, errors, touched, setTouched, handleSubmit }) => {
@@ -326,7 +339,13 @@ export default function QuestModal({
                   <Stepper
                     submitButton={
                       <>
-                        {questDeposit?.token?.token !== values.bounty?.token?.token && (
+                        <div
+                          className={
+                            questDeposit?.token?.token !== values.bounty?.token?.token
+                              ? 'show'
+                              : 'hide'
+                          }
+                        >
                           <WalletBalance
                             key="reward-token-balance"
                             askedTokenAmount={values.bounty}
@@ -334,7 +353,7 @@ export default function QuestModal({
                             label="Reward balance"
                             tooltip="The balance of the reward token in the connected wallet"
                           />
-                        )}
+                        </div>
                         {questDeposit && questDeposit?.parsedAmount > 0 && (
                           <>
                             <WalletBalance
@@ -350,7 +369,7 @@ export default function QuestModal({
                             >
                               <AmountFieldInput
                                 id="questDeposit"
-                                label="Quest Deposit"
+                                label="Create Deposit"
                                 tooltip="This amount will be hold by the Quest. It will be reclaimable from reclaim button once the Quest is expired."
                                 value={questDeposit}
                                 compact
@@ -512,6 +531,31 @@ export default function QuestModal({
                           placeHolder="Quest communication link"
                           wide
                         />
+                        <FieldInput error={touched.maxPlayers && errors.maxPlayers}>
+                          <MaxPlayerLineStyled>
+                            <PlayerWrapperStyled>
+                              <NumberFieldInput
+                                id="maxPlayers"
+                                label="Max players"
+                                isEdit
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.maxPlayers}
+                                tooltip="The max amount of players that can simultaneously work on this quest"
+                                disabled={values.unlimited}
+                              />
+                            </PlayerWrapperStyled>
+                            <CheckboxFieldInput
+                              id="unlimited"
+                              label="Unlimited"
+                              onChange={handleChange}
+                              handleBlur={handleBlur}
+                              value={values.unlimited}
+                              isEdit
+                              tooltip="Select for unlimited amount of players"
+                            />
+                          </MaxPlayerLineStyled>
+                        </FieldInput>
                       </>,
                     ]}
                   />
