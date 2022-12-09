@@ -126,7 +126,7 @@ export default function ChallengeModal({
       );
   }, [challengeDeposit, challengeFee]);
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -314,8 +314,8 @@ export default function ChallengeModal({
           className="m-8"
         />,
       ]}
-      onClose={closeModal}
-      isOpen={opened}
+      onModalClosed={onModalClosed}
+      isOpened={opened}
     >
       <Formik
         initialValues={{ reason: challengeDataState.reason ?? '' } as any}

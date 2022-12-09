@@ -115,7 +115,7 @@ export default function ScheduleClaimModal({
     [questData.expireTime],
   );
 
-  const closeModal = (succeed: any) => {
+  const onModalClosed = (succeed: any) => {
     setOpened(false);
     onClose(succeed);
   };
@@ -244,7 +244,7 @@ export default function ScheduleClaimModal({
   return (
     <ModalBase
       id={modalId}
-      title="Schedule a Quest claim"
+      title="Schedule a quest claim"
       openButton={
         <OpenButtonStyled
           className="open-claim-button"
@@ -256,8 +256,8 @@ export default function ScheduleClaimModal({
           disabled={!questTotalBounty}
         />
       }
-      onClose={closeModal}
-      isOpen={opened}
+      onModalClosed={onModalClosed}
+      isOpened={opened}
     >
       <Formik
         initialValues={

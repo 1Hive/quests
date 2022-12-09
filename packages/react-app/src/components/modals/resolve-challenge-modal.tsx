@@ -204,7 +204,7 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
     }
   };
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -317,8 +317,8 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
           />,
         ]
       }
-      onClose={closeModal}
-      isOpen={opened}
+      onModalClosed={onModalClosed}
+      isOpened={opened}
     >
       <Outset gu16>
         <>

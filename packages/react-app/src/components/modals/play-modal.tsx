@@ -31,6 +31,7 @@ import AmountFieldInput from '../field-input/amount-field-input';
 
 const FormStyled = styled(Form)`
   width: 100%;
+  padding: 32px 16px;
 `;
 
 const OpenButtonStyled = styled(Button)`
@@ -80,7 +81,7 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
     }
   }, [questData.playDeposit?.token]);
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -225,25 +226,23 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
               }
             />,
           ]}
-          onClose={closeModal}
-          isOpen={opened}
+          onModalClosed={onModalClosed}
+          isOpened={opened}
           size="small"
         >
           <FormStyled id="play-form" onSubmit={handleSubmit} ref={formRef}>
-            <Outset gu32 vertical>
-              <AddressFieldInput
-                id="player"
-                isEdit
-                label="Player"
-                tooltip="The address of the player to register (only creator can register another player than connected one)"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.player || walletAddress}
-                error={touched.player && (errors.player as string)}
-                wide
-                disabled={walletAddress !== questData.creatorAddress}
-              />
-            </Outset>
+            <AddressFieldInput
+              id="player"
+              isEdit
+              label="Player"
+              tooltip="The address of the player to register (only creator can register another player than connected one)"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.player || walletAddress}
+              error={touched.player && (errors.player as string)}
+              wide
+              disabled={walletAddress !== questData.creatorAddress}
+            />
           </FormStyled>
           {maxPlayerReached && (
             <Outset vertical>

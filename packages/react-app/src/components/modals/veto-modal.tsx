@@ -86,7 +86,7 @@ export default function VetoModal({
     [],
   );
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -176,8 +176,8 @@ export default function VetoModal({
           className="m-8"
         />,
       ]}
-      onClose={closeModal}
-      isOpen={opened}
+      onModalClosed={onModalClosed}
+      isOpened={opened}
     >
       <Formik
         initialValues={{ reason: vetoDataState.reason ?? '' } as any}

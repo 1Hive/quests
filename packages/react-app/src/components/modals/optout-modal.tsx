@@ -20,7 +20,6 @@ import { toTokenAmountModel } from 'src/utils/data.utils';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { TransactionType } from 'src/enums/transaction-type.enum';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
-import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import * as QuestService from '../../services/quest.service';
@@ -28,6 +27,7 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 
 const FormStyled = styled(Form)`
   width: 100%;
+  padding: 32px 16px 0 32px;
 `;
 
 const OpenButtonStyled = styled(Button)`
@@ -72,7 +72,7 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
     }
   }, [questData.playDeposit?.token]);
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -177,35 +177,33 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
               disabled={!isFormValid}
             />,
           ]}
-          onClose={closeModal}
-          isOpen={opened}
+          onModalClosed={onModalClosed}
+          isOpened={opened}
           size="small"
         >
           <FormStyled id="unplay-form" onSubmit={handleSubmit} ref={formRef}>
-            <Outset gu32 vertical>
-              <AddressFieldInput
-                id="player"
-                isEdit
-                label="Player"
-                tooltip="The address of the player to unregister (only creator can unregister another player than connected one)"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.player || walletAddress}
-                error={touched.player && (errors.player as string)}
-                wide
-                disabled={walletAddress !== questData.creatorAddress}
-              />
-              {deposit && (
-                <RowStyled>
-                  <AmountFieldInputFormik
-                    id="bounty"
-                    label="Deposit recover"
-                    value={deposit}
-                    tooltip="Will be transfer to the player's wallet"
-                  />
-                </RowStyled>
-              )}
-            </Outset>
+            <AddressFieldInput
+              id="player"
+              isEdit
+              label="Player"
+              tooltip="The address of the player to unregister (only creator can unregister another player than connected one)"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.player || walletAddress}
+              error={touched.player && (errors.player as string)}
+              wide
+              disabled={walletAddress !== questData.creatorAddress}
+            />
+            {deposit && (
+              <RowStyled>
+                <AmountFieldInputFormik
+                  id="bounty"
+                  label="Deposit recover"
+                  value={deposit}
+                  tooltip="Will be transfer to the player's wallet"
+                />
+              </RowStyled>
+            )}
           </FormStyled>
         </ModalBase>
       )}
