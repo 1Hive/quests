@@ -4,13 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Quest from 'src/components/quest';
-import {
-  ENUM_PAGES,
-  QUESTS_PAGE_SIZE,
-  DEFAULT_FILTER,
-  ENUM_TRANSACTION_STATUS,
-  ENUM_QUEST_STATE,
-} from 'src/constants';
+import { QUESTS_PAGE_SIZE, DEFAULT_FILTER } from 'src/constants';
 import { FilterModel } from 'src/models/filter.model';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
@@ -23,6 +17,9 @@ import { ThemeInterface } from 'src/styles/theme';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { getNetwork } from 'src/networks';
+import { Pages } from 'src/enums/pages.enum';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -43,7 +40,7 @@ const FilterWrapperStyled = styled.div<{
   theme: ThemeInterface;
 }>`
   position: sticky;
-  top: 1px;
+  top: -1px;
   width: calc(100% + 20px); // Size of scrollbar
   z-index: 1;
   background-image: url(${background});
@@ -103,7 +100,7 @@ export default function QuestList() {
 
   // Init
   useEffect(() => {
-    setPage(ENUM_PAGES.List);
+    setPage(Pages.List);
   }, []);
 
   useEffect(() => {
@@ -120,8 +117,8 @@ export default function QuestList() {
     // Should not be nullish and not already exist in list
     if (
       transaction?.type === 'QuestCreate' &&
-      transaction.status === ENUM_TRANSACTION_STATUS.Confirmed &&
-      filter.status !== ENUM_QUEST_STATE.Expired
+      transaction.status === TransactionStatus.Confirmed &&
+      filter.status !== QuestStatus.Expired
     ) {
       // Insert the newQuest at the top of the list
       if (transaction.args?.questAddress) {
@@ -141,7 +138,7 @@ export default function QuestList() {
       if (newQuest) {
         setNewQuestLoading(false);
         if (
-          (filter.status === ENUM_QUEST_STATE.All || filter.status === ENUM_QUEST_STATE.Active) &&
+          (filter.status === QuestStatus.All || filter.status === QuestStatus.Active) &&
           (!filter.title || filter.title.includes(newQuest.title!)) &&
           (!filter.description || filter.description.includes(newQuest.description!)) &&
           (!filter.minExpireTime || filter.minExpireTime <= newQuest.expireTime)

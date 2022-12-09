@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { MouseEventHandler } from 'react';
-import { ENUM_PAGES } from '../../constants';
+import { Pages } from 'src/enums/pages.enum';
 import { LogoTitle } from '../../assets/logo-title';
 
 // #region StyledComponents
@@ -29,7 +29,7 @@ type Props = {
 
 export default function HeaderTitle({ onClick = noop }: Props) {
   return (
-    <TitleLinkStyled onClick={onClick} to={ENUM_PAGES.List}>
+    <TitleLinkStyled onClick={onClick} to={Pages.List}>
       <TitleLinkWrapperStyled>
         <LogoTitle />
       </TitleLinkWrapperStyled>

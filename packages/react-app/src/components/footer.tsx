@@ -1,5 +1,5 @@
 import { useTheme, GU, Link, IconExternal } from '@1hive/1hive-ui';
-import { ENUM_QUEST_VIEW_MODE, REPO_ADDRESS } from 'src/constants';
+import { REPO_ADDRESS } from 'src/constants';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getNetwork } from 'src/networks';
 import { TOKENS } from 'src/tokens';
 import { LoggerOnce } from 'src/utils/logger';
+import { QuestViewMode } from 'src/enums/quest-view-mode.enum';
 import QuestModal from './modals/create-quest-modal';
 import { GenericTooltip } from './field-input/generic-tooltip';
 
@@ -175,9 +176,7 @@ export default function footer() {
           <FooterNavItemStyled href="/" external={false}>
             Quest List
           </FooterNavItemStyled>
-          {walletConnected && (
-            <QuestModal questMode={ENUM_QUEST_VIEW_MODE.Create} buttonMode="link" />
-          )}
+          {walletConnected && <QuestModal questMode={QuestViewMode.Create} buttonMode="link" />}
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>

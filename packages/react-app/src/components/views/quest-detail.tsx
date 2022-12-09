@@ -1,10 +1,10 @@
 import { useToast } from '@1hive/1hive-ui';
 import { useEffect, useState } from 'react';
-import { ENUM_PAGES } from 'src/constants';
 import { useQueryParam } from 'src/hooks/use-query-params';
 import { QuestModel } from 'src/models/quest.model';
 import { usePageContext } from 'src/contexts/page.context';
 import { fetchQuest } from 'src/services/quest.service';
+import { Pages } from 'src/enums/pages.enum';
 import Quest from '../quest';
 import MainView from '../main-view';
 
@@ -17,7 +17,7 @@ export default function QuestDetail() {
 
   useEffect(() => {
     let isSubscribed = true;
-    setPage(ENUM_PAGES.Detail);
+    setPage(Pages.Detail);
     const fetchQuestAsync = async (questAddress: string) => {
       const questResult = await fetchQuest(questAddress);
       if (isSubscribed) {

@@ -24,6 +24,7 @@ import governGnosis from "./deployments/xdai/Govern.json";
 import governGoerli from "./deployments/goerli/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
+import GovernAbi from "./abi/contracts/Externals/Govern.json";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
 import CelesteMockRinkeby from "./deployments/rinkeby/OwnableCeleste.json";
 
@@ -57,7 +58,8 @@ const mainnetGwei = 21;
 
 function mnemonic() {
   try {
-    if (!process.env.MNEMONIC) throw new Error("No mnemonic detected");
+    if (!process.env.MNEMONIC || !process.env.PRIVATE_KEY)
+      throw new Error("No mnemonic detected");
     return process.env.MNEMONIC;
   } catch (e) {
     if (defaultNetwork !== "localhost") {
@@ -71,8 +73,8 @@ function mnemonic() {
 }
 
 function getAccounts(): HardhatNetworkAccountsUserConfig {
-  if (process.env.ETH_KEY) {
-    return [process.env.ETH_KEY as any];
+  if (process.env.PRIVATE_KEY) {
+    return [process.env.PRIVATE_KEY as any];
   }
 
   return {
@@ -112,23 +114,16 @@ const hardhatConfig: HardhatUserConfig = {
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        // gasPrice: mainnetGwei * 1000000000, TODO : Consider uncoment if using mainnet
-        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     ropsten: {
       url: "https://ropsten.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     goerli: {
       chainId: 5,
       url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
-      accounts: {
-        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     xdai: {
       chainId: 100,
@@ -242,7 +237,7 @@ const hardhatConfig: HardhatUserConfig = {
     solcVersion: "0.7.6",
   },
   etherscan: {
-    apiKey: "MXZSHPHKD1J7MGGSW9124C61G3PJZQVK2W",
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   namedAccounts: {
     deployer: {
@@ -954,6 +949,17 @@ task("newQuestFactory:gnosis")
     defaultConfig.CreateQuestDeposit.xdai.amount,
     types.float
   )
+  .addOptionalParam(
+    "playDepositToken",
+    "Address of the play quest deposit (default is HNY)",
+    defaultConfig.PlayQuestDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "playDepositAmount",
+    "Amount of the quest play deposit token",
+    defaultConfig.PlayQuestDeposit.xdai.amount,
+    types.float
+  )
   .setAction(async (args, hre) => {
     const deployResult = await deployQuestFactory(hre, args);
     console.log(
@@ -989,41 +995,15 @@ task("newQuestFactory:goerli")
     defaultConfig.CreateQuestDeposit.goerli.amount,
     types.float
   )
-  .setAction(async (args, hre) => {
-    console.log("Deploying QuestFactory...");
-    const deployResult = await deployQuestFactory(hre, args);
-
-    exportContractResult(hre.network, "QuestFactory", {
-      address: deployResult.address,
-      abi: deployResult.abi,
-    });
-    console.log(
-      "Deployed QuestFactory (" + hre.network.name + "):",
-      deployResult.address
-    );
-  });
-
-task("newQuestFactory:rinkeby")
-  .setDescription("Deploy a new QuestFactory and export it to front end")
   .addOptionalParam(
-    "governAddress",
+    "playDepositToken",
+    "Address of the play quest deposit",
+    defaultConfig.PlayQuestDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "playDepositAmount",
     "Address of the govern",
-    governRinkeby.address
-  )
-  .addOptionalParam(
-    "initialOwner",
-    "Initial owner of the QuestFactory (will be able to change deposits)",
-    defaultConfig.RootOwner.rinkeby
-  )
-  .addOptionalParam(
-    "createDepositToken",
-    "Address of the create quest deposit",
-    defaultConfig.CreateQuestDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "createDepositAmount",
-    "Address of the govern",
-    defaultConfig.CreateQuestDeposit.rinkeby.amount,
+    defaultConfig.PlayQuestDeposit.goerli.amount,
     types.float
   )
   .setAction(async (args, hre) => {
@@ -1277,22 +1257,8 @@ task("deployAll:rinkeby")
   )
   .setAction(deployAll);
 
-task("sig")
-  .addOptionalParam(
-    "func",
-    "function signature without variables names",
-    "schedule(ERC3000Data.Container)"
-  )
-  .setAction(async (args: { func: string }, _b) => {
-    const { func } = args;
-    const keccak = utils
-      .keccak256(utils.toUtf8Bytes(func))
-      .substring(0, (4 + 1) * 2);
-    console.log(keccak);
-  });
-
 task("sigAbi").setAction(async (_args, { web3 }) => {
-  const aclFunctions = [
+  const aclQueueFunctions = [
     "schedule",
     "resolve",
     "challenge",
@@ -1300,8 +1266,23 @@ task("sigAbi").setAction(async (_args, { web3 }) => {
     "veto",
     "configure",
   ];
+  const aclGovernFunctions = [
+    "withdraw",
+    "exec",
+    "registerStandardAndCallback",
+    "setSignatureValidator",
+  ];
+  console.log("GovernQueue roles:");
   for (const obj of GovernQueueAbi) {
-    if (obj.type !== "function" || !aclFunctions.includes(obj.name)) {
+    if (obj.type !== "function" || !aclQueueFunctions.includes(obj.name)) {
+      continue;
+    }
+    let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+    console.log(`${obj.name}:`, signature);
+  }
+  console.log("Govern roles:");
+  for (const obj of GovernAbi) {
+    if (obj.type !== "function" || !aclGovernFunctions.includes(obj.name)) {
       continue;
     }
     let signature = web3.eth.abi.encodeFunctionSignature(obj as any);

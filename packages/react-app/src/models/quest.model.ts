@@ -1,3 +1,4 @@
+import { QuestStatus } from 'src/enums/quest-status.enum';
 import { TokenModel } from './token.model';
 import { TokenAmountModel } from './token-amount.model';
 import { DepositModel } from './deposit-model';
@@ -10,13 +11,18 @@ export type QuestModel = {
   expireTime: Date;
   fallbackAddress: string;
   creatorAddress: string;
-  // Computed
+  maxPlayers?: number;
+  unlimited?: boolean;
+
+  // Loaded from subgraph
   activeClaimCount?: number;
   creationTime?: Date;
   address?: string;
   bounty?: TokenAmountModel | null;
   rewardToken?: TokenModel | string;
   detailsRefIpfs?: string;
-  state: string;
-  deposit?: DepositModel;
+  status: QuestStatus;
+  createDeposit?: DepositModel;
+  playDeposit?: DepositModel;
+  players?: string[];
 };
