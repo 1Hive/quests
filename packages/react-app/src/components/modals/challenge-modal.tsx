@@ -5,7 +5,6 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, FormikErrors } from 'formik';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM, ENUM_CLAIM_STATE, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { ChallengeModel } from 'src/models/challenge.model';
 import { GUpx } from 'src/utils/style.util';
@@ -18,8 +17,10 @@ import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
-import { getNetwork } from 'src/networks';
 import { Logger } from 'src/utils/logger';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { QuestModel } from 'src/models/quest.model';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -67,6 +68,7 @@ const DepositInfoStyled = styled(Info)`
 // #endregion
 
 type Props = {
+  questData: QuestModel;
   claim: ClaimModel;
   challengeDeposit: TokenAmountModel;
   challengeData?: ChallengeModel;
@@ -76,6 +78,7 @@ type Props = {
 const emptyChallengeData = {} as ChallengeModel;
 
 export default function ChallengeModal({
+  questData,
   claim,
   challengeData = emptyChallengeData,
   challengeDeposit,
@@ -123,7 +126,7 @@ export default function ChallengeModal({
       );
   }, [challengeDeposit, challengeFee]);
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -131,7 +134,7 @@ export default function ChallengeModal({
   const challengeTx = async (values: Partial<ChallengeModel>) => {
     if (isFormValid) {
       try {
-        const { governQueueAddress } = getNetwork();
+        const governQueueAddress = await QuestService.getGovernQueueAddressFromQuest(questData);
         if (
           challengeFee?.parsedAmount &&
           (!isFeeDepositSameToken || !+claim.container!.config.challengeDeposit.amount)
@@ -172,15 +175,15 @@ export default function ChallengeModal({
         if (!claim.container) throw new Error('Container is not defined');
         let txPayload = {
           modalId,
-          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimChallenging,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
-          status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
+          status: TransactionStatus.WaitingForSignature,
           type: 'ClaimChallenge',
           args: { questAddress: claim.questAddress, containerId: claim.container.id },
         } as TransactionModel;
         setTransaction(txPayload);
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,
+          questData,
           {
             reason: values.reason!,
             deposit: challengeDeposit,
@@ -191,15 +194,15 @@ export default function ChallengeModal({
             txPayload = { ...txPayload, hash: txHash };
             setTransaction({
               ...txPayload,
-              status: ENUM_TRANSACTION_STATUS.Pending,
+              status: TransactionStatus.Pending,
             });
           },
         );
         setTransaction({
           ...txPayload,
           status: challengeTxReceipt?.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
+            ? TransactionStatus.Confirmed
+            : TransactionStatus.Failed,
         });
         if (!challengeTxReceipt?.status) throw new Error('Failed to challenge the quest claim');
         if (isMountedRef.current) {
@@ -211,7 +214,7 @@ export default function ChallengeModal({
             oldTx && {
               ...oldTx,
               message: computeTransactionErrorMessage(e),
-              status: ENUM_TRANSACTION_STATUS.Failed,
+              status: TransactionStatus.Failed,
             },
         );
         toast(computeTransactionErrorMessage(e));
@@ -239,11 +242,11 @@ export default function ChallengeModal({
             label="Challenge"
             mode="negative"
             title={
-              claim.state === ENUM_CLAIM_STATE.AvailableToExecute
+              claim.state === ClaimStatus.AvailableToExecute
                 ? 'Challenge period is over'
                 : "Open challenge for this quest's claim"
             }
-            disabled={claim.state === ENUM_CLAIM_STATE.AvailableToExecute}
+            disabled={claim.state === ClaimStatus.AvailableToExecute}
           />
         </OpenButtonWrapperStyled>
       }
@@ -311,8 +314,8 @@ export default function ChallengeModal({
           className="m-8"
         />,
       ]}
-      onClose={closeModal}
-      isOpen={opened}
+      onModalClosed={onModalClosed}
+      isOpened={opened}
     >
       <Formik
         initialValues={{ reason: challengeDataState.reason ?? '' } as any}
@@ -325,7 +328,6 @@ export default function ChallengeModal({
             });
           }
         }}
-        validateOnChange
         validate={validate}
       >
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (

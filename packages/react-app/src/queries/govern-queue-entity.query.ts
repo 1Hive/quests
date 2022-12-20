@@ -28,68 +28,63 @@ export const GovernQueueEntityQuery = gql`
   }
 `;
 
-export const GovernQueueEntityContainersQuery = gql`
-  query governQueue($ID: String) {
-    governQueue(id: $ID) {
+export const ClaimContainersQuery = gql`
+  query containers {
+    containers {
       id
-      containers {
+      state
+      payload {
         id
-        state
-        payload {
+        nonce
+        proof
+        submitter
+        executionTime
+        executor {
           id
-          nonce
-          proof
-          submitter
-          executionTime
-          executor {
-            id
-          }
-          actions {
-            to
-            value
-            data
-          }
-          allowFailuresMap
         }
-        config {
+        actions {
+          to
+          value
+          data
+        }
+        allowFailuresMap
+      }
+      config {
+        id
+        executionDelay
+        scheduleDeposit {
           id
-          executionDelay
-          scheduleDeposit {
-            id
-            token
-            amount
-            decimals
-            name
-            symbol
-          }
-          challengeDeposit {
-            id
-            token
-            amount
-            decimals
-            name
-            symbol
-          }
-          resolver
-          rules
-          maxCalldataSize
+          token
+          amount
+          decimals
+          name
+          symbol
         }
+        challengeDeposit {
+          id
+          token
+          amount
+          decimals
+          name
+          symbol
+        }
+        resolver
+        rules
+        maxCalldataSize
       }
     }
   }
 `;
 
-export const GovernQueueEntityClaimsLightQuery = gql`
-  query governQueue($ID: String) {
-    governQueue(id: $ID) {
-      containers {
-        payload {
-          actions {
-            to
-          }
+export const ContainersLightQuery = gql`
+  query containers {
+    containers {
+      payload {
+        actions {
+          to
         }
-        state
       }
+      state
     }
   }
 `;
@@ -146,6 +141,25 @@ export const GovernQueueVetoReasonsQuery = gql`
       orderDirection: desc
     ) {
       reason
+    }
+  }
+`;
+
+export const GovernQueueEntities = gql`
+  query governQueues {
+    governQueues {
+      id
+    }
+  }
+`;
+
+export const GovernEntity = gql`
+  query govern($id: String) {
+    govern(id: $id) {
+      roles {
+        selector
+        who
+      }
     }
   }
 `;

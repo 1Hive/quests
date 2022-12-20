@@ -1,13 +1,14 @@
 import { Modal, textStyle, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { useEffect, useMemo } from 'react';
-import { ENUM_TRANSACTION_STATUS } from 'src/constants';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
 import { TransactionProgressComponent } from '../utils/transaction-progress-component';
 
+// #region StyledComponents
 const ModalFooterStyled = styled.div`
   width: 100%;
   text-align: right;
@@ -23,14 +24,23 @@ const ModalStyled = styled(Modal)`
   z-index: 1;
 `;
 
+const TopRightCornerStyled = styled.div`
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 999;
+`;
+
+// #endregion
+
 type Props = {
   id: string;
   children?: React.ReactNode;
   title?: React.ReactNode | string;
   openButton: React.ReactNode;
   buttons?: React.ReactNode;
-  onClose?: (_success: boolean) => void;
-  isOpen: boolean;
+  onModalClosed?: (_success: boolean) => void;
+  isOpened: boolean;
   css?: React.CSSProperties;
   size?: 'small' | 'normal' | 'large';
 };
@@ -41,23 +51,28 @@ export default function ModalBase({
   title,
   openButton,
   buttons,
-  onClose = noop,
-  isOpen = false,
+  onModalClosed = noop,
+  isOpened = false,
   size = 'normal',
   css,
 }: Props) {
   const openButtonId = `open-${id}`;
   const { transaction, setTransaction } = useTransactionContext();
+  const [isOpenedState, setIsOpenedState] = useState(isOpened);
+
+  useEffect(() => {
+    setIsOpenedState(isOpened);
+  }, [isOpened]);
 
   const txFailed = useMemo(
-    () => transaction?.status === ENUM_TRANSACTION_STATUS.Failed,
+    () => transaction?.status === TransactionStatus.Failed,
     [transaction?.status],
   );
 
   const width = useMemo(() => {
     switch (size) {
       case 'small':
-        return 500;
+        return 600;
       case 'large':
         return 1500;
       default:
@@ -66,7 +81,7 @@ export default function ModalBase({
   }, [size]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpenedState) {
       // STO to put this instruction in the bottom of the call stack to let the dom mount correctly
       setTimeout(() => {
         (document.getElementById(id) as HTMLElement)?.focus();
@@ -78,17 +93,17 @@ export default function ModalBase({
     }
 
     return () => document.removeEventListener('keydown', escFunction, false);
-  }, [isOpen]);
+  }, [isOpenedState]);
 
   useEffect(() => {
     if (
-      (transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed || txFailed) &&
-      transaction?.modalId === id &&
-      !isOpen
+      !isOpenedState &&
+      transaction?.status === TransactionStatus.Confirmed &&
+      transaction?.modalId === id
     ) {
       setTransaction(undefined);
     }
-  }, [transaction?.status, txFailed, isOpen]);
+  }, [transaction?.status, isOpenedState]);
 
   const escFunction = (e: any) => {
     const modalDom = document.getElementById(id) as HTMLElement;
@@ -104,17 +119,16 @@ export default function ModalBase({
 
   const handleOnClose = (e: any) => {
     if (e) {
-      onClose(
-        transaction?.modalId === id && transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed,
+      setIsOpenedState(false); // Useless but better to be explicit
+      onModalClosed(
+        transaction?.modalId === id &&
+          (transaction?.status === TransactionStatus.Confirmed || txFailed),
       );
       if (
-        (transaction?.modalId === id &&
-          transaction?.status === ENUM_TRANSACTION_STATUS.Confirmed) ||
-        txFailed
+        transaction?.modalId === id &&
+        (transaction?.status === TransactionStatus.Confirmed || txFailed)
       ) {
-        setTimeout(() => {
-          setTransaction(undefined);
-        }, 1000);
+        setTransaction(undefined);
       }
     }
   };
@@ -126,28 +140,35 @@ export default function ModalBase({
   return (
     <>
       <div id={openButtonId}>{openButton}</div>
-      <ModalStyled
-        visible={isOpen}
-        onClose={(e: any) => handleOnClose(e)}
-        width={(viewport: VisualViewport) => Math.min(viewport.width - 16, width)}
-        style={css}
-        id={id}
-        tabIndex="-1"
-      >
-        <Outset gu8>
-          <TitleStyled>{title}</TitleStyled>
-        </Outset>
-        {transaction && transaction?.modalId === id ? <TransactionProgressComponent /> : children}
-        {(buttons || txFailed) && (
-          <ModalFooterStyled>
-            <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>
-              {transaction && transaction?.modalId === id
-                ? txFailed && <Button onClick={onBackButtonClick}>Back</Button>
-                : buttons}
-            </ChildSpacer>
-          </ModalFooterStyled>
-        )}
-      </ModalStyled>
+      {isOpenedState && (
+        <ModalStyled
+          visible
+          onClose={(e: any) => handleOnClose(e)}
+          width={(viewport: VisualViewport) => Math.min(viewport.width - 16, width)}
+          style={css}
+          id={id}
+          tabIndex="-1"
+        >
+          <Outset gu8>
+            <TitleStyled>{title}</TitleStyled>
+          </Outset>
+          {transaction && transaction?.modalId === id ? <TransactionProgressComponent /> : children}
+          {(buttons || txFailed) && (
+            <ModalFooterStyled>
+              <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>
+                {transaction && transaction?.modalId === id
+                  ? txFailed && <Button onClick={onBackButtonClick}>Back</Button>
+                  : buttons}
+              </ChildSpacer>
+            </ModalFooterStyled>
+          )}
+        </ModalStyled>
+      )}
+      {transaction && !isOpenedState && transaction?.modalId === id && (
+        <TopRightCornerStyled title={transaction.message}>
+          <TransactionProgressComponent isReduced onClick={() => setIsOpenedState(true)} />
+        </TopRightCornerStyled>
+      )}
     </>
   );
 }
