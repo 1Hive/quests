@@ -19,7 +19,7 @@
       "amount": 0.1
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     }
   },
@@ -33,7 +33,7 @@
       "amount": 0.1
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     }
   },
@@ -47,7 +47,7 @@
       "amount": 0.1
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     }
   },
@@ -61,7 +61,7 @@
       "amount": 0.05
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     }
   },
@@ -75,7 +75,7 @@
       "amount": 0.05
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.05
     }
   },
@@ -92,6 +92,6 @@
   "CelesteResolver": {
     "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
     "rinkeby": "0xeec9bf3ff552d8ff43954669601f2f483ea45116",
-    "goerli": "0x5D775285F343e84cf325D54cCcC70742ed711019"
+    "goerli": "0x15EA6E0Ab085B8d7D899672F10F213d53cE02150"
   }
 }

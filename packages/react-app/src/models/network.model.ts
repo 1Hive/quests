@@ -16,4 +16,9 @@ export type NetworkModel = {
   isTestNetwork: boolean;
   stableTokens: TokenModel[];
   isDeprecated?: boolean;
+  blackListedTokens: string[];
+};
+
+export type StagingNetworkModel = Partial<NetworkModel> & {
+  stagingOf: string;
 };

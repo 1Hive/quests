@@ -51,7 +51,8 @@ function getContract(
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
     let askedContract = contracts[contractName];
-    if (Array.isArray(askedContract)) {
+    // Is array of contract, not abi
+    if (Array.isArray(askedContract) && askedContract[0].abi) {
       if (!contractAddressOverride) {
         // If no contract address override, use the last one
         askedContract = askedContract[askedContract.length - 1];
@@ -138,9 +139,8 @@ export async function getCelesteContract(celesteAddressOverride?: string) {
 }
 
 export async function getCelesteDisputeManagerContract(celesteAddressOverride?: string) {
-  const disputeManagerAddress = (
-    await getCelesteContract(celesteAddressOverride)
-  ).getDisputeManager();
+  const celesteContract = await getCelesteContract(celesteAddressOverride);
+  const disputeManagerAddress = await celesteContract.getDisputeManager();
   return getContract('CelesteDisputeManager', disputeManagerAddress);
 }
 

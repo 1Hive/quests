@@ -1,12 +1,8 @@
 import HardhatDeployement from './contracts/hardhat_contracts.json';
 import { getCurrentChain } from './local-settings';
 import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
-import { NetworkModel } from './models/network.model';
+import { NetworkModel, StagingNetworkModel } from './models/network.model';
 import { StableTokens } from './tokens';
-
-type StagingNetworkModel = Partial<NetworkModel> & {
-  stagingOf: string;
-};
 
 export const networks = Object.freeze({
   rinkeby: {
@@ -25,6 +21,7 @@ export const networks = Object.freeze({
     isTestNetwork: true,
     stableTokens: StableTokens.rinkeby,
     isDeprecated: true,
+    blackListedTokens: [],
   },
   rinkebyStaging: {
     stagingOf: 'rinkeby',
@@ -46,6 +43,7 @@ export const networks = Object.freeze({
     rpcKeyEnvName: 'ALCHEMY_API_KEY',
     isTestNetwork: true,
     stableTokens: StableTokens.goerli,
+    blackListedTokens: ['0xbc74d76abB7FA2311eab46A31273452aAFD98DB1'],
   },
   goerliStaging: {
     stagingOf: 'goerli',
@@ -66,6 +64,7 @@ export const networks = Object.freeze({
     rpcUri: 'https://rpc.gnosischain.com/',
     isTestNetwork: false,
     stableTokens: StableTokens.gnosis,
+    blackListedTokens: [],
   } as NetworkModel,
   gnosisStaging: {
     stagingOf: 'gnosis',
@@ -78,6 +77,7 @@ export const networks = Object.freeze({
     defaultEthNode: 'http://0.0.0.0:8545/',
     questFactoryAddress: HardhatDeployement[1337]?.localhost.contracts.QuestFactory.address,
     isTestNetwork: true,
+    blackListedTokens: [],
   } as unknown as NetworkModel,
 } as { [key: string]: NetworkModel | StagingNetworkModel });
 

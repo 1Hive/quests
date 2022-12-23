@@ -407,17 +407,16 @@ export async function fetchChallenge(
 ): Promise<ChallengeModel | null> {
   const { governSubgraph } = getNetwork();
   const governQueueAddress = await getGovernQueueAddressFromQuest(quest);
-  const result = (
-    await request(governSubgraph, GovernQueueChallengesQuery, {
-      containerId: container.id,
-    })
-  ).containerEventChallenges.find((x: any) =>
-    x.container.queue.id.localeCompare(governQueueAddress),
+  const result = await request(governSubgraph, GovernQueueChallengesQuery, {
+    containerId: container.id,
+  });
+  const refinedResult = result.containerEventChallenges.find(
+    (x: any) => x.container.queue.id.toLowerCase() === governQueueAddress.toLowerCase(),
   ); // Validate same queue as app GovernQueue
 
-  if (!result) return null;
+  if (!refinedResult) return null;
 
-  const { disputeId, reason, createdAt, resolver, collateral, challenger } = result;
+  const { disputeId, reason, createdAt, resolver, collateral, challenger } = refinedResult;
   const fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph);
   return {
     deposit: {
@@ -475,11 +474,12 @@ export async function fetchVetoReason(container: ContainerModel): Promise<string
 }
 
 export async function fetchRewardTokens(): Promise<TokenModel[]> {
+  const { blackListedTokens } = getNetwork();
   const tokenAddresses = await fetchQuestRewardTokens();
   const tokensResult = await (Promise.all(
     arrayDistinct<string>(tokenAddresses).map(getTokenInfo),
   ) as Promise<TokenModel[]>);
-  return tokensResult.filter((token) => !!token); // Filter out not found tokens
+  return tokensResult.filter((token) => !!token && !blackListedTokens.includes(token.token)); // Filter out not found tokens and black listed
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {

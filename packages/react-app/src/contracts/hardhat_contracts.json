@@ -5837,16 +5837,11 @@
           ]
         },
         "Celeste": {
-          "address": "0x5D775285F343e84cf325D54cCcC70742ed711019",
+          "address": "0x15EA6E0Ab085B8d7D899672F10F213d53cE02150",
           "abi": [
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_owner",
-                  "type": "address"
-                }
-              ],
+              "inputs": [{ "name": "_owner", "type": "address" }],
               "name": "setOwner",
               "outputs": [],
               "payable": false,
@@ -5856,14 +5851,8 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_state",
-                  "type": "uint8"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_state", "type": "uint8" }
               ],
               "name": "decideDispute",
               "outputs": [],
@@ -5873,22 +5862,11 @@
             },
             {
               "constant": true,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "", "type": "uint256" }],
               "name": "disputes",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "state",
-                  "type": "uint8"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "state", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -5898,12 +5876,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeToken",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -5912,12 +5885,7 @@
               "constant": true,
               "inputs": [],
               "name": "feeAmount",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -5927,18 +5895,9 @@
               "inputs": [],
               "name": "getDisputeFees",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "address"
-                },
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
+                { "name": "", "type": "address" },
+                { "name": "", "type": "address" },
+                { "name": "", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -5947,18 +5906,9 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_submitter",
-                  "type": "address"
-                },
-                {
-                  "name": "_evidence",
-                  "type": "bytes"
-                }
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_submitter", "type": "address" },
+                { "name": "_evidence", "type": "bytes" }
               ],
               "name": "submitEvidence",
               "outputs": [],
@@ -5968,12 +5918,7 @@
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "closeEvidencePeriod",
               "outputs": [],
               "payable": false,
@@ -5984,11 +5929,18 @@
               "constant": true,
               "inputs": [],
               "name": "owner",
+              "outputs": [{ "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "computeRuling",
               "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "finalRuling", "type": "uint8" }
               ],
               "payable": false,
               "stateMutability": "view",
@@ -5997,67 +5949,22 @@
             {
               "constant": false,
               "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
-              "name": "computeRuling",
-              "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "finalRuling",
-                  "type": "uint8"
-                }
-              ],
-              "payable": false,
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "constant": false,
-              "inputs": [
-                {
-                  "name": "_possibleRulings",
-                  "type": "uint256"
-                },
-                {
-                  "name": "_metadata",
-                  "type": "bytes"
-                }
+                { "name": "_possibleRulings", "type": "uint256" },
+                { "name": "_metadata", "type": "bytes" }
               ],
               "name": "createDispute",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "nonpayable",
               "type": "function"
             },
             {
               "constant": false,
-              "inputs": [
-                {
-                  "name": "_disputeId",
-                  "type": "uint256"
-                }
-              ],
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "rule",
               "outputs": [
-                {
-                  "name": "subject",
-                  "type": "address"
-                },
-                {
-                  "name": "ruling",
-                  "type": "uint256"
-                }
+                { "name": "subject", "type": "address" },
+                { "name": "ruling", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
@@ -6067,12 +5974,7 @@
               "constant": true,
               "inputs": [],
               "name": "getDisputeManager",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "address"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "address" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
@@ -6081,26 +5983,27 @@
               "constant": true,
               "inputs": [],
               "name": "currentId",
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
+              "outputs": [{ "name": "", "type": "uint256" }],
               "payable": false,
               "stateMutability": "view",
               "type": "function"
             },
             {
+              "constant": false,
               "inputs": [
-                {
-                  "name": "_feeToken",
-                  "type": "address"
-                },
-                {
-                  "name": "_feeAmount",
-                  "type": "uint256"
-                }
+                { "name": "_feeToken", "type": "address" },
+                { "name": "_feeAmount", "type": "uint256" }
+              ],
+              "name": "setFee",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                { "name": "_feeToken", "type": "address" },
+                { "name": "_feeAmount", "type": "uint256" }
               ],
               "payable": false,
               "stateMutability": "nonpayable",
