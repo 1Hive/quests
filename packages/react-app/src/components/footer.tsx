@@ -180,7 +180,7 @@ export default function footer() {
         </FooterColumnStyled>
         <FooterColumnStyled>
           <FooterTitleStyled>Community</FooterTitleStyled>
-          <FooterNavItemStyled href="https://twitter.com/1HiveOrg" external>
+          <FooterNavItemStyled href="https://twitter.com/1hive_Quests" external>
             <IconStyled>
               <FontAwesomeIcon icon={faTwitter} />
             </IconStyled>
