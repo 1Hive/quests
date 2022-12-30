@@ -1,7 +1,8 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import exportContractResult from "../scripts/export-contract-result";
 
 // Not actually used but so verification using etherscan-verify will verify the quest contract
-module.exports = async ({
+export default async ({
   getNamedAccounts,
   deployments,
   network,
@@ -55,5 +56,12 @@ module.exports = async ({
       console.error("Failed when verifying the Quest contract", error);
     }
   }
+
+  exportContractResult(network, "Quest", {
+    address: deployResult.address,
+    abi: deployResult.abi,
+  });
+
+  return deployResult;
 };
-module.exports.tags = ["Quest"];
+export const tags = ["Quest"];

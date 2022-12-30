@@ -1,6 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import "@nomiclabs/hardhat-etherscan";
 import defaultConfig from "../default-config.json";
+import exportContractResult from "../scripts/export-contract-result";
 
 export default async (
   {
@@ -62,6 +63,11 @@ export default async (
       console.error("Failed when verifying the QuestFactory contract", error);
     }
   }
+
+  exportContractResult(network, "Quest", {
+    address: deployResult.address,
+    abi: deployResult.abi,
+  });
 
   return deployResult;
 };
