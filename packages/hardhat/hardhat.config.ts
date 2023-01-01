@@ -894,20 +894,10 @@ task("newQuestFactory:goerli")
     );
   });
 
-task("newQuest:gnosis")
+task("newQuest")
   .setDescription("Deploy a new Quest and export it to front end")
-  .setAction(async (args, hre) => {
-    const deployResult = await deployQuest(hre, args);
-    console.log(
-      "Deployed quest (" + hre.network.name + "):",
-      deployResult.address
-    );
-  });
-
-task("newQuest:goerli")
-  .setDescription("Deploy a new Quest and export it to front end")
-  .setAction(async (args, hre) => {
-    const deployResult = await deployQuest(hre, args);
+  .setAction(async (hre) => {
+    const deployResult = await deployQuest(hre);
     console.log(
       "Deployed quest (" + hre.network.name + "):",
       deployResult.address
@@ -954,13 +944,9 @@ async function deployAll(
     createDepositToken: args.createDepositToken,
     createDepositAmount: args.createDepositAmount,
   });
-  await run(`newQuestFactory:${networkId}`, {
-    governAddress,
-    initialOwner: args.ownerAddress,
-    createDepositToken: args.createDepositToken,
-    createDepositAmount: args.createDepositAmount,
-  });
-  await run(`newQuest:${networkId}`);
+
+  // Will deploy a dummy quest just for bytecode matching when contract verification
+  await run(`newQuest`);
 }
 
 task("deployAll:gnosis")
@@ -1177,6 +1163,8 @@ task("deployCeleste:goerli")
       } catch (error) {
         console.error("Failed when verifying OwnableCeleste contract", error);
       }
+
+      exportContractResult(network, "Celeste", result);
     }
   );
 
