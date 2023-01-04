@@ -42,7 +42,7 @@ type Props = {
   onClick?: () => void;
 };
 
-export function TransactionProgressComponent({ isReduced = false, onClick }: Props) {
+export function TransactionProgress({ isReduced = false, onClick }: Props) {
   const network = getNetwork();
   const { transaction } = useTransactionContext();
   const [message, setMessage] = useState<string | undefined>();
@@ -60,12 +60,12 @@ export function TransactionProgressComponent({ isReduced = false, onClick }: Pro
   useEffect(() => {
     switch (transaction?.status) {
       case TransactionStatus.WaitingForSignature:
-        setMessage('Waiting for your signature');
+        setMessage('Waiting for your signature.');
         setLogoColor(content);
         setMessageColor(content);
         break;
       case TransactionStatus.Pending:
-        setMessage('Transaction is pending');
+        setMessage('Transaction is pending.');
         setLogoColor(warning);
         setMessageColor(warningSurfaceContent);
         break;
