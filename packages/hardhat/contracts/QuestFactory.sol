@@ -129,4 +129,15 @@ contract QuestFactory is Ownable {
 
         return address(quest);
     }
+
+    /**
+     * @dev Be able to change it after deploy so we can deploy
+     * a new GovernQueue but keep the same QuestFactory
+     * @param _aragonGovernAddress The aragonGovernAddress.
+     */
+    function setAragonGovernAddress(
+        address _aragonGovernAddress
+    ) external onlyOwner {
+        aragonGovernAddress = _aragonGovernAddress;
+    }
 }

@@ -128,7 +128,6 @@ const hardhatConfig: HardhatUserConfig = {
     xdai: {
       chainId: 100,
       url: "https://rpc.gnosischain.com/",
-      gasPrice: 1000000000,
       accounts: getAccounts(),
     },
     matic: {
@@ -1079,40 +1078,57 @@ task("deployAll:goerli")
   )
   .setAction(deployAll);
 
-task("sigAbi").setAction(async (_args, { web3 }) => {
-  const aclQueueFunctions = [
-    "schedule",
-    "resolve",
-    "challenge",
-    "execute",
-    "veto",
-    "configure",
-  ];
-  const aclGovernFunctions = [
-    "withdraw",
-    "exec",
-    "registerStandardAndCallback",
-    "setSignatureValidator",
-  ];
-  console.log("GovernQueue roles:");
-  for (const obj of GovernQueueAbi) {
-    if (obj.type !== "function" || !aclQueueFunctions.includes(obj.name)) {
-      continue;
+task("grantGovernQueue").setAction(
+  async (_args, { web3, getNamedAccounts }) => {
+    const { owner } = await getNamedAccounts();
+    const publicQueueFonctions = [
+      "schedule",
+      "resolve",
+      "challenge",
+      "execute",
+    ];
+    const ownerOnlyQueueFonctions = ["veto", "configure"];
+    const queueFonctions = publicQueueFonctions.concat(ownerOnlyQueueFonctions);
+    const aclGovernFunctions = [
+      "withdraw",
+      "exec",
+      "registerStandardAndCallback",
+      "setSignatureValidator",
+    ];
+    console.log("GovernQueue roles:");
+    const publicGrant = "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF";
+    let roles = [];
+    for (const obj of GovernQueueAbi) {
+      if (obj.type !== "function" || !queueFonctions.includes(obj.name)) {
+        continue;
+      }
+      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      roles.push({
+        signature,
+        address: ownerOnlyQueueFonctions.includes(obj.name)
+          ? owner
+          : publicGrant,
+      });
+      console.log(`${obj.name}:`, signature);
     }
-    let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
-    console.log(`${obj.name}:`, signature);
-  }
-  console.log("Govern roles:");
-  for (const obj of GovernAbi) {
-    if (obj.type !== "function" || !aclGovernFunctions.includes(obj.name)) {
-      continue;
+    console.log("Bulk grant:");
+    console.log(
+      `[${roles.map((x) => `[0,"${x.signature}","${x.address}"]`).join(",")}]`
+    );
+    console.log("Govern roles:");
+    for (const obj of GovernAbi) {
+      if (obj.type !== "function" || !aclGovernFunctions.includes(obj.name)) {
+        continue;
+      }
+      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      roles.push({
+        signature,
+        address: owner,
+      });
+      console.log(`${obj.name}:`, signature);
     }
-    let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
-    console.log(`${obj.name}:`, signature);
   }
-
-  console.log("Grant all user", "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF");
-});
+);
 
 task("deployCeleste:goerli")
   .setDescription("Deploy a mock version of Celeste on goerli")

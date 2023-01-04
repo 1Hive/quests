@@ -37,24 +37,22 @@ export default async ({
 
   console.log({ constructorArguments });
 
-  if (network.name === "rinkeby" || network.name === "goerli") {
-    try {
-      console.log("Verifying Quest...");
-      await new Promise((res, rej) => {
-        setTimeout(
-          () =>
-            run("verify:verify", {
-              address: deployResult.address,
-              constructorArguments,
-            })
-              .then(res)
-              .catch(rej),
-          30000
-        ); // Wait for contract to be deployed
-      });
-    } catch (error) {
-      console.error("Failed when verifying the Quest contract", error);
-    }
+  try {
+    console.log("Verifying Quest...");
+    await new Promise((res, rej) => {
+      setTimeout(
+        () =>
+          run("verify:verify", {
+            address: deployResult.address,
+            constructorArguments,
+          })
+            .then(res)
+            .catch(rej),
+        30000
+      ); // Wait for contract to be deployed
+    });
+  } catch (error) {
+    console.error("Failed when verifying the Quest contract", error);
   }
 
   exportContractResult(network, "Quest", {

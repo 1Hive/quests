@@ -1,17 +1,17 @@
 # Do not edit subgraph.yaml,this is a generated file.
 # Instead, edit subgraph.template.yaml and run `yarn manifest-<network>-[staging]`
 specVersion: 0.0.2
-description: Govern subgraphs
-repository: https://github.com/Corantin/govern
+description: A template for Aragon subgraphs
+repository: https://github.com/aragon/govern
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Govern
-    network: xdai
+    network: goerli
     source:
       abi: Govern
-      startBlock: 22769097
+      startBlock: 7543552
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -43,11 +43,11 @@ dataSources:
       file: ./src/Govern.ts
   - kind: ethereum/contract
     name: GovernQueue
-    network: xdai
+    network: goerli
     source:
       abi: GovernQueue
-      address: '0xd8D142f13E58dFEedaF96418C0B6843108d46B94'
-      startBlock: 22769097
+      address: '0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E'
+      startBlock: 7543552
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -86,11 +86,11 @@ dataSources:
       file: ./src/GovernQueue.ts
   - kind: ethereum/contract
     name: GovernQueueV2
-    network: xdai
+    network: goerli
     source:
       abi: GovernQueue
-      address: '0x6D8189C979bBB6768395A78E2AB8A15133459600'
-      startBlock: 25719047
+      address: '0xc73BCDc0FF18Fb903FCd34de4BFfE37BE66b4E8f'
+      startBlock: 7985656
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

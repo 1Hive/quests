@@ -67,6 +67,8 @@
     "deploy-all:gnosis": "hardhat deployAll:goerli --network xdai",
     "queue-config:goerli": "hardhat generateGovernQueueConfig:goerli",
     "queue-config:gnosis": "hardhat generateGovernQueueConfig:gnosis",
+    "queue-grant:gnosis": "hardhat grantGovernQueue --network xdai",
+    "queue-grant:goerli": "hardhat grantGovernQueue --network goerli",
     "deploy-all:local": "hardhat deployAll:goerli",
     "console": "hardhat console",
     "watch": "node scripts/watch.js",
@@ -77,7 +79,6 @@
     "account": "hardhat account",
     "verify:rinkeby": "hardhat verify-quests-contracts --network rinkeby",
     "verify:goerli": "hardhat verify-quests-contracts --network goerli",
-    "sig": "hardhat sigAbi",
     "ci": "yarn install --pure-lockfile --immutable --skip-builds"
   }
 }

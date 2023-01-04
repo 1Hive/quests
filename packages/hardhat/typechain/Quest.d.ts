@@ -23,7 +23,6 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
-    "c_0x28c23fc5(bytes32)": FunctionFragment;
     "canExecute(address)": FunctionFragment;
     "claim(bytes,address,uint256,bool)": FunctionFragment;
     "claims(uint256)": FunctionFragment;
@@ -46,10 +45,6 @@ interface QuestInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "aragonGovernAddress",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x28c23fc5",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "canExecute", values: [string]): string;
   encodeFunctionData(
@@ -113,10 +108,6 @@ interface QuestInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "aragonGovernAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x28c23fc5",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "canExecute", data: BytesLike): Result;
@@ -189,16 +180,6 @@ export class Quest extends Contract {
     aragonGovernAddress(overrides?: CallOverrides): Promise<[string]>;
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
-
-    c_0x28c23fc5(
-      c__0x28c23fc5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x28c23fc5(bytes32)"(
-      c__0x28c23fc5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
 
     canExecute(executer: string, overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -325,16 +306,6 @@ export class Quest extends Contract {
 
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  c_0x28c23fc5(
-    c__0x28c23fc5: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x28c23fc5(bytes32)"(
-    c__0x28c23fc5: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   canExecute(executer: string, overrides?: CallOverrides): Promise<boolean>;
 
   "canExecute(address)"(
@@ -456,16 +427,6 @@ export class Quest extends Contract {
     aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
-
-    c_0x28c23fc5(
-      c__0x28c23fc5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x28c23fc5(bytes32)"(
-      c__0x28c23fc5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     canExecute(executer: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -593,16 +554,6 @@ export class Quest extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    c_0x28c23fc5(
-      c__0x28c23fc5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x28c23fc5(bytes32)"(
-      c__0x28c23fc5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     canExecute(executer: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "canExecute(address)"(
@@ -699,16 +650,6 @@ export class Quest extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "aragonGovernAddress()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x28c23fc5(
-      c__0x28c23fc5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x28c23fc5(bytes32)"(
-      c__0x28c23fc5: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

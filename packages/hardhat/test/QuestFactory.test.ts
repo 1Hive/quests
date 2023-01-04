@@ -270,4 +270,34 @@ describe("[Contract] QuestFactory", function () {
       expect(amount.eq(depositAmount)).to.eq(true);
     });
   });
+
+  describe("setAragonGovernAddress()", function () {
+    it("SHOULD set AragonGovernAddress WHEN valid", async () => {
+      // Arrange
+      const newGovernAddress = "0x0000000000000000000000000000000000000001";
+      // Act
+      await questFactoryContract
+        .connect(owner)
+        .setAragonGovernAddress(newGovernAddress);
+
+      // Assert
+      expect(await questFactoryContract.aragonGovernAddress()).to.eq(
+        newGovernAddress
+      );
+    });
+
+    it("SHOULD revert WHEN not owner", async () => {
+      // Arrange
+      const newGovernAddress = "0x0000000000000000000000000000000000000001";
+      // Act
+      const act = () =>
+        questFactoryContract
+          .connect(stranger)
+          .setAragonGovernAddress(newGovernAddress);
+      // Assert
+      await expect(act()).to.be.revertedWith(
+        "Ownable: caller is not the owner"
+      );
+    });
+  });
 });

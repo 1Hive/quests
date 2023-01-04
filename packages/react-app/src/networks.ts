@@ -4,6 +4,7 @@ import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel, StagingNetworkModel } from './models/network.model';
 import { StableTokens } from './tokens';
 
+console.log({ REACT_APP_STAGING: process.env.REACT_APP_STAGING });
 export const networks = Object.freeze({
   goerli: {
     networkId: 'goerli',
@@ -45,8 +46,8 @@ export const networks = Object.freeze({
   } as NetworkModel,
   gnosisStaging: {
     stagingOf: 'gnosis',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai-staging',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai-staging',
+    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
+    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
   } as StagingNetworkModel,
   local: {
     networkId: 'local',

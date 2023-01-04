@@ -299,6 +299,19 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_aragonGovernAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setAragonGovernAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "contract IERC20",
         "name": "token",
         "type": "address"

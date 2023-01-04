@@ -1,5 +1,17 @@
 {
   "network": "xdai",
-  "startBlock": 22777803,
-  "questFactoryAddress": "0x5Be5286FEFE6a44f394b551B6AC9255D42e974fe"
+  "dataSources": [
+    {
+      "nameContract": "QuestFactory",
+      "startBlock": 22777803,
+      "questFactoryAddress": "0x5Be5286FEFE6a44f394b551B6AC9255D42e974fe",
+      "customTemplate": "questFactory.yaml"
+    },
+    {
+      "nameContract": "QuestFactoryV2",
+      "startBlock": 25750107,
+      "questFactoryAddress": "0x2fc3f4A630cD6962A22033436Fd63D93B180c076",
+      "customTemplate": "questFactoryV2.yaml"
+    }
+  ]
 }
