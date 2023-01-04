@@ -82,13 +82,13 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
       throw new Error("Deposit or quest's address not defined");
 
     try {
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
         message: 'Opting out quest',
         status: TransactionStatus.WaitingForSignature,
         type: TransactionType.QuestUnplay,
         args: { questAddress: questData.address, player: values.player || walletAddress },
-      } as TransactionModel;
+      };
       setTransaction(txPayload);
       const txReceipt = await QuestService.unplayQuest(
         walletAddress,

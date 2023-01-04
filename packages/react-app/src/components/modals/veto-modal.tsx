@@ -15,6 +15,7 @@ import { VetoModel } from 'src/models/veto.model';
 import { useWallet } from 'src/contexts/wallet.context';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { QuestModel } from 'src/models/quest.model';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import TextFieldInput from '../field-input/text-field-input';
@@ -95,13 +96,13 @@ export default function VetoModal({
     if (isFormValid) {
       try {
         if (!claim.container) throw new Error('Container is not defined');
-        let txPayload = {
+        let txPayload: TransactionModel = {
           modalId,
           message: `Vetoing Quest (1/1)`,
           status: TransactionStatus.WaitingForSignature,
-          type: 'ClaimVeto',
+          type: TransactionType.ClaimVeto,
           args: { questAddress: claim.questAddress, containerId: claim.container.id },
-        } as TransactionModel;
+        };
         setTransaction(txPayload);
         const vetoTxReceipt = await QuestService.vetoQuestClaim(
           walletAddress,

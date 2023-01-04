@@ -21,6 +21,7 @@ import { Logger } from 'src/utils/logger';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { QuestModel } from 'src/models/quest.model';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
@@ -173,13 +174,13 @@ export default function ChallengeModal({
         }
 
         if (!claim.container) throw new Error('Container is not defined');
-        let txPayload = {
+        let txPayload: TransactionModel = {
           modalId,
           message: `Challenging Quest (${isFeeDepositSameToken ? '2/2' : '3/3'})`,
           status: TransactionStatus.WaitingForSignature,
-          type: 'ClaimChallenge',
+          type: TransactionType.ClaimChallenge,
           args: { questAddress: claim.questAddress, containerId: claim.container.id },
-        } as TransactionModel;
+        };
         setTransaction(txPayload);
         const challengeTxReceipt = await QuestService.challengeQuestClaim(
           walletAddress,

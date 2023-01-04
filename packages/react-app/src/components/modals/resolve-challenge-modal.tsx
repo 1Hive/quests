@@ -20,6 +20,7 @@ import { DisputeStatus } from 'src/enums/dispute-status.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { QuestModel } from 'src/models/quest.model';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import { Outset } from '../utils/spacer-util';
@@ -155,17 +156,17 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
     try {
       if (!claim.container) throw new Error('Container is not defined');
       const message = 'Resolving claim challenge';
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
         message,
         status: TransactionStatus.WaitingForSignature,
-        type: 'ClaimChallengeResolve',
+        type: TransactionType.ClaimChallengeResolve,
         args: {
           questAddress: claim.questAddress,
           containerId: claim.container.id,
           disputeState: dispute!.state,
         },
-      } as TransactionModel;
+      };
       setTransaction(txPayload);
       const challengeTxReceipt = await QuestService.resolveClaimChallenge(
         walletAddress,

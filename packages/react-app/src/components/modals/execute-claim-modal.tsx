@@ -6,6 +6,7 @@ import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import { ClaimModel } from 'src/models/claim.model';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -80,13 +81,13 @@ export default function ExecuteClaimModal({
 
   const claimTx = async () => {
     try {
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
         message: 'Claiming bounty',
         status: TransactionStatus.WaitingForSignature,
-        type: 'ClaimExecute',
+        type: TransactionType.ClaimExecute,
         args: { questAddress: claim.questAddress, containerId: claim.container!.id },
-      } as TransactionModel;
+      };
       setTransaction(txPayload);
       const txReceipt = await QuestService.executeQuestClaim(
         walletAddress,

@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { isDevelopement } from 'src/components/utils/debug-util';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { TransactionModel } from 'src/models/transaction.model';
@@ -25,12 +26,12 @@ export async function approveTokenTransaction(
   }
 
   if (!allowance.isZero()) {
-    let revokeTxPayload = {
+    let revokeTxPayload: TransactionModel = {
       modalId,
       message: 'Revoking already existing approval',
       status: TransactionStatus.WaitingForSignature,
-      type: 'TokenApproval',
-    } as TransactionModel;
+      type: TransactionType.TokenApproval,
+    };
     // Reset approval to 0 before approving again
     setTransaction(revokeTxPayload);
     success = await approveTokenAmount(
@@ -57,12 +58,12 @@ export async function approveTokenTransaction(
     }
   }
 
-  let txPayload = {
+  let txPayload: TransactionModel = {
     modalId,
     message,
     status: TransactionStatus.WaitingForSignature,
-    type: 'TokenApproval',
-  } as TransactionModel;
+    type: TransactionType.TokenApproval,
+  };
   setTransaction(txPayload);
   try {
     success = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
@@ -98,13 +99,13 @@ export async function fundQuestTransaction(
   walletAddress: string,
   setTransaction: Dispatch<SetStateAction<TransactionModel | undefined>>,
 ) {
-  let txPayload = {
+  let txPayload: TransactionModel = {
     modalId,
     message,
     status: TransactionStatus.WaitingForSignature,
-    type: 'QuestFund',
+    type: TransactionType.QuestFund,
     args: { questAddress },
-  } as TransactionModel;
+  };
   setTransaction(txPayload);
   const txReceipt = await fundQuest(walletAddress, questAddress, funds, (txHash) => {
     txPayload = { ...txPayload, hash: txHash };

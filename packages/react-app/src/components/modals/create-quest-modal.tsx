@@ -23,6 +23,7 @@ import { GUpx } from 'src/utils/style.util';
 import { QuestStatus } from 'src/enums/quest-status.enum';
 import { QuestViewMode } from 'src/enums/quest-view-mode.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -213,12 +214,12 @@ export default function QuestModal({
 
       let newQuestAddress: string;
       try {
-        let txPayload = {
+        let txPayload: TransactionModel = {
           modalId,
           message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
           status: TransactionStatus.WaitingForSignature,
-          type: 'QuestCreate',
-        } as TransactionModel;
+          type: TransactionType.QuestCreate,
+        };
         setTransaction(txPayload);
         const txReceiptSaveQuest = await QuestService.saveQuest(
           walletAddress,

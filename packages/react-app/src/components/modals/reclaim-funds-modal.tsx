@@ -15,6 +15,7 @@ import { TokenModel } from 'src/models/token.model';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -89,13 +90,13 @@ export default function RecoverFundsModal({
 
   const recoverFundTx = async () => {
     try {
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
         message: 'Recovering funds and deposit',
         status: TransactionStatus.WaitingForSignature,
-        type: 'QuestReclaimFunds',
+        type: TransactionType.QuestReclaimFunds,
         args: { questAddress: questData.address },
-      } as TransactionModel;
+      };
       setTransaction(txPayload);
       const txReceipt = await QuestService.recoverFundsAndDeposit(
         walletAddress,

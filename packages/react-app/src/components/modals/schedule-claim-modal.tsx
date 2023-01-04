@@ -22,6 +22,7 @@ import { QuestStatus } from 'src/enums/quest-status.enum';
 import { DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -169,13 +170,13 @@ export default function ScheduleClaimModal({
         walletAddress,
         setTransaction,
       );
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
         message: 'Scheduling claim (2/2)',
         status: TransactionStatus.WaitingForSignature,
-        type: 'ClaimSchedule',
+        type: TransactionType.ClaimSchedule,
         args: { questAddress },
-      } as TransactionModel;
+      };
       setTransaction(txPayload);
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,

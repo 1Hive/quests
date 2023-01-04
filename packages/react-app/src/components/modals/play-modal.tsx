@@ -100,13 +100,13 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
     );
 
     try {
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
         message: 'Playing quest (2/2)',
         status: TransactionStatus.WaitingForSignature,
         type: TransactionType.QuestPlay,
         args: { questAddress: questData.address, player: values.player || walletAddress },
-      } as TransactionModel;
+      };
       if (!isMountedRef.current) return;
       setTransaction(txPayload);
       const txReceipt = await QuestService.playQuest(walletAddress, questData, values, (txHash) => {
