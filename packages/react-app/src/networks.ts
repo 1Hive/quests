@@ -4,7 +4,6 @@ import { getNetworkId, isLocalOrUnknownNetwork } from './utils/web3.utils';
 import { NetworkModel, StagingNetworkModel } from './models/network.model';
 import { StableTokens } from './tokens';
 
-console.log({ REACT_APP_STAGING: process.env.REACT_APP_STAGING });
 export const networks = Object.freeze({
   goerli: {
     networkId: 'goerli',
