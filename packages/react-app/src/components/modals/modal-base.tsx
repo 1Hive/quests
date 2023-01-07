@@ -6,7 +6,7 @@ import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { ChildSpacer, Outset } from '../utils/spacer-util';
-import { TransactionProgressComponent } from '../utils/transaction-progress-component';
+import { TransactionProgress } from '../utils/transaction-progress';
 
 // #region StyledComponents
 const ModalFooterStyled = styled.div`
@@ -152,7 +152,7 @@ export default function ModalBase({
           <Outset gu8>
             <TitleStyled>{title}</TitleStyled>
           </Outset>
-          {transaction && transaction?.modalId === id ? <TransactionProgressComponent /> : children}
+          {transaction && transaction?.modalId === id ? <TransactionProgress /> : children}
           {(buttons || txFailed) && (
             <ModalFooterStyled>
               <ChildSpacer justify="start" align="center" buttonEnd={!txFailed}>
@@ -166,7 +166,7 @@ export default function ModalBase({
       )}
       {transaction && !isOpenedState && transaction?.modalId === id && (
         <TopRightCornerStyled title={transaction.message}>
-          <TransactionProgressComponent isReduced onClick={() => setIsOpenedState(true)} />
+          <TransactionProgress isReduced onClick={() => setIsOpenedState(true)} />
         </TopRightCornerStyled>
       )}
     </>
