@@ -2,12 +2,12 @@ import {
   QuestCreated,
   PlayDepositChanged,
   CreateDepositChanged,
-} from '../generated/QuestFactoryV2/QuestFactory';
+} from '../../generated/QuestFactoryV2/QuestFactory';
 import {
   CreateDepositEntity,
   PlayDepositEntity,
   QuestEntity,
-} from '../generated/schema';
+} from '../../generated/schema';
 import { Bytes, ipfs } from '@graphprotocol/graph-ts';
 import { json } from '@graphprotocol/graph-ts';
 

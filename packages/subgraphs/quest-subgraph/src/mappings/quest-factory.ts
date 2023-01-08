@@ -1,9 +1,9 @@
 import {
   QuestCreated,
   DepositChanged,
-} from '../generated/QuestFactory/QuestFactory';
-import { CreateDepositEntity, QuestEntity } from '../generated/schema';
-import { BigInt, Bytes, ipfs } from '@graphprotocol/graph-ts';
+} from '../../generated/QuestFactory/QuestFactory';
+import { CreateDepositEntity, QuestEntity } from '../../generated/schema';
+import { Bytes, ipfs } from '@graphprotocol/graph-ts';
 import { json } from '@graphprotocol/graph-ts';
 export function handleDepositChanged(event: DepositChanged): void {
   let depositEntity = new CreateDepositEntity(

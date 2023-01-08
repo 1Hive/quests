@@ -1,0 +1,43 @@
+- kind: ethereum/contract
+    name: {{name}}
+    network: {{network}}
+    source:
+      abi: GovernQueue
+      address: "{{address}}"
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Collateral
+        - Config
+        - Container
+        - ContainerEvent
+        - Payload
+        - Role
+      abis:
+        - name: GovernQueue
+          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueueV2.json
+        - name: ERC20
+          file: ./govern-contract-utils/abi/contracts/erc20/ERC20.sol/ERC20.json
+      eventHandlers:
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes,uint256))
+          handler: handleConfigured
+        - event: Frozen(indexed bytes4,indexed address)
+          handler: handleFrozen
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
+          handler: handleGranted
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes,address))
+          handler: handleScheduled
+        - event: Executed(indexed bytes32,indexed address)
+          handler: handleExecuted
+        - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
+          handler: handleChallenged
+        - event: Vetoed(indexed bytes32,indexed address,bytes)
+          handler: handleVetoed
+        - event: Resolved(indexed bytes32,indexed address,bool)
+          handler: handleResolved
+        - event: Revoked(indexed bytes4,indexed address,indexed address)
+          handler: handleRevoked
+      file: ./src/GovernQueue.ts

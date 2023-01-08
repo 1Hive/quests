@@ -467,6 +467,36 @@ export class RenounceOwnershipCall__Outputs {
   }
 }
 
+export class SetAragonGovernAddressCall extends ethereum.Call {
+  get inputs(): SetAragonGovernAddressCall__Inputs {
+    return new SetAragonGovernAddressCall__Inputs(this);
+  }
+
+  get outputs(): SetAragonGovernAddressCall__Outputs {
+    return new SetAragonGovernAddressCall__Outputs(this);
+  }
+}
+
+export class SetAragonGovernAddressCall__Inputs {
+  _call: SetAragonGovernAddressCall;
+
+  constructor(call: SetAragonGovernAddressCall) {
+    this._call = call;
+  }
+
+  get _aragonGovernAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class SetAragonGovernAddressCall__Outputs {
+  _call: SetAragonGovernAddressCall;
+
+  constructor(call: SetAragonGovernAddressCall) {
+    this._call = call;
+  }
+}
+
 export class SetCreateDepositCall extends ethereum.Call {
   get inputs(): SetCreateDepositCall__Inputs {
     return new SetCreateDepositCall__Inputs(this);

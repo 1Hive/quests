@@ -2,12 +2,21 @@
   "network": "goerli",
   "dataSources": [
     {
-      "startBlock": 7543552,
-      "governQueueAddress": "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E"
+      "name": "Govern",
+      "startBlock": 7985656,
+      "customTemplate": "Govern"
     },
     {
+      "name": "GovernQueue",
+      "startBlock": 7543552,
+      "address": "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E",
+      "customTemplate": "GovernQueue"
+    },
+    {
+      "name": "GovernQueueV2",
       "startBlock": 7985656,
-      "governQueueAddress": "0xc73BCDc0FF18Fb903FCd34de4BFfE37BE66b4E8f"
+      "address": "0xc73BCDc0FF18Fb903FCd34de4BFfE37BE66b4E8f",
+      "customTemplate": "GovernQueue"
     }
   ]
 }

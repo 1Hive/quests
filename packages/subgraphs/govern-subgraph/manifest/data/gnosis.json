@@ -1,0 +1,22 @@
+{
+  "network": "gnosis",
+  "dataSources": [
+    {
+      "name": "Govern",
+      "startBlock": 22769097,
+      "customTemplate": "Govern"
+    },
+    {
+      "name": "GovernQueue",
+      "startBlock": 22769097,
+      "address": "0xd8D142f13E58dFEedaF96418C0B6843108d46B94",
+      "customTemplate": "GovernQueue"
+    },
+    {
+      "name": "GovernQueueV2",
+      "startBlock": 25719047,
+      "address": "0x6D8189C979bBB6768395A78E2AB8A15133459600",
+      "customTemplate": "GovernQueueV2"
+    }
+  ]
+}

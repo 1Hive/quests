@@ -1,0 +1,24 @@
+- kind: ethereum/contract
+    name: {{name}}
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: QuestFactory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreatedV2
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.2.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address,uint256,address,uint32)
+          handler: handleQuestCreated
+        - event: CreateDepositChanged(uint256,address,uint256)
+          handler: handleCreateDepositChanged
+        - event: PlayDepositChanged(uint256,address,uint256)
+          handler: handlePlayDepositChanged
+      file: ./src/mappings/quest-factory.2.ts
