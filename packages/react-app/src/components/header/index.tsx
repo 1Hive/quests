@@ -1,12 +1,12 @@
 import { BackButton, useTheme, useViewport, DropDown } from '@1hive/1hive-ui';
 import { useHistory } from 'react-router-dom';
-import { ENUM_PAGES } from 'src/constants';
 import { usePageContext } from 'src/contexts/page.context';
 import { GUpx, isDarkTheme } from 'src/utils/style.util';
 import styled from 'styled-components';
 import React, { useMemo } from 'react';
 import { useWallet } from 'src/contexts/wallet.context';
 import { flags } from 'src/services/feature-flag.service';
+import { Pages } from 'src/enums/pages.enum';
 import AccountModule from '../account/account-module';
 import HeaderMenu from './header-menu';
 import HeaderTitle from './header-title';
@@ -85,8 +85,8 @@ function Header({ children }: Props) {
     <HeaderWraperStyled theme={theme}>
       <HeaderLayoutContentStyled>
         <HeaderLayoutContentFlexStyled>
-          {page !== ENUM_PAGES.List ? (
-            <BackButtonStyled onClick={() => history.push(ENUM_PAGES.List)} label="" />
+          {page !== Pages.List ? (
+            <BackButtonStyled onClick={() => history.push(Pages.List)} label="" />
           ) : (
             <BackButtonSpacerStyled />
           )}
@@ -102,8 +102,8 @@ function Header({ children }: Props) {
               items={networkNames}
               selected={networkNames.indexOf(name)}
               onChange={(i: number) => {
-                if (page === ENUM_PAGES.Detail) {
-                  window.history.pushState({}, '', ENUM_PAGES.List);
+                if (page === Pages.Detail) {
+                  window.history.pushState({}, '', Pages.List);
                 }
                 changeNetwork(
                   Object.values(networks).find((network) => network.name === networkNames[i])!

@@ -2,12 +2,12 @@
   "GovernQueueFactory": {
     "rinkeby": "0x3383032F06BB4Bc4c9DfE08c564cde467c2f725e",
     "xdai": "0xA6591419f78C044979bf63Aa81edD5e100C0E957",
-    "goerli": "0xC7ADACbA47a02E1Ec3431f67eB33f31012f164Af"
+    "goerli": "0xEA6015008c7926E84C76b70344EbD31a48A6fd2c"
   },
   "GovernFactory": {
     "rinkeby": "0x3ddc3e8bbf3f6987e4008a7d6f486dae4d0f120f",
     "xdai": "0x8De393cd9F84D7989A1164191a1f6CDd5D2a7F9B",
-    "goerli": "0xd439D35257a5Ff51c7d98Cf2b932e9096bbeAb63"
+    "goerli": "0xd0A50194CeFf1A33E2a831F80EBfa2b11aC44B78"
   },
   "CreateQuestDeposit": {
     "rinkeby": {
@@ -19,9 +19,23 @@
       "amount": 0.1
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
-    }   
+    }
+  },
+  "PlayQuestDeposit": {
+    "rinkeby": {
+      "token": "0x3050E20FAbE19f8576865811c9F28e85b96Fa4f9",
+      "amount": 0.01
+    },
+    "xdai": {
+      "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+      "amount": 0.1
+    },
+    "goerli": {
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
+      "amount": 0.01
+    }
   },
   "ScheduleDeposit": {
     "rinkeby": {
@@ -33,7 +47,7 @@
       "amount": 0.1
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     }
   },
@@ -47,7 +61,7 @@
       "amount": 0.05
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     }
   },
@@ -61,7 +75,7 @@
       "amount": 0.05
     },
     "goerli": {
-      "token": "0xbc74d76abB7FA2311eab46A31273452aAFD98DB1",
+      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.05
     }
   },
@@ -78,6 +92,6 @@
   "CelesteResolver": {
     "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
     "rinkeby": "0xeec9bf3ff552d8ff43954669601f2f483ea45116",
-    "goerli": "0x5D775285F343e84cf325D54cCcC70742ed711019"
+    "goerli": "0x15EA6E0Ab085B8d7D899672F10F213d53cE02150"
   }
 }

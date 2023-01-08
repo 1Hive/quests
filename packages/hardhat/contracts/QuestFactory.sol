@@ -12,7 +12,8 @@ contract QuestFactory is Ownable {
     using DepositLib for Models.Deposit;
 
     address public aragonGovernAddress;
-    Models.Deposit public deposit;
+    Models.Deposit public createDeposit;
+    Models.Deposit public playDeposit;
 
     event QuestCreated(
         address questAddress,
@@ -21,21 +22,33 @@ contract QuestFactory is Ownable {
         address rewardTokenAddress,
         uint256 expireTime,
         address fundsRecoveryAddress,
-        address depositToken,
-        uint256 depositAmount,
-        address creator
+        address createDepositToken,
+        uint256 createDepositAmount,
+        address playDepositToken,
+        uint256 playDepositAmount,
+        address creator,
+        uint32 maxPlayers
     );
 
-    event DepositChanged(uint256 timestamp, address token, uint256 amount);
+    event CreateDepositChanged(
+        uint256 timestamp,
+        address token,
+        uint256 amount
+    );
+
+    event PlayDepositChanged(uint256 timestamp, address token, uint256 amount);
 
     constructor(
         address _aragonGovernAddress,
-        IERC20 _depositToken,
-        uint256 _depositAmount,
+        IERC20 _createDepositToken,
+        uint256 _createDepositAmount,
+        IERC20 _playDepositToken,
+        uint256 _playDepositAmount,
         address _initialOwner
     ) {
         aragonGovernAddress = _aragonGovernAddress;
-        setDeposit(_depositToken, _depositAmount);
+        setCreateDeposit(_createDepositToken, _createDepositAmount);
+        setPlayDeposit(_playDepositToken, _playDepositAmount);
         if (_initialOwner != msg.sender) {
             transferOwnership(_initialOwner);
         }
@@ -45,11 +58,22 @@ contract QuestFactory is Ownable {
      * @dev Set the deposit token and amount.
      * @param _depositToken The deposit token.
      * @param _depositAmount The deposit amount.
-     * emit DepositChanged
+     * emit CreateDepositChanged
      */
-    function setDeposit(IERC20 token, uint256 amount) public onlyOwner {
-        deposit = Models.Deposit(token, amount);
-        emit DepositChanged(block.timestamp, address(token), amount);
+    function setCreateDeposit(IERC20 token, uint256 amount) public onlyOwner {
+        createDeposit = Models.Deposit(token, amount);
+        emit CreateDepositChanged(block.timestamp, address(token), amount);
+    }
+
+    /*
+     * @dev Set the play deposit token and amount.
+     * @param _depositToken The deposit token.
+     * @param _depositAmount The deposit amount.
+     * emit PlayDepositChanged
+     */
+    function setPlayDeposit(IERC20 token, uint256 amount) public onlyOwner {
+        playDeposit = Models.Deposit(token, amount);
+        emit PlayDepositChanged(block.timestamp, address(token), amount);
     }
 
     /*
@@ -69,7 +93,8 @@ contract QuestFactory is Ownable {
         bytes memory _questDetailsRef,
         IERC20 _rewardToken,
         uint256 _expireTime,
-        address payable _fundsRecoveryAddress
+        address payable _fundsRecoveryAddress,
+        uint32 _maxPlayers
     ) external returns (address) {
         Quest quest = new Quest(
             _questTitle,
@@ -78,13 +103,14 @@ contract QuestFactory is Ownable {
             _expireTime,
             aragonGovernAddress,
             _fundsRecoveryAddress,
-            deposit.token,
-            deposit.amount,
-            msg.sender
+            Models.Deposit(createDeposit.token, createDeposit.amount),
+            Models.Deposit(playDeposit.token, playDeposit.amount),
+            msg.sender,
+            _maxPlayers
         );
 
         // Collect deposit from quest creator and send it to quest
-        deposit.collectFrom(msg.sender, address(quest));
+        createDeposit.collectFrom(msg.sender, address(quest));
 
         emit QuestCreated(
             address(quest),
@@ -93,11 +119,25 @@ contract QuestFactory is Ownable {
             address(_rewardToken),
             _expireTime,
             _fundsRecoveryAddress,
-            address(deposit.token),
-            deposit.amount,
-            msg.sender
+            address(createDeposit.token),
+            createDeposit.amount,
+            address(playDeposit.token),
+            playDeposit.amount,
+            msg.sender,
+            _maxPlayers
         );
 
         return address(quest);
+    }
+
+    /**
+     * @dev Be able to change it after deploy so we can deploy
+     * a new GovernQueue but keep the same QuestFactory
+     * @param _aragonGovernAddress The aragonGovernAddress.
+     */
+    function setAragonGovernAddress(
+        address _aragonGovernAddress
+    ) external onlyOwner {
+        aragonGovernAddress = _aragonGovernAddress;
     }
 }

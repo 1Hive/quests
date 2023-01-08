@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { isDevelopement } from 'src/components/utils/debug-util';
-import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { TokenModel } from 'src/models/token.model';
 import { TransactionModel } from 'src/models/transaction.model';
@@ -25,13 +26,12 @@ export async function approveTokenTransaction(
   }
 
   if (!allowance.isZero()) {
-    let revokeTxPayload = {
+    let revokeTxPayload: TransactionModel = {
       modalId,
-      estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
       message: 'Revoking already existing approval',
-      status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-      type: 'TokenApproval',
-    } as TransactionModel;
+      status: TransactionStatus.WaitingForSignature,
+      type: TransactionType.TokenApproval,
+    };
     // Reset approval to 0 before approving again
     setTransaction(revokeTxPayload);
     success = await approveTokenAmount(
@@ -42,7 +42,7 @@ export async function approveTokenTransaction(
         revokeTxPayload = { ...revokeTxPayload, hash: txHash };
         setTransaction({
           ...revokeTxPayload,
-          status: ENUM_TRANSACTION_STATUS.Pending,
+          status: TransactionStatus.Pending,
         });
       },
     );
@@ -50,7 +50,7 @@ export async function approveTokenTransaction(
     if (!success) {
       setTransaction({
         ...revokeTxPayload,
-        status: ENUM_TRANSACTION_STATUS.Failed,
+        status: TransactionStatus.Failed,
       });
       throw new Error(
         `Failed to revoke existing allowance : ${token.name} (${token.symbol}-${token.token})`,
@@ -58,33 +58,32 @@ export async function approveTokenTransaction(
     }
   }
 
-  let txPayload = {
+  let txPayload: TransactionModel = {
     modalId,
-    estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.TokenAproval,
     message,
-    status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-    type: 'TokenApproval',
-  } as TransactionModel;
+    status: TransactionStatus.WaitingForSignature,
+    type: TransactionType.TokenApproval,
+  };
   setTransaction(txPayload);
   try {
     success = await approveTokenAmount(walletAddress, spender, token, (txHash) => {
       txPayload = { ...txPayload, hash: txHash };
       setTransaction({
         ...txPayload,
-        status: ENUM_TRANSACTION_STATUS.Pending,
+        status: TransactionStatus.Pending,
       });
     });
   } finally {
     setTransaction({
       ...txPayload,
-      status: success ? ENUM_TRANSACTION_STATUS.Confirmed : ENUM_TRANSACTION_STATUS.Failed,
+      status: success ? TransactionStatus.Confirmed : TransactionStatus.Failed,
     });
   }
 
   if (!success) {
     setTransaction({
       ...txPayload,
-      status: ENUM_TRANSACTION_STATUS.Failed,
+      status: TransactionStatus.Failed,
     });
     throw new Error(
       `Failed to approve token allowance : ${token.name} (${token.symbol}-${token.token})`,
@@ -100,31 +99,30 @@ export async function fundQuestTransaction(
   walletAddress: string,
   setTransaction: Dispatch<SetStateAction<TransactionModel | undefined>>,
 ) {
-  let txPayload = {
+  let txPayload: TransactionModel = {
     modalId,
-    estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFunding,
     message,
-    status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-    type: 'QuestFund',
+    status: TransactionStatus.WaitingForSignature,
+    type: TransactionType.QuestFund,
     args: { questAddress },
-  } as TransactionModel;
+  };
   setTransaction(txPayload);
   const txReceipt = await fundQuest(walletAddress, questAddress, funds, (txHash) => {
     txPayload = { ...txPayload, hash: txHash };
     setTransaction({
       ...txPayload,
-      status: ENUM_TRANSACTION_STATUS.Pending,
+      status: TransactionStatus.Pending,
     });
   });
   setTransaction({
     ...txPayload,
-    status: txReceipt?.status ? ENUM_TRANSACTION_STATUS.Confirmed : ENUM_TRANSACTION_STATUS.Failed,
+    status: txReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
   });
 
   if (!txReceipt) {
     setTransaction({
       ...txPayload,
-      status: ENUM_TRANSACTION_STATUS.Failed,
+      status: TransactionStatus.Failed,
     });
     throw new Error('Failed to fund quest');
   }

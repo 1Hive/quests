@@ -50,7 +50,18 @@ function getContract(
     }
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
-    const askedContract = contracts[contractName];
+    let askedContract = contracts[contractName];
+    // Is array of contract, not abi
+    if (Array.isArray(askedContract) && askedContract[0].abi) {
+      if (!contractAddressOverride) {
+        // If no contract address override, use the last one
+        askedContract = askedContract[askedContract.length - 1];
+      } else {
+        askedContract = askedContract.find(
+          (c) => c.address.toLowerCase() === contractAddressOverride.toLowerCase(),
+        );
+      }
+    }
     const contractAddress: string = contractAddressOverride ?? askedContract.address;
     const contractAbi = askedContract.abi ?? askedContract;
     const provider = getDefaultProvider();
@@ -80,8 +91,10 @@ export function getQuestFactoryContract(walletAddress: string) {
   return getContract('QuestFactory', undefined, walletAddress);
 }
 
-export function getGovernQueueContract(walletAddress: string): Contract | null {
-  const { governQueueAddress } = getNetwork();
+export function getGovernQueueContract(
+  walletAddress: string,
+  governQueueAddress: string,
+): Contract | null {
   return getContract('GovernQueue', governQueueAddress, walletAddress);
 }
 
@@ -126,9 +139,8 @@ export async function getCelesteContract(celesteAddressOverride?: string) {
 }
 
 export async function getCelesteDisputeManagerContract(celesteAddressOverride?: string) {
-  const disputeManagerAddress = (
-    await getCelesteContract(celesteAddressOverride)
-  ).getDisputeManager();
+  const celesteContract = await getCelesteContract(celesteAddressOverride);
+  const disputeManagerAddress = await celesteContract.getDisputeManager();
   return getContract('CelesteDisputeManager', disputeManagerAddress);
 }
 

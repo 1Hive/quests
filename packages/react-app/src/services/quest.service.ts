@@ -1,16 +1,16 @@
 import { request } from 'graphql-request';
 import { FilterModel } from 'src/models/filter.model';
-import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
 import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueChallengeReasonQuery,
   GovernQueueChallengesQuery,
-  GovernQueueEntityClaimsLightQuery,
-  GovernQueueEntityContainersQuery,
+  ClaimContainersQuery,
   GovernQueueEntityQuery,
   GovernQueueVetoReasonsQuery,
+  ContainersLightQuery as ClaimContainersLightQuery,
+  GovernQueueEntities,
 } from 'src/queries/govern-queue-entity.query';
 import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
@@ -30,7 +30,11 @@ import {
 import { DepositModel } from 'src/models/deposit-model';
 import { compareCaseInsensitive } from 'src/utils/string.util';
 import { VetoModel } from 'src/models/veto.model';
-import { DEFAULT_CLAIM_EXECUTION_DELAY_MS, ENUM_CLAIM_STATE } from '../constants';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { QuestStatus } from 'src/enums/quest-status.enum';
+import { PlayModel } from 'src/models/play.model';
+import { QuestModel } from 'src/models/quest.model';
+import { ADDRESS_ZERO, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
@@ -50,7 +54,11 @@ import {
   getCelesteContract,
 } from '../utils/contract.util';
 import { getLastBlockTimestamp } from '../utils/date.utils';
-import { cacheFetchBalance, cacheFetchTokenPrice } from './cache.service';
+import {
+  cacheFetchBalance,
+  cacheFetchTokenPrice,
+  cacheGovernQueueAddressForQuest,
+} from './cache.service';
 
 let questList: QuestModel[] = [];
 
@@ -70,21 +78,39 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
       creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
-      deposit: +questEntity.depositToken
+      createDeposit: +questEntity.questCreateDepositToken
         ? ({
-            amount: BigNumber.from(questEntity.depositAmount),
-            token: toChecksumAddress(questEntity.depositToken),
+            amount: BigNumber.from(questEntity.questCreateDepositAmount),
+            token: toChecksumAddress(questEntity.questCreateDepositToken),
+          } as DepositModel)
+        : undefined,
+      playDeposit: +questEntity.questPlayDepositToken
+        ? ({
+            amount: BigNumber.from(questEntity.questPlayDepositAmount),
+            token: toChecksumAddress(questEntity.questPlayDepositToken),
           } as DepositModel)
         : undefined,
       fallbackAddress: toChecksumAddress(questEntity.questFundsRecoveryAddress),
       creatorAddress: toChecksumAddress(questEntity.questCreator),
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
+      maxPlayers: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers : undefined, // If null put undefined
+      unlimited: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers === 0 : undefined,
+      status: QuestStatus.Active,
+      players: [],
+      governAddress: toChecksumAddress(questEntity.questGovernAddress),
     } as QuestModel;
 
-    if (!quest.detailsRefIpfs) quest.description = '[No description]';
-    // If failed to fetch ipfs description
-    else if (!quest.description)
+    if (!quest.detailsRefIpfs) {
+      quest.description = '[No description]';
+    } else if (!quest.description) {
+      // If failed to fetch ipfs description
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
+    }
+
+    if (quest?.maxPlayers !== undefined) {
+      quest.players = await getQuestContract(quest.address!).getPlayers();
+    }
+
     return quest;
   } catch (error) {
     Logger.exception(error, `Failed to map quest :\n${JSON.stringify(questEntity)}`);
@@ -100,8 +126,11 @@ async function mapQuestList(quests: any[]): Promise<QuestModel[]> {
   ) as Promise<QuestModel[]>; // Filter out undefined quests (skiped)
 }
 
-async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel }> {
-  const { governSubgraph, governQueueAddress } = getNetwork();
+async function fetchGovernQueue(
+  questData: QuestModel,
+): Promise<{ nonce: number; config: ConfigModel }> {
+  const { governSubgraph } = getNetwork();
+  const governQueueAddress = await getGovernQueueAddressFromQuest(questData);
 
   const result = await request(governSubgraph, GovernQueueEntityQuery, {
     ID: governQueueAddress.toLowerCase(),
@@ -124,30 +153,21 @@ async function fetchGovernQueue(): Promise<{ nonce: number; config: ConfigModel 
 }
 
 export async function fetchGovernQueueClaimsCount(): Promise<Map<string, number>> {
-  const { governSubgraph, governQueueAddress } = getNetwork();
-  const result = await request(governSubgraph, GovernQueueEntityClaimsLightQuery, {
-    ID: governQueueAddress.toLowerCase(),
-  });
-  if (!result?.governQueue)
-    throw new Error(`GovernQueue does not exist at this address : ${governQueueAddress}`);
+  const { governSubgraph } = getNetwork();
+  const result = await request(governSubgraph, ClaimContainersLightQuery);
   const countMap = new Map<string, number>();
-  result.governQueue.containers.forEach((claim: any) => {
+  result.containers.forEach((claim: any) => {
     const questAddress = toChecksumAddress(claim.payload.actions[0].to);
     countMap.set(questAddress, (countMap.get(questAddress) ?? 0) + 1);
   });
   return countMap;
 }
 
-async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
-  const { governSubgraph, governQueueAddress } = getNetwork();
-  const result = await request(governSubgraph, GovernQueueEntityContainersQuery, {
-    ID: governQueueAddress.toLowerCase(),
-  });
+async function fetchClaimContainers(): Promise<ContainerModel[]> {
+  const { governSubgraph } = getNetwork();
+  const result = await request(governSubgraph, ClaimContainersQuery);
 
-  if (!result?.governQueue)
-    throw new Error(`GovernQueue does not exist at this address : ${governQueueAddress}`);
-
-  const containers = result.governQueue.containers.map(
+  const containers = result.containers.map(
     (x: any) =>
       ({
         id: x.id,
@@ -163,6 +183,7 @@ async function fetchGovernQueueContainers(): Promise<ContainerModel[]> {
           executor: toChecksumAddress(x.payload.executor.id),
           submitter: toChecksumAddress(x.payload.submitter),
           allowFailuresMap: x.payload.allowFailuresMap,
+          challenger: ADDRESS_ZERO,
         },
         state: x.state,
         config: {
@@ -219,7 +240,7 @@ async function generateScheduleContainer(
 ): Promise<ContainerModel> {
   const questContract = getQuestContract(claimData.questAddress);
   const governAddress = await questContract.aragonGovernAddress();
-  const governQueueResult = await fetchGovernQueue();
+  const governQueueResult = await fetchGovernQueue(questData);
   const erc3000Config = governQueueResult.config;
   const lastBlockTimestamp = await getLastBlockTimestamp();
 
@@ -265,6 +286,7 @@ async function generateScheduleContainer(
       ],
       allowFailuresMap: '0x0000000000000000000000000000000000000000000000000000000000000000',
       proof: claimInfoIpfsHash,
+      challenger: ADDRESS_ZERO,
     },
   } as ContainerModel;
 }
@@ -287,15 +309,11 @@ export async function fetchQuestsPaging(
 export async function fetchQuest(questAddress: string) {
   const queryResult = await fetchQuestEnity(questAddress);
   const claimResult = await fetchGovernQueueClaimsCount();
-  const newQuest = mapQuest(queryResult, claimResult);
-  return newQuest;
+  return mapQuest(queryResult, claimResult);
 }
 
-export async function fetchQuestClaims(
-  quest: QuestModel,
-  skipIpfs?: boolean,
-): Promise<ClaimModel[]> {
-  const res = await fetchGovernQueueContainers();
+export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]> {
+  const res = await fetchClaimContainers();
 
   return Promise.all(
     res
@@ -309,7 +327,7 @@ export async function fetchQuestClaims(
           typeof quest.rewardToken === 'string'
             ? ((await getTokenInfo(quest.rewardToken)) as TokenModel)
             : quest.rewardToken;
-        const claim = {
+        return {
           claimedAmount: {
             token: tokenModel,
             parsedAmount: fromBigNumber(BigNumber.from(claimAmount), tokenModel?.decimals),
@@ -317,21 +335,11 @@ export async function fetchQuestClaims(
           claimInfoIpfsHash,
           playerAddress,
           questAddress: quest.address,
-          state: container.state ? ENUM_CLAIM_STATE[container.state] : undefined,
+          state: container.state ? ClaimStatus[container.state] : undefined,
           claimAll,
           executionTimeMs: +container.payload.executionTime * 1000, // Sec to MS
           container,
         } as ClaimModel;
-
-        if (skipIpfs) {
-          claim.evidence = formatIpfsMarkdownLink(claimInfoIpfsHash, 'See evidence');
-        } else {
-          const { evidence, contactInformation } = await fetchClaimIpfsInfo(claimInfoIpfsHash);
-          claim.evidence = evidence;
-          claim.contactInformation = contactInformation;
-        }
-
-        return claim;
       }),
   ).then((claims) =>
     claims.sort((a: ClaimModel, b: ClaimModel) => b.executionTimeMs! - a.executionTimeMs!),
@@ -375,8 +383,8 @@ export async function fetchClaimIpfsInfo(claimInfoIpfsHash?: string) {
   }
 }
 
-export async function fetchDeposits() {
-  const { config } = await fetchGovernQueue();
+export async function fetchDeposits(questData: QuestModel) {
+  const { config } = await fetchGovernQueue(questData);
   return {
     claim: toTokenAmountModel(config.scheduleDeposit),
     challenge: toTokenAmountModel(config.challengeDeposit),
@@ -384,7 +392,7 @@ export async function fetchDeposits() {
 }
 
 export async function getClaimExecutableTime(questAddress: string, playerAddress: string) {
-  const governQueueContainers = await fetchGovernQueueContainers();
+  const governQueueContainers = await fetchClaimContainers();
   const container: ContainerModel | undefined = governQueueContainers?.find(
     (x: ContainerModel) =>
       x.payload.submitter === playerAddress && x.payload.actions[0].to === questAddress,
@@ -393,19 +401,22 @@ export async function getClaimExecutableTime(questAddress: string, playerAddress
   return container && +container.payload.executionTime * 1000; // Convert Sec to MS
 }
 
-export async function fetchChallenge(container: ContainerModel): Promise<ChallengeModel | null> {
-  const { governSubgraph, governQueueAddress } = getNetwork();
-  const result = (
-    await request(governSubgraph, GovernQueueChallengesQuery, {
-      containerId: container.id,
-    })
-  ).containerEventChallenges.find((x: any) =>
-    x.container.queue.id.localeCompare(governQueueAddress),
+export async function fetchChallenge(
+  container: ContainerModel,
+  quest: QuestModel,
+): Promise<ChallengeModel | null> {
+  const { governSubgraph } = getNetwork();
+  const governQueueAddress = await getGovernQueueAddressFromQuest(quest);
+  const result = await request(governSubgraph, GovernQueueChallengesQuery, {
+    containerId: container.id,
+  });
+  const refinedResult = result.containerEventChallenges.find(
+    (x: any) => x.container.queue.id.toLowerCase() === governQueueAddress.toLowerCase(),
   ); // Validate same queue as app GovernQueue
 
-  if (!result) return null;
+  if (!refinedResult) return null;
 
-  const { disputeId, reason, createdAt, resolver, collateral, challenger } = result;
+  const { disputeId, reason, createdAt, resolver, collateral, challenger } = refinedResult;
   const fetchedReason = await getObjectFromIpfs(reason, ipfsTheGraph);
   return {
     deposit: {
@@ -418,6 +429,21 @@ export async function fetchChallenge(container: ContainerModel): Promise<Challen
     challengerAddress: toChecksumAddress(challenger),
     disputeId: +disputeId,
   };
+}
+
+/**
+ * Fetch the last govern queue given a quest creation timestamp
+ * @param questData, let undefined to fetch the last created govern queue
+ */
+export async function getGovernQueueAddressFromQuest(questData?: QuestModel) {
+  if (!questData?.address) {
+    // Fetch the last created govern queue
+    const { governSubgraph } = getNetwork();
+    const result = await request(governSubgraph, GovernQueueEntities);
+    return result.governQueues[result.governQueues.length - 1].id;
+  }
+
+  return cacheGovernQueueAddressForQuest(questData);
 }
 
 export async function fetchChallengeReason(container: ContainerModel): Promise<string | undefined> {
@@ -448,35 +474,47 @@ export async function fetchVetoReason(container: ContainerModel): Promise<string
 }
 
 export async function fetchRewardTokens(): Promise<TokenModel[]> {
+  const { blackListedTokens } = getNetwork();
   const tokenAddresses = await fetchQuestRewardTokens();
   const tokensResult = await (Promise.all(
     arrayDistinct<string>(tokenAddresses).map(getTokenInfo),
   ) as Promise<TokenModel[]>);
-  return tokensResult.filter((token) => !!token); // Filter out not found tokens
+  return tokensResult.filter((token) => !!token && !blackListedTokens.includes(token.token)); // Filter out not found tokens and black listed
 }
 
 export async function getDashboardInfo(): Promise<DashboardModel> {
   const { isTestNetwork } = getNetwork();
   const result = await fetchActiveQuestEntitiesLight();
   const quests = result.questEntities as {
-    id: string;
+    questAddress: string;
     questRewardTokenAddress: string;
-    depositToken: string;
-    depositAmount: string;
+    questCreateDepositToken: string;
+    questCreateDepositAmount: string;
+    questPlayDepositToken: string;
+    questPlayDepositAmount: string;
+    questMaxPlayers: string;
   }[];
   const funds = (
     await Promise.all(
-      quests.map(async (quest) =>
-        getBalanceOf(
-          quest.questRewardTokenAddress,
-          quest.id,
+      quests.map(async (quest) => {
+        const lockedFunds = [
           {
-            amount: BigNumber.from(quest.depositAmount),
-            token: quest.depositToken,
+            amount: BigNumber.from(quest.questCreateDepositAmount),
+            token: quest.questCreateDepositToken,
           },
-          true,
-        ),
-      ),
+        ];
+
+        // If max player is not null then the quest is playable
+        if (quest.questMaxPlayers) {
+          const questPlayers = await getQuestContract(quest.questAddress!).getPlayers();
+          lockedFunds.push({
+            amount: BigNumber.from(quest.questPlayDepositAmount).mul(questPlayers.length),
+            token: quest.questPlayDepositToken,
+          });
+        }
+
+        return getBalanceOf(quest.questRewardTokenAddress, quest.questAddress, lockedFunds, true);
+      }),
     )
   ).filter((x) => !!x) as TokenAmountModel[];
   const totalFunds = funds
@@ -503,7 +541,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
 
 export async function fetchCreateQuestDeposit(walletAddress: string) {
   const questFactoryContract = getQuestFactoryContract(walletAddress);
-  const res = await questFactoryContract.deposit();
+  const res = await questFactoryContract.createDeposit();
   const token = await getTokenInfo(res.token);
   if (!token) {
     return null;
@@ -531,6 +569,7 @@ export async function saveQuest(
     description: data.description ?? '',
     communicationLink: data.communicationLink,
   });
+
   const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
   const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
     data.title,
@@ -538,8 +577,9 @@ export async function saveQuest(
     typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
+    data.maxPlayers,
     {
-      gasLimit: 10000000,
+      // gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -568,14 +608,46 @@ export async function getQuestRecoveryAddress(questAddress: string): Promise<str
   return getQuestContract(questAddress)?.fundsRecoveryAddress() ?? null;
 }
 
-export async function isQuestDepositReleased(questAddress: string): Promise<boolean> {
+export async function isCreateQuestDepositReleased(questAddress: string): Promise<boolean> {
   try {
     const quest = getQuestContract(questAddress);
-    return await quest.isDepositReleased();
+    return await quest.isCreateDepositReleased();
   } catch (error) {
     Logger.debug('Failed to get quest deposit status', { questAddress, error });
     return false;
   }
+}
+
+export async function playQuest(
+  walletAddress: string,
+  quest: QuestModel,
+  data: PlayModel,
+  onTx?: onTxCallback,
+): Promise<ethers.ContractReceipt | null> {
+  if (!quest.address) throw new Error('Quest address is not defined when playing a quest');
+  const questContract = getQuestContract(quest.address, walletAddress);
+  if (!questContract) return null;
+  Logger.debug('Playing quest...', { quest });
+  const tx = await questContract.play(data.player || walletAddress, {
+    gasLimit: 1000000,
+  });
+  return handleTransaction(tx, onTx);
+}
+
+export async function unplayQuest(
+  walletAddress: string,
+  quest: QuestModel,
+  data: PlayModel,
+  onTx?: onTxCallback,
+): Promise<ethers.ContractReceipt | null> {
+  if (!quest.address) throw new Error('Quest address is not defined when unplaying a quest');
+  const questContract = getQuestContract(quest.address, walletAddress);
+  if (!questContract) return null;
+  Logger.debug('Unplaying quest...', { quest });
+  const tx = await questContract.unplay(data.player || walletAddress, {
+    gasLimit: 1000000,
+  });
+  return handleTransaction(tx, onTx);
 }
 
 // #endregion
@@ -652,22 +724,26 @@ export function getAllowanceOf(walletAddress: string, token: TokenModel, spender
 export async function getBalanceOf(
   token: TokenModel | string,
   address: string,
-  lockedFunds?: DepositModel,
+  lockedFunds?: DepositModel[],
   forceCacheRefresh?: boolean,
 ): Promise<TokenAmountModel | null> {
   try {
     let tokenInfo: TokenModel;
-    if (typeof token === 'string') tokenInfo = (await getTokenInfo(token)) as TokenModel;
-    else tokenInfo = token;
+    if (typeof token === 'string') {
+      tokenInfo = (await getTokenInfo(token)) as TokenModel;
+    } else {
+      tokenInfo = token;
+    }
     if (tokenInfo) {
       const erc20Contract = getERC20Contract(tokenInfo);
       if (!erc20Contract) return null;
       let balance = await cacheFetchBalance(tokenInfo, address, erc20Contract, forceCacheRefresh);
-
-      if (lockedFunds && compareCaseInsensitive(lockedFunds.token, tokenInfo.token)) {
-        // Substract deposit from funds if both same token
-        balance = balance.sub(BigNumber.from(lockedFunds.amount));
-      }
+      lockedFunds?.forEach((lockedFund) => {
+        if (compareCaseInsensitive(lockedFund.token, tokenInfo.token)) {
+          // Substract deposit from funds if both same token
+          balance = balance.sub(BigNumber.from(lockedFund.amount));
+        }
+      });
       tokenInfo.amount = balance.toString();
       const price = await cacheFetchTokenPrice(tokenInfo);
       const parsedAmount = fromBigNumber(balance, tokenInfo.decimals);
@@ -697,7 +773,8 @@ export async function scheduleQuestClaim(
   claimData: ClaimModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
-  const governQueueContract = getGovernQueueContract(walletAddress);
+  const governQueueAddress = await getGovernQueueAddressFromQuest(questData);
+  const governQueueContract = getGovernQueueContract(walletAddress, governQueueAddress);
   if (!governQueueContract) return null;
   const container = await generateScheduleContainer(walletAddress, claimData, questData);
   Logger.debug('Scheduling quest claim...', { container });
@@ -709,10 +786,12 @@ export async function scheduleQuestClaim(
 
 export async function executeQuestClaim(
   walletAddress: string,
+  questData: QuestModel,
   claimData: ClaimModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
-  const governQueueContract = getGovernQueueContract(walletAddress);
+  const governQueueAddress = await getGovernQueueAddressFromQuest(questData);
+  const governQueueContract = getGovernQueueContract(walletAddress, governQueueAddress);
   if (!governQueueContract) return null;
   Logger.debug('Executing quest claim...', { container: claimData.container, claimData });
   const tx = await governQueueContract.execute(
@@ -729,11 +808,13 @@ export async function executeQuestClaim(
 
 export async function challengeQuestClaim(
   walletAddress: string,
+  questData: QuestModel,
   challenge: ChallengeModel,
   container: ContainerModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
-  const governQueueContract = getGovernQueueContract(walletAddress);
+  const governQueueAddress = await getGovernQueueAddressFromQuest(questData);
+  const governQueueContract = getGovernQueueContract(walletAddress, governQueueAddress);
   if (!governQueueContract) return null;
   Logger.debug('Challenging a quest claim...', { container, challenge });
   const challengeReasonIpfs = await pushObjectToIpfs(challenge.reason ?? '');
@@ -749,11 +830,13 @@ export async function challengeQuestClaim(
 
 export async function vetoQuestClaim(
   walletAddress: string,
+  questData: QuestModel,
   veto: VetoModel,
   container: ContainerModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
-  const governQueueContract = getGovernQueueContract(walletAddress);
+  const governQueueAddress = await getGovernQueueAddressFromQuest(questData);
+  const governQueueContract = getGovernQueueContract(walletAddress, governQueueAddress);
   if (!governQueueContract) return null;
   Logger.debug('Vetoing a quest claim ...', { container, veto });
   const vetoReasonIpfs = await pushObjectToIpfs(veto.reason ?? '');
@@ -769,11 +852,13 @@ export async function vetoQuestClaim(
 
 export async function resolveClaimChallenge(
   walletAddress: string,
+  questData: QuestModel,
   container: ContainerModel,
   dispute: DisputeModel,
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
-  const governQueueContract = getGovernQueueContract(walletAddress);
+  const governQueueAddress = await getGovernQueueAddressFromQuest(questData);
+  const governQueueContract = getGovernQueueContract(walletAddress, governQueueAddress);
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
   const tx = await governQueueContract.resolve(container, dispute.id, {

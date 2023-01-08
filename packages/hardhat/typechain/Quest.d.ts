@@ -23,28 +23,30 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
-    "c_0xddbcb989(bytes32)": FunctionFragment;
+    "canExecute(address)": FunctionFragment;
     "claim(bytes,address,uint256,bool)": FunctionFragment;
     "claims(uint256)": FunctionFragment;
-    "deposit()": FunctionFragment;
+    "createDeposit()": FunctionFragment;
     "expireTime()": FunctionFragment;
     "fundsRecoveryAddress()": FunctionFragment;
-    "isDepositReleased()": FunctionFragment;
+    "getPlayers()": FunctionFragment;
+    "isCreateDepositReleased()": FunctionFragment;
+    "maxPlayers()": FunctionFragment;
+    "play(address)": FunctionFragment;
+    "playDeposit()": FunctionFragment;
     "questCreator()": FunctionFragment;
     "questDetailsRef()": FunctionFragment;
     "questTitle()": FunctionFragment;
     "recoverFundsAndDeposit()": FunctionFragment;
     "rewardToken()": FunctionFragment;
+    "unplay(address)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "aragonGovernAddress",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xddbcb989",
-    values: [BytesLike]
-  ): string;
+  encodeFunctionData(functionFragment: "canExecute", values: [string]): string;
   encodeFunctionData(
     functionFragment: "claim",
     values: [BytesLike, string, BigNumberish, boolean]
@@ -53,7 +55,10 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "claims",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "deposit", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "createDeposit",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "expireTime",
     values?: undefined
@@ -63,7 +68,20 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "isDepositReleased",
+    functionFragment: "getPlayers",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isCreateDepositReleased",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "maxPlayers",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "play", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "playDeposit",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -86,25 +104,33 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "rewardToken",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "unplay", values: [string]): string;
 
   decodeFunctionResult(
     functionFragment: "aragonGovernAddress",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xddbcb989",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "canExecute", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claims", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "createDeposit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "expireTime", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "fundsRecoveryAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getPlayers", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "isDepositReleased",
+    functionFragment: "isCreateDepositReleased",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "maxPlayers", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "play", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "playDeposit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -124,12 +150,17 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "rewardToken",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "unplay", data: BytesLike): Result;
 
   events: {
     "QuestClaimed(bytes,address,uint256)": EventFragment;
+    "QuestPlayed(address,uint256)": EventFragment;
+    "QuestUnplayed(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "QuestClaimed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "QuestPlayed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "QuestUnplayed"): EventFragment;
 }
 
 export class Quest extends Contract {
@@ -150,15 +181,12 @@ export class Quest extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
-    c_0xddbcb989(
-      c__0xddbcb989: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
+    canExecute(executer: string, overrides?: CallOverrides): Promise<[boolean]>;
 
-    "c_0xddbcb989(bytes32)"(
-      c__0xddbcb989: BytesLike,
+    "canExecute(address)"(
+      executer: string,
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[boolean]>;
 
     claim(
       _evidence: BytesLike,
@@ -198,11 +226,11 @@ export class Quest extends Contract {
       }
     >;
 
-    deposit(
+    createDeposit(
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
-    "deposit()"(
+    "createDeposit()"(
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
@@ -214,9 +242,32 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
-    isDepositReleased(overrides?: CallOverrides): Promise<[boolean]>;
+    getPlayers(overrides?: CallOverrides): Promise<[string[]]>;
 
-    "isDepositReleased()"(overrides?: CallOverrides): Promise<[boolean]>;
+    "getPlayers()"(overrides?: CallOverrides): Promise<[string[]]>;
+
+    isCreateDepositReleased(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<[boolean]>;
+
+    maxPlayers(overrides?: CallOverrides): Promise<[number]>;
+
+    "maxPlayers()"(overrides?: CallOverrides): Promise<[number]>;
+
+    play(_player: string, overrides?: Overrides): Promise<ContractTransaction>;
+
+    "play(address)"(
+      _player: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    playDeposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "playDeposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
     questCreator(overrides?: CallOverrides): Promise<[string]>;
 
@@ -239,21 +290,28 @@ export class Quest extends Contract {
     rewardToken(overrides?: CallOverrides): Promise<[string]>;
 
     "rewardToken()"(overrides?: CallOverrides): Promise<[string]>;
+
+    unplay(
+      _player: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "unplay(address)"(
+      _player: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
   };
 
   aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
 
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  c_0xddbcb989(
-    c__0xddbcb989: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
+  canExecute(executer: string, overrides?: CallOverrides): Promise<boolean>;
 
-  "c_0xddbcb989(bytes32)"(
-    c__0xddbcb989: BytesLike,
+  "canExecute(address)"(
+    executer: string,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<boolean>;
 
   claim(
     _evidence: BytesLike,
@@ -293,11 +351,11 @@ export class Quest extends Contract {
     }
   >;
 
-  deposit(
+  createDeposit(
     overrides?: CallOverrides
   ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
-  "deposit()"(
+  "createDeposit()"(
     overrides?: CallOverrides
   ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
@@ -309,9 +367,32 @@ export class Quest extends Contract {
 
   "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  isDepositReleased(overrides?: CallOverrides): Promise<boolean>;
+  getPlayers(overrides?: CallOverrides): Promise<string[]>;
 
-  "isDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
+  "getPlayers()"(overrides?: CallOverrides): Promise<string[]>;
+
+  isCreateDepositReleased(overrides?: CallOverrides): Promise<boolean>;
+
+  "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
+
+  maxPlayers(overrides?: CallOverrides): Promise<number>;
+
+  "maxPlayers()"(overrides?: CallOverrides): Promise<number>;
+
+  play(_player: string, overrides?: Overrides): Promise<ContractTransaction>;
+
+  "play(address)"(
+    _player: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  playDeposit(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+  "playDeposit()"(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
   questCreator(overrides?: CallOverrides): Promise<string>;
 
@@ -335,20 +416,24 @@ export class Quest extends Contract {
 
   "rewardToken()"(overrides?: CallOverrides): Promise<string>;
 
+  unplay(_player: string, overrides?: Overrides): Promise<ContractTransaction>;
+
+  "unplay(address)"(
+    _player: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-    c_0xddbcb989(
-      c__0xddbcb989: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    canExecute(executer: string, overrides?: CallOverrides): Promise<boolean>;
 
-    "c_0xddbcb989(bytes32)"(
-      c__0xddbcb989: BytesLike,
+    "canExecute(address)"(
+      executer: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<boolean>;
 
     claim(
       _evidence: BytesLike,
@@ -388,11 +473,11 @@ export class Quest extends Contract {
       }
     >;
 
-    deposit(
+    createDeposit(
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
-    "deposit()"(
+    "createDeposit()"(
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
@@ -404,9 +489,29 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<string>;
 
-    isDepositReleased(overrides?: CallOverrides): Promise<boolean>;
+    getPlayers(overrides?: CallOverrides): Promise<string[]>;
 
-    "isDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
+    "getPlayers()"(overrides?: CallOverrides): Promise<string[]>;
+
+    isCreateDepositReleased(overrides?: CallOverrides): Promise<boolean>;
+
+    "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
+
+    maxPlayers(overrides?: CallOverrides): Promise<number>;
+
+    "maxPlayers()"(overrides?: CallOverrides): Promise<number>;
+
+    play(_player: string, overrides?: CallOverrides): Promise<void>;
+
+    "play(address)"(_player: string, overrides?: CallOverrides): Promise<void>;
+
+    playDeposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "playDeposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
     questCreator(overrides?: CallOverrides): Promise<string>;
 
@@ -427,10 +532,21 @@ export class Quest extends Contract {
     rewardToken(overrides?: CallOverrides): Promise<string>;
 
     "rewardToken()"(overrides?: CallOverrides): Promise<string>;
+
+    unplay(_player: string, overrides?: CallOverrides): Promise<void>;
+
+    "unplay(address)"(
+      _player: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
     QuestClaimed(evidence: null, player: null, amount: null): EventFilter;
+
+    QuestPlayed(player: null, timestamp: null): EventFilter;
+
+    QuestUnplayed(player: null, timestamp: null): EventFilter;
   };
 
   estimateGas: {
@@ -438,13 +554,10 @@ export class Quest extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    c_0xddbcb989(
-      c__0xddbcb989: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    canExecute(executer: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "c_0xddbcb989(bytes32)"(
-      c__0xddbcb989: BytesLike,
+    "canExecute(address)"(
+      executer: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -471,9 +584,9 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    deposit(overrides?: CallOverrides): Promise<BigNumber>;
+    createDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "deposit()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -483,9 +596,25 @@ export class Quest extends Contract {
 
     "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    isDepositReleased(overrides?: CallOverrides): Promise<BigNumber>;
+    getPlayers(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "isDepositReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "getPlayers()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    isCreateDepositReleased(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    maxPlayers(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "maxPlayers()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    play(_player: string, overrides?: Overrides): Promise<BigNumber>;
+
+    "play(address)"(_player: string, overrides?: Overrides): Promise<BigNumber>;
+
+    playDeposit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "playDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     questCreator(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -506,6 +635,13 @@ export class Quest extends Contract {
     rewardToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     "rewardToken()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    unplay(_player: string, overrides?: Overrides): Promise<BigNumber>;
+
+    "unplay(address)"(
+      _player: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -517,13 +653,13 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    c_0xddbcb989(
-      c__0xddbcb989: BytesLike,
+    canExecute(
+      executer: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "c_0xddbcb989(bytes32)"(
-      c__0xddbcb989: BytesLike,
+    "canExecute(address)"(
+      executer: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -553,9 +689,9 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    deposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    createDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "deposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     expireTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -569,11 +705,32 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    isDepositReleased(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getPlayers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "isDepositReleased()"(
+    "getPlayers()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    isCreateDepositReleased(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    "isCreateDepositReleased()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    maxPlayers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "maxPlayers()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    play(_player: string, overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "play(address)"(
+      _player: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    playDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "playDeposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     questCreator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -600,5 +757,15 @@ export class Quest extends Contract {
     rewardToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "rewardToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    unplay(
+      _player: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "unplay(address)"(
+      _player: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
   };
 }

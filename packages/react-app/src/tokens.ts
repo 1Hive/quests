@@ -61,7 +61,7 @@ export const TOKENS = Object.freeze({
     HoneyTest: {
       name: 'HoneyTest',
       symbol: 'HNYT',
-      token: '0xbc74d76abB7FA2311eab46A31273452aAFD98DB1',
+      token: '0x2d467a24095B262787f58ce97d9B130ce7232B57',
       decimals: 18,
     } as TokenModel,
     Dai: {

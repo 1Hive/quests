@@ -2,7 +2,6 @@
 import { Button, IconRotateLeft, IconCaution, Info } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
-import { ENUM_TRANSACTION_STATUS, ENUM } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { QuestModel } from 'src/models/quest.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
@@ -15,6 +14,8 @@ import { toTokenAmountModel } from 'src/utils/data.utils';
 import { TokenModel } from 'src/models/token.model';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import * as QuestService from '../../services/quest.service';
 import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 import { Outset } from '../utils/spacer-util';
@@ -57,7 +58,7 @@ type Props = {
   pendingClaims: boolean;
 };
 
-export default function ReclaimFundsModal({
+export default function RecoverFundsModal({
   questData,
   bounty,
   onClose = noop,
@@ -72,9 +73,9 @@ export default function ReclaimFundsModal({
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    if (questData.deposit) {
-      const depositAmount = questData.deposit;
-      getTokenInfo(questData.deposit?.token).then((token) => {
+    if (questData.createDeposit) {
+      const depositAmount = questData.createDeposit;
+      getTokenInfo(questData.createDeposit?.token).then((token) => {
         if (isMountedRef.current) {
           setDepositTokenAmount(
             toTokenAmountModel({
@@ -89,14 +90,13 @@ export default function ReclaimFundsModal({
 
   const recoverFundTx = async () => {
     try {
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
-        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.QuestFundsReclaiming,
-        message: 'Reclaiming funds and deposit',
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        type: 'QuestReclaimFunds',
+        message: 'Recovering funds and deposit',
+        status: TransactionStatus.WaitingForSignature,
+        type: TransactionType.QuestReclaimFunds,
         args: { questAddress: questData.address },
-      } as TransactionModel;
+      };
       setTransaction(txPayload);
       const txReceipt = await QuestService.recoverFundsAndDeposit(
         walletAddress,
@@ -105,15 +105,13 @@ export default function ReclaimFundsModal({
           txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            status: ENUM_TRANSACTION_STATUS.Pending,
+            status: TransactionStatus.Pending,
           });
         },
       );
       setTransaction({
         ...txPayload,
-        status: txReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+        status: txReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
       });
       if (!txReceipt?.status) throw new Error('Failed to reclaim funds');
     } catch (e: any) {
@@ -121,14 +119,14 @@ export default function ReclaimFundsModal({
         (oldTx) =>
           oldTx && {
             ...oldTx,
-            status: ENUM_TRANSACTION_STATUS.Failed,
+            status: TransactionStatus.Failed,
             message: computeTransactionErrorMessage(e),
           },
       );
     }
   };
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -156,8 +154,8 @@ export default function ReclaimFundsModal({
             title="Recover remaining funds and deposit"
           />
         }
-        onClose={closeModal}
-        isOpen={opened}
+        onModalClosed={onModalClosed}
+        isOpened={opened}
       >
         <RowStyled>
           <AmoutWrapperStyled>

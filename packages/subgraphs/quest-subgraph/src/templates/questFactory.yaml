@@ -1,8 +1,8 @@
 - kind: ethereum/contract
-    name: QuestFactory
+    name: {{name}}
     network: {{network}}
     source:
-      address: "{{questFactoryAddress}}"
+      address: "{{address}}"
       abi: QuestFactory
       startBlock: {{startBlock}}
     mapping:
@@ -19,4 +19,4 @@
           handler: handleQuestCreated
         - event: DepositChanged(uint256,address,uint256)
           handler: handleDepositChanged
-      file: ./src/mapping.ts
+      file: ./src/mappings/quest-factory.ts

@@ -23,8 +23,8 @@ yarn
 Start the project
 
 ```sh
-# Rinkeby testnet
-yarn start:rinkeby
+# Goerli testnet
+yarn start:goerli
 ```
 
 ### Docs

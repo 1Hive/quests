@@ -25,13 +25,21 @@ export default function exportContractResult(
   }
   const path = "../react-app/src/contracts/hardhat_contracts.json";
   try {
-    hardhatContracts[network.config.chainId][network.name].contracts[
-      contractName
-    ] = contractValue;
+    let arrayMaybe =
+      hardhatContracts[network.config.chainId][network.name].contracts[
+        contractName
+      ];
+    if (Array.isArray(arrayMaybe)) {
+      arrayMaybe.push(contractValue);
+    } else {
+      hardhatContracts[network.config.chainId][network.name].contracts[
+        contractName
+      ] = contractValue;
+    }
     fs.writeFileSync(path, JSON.stringify(hardhatContracts, null, 2));
   } catch (error) {
     console.error(
-      `[${contractName}]Error during publishing deployement result into ${path}`,
+      `[${contractName}] Error during publishing deployement result into ${path}`,
       error
     );
   }

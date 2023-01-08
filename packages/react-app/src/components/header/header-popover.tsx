@@ -1,4 +1,4 @@
-/* eslint-disable no-shadow */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { GU, Popover, springs } from '@1hive/1hive-ui';
 import React from 'react';
 import { animated, Spring } from 'react-spring/renderprops';

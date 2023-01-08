@@ -16,10 +16,10 @@ contract GovernERC20 {
 
     function balanceOf(address _who) public view returns (uint256);
 
-    function allowance(address _owner, address _spender)
-        public
-        view
-        returns (uint256);
+    function allowance(
+        address _owner,
+        address _spender
+    ) public view returns (uint256);
 
     function transfer(address _to, uint256 _value) public returns (bool);
 
@@ -51,9 +51,10 @@ interface IArbitrator {
      * @param _metadata Optional metadata that can be used to provide additional information on the dispute to be created
      * @return Dispute identification number
      */
-    function createDispute(uint256 _possibleRulings, bytes calldata _metadata)
-        external
-        returns (uint256);
+    function createDispute(
+        uint256 _possibleRulings,
+        bytes calldata _metadata
+    ) external returns (uint256);
 
     /**
      * @dev Submit evidence for a dispute
@@ -79,9 +80,9 @@ interface IArbitrator {
      * @return subject Arbitrable instance associated to the dispute
      * @return ruling Ruling number computed for the given dispute
      */
-    function rule(uint256 _disputeId)
-        external
-        returns (address subject, uint256 ruling);
+    function rule(
+        uint256 _disputeId
+    ) external returns (address subject, uint256 ruling);
 
     /**
      * @dev Tell the dispute fees information to create a dispute
@@ -92,11 +93,7 @@ interface IArbitrator {
     function getDisputeFees()
         external
         view
-        returns (
-            address recipient,
-            GovernERC20 feeToken,
-            uint256 feeAmount
-        );
+        returns (address recipient, GovernERC20 feeToken, uint256 feeAmount);
 }
 
 // File: contracts/lib/os/SafeGovernERC20.sol
@@ -164,10 +161,10 @@ library SafeGovernERC20 {
         return invokeAndCheckSuccess(address(_token), approveCallData);
     }
 
-    function invokeAndCheckSuccess(address _addr, bytes memory _calldata)
-        private
-        returns (bool)
-    {
+    function invokeAndCheckSuccess(
+        address _addr,
+        bytes memory _calldata
+    ) private returns (bool) {
         bool ret;
         assembly {
             let ptr := mload(0x40) // free memory pointer
@@ -260,10 +257,10 @@ contract OwnableCeleste is IArbitrator {
      * @param _metadata Optional metadata that can be used to provide additional information on the dispute to be created
      * @return Dispute identification number
      */
-    function createDispute(uint256 _possibleRulings, bytes calldata _metadata)
-        external
-        returns (uint256)
-    {
+    function createDispute(
+        uint256 _possibleRulings,
+        bytes calldata _metadata
+    ) external returns (uint256) {
         uint256 disputeId = currentId;
         disputes[disputeId] = Dispute(msg.sender, State.DISPUTED);
         currentId++;
@@ -275,10 +272,10 @@ contract OwnableCeleste is IArbitrator {
         return disputeId;
     }
 
-    function decideDispute(uint256 _disputeId, State _state)
-        external
-        onlyOwner
-    {
+    function decideDispute(
+        uint256 _disputeId,
+        State _state
+    ) external onlyOwner {
         require(
             _state != State.NOT_DISPUTED && _state != State.DISPUTED,
             "ERR:OUTCOME_NOT_ASSIGNABLE"
@@ -314,10 +311,9 @@ contract OwnableCeleste is IArbitrator {
      * @return subject Arbitrable instance associated to the dispute
      * @return ruling Ruling number computed for the given dispute
      */
-    function rule(uint256 _disputeId)
-        external
-        returns (address subject, uint256 ruling)
-    {
+    function rule(
+        uint256 _disputeId
+    ) external returns (address subject, uint256 ruling) {
         Dispute storage dispute = disputes[_disputeId];
 
         if (dispute.state == State.DISPUTES_RULING_CHALLENGER) {
@@ -340,11 +336,7 @@ contract OwnableCeleste is IArbitrator {
     function getDisputeFees()
         external
         view
-        returns (
-            address,
-            GovernERC20,
-            uint256
-        )
+        returns (address, GovernERC20, uint256)
     {
         return (address(this), feeToken, feeAmount);
     }
@@ -353,12 +345,16 @@ contract OwnableCeleste is IArbitrator {
         return address(this);
     }
 
-    function computeRuling(uint256 _disputeId)
-        external
-        returns (address subject, State finalRuling)
-    {
+    function computeRuling(
+        uint256 _disputeId
+    ) external view returns (address subject, State finalRuling) {
         Dispute storage dispute = disputes[_disputeId];
         subject = dispute.subject;
         finalRuling = dispute.state;
+    }
+
+    function setFee(address _feeToken, uint256 _feeAmount) external onlyOwner {
+        feeAmount = _feeAmount;
+        feeToken = GovernERC20(_feeToken);
     }
 }

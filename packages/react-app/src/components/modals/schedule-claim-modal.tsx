@@ -4,17 +4,10 @@ import { debounce, noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
-import {
-  ENUM_TRANSACTION_STATUS,
-  ENUM,
-  DEFAULT_CLAIM_EXECUTION_DELAY_MS,
-  ENUM_QUEST_STATE,
-} from 'src/constants';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
-import { getNetwork } from 'src/networks';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
@@ -25,6 +18,11 @@ import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye, FaMoneyBillWave } from 'react-icons/fa';
 import { QuestModel } from 'src/models/quest.model';
+import { QuestStatus } from 'src/enums/quest-status.enum';
+import { DEFAULT_CLAIM_EXECUTION_DELAY_MS } from 'src/constants';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { ClaimStatus } from 'src/enums/claim-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
@@ -90,9 +88,11 @@ type Props = {
   questData: QuestModel;
   onClose?: ModalCallback;
 };
+
 const emptyClaimData = {
-  state: ENUM_QUEST_STATE.Draft,
+  state: ClaimStatus.None,
 } as ClaimModel;
+
 export default function ScheduleClaimModal({
   questAddress,
   questTotalBounty,
@@ -116,7 +116,7 @@ export default function ScheduleClaimModal({
     [questData.expireTime],
   );
 
-  const closeModal = (succeed: any) => {
+  const onModalClosed = (succeed: any) => {
     setOpened(false);
     onClose(succeed);
   };
@@ -160,8 +160,8 @@ export default function ScheduleClaimModal({
 
   const scheduleClaimTx = async (values: Partial<ClaimModel>) => {
     try {
-      const { governQueueAddress } = getNetwork();
-      const scheduleDeposit = (await QuestService.fetchDeposits()).claim;
+      const governQueueAddress = await QuestService.getGovernQueueAddressFromQuest(questData);
+      const scheduleDeposit = (await QuestService.fetchDeposits(questData)).claim;
       await approveTokenTransaction(
         modalId,
         scheduleDeposit.token,
@@ -170,14 +170,13 @@ export default function ScheduleClaimModal({
         walletAddress,
         setTransaction,
       );
-      let txPayload = {
+      let txPayload: TransactionModel = {
         modalId,
-        estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimScheduling,
         message: 'Scheduling claim (2/2)',
-        status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-        type: 'ClaimSchedule',
+        status: TransactionStatus.WaitingForSignature,
+        type: TransactionType.ClaimSchedule,
         args: { questAddress },
-      } as TransactionModel;
+      };
       setTransaction(txPayload);
       const scheduleReceipt = await QuestService.scheduleQuestClaim(
         walletAddress,
@@ -194,15 +193,13 @@ export default function ScheduleClaimModal({
           txPayload = { ...txPayload, hash: txHash };
           setTransaction({
             ...txPayload,
-            status: ENUM_TRANSACTION_STATUS.Pending,
+            status: TransactionStatus.Pending,
           });
         },
       );
       setTransaction({
         ...txPayload,
-        status: scheduleReceipt?.status
-          ? ENUM_TRANSACTION_STATUS.Confirmed
-          : ENUM_TRANSACTION_STATUS.Failed,
+        status: scheduleReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
       });
       if (!scheduleReceipt?.status)
         throw new Error('Failed to schedule the claim, please retry in a few seconds');
@@ -215,7 +212,7 @@ export default function ScheduleClaimModal({
           (oldTx) =>
             oldTx && {
               ...oldTx,
-              status: ENUM_TRANSACTION_STATUS.Failed,
+              status: TransactionStatus.Failed,
               message: computeTransactionErrorMessage(e),
             },
         );
@@ -248,7 +245,7 @@ export default function ScheduleClaimModal({
   return (
     <ModalBase
       id={modalId}
-      title="Schedule a Quest claim"
+      title="Schedule a quest claim"
       openButton={
         <OpenButtonStyled
           className="open-claim-button"
@@ -260,8 +257,8 @@ export default function ScheduleClaimModal({
           disabled={!questTotalBounty}
         />
       }
-      onClose={closeModal}
-      isOpen={opened}
+      onModalClosed={onModalClosed}
+      isOpened={opened}
     >
       <Formik
         initialValues={
@@ -278,7 +275,6 @@ export default function ScheduleClaimModal({
         onSubmit={(values) => {
           onClaimSubmit(values);
         }}
-        validateOnChange
         validate={validate}
       >
         {({ values, handleSubmit, handleChange, handleBlur, errors, touched, setTouched }) => (
@@ -360,7 +356,7 @@ export default function ScheduleClaimModal({
                     compact
                     isMarkDown
                   />
-                  {questData.state === ENUM_QUEST_STATE.Archived ? (
+                  {questData.status === QuestStatus.Archived ? (
                     archivedWarning
                   ) : (
                     <>{willExpireBeforeClaim && expirationWarning}</>

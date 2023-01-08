@@ -8,6 +8,7 @@ export type PayloadModel = {
   actions: { to: string; value: number; data: string }[];
   allowFailuresMap?: string;
   proof: string;
+  challenger: string;
 };
 
 export type ConfigModel = {

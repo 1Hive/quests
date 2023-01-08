@@ -45,7 +45,9 @@
     "react/state-in-constructor": "off",
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "no-debugger": "warn",
-    "react/no-unknown-property": ["error", { "ignore": ["css"] }]
+    "react/no-unknown-property": ["error", { "ignore": ["css"] }],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error"
   },
   "settings": {
     "import/resolver": {

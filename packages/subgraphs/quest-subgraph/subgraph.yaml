@@ -8,11 +8,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: QuestFactory
-    network: goerli
+    network: xdai
     source:
-      address: "0x4DfE6C03132BD14D95b87803e232AcA352a715b4"
+      address: "0x5Be5286FEFE6a44f394b551B6AC9255D42e974fe"
       abi: QuestFactory
-      startBlock: 7543619
+      startBlock: 22777803
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -27,5 +27,28 @@ dataSources:
           handler: handleQuestCreated
         - event: DepositChanged(uint256,address,uint256)
           handler: handleDepositChanged
-      file: ./src/mapping.ts
-
+      file: ./src/mappings/quest-factory.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV2
+    network: xdai
+    source:
+      address: "0x2fc3f4A630cD6962A22033436Fd63D93B180c076"
+      abi: QuestFactory
+      startBlock: 25750107
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreatedV2
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.2.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address,uint256,address,uint32)
+          handler: handleQuestCreated
+        - event: CreateDepositChanged(uint256,address,uint256)
+          handler: handleCreateDepositChanged
+        - event: PlayDepositChanged(uint256,address,uint256)
+          handler: handlePlayDepositChanged
+      file: ./src/mappings/quest-factory.2.ts

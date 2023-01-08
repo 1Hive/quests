@@ -1,0 +1,35 @@
+- kind: ethereum/contract
+    name: {{name}}
+    network: {{network}}
+    source:
+      abi: Govern
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.1
+      language: wasm/assemblyscript
+      entities:
+        - Container
+        - ContainerEvent
+        - Role
+      abis:
+        - name: Govern
+          file: ./govern-core/abi/contracts/Govern.sol/Govern.json
+        - name: GovernQueue
+          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+      eventHandlers:
+        - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
+          handler: handleExecuted
+        - event: ETHDeposited(address,uint256)
+          handler: handleETHDeposited
+        - event: Deposited(indexed address,indexed address,uint256,string)
+          handler: handleDeposited
+        - event: Withdrawn(indexed address,indexed address,address,uint256,string)
+          handler: handleWithdrawn
+        - event: Frozen(indexed bytes4,indexed address)
+          handler: handleFrozen
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
+          handler: handleGranted
+        - event: Revoked(indexed bytes4,indexed address,indexed address)
+          handler: handleRevoked
+      file: ./src/Govern.ts

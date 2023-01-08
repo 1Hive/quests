@@ -7,12 +7,47 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: Govern
+    network: gnosis
+    source:
+      abi: Govern
+      startBlock: 22769097
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Container
+        - ContainerEvent
+        - Role
+      abis:
+        - name: Govern
+          file: ./govern-core/abi/contracts/Govern.sol/Govern.json
+        - name: GovernQueue
+          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+      eventHandlers:
+        - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
+          handler: handleExecuted
+        - event: ETHDeposited(address,uint256)
+          handler: handleETHDeposited
+        - event: Deposited(indexed address,indexed address,uint256,string)
+          handler: handleDeposited
+        - event: Withdrawn(indexed address,indexed address,address,uint256,string)
+          handler: handleWithdrawn
+        - event: Frozen(indexed bytes4,indexed address)
+          handler: handleFrozen
+        - event: Granted(indexed bytes4,indexed address,indexed address,address)
+          handler: handleGranted
+        - event: Revoked(indexed bytes4,indexed address,indexed address)
+          handler: handleRevoked
+      file: ./src/Govern.ts
+  - kind: ethereum/contract
     name: GovernQueue
-    network: goerli
+    network: gnosis
     source:
       abi: GovernQueue
-      address: "0x71aCe36baFFcEA97e934874B3F2f340C292d4f1E"
-      startBlock: 7543552
+      address: "0xd8D142f13E58dFEedaF96418C0B6843108d46B94"
+      startBlock: 22769097
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -50,37 +85,46 @@ dataSources:
           handler: handleRevoked
       file: ./src/GovernQueue.ts
   - kind: ethereum/contract
-    name: Govern
-    network: goerli
+    name: GovernQueueV2
+    network: gnosis
     source:
-      abi: Govern
-      startBlock: 7543552
+      abi: GovernQueue
+      address: "0x6D8189C979bBB6768395A78E2AB8A15133459600"
+      startBlock: 25719047
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - Collateral
+        - Config
         - Container
         - ContainerEvent
+        - Payload
         - Role
       abis:
-        - name: Govern
-          file: ./govern-core/abi/contracts/Govern.sol/Govern.json
         - name: GovernQueue
-          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueue.json
+          file: ./govern-core/abi/contracts/pipelines/GovernQueue.sol/GovernQueueV2.json
+        - name: ERC20
+          file: ./govern-contract-utils/abi/contracts/erc20/ERC20.sol/ERC20.json
       eventHandlers:
-        - event: Executed(indexed address,(address,uint256,bytes)[],bytes32,bytes32,bytes[])
-          handler: handleExecuted
-        - event: ETHDeposited(address,uint256)
-          handler: handleETHDeposited
-        - event: Deposited(indexed address,indexed address,uint256,string)
-          handler: handleDeposited
-        - event: Withdrawn(indexed address,indexed address,address,uint256,string)
-          handler: handleWithdrawn
+        - event: Configured(indexed bytes32,indexed address,(uint256,(address,uint256),(address,uint256),address,bytes,uint256))
+          handler: handleConfigured
         - event: Frozen(indexed bytes4,indexed address)
           handler: handleFrozen
         - event: Granted(indexed bytes4,indexed address,indexed address,address)
           handler: handleGranted
+        - event: Scheduled(indexed bytes32,(uint256,uint256,address,address,(address,uint256,bytes)[],bytes32,bytes,address))
+          handler: handleScheduled
+        - event: Executed(indexed bytes32,indexed address)
+          handler: handleExecuted
+        - event: Challenged(indexed bytes32,indexed address,bytes,uint256,(address,uint256))
+          handler: handleChallenged
+        - event: Vetoed(indexed bytes32,indexed address,bytes)
+          handler: handleVetoed
+        - event: Resolved(indexed bytes32,indexed address,bool)
+          handler: handleResolved
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
-      file: ./src/Govern.ts
+      file: ./src/GovernQueue.ts
+  

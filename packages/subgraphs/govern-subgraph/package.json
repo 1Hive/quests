@@ -1,27 +1,25 @@
 {
   "name": "@aragon/govern-subgraph",
   "version": "1.0.0-beta.12",
+  "type": "module",
   "scripts": {
     "ci": "yarn install --pure-lockfile --immutable --skip-builds",
-    "prepare-goerli": "node ./scripts/sync-with-last-deploy.js goerli",
-    "prepare-rinkeby": "node ./scripts/sync-with-last-deploy.js rinkeby",
-    "prepare-gnosis": "node ./scripts/sync-with-last-deploy.js xdai",
-    "manifest-goerli": "mustache manifest/data/goerli.json src/subgraph.template.yaml > subgraph.yaml",
-    "manifest-rinkeby": "mustache manifest/data/rinkeby.json src/subgraph.template.yaml > subgraph.yaml",
-    "manifest-gnosis": "mustache manifest/data/xdai.json src/subgraph.template.yaml > subgraph.yaml",
+    "prepare:goerli": "node ./scripts/sync-with-last-deploy.js goerli",
+    "prepare:gnosis": "node ./scripts/sync-with-last-deploy.js xdai",
+    "manifest:goerli": "node ./scripts/mustache goerli",
+    "manifest:gnosis": "node ./scripts/mustache gnosis",
     "build": "graph codegen && graph build",
-    "deploy-goerli": "node ./scripts/deploy.js corantin govern-goerli goerli",
-    "deploy-rinkeby": "node ./scripts/deploy.js corantin govern-1hive-rinkeby rinkeby",
-    "deploy-rinkeby-staging": "node ./scripts/deploy.js corantin govern-1hive-rinkeby-staging rinkeby",
-    "deploy-xdai": "node ./scripts/deploy.js corantin govern-1hive-xdai xdai",
-    "deploy-xdai-staging": "node ./scripts/deploy.js corantin govern-1hive-xdai-staging xdai",
-    "create-local": "graph create corantin/govern-1hive-local --node http://localhost:8020",
-    "deploy-local": "graph deploy corantin/govern-1hive-local --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020"
+    "deploy:goerli": "dotenv -- cross-var yarn manifest:goerli && graph deploy corantin/govern-goerli --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
+    "deploy:goerli-staging": "dotenv -- cross-var yarn manifest:goerli && graph deploy corantin/govern-goerli-staging --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
+    "deploy:gnosis": "dotenv -- cross-var yarn manifest:gnosis && graph deploy corantin/govern-1hive-xdai --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
+    "deploy:gnosis-staging": "dotenv -- cross-var yarn manifest:gnosis && graph deploy corantin/govern-1hive-gnosis-staging --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
+    "create:local": "graph create corantin/govern-1hive-local --node http://localhost:8020",
+    "deploy:local": "graph deploy corantin/govern-1hive-local --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.19.0",
     "@graphprotocol/graph-ts": "^0.19.0",
-    "mustache": "^4.0.1"
+    "mustache": "^4.2.0"
   },
   "dependencies": {
     "@aragon/govern-core": "^1.0.0-beta.12",
@@ -30,7 +28,9 @@
     "file-type": "^16.5.0",
     "cross-var": "^1.1.0",
     "dotenv": "^10.0.0",
-    "dotenv-cli": "^4.0.0"
+    "dotenv-cli": "^4.0.0",
+    "inquirer": "^8.2.4",
+    "js-yaml": "^4.1.0"
   },
   "gitHead": "aabbf6bd2dac11872ba9bb1f1dc8fffb6044aa7c"
 }

@@ -15,17 +15,18 @@ import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
 import deployQuestFactory from "./deploy/deploy-quest_factory";
+import deployQuest from "./deploy/deploy-quest";
 import deployGovernQueue, {
   generateQueueConfig,
 } from "./scripts/deploy-govern_queue";
 import deployGovern from "./scripts/deploy-govern";
-import governRinkeby from "./deployments/rinkeby/Govern.json";
 import governGnosis from "./deployments/xdai/Govern.json";
 import governGoerli from "./deployments/goerli/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
+import GovernAbi from "./abi/contracts/Externals/Govern.json";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
-import CelesteMockRinkeby from "./deployments/rinkeby/OwnableCeleste.json";
+import CelesteMockGoerli from "./deployments/goerli/OwnableCeleste.json";
 
 dotenvConfig({
   path: resolve(
@@ -57,7 +58,8 @@ const mainnetGwei = 21;
 
 function mnemonic() {
   try {
-    if (!process.env.MNEMONIC) throw new Error("No mnemonic detected");
+    if (!process.env.MNEMONIC || !process.env.PRIVATE_KEY)
+      throw new Error("No mnemonic detected");
     return process.env.MNEMONIC;
   } catch (e) {
     if (defaultNetwork !== "localhost") {
@@ -71,8 +73,8 @@ function mnemonic() {
 }
 
 function getAccounts(): HardhatNetworkAccountsUserConfig {
-  if (process.env.ETH_KEY) {
-    return [process.env.ETH_KEY as any];
+  if (process.env.PRIVATE_KEY) {
+    return [process.env.PRIVATE_KEY as any];
   }
 
   return {
@@ -112,28 +114,20 @@ const hardhatConfig: HardhatUserConfig = {
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        // gasPrice: mainnetGwei * 1000000000, TODO : Consider uncoment if using mainnet
-        mnemonic: mnemonic(), // Need to set your private key as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     ropsten: {
       url: "https://ropsten.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     goerli: {
       chainId: 5,
       url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
-      accounts: {
-        mnemonic: mnemonic(), // Need to set your privateKey/mnemonicPhrase as MNEMONIC=<PRIVATE_KEY>
-      },
+      accounts: getAccounts(),
     },
     xdai: {
       chainId: 100,
       url: "https://rpc.gnosischain.com/",
-      gasPrice: 1000000000,
       accounts: getAccounts(),
     },
     matic: {
@@ -242,27 +236,24 @@ const hardhatConfig: HardhatUserConfig = {
     solcVersion: "0.7.6",
   },
   etherscan: {
-    apiKey: "MXZSHPHKD1J7MGGSW9124C61G3PJZQVK2W",
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   namedAccounts: {
     deployer: {
       default: 0,
       100: process.env.DEPLOYER_ADDRESS,
-      rinkeby: process.env.DEPLOYER_ADDRESS,
       goerli: process.env.DEPLOYER_ADDRESS,
     },
     govern: {
       default: 1,
       xdai: governGnosis.address,
-      rinkeby: governRinkeby.address, // Govern address on rinkeby
-      goerli: governGoerli.address, // Govern address on rinkeby
+      goerli: governGoerli.address, // Govern address on Goerli
     },
     owner: {
       default: 1,
       xdai: defaultConfig.RootOwner.xdai,
-      rinkeby: defaultConfig.RootOwner.rinkeby,
       goerli: defaultConfig.RootOwner.goerli,
-    }, // Rinkeby Gnosis Safe address
+    }, // Goerli Gnosis Safe address
   },
 };
 
@@ -642,65 +633,6 @@ task("generateGovernQueueConfig:gnosis")
     console.log("Config tupple : ", JSON.stringify(tupple));
   });
 
-task("generateGovernQueueConfig:rinkeby")
-  .setDescription("Generate GovernQueue config tupple")
-  .addOptionalParam(
-    "executionDelay",
-    "Execution delay for claims in seconds (default is 7 days)",
-    defaultConfig.ClaimDelay.rinkeby,
-    types.int
-  )
-  .addOptionalParam(
-    "scheduleDepositToken",
-    "Address of the schedule deposit token (default is HNY)",
-    defaultConfig.ScheduleDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "scheduleDepositAmount",
-    "Amount of the schedule deposit token",
-    defaultConfig.ScheduleDeposit.rinkeby.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "challengeDepositToken",
-    "Address of the challenge deposit token (default is HNY)",
-    defaultConfig.ChallengeDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "challengeDepositAmount",
-    "Amount of the challenge deposit token",
-    defaultConfig.ChallengeDeposit.rinkeby.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "resolver",
-    "Address of Celeste(IArbitrator)",
-    CelesteMockRinkeby.address
-  )
-  .addOptionalParam(
-    "rules",
-    "Rules of how DAO should be managed",
-    "0x0000000000000000000000000000000000000000"
-  )
-  .addOptionalParam(
-    "maxCalldataSize",
-    "Max calldatasize for the schedule",
-    100000,
-    types.int
-  )
-  .setAction(async (taskArgs) => {
-    const config = generateQueueConfig(taskArgs);
-    const tupple = [
-      config.executionDelay,
-      [config.scheduleDeposit.token, config.scheduleDeposit.amount],
-      [config.challengeDeposit.token, config.challengeDeposit.amount],
-      config.resolver,
-      config.rules,
-      config.maxCalldataSize,
-    ];
-    console.log("Config tupple : ", JSON.stringify(tupple));
-  });
-
 task("generateGovernQueueConfig:goerli")
   .setDescription("Generate GovernQueue config tupple")
   .addOptionalParam(
@@ -850,49 +782,6 @@ task("newGovernQueue:goerli")
   )
   .setAction(deployGovernQueue);
 
-task("newGovernQueue:rinkeby")
-  .setDescription("Deploy a new GovernQueue and export it to front end")
-  .addParam("aclRoot", "Address that will be granted Root ACL role")
-  .addOptionalParam(
-    "governQueueFactoryAddress",
-    "Address of the govern queue factory",
-    defaultConfig.GovernQueueFactory.rinkeby
-  )
-  .addOptionalParam(
-    "resolver",
-    "Address of Celeste(IArbitrator)",
-    CelesteMockRinkeby.address
-  )
-  .addOptionalParam(
-    "executionDelay",
-    "Execution delay for claims in seconds (default is 5 min)",
-    defaultConfig.ClaimDelay.rinkeby,
-    types.int
-  )
-  .addOptionalParam(
-    "scheduleDepositToken",
-    "Address of the schedule deposit token (default is HNYT)",
-    defaultConfig.ScheduleDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "scheduleDepositAmount",
-    "Amount of the schedule deposit token",
-    defaultConfig.ScheduleDeposit.rinkeby.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "challengeDepositToken",
-    "Address of the challenge deposit token (default is HNYT)",
-    defaultConfig.ChallengeDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "challengeDepositAmount",
-    "Amount of the challenge deposit token",
-    defaultConfig.ChallengeDeposit.rinkeby.amount,
-    types.float
-  )
-  .setAction(deployGovernQueue);
-
 task("newGovern:gnosis")
   .setDescription("Deploy a new Govern and export it to front end")
   .addParam(
@@ -903,19 +792,6 @@ task("newGovern:gnosis")
     "governFactoryAddress",
     "Address of the govern factory",
     defaultConfig.GovernFactory.xdai
-  )
-  .setAction(deployGovern);
-
-task("newGovern:rinkeby")
-  .setDescription("Deploy a new Govern and export it to front end")
-  .addParam(
-    "initialExecutorAddress",
-    "Address of the initial executor (should usually be the GovernQueue)"
-  )
-  .addOptionalParam(
-    "governFactoryAddress",
-    "Address of the govern factory",
-    defaultConfig.GovernFactory.rinkeby
   )
   .setAction(deployGovern);
 
@@ -954,16 +830,23 @@ task("newQuestFactory:gnosis")
     defaultConfig.CreateQuestDeposit.xdai.amount,
     types.float
   )
+  .addOptionalParam(
+    "playDepositToken",
+    "Address of the play quest deposit (default is HNY)",
+    defaultConfig.PlayQuestDeposit.xdai.token
+  )
+  .addOptionalParam(
+    "playDepositAmount",
+    "Amount of the quest play deposit token",
+    defaultConfig.PlayQuestDeposit.xdai.amount,
+    types.float
+  )
   .setAction(async (args, hre) => {
     const deployResult = await deployQuestFactory(hre, args);
     console.log(
       "Deployed quest factory (" + hre.network.name + "):",
       deployResult.address
     );
-    exportContractResult(hre.network, "QuestFactory", {
-      address: deployResult.address,
-      abi: deployResult.abi,
-    });
   });
 
 task("newQuestFactory:goerli")
@@ -989,53 +872,33 @@ task("newQuestFactory:goerli")
     defaultConfig.CreateQuestDeposit.goerli.amount,
     types.float
   )
-  .setAction(async (args, hre) => {
-    console.log("Deploying QuestFactory...");
-    const deployResult = await deployQuestFactory(hre, args);
-
-    exportContractResult(hre.network, "QuestFactory", {
-      address: deployResult.address,
-      abi: deployResult.abi,
-    });
-    console.log(
-      "Deployed QuestFactory (" + hre.network.name + "):",
-      deployResult.address
-    );
-  });
-
-task("newQuestFactory:rinkeby")
-  .setDescription("Deploy a new QuestFactory and export it to front end")
   .addOptionalParam(
-    "governAddress",
+    "playDepositToken",
+    "Address of the play quest deposit",
+    defaultConfig.PlayQuestDeposit.goerli.token
+  )
+  .addOptionalParam(
+    "playDepositAmount",
     "Address of the govern",
-    governRinkeby.address
-  )
-  .addOptionalParam(
-    "initialOwner",
-    "Initial owner of the QuestFactory (will be able to change deposits)",
-    defaultConfig.RootOwner.rinkeby
-  )
-  .addOptionalParam(
-    "createDepositToken",
-    "Address of the create quest deposit",
-    defaultConfig.CreateQuestDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "createDepositAmount",
-    "Address of the govern",
-    defaultConfig.CreateQuestDeposit.rinkeby.amount,
+    defaultConfig.PlayQuestDeposit.goerli.amount,
     types.float
   )
   .setAction(async (args, hre) => {
     console.log("Deploying QuestFactory...");
     const deployResult = await deployQuestFactory(hre, args);
 
-    exportContractResult(hre.network, "QuestFactory", {
-      address: deployResult.address,
-      abi: deployResult.abi,
-    });
     console.log(
       "Deployed QuestFactory (" + hre.network.name + "):",
+      deployResult.address
+    );
+  });
+
+task("newQuest")
+  .setDescription("Deploy a new Quest and export it to front end")
+  .setAction(async (hre) => {
+    const deployResult = await deployQuest(hre);
+    console.log(
+      "Deployed quest (" + hre.network.name + "):",
       deployResult.address
     );
   });
@@ -1080,6 +943,9 @@ async function deployAll(
     createDepositToken: args.createDepositToken,
     createDepositAmount: args.createDepositAmount,
   });
+
+  // Will deploy a dummy quest just for bytecode matching when contract verification
+  await run(`newQuest`);
 }
 
 task("deployAll:gnosis")
@@ -1169,7 +1035,7 @@ task("deployAll:goerli")
   .addOptionalParam(
     "resolver",
     "Address of Celeste(IArbitrator)",
-    CelesteMockRinkeby.address
+    CelesteMockGoerli.address
   )
   .addOptionalParam(
     "executionDelay",
@@ -1212,104 +1078,57 @@ task("deployAll:goerli")
   )
   .setAction(deployAll);
 
-task("deployAll:rinkeby")
-  .setDescription(
-    "Deploy all the needed Govern and Quest contracts and export them to frontend"
-  )
-  .addOptionalParam(
-    "ownerAddress",
-    "Address that will be granted Root ACL role and owner for QuestFactory",
-    defaultConfig.RootOwner.rinkeby
-  )
-  .addOptionalParam(
-    "governQueueFactoryAddress",
-    "Address of the govern queue factory",
-    defaultConfig.GovernQueueFactory.rinkeby
-  )
-  .addOptionalParam(
-    "governFactoryAddress",
-    "Address of the govern factory",
-    defaultConfig.GovernFactory.rinkeby
-  )
-  .addOptionalParam(
-    "resolver",
-    "Address of Celeste(IArbitrator)",
-    CelesteMockRinkeby.address
-  )
-  .addOptionalParam(
-    "executionDelay",
-    "Execution delay for claims in seconds (default is 5 min)",
-    defaultConfig.ClaimDelay.rinkeby,
-    types.int
-  )
-  .addOptionalParam(
-    "scheduleDepositToken",
-    "Address of the schedule deposit token",
-    defaultConfig.ScheduleDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "scheduleDepositAmount",
-    "Amount of the schedule deposit token",
-    defaultConfig.ScheduleDeposit.rinkeby.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "challengeDepositToken",
-    "Address of the challenge deposit token",
-    defaultConfig.ChallengeDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "challengeDepositAmount",
-    "Amount of the challenge deposit token",
-    defaultConfig.ChallengeDeposit.rinkeby.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "createQuestDepositToken",
-    "Address of the create quest deposit token",
-    defaultConfig.CreateQuestDeposit.rinkeby.token
-  )
-  .addOptionalParam(
-    "createQuestDepositAmount",
-    "Amount of the create quest deposit token",
-    defaultConfig.CreateQuestDeposit.rinkeby.amount,
-    types.float
-  )
-  .setAction(deployAll);
-
-task("sig")
-  .addOptionalParam(
-    "func",
-    "function signature without variables names",
-    "schedule(ERC3000Data.Container)"
-  )
-  .setAction(async (args: { func: string }, _b) => {
-    const { func } = args;
-    const keccak = utils
-      .keccak256(utils.toUtf8Bytes(func))
-      .substring(0, (4 + 1) * 2);
-    console.log(keccak);
-  });
-
-task("sigAbi").setAction(async (_args, { web3 }) => {
-  const aclFunctions = [
-    "schedule",
-    "resolve",
-    "challenge",
-    "execute",
-    "veto",
-    "configure",
-  ];
-  for (const obj of GovernQueueAbi) {
-    if (obj.type !== "function" || !aclFunctions.includes(obj.name)) {
-      continue;
+task("grantGovernQueue").setAction(
+  async (_args, { web3, getNamedAccounts }) => {
+    const { owner } = await getNamedAccounts();
+    const publicQueueFonctions = [
+      "schedule",
+      "resolve",
+      "challenge",
+      "execute",
+    ];
+    const ownerOnlyQueueFonctions = ["veto", "configure"];
+    const queueFonctions = publicQueueFonctions.concat(ownerOnlyQueueFonctions);
+    const aclGovernFunctions = [
+      "withdraw",
+      "exec",
+      "registerStandardAndCallback",
+      "setSignatureValidator",
+    ];
+    console.log("GovernQueue roles:");
+    const publicGrant = "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF";
+    let roles = [];
+    for (const obj of GovernQueueAbi) {
+      if (obj.type !== "function" || !queueFonctions.includes(obj.name)) {
+        continue;
+      }
+      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      roles.push({
+        signature,
+        address: ownerOnlyQueueFonctions.includes(obj.name)
+          ? owner
+          : publicGrant,
+      });
+      console.log(`${obj.name}:`, signature);
     }
-    let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
-    console.log(`${obj.name}:`, signature);
+    console.log("Bulk grant:");
+    console.log(
+      `[${roles.map((x) => `[0,"${x.signature}","${x.address}"]`).join(",")}]`
+    );
+    console.log("Govern roles:");
+    for (const obj of GovernAbi) {
+      if (obj.type !== "function" || !aclGovernFunctions.includes(obj.name)) {
+        continue;
+      }
+      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      roles.push({
+        signature,
+        address: owner,
+      });
+      console.log(`${obj.name}:`, signature);
+    }
   }
-
-  console.log("Grant all user", "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF");
-});
+);
 
 task("deployCeleste:goerli")
   .setDescription("Deploy a mock version of Celeste on goerli")
@@ -1360,54 +1179,8 @@ task("deployCeleste:goerli")
       } catch (error) {
         console.error("Failed when verifying OwnableCeleste contract", error);
       }
-    }
-  );
-task("deployCeleste:rinkeby")
-  .setDescription("Deploy a mock version of Celeste on rinkeby")
-  .addOptionalParam(
-    "feeToken",
-    "Address of the challenge fee token",
-    defaultConfig.ChallengeFee.rinkeby.token
-  )
-  .addOptionalParam(
-    "feeAmount",
-    "Amount of the challenge fee",
-    defaultConfig.ChallengeFee.rinkeby.amount,
-    types.float
-  )
-  .setAction(
-    async (args, { deployments, ethers, getNamedAccounts, network, run }) => {
-      const { deployer, owner } = await getNamedAccounts();
-      const constructorArguments = [
-        args.feeToken,
-        ethers.utils.parseEther(args.feeAmount.toString()),
-      ];
-      const result = await deployments.deploy("OwnableCeleste", {
-        from: deployer,
-        args: constructorArguments,
-        gasLimit: 10000000,
-      });
-      console.log("Deployed Celeste (" + network.name + "):", result.address);
-      const contract = await ethers.getContractAt(result.abi, result.address);
-      await contract.setOwner(owner, { from: deployer, gasLimit: 500000 });
-      console.log("Ownership transfered to: ", owner);
-      exportContractResult(network, "Celeste", result);
 
-      try {
-        console.log("Verifying OwnableCeleste...");
-        await new Promise((res, rej) => {
-          setTimeout(
-            () =>
-              run("verify:verify", {
-                address: result.address,
-                constructorArguments,
-              }).then,
-            2000
-          ); // Wait for contract to be deployed
-        });
-      } catch (error) {
-        console.error("Failed when verifying OwnableCeleste contract", error);
-      }
+      exportContractResult(network, "Celeste", result);
     }
   );
 

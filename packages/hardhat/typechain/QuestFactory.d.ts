@@ -23,12 +23,14 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface QuestFactoryInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
-    "c_0x5729a62b(bytes32)": FunctionFragment;
-    "createQuest(string,bytes,address,uint256,address)": FunctionFragment;
-    "deposit()": FunctionFragment;
+    "createDeposit()": FunctionFragment;
+    "createQuest(string,bytes,address,uint256,address,uint32)": FunctionFragment;
     "owner()": FunctionFragment;
+    "playDeposit()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setDeposit(address,uint256)": FunctionFragment;
+    "setAragonGovernAddress(address)": FunctionFragment;
+    "setCreateDeposit(address,uint256)": FunctionFragment;
+    "setPlayDeposit(address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
@@ -37,21 +39,32 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "c_0x5729a62b",
-    values: [BytesLike]
+    functionFragment: "createDeposit",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "createQuest",
-    values: [string, BytesLike, string, BigNumberish, string]
+    values: [string, BytesLike, string, BigNumberish, string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "deposit", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "playDeposit",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setDeposit",
+    functionFragment: "setAragonGovernAddress",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setCreateDeposit",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPlayDeposit",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -64,33 +77,49 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "c_0x5729a62b",
+    functionFragment: "createDeposit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "createQuest",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "playDeposit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setDeposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setAragonGovernAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setCreateDeposit",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setPlayDeposit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
 
   events: {
-    "DepositChanged(uint256,address,uint256)": EventFragment;
+    "CreateDepositChanged(uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
-    "QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address)": EventFragment;
+    "PlayDepositChanged(uint256,address,uint256)": EventFragment;
+    "QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address,uint256,address,uint32)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "DepositChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CreateDepositChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PlayDepositChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "QuestCreated"): EventFragment;
 }
 
@@ -112,15 +141,13 @@ export class QuestFactory extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
 
-    c_0x5729a62b(
-      c__0x5729a62b: BytesLike,
+    createDeposit(
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
-    "c_0x5729a62b(bytes32)"(
-      c__0x5729a62b: BytesLike,
+    "createDeposit()"(
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
     createQuest(
       _questTitle: string,
@@ -128,41 +155,65 @@ export class QuestFactory extends Contract {
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createQuest(string,bytes,address,uint256,address)"(
+    "createQuest(string,bytes,address,uint256,address,uint32)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
-
-    deposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
-
-    "deposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
+    playDeposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "playDeposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
     renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-    setDeposit(
+    setAragonGovernAddress(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setAragonGovernAddress(address)"(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    setCreateDeposit(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "setDeposit(address,uint256)"(
+    "setCreateDeposit(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    setPlayDeposit(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setPlayDeposit(address,uint256)"(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides
@@ -183,15 +234,13 @@ export class QuestFactory extends Contract {
 
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  c_0x5729a62b(
-    c__0x5729a62b: BytesLike,
+  createDeposit(
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
-  "c_0x5729a62b(bytes32)"(
-    c__0x5729a62b: BytesLike,
+  "createDeposit()"(
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
   createQuest(
     _questTitle: string,
@@ -199,41 +248,65 @@ export class QuestFactory extends Contract {
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
+    _maxPlayers: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createQuest(string,bytes,address,uint256,address)"(
+  "createQuest(string,bytes,address,uint256,address,uint32)"(
     _questTitle: string,
     _questDetailsRef: BytesLike,
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
+    _maxPlayers: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
-
-  deposit(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
-
-  "deposit()"(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
+  playDeposit(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+  "playDeposit()"(
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
   renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
   "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
 
-  setDeposit(
+  setAragonGovernAddress(
+    _aragonGovernAddress: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setAragonGovernAddress(address)"(
+    _aragonGovernAddress: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  setCreateDeposit(
     token: string,
     amount: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "setDeposit(address,uint256)"(
+  "setCreateDeposit(address,uint256)"(
+    token: string,
+    amount: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  setPlayDeposit(
+    token: string,
+    amount: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setPlayDeposit(address,uint256)"(
     token: string,
     amount: BigNumberish,
     overrides?: Overrides
@@ -254,15 +327,13 @@ export class QuestFactory extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-    c_0x5729a62b(
-      c__0x5729a62b: BytesLike,
+    createDeposit(
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
-    "c_0x5729a62b(bytes32)"(
-      c__0x5729a62b: BytesLike,
+    "createDeposit()"(
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
     createQuest(
       _questTitle: string,
@@ -270,41 +341,65 @@ export class QuestFactory extends Contract {
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createQuest(string,bytes,address,uint256,address)"(
+    "createQuest(string,bytes,address,uint256,address,uint32)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    deposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
-
-    "deposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
+    playDeposit(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
+    "playDeposit()"(
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
 
-    setDeposit(
+    setAragonGovernAddress(
+      _aragonGovernAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setAragonGovernAddress(address)"(
+      _aragonGovernAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setCreateDeposit(
       token: string,
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setDeposit(address,uint256)"(
+    "setCreateDeposit(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setPlayDeposit(
+      token: string,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setPlayDeposit(address,uint256)"(
       token: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -322,12 +417,18 @@ export class QuestFactory extends Contract {
   };
 
   filters: {
-    DepositChanged(timestamp: null, token: null, amount: null): EventFilter;
+    CreateDepositChanged(
+      timestamp: null,
+      token: null,
+      amount: null
+    ): EventFilter;
 
     OwnershipTransferred(
       previousOwner: string | null,
       newOwner: string | null
     ): EventFilter;
+
+    PlayDepositChanged(timestamp: null, token: null, amount: null): EventFilter;
 
     QuestCreated(
       questAddress: null,
@@ -336,9 +437,12 @@ export class QuestFactory extends Contract {
       rewardTokenAddress: null,
       expireTime: null,
       fundsRecoveryAddress: null,
-      depositToken: null,
-      depositAmount: null,
-      creator: null
+      createDepositToken: null,
+      createDepositAmount: null,
+      playDepositToken: null,
+      playDepositAmount: null,
+      creator: null,
+      maxPlayers: null
     ): EventFilter;
   };
 
@@ -347,15 +451,9 @@ export class QuestFactory extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    c_0x5729a62b(
-      c__0x5729a62b: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    createDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "c_0x5729a62b(bytes32)"(
-      c__0x5729a62b: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     createQuest(
       _questTitle: string,
@@ -363,37 +461,61 @@ export class QuestFactory extends Contract {
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createQuest(string,bytes,address,uint256,address)"(
+    "createQuest(string,bytes,address,uint256,address,uint32)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
-
-    deposit(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "deposit()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    playDeposit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "playDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     renounceOwnership(overrides?: Overrides): Promise<BigNumber>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<BigNumber>;
 
-    setDeposit(
+    setAragonGovernAddress(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setAragonGovernAddress(address)"(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    setCreateDeposit(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "setDeposit(address,uint256)"(
+    "setCreateDeposit(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    setPlayDeposit(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setPlayDeposit(address,uint256)"(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides
@@ -419,15 +541,9 @@ export class QuestFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    c_0x5729a62b(
-      c__0x5729a62b: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    createDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "c_0x5729a62b(bytes32)"(
-      c__0x5729a62b: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     createQuest(
       _questTitle: string,
@@ -435,37 +551,61 @@ export class QuestFactory extends Contract {
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createQuest(string,bytes,address,uint256,address)"(
+    "createQuest(string,bytes,address,uint256,address,uint32)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
+      _maxPlayers: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
-
-    deposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "deposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    playDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "playDeposit()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     renounceOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    setDeposit(
+    setAragonGovernAddress(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setAragonGovernAddress(address)"(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    setCreateDeposit(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "setDeposit(address,uint256)"(
+    "setCreateDeposit(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    setPlayDeposit(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setPlayDeposit(address,uint256)"(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides

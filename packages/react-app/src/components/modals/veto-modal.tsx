@@ -5,7 +5,6 @@ import { useState, useRef, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, FormikErrors } from 'formik';
 import { ClaimModel } from 'src/models/claim.model';
-import { ENUM, ENUM_TRANSACTION_STATUS } from 'src/constants';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { GUpx } from 'src/utils/style.util';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
@@ -14,6 +13,9 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { FaEdit, FaEye } from 'react-icons/fa';
 import { VetoModel } from 'src/models/veto.model';
 import { useWallet } from 'src/contexts/wallet.context';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { QuestModel } from 'src/models/quest.model';
+import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import TextFieldInput from '../field-input/text-field-input';
@@ -56,13 +58,19 @@ const ButtonLinkStyled = styled(Button)`
 
 type Props = {
   claim: ClaimModel;
+  questData: QuestModel;
   vetoData?: VetoModel;
   onClose?: ModalCallback;
 };
 
 const emptyVetoData = {} as VetoModel;
 
-export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = noop }: Props) {
+export default function VetoModal({
+  claim,
+  questData,
+  vetoData = emptyVetoData,
+  onClose = noop,
+}: Props) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -79,7 +87,7 @@ export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = n
     [],
   );
 
-  const closeModal = (success: boolean) => {
+  const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
@@ -88,17 +96,17 @@ export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = n
     if (isFormValid) {
       try {
         if (!claim.container) throw new Error('Container is not defined');
-        let txPayload = {
+        let txPayload: TransactionModel = {
           modalId,
-          estimatedDuration: ENUM.ENUM_ESTIMATED_TX_TIME_MS.ClaimVetoing,
           message: `Vetoing Quest (1/1)`,
-          status: ENUM_TRANSACTION_STATUS.WaitingForSignature,
-          type: 'ClaimVeto',
+          status: TransactionStatus.WaitingForSignature,
+          type: TransactionType.ClaimVeto,
           args: { questAddress: claim.questAddress, containerId: claim.container.id },
-        } as TransactionModel;
+        };
         setTransaction(txPayload);
         const vetoTxReceipt = await QuestService.vetoQuestClaim(
           walletAddress,
+          questData,
           {
             reason: values.reason!,
           },
@@ -107,15 +115,13 @@ export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = n
             txPayload = { ...txPayload, hash: txHash };
             setTransaction({
               ...txPayload,
-              status: ENUM_TRANSACTION_STATUS.Pending,
+              status: TransactionStatus.Pending,
             });
           },
         );
         setTransaction({
           ...txPayload,
-          status: vetoTxReceipt?.status
-            ? ENUM_TRANSACTION_STATUS.Confirmed
-            : ENUM_TRANSACTION_STATUS.Failed,
+          status: vetoTxReceipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
         });
         if (!vetoTxReceipt?.status) throw new Error('Failed to veto the quest claim');
         if (isMountedRef.current) {
@@ -127,7 +133,7 @@ export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = n
             oldTx && {
               ...oldTx,
               message: computeTransactionErrorMessage(e),
-              status: ENUM_TRANSACTION_STATUS.Failed,
+              status: TransactionStatus.Failed,
             },
         );
         toast(computeTransactionErrorMessage(e));
@@ -171,8 +177,8 @@ export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = n
           className="m-8"
         />,
       ]}
-      onClose={closeModal}
-      isOpen={opened}
+      onModalClosed={onModalClosed}
+      isOpened={opened}
     >
       <Formik
         initialValues={{ reason: vetoDataState.reason ?? '' } as any}
@@ -184,7 +190,6 @@ export default function VetoModal({ claim, vetoData = emptyVetoData, onClose = n
             });
           }
         }}
-        validateOnChange
         validate={validate}
       >
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (

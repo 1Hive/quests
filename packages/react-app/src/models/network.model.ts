@@ -9,7 +9,6 @@ export type NetworkModel = {
   governSubgraph: string;
   tokenPairSubgraph: string;
   questFactoryAddress: string;
-  governQueueAddress: string;
   celesteAddress: string;
   managerAddress?: string;
   rpcUri: string;
@@ -17,4 +16,9 @@ export type NetworkModel = {
   isTestNetwork: boolean;
   stableTokens: TokenModel[];
   isDeprecated?: boolean;
+  blackListedTokens: string[];
+};
+
+export type StagingNetworkModel = Partial<NetworkModel> & {
+  stagingOf: string;
 };
