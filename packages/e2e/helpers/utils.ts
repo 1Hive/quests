@@ -73,7 +73,7 @@ export async function sleep(timeout: number) {
 
 export async function executeTransaction() {
   await page.waitForSelector('.TX_WAITING_FOR_SIGNATURE');
-  let timeout = 5000; // 5 seconds
+  let timeout = 10000; // 5 seconds
   await sleep(timeout); // Wait for gas suggestion to be fetched
   try {
     await metamask.confirmTransaction();
