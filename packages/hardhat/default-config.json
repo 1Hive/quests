@@ -54,18 +54,15 @@
     }
   },
   "RootOwner": {
-    "rinkeby": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
     "xdai": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
     "goerli": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0"
   },
   "ClaimDelay": {
-    "rinkeby": 300,
     "xdai": 604800,
     "goerli": 300
   },
   "CelesteResolver": {
     "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
-    "rinkeby": "0xeec9bf3ff552d8ff43954669601f2f483ea45116",
-    "goerli": "0x15EA6E0Ab085B8d7D899672F10F213d53cE02150"
+    "goerli": "0xCDD144eac3dD79667a1cAADFDc4Edaa75D0Eb81f"
   }
 }
