@@ -20,7 +20,7 @@
   "PlayQuestDeposit": {
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 2
+      "amount": 0.5
     },
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
@@ -30,7 +30,7 @@
   "ScheduleDeposit": {
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 2
+      "amount": 0.5
     },
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
@@ -40,7 +40,7 @@
   "ChallengeDeposit": {
     "xdai": {
       "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 1
+      "amount": 0.3
     },
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
