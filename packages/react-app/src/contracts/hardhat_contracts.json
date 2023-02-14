@@ -4060,7 +4060,6 @@
           "address": "0xb790b3198f5e659a4f931de0cb09273f86f7c324",
           "abi": [
             {
-<<<<<<< HEAD
               "constant": true,
               "inputs": [],
               "name": "getCurrentTermId",
@@ -4070,8 +4069,6 @@
               "type": "function"
             },
             {
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "constant": false,
               "inputs": [{ "name": "_owner", "type": "address" }],
               "name": "setOwner",
@@ -4081,7 +4078,6 @@
               "type": "function"
             },
             {
-<<<<<<< HEAD
               "constant": true,
               "inputs": [],
               "name": "getVoting",
@@ -4091,8 +4087,6 @@
               "type": "function"
             },
             {
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "constant": false,
               "inputs": [
                 { "name": "_disputeId", "type": "uint256" },
@@ -4105,7 +4099,6 @@
               "type": "function"
             },
             {
-<<<<<<< HEAD
               "constant": true,
               "inputs": [],
               "name": "getTermDuration",
@@ -4151,8 +4144,6 @@
               "type": "function"
             },
             {
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "constant": false,
               "inputs": [{ "name": "_newFeesUpdater", "type": "address" }],
               "name": "changeFeesUpdater",
@@ -4218,7 +4209,6 @@
               "type": "function"
             },
             {
-<<<<<<< HEAD
               "constant": true,
               "inputs": [],
               "name": "getBrightIdRegister",
@@ -4228,8 +4218,6 @@
               "type": "function"
             },
             {
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "constant": false,
               "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "draft",
@@ -4252,7 +4240,6 @@
               "type": "function"
             },
             {
-<<<<<<< HEAD
               "constant": true,
               "inputs": [{ "name": "_id", "type": "bytes32" }],
               "name": "getModule",
@@ -4262,8 +4249,6 @@
               "type": "function"
             },
             {
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "constant": false,
               "inputs": [],
               "name": "ejectModulesGovernor",
@@ -4291,7 +4276,6 @@
               "type": "function"
             },
             {
-<<<<<<< HEAD
               "constant": true,
               "inputs": [],
               "name": "getJurorsRegistry",
@@ -4310,8 +4294,6 @@
               "type": "function"
             },
             {
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "constant": false,
               "inputs": [{ "name": "_maxRequestedTransitions", "type": "uint64" }],
               "name": "heartbeat",
@@ -4322,7 +4304,6 @@
             },
             {
               "constant": false,
-<<<<<<< HEAD
               "inputs": [{ "name": "_termDuration", "type": "uint64" }],
               "name": "setTermDuration",
               "outputs": [],
@@ -4341,8 +4322,6 @@
             },
             {
               "constant": false,
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "inputs": [{ "name": "_disputeId", "type": "uint256" }],
               "name": "computeRuling",
               "outputs": [
@@ -4427,7 +4406,6 @@
             },
             {
               "constant": true,
-<<<<<<< HEAD
               "inputs": [{ "name": "_termId", "type": "uint64" }],
               "name": "getConfig",
               "outputs": [
@@ -4445,8 +4423,6 @@
             },
             {
               "constant": true,
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "inputs": [],
               "name": "currentId",
               "outputs": [{ "name": "", "type": "uint256" }],
@@ -4464,7 +4440,6 @@
               "type": "function"
             },
             {
-<<<<<<< HEAD
               "constant": true,
               "inputs": [{ "name": "_termId", "type": "uint64" }],
               "name": "getTerm",
@@ -4479,8 +4454,6 @@
               "type": "function"
             },
             {
-=======
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               "inputs": [
                 { "name": "_feeToken", "type": "address" },
                 { "name": "_feeAmount", "type": "uint256" }
@@ -4621,7 +4594,6 @@
             {
               "anonymous": false,
               "inputs": [
-<<<<<<< HEAD
                 {
                   "indexed": false,
                   "name": "previousMaxJurorsPerDraftBatch",
@@ -4632,10 +4604,6 @@
                   "name": "currentMaxJurorsPerDraftBatch",
                   "type": "uint64"
                 }
-=======
-                { "indexed": false, "name": "previousMaxJurorsPerDraftBatch", "type": "uint64" },
-                { "indexed": false, "name": "currentMaxJurorsPerDraftBatch", "type": "uint64" }
->>>>>>> 3a094be12fb8e6c15bcb8bb175b07c41428fe26d
               ],
               "name": "MaxJurorsPerDraftBatchChanged",
               "type": "event"
