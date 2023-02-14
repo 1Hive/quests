@@ -778,9 +778,7 @@ export async function scheduleQuestClaim(
   if (!governQueueContract) return null;
   const container = await generateScheduleContainer(walletAddress, claimData, questData);
   Logger.debug('Scheduling quest claim...', { container });
-  const tx = (await governQueueContract.schedule(container, {
-    gasLimit: 1000000,
-  })) as ContractTransaction;
+  const tx = (await governQueueContract.schedule(container)) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
 
