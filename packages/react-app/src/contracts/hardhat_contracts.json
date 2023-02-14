@@ -4058,7 +4058,446 @@
         ],
         "Celeste": {
           "address": "0xb790b3198f5e659a4f931de0cb09273f86f7c324",
-          "abi": [{"constant":false,"inputs":[{"name":"_owner","type":"address"}],"name":"setOwner","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_disputeId","type":"uint256"},{"name":"_state","type":"uint8"}],"name":"decideDispute","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newFeesUpdater","type":"address"}],"name":"changeFeesUpdater","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_id","type":"bytes32"},{"name":"_addr","type":"address"}],"name":"setModule","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"disputes","outputs":[{"name":"subject","type":"address"},{"name":"state","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_subject","type":"address"},{"name":"_disputeId","type":"uint256"},{"name":"_submitter","type":"address"},{"name":"_evidence","type":"bytes"}],"name":"submitEvidence","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"feeToken","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"feeAmount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_disputeId","type":"uint256"}],"name":"draft","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getDisputeFees","outputs":[{"name":"","type":"address"},{"name":"","type":"address"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"ejectModulesGovernor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_newFundsGovernor","type":"address"}],"name":"changeFundsGovernor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_maxRequestedTransitions","type":"uint64"}],"name":"heartbeat","outputs":[{"name":"","type":"uint64"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_disputeId","type":"uint256"}],"name":"computeRuling","outputs":[{"name":"subject","type":"address"},{"name":"finalRuling","type":"uint8"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_possibleRulings","type":"uint256"},{"name":"_metadata","type":"bytes"}],"name":"createDispute","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_subject","type":"address"},{"name":"_disputeId","type":"uint256"}],"name":"closeEvidencePeriod","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"ejectFundsGovernor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newModulesGovernor","type":"address"}],"name":"changeModulesGovernor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newConfigGovernor","type":"address"}],"name":"changeConfigGovernor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_disputeId","type":"uint256"}],"name":"rule","outputs":[{"name":"subject","type":"address"},{"name":"ruling","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getDisputeManager","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"currentId","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_newFirstTermStartTime","type":"uint64"}],"name":"delayStartTime","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"_feeToken","type":"address"},{"name":"_feeAmount","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"previousTermId","type":"uint64"},{"indexed":false,"name":"currentTermId","type":"uint64"}],"name":"Heartbeat","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"previousStartTime","type":"uint64"},{"indexed":false,"name":"currentStartTime","type":"uint64"}],"name":"StartTimeDelayed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"state","type":"uint8"}],"name":"DisputeStateChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"submitter","type":"address"},{"indexed":false,"name":"evidence","type":"bytes"}],"name":"EvidenceSubmitted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"termId","type":"uint64"}],"name":"EvidencePeriodClosed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"subject","type":"address"},{"indexed":true,"name":"draftTermId","type":"uint64"},{"indexed":false,"name":"jurorsNumber","type":"uint64"},{"indexed":false,"name":"metadata","type":"bytes"}],"name":"NewDispute","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"roundId","type":"uint256"},{"indexed":true,"name":"juror","type":"address"}],"name":"JurorDrafted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"roundId","type":"uint256"},{"indexed":false,"name":"ruling","type":"uint8"}],"name":"RulingAppealed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"roundId","type":"uint256"},{"indexed":true,"name":"draftTermId","type":"uint64"},{"indexed":false,"name":"jurorsNumber","type":"uint256"}],"name":"RulingAppealConfirmed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"ruling","type":"uint8"}],"name":"RulingComputed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"roundId","type":"uint256"},{"indexed":false,"name":"collectedTokens","type":"uint256"}],"name":"PenaltiesSettled","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"roundId","type":"uint256"},{"indexed":false,"name":"juror","type":"address"},{"indexed":false,"name":"tokens","type":"uint256"},{"indexed":false,"name":"fees","type":"uint256"}],"name":"RewardSettled","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"disputeId","type":"uint256"},{"indexed":true,"name":"roundId","type":"uint256"}],"name":"AppealDepositSettled","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"previousMaxJurorsPerDraftBatch","type":"uint64"},{"indexed":false,"name":"currentMaxJurorsPerDraftBatch","type":"uint64"}],"name":"MaxJurorsPerDraftBatchChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"bytes32"},{"indexed":false,"name":"addr","type":"address"}],"name":"ModuleSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"previousGovernor","type":"address"},{"indexed":false,"name":"currentGovernor","type":"address"}],"name":"FundsGovernorChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"previousGovernor","type":"address"},{"indexed":false,"name":"currentGovernor","type":"address"}],"name":"ConfigGovernorChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"previousFeesUpdater","type":"address"},{"indexed":false,"name":"currentFeesUpdater","type":"address"}],"name":"FeesUpdaterChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"previousGovernor","type":"address"},{"indexed":false,"name":"currentGovernor","type":"address"}],"name":"ModulesGovernorChanged","type":"event"}]
+          "abi": [
+            {
+              "constant": false,
+              "inputs": [{ "name": "_owner", "type": "address" }],
+              "name": "setOwner",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_state", "type": "uint8" }
+              ],
+              "name": "decideDispute",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_newFeesUpdater", "type": "address" }],
+              "name": "changeFeesUpdater",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_id", "type": "bytes32" },
+                { "name": "_addr", "type": "address" }
+              ],
+              "name": "setModule",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [{ "name": "", "type": "uint256" }],
+              "name": "disputes",
+              "outputs": [
+                { "name": "subject", "type": "address" },
+                { "name": "state", "type": "uint8" }
+              ],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_subject", "type": "address" },
+                { "name": "_disputeId", "type": "uint256" },
+                { "name": "_submitter", "type": "address" },
+                { "name": "_evidence", "type": "bytes" }
+              ],
+              "name": "submitEvidence",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "feeToken",
+              "outputs": [{ "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "feeAmount",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "draft",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "getDisputeFees",
+              "outputs": [
+                { "name": "", "type": "address" },
+                { "name": "", "type": "address" },
+                { "name": "", "type": "uint256" }
+              ],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [],
+              "name": "ejectModulesGovernor",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "owner",
+              "outputs": [{ "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_newFundsGovernor", "type": "address" }],
+              "name": "changeFundsGovernor",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_maxRequestedTransitions", "type": "uint64" }],
+              "name": "heartbeat",
+              "outputs": [{ "name": "", "type": "uint64" }],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "computeRuling",
+              "outputs": [
+                { "name": "subject", "type": "address" },
+                { "name": "finalRuling", "type": "uint8" }
+              ],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_possibleRulings", "type": "uint256" },
+                { "name": "_metadata", "type": "bytes" }
+              ],
+              "name": "createDispute",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "name": "_subject", "type": "address" },
+                { "name": "_disputeId", "type": "uint256" }
+              ],
+              "name": "closeEvidencePeriod",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [],
+              "name": "ejectFundsGovernor",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_newModulesGovernor", "type": "address" }],
+              "name": "changeModulesGovernor",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_newConfigGovernor", "type": "address" }],
+              "name": "changeConfigGovernor",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_disputeId", "type": "uint256" }],
+              "name": "rule",
+              "outputs": [
+                { "name": "subject", "type": "address" },
+                { "name": "ruling", "type": "uint256" }
+              ],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "getDisputeManager",
+              "outputs": [{ "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "currentId",
+              "outputs": [{ "name": "", "type": "uint256" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [{ "name": "_newFirstTermStartTime", "type": "uint64" }],
+              "name": "delayStartTime",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                { "name": "_feeToken", "type": "address" },
+                { "name": "_feeAmount", "type": "uint256" }
+              ],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "previousTermId", "type": "uint64" },
+                { "indexed": false, "name": "currentTermId", "type": "uint64" }
+              ],
+              "name": "Heartbeat",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "previousStartTime", "type": "uint64" },
+                { "indexed": false, "name": "currentStartTime", "type": "uint64" }
+              ],
+              "name": "StartTimeDelayed",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "state", "type": "uint8" }
+              ],
+              "name": "DisputeStateChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "submitter", "type": "address" },
+                { "indexed": false, "name": "evidence", "type": "bytes" }
+              ],
+              "name": "EvidenceSubmitted",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "termId", "type": "uint64" }
+              ],
+              "name": "EvidencePeriodClosed",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "subject", "type": "address" },
+                { "indexed": true, "name": "draftTermId", "type": "uint64" },
+                { "indexed": false, "name": "jurorsNumber", "type": "uint64" },
+                { "indexed": false, "name": "metadata", "type": "bytes" }
+              ],
+              "name": "NewDispute",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "roundId", "type": "uint256" },
+                { "indexed": true, "name": "juror", "type": "address" }
+              ],
+              "name": "JurorDrafted",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "roundId", "type": "uint256" },
+                { "indexed": false, "name": "ruling", "type": "uint8" }
+              ],
+              "name": "RulingAppealed",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "roundId", "type": "uint256" },
+                { "indexed": true, "name": "draftTermId", "type": "uint64" },
+                { "indexed": false, "name": "jurorsNumber", "type": "uint256" }
+              ],
+              "name": "RulingAppealConfirmed",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "ruling", "type": "uint8" }
+              ],
+              "name": "RulingComputed",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "roundId", "type": "uint256" },
+                { "indexed": false, "name": "collectedTokens", "type": "uint256" }
+              ],
+              "name": "PenaltiesSettled",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "roundId", "type": "uint256" },
+                { "indexed": false, "name": "juror", "type": "address" },
+                { "indexed": false, "name": "tokens", "type": "uint256" },
+                { "indexed": false, "name": "fees", "type": "uint256" }
+              ],
+              "name": "RewardSettled",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "name": "disputeId", "type": "uint256" },
+                { "indexed": true, "name": "roundId", "type": "uint256" }
+              ],
+              "name": "AppealDepositSettled",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "previousMaxJurorsPerDraftBatch", "type": "uint64" },
+                { "indexed": false, "name": "currentMaxJurorsPerDraftBatch", "type": "uint64" }
+              ],
+              "name": "MaxJurorsPerDraftBatchChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "id", "type": "bytes32" },
+                { "indexed": false, "name": "addr", "type": "address" }
+              ],
+              "name": "ModuleSet",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "previousGovernor", "type": "address" },
+                { "indexed": false, "name": "currentGovernor", "type": "address" }
+              ],
+              "name": "FundsGovernorChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "previousGovernor", "type": "address" },
+                { "indexed": false, "name": "currentGovernor", "type": "address" }
+              ],
+              "name": "ConfigGovernorChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "previousFeesUpdater", "type": "address" },
+                { "indexed": false, "name": "currentFeesUpdater", "type": "address" }
+              ],
+              "name": "FeesUpdaterChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "name": "previousGovernor", "type": "address" },
+                { "indexed": false, "name": "currentGovernor", "type": "address" }
+              ],
+              "name": "ModulesGovernorChanged",
+              "type": "event"
+            }
+          ]
         },
         "Quest": {
           "address": "0xa6FEAF5CA07b6F367CF39a840F5A7E41d0AE613D",
@@ -7012,1320 +7451,1699 @@
             "address": "0x6D8189C979bBB6768395A78E2AB8A15133459600",
             "abi": [
               {
-                "type": "constructor",
                 "inputs": [
                   {
-                    "type": "address",
+                    "internalType": "address",
                     "name": "_aclRoot",
-                    "internalType": "address"
+                    "type": "address"
                   },
                   {
-                    "type": "tuple",
+                    "components": [
+                      {
+                        "internalType": "uint256",
+                        "name": "executionDelay",
+                        "type": "uint256"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "address",
+                            "name": "token",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "scheduleDeposit",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "address",
+                            "name": "token",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "challengeDeposit",
+                        "type": "tuple"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "resolver",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "bytes",
+                        "name": "rules",
+                        "type": "bytes"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "maxCalldataSize",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Config",
                     "name": "_initialConfig",
-                    "internalType": "struct ERC3000Data.Config",
-                    "components": [
-                      {
-                        "type": "uint256"
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "address"
-                      },
-                      {
-                        "type": "bytes"
-                      },
-                      {
-                        "type": "uint256"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "",
-                    "internalType": "bytes4"
+                    "type": "tuple"
                   }
                 ],
-                "name": "ROOT_ROLE",
-                "inputs": []
-              },
-              {
-                "type": "function",
                 "stateMutability": "nonpayable",
-                "outputs": [],
-                "name": "bulk",
+                "type": "constructor"
+              },
+              {
+                "anonymous": false,
                 "inputs": [
                   {
-                    "type": "tuple[]",
-                    "name": "items",
-                    "internalType": "struct ACLData.BulkItem[]",
-                    "components": [
-                      {
-                        "type": "uint8"
-                      },
-                      {
-                        "type": "bytes4"
-                      },
-                      {
-                        "type": "address"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [
-                  {
-                    "type": "uint256",
-                    "name": "disputeId",
-                    "internalType": "uint256"
-                  }
-                ],
-                "name": "challenge",
-                "inputs": [
-                  {
-                    "type": "tuple",
-                    "name": "_container",
-                    "internalType": "struct ERC3000Data.Container",
-                    "components": [
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "tuple[]",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              },
-                              {
-                                "type": "bytes"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "bytes32"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "address"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "bytes",
-                    "name": "_reason",
-                    "internalType": "bytes"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "address",
-                    "name": "",
-                    "internalType": "address"
-                  }
-                ],
-                "name": "challengerCache",
-                "inputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "",
-                    "internalType": "bytes32"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "",
-                    "internalType": "bytes32"
-                  }
-                ],
-                "name": "configHash",
-                "inputs": []
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "",
-                    "internalType": "bytes32"
-                  }
-                ],
-                "name": "configure",
-                "inputs": [
-                  {
-                    "type": "tuple",
-                    "name": "_config",
-                    "internalType": "struct ERC3000Data.Config",
-                    "components": [
-                      {
-                        "type": "uint256"
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "address"
-                      },
-                      {
-                        "type": "bytes"
-                      },
-                      {
-                        "type": "uint256"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "uint256",
-                    "name": "",
-                    "internalType": "uint256"
-                  }
-                ],
-                "name": "disputeItemCache",
-                "inputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "",
-                    "internalType": "bytes32"
-                  },
-                  {
-                    "type": "address",
-                    "name": "",
-                    "internalType": "contract IArbitrator"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "failureMap",
-                    "internalType": "bytes32"
-                  },
-                  {
-                    "type": "bytes[]",
-                    "name": "",
-                    "internalType": "bytes[]"
-                  }
-                ],
-                "name": "execute",
-                "inputs": [
-                  {
-                    "type": "tuple",
-                    "name": "_container",
-                    "internalType": "struct ERC3000Data.Container",
-                    "components": [
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "tuple[]",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              },
-                              {
-                                "type": "bytes"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "bytes32"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "address"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [],
-                "name": "freeze",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "_role",
-                    "internalType": "bytes4"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [],
-                "name": "grant",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "_role",
-                    "internalType": "bytes4"
-                  },
-                  {
-                    "type": "address",
-                    "name": "_who",
-                    "internalType": "address"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [],
-                "name": "grantWithOracle",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "_role",
-                    "internalType": "bytes4"
-                  },
-                  {
-                    "type": "address",
-                    "name": "_who",
-                    "internalType": "address"
-                  },
-                  {
-                    "type": "address",
-                    "name": "_oracle",
-                    "internalType": "contract IACLOracle"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "uint256",
-                    "name": "",
-                    "internalType": "uint256"
-                  }
-                ],
-                "name": "initBlocks",
-                "inputs": [
-                  {
-                    "type": "string",
-                    "name": "",
-                    "internalType": "string"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [],
-                "name": "initialize",
-                "inputs": [
-                  {
-                    "type": "address",
-                    "name": "_aclRoot",
-                    "internalType": "address"
-                  },
-                  {
-                    "type": "tuple",
-                    "name": "_initialConfig",
-                    "internalType": "struct ERC3000Data.Config",
-                    "components": [
-                      {
-                        "type": "uint256"
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "address"
-                      },
-                      {
-                        "type": "bytes"
-                      },
-                      {
-                        "type": "uint256"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "bool",
-                    "name": "",
-                    "internalType": "bool"
-                  }
-                ],
-                "name": "isFrozen",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "_role",
-                    "internalType": "bytes4"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "uint256",
-                    "name": "",
-                    "internalType": "uint256"
-                  }
-                ],
-                "name": "nonce",
-                "inputs": []
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "uint8",
-                    "name": "state",
-                    "internalType": "enum GovernQueueStateLib.State"
-                  }
-                ],
-                "name": "queue",
-                "inputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "",
-                    "internalType": "bytes32"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "failureMap",
-                    "internalType": "bytes32"
-                  },
-                  {
-                    "type": "bytes[]",
-                    "name": "",
-                    "internalType": "bytes[]"
-                  }
-                ],
-                "name": "resolve",
-                "inputs": [
-                  {
-                    "type": "tuple",
-                    "name": "_container",
-                    "internalType": "struct ERC3000Data.Container",
-                    "components": [
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "tuple[]",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              },
-                              {
-                                "type": "bytes"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "bytes32"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "address"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "uint256",
-                    "name": "_disputeId",
-                    "internalType": "uint256"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [],
-                "name": "revoke",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "_role",
-                    "internalType": "bytes4"
-                  },
-                  {
-                    "type": "address",
-                    "name": "_who",
-                    "internalType": "address"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "address",
-                    "name": "",
-                    "internalType": "address"
-                  }
-                ],
-                "name": "roles",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "",
-                    "internalType": "bytes4"
-                  },
-                  {
-                    "type": "address",
-                    "name": "",
-                    "internalType": "address"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [
-                  {
-                    "type": "bytes32",
+                    "indexed": true,
+                    "internalType": "bytes32",
                     "name": "containerHash",
-                    "internalType": "bytes32"
-                  }
-                ],
-                "name": "schedule",
-                "inputs": [
-                  {
-                    "type": "tuple",
-                    "name": "_container",
-                    "internalType": "struct ERC3000Data.Container",
-                    "components": [
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "tuple[]",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              },
-                              {
-                                "type": "bytes"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "bytes32"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "address"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "view",
-                "outputs": [
-                  {
-                    "type": "bool",
-                    "name": "",
-                    "internalType": "bool"
-                  }
-                ],
-                "name": "supportsInterface",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "_interfaceId",
-                    "internalType": "bytes4"
-                  }
-                ]
-              },
-              {
-                "type": "function",
-                "stateMutability": "nonpayable",
-                "outputs": [],
-                "name": "veto",
-                "inputs": [
-                  {
-                    "type": "tuple",
-                    "name": "_container",
-                    "internalType": "struct ERC3000Data.Container",
-                    "components": [
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "tuple[]",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              },
-                              {
-                                "type": "bytes"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "bytes32"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "address"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "tuple",
-                        "components": [
-                          {
-                            "type": "uint256"
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "tuple",
-                            "components": [
-                              {
-                                "type": "address"
-                              },
-                              {
-                                "type": "uint256"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "address"
-                          },
-                          {
-                            "type": "bytes"
-                          },
-                          {
-                            "type": "uint256"
-                          }
-                        ]
-                      }
-                    ]
+                    "type": "bytes32"
                   },
                   {
-                    "type": "bytes",
-                    "name": "_reason",
-                    "internalType": "bytes"
-                  }
-                ]
-              },
-              {
-                "type": "event",
-                "name": "Challenged",
-                "inputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "containerHash",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address",
                     "name": "actor",
-                    "indexed": true
+                    "type": "address"
                   },
                   {
-                    "type": "bytes",
+                    "indexed": false,
+                    "internalType": "bytes",
                     "name": "reason",
-                    "indexed": false
+                    "type": "bytes"
                   },
                   {
-                    "type": "uint256",
-                    "name": "resolverId",
-                    "indexed": false
-                  },
-                  {
-                    "type": "tuple",
-                    "name": "collateral",
                     "indexed": false,
+                    "internalType": "uint256",
+                    "name": "resolverId",
+                    "type": "uint256"
+                  },
+                  {
                     "components": [
                       {
+                        "internalType": "address",
+                        "name": "token",
                         "type": "address"
                       },
                       {
+                        "internalType": "uint256",
+                        "name": "amount",
                         "type": "uint256"
                       }
-                    ]
+                    ],
+                    "indexed": false,
+                    "internalType": "struct ERC3000Data.Collateral",
+                    "name": "collateral",
+                    "type": "tuple"
                   }
                 ],
-                "anonymous": false
+                "name": "Challenged",
+                "type": "event"
               },
               {
-                "type": "event",
-                "name": "Configured",
+                "anonymous": false,
                 "inputs": [
                   {
-                    "type": "bytes32",
+                    "indexed": true,
+                    "internalType": "bytes32",
                     "name": "configHash",
-                    "indexed": true
+                    "type": "bytes32"
                   },
                   {
-                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address",
                     "name": "actor",
-                    "indexed": true
+                    "type": "address"
                   },
                   {
-                    "type": "tuple",
-                    "name": "config",
-                    "indexed": false,
                     "components": [
                       {
+                        "internalType": "uint256",
+                        "name": "executionDelay",
                         "type": "uint256"
                       },
                       {
-                        "type": "tuple",
                         "components": [
                           {
+                            "internalType": "address",
+                            "name": "token",
                             "type": "address"
                           },
                           {
+                            "internalType": "uint256",
+                            "name": "amount",
                             "type": "uint256"
                           }
-                        ]
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "scheduleDeposit",
+                        "type": "tuple"
                       },
                       {
-                        "type": "tuple",
                         "components": [
                           {
+                            "internalType": "address",
+                            "name": "token",
                             "type": "address"
                           },
                           {
+                            "internalType": "uint256",
+                            "name": "amount",
                             "type": "uint256"
                           }
-                        ]
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "challengeDeposit",
+                        "type": "tuple"
                       },
                       {
+                        "internalType": "address",
+                        "name": "resolver",
                         "type": "address"
                       },
                       {
+                        "internalType": "bytes",
+                        "name": "rules",
                         "type": "bytes"
                       },
                       {
+                        "internalType": "uint256",
+                        "name": "maxCalldataSize",
                         "type": "uint256"
                       }
-                    ]
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Executed",
-                "inputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "containerHash",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "actor",
-                    "indexed": true
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Frozen",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "role",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "actor",
-                    "indexed": true
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Granted",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "role",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "actor",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "who",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "oracle",
-                    "indexed": false
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Initialized",
-                "inputs": [
-                  {
-                    "type": "string",
-                    "name": "key",
-                    "indexed": true
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "ReceivedCallback",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "sig",
-                    "indexed": true
-                  },
-                  {
-                    "type": "bytes",
-                    "name": "data",
-                    "indexed": false
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "RegisteredCallback",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "sig",
-                    "indexed": false
-                  },
-                  {
-                    "type": "bytes4",
-                    "name": "magicNumber",
-                    "indexed": false
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "RegisteredStandard",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "interfaceId",
-                    "indexed": false
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Resolved",
-                "inputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "containerHash",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "actor",
-                    "indexed": true
-                  },
-                  {
-                    "type": "bool",
-                    "name": "approved",
-                    "indexed": false
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Revoked",
-                "inputs": [
-                  {
-                    "type": "bytes4",
-                    "name": "role",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "actor",
-                    "indexed": true
-                  },
-                  {
-                    "type": "address",
-                    "name": "who",
-                    "indexed": true
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Ruled",
-                "inputs": [
-                  {
-                    "type": "address",
-                    "name": "arbitrator",
-                    "indexed": true
-                  },
-                  {
-                    "type": "uint256",
-                    "name": "disputeId",
-                    "indexed": true
-                  },
-                  {
-                    "type": "uint256",
-                    "name": "ruling",
-                    "indexed": false
-                  }
-                ],
-                "anonymous": false
-              },
-              {
-                "type": "event",
-                "name": "Scheduled",
-                "inputs": [
-                  {
-                    "type": "bytes32",
-                    "name": "containerHash",
-                    "indexed": true
-                  },
-                  {
-                    "type": "tuple",
-                    "name": "payload",
+                    ],
                     "indexed": false,
+                    "internalType": "struct ERC3000Data.Config",
+                    "name": "config",
+                    "type": "tuple"
+                  }
+                ],
+                "name": "Configured",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "bytes32",
+                    "name": "containerHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "actor",
+                    "type": "address"
+                  }
+                ],
+                "name": "Executed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "bytes4",
+                    "name": "role",
+                    "type": "bytes4"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "actor",
+                    "type": "address"
+                  }
+                ],
+                "name": "Frozen",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "bytes4",
+                    "name": "role",
+                    "type": "bytes4"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "actor",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "who",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "contract IACLOracle",
+                    "name": "oracle",
+                    "type": "address"
+                  }
+                ],
+                "name": "Granted",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "string",
+                    "name": "key",
+                    "type": "string"
+                  }
+                ],
+                "name": "Initialized",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "bytes4",
+                    "name": "sig",
+                    "type": "bytes4"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "bytes",
+                    "name": "data",
+                    "type": "bytes"
+                  }
+                ],
+                "name": "ReceivedCallback",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "bytes4",
+                    "name": "sig",
+                    "type": "bytes4"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "bytes4",
+                    "name": "magicNumber",
+                    "type": "bytes4"
+                  }
+                ],
+                "name": "RegisteredCallback",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "bytes4",
+                    "name": "interfaceId",
+                    "type": "bytes4"
+                  }
+                ],
+                "name": "RegisteredStandard",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "bytes32",
+                    "name": "containerHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "actor",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "bool",
+                    "name": "approved",
+                    "type": "bool"
+                  }
+                ],
+                "name": "Resolved",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "bytes4",
+                    "name": "role",
+                    "type": "bytes4"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "actor",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "who",
+                    "type": "address"
+                  }
+                ],
+                "name": "Revoked",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "contract IArbitrator",
+                    "name": "arbitrator",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "disputeId",
+                    "type": "uint256"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "ruling",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "Ruled",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": true,
+                    "internalType": "bytes32",
+                    "name": "containerHash",
+                    "type": "bytes32"
+                  },
+                  {
                     "components": [
                       {
+                        "internalType": "uint256",
+                        "name": "nonce",
                         "type": "uint256"
                       },
                       {
+                        "internalType": "uint256",
+                        "name": "executionTime",
                         "type": "uint256"
                       },
                       {
+                        "internalType": "address",
+                        "name": "submitter",
                         "type": "address"
                       },
                       {
+                        "internalType": "contract IERC3000Executor",
+                        "name": "executor",
                         "type": "address"
                       },
                       {
-                        "type": "tuple[]",
                         "components": [
                           {
+                            "internalType": "address",
+                            "name": "to",
                             "type": "address"
                           },
                           {
+                            "internalType": "uint256",
+                            "name": "value",
                             "type": "uint256"
                           },
                           {
+                            "internalType": "bytes",
+                            "name": "data",
                             "type": "bytes"
                           }
-                        ]
+                        ],
+                        "internalType": "struct ERC3000Data.Action[]",
+                        "name": "actions",
+                        "type": "tuple[]"
                       },
                       {
+                        "internalType": "bytes32",
+                        "name": "allowFailuresMap",
                         "type": "bytes32"
                       },
                       {
+                        "internalType": "bytes",
+                        "name": "proof",
                         "type": "bytes"
                       },
                       {
+                        "internalType": "address",
+                        "name": "challenger",
                         "type": "address"
                       }
-                    ]
+                    ],
+                    "indexed": false,
+                    "internalType": "struct ERC3000Data.Payload",
+                    "name": "payload",
+                    "type": "tuple"
                   }
                 ],
-                "anonymous": false
+                "name": "Scheduled",
+                "type": "event"
               },
               {
-                "type": "event",
-                "name": "Vetoed",
+                "anonymous": false,
                 "inputs": [
                   {
-                    "type": "bytes32",
+                    "indexed": true,
+                    "internalType": "bytes32",
                     "name": "containerHash",
-                    "indexed": true
+                    "type": "bytes32"
                   },
                   {
-                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address",
                     "name": "actor",
-                    "indexed": true
+                    "type": "address"
                   },
                   {
-                    "type": "bytes",
+                    "indexed": false,
+                    "internalType": "bytes",
                     "name": "reason",
-                    "indexed": false
+                    "type": "bytes"
                   }
                 ],
-                "anonymous": false
+                "name": "Vetoed",
+                "type": "event"
+              },
+              {
+                "inputs": [],
+                "name": "ROOT_ROLE",
+                "outputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "",
+                    "type": "bytes4"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "components": [
+                      {
+                        "internalType": "enum ACLData.BulkOp",
+                        "name": "op",
+                        "type": "uint8"
+                      },
+                      {
+                        "internalType": "bytes4",
+                        "name": "role",
+                        "type": "bytes4"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "who",
+                        "type": "address"
+                      }
+                    ],
+                    "internalType": "struct ACLData.BulkItem[]",
+                    "name": "items",
+                    "type": "tuple[]"
+                  }
+                ],
+                "name": "bulk",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "components": [
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "nonce",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "executionTime",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "submitter",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "contract IERC3000Executor",
+                            "name": "executor",
+                            "type": "address"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                              },
+                              {
+                                "internalType": "bytes",
+                                "name": "data",
+                                "type": "bytes"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Action[]",
+                            "name": "actions",
+                            "type": "tuple[]"
+                          },
+                          {
+                            "internalType": "bytes32",
+                            "name": "allowFailuresMap",
+                            "type": "bytes32"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "proof",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "challenger",
+                            "type": "address"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Payload",
+                        "name": "payload",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "executionDelay",
+                            "type": "uint256"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "scheduleDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "challengeDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "resolver",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "rules",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "maxCalldataSize",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Config",
+                        "name": "config",
+                        "type": "tuple"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Container",
+                    "name": "_container",
+                    "type": "tuple"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "_reason",
+                    "type": "bytes"
+                  }
+                ],
+                "name": "challenge",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "disputeId",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                  }
+                ],
+                "name": "challengerCache",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "configHash",
+                "outputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "components": [
+                      {
+                        "internalType": "uint256",
+                        "name": "executionDelay",
+                        "type": "uint256"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "address",
+                            "name": "token",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "scheduleDeposit",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "address",
+                            "name": "token",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "challengeDeposit",
+                        "type": "tuple"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "resolver",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "bytes",
+                        "name": "rules",
+                        "type": "bytes"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "maxCalldataSize",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Config",
+                    "name": "_config",
+                    "type": "tuple"
+                  }
+                ],
+                "name": "configure",
+                "outputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "contract IArbitrator",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "name": "disputeItemCache",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "components": [
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "nonce",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "executionTime",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "submitter",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "contract IERC3000Executor",
+                            "name": "executor",
+                            "type": "address"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                              },
+                              {
+                                "internalType": "bytes",
+                                "name": "data",
+                                "type": "bytes"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Action[]",
+                            "name": "actions",
+                            "type": "tuple[]"
+                          },
+                          {
+                            "internalType": "bytes32",
+                            "name": "allowFailuresMap",
+                            "type": "bytes32"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "proof",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "challenger",
+                            "type": "address"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Payload",
+                        "name": "payload",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "executionDelay",
+                            "type": "uint256"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "scheduleDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "challengeDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "resolver",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "rules",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "maxCalldataSize",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Config",
+                        "name": "config",
+                        "type": "tuple"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Container",
+                    "name": "_container",
+                    "type": "tuple"
+                  }
+                ],
+                "name": "execute",
+                "outputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "failureMap",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes[]",
+                    "name": "",
+                    "type": "bytes[]"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "_role",
+                    "type": "bytes4"
+                  }
+                ],
+                "name": "freeze",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "_role",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "_who",
+                    "type": "address"
+                  }
+                ],
+                "name": "grant",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "_role",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "_who",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "contract IACLOracle",
+                    "name": "_oracle",
+                    "type": "address"
+                  }
+                ],
+                "name": "grantWithOracle",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                  }
+                ],
+                "name": "initBlocks",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_aclRoot",
+                    "type": "address"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "uint256",
+                        "name": "executionDelay",
+                        "type": "uint256"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "address",
+                            "name": "token",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "scheduleDeposit",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "address",
+                            "name": "token",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Collateral",
+                        "name": "challengeDeposit",
+                        "type": "tuple"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "resolver",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "bytes",
+                        "name": "rules",
+                        "type": "bytes"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "maxCalldataSize",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Config",
+                    "name": "_initialConfig",
+                    "type": "tuple"
+                  }
+                ],
+                "name": "initialize",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "_role",
+                    "type": "bytes4"
+                  }
+                ],
+                "name": "isFrozen",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "nonce",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                  }
+                ],
+                "name": "queue",
+                "outputs": [
+                  {
+                    "internalType": "enum GovernQueueStateLib.State",
+                    "name": "state",
+                    "type": "uint8"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "components": [
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "nonce",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "executionTime",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "submitter",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "contract IERC3000Executor",
+                            "name": "executor",
+                            "type": "address"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                              },
+                              {
+                                "internalType": "bytes",
+                                "name": "data",
+                                "type": "bytes"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Action[]",
+                            "name": "actions",
+                            "type": "tuple[]"
+                          },
+                          {
+                            "internalType": "bytes32",
+                            "name": "allowFailuresMap",
+                            "type": "bytes32"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "proof",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "challenger",
+                            "type": "address"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Payload",
+                        "name": "payload",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "executionDelay",
+                            "type": "uint256"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "scheduleDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "challengeDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "resolver",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "rules",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "maxCalldataSize",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Config",
+                        "name": "config",
+                        "type": "tuple"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Container",
+                    "name": "_container",
+                    "type": "tuple"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "_disputeId",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "resolve",
+                "outputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "failureMap",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes[]",
+                    "name": "",
+                    "type": "bytes[]"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "_role",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "_who",
+                    "type": "address"
+                  }
+                ],
+                "name": "revoke",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "name": "roles",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "components": [
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "nonce",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "executionTime",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "submitter",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "contract IERC3000Executor",
+                            "name": "executor",
+                            "type": "address"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                              },
+                              {
+                                "internalType": "bytes",
+                                "name": "data",
+                                "type": "bytes"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Action[]",
+                            "name": "actions",
+                            "type": "tuple[]"
+                          },
+                          {
+                            "internalType": "bytes32",
+                            "name": "allowFailuresMap",
+                            "type": "bytes32"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "proof",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "challenger",
+                            "type": "address"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Payload",
+                        "name": "payload",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "executionDelay",
+                            "type": "uint256"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "scheduleDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "challengeDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "resolver",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "rules",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "maxCalldataSize",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Config",
+                        "name": "config",
+                        "type": "tuple"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Container",
+                    "name": "_container",
+                    "type": "tuple"
+                  }
+                ],
+                "name": "schedule",
+                "outputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "containerHash",
+                    "type": "bytes32"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "_interfaceId",
+                    "type": "bytes4"
+                  }
+                ],
+                "name": "supportsInterface",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "components": [
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "nonce",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "executionTime",
+                            "type": "uint256"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "submitter",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "contract IERC3000Executor",
+                            "name": "executor",
+                            "type": "address"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                              },
+                              {
+                                "internalType": "bytes",
+                                "name": "data",
+                                "type": "bytes"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Action[]",
+                            "name": "actions",
+                            "type": "tuple[]"
+                          },
+                          {
+                            "internalType": "bytes32",
+                            "name": "allowFailuresMap",
+                            "type": "bytes32"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "proof",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "challenger",
+                            "type": "address"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Payload",
+                        "name": "payload",
+                        "type": "tuple"
+                      },
+                      {
+                        "components": [
+                          {
+                            "internalType": "uint256",
+                            "name": "executionDelay",
+                            "type": "uint256"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "scheduleDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "components": [
+                              {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                              },
+                              {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                              }
+                            ],
+                            "internalType": "struct ERC3000Data.Collateral",
+                            "name": "challengeDeposit",
+                            "type": "tuple"
+                          },
+                          {
+                            "internalType": "address",
+                            "name": "resolver",
+                            "type": "address"
+                          },
+                          {
+                            "internalType": "bytes",
+                            "name": "rules",
+                            "type": "bytes"
+                          },
+                          {
+                            "internalType": "uint256",
+                            "name": "maxCalldataSize",
+                            "type": "uint256"
+                          }
+                        ],
+                        "internalType": "struct ERC3000Data.Config",
+                        "name": "config",
+                        "type": "tuple"
+                      }
+                    ],
+                    "internalType": "struct ERC3000Data.Container",
+                    "name": "_container",
+                    "type": "tuple"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "_reason",
+                    "type": "bytes"
+                  }
+                ],
+                "name": "veto",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
               }
             ]
           }
