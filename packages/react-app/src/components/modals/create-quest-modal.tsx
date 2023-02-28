@@ -36,6 +36,7 @@ import { feedDummyQuestData } from '../utils/debug-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { FieldInput } from '../field-input/field-input';
 import { Outset } from '../utils/spacer-util';
+import MarkdownFieldInput from '../field-input/markdown-field-input';
 
 // #region StyledComponents
 
@@ -419,6 +420,71 @@ export default function QuestModal({
                           error={touched.title && errors.title}
                         />
 
+                        <MarkdownFieldInput
+                          id="description"
+                          label={
+                            <>
+                              <LineStyled>
+                                Description
+                                <Outset horizontal>
+                                  <ButtonLinkStyled
+                                    size="mini"
+                                    icon={showPreview ? <FaEdit /> : <FaEye />}
+                                    display="icon"
+                                    label={showPreview ? 'Edit' : 'Preview'}
+                                    onClick={() => setShowPreview((old) => !old)}
+                                    title={
+                                      showPreview
+                                        ? 'Back to edit mode'
+                                        : 'Show a preview of the description'
+                                    }
+                                  />
+                                </Outset>
+                                {showPreview && (
+                                  <Button
+                                    size="mini"
+                                    label={simulateSummary ? 'Detail' : 'Summary'}
+                                    onClick={() => setSimulateSummary((old) => !old)}
+                                    title={
+                                      !showPreview
+                                        ? 'Enable preview first'
+                                        : `Simulate ${
+                                            simulateSummary ? 'detail' : 'summary'
+                                          } description view`
+                                    }
+                                  />
+                                )}
+                              </LineStyled>
+                            </>
+                          }
+                          value={values.description}
+                          isEdit={!showPreview}
+                          placeHolder="Quest description"
+                          blockVisibility={simulateSummary ? 'hidden' : 'visible'}
+                          tooltip={
+                            <>
+                              <b>The quest description should include:</b>
+                              <br />- Details about what the quest entails.
+                              <br />- What evidence must be submitted by users claiming a reward for
+                              completing the quest.
+                              <br />- The payout amount. This could be a constant amount for quests
+                              that payout multiple times, a range with reference to what determines
+                              what amount, the contracts balance at time of claim.
+                              <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed
+                              in main page. This is supposed to be an overview of the Quest. Try not
+                              to use styled text to prevent any overflow cutting due to oversize.
+                              <br />
+                              ⚠️<i>The description should not include any sensitive information.</i>
+                              <br />
+                            </>
+                          }
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.description && errors.description}
+                          wide
+                          multiline
+                          maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
+                        />
                         <TextFieldInput
                           id="description"
                           label={
