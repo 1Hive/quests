@@ -125,7 +125,7 @@ export function AddressFieldInput({
         showExplorerLink && !isLoading ? (
           <LineStyled>
             {label}
-            <LinkStyled label="Open in explorer" href={explorerLink} external>
+            <LinkStyled title="Open in explorer" href={explorerLink} external>
               <IconExternal size="small" />
             </LinkStyled>
           </LineStyled>
