@@ -12,7 +12,7 @@ const TextInputStyled = styled(TextInput)`
   border-radius: 12px;
   width: 100%;
   text-overflow: ellipsis;
-  padding-right: 42px;
+  padding-right: 32px !important;
 `;
 const TextCopyStyled = styled(TextCopy)`
   margin-left: 1px;
