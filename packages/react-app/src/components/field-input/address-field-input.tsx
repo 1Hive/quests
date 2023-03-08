@@ -1,6 +1,8 @@
-import { TextInput, EthIdenticon, TextCopy } from '@1hive/1hive-ui';
+import { TextInput, EthIdenticon, TextCopy, IconExternal, Link } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { getNetwork } from 'src/networks';
+import { getExplorerUrl } from 'src/utils/web3.utils';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
 
@@ -10,8 +12,9 @@ const TextInputStyled = styled(TextInput)`
   border-radius: 12px;
   width: 100%;
   text-overflow: ellipsis;
-  padding-right: 42px;
+  padding-right: 32px !important;
 `;
+
 const TextCopyStyled = styled(TextCopy)`
   margin-left: 1px;
 `;
@@ -35,13 +38,24 @@ const AddressWrapperStyled = styled.div<{
   }
 `;
 
+const LineStyled = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const LinkStyled = styled(Link)`
+  height: 16px;
+  margin-left: 8px;
+  margin-bottom: 2px;
+`;
+
 // #endregion
 
 type Props = {
   id: string;
   isEdit?: boolean;
   isLoading?: boolean;
-  label?: string;
+  label?: React.ReactNode;
   onChange?: Function;
   value?: string;
   compact?: boolean;
@@ -50,6 +64,7 @@ type Props = {
   onBlur?: Function;
   error?: string | false;
   disabled?: boolean;
+  showExplorerLink?: boolean;
 };
 export function AddressFieldInput({
   id,
@@ -64,7 +79,14 @@ export function AddressFieldInput({
   onBlur = noop,
   disabled = false,
   error,
+  showExplorerLink = false,
 }: Props) {
+  const { chainId } = getNetwork();
+  const explorerLink = useMemo(
+    () => `${getExplorerUrl(chainId)}/address/${value}`,
+    [value, chainId],
+  );
+
   const loadableContent = (
     <AddressWrapperStyled isEdit={isEdit} wide={wide}>
       {isEdit ? (
@@ -93,6 +115,7 @@ export function AddressFieldInput({
           adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
           adornmentPosition={isEdit ? 'end' : 'start'}
           adornmentSettings={{ padding: 0, width: 36 }}
+          title={value}
         />
       )}
     </AddressWrapperStyled>
@@ -100,7 +123,18 @@ export function AddressFieldInput({
   return (
     <FieldInput
       id={id}
-      label={label}
+      label={
+        showExplorerLink && !isLoading ? (
+          <LineStyled>
+            {label}
+            <LinkStyled title="Open in explorer" href={explorerLink} external>
+              <IconExternal size="small" />
+            </LinkStyled>
+          </LineStyled>
+        ) : (
+          label
+        )
+      }
       tooltip={tooltip}
       compact={compact}
       error={error}
