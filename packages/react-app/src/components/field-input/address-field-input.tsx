@@ -12,6 +12,7 @@ const TextInputStyled = styled(TextInput)`
   text-overflow: ellipsis;
   padding-right: 42px;
 `;
+
 const TextCopyStyled = styled(TextCopy)`
   margin-left: 1px;
 `;

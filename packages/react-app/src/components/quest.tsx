@@ -36,6 +36,7 @@ import NumberFieldInput from './field-input/number-field-input';
 import { ActionsPlaceholder } from './actions-placeholder';
 import PlayModal from './modals/play-modal';
 import OptoutModal from './modals/optout-modal';
+import MarkdownFieldInput from './field-input/markdown-field-input';
 
 // #region StyledComponents
 
@@ -384,13 +385,11 @@ export default function Quest({
 
               {!isSummary && fieldsRow}
 
-              <TextFieldInput
+              <MarkdownFieldInput
                 id="description"
                 label={isSummary ? undefined : 'Description'}
                 value={questData?.description}
                 isLoading={isLoading || !questData}
-                multiline
-                isMarkDown
                 disableLinks={isSummary}
                 blockVisibility={isSummary ? 'hidden' : 'visible'}
                 maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
@@ -398,12 +397,11 @@ export default function Quest({
               />
               {!isSummary && (
                 <LinkWrapperStyled>
-                  <TextFieldInput
+                  <MarkdownFieldInput
                     id="communication-link"
                     label={isSummary ? undefined : 'Communication method'}
                     value={questData?.communicationLink ?? '*No communication link provided*'}
                     isLoading={isLoading || !questData}
-                    isMarkDown
                     wide
                     compact
                   />

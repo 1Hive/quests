@@ -18,8 +18,8 @@ import { QuestModel } from 'src/models/quest.model';
 import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
-import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
+import MarkdownFieldInput from '../field-input/markdown-field-input';
 
 // #region StyledComponents
 
@@ -195,7 +195,7 @@ export default function VetoModal({
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (
           <FormStyled id="form-veto" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
-              <TextFieldInput
+              <MarkdownFieldInput
                 id="reason"
                 isEdit={!showPreview}
                 label={
@@ -218,11 +218,9 @@ export default function VetoModal({
                 tooltip="Reason why this claim should be vetoed."
                 value={values.reason}
                 onChange={handleChange}
-                multiline
                 error={touched.reason && errors.reason}
                 onBlur={handleBlur}
                 wide
-                isMarkDown
               />
             </Outset>
           </FormStyled>

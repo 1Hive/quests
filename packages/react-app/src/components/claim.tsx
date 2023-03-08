@@ -21,7 +21,6 @@ import { CollapsableBlock } from './collapsable-block';
 import { AddressFieldInput } from './field-input/address-field-input';
 import AmountFieldInput from './field-input/amount-field-input';
 import { FieldInput } from './field-input/field-input';
-import TextFieldInput from './field-input/text-field-input';
 import ChallengeModal from './modals/challenge-modal';
 import ExecuteClaimModal from './modals/execute-claim-modal';
 import ResolveChallengeModal from './modals/resolve-challenge-modal';
@@ -30,6 +29,7 @@ import { StatusTag } from './status-tag';
 import { Outset, ChildSpacer } from './utils/spacer-util';
 import * as QuestService from '../services/quest.service';
 import { ActionsPlaceholder } from './actions-placeholder';
+import MarkdownFieldInput from './field-input/markdown-field-input';
 
 // #region StyledComponents
 
@@ -288,16 +288,15 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
         }
       >
         <EvidenceWrapperStyled>
-          <TextFieldInput
+          <MarkdownFieldInput
             id="evidence"
             value={claim.evidence}
             isLoading={isLoading || status === ClaimStatus.None}
-            isMarkDown
             wide
             label="Evidence of completion"
           />
           {claim.contactInformation && (
-            <TextFieldInput
+            <MarkdownFieldInput
               id="contact"
               value={claim.contactInformation}
               wide
@@ -305,16 +304,15 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
             />
           )}
           {challengeReason && (
-            <TextFieldInput
-              id="reason"
+            <MarkdownFieldInput
+              id="challengeReason"
               value={challengeReason}
-              isMarkDown
               wide
               label="Challenge reason"
             />
           )}
           {vetoReason && (
-            <TextFieldInput id="reason" value={vetoReason} isMarkDown wide label="Veto reason" />
+            <MarkdownFieldInput id="vetoReason" value={vetoReason} wide label="Veto reason" />
           )}
         </EvidenceWrapperStyled>
       </CollapsableBlock>

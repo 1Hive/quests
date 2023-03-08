@@ -16,6 +16,7 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { approveTokenTransaction, fundQuestTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
+import { FaEdit, FaEye } from 'react-icons/fa';
 import { getNetwork } from 'src/networks';
 import { flags } from 'src/services/feature-flag.service';
 import { GUpx } from 'src/utils/style.util';
@@ -35,6 +36,7 @@ import { feedDummyQuestData } from '../utils/debug-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { FieldInput } from '../field-input/field-input';
 import MarkdownFieldInput from '../field-input/markdown-field-input';
+import { Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
 
@@ -423,9 +425,43 @@ export default function QuestModal({
 
                         <MarkdownFieldInputStyled
                           id="description"
-                          label="Description"
-                          value={questDataState.description}
-                          isEdit
+                          label={
+                            <>
+                              <LineStyled>
+                                Description
+                                <Outset horizontal>
+                                  <ButtonLinkStyled
+                                    size="mini"
+                                    icon={showPreview ? <FaEdit /> : <FaEye />}
+                                    display="icon"
+                                    label={showPreview ? 'Edit' : 'Preview'}
+                                    onClick={() => setShowPreview((old) => !old)}
+                                    title={
+                                      showPreview
+                                        ? 'Back to edit mode'
+                                        : 'Show a preview of the description'
+                                    }
+                                  />
+                                </Outset>
+                                {showPreview && (
+                                  <Button
+                                    size="mini"
+                                    label={simulateSummary ? 'Detail' : 'Summary'}
+                                    onClick={() => setSimulateSummary((old) => !old)}
+                                    title={
+                                      !showPreview
+                                        ? 'Enable preview first'
+                                        : `Simulate ${
+                                            simulateSummary ? 'detail' : 'summary'
+                                          } description view`
+                                    }
+                                  />
+                                )}
+                              </LineStyled>
+                            </>
+                          }
+                          value={values.description}
+                          isEdit={!showPreview}
                           blockVisibility={simulateSummary ? 'hidden' : 'visible'}
                           tooltip={
                             <>
@@ -444,15 +480,12 @@ export default function QuestModal({
                               <br />
                             </>
                           }
-                          onChange={(val: string) => {
-                            setQuestDataState({ ...questDataState, description: val });
-                            values.description = val;
-                            touched.description = true;
-                          }}
+                          onChange={handleChange}
                           onBlur={handleBlur}
                           error={touched.description && errors.description}
                           wide
-                          // multiline
+                          maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
+                          placeHolder="Quest description"
                         />
                       </>,
                       <>
