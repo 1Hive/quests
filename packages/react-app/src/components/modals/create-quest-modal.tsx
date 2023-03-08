@@ -16,7 +16,6 @@ import { TokenAmountModel } from 'src/models/token-amount.model';
 import { approveTokenTransaction, fundQuestTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
 import { TransactionModel } from 'src/models/transaction.model';
-import { FaEdit, FaEye } from 'react-icons/fa';
 import { getNetwork } from 'src/networks';
 import { flags } from 'src/services/feature-flag.service';
 import { GUpx } from 'src/utils/style.util';
@@ -35,7 +34,6 @@ import { WalletBalance } from '../wallet-balance';
 import { feedDummyQuestData } from '../utils/debug-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { FieldInput } from '../field-input/field-input';
-import { Outset } from '../utils/spacer-util';
 import MarkdownFieldInput from '../field-input/markdown-field-input';
 
 // #region StyledComponents
@@ -50,6 +48,9 @@ const ButtonLinkStyled = styled(Button)`
   background: transparent;
   padding-top: 4px;
   justify-content: flex-start;
+`;
+const MarkdownFieldInputStyled = styled(MarkdownFieldInput)`
+  width: 100%;
 `;
 
 const FormStyled = styled(Form)`
@@ -420,46 +421,11 @@ export default function QuestModal({
                           error={touched.title && errors.title}
                         />
 
-                        <MarkdownFieldInput
+                        <MarkdownFieldInputStyled
                           id="description"
-                          label={
-                            <>
-                              <LineStyled>
-                                Description
-                                <Outset horizontal>
-                                  <ButtonLinkStyled
-                                    size="mini"
-                                    icon={showPreview ? <FaEdit /> : <FaEye />}
-                                    display="icon"
-                                    label={showPreview ? 'Edit' : 'Preview'}
-                                    onClick={() => setShowPreview((old) => !old)}
-                                    title={
-                                      showPreview
-                                        ? 'Back to edit mode'
-                                        : 'Show a preview of the description'
-                                    }
-                                  />
-                                </Outset>
-                                {showPreview && (
-                                  <Button
-                                    size="mini"
-                                    label={simulateSummary ? 'Detail' : 'Summary'}
-                                    onClick={() => setSimulateSummary((old) => !old)}
-                                    title={
-                                      !showPreview
-                                        ? 'Enable preview first'
-                                        : `Simulate ${
-                                            simulateSummary ? 'detail' : 'summary'
-                                          } description view`
-                                    }
-                                  />
-                                )}
-                              </LineStyled>
-                            </>
-                          }
-                          value={values.description}
-                          isEdit={!showPreview}
-                          placeHolder="Quest description"
+                          label="Description"
+                          value={questDataState.description}
+                          isEdit
                           blockVisibility={simulateSummary ? 'hidden' : 'visible'}
                           tooltip={
                             <>
@@ -478,78 +444,15 @@ export default function QuestModal({
                               <br />
                             </>
                           }
-                          onChange={handleChange}
+                          onChange={(val: string) => {
+                            setQuestDataState({ ...questDataState, description: val });
+                            values.description = val;
+                            touched.description = true;
+                          }}
                           onBlur={handleBlur}
                           error={touched.description && errors.description}
                           wide
-                          multiline
-                          maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
-                        />
-                        <TextFieldInput
-                          id="description"
-                          label={
-                            <>
-                              <LineStyled>
-                                Description
-                                <Outset horizontal>
-                                  <ButtonLinkStyled
-                                    size="mini"
-                                    icon={showPreview ? <FaEdit /> : <FaEye />}
-                                    display="icon"
-                                    label={showPreview ? 'Edit' : 'Preview'}
-                                    onClick={() => setShowPreview((old) => !old)}
-                                    title={
-                                      showPreview
-                                        ? 'Back to edit mode'
-                                        : 'Show a preview of the description'
-                                    }
-                                  />
-                                </Outset>
-                                {showPreview && (
-                                  <Button
-                                    size="mini"
-                                    label={simulateSummary ? 'Detail' : 'Summary'}
-                                    onClick={() => setSimulateSummary((old) => !old)}
-                                    title={
-                                      !showPreview
-                                        ? 'Enable preview first'
-                                        : `Simulate ${
-                                            simulateSummary ? 'detail' : 'summary'
-                                          } description view`
-                                    }
-                                  />
-                                )}
-                              </LineStyled>
-                            </>
-                          }
-                          value={values.description}
-                          isEdit={!showPreview}
-                          placeHolder="Quest description"
-                          blockVisibility={simulateSummary ? 'hidden' : 'visible'}
-                          tooltip={
-                            <>
-                              <b>The quest description should include:</b>
-                              <br />- Details about what the quest entails.
-                              <br />- What evidence must be submitted by users claiming a reward for
-                              completing the quest.
-                              <br />- The payout amount. This could be a constant amount for quests
-                              that payout multiple times, a range with reference to what determines
-                              what amount, the contracts balance at time of claim.
-                              <br />- The first {MAX_LINE_DESCRIPTION} lines only will be displayed
-                              in main page. This is supposed to be an overview of the Quest. Try not
-                              to use styled text to prevent any overflow cutting due to oversize.
-                              <br />
-                              ⚠️<i>The description should not include any sensitive information.</i>
-                              <br />
-                            </>
-                          }
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.description && errors.description}
-                          wide
-                          multiline
-                          isMarkDown
-                          maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
+                          // multiline
                         />
                       </>,
                       <>
