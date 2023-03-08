@@ -14,6 +14,7 @@ const TextInputStyled = styled(TextInput)`
   text-overflow: ellipsis;
   padding-right: 32px !important;
 `;
+
 const TextCopyStyled = styled(TextCopy)`
   margin-left: 1px;
 `;
@@ -114,6 +115,7 @@ export function AddressFieldInput({
           adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
           adornmentPosition={isEdit ? 'end' : 'start'}
           adornmentSettings={{ padding: 0, width: 36 }}
+          title={value}
         />
       )}
     </AddressWrapperStyled>
