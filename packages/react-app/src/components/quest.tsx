@@ -78,9 +78,12 @@ const QuestFooterStyled = styled.div`
   flex-wrap: wrap;
   row-gap: ${GUpx(2)};
 `;
+
 const LinkWrapperStyled = styled.div`
   padding-top: ${GUpx(2)};
+  overflow-wrap: break-word;
 `;
+
 const RowStyled = styled.div`
   display: flex;
   width: 100%;
@@ -404,8 +407,6 @@ export default function Quest({
                     value={questData?.communicationLink ?? '*No communication link provided*'}
                     isLoading={isLoading || !questData}
                     isMarkDown
-                    wide
-                    compact
                   />
                 </LinkWrapperStyled>
               )}
