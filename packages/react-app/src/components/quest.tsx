@@ -81,7 +81,6 @@ const QuestFooterStyled = styled.div`
 
 const LinkWrapperStyled = styled.div`
   padding-top: ${GUpx(2)};
-  overflow-wrap: break-word;
 `;
 
 const RowStyled = styled.div`
@@ -99,10 +98,7 @@ const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
-  .UjkFY a {
-    word-wrap: break-word;
-  }
+  word-wrap: break-word;
 `;
 
 const BountyWrapperStyled = styled.div`
@@ -407,6 +403,8 @@ export default function Quest({
                     value={questData?.communicationLink ?? '*No communication link provided*'}
                     isLoading={isLoading || !questData}
                     isMarkDown
+                    wide
+                    compact
                   />
                 </LinkWrapperStyled>
               )}
