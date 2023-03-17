@@ -43,11 +43,11 @@ export const networks = Object.freeze({
     stableTokens: StableTokens.gnosis,
     blackListedTokens: [],
   } as NetworkModel,
-  gnosisStaging: {
-    stagingOf: 'gnosis',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
-  } as StagingNetworkModel,
+  // gnosisStaging: {
+  //   stagingOf: 'gnosis',
+  //   questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
+  //   governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
+  // } as StagingNetworkModel,
   local: {
     networkId: 'local',
     chainId: 1337,
