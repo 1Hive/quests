@@ -44,7 +44,7 @@ export const networks = Object.freeze({
     blackListedTokens: [],
   } as NetworkModel,
   gnosisStaging: {
-    //   stagingOf: 'gnosis',
+    stagingOf: 'gnosis',
     //   questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
     //   governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
   } as StagingNetworkModel,
