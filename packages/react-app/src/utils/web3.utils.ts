@@ -174,6 +174,8 @@ export function getExplorerUrl(chainId?: number) {
       return 'https://blockscout.com/xdai/mainnet';
     case 'polygonscan':
       return 'https://polygonscan.com';
+    case 'gnosisscan':
+      return 'https://gnosisscan.io';
     default:
       return '';
   }

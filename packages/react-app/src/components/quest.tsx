@@ -78,9 +78,11 @@ const QuestFooterStyled = styled.div`
   flex-wrap: wrap;
   row-gap: ${GUpx(2)};
 `;
+
 const LinkWrapperStyled = styled.div`
   padding-top: ${GUpx(2)};
 `;
+
 const RowStyled = styled.div`
   display: flex;
   width: 100%;
@@ -96,10 +98,7 @@ const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
-  .UjkFY a {
-    word-wrap: break-word;
-  }
+  word-wrap: break-word;
 `;
 
 const BountyWrapperStyled = styled.div`
@@ -268,7 +267,7 @@ export default function Quest({
     <div
       onMouseLeave={() => setHighlight(true)}
       onMouseEnter={() => setHighlight(false)}
-      className="max-width-100"
+      className="max-width-10Button0"
     >
       {children}
     </div>
@@ -282,6 +281,7 @@ export default function Quest({
           label="Quest Address"
           isLoading={isLoading || !questData}
           value={questData?.address}
+          showExplorerLink={!isSummary}
         />
       </HighlightBlocker>
       {isSummary && (
