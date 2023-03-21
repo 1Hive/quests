@@ -129,6 +129,7 @@ export default function Quest({
     status: QuestStatus.Draft,
     fallbackAddress: ADDRESS_ZERO,
     creatorAddress: ADDRESS_ZERO,
+    features: {},
   },
   isLoading = false,
   isSummary = false,
@@ -396,7 +397,7 @@ export default function Quest({
                 maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
                 wide
               />
-              {!isSummary && (
+              {!isSummary && questData.features.communicationLink && (
                 <LinkWrapperStyled>
                   <TextFieldInput
                     id="communication-link"
