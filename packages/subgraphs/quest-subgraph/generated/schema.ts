@@ -16,6 +16,7 @@ export class QuestEntity extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("version", Value.fromI32(0));
     this.set("questAddress", Value.fromString(""));
     this.set("questTitle", Value.fromString(""));
     this.set("questDescription", Value.fromString(""));
@@ -54,6 +55,15 @@ export class QuestEntity extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get version(): i32 {
+    let value = this.get("version");
+    return value!.toI32();
+  }
+
+  set version(value: i32) {
+    this.set("version", Value.fromI32(value));
   }
 
   get questAddress(): string {

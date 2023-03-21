@@ -230,7 +230,7 @@ export default function Quest({
       if (questData.address) {
         let depositReleased = false;
         if (isQuestExpired(questData)) {
-          depositReleased = await QuestService.isCreateQuestDepositReleased(questData.address);
+          depositReleased = await QuestService.isCreateQuestDepositReleased(questData);
         }
         const depositLocked: DepositModel[] = [];
         if (!depositReleased && questData.createDeposit) {
@@ -430,7 +430,7 @@ export default function Quest({
                     {(!isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||
                       (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
-                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                      questData.features?.playableQuest && (
                         <PlayModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}

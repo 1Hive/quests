@@ -1,4 +1,5 @@
 import { QuestStatus } from 'src/enums/quest-status.enum';
+import { FeatureSupportModel } from 'src/services/feature-support.service';
 import { TokenModel } from './token.model';
 import { TokenAmountModel } from './token-amount.model';
 import { DepositModel } from './deposit-model';
@@ -25,4 +26,9 @@ export type QuestModel = {
   createDeposit?: DepositModel;
   playDeposit?: DepositModel;
   players?: string[];
+  governAddress?: string;
+  version?: number;
+
+  // Feature support
+  features: FeatureSupportModel;
 };

@@ -41,6 +41,7 @@ function getContract(
   contractName: string,
   contractAddressOverride?: string,
   walletAddress?: string,
+  abiIndex?: number,
 ): Contract {
   try {
     const id = (contractAddressOverride ?? contractName) + (walletAddress ?? '');
@@ -51,15 +52,16 @@ function getContract(
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
     let askedContract = contracts[contractName];
-    // Is array of contract, not abi
-    if (Array.isArray(askedContract) && askedContract[0].abi) {
-      if (!contractAddressOverride) {
+    if (Array.isArray(askedContract) && askedContract.length) {
+      if (abiIndex) {
         // If no contract address override, use the last one
-        askedContract = askedContract[askedContract.length - 1];
-      } else {
+        askedContract = askedContract[abiIndex];
+      } else if (contractAddressOverride) {
         askedContract = askedContract.find(
           (c) => c.address.toLowerCase() === contractAddressOverride.toLowerCase(),
         );
+      } else {
+        askedContract = askedContract[askedContract.length - 1]; // Use the last one
       }
     }
     const contractAddress: string = contractAddressOverride ?? askedContract.address;
@@ -125,8 +127,11 @@ export async function getTokenInfo(tokenAddress: string) {
   return null;
 }
 
-export function getQuestContract(questAddress: string, walletAddress?: string): Contract {
-  return getContract('Quest', questAddress, walletAddress);
+export function getQuestContract(
+  questData: { address?: string; version?: number },
+  walletAddress?: string,
+): Contract {
+  return getContract('Quest', questData.address, walletAddress, questData.version);
 }
 
 export function getUniswapPairContract(pairAddress: string) {
