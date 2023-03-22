@@ -285,6 +285,14 @@ export default function QuestModal({
     }
   };
 
+  const descriptionTemplate = `[Summary of ~5 lines]
+
+## Specifications
+
+## Requirement
+
+## Compensation agreement`;
+
   return (
     <>
       {flags.CREATE_QUEST && (
@@ -319,6 +327,7 @@ export default function QuestModal({
           <Formik
             initialValues={
               {
+                description: descriptionTemplate,
                 ...questDataState,
                 unlimited: true,
                 fallbackAddress: questDataState?.fallbackAddress,

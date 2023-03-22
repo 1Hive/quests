@@ -28,6 +28,10 @@ const MarkdownEditorStyled = styled(MarkdownEditor)<{ rows: number }>`
   // Overide the default style of the editor
   --color-canvas-subtle: #303030;
   --color-fg-default: #8d8d79;
+
+  .cm-line ::selection {
+    background: #f7f7ce;
+  }
 `;
 
 const MaxLineStyled = styled.div<{ maxLine: number }>`
