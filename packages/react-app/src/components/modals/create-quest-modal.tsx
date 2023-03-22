@@ -289,9 +289,9 @@ export default function QuestModal({
 
 ## Specifications
 
-## Requirement
+## Requirement / Deliverables
 
-## Compensation agreement`;
+## Reward agreement`;
 
   return (
     <>
