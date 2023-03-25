@@ -439,7 +439,8 @@ export default function Quest({
                     {(isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||
                       (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
-                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                      questData.maxPlayers !== undefined &&
+                      questData.players!.length > 0 && ( // Make sure maxPlayers is set (play feature is available on this quest)
                         <OptoutModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}

@@ -160,7 +160,12 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
               icon={<GiCrossedSwords />}
               className="open-unplay-button"
               onClick={() => setOpened(true)}
-              label="Opt out"
+              label={
+                questData.creatorAddress === walletAddress &&
+                !questData.players?.includes(walletAddress)
+                  ? 'Remove player'
+                  : 'Opt out'
+              }
               mode="negative"
             />
           }
