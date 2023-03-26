@@ -4,7 +4,7 @@ export type NetworkModel = {
   networkId: 'rinkeby' | 'goerli' | 'xdai' | 'polygon' | 'mainnet' | 'local';
   chainId: number;
   name: string;
-  explorer: string;
+  explorer: 'etherscan' | 'blockscout' | 'polygonscan' | 'gnosisscan';
   questsSubgraph: string;
   governSubgraph: string;
   tokenPairSubgraph: string;

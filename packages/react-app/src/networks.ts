@@ -31,7 +31,7 @@ export const networks = Object.freeze({
     networkId: 'xdai',
     chainId: 100,
     name: 'Gnosis',
-    explorer: 'blockscout',
+    explorer: 'gnosisscan',
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-gnosis',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai',
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/honeyswap-xdai',
@@ -45,8 +45,8 @@ export const networks = Object.freeze({
   } as NetworkModel,
   gnosisStaging: {
     stagingOf: 'gnosis',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
+    //   questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
+    //   governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
   } as StagingNetworkModel,
   local: {
     networkId: 'local',

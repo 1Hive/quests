@@ -12,7 +12,7 @@ import {
   ContainersLightQuery as ClaimContainersLightQuery,
   GovernQueueEntities,
 } from 'src/queries/govern-queue-entity.query';
-import { BigNumber, ContractTransaction, ethers } from 'ethers';
+import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
@@ -36,7 +36,7 @@ import { PlayModel } from 'src/models/play.model';
 import { QuestModel } from 'src/models/quest.model';
 import { ADDRESS_ZERO, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
-import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
+import { fromBigNumber, getDefaultProvider, toBigNumber } from '../utils/web3.utils';
 import {
   getObjectFromIpfs,
   pushObjectToIpfs,
@@ -612,9 +612,21 @@ export async function isCreateQuestDepositReleased(questAddress: string): Promis
   try {
     const quest = getQuestContract(questAddress);
     return await quest.isCreateDepositReleased();
-  } catch (error) {
-    Logger.debug('Failed to get quest deposit status', { questAddress, error });
-    return false;
+  } catch (error: any) {
+    try {
+      if (error.code === 'CALL_EXCEPTION') {
+        // TODO: Have a cleaner way to handle backward compatibility
+        return await new Contract(
+          questAddress,
+          ['function isDepositReleased() external view'],
+          getDefaultProvider(),
+        ).isDepositReleased();
+      }
+      return false;
+    } catch (error2) {
+      Logger.warn('Failed to get quest deposit status', { questAddress, error, error2 });
+      return false;
+    }
   }
 }
 
