@@ -12,7 +12,7 @@ import {
   ContainersLightQuery as ClaimContainersLightQuery,
   GovernQueueEntities,
 } from 'src/queries/govern-queue-entity.query';
-import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers';
+import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { ConfigModel, ContainerModel, PayloadModel } from 'src/models/govern.model';
 import { ClaimModel } from 'src/models/claim.model';
 import { ChallengeModel } from 'src/models/challenge.model';
@@ -36,7 +36,7 @@ import { PlayModel } from 'src/models/play.model';
 import { QuestModel } from 'src/models/quest.model';
 import { ADDRESS_ZERO, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
-import { fromBigNumber, getDefaultProvider, toBigNumber } from '../utils/web3.utils';
+import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
 import {
   getObjectFromIpfs,
   pushObjectToIpfs,
@@ -59,6 +59,7 @@ import {
   cacheFetchTokenPrice,
   cacheGovernQueueAddressForQuest,
 } from './cache.service';
+import { loadFeatureSupport } from './feature-support.service';
 
 let questList: QuestModel[] = [];
 
@@ -69,13 +70,13 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
   if (!questEntity) return undefined;
   try {
     const questAddress = toChecksumAddress(questEntity.questAddress);
-    const quest = {
+    const quest: QuestModel = {
       address: questAddress,
       title: questEntity.questTitle,
       description: questEntity.questDescription || undefined, // if '' -> undefined
       communicationLink: questEntity.questCommunicationLink,
       detailsRefIpfs: toAscii(questEntity.questDetailsRef),
-      rewardToken: await getTokenInfo(questEntity.questRewardTokenAddress),
+      rewardToken: (await getTokenInfo(questEntity.questRewardTokenAddress)) ?? undefined,
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
       creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
       createDeposit: +questEntity.questCreateDepositToken
@@ -98,7 +99,11 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       status: QuestStatus.Active,
       players: [],
       governAddress: toChecksumAddress(questEntity.questGovernAddress),
-    } as QuestModel;
+      version: questEntity.version,
+      features: {},
+    };
+
+    loadFeatureSupport(quest);
 
     if (!quest.detailsRefIpfs) {
       quest.description = '[No description]';
@@ -108,13 +113,13 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     }
 
     if (quest?.maxPlayers !== undefined) {
-      quest.players = await getQuestContract(quest.address!).getPlayers();
+      quest.players = await getQuestContract(quest).getPlayers();
     }
 
     return quest;
   } catch (error) {
     Logger.exception(error, `Failed to map quest :\n${JSON.stringify(questEntity)}`);
-    return undefined;
+    throw error;
   }
 }
 
@@ -238,7 +243,7 @@ async function generateScheduleContainer(
   questData: QuestModel,
   extraDelaySec?: number,
 ): Promise<ContainerModel> {
-  const questContract = getQuestContract(claimData.questAddress);
+  const questContract = getQuestContract(questData);
   const governAddress = await questContract.aragonGovernAddress();
   const governQueueResult = await fetchGovernQueue(questData);
   const erc3000Config = governQueueResult.config;
@@ -486,6 +491,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   const { isTestNetwork } = getNetwork();
   const result = await fetchActiveQuestEntitiesLight();
   const quests = result.questEntities as {
+    version: number;
     questAddress: string;
     questRewardTokenAddress: string;
     questCreateDepositToken: string;
@@ -506,7 +512,10 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
 
         // If max player is not null then the quest is playable
         if (quest.questMaxPlayers) {
-          const questPlayers = await getQuestContract(quest.questAddress!).getPlayers();
+          const questPlayers = await getQuestContract({
+            address: quest.questAddress,
+            version: quest.version,
+          }).getPlayers();
           lockedFunds.push({
             amount: BigNumber.from(quest.questPlayDepositAmount).mul(questPlayers.length),
             token: quest.questPlayDepositToken,
@@ -595,7 +604,7 @@ export async function recoverFundsAndDeposit(
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   if (!quest.address) throw new Error('Quest address is not defined when recovering funds');
-  const questContract = getQuestContract(quest.address, walletAddress);
+  const questContract = getQuestContract(quest, walletAddress);
   if (!questContract) return null;
   Logger.debug('Recovering quest unused funds and deposit...', { quest });
   const tx = await questContract.recoverFundsAndDeposit({
@@ -604,30 +613,13 @@ export async function recoverFundsAndDeposit(
   return handleTransaction(tx, onTx);
 }
 
-export async function getQuestRecoveryAddress(questAddress: string): Promise<string | null> {
-  return getQuestContract(questAddress)?.fundsRecoveryAddress() ?? null;
-}
-
-export async function isCreateQuestDepositReleased(questAddress: string): Promise<boolean> {
-  try {
-    const quest = getQuestContract(questAddress);
-    return await quest.isCreateDepositReleased();
-  } catch (error: any) {
-    try {
-      if (error.code === 'CALL_EXCEPTION') {
-        // TODO: Have a cleaner way to handle backward compatibility
-        return await new Contract(
-          questAddress,
-          ['function isDepositReleased() external view'],
-          getDefaultProvider(),
-        ).isDepositReleased();
-      }
-      return false;
-    } catch (error2) {
-      Logger.warn('Failed to get quest deposit status', { questAddress, error, error2 });
-      return false;
-    }
+export async function isCreateQuestDepositReleased(questData: QuestModel): Promise<boolean> {
+  if (!questData.features?.playableQuest) {
+    return true;
   }
+  // If quest is playable then the `isCreateDepositReleased` function exists
+  const quest = getQuestContract(questData);
+  return quest.isCreateDepositReleased();
 }
 
 export async function playQuest(
@@ -637,7 +629,7 @@ export async function playQuest(
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   if (!quest.address) throw new Error('Quest address is not defined when playing a quest');
-  const questContract = getQuestContract(quest.address, walletAddress);
+  const questContract = getQuestContract(quest, walletAddress);
   if (!questContract) return null;
   Logger.debug('Playing quest...', { quest });
   const tx = await questContract.play(data.player || walletAddress, {
@@ -653,7 +645,7 @@ export async function unplayQuest(
   onTx?: onTxCallback,
 ): Promise<ethers.ContractReceipt | null> {
   if (!quest.address) throw new Error('Quest address is not defined when unplaying a quest');
-  const questContract = getQuestContract(quest.address, walletAddress);
+  const questContract = getQuestContract(quest, walletAddress);
   if (!questContract) return null;
   Logger.debug('Unplaying quest...', { quest });
   const tx = await questContract.unplay(data.player || walletAddress, {

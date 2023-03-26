@@ -129,6 +129,7 @@ export default function Quest({
     status: QuestStatus.Draft,
     fallbackAddress: ADDRESS_ZERO,
     creatorAddress: ADDRESS_ZERO,
+    features: {},
   },
   isLoading = false,
   isSummary = false,
@@ -230,7 +231,7 @@ export default function Quest({
       if (questData.address) {
         let depositReleased = false;
         if (isQuestExpired(questData)) {
-          depositReleased = await QuestService.isCreateQuestDepositReleased(questData.address);
+          depositReleased = await QuestService.isCreateQuestDepositReleased(questData);
         }
         const depositLocked: DepositModel[] = [];
         if (!depositReleased && questData.createDeposit) {
@@ -396,7 +397,7 @@ export default function Quest({
                 maxLine={isSummary ? MAX_LINE_DESCRIPTION : undefined}
                 wide
               />
-              {!isSummary && (
+              {!isSummary && questData.features.communicationLink && (
                 <LinkWrapperStyled>
                   <TextFieldInput
                     id="communication-link"
@@ -430,7 +431,7 @@ export default function Quest({
                     {(!isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||
                       (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
-                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                      questData.features?.playableQuest && (
                         <PlayModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}

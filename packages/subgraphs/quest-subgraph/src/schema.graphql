@@ -17,6 +17,7 @@ type _Schema_
 
 type QuestEntity @entity(immutable: true) {
   id: ID!
+  version: Int!
   questAddress: String!
   questTitle: String!
   questDescription: String!
