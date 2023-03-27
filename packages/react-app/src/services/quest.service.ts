@@ -202,14 +202,19 @@ async function fetchClaimContainers(): Promise<ContainerModel[]> {
   return containers as ContainerModel[];
 }
 
-function decodeClaimAction(payload: PayloadModel) {
-  const [claimInfoIpfsHash, playerAddress, claimAmount, claimAll] =
-    getQuestContractInterface().decodeFunctionData('claim', payload.actions[0].data);
+function decodeClaimAction(questData: QuestModel, payload: PayloadModel) {
+  const [claimInfoIpfsHash, playerAddress, claimAmount, claimAll] = getQuestContractInterface(
+    questData.version,
+  ).decodeFunctionData('claim', payload.actions[0].data);
   return { claimInfoIpfsHash, playerAddress, claimAmount, claimAll };
 }
 
-function encodeClaimAction(claimData: ClaimModel, claimInfoIpfsHash: string) {
-  return getQuestContractInterface().encodeFunctionData('claim', [
+function encodeClaimAction(
+  questData: QuestModel,
+  claimData: ClaimModel,
+  claimInfoIpfsHash: string,
+) {
+  return getQuestContractInterface(questData.version).encodeFunctionData('claim', [
     claimInfoIpfsHash,
     claimData.playerAddress,
     toBigNumber(claimData.claimedAmount),
@@ -273,7 +278,7 @@ async function generateScheduleContainer(
     defendant: walletAddress,
   });
 
-  const claimCall = encodeClaimAction(claimData, questPayloadIpfsHash);
+  const claimCall = encodeClaimAction(questData, claimData, questPayloadIpfsHash);
 
   return {
     config: erc3000Config,
@@ -325,6 +330,7 @@ export async function fetchQuestClaims(quest: QuestModel): Promise<ClaimModel[]>
       .filter((x) => x.payload.actions[0].to.toLowerCase() === quest.address?.toLowerCase())
       .map(async (container) => {
         const { claimInfoIpfsHash, claimAmount, playerAddress, claimAll } = decodeClaimAction(
+          quest,
           container.payload,
         );
 
