@@ -10,6 +10,7 @@ import {
 import { Bytes, ipfs } from "@graphprotocol/graph-ts";
 import { json } from "@graphprotocol/graph-ts";
 import { QuestClaimed } from "../../generated/QuestFactory-Quest/Quest";
+
 export function handleDepositChanged(event: DepositChanged): void {
   let depositEntity = new CreateDepositEntity(
     `Create_${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
