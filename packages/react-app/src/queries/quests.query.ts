@@ -27,6 +27,7 @@ const QuestEntityQuery = gql`
       questCreator
       questFundsRecoveryAddress
       questMaxPlayers
+      questPlayers
     }
   }
 `;
@@ -74,6 +75,7 @@ const QuestEntitiesQuery = (payload: any) => gql`
       questCreator
       questFundsRecoveryAddress
       questMaxPlayers
+      questPlayers
     }
   }
 `;

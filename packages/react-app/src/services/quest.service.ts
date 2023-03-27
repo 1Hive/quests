@@ -97,7 +97,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       maxPlayers: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers : undefined, // If null put undefined
       unlimited: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers === 0 : undefined,
       status: QuestStatus.Active,
-      players: [],
+      players: questEntity.questPlayers ?? [],
       governAddress: toChecksumAddress(questEntity.questGovernAddress),
       version: questEntity.version,
       features: {},
@@ -110,10 +110,6 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     } else if (!quest.description) {
       // If failed to fetch ipfs description
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
-    }
-
-    if (quest?.features.playableQuest) {
-      quest.players = await getQuestContract(quest).getPlayers();
     }
 
     return quest;
