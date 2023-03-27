@@ -112,7 +112,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
     }
 
-    if (quest?.maxPlayers !== undefined) {
+    if (quest?.features.playableQuest) {
       quest.players = await getQuestContract(quest).getPlayers();
     }
 

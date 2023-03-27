@@ -3,12 +3,19 @@ import {
   PlayDepositChanged,
   CreateDepositChanged,
 } from "../../generated/QuestFactoryV2/QuestFactory";
+
+import {
+  QuestPlayed,
+  QuestClaimed,
+  QuestUnplayed,
+} from "../../generated/QuestFactoryV2-Quest/Quest";
 import {
   CreateDepositEntity,
   PlayDepositEntity,
+  QuestClaimEntity,
   QuestEntity,
 } from "../../generated/schema";
-import { Bytes, ipfs } from "@graphprotocol/graph-ts";
+import { Bytes, ethereum, ipfs } from "@graphprotocol/graph-ts";
 import { json } from "@graphprotocol/graph-ts";
 
 export function handleCreateDepositChanged(event: CreateDepositChanged): void {
@@ -51,6 +58,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questPlayDepositAmount = event.params.playDepositAmount;
   questEntity.questCreator = event.params.creator;
   questEntity.questMaxPlayers = event.params.maxPlayers;
+  questEntity.questPlayers = [];
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = "";
@@ -88,4 +96,41 @@ export function handleQuestCreated(event: QuestCreated): void {
   }
 
   questEntity.save();
+}
+
+export function handleQuestPlayed(event: QuestPlayed): void {
+  const hexAddress = event.params._event.address.toHex();
+  let questEntity = QuestEntity.load(hexAddress);
+
+  if (!questEntity) {
+    throw new Error("Quest entity not found with " + hexAddress);
+  }
+
+  questEntity.questPlayers.push(event.params.player.toHexString());
+  questEntity.save();
+}
+
+export function handleQuestUnplayed(event: QuestUnplayed): void {
+  const hexAddress = event.params._event.address.toHex();
+  let questEntity = QuestEntity.load(hexAddress);
+
+  if (!questEntity) {
+    throw new Error("Quest entity not found with " + hexAddress);
+  }
+  const indexToBeRemoved = questEntity.questPlayers.indexOf(
+    event.params.player.toHexString()
+  );
+  questEntity.questPlayers.splice(indexToBeRemoved, 1);
+  questEntity.save();
+}
+
+export function handleQuestClaimed(event: QuestClaimed): void {
+  const questClaimEntity = new QuestClaimEntity(
+    event.params._event.transaction.hash.toHex()
+  );
+  questClaimEntity.questAddress = event.params._event.address.toHexString();
+  questClaimEntity.amount = event.params.amount;
+  questClaimEntity.evidenceIpfsHash = event.params.evidence;
+  questClaimEntity.player = event.params.player.toHexString();
+  questClaimEntity.save();
 }

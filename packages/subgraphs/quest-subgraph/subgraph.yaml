@@ -8,11 +8,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: QuestFactory
-    network: xdai
+    network: goerli
     source:
-      address: "0x5Be5286FEFE6a44f394b551B6AC9255D42e974fe"
+      address: "0x4DfE6C03132BD14D95b87803e232AcA352a715b4"
       abi: QuestFactory
-      startBlock: 22777803
+      startBlock: 7543619
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -29,12 +29,31 @@ dataSources:
           handler: handleDepositChanged
       file: ./src/mappings/quest-factory.ts
   - kind: ethereum/contract
-    name: QuestFactoryV2
-    network: xdai
+    name: QuestFactory-Quest
+    network: goerli
     source:
-      address: "0x2fc3f4A630cD6962A22033436Fd63D93B180c076"
+      abi: Quest
+      startBlock: 7543619
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestClaimed
+      abis:
+        - name: Quest
+          file: ./abis/Quest.json
+      eventHandlers:
+        - event: QuestClaimed(bytes,address,uint256)
+          handler: handleQuestClaimed
+      file: ./src/mappings/quest-factory.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV2
+    network: goerli
+    source:
+      address: "0xa6FEAF5CA07b6F367CF39a840F5A7E41d0AE613D"
       abi: QuestFactory
-      startBlock: 25750107
+      startBlock: 8240344
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -51,4 +70,29 @@ dataSources:
           handler: handleCreateDepositChanged
         - event: PlayDepositChanged(uint256,address,uint256)
           handler: handlePlayDepositChanged
+      file: ./src/mappings/quest-factory.2.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV2-Quest
+    network: goerli
+    source:
+      abi: Quest
+      startBlock: 8240344
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestClaimedV2
+        - QuestPlayed
+        - QuestUnplayed
+      abis:
+        - name: Quest
+          file: ./abis/Quest.2.json
+      eventHandlers:
+        - event: QuestClaimed(bytes,address,uint256)
+          handler: handleQuestClaimed
+        - event: QuestPlayed(address,uint256)
+          handler: handleQuestPlayed
+        - event: QuestUnplayed(address,uint256)
+          handler: handleQuestUnplayed
       file: ./src/mappings/quest-factory.2.ts
