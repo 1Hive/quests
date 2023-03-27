@@ -10,6 +10,12 @@ import "@nomiclabs/hardhat-web3";
 import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
 import "hardhat-typechain";
+
+// ZkSync plugins
+import "@matterlabs/hardhat-zksync-deploy";
+import "@matterlabs/hardhat-zksync-solc";
+import "@matterlabs/hardhat-zksync-verify";
+
 import { task, HardhatUserConfig, types } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
@@ -22,6 +28,7 @@ import deployGovernQueue, {
 import deployGovern from "./scripts/deploy-govern";
 import governGnosis from "./deployments/xdai/Govern.json";
 import governGoerli from "./deployments/goerli/Govern.json";
+import governZkSyncTestNet from "./deployments/zkSyncTestNet/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
 import GovernAbi from "./abi/contracts/Externals/Govern.json";
@@ -33,9 +40,11 @@ dotenvConfig({
     __dirname,
     fs
       .readdirSync("../../")
-      .filter(
-        (allFilesPaths: string) => allFilesPaths.match(/\.env$/) !== null
-      )[0]
+      .filter((allFilesPaths: string) => allFilesPaths.match(/\.env$/) !== null)
+      .map((x) => {
+        console.log(chalk.green(`🔑 Found .env file: ${x}`));
+        return `../../${x}`;
+      })[0]
   ),
 });
 
@@ -72,6 +81,13 @@ function mnemonic() {
   return "test test test test test test test test test test test junk";
 }
 
+console.log("👷‍♂️ Hardhat config loaded", {
+  mnemonic: mnemonic(),
+  ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
+  INFURA_ID: process.env.INFURA_ID,
+  DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS,
+});
+
 function getAccounts(): HardhatNetworkAccountsUserConfig {
   if (process.env.PRIVATE_KEY) {
     return [process.env.PRIVATE_KEY as any];
@@ -93,10 +109,12 @@ const hardhatConfig: HardhatUserConfig = {
   networks: {
     hardhat: {
       chainId: 1337,
+      zksync: false,
     },
     localhost: {
       url: "http://localhost:8545",
       chainId: 1337,
+      zksync: false,
       /*
         notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
         (you can put in a mnemonic here to set the deployer locally)
@@ -107,33 +125,40 @@ const hardhatConfig: HardhatUserConfig = {
       url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: getAccounts(),
       gasPrice: 40000000000,
+      zksync: false,
     },
     kovan: {
       url: "https://kovan.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: getAccounts(),
+      zksync: false,
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: getAccounts(),
+      zksync: false,
     },
     ropsten: {
       url: "https://ropsten.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
       accounts: getAccounts(),
+      zksync: false,
     },
     goerli: {
       chainId: 5,
       url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
       accounts: getAccounts(),
+      zksync: false,
     },
     xdai: {
       chainId: 100,
       url: "https://rpc.gnosischain.com/",
       accounts: getAccounts(),
+      zksync: false,
     },
     matic: {
       url: "https://rpc-mainnet.maticvigil.com/",
       gasPrice: 1000000000,
       accounts: getAccounts(),
+      zksync: false,
     },
     rinkebyArbitrum: {
       url: "https://rinkeby.arbitrum.io/rpc",
@@ -142,6 +167,7 @@ const hardhatConfig: HardhatUserConfig = {
       companionNetworks: {
         l1: "rinkeby",
       },
+      zksync: false,
     },
     localArbitrum: {
       url: "http://localhost:8547",
@@ -150,6 +176,7 @@ const hardhatConfig: HardhatUserConfig = {
       companionNetworks: {
         l1: "localArbitrumL1",
       },
+      zksync: false,
     },
     localArbitrumL1: {
       url: "http://localhost:7545",
@@ -158,6 +185,7 @@ const hardhatConfig: HardhatUserConfig = {
       companionNetworks: {
         l2: "localArbitrum",
       },
+      zksync: false,
     },
     kovanOptimism: {
       url: "https://kovan.optimism.io",
@@ -167,6 +195,7 @@ const hardhatConfig: HardhatUserConfig = {
       companionNetworks: {
         l1: "kovan",
       },
+      zksync: false,
     },
     localOptimism: {
       url: "http://localhost:8545",
@@ -176,6 +205,7 @@ const hardhatConfig: HardhatUserConfig = {
       companionNetworks: {
         l1: "localOptimismL1",
       },
+      zksync: false,
     },
     localOptimismL1: {
       url: "http://localhost:9545",
@@ -184,42 +214,58 @@ const hardhatConfig: HardhatUserConfig = {
       companionNetworks: {
         l2: "localOptimism",
       },
+      zksync: false,
     },
     localAvalanche: {
       url: "http://localhost:9650/ext/bc/C/rpc",
       gasPrice: 225000000000,
       chainId: 43112,
       accounts: getAccounts(),
+      zksync: false,
     },
     fujiAvalanche: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       gasPrice: 225000000000,
       chainId: 43113,
       accounts: getAccounts(),
+      zksync: false,
     },
     mainnetAvalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       gasPrice: 225000000000,
       chainId: 43114,
       accounts: getAccounts(),
+      zksync: false,
     },
     testnetHarmony: {
       url: "https://api.s0.b.hmny.io",
       gasPrice: 1000000000,
       chainId: 1666700000,
       accounts: getAccounts(),
+      zksync: false,
     },
     mainnetHarmony: {
       url: "https://api.harmony.one",
       gasPrice: 1000000000,
       chainId: 1666600000,
       accounts: getAccounts(),
+      zksync: false,
+    },
+    zkSyncTestnet: {
+      url: "https://zksync2-testnet.zksync.dev",
+      ethNetwork: "goerli", // or a Goerli RPC endpoint from Infura/Alchemy/Chainstack etc.
+      zksync: true,
+      verifyURL:
+        "https://zksync2-testnet-explorer.zksync.dev/contract_verification",
     },
   },
   solidity: {
     compilers: [
       {
         version: "0.5.8",
+      },
+      {
+        version: "0.4.24",
       },
       {
         version: "0.8.1",
@@ -232,6 +278,11 @@ const hardhatConfig: HardhatUserConfig = {
       },
     ],
   },
+  zksolc: {
+    version: "1.3.5",
+    compilerSource: "binary",
+    settings: {},
+  },
   ovm: {
     solcVersion: "0.7.6",
   },
@@ -243,16 +294,19 @@ const hardhatConfig: HardhatUserConfig = {
       default: 0,
       100: process.env.DEPLOYER_ADDRESS,
       goerli: process.env.DEPLOYER_ADDRESS,
+      280: process.env.DEPLOYER_ADDRESS,
     },
     govern: {
       default: 1,
       xdai: governGnosis.address,
       goerli: governGoerli.address, // Govern address on Goerli
+      280: governZkSyncTestNet.address, // Govern address on Goerli
     },
     owner: {
       default: 1,
       xdai: defaultConfig.RootOwner.xdai,
       goerli: defaultConfig.RootOwner.goerli,
+      zkSync: defaultConfig.RootOwner.zkSyncTestnet,
     }, // Goerli Gnosis Safe address
   },
 };

@@ -6,7 +6,7 @@ import exportContractResult from "../scripts/export-contract-result";
 import { Contract, Wallet } from "zksync-web3";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 
-const contractName = "Quest";
+const contractName = "OwnableCelesteMock";
 
 // Not actually used but so verification using etherscan-verify will verify the quest contract
 export default async (hre: HardhatRuntimeEnvironment) => {

@@ -4,8 +4,8 @@ pragma solidity ^0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./libraries/Deposit.sol";
-import "./libraries/Models.sol";
+import "./libraries_Deposit.sol";
+import "./libraries_Models.sol";
 import "./Quest.sol";
 
 contract QuestFactory is Ownable {
