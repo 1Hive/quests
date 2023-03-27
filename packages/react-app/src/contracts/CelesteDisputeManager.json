@@ -1,442 +1,444 @@
-[
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "setMaxJurorsPerDraftBatch",
-    "inputs": [{ "type": "uint64", "name": "_maxJurorsPerDraftBatch" }],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "ensureCanCommit",
-    "inputs": [
-      { "type": "uint256", "name": "_voteId" },
-      { "type": "address", "name": "_voter" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "createAppeal",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" },
-      { "type": "uint8", "name": "_ruling" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "ensureCanCommit",
-    "inputs": [{ "type": "uint256", "name": "_voteId" }],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "createDispute",
-    "inputs": [
-      { "type": "address", "name": "_subject" },
-      { "type": "uint8", "name": "_possibleRulings" },
-      { "type": "bytes", "name": "_metadata" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "recoverFunds",
-    "inputs": [
-      { "type": "address", "name": "_token" },
-      { "type": "address", "name": "_to" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "address", "name": "" }],
-    "name": "getController",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "uint64", "name": "" }],
-    "name": "maxJurorsPerDraftBatch",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [
-      { "type": "uint64", "name": "draftTerm" },
-      { "type": "uint64", "name": "delayedTerms" },
-      { "type": "uint64", "name": "jurorsNumber" },
-      { "type": "uint64", "name": "selectedJurors" },
-      { "type": "uint256", "name": "jurorFees" },
-      { "type": "bool", "name": "settledPenalties" },
-      { "type": "uint256", "name": "collectedTokens" },
-      { "type": "uint64", "name": "coherentJurors" },
-      { "type": "uint8", "name": "state" }
-    ],
-    "name": "getRound",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" }
-    ],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [
-      { "type": "uint64", "name": "weight" },
-      { "type": "bool", "name": "rewarded" }
-    ],
-    "name": "getJuror",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" },
-      { "type": "address", "name": "_juror" }
-    ],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "submitEvidence",
-    "inputs": [
-      { "type": "address", "name": "_subject" },
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "address", "name": "_submitter" },
-      { "type": "bytes", "name": "_evidence" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "draft",
-    "inputs": [{ "type": "uint256", "name": "_disputeId" }],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [
-      { "type": "address", "name": "maker" },
-      { "type": "uint64", "name": "appealedRuling" },
-      { "type": "address", "name": "taker" },
-      { "type": "uint64", "name": "opposedRuling" }
-    ],
-    "name": "getAppeal",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" }
-    ],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [
-      { "type": "address", "name": "feeToken" },
-      { "type": "uint256", "name": "totalFees" }
-    ],
-    "name": "getDisputeFees",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "settleReward",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" },
-      { "type": "address", "name": "_juror" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "settlePenalties",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" },
-      { "type": "uint256", "name": "_jurorsToSettle" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "confirmAppeal",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" },
-      { "type": "uint8", "name": "_ruling" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [
-      { "type": "address", "name": "subject" },
-      { "type": "uint8", "name": "finalRuling" }
-    ],
-    "name": "computeRuling",
-    "inputs": [{ "type": "uint256", "name": "_disputeId" }],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [{ "type": "uint64", "name": "" }],
-    "name": "ensureCanReveal",
-    "inputs": [
-      { "type": "uint256", "name": "_voteId" },
-      { "type": "address", "name": "_voter" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "closeEvidencePeriod",
-    "inputs": [
-      { "type": "address", "name": "_subject" },
-      { "type": "uint256", "name": "_disputeId" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [
-      { "type": "uint64", "name": "nextRoundStartTerm" },
-      { "type": "uint64", "name": "nextRoundJurorsNumber" },
-      { "type": "uint8", "name": "newDisputeState" },
-      { "type": "address", "name": "feeToken" },
-      { "type": "uint256", "name": "totalFees" },
-      { "type": "uint256", "name": "jurorFees" },
-      { "type": "uint256", "name": "appealDeposit" },
-      { "type": "uint256", "name": "confirmAppealDeposit" }
-    ],
-    "name": "getNextRoundDetails",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" }
-    ],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [
-      { "type": "address", "name": "subject" },
-      { "type": "uint8", "name": "possibleRulings" },
-      { "type": "uint8", "name": "state" },
-      { "type": "uint8", "name": "finalRuling" },
-      { "type": "uint256", "name": "lastRoundId" },
-      { "type": "uint64", "name": "createTermId" }
-    ],
-    "name": "getDispute",
-    "inputs": [{ "type": "uint256", "name": "_disputeId" }],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "settleAppealDeposit",
-    "inputs": [
-      { "type": "uint256", "name": "_disputeId" },
-      { "type": "uint256", "name": "_roundId" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "constructor",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "inputs": [
-      { "type": "address", "name": "_controller" },
-      { "type": "uint64", "name": "_maxJurorsPerDraftBatch" },
-      { "type": "uint256", "name": "_skippedDisputes" }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "DisputeStateChanged",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint8", "name": "state", "indexed": true }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "EvidenceSubmitted",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "address", "name": "submitter", "indexed": true },
-      { "type": "bytes", "name": "evidence", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "EvidencePeriodClosed",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint64", "name": "termId", "indexed": true }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "NewDispute",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "address", "name": "subject", "indexed": true },
-      { "type": "uint64", "name": "draftTermId", "indexed": true },
-      { "type": "uint64", "name": "jurorsNumber", "indexed": false },
-      { "type": "bytes", "name": "metadata", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "JurorDrafted",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint256", "name": "roundId", "indexed": true },
-      { "type": "address", "name": "juror", "indexed": true }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RulingAppealed",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint256", "name": "roundId", "indexed": true },
-      { "type": "uint8", "name": "ruling", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RulingAppealConfirmed",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint256", "name": "roundId", "indexed": true },
-      { "type": "uint64", "name": "draftTermId", "indexed": true },
-      { "type": "uint256", "name": "jurorsNumber", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RulingComputed",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint8", "name": "ruling", "indexed": true }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "PenaltiesSettled",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint256", "name": "roundId", "indexed": true },
-      { "type": "uint256", "name": "collectedTokens", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RewardSettled",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint256", "name": "roundId", "indexed": true },
-      { "type": "address", "name": "juror", "indexed": false },
-      { "type": "uint256", "name": "tokens", "indexed": false },
-      { "type": "uint256", "name": "fees", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "AppealDepositSettled",
-    "inputs": [
-      { "type": "uint256", "name": "disputeId", "indexed": true },
-      { "type": "uint256", "name": "roundId", "indexed": true }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "MaxJurorsPerDraftBatchChanged",
-    "inputs": [
-      { "type": "uint64", "name": "previousMaxJurorsPerDraftBatch", "indexed": false },
-      { "type": "uint64", "name": "currentMaxJurorsPerDraftBatch", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RecoverFunds",
-    "inputs": [
-      { "type": "address", "name": "token", "indexed": false },
-      { "type": "address", "name": "recipient", "indexed": false },
-      { "type": "uint256", "name": "balance", "indexed": false }
-    ],
-    "anonymous": false
-  }
-]
+{
+  "abi": [
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "setMaxJurorsPerDraftBatch",
+      "inputs": [{ "type": "uint64", "name": "_maxJurorsPerDraftBatch" }],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "ensureCanCommit",
+      "inputs": [
+        { "type": "uint256", "name": "_voteId" },
+        { "type": "address", "name": "_voter" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "createAppeal",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" },
+        { "type": "uint8", "name": "_ruling" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "ensureCanCommit",
+      "inputs": [{ "type": "uint256", "name": "_voteId" }],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [{ "type": "uint256", "name": "" }],
+      "name": "createDispute",
+      "inputs": [
+        { "type": "address", "name": "_subject" },
+        { "type": "uint8", "name": "_possibleRulings" },
+        { "type": "bytes", "name": "_metadata" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "recoverFunds",
+      "inputs": [
+        { "type": "address", "name": "_token" },
+        { "type": "address", "name": "_to" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [{ "type": "address", "name": "" }],
+      "name": "getController",
+      "inputs": [],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [{ "type": "uint64", "name": "" }],
+      "name": "maxJurorsPerDraftBatch",
+      "inputs": [],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [
+        { "type": "uint64", "name": "draftTerm" },
+        { "type": "uint64", "name": "delayedTerms" },
+        { "type": "uint64", "name": "jurorsNumber" },
+        { "type": "uint64", "name": "selectedJurors" },
+        { "type": "uint256", "name": "jurorFees" },
+        { "type": "bool", "name": "settledPenalties" },
+        { "type": "uint256", "name": "collectedTokens" },
+        { "type": "uint64", "name": "coherentJurors" },
+        { "type": "uint8", "name": "state" }
+      ],
+      "name": "getRound",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" }
+      ],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [
+        { "type": "uint64", "name": "weight" },
+        { "type": "bool", "name": "rewarded" }
+      ],
+      "name": "getJuror",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" },
+        { "type": "address", "name": "_juror" }
+      ],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "submitEvidence",
+      "inputs": [
+        { "type": "address", "name": "_subject" },
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "address", "name": "_submitter" },
+        { "type": "bytes", "name": "_evidence" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "draft",
+      "inputs": [{ "type": "uint256", "name": "_disputeId" }],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [
+        { "type": "address", "name": "maker" },
+        { "type": "uint64", "name": "appealedRuling" },
+        { "type": "address", "name": "taker" },
+        { "type": "uint64", "name": "opposedRuling" }
+      ],
+      "name": "getAppeal",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" }
+      ],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [
+        { "type": "address", "name": "feeToken" },
+        { "type": "uint256", "name": "totalFees" }
+      ],
+      "name": "getDisputeFees",
+      "inputs": [],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "settleReward",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" },
+        { "type": "address", "name": "_juror" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "settlePenalties",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" },
+        { "type": "uint256", "name": "_jurorsToSettle" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "confirmAppeal",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" },
+        { "type": "uint8", "name": "_ruling" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [
+        { "type": "address", "name": "subject" },
+        { "type": "uint8", "name": "finalRuling" }
+      ],
+      "name": "computeRuling",
+      "inputs": [{ "type": "uint256", "name": "_disputeId" }],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [{ "type": "uint64", "name": "" }],
+      "name": "ensureCanReveal",
+      "inputs": [
+        { "type": "uint256", "name": "_voteId" },
+        { "type": "address", "name": "_voter" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "closeEvidencePeriod",
+      "inputs": [
+        { "type": "address", "name": "_subject" },
+        { "type": "uint256", "name": "_disputeId" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [
+        { "type": "uint64", "name": "nextRoundStartTerm" },
+        { "type": "uint64", "name": "nextRoundJurorsNumber" },
+        { "type": "uint8", "name": "newDisputeState" },
+        { "type": "address", "name": "feeToken" },
+        { "type": "uint256", "name": "totalFees" },
+        { "type": "uint256", "name": "jurorFees" },
+        { "type": "uint256", "name": "appealDeposit" },
+        { "type": "uint256", "name": "confirmAppealDeposit" }
+      ],
+      "name": "getNextRoundDetails",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" }
+      ],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "view",
+      "payable": false,
+      "outputs": [
+        { "type": "address", "name": "subject" },
+        { "type": "uint8", "name": "possibleRulings" },
+        { "type": "uint8", "name": "state" },
+        { "type": "uint8", "name": "finalRuling" },
+        { "type": "uint256", "name": "lastRoundId" },
+        { "type": "uint64", "name": "createTermId" }
+      ],
+      "name": "getDispute",
+      "inputs": [{ "type": "uint256", "name": "_disputeId" }],
+      "constant": true
+    },
+    {
+      "type": "function",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "outputs": [],
+      "name": "settleAppealDeposit",
+      "inputs": [
+        { "type": "uint256", "name": "_disputeId" },
+        { "type": "uint256", "name": "_roundId" }
+      ],
+      "constant": false
+    },
+    {
+      "type": "constructor",
+      "stateMutability": "nonpayable",
+      "payable": false,
+      "inputs": [
+        { "type": "address", "name": "_controller" },
+        { "type": "uint64", "name": "_maxJurorsPerDraftBatch" },
+        { "type": "uint256", "name": "_skippedDisputes" }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "DisputeStateChanged",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint8", "name": "state", "indexed": true }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "EvidenceSubmitted",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "address", "name": "submitter", "indexed": true },
+        { "type": "bytes", "name": "evidence", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "EvidencePeriodClosed",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint64", "name": "termId", "indexed": true }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "NewDispute",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "address", "name": "subject", "indexed": true },
+        { "type": "uint64", "name": "draftTermId", "indexed": true },
+        { "type": "uint64", "name": "jurorsNumber", "indexed": false },
+        { "type": "bytes", "name": "metadata", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "JurorDrafted",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint256", "name": "roundId", "indexed": true },
+        { "type": "address", "name": "juror", "indexed": true }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RulingAppealed",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint256", "name": "roundId", "indexed": true },
+        { "type": "uint8", "name": "ruling", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RulingAppealConfirmed",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint256", "name": "roundId", "indexed": true },
+        { "type": "uint64", "name": "draftTermId", "indexed": true },
+        { "type": "uint256", "name": "jurorsNumber", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RulingComputed",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint8", "name": "ruling", "indexed": true }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "PenaltiesSettled",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint256", "name": "roundId", "indexed": true },
+        { "type": "uint256", "name": "collectedTokens", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RewardSettled",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint256", "name": "roundId", "indexed": true },
+        { "type": "address", "name": "juror", "indexed": false },
+        { "type": "uint256", "name": "tokens", "indexed": false },
+        { "type": "uint256", "name": "fees", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "AppealDepositSettled",
+      "inputs": [
+        { "type": "uint256", "name": "disputeId", "indexed": true },
+        { "type": "uint256", "name": "roundId", "indexed": true }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "MaxJurorsPerDraftBatchChanged",
+      "inputs": [
+        { "type": "uint64", "name": "previousMaxJurorsPerDraftBatch", "indexed": false },
+        { "type": "uint64", "name": "currentMaxJurorsPerDraftBatch", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RecoverFunds",
+      "inputs": [
+        { "type": "address", "name": "token", "indexed": false },
+        { "type": "address", "name": "recipient", "indexed": false },
+        { "type": "uint256", "name": "balance", "indexed": false }
+      ],
+      "anonymous": false
+    }
+  ]
+}

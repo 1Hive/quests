@@ -65,11 +65,13 @@ function getContract(
       }
     }
     const contractAddress: string = contractAddressOverride ?? askedContract.address;
-    const contractAbi = askedContract.abi ?? askedContract;
+
+    const contractAbi = askedContract.abi;
     const provider = getDefaultProvider();
 
     if (!contractAddress) throw new Error(`${contractName} address was not defined`);
-    if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
+    if (!contractAbi)
+      throw new Error(`${contractName} ABI was not defined, address: ${contractAddress}`);
 
     contract = new Contract(
       contractAddress,
