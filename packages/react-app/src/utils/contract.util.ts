@@ -29,7 +29,7 @@ export function getProviderOrSigner(ethersProvider: any, walletAddress?: string)
 function getContractsJson(network?: any) {
   network = network ?? getNetwork();
   return {
-    Celeste, // Only when not rinkeby (hardhat_contracts.json Celeste will override this one only on rinkeby)
+    Celeste, // Only when not goerli (hardhat_contracts.json Celeste will override this one only on goerli)
     ...contractsJson[network.chainId][network.networkId].contracts,
     ERC20,
     UniswapPair,
@@ -149,8 +149,8 @@ export async function getCelesteDisputeManagerContract(celesteAddressOverride?: 
   return getContract('CelesteDisputeManager', disputeManagerAddress);
 }
 
-export function getQuestContractInterface() {
-  return new ethers.utils.Interface(getContractsJson().Quest.abi);
+export function getQuestContractInterface(version?: number) {
+  return new ethers.utils.Interface(getContractsJson().Quest[version ?? 0].abi);
 }
 
 // #endregion
