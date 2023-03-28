@@ -20,7 +20,7 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface IERC20PermitInterface extends ethers.utils.Interface {
+interface Ierc20PermitInterface extends ethers.utils.Interface {
   functions: {
     "DOMAIN_SEPARATOR()": FunctionFragment;
     "nonces(address)": FunctionFragment;
@@ -55,7 +55,7 @@ interface IERC20PermitInterface extends ethers.utils.Interface {
   events: {};
 }
 
-export class IERC20Permit extends Contract {
+export class Ierc20Permit extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -66,19 +66,30 @@ export class IERC20Permit extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: IERC20PermitInterface;
+  interface: Ierc20PermitInterface;
 
   functions: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<[string]>;
+    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    nonces(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
 
     "nonces(address)"(
       owner: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<{
+      0: BigNumber;
+    }>;
 
     permit(
       owner: string,

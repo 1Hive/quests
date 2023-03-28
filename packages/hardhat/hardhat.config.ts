@@ -17,7 +17,7 @@ import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-verify";
 
 import { task, HardhatUserConfig, types } from "hardhat/config";
-import { HttpNetworkUserConfig } from "hardhat/types";
+import { HardhatNetworkConfig, HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
 import deployQuestFactory from "./deploy/deploy-quest_factory";
@@ -28,7 +28,7 @@ import deployGovernQueue, {
 import deployGovern from "./scripts/deploy-govern";
 import governGnosis from "./deployments/xdai/Govern.json";
 import governGoerli from "./deployments/goerli/Govern.json";
-import governZkSyncTestNet from "./deployments/zkSyncTestNet/Govern.json";
+import governZkTestnet from "./deployments/zkTestnet/Govern.json";
 import defaultConfig from "./default-config.json";
 import exportContractResult from "./scripts/export-contract-result";
 import GovernAbi from "./abi/contracts/Externals/Govern.json";
@@ -41,8 +41,8 @@ dotenvConfig({
     fs
       .readdirSync("../../")
       .filter((allFilesPaths: string) => allFilesPaths.match(/\.env$/) !== null)
-      .map((x) => {
-        console.log(chalk.green(`🔑 Found .env file: ${x}`));
+      .map((x, i) => {
+        if (i === 0) console.log(chalk.green(`🔑 Found .env file: ${x}`));
         return `../../${x}`;
       })[0]
   ),
@@ -65,11 +65,11 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 const defaultNetwork = "localhost";
 const mainnetGwei = 21;
 
-function mnemonic() {
+export function mnemonic() {
   try {
-    if (!process.env.MNEMONIC || !process.env.PRIVATE_KEY)
-      throw new Error("No mnemonic detected");
-    return process.env.MNEMONIC;
+    const mnemonic = process.env.MNEMONIC || process.env.PRIVATE_KEY;
+    if (!mnemonic) throw new Error("No mnemonic detected");
+    return mnemonic;
   } catch (e) {
     if (defaultNetwork !== "localhost") {
       console.warn(
@@ -86,6 +86,7 @@ console.log("👷‍♂️ Hardhat config loaded", {
   ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
   INFURA_ID: process.env.INFURA_ID,
   DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS,
+  ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
 });
 
 function getAccounts(): HardhatNetworkAccountsUserConfig {
@@ -98,7 +99,7 @@ function getAccounts(): HardhatNetworkAccountsUserConfig {
   };
 }
 
-const hardhatConfig: HardhatUserConfig = {
+const hardhatConfig = {
   defaultNetwork,
 
   // don't forget to set your provider like:
@@ -144,7 +145,7 @@ const hardhatConfig: HardhatUserConfig = {
     },
     goerli: {
       chainId: 5,
-      url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
+      url: "https://eth-goerli.g.alchemy.com/v2/" + process.env.ALCHEMY_API_KEY,
       accounts: getAccounts(),
       zksync: false,
     },
@@ -251,9 +252,10 @@ const hardhatConfig: HardhatUserConfig = {
       accounts: getAccounts(),
       zksync: false,
     },
-    zkSyncTestnet: {
+    zkTestnet: {
       url: "https://zksync2-testnet.zksync.dev",
-      ethNetwork: "goerli", // or a Goerli RPC endpoint from Infura/Alchemy/Chainstack etc.
+      ethNetwork:
+        "https://eth-goerli.g.alchemy.com/v2/" + process.env.ALCHEMY_API_KEY, // or a Goerli RPC endpoint from Infura/Alchemy/Chainstack etc.
       zksync: true,
       verifyURL:
         "https://zksync2-testnet-explorer.zksync.dev/contract_verification",
@@ -281,7 +283,9 @@ const hardhatConfig: HardhatUserConfig = {
   zksolc: {
     version: "1.3.5",
     compilerSource: "binary",
-    settings: {},
+    settings: {
+      libraries: {},
+    },
   },
   ovm: {
     solcVersion: "0.7.6",
@@ -300,7 +304,7 @@ const hardhatConfig: HardhatUserConfig = {
       default: 1,
       xdai: governGnosis.address,
       goerli: governGoerli.address, // Govern address on Goerli
-      280: governZkSyncTestNet.address, // Govern address on Goerli
+      280: governZkTestnet.address, // Govern address on Goerli
     },
     owner: {
       default: 1,

@@ -15,6 +15,10 @@
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
+    },
+    "zkSyncTestnet": {
+      "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
+      "amount": 0.01
     }
   },
   "PlayQuestDeposit": {
@@ -24,6 +28,10 @@
     },
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
+      "amount": 0.01
+    },
+    "zkSyncTestnet": {
+      "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
       "amount": 0.01
     }
   },
@@ -35,6 +43,10 @@
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
+    },
+    "zkSyncTestnet": {
+      "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
+      "amount": 0.01
     }
   },
   "ChallengeDeposit": {
@@ -45,12 +57,20 @@
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
+    },
+    "zkSyncTestnet": {
+      "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
+      "amount": 0.01
     }
   },
   "ChallengeFee": {
     "goerli": {
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.05
+    },
+    "zkSyncTestnet": {
+      "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
+      "amount": 0.01
     }
   },
   "RootOwner": {

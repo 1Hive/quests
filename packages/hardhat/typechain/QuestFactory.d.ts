@@ -137,17 +137,27 @@ export class QuestFactory extends Contract {
   interface: QuestFactoryInterface;
 
   functions: {
-    aragonGovernAddress(overrides?: CallOverrides): Promise<[string]>;
+    aragonGovernAddress(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "aragonGovernAddress()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    createDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    createDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "createDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     createQuest(
       _questTitle: string,
@@ -169,17 +179,27 @@ export class QuestFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
+    owner(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+    "owner()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    playDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    playDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "playDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "playDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -234,13 +254,19 @@ export class QuestFactory extends Contract {
 
   "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  createDeposit(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  createDeposit(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
-  "createDeposit()"(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  "createDeposit()"(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
   createQuest(
     _questTitle: string,
@@ -266,13 +292,19 @@ export class QuestFactory extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
-  playDeposit(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  playDeposit(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
-  "playDeposit()"(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  "playDeposit()"(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
   renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -327,13 +359,19 @@ export class QuestFactory extends Contract {
 
     "aragonGovernAddress()"(overrides?: CallOverrides): Promise<string>;
 
-    createDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    createDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "createDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     createQuest(
       _questTitle: string,
@@ -359,13 +397,19 @@ export class QuestFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
-    playDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    playDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "playDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "playDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 

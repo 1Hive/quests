@@ -82,25 +82,23 @@ export class IArbitrator extends Contract {
   interface: IArbitratorInterface;
 
   functions: {
-    getDisputeFees(
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        recipient: string;
-        feeToken: string;
-        feeAmount: BigNumber;
-      }
-    >;
+    getDisputeFees(overrides?: CallOverrides): Promise<{
+      recipient: string;
+      feeToken: string;
+      feeAmount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
-    "getDisputeFees()"(
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        recipient: string;
-        feeToken: string;
-        feeAmount: BigNumber;
-      }
-    >;
+    "getDisputeFees()"(overrides?: CallOverrides): Promise<{
+      recipient: string;
+      feeToken: string;
+      feeAmount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
     submitEvidence(
       _disputeId: BigNumberish,
@@ -149,25 +147,23 @@ export class IArbitrator extends Contract {
     ): Promise<ContractTransaction>;
   };
 
-  getDisputeFees(
-    overrides?: CallOverrides
-  ): Promise<
-    [string, string, BigNumber] & {
-      recipient: string;
-      feeToken: string;
-      feeAmount: BigNumber;
-    }
-  >;
+  getDisputeFees(overrides?: CallOverrides): Promise<{
+    recipient: string;
+    feeToken: string;
+    feeAmount: BigNumber;
+    0: string;
+    1: string;
+    2: BigNumber;
+  }>;
 
-  "getDisputeFees()"(
-    overrides?: CallOverrides
-  ): Promise<
-    [string, string, BigNumber] & {
-      recipient: string;
-      feeToken: string;
-      feeAmount: BigNumber;
-    }
-  >;
+  "getDisputeFees()"(overrides?: CallOverrides): Promise<{
+    recipient: string;
+    feeToken: string;
+    feeAmount: BigNumber;
+    0: string;
+    1: string;
+    2: BigNumber;
+  }>;
 
   submitEvidence(
     _disputeId: BigNumberish,
@@ -216,25 +212,23 @@ export class IArbitrator extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getDisputeFees(
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        recipient: string;
-        feeToken: string;
-        feeAmount: BigNumber;
-      }
-    >;
+    getDisputeFees(overrides?: CallOverrides): Promise<{
+      recipient: string;
+      feeToken: string;
+      feeAmount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
-    "getDisputeFees()"(
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        recipient: string;
-        feeToken: string;
-        feeAmount: BigNumber;
-      }
-    >;
+    "getDisputeFees()"(overrides?: CallOverrides): Promise<{
+      recipient: string;
+      feeToken: string;
+      feeAmount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
     submitEvidence(
       _disputeId: BigNumberish,
@@ -275,12 +269,22 @@ export class IArbitrator extends Contract {
     rule(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { subject: string; ruling: BigNumber }>;
+    ): Promise<{
+      subject: string;
+      ruling: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     "rule(uint256)"(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { subject: string; ruling: BigNumber }>;
+    ): Promise<{
+      subject: string;
+      ruling: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
   };
 
   filters: {};

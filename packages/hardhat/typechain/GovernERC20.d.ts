@@ -20,7 +20,7 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface GovernERC20Interface extends ethers.utils.Interface {
+interface GovernErc20Interface extends ethers.utils.Interface {
   functions: {
     "approve(address,uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -74,7 +74,7 @@ interface GovernERC20Interface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
 }
 
-export class GovernERC20 extends Contract {
+export class GovernErc20 extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -85,7 +85,7 @@ export class GovernERC20 extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: GovernERC20Interface;
+  interface: GovernErc20Interface;
 
   functions: {
     approve(
@@ -100,9 +100,13 @@ export class GovernERC20 extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+    totalSupply(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "totalSupply()"(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
     transferFrom(
       _from: string,
@@ -118,12 +122,19 @@ export class GovernERC20 extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    balanceOf(_who: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    balanceOf(
+      _who: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
 
     "balanceOf(address)"(
       _who: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<{
+      0: BigNumber;
+    }>;
 
     transfer(
       _to: string,
@@ -141,13 +152,17 @@ export class GovernERC20 extends Contract {
       _owner: string,
       _spender: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<{
+      0: BigNumber;
+    }>;
 
     "allowance(address,address)"(
       _owner: string,
       _spender: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<{
+      0: BigNumber;
+    }>;
   };
 
   approve(

@@ -1,109 +1,83 @@
-import { DeployResult } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import exportContractResult from "../scripts/export-contract-result";
+import * as ethers from "ethers";
 
 // ZkSync support
-import { Contract, Wallet } from "zksync-web3";
+import { Contract, Wallet, utils } from "zksync-web3";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 
-const contractName = "HoneyTest";
+const contractName = "HoneyTestToken";
 
-// Not actually used but so verification using etherscan-verify will verify the quest contract
 export default async (hre: HardhatRuntimeEnvironment) => {
   console.log("PRIVATE_KEY", process.env.PRIVATE_KEY);
   const { deploy } = hre.deployments;
   const { deployer, owner } = await hre.getNamedAccounts();
 
   let token: Contract;
-  let tokenController: Contract;
-  let tokenFactory: DeployResult | Contract;
 
-  const constructorArguments = [
-    "0x0000000000000000000000000000000000000000",
-    1,
-    "Honey test",
-    18,
-    "HNYT",
-    true,
-  ];
+  const constructorArguments = [];
 
   if (hre.network.zksync) {
-    const wallet = new Wallet(deployer);
+    console.log("Deploying HoneyTest on zkSync...", { deployer });
+    const wallet = new Wallet(process.env.PRIVATE_KEY);
+    console.log("Wallet initialized");
     const zkDeployer = new Deployer(hre, wallet);
-    // Deploy TokenFactory
-    const tokenFactoryArtifact = await zkDeployer.loadArtifact(
-      "MiniMeTokenFactory"
-    );
-    tokenFactory = await zkDeployer.deploy(tokenFactoryArtifact, []);
+    console.log("Deployer initialized");
 
-    // Deploy TokenController
-    const tokenControllerArtifact = await zkDeployer.loadArtifact(
-      "TokenController"
+    const tokenArtifact = await zkDeployer.loadArtifact(contractName);
+    console.log("TokenArtifact loaded");
+
+    // Deposit ETH to zkSync
+    const depositAmount = ethers.utils.parseEther("0.001");
+    console.log("Estimating fee and gas...");
+    const estimatedFee = await zkDeployer.estimateDeployFee(
+      tokenArtifact,
+      constructorArguments
     );
-    tokenController = await zkDeployer.deploy(tokenControllerArtifact, [owner]);
-    // Deploy TokenController
-    const miniMeTokenArtifact = await zkDeployer.loadArtifact("MiniMeToken");
-    token = await zkDeployer.deploy(miniMeTokenArtifact, [
-      tokenFactory.address,
-      ...constructorArguments,
-    ]);
+    const estimatedGas = await zkDeployer.estimateDeployGas(
+      tokenArtifact,
+      constructorArguments
+    );
+    const deployerBalance = await zkDeployer.zkWallet.getBalance(
+      utils.ETH_ADDRESS
+    );
+    console.log("Actual state and estimations", {
+      balance: deployerBalance.toString(),
+      depositAmount: depositAmount.toString(),
+      estimatedFee: estimatedFee.toString(),
+      estimatedGas: estimatedGas.toString(),
+    });
+    if (deployerBalance.lt(depositAmount.add(estimatedFee).add(estimatedGas))) {
+      console.log("Depositing ETH to zkSync...");
+      const depositHandle = await zkDeployer.zkWallet.deposit({
+        to: zkDeployer.zkWallet.address,
+        token: utils.ETH_ADDRESS,
+        amount: depositAmount,
+      });
+      await depositHandle.wait();
+      console.log("ETH deposited", { depositHandle });
+    } else {
+      console.log("Enough ETH already deposited");
+    }
+
+    // Deploy TokenFactory
+    console.log("Deploying contract...", {
+      contract: tokenArtifact.contractName,
+    });
+    token = await zkDeployer.deploy(tokenArtifact, []);
+    console.log("Deploying succeed", { address: token.address });
   } else {
     // Deploy TokenController
-    tokenFactory = await deploy("MiniMeTokenFactory", {
+    const result = await deploy(contractName, {
       from: deployer,
-      args: [],
-      log: true,
-    });
-    // Deploy TokenController
-    const tokenControllerResult = await deploy("TokenController", {
-      from: deployer,
-      args: [owner],
-      log: true,
-    });
-    tokenController = new Contract(
-      tokenControllerResult.address,
-      tokenControllerResult.abi,
-      hre.ethers.provider
-    );
-    // Deploy TokenController
-    const result = await deploy("MiniMeToken", {
-      from: deployer,
-      args: [tokenFactory.address, ...constructorArguments],
+      args: constructorArguments,
       log: true,
     });
 
     token = new Contract(result.address, result.abi, hre.ethers.provider);
   }
 
-  // Setting controller
-  token
-    .changeController(tokenController.address)
-    .then((tx) => {
-      console.log("Successfully setting controller", tx);
-
-      // Setting MiniMeToken owner
-      token
-        .transferOwnership(owner)
-        .then((tx) => {
-          console.log("Successfully setting token controller owner", tx);
-        })
-        .catch((error) => {
-          console.error("Failed when setting token controller owner", error);
-        });
-    })
-    .catch((error) => {
-      console.error("Failed when setting controller", error);
-    });
-
-  // Setting controller owner
-  tokenController
-    .transferOwnership(owner)
-    .then((tx) => {
-      console.log("Successfully setting token controller owner", tx);
-    })
-    .catch((error) => {
-      console.error("Failed when setting token controller owner", error);
-    });
+  await token.transferOwnership(owner);
 
   try {
     console.log("Verifying HoneyTest...");
@@ -111,28 +85,9 @@ export default async (hre: HardhatRuntimeEnvironment) => {
       setTimeout(() => {
         hre
           .run("verify:verify", {
-            address: tokenController.address,
-            contract: "TokenFactory",
-            constructorArguments: [owner],
-          })
-          .then(res)
-          .catch(rej);
-        hre
-          .run("verify:verify", {
-            address: tokenController.address,
-            contract: "TokenController",
-            constructorArguments: [owner],
-          })
-          .then(res)
-          .catch(rej);
-        hre
-          .run("verify:verify", {
             address: token.address,
-            contract: "MiniMeToken",
-            constructorArguments: [
-              tokenFactory.address,
-              ...constructorArguments,
-            ],
+            contract: contractName,
+            constructorArguments,
           })
           .then(res)
           .catch(rej);

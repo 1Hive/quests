@@ -177,16 +177,27 @@ export class Quest extends Contract {
   interface: QuestInterface;
 
   functions: {
-    aragonGovernAddress(overrides?: CallOverrides): Promise<[string]>;
+    aragonGovernAddress(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "aragonGovernAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "aragonGovernAddress()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    canExecute(executer: string, overrides?: CallOverrides): Promise<[boolean]>;
+    canExecute(
+      executer: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: boolean;
+    }>;
 
     "canExecute(address)"(
       executer: string,
       overrides?: CallOverrides
-    ): Promise<[boolean]>;
+    ): Promise<{
+      0: boolean;
+    }>;
 
     claim(
       _evidence: BytesLike,
@@ -207,52 +218,80 @@ export class Quest extends Contract {
     claims(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        evidence: string;
-        player: string;
-        amount: BigNumber;
-      }
-    >;
+    ): Promise<{
+      evidence: string;
+      player: string;
+      amount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
     "claims(uint256)"(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        evidence: string;
-        player: string;
-        amount: BigNumber;
-      }
-    >;
+    ): Promise<{
+      evidence: string;
+      player: string;
+      amount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
-    createDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    createDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "createDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    expireTime(overrides?: CallOverrides): Promise<[BigNumber]>;
+    expireTime(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
-    "expireTime()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "expireTime()"(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
-    fundsRecoveryAddress(overrides?: CallOverrides): Promise<[string]>;
+    fundsRecoveryAddress(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<[string]>;
+    "fundsRecoveryAddress()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    getPlayers(overrides?: CallOverrides): Promise<[string[]]>;
+    getPlayers(overrides?: CallOverrides): Promise<{
+      0: string[];
+    }>;
 
-    "getPlayers()"(overrides?: CallOverrides): Promise<[string[]]>;
+    "getPlayers()"(overrides?: CallOverrides): Promise<{
+      0: string[];
+    }>;
 
-    isCreateDepositReleased(overrides?: CallOverrides): Promise<[boolean]>;
+    isCreateDepositReleased(overrides?: CallOverrides): Promise<{
+      0: boolean;
+    }>;
 
-    "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<[boolean]>;
+    "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<{
+      0: boolean;
+    }>;
 
-    maxPlayers(overrides?: CallOverrides): Promise<[number]>;
+    maxPlayers(overrides?: CallOverrides): Promise<{
+      0: number;
+    }>;
 
-    "maxPlayers()"(overrides?: CallOverrides): Promise<[number]>;
+    "maxPlayers()"(overrides?: CallOverrides): Promise<{
+      0: number;
+    }>;
 
     play(_player: string, overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -261,25 +300,43 @@ export class Quest extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    playDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    playDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "playDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "playDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    questCreator(overrides?: CallOverrides): Promise<[string]>;
+    questCreator(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "questCreator()"(overrides?: CallOverrides): Promise<[string]>;
+    "questCreator()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    questDetailsRef(overrides?: CallOverrides): Promise<[string]>;
+    questDetailsRef(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "questDetailsRef()"(overrides?: CallOverrides): Promise<[string]>;
+    "questDetailsRef()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    questTitle(overrides?: CallOverrides): Promise<[string]>;
+    questTitle(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "questTitle()"(overrides?: CallOverrides): Promise<[string]>;
+    "questTitle()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
     recoverFundsAndDeposit(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -287,9 +344,13 @@ export class Quest extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    rewardToken(overrides?: CallOverrides): Promise<[string]>;
+    rewardToken(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "rewardToken()"(overrides?: CallOverrides): Promise<[string]>;
+    "rewardToken()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
     unplay(
       _player: string,
@@ -332,32 +393,40 @@ export class Quest extends Contract {
   claims(
     arg0: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [string, string, BigNumber] & {
-      evidence: string;
-      player: string;
-      amount: BigNumber;
-    }
-  >;
+  ): Promise<{
+    evidence: string;
+    player: string;
+    amount: BigNumber;
+    0: string;
+    1: string;
+    2: BigNumber;
+  }>;
 
   "claims(uint256)"(
     arg0: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [string, string, BigNumber] & {
-      evidence: string;
-      player: string;
-      amount: BigNumber;
-    }
-  >;
+  ): Promise<{
+    evidence: string;
+    player: string;
+    amount: BigNumber;
+    0: string;
+    1: string;
+    2: BigNumber;
+  }>;
 
-  createDeposit(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  createDeposit(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
-  "createDeposit()"(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  "createDeposit()"(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
   expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -386,13 +455,19 @@ export class Quest extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  playDeposit(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  playDeposit(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
-  "playDeposit()"(
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+  "playDeposit()"(overrides?: CallOverrides): Promise<{
+    token: string;
+    amount: BigNumber;
+    0: string;
+    1: BigNumber;
+  }>;
 
   questCreator(overrides?: CallOverrides): Promise<string>;
 
@@ -454,32 +529,40 @@ export class Quest extends Contract {
     claims(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        evidence: string;
-        player: string;
-        amount: BigNumber;
-      }
-    >;
+    ): Promise<{
+      evidence: string;
+      player: string;
+      amount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
     "claims(uint256)"(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [string, string, BigNumber] & {
-        evidence: string;
-        player: string;
-        amount: BigNumber;
-      }
-    >;
+    ): Promise<{
+      evidence: string;
+      player: string;
+      amount: BigNumber;
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
-    createDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    createDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "createDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "createDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     expireTime(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -505,13 +588,19 @@ export class Quest extends Contract {
 
     "play(address)"(_player: string, overrides?: CallOverrides): Promise<void>;
 
-    playDeposit(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    playDeposit(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
-    "playDeposit()"(
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { token: string; amount: BigNumber }>;
+    "playDeposit()"(overrides?: CallOverrides): Promise<{
+      token: string;
+      amount: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     questCreator(overrides?: CallOverrides): Promise<string>;
 

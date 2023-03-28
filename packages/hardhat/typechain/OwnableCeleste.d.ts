@@ -161,28 +161,50 @@ export class OwnableCeleste extends Contract {
     disputes(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; state: number }>;
+    ): Promise<{
+      subject: string;
+      state: number;
+      0: string;
+      1: number;
+    }>;
 
     "disputes(uint256)"(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; state: number }>;
+    ): Promise<{
+      subject: string;
+      state: number;
+      0: string;
+      1: number;
+    }>;
 
-    feeToken(overrides?: CallOverrides): Promise<[string]>;
+    feeToken(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "feeToken()"(overrides?: CallOverrides): Promise<[string]>;
+    "feeToken()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    feeAmount(overrides?: CallOverrides): Promise<[BigNumber]>;
+    feeAmount(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
-    "feeAmount()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "feeAmount()"(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
-    getDisputeFees(
-      overrides?: CallOverrides
-    ): Promise<[string, string, BigNumber]>;
+    getDisputeFees(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
-    "getDisputeFees()"(
-      overrides?: CallOverrides
-    ): Promise<[string, string, BigNumber]>;
+    "getDisputeFees()"(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
     submitEvidence(
       _disputeId: BigNumberish,
@@ -208,19 +230,33 @@ export class OwnableCeleste extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
+    owner(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+    "owner()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
     computeRuling(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+    ): Promise<{
+      subject: string;
+      finalRuling: number;
+      0: string;
+      1: number;
+    }>;
 
     "computeRuling(uint256)"(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+    ): Promise<{
+      subject: string;
+      finalRuling: number;
+      0: string;
+      1: number;
+    }>;
 
     createDispute(
       _possibleRulings: BigNumberish,
@@ -244,13 +280,21 @@ export class OwnableCeleste extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    getDisputeManager(overrides?: CallOverrides): Promise<[string]>;
+    getDisputeManager(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    "getDisputeManager()"(overrides?: CallOverrides): Promise<[string]>;
+    "getDisputeManager()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
 
-    currentId(overrides?: CallOverrides): Promise<[BigNumber]>;
+    currentId(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
-    "currentId()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "currentId()"(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
 
     setFee(
       _feeToken: string,
@@ -287,12 +331,22 @@ export class OwnableCeleste extends Contract {
   disputes(
     arg0: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<[string, number] & { subject: string; state: number }>;
+  ): Promise<{
+    subject: string;
+    state: number;
+    0: string;
+    1: number;
+  }>;
 
   "disputes(uint256)"(
     arg0: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<[string, number] & { subject: string; state: number }>;
+  ): Promise<{
+    subject: string;
+    state: number;
+    0: string;
+    1: number;
+  }>;
 
   feeToken(overrides?: CallOverrides): Promise<string>;
 
@@ -302,13 +356,17 @@ export class OwnableCeleste extends Contract {
 
   "feeAmount()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getDisputeFees(
-    overrides?: CallOverrides
-  ): Promise<[string, string, BigNumber]>;
+  getDisputeFees(overrides?: CallOverrides): Promise<{
+    0: string;
+    1: string;
+    2: BigNumber;
+  }>;
 
-  "getDisputeFees()"(
-    overrides?: CallOverrides
-  ): Promise<[string, string, BigNumber]>;
+  "getDisputeFees()"(overrides?: CallOverrides): Promise<{
+    0: string;
+    1: string;
+    2: BigNumber;
+  }>;
 
   submitEvidence(
     _disputeId: BigNumberish,
@@ -341,12 +399,22 @@ export class OwnableCeleste extends Contract {
   computeRuling(
     _disputeId: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+  ): Promise<{
+    subject: string;
+    finalRuling: number;
+    0: string;
+    1: number;
+  }>;
 
   "computeRuling(uint256)"(
     _disputeId: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+  ): Promise<{
+    subject: string;
+    finalRuling: number;
+    0: string;
+    1: number;
+  }>;
 
   createDispute(
     _possibleRulings: BigNumberish,
@@ -413,12 +481,22 @@ export class OwnableCeleste extends Contract {
     disputes(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; state: number }>;
+    ): Promise<{
+      subject: string;
+      state: number;
+      0: string;
+      1: number;
+    }>;
 
     "disputes(uint256)"(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; state: number }>;
+    ): Promise<{
+      subject: string;
+      state: number;
+      0: string;
+      1: number;
+    }>;
 
     feeToken(overrides?: CallOverrides): Promise<string>;
 
@@ -428,13 +506,17 @@ export class OwnableCeleste extends Contract {
 
     "feeAmount()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getDisputeFees(
-      overrides?: CallOverrides
-    ): Promise<[string, string, BigNumber]>;
+    getDisputeFees(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
-    "getDisputeFees()"(
-      overrides?: CallOverrides
-    ): Promise<[string, string, BigNumber]>;
+    "getDisputeFees()"(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: string;
+      2: BigNumber;
+    }>;
 
     submitEvidence(
       _disputeId: BigNumberish,
@@ -467,12 +549,22 @@ export class OwnableCeleste extends Contract {
     computeRuling(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+    ): Promise<{
+      subject: string;
+      finalRuling: number;
+      0: string;
+      1: number;
+    }>;
 
     "computeRuling(uint256)"(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+    ): Promise<{
+      subject: string;
+      finalRuling: number;
+      0: string;
+      1: number;
+    }>;
 
     createDispute(
       _possibleRulings: BigNumberish,
@@ -489,12 +581,22 @@ export class OwnableCeleste extends Contract {
     rule(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { subject: string; ruling: BigNumber }>;
+    ): Promise<{
+      subject: string;
+      ruling: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     "rule(uint256)"(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { subject: string; ruling: BigNumber }>;
+    ): Promise<{
+      subject: string;
+      ruling: BigNumber;
+      0: string;
+      1: BigNumber;
+    }>;
 
     getDisputeManager(overrides?: CallOverrides): Promise<string>;
 
