@@ -271,12 +271,7 @@ const hardhatConfig = {
       },
       {
         version: "0.8.1",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 20000,
-          },
-        },
+        settings: {},
       },
     ],
   },
@@ -298,19 +293,19 @@ const hardhatConfig = {
       default: 0,
       100: process.env.DEPLOYER_ADDRESS,
       goerli: process.env.DEPLOYER_ADDRESS,
-      280: process.env.DEPLOYER_ADDRESS,
+      zkTestnet: process.env.DEPLOYER_ADDRESS,
     },
     govern: {
       default: 1,
       xdai: governGnosis.address,
       goerli: governGoerli.address, // Govern address on Goerli
-      280: governZkTestnet.address, // Govern address on Goerli
+      zkTestnet: defaultConfig.RootOwner.zkTestnet,
     },
     owner: {
       default: 1,
       xdai: defaultConfig.RootOwner.xdai,
       goerli: defaultConfig.RootOwner.goerli,
-      zkSync: defaultConfig.RootOwner.zkSyncTestnet,
+      zkTestnet: defaultConfig.RootOwner.zkTestnet,
     }, // Goerli Gnosis Safe address
   },
 };

@@ -16,7 +16,7 @@
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     },
-    "zkSyncTestnet": {
+    "zkTestnet": {
       "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
       "amount": 0.01
     }
@@ -30,7 +30,7 @@
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     },
-    "zkSyncTestnet": {
+    "zkTestnet": {
       "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
       "amount": 0.01
     }
@@ -44,7 +44,7 @@
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     },
-    "zkSyncTestnet": {
+    "zkTestnet": {
       "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
       "amount": 0.01
     }
@@ -58,7 +58,7 @@
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.01
     },
-    "zkSyncTestnet": {
+    "zkTestnet": {
       "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
       "amount": 0.01
     }
@@ -68,7 +68,7 @@
       "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
       "amount": 0.05
     },
-    "zkSyncTestnet": {
+    "zkTestnet": {
       "token": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
       "amount": 0.01
     }
@@ -76,16 +76,16 @@
   "RootOwner": {
     "xdai": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
     "goerli": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
-    "zkSyncTestnet": "0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E"
+    "zkTestnet": "0x91B0d67D3F47A30FBEeB159E67209Ad6cb2cE22E"
   },
   "ClaimDelay": {
     "xdai": 604800,
     "goerli": 300,
-    "zkSyncTestnet": 300
+    "zkTestnet": 300
   },
   "CelesteResolver": {
     "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
     "goerli": "0xCDD144eac3dD79667a1cAADFDc4Edaa75D0Eb81f",
-    "zkSyncTestnet": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0"
+    "zkTestnet": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0"
   }
 }
