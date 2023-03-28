@@ -1,33 +1,30 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import exportContractResult from "../scripts/export-contract-result";
-import * as ethers from "ethers";
 
 // ZkSync support
 import { Contract, Wallet, utils } from "zksync-web3";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
+import { DeployFunction } from "hardhat-deploy/dist/types";
 
 const contractName = "HoneyTestToken";
 let verificationContractName = contractName;
 
-export default async (hre: HardhatRuntimeEnvironment) => {
+const deployment: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   // console.log("PRIVATE_KEY", process.env.PRIVATE_KEY);
   // const { deploy } = hre.deployments;
   // const { deployer, owner } = await hre.getNamedAccounts();
 
-  // let token: Contract;
-
   const constructorArguments = [];
 
   // if (hre.network.zksync) {
-  verificationContractName = "contracts/mocks_HoneyTest.sol:HoneyTestToken";
-  //   console.log("Deploying HoneyTest on zkSync...", { deployer });
-  //   const wallet = new Wallet(process.env.PRIVATE_KEY);
-  //   console.log("Wallet initialized");
-  //   const zkDeployer = new Deployer(hre, wallet);
-  //   console.log("Deployer initialized");
+  verificationContractName = "contracts/HoneyTestToken.sol:HoneyTestToken";
+  // console.log("Deploying HoneyTest on zkSync...", { deployer });
+  const wallet = new Wallet(process.env.PRIVATE_KEY);
+  console.log("Wallet initialized");
+  const zkDeployer = new Deployer(hre, wallet);
+  console.log("Deployer initialized");
 
-  //   const tokenArtifact = await zkDeployer.loadArtifact(contractName);
-  //   console.log("TokenArtifact loaded");
+  const tokenArtifact = await zkDeployer.loadArtifact(contractName);
+  console.log("TokenArtifact loaded");
 
   //   // Deposit ETH to zkSync
   //   const depositAmount = ethers.utils.parseEther("0.001");
@@ -66,8 +63,8 @@ export default async (hre: HardhatRuntimeEnvironment) => {
   //   console.log("Deploying contract...", {
   //     contract: tokenArtifact.contractName,
   //   });
-  //   token = await zkDeployer.deploy(tokenArtifact, []);
-  //   console.log("Deploying succeed", { address: token.address });
+  const token = await zkDeployer.deploy(tokenArtifact, []);
+  console.log("Deploying succeed", { address: token.address });
   // } else {
   //   // Deploy TokenController
   //   const result = await deploy(contractName, {
@@ -106,15 +103,17 @@ export default async (hre: HardhatRuntimeEnvironment) => {
   // });
 
   try {
+    const address = token.address;
     console.log("Verifying HoneyTest...");
-    const result = await hre.run("verify:verify", {
-      address: "0xc557f499C3c07FBC657a7FeC7B446d53d512F3E0",
+    await hre.run("verify:verify", {
+      address: address,
       contract: verificationContractName,
       constructorArguments,
     });
-    console.log(result);
   } catch (error) {
     console.error(`Failed when verifying the ${contractName} contract`, error);
   }
 };
-export const tags = [contractName];
+deployment.tags = [contractName];
+
+export default deployment;

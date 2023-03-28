@@ -1,5 +1,5 @@
 import { Artifact, HardhatRuntimeEnvironment } from "hardhat/types";
-import "@nomiclabs/hardhat-etherscan";
+// import "@nomiclabs/hardhat-etherscan";
 import defaultConfig from "../default-config.json";
 import exportContractResult from "../scripts/export-contract-result";
 import { DeployResult } from "hardhat-deploy/dist/types";

@@ -7,9 +7,9 @@ import chalk from "chalk";
 import "@nomiclabs/hardhat-waffle";
 import "@eth-optimism/hardhat-ovm";
 import "@nomiclabs/hardhat-web3";
-import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
-import "hardhat-typechain";
+import "@tenderly/hardhat-tenderly";
+// import "hardhat-typechain";
 
 // ZkSync plugins
 import "@matterlabs/hardhat-zksync-deploy";
@@ -62,7 +62,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "localhost";
+const defaultNetwork = "zkTestnet";
 const mainnetGwei = 21;
 
 export function mnemonic() {
@@ -82,7 +82,7 @@ export function mnemonic() {
 }
 
 console.log("👷‍♂️ Hardhat config loaded", {
-  mnemonic: mnemonic(),
+  // mnemonic: mnemonic(),
   ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
   INFURA_ID: process.env.INFURA_ID,
   DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS,
@@ -101,6 +101,12 @@ function getAccounts(): HardhatNetworkAccountsUserConfig {
 
 const hardhatConfig = {
   defaultNetwork,
+  // paths: {
+  //   artifacts: "build/artifacts",
+  //   cache: "build/cache",
+  //   // deploy: "src/deploy",
+  //   sources: "contracts",
+  // },
 
   // don't forget to set your provider like:
   // REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
@@ -120,18 +126,6 @@ const hardhatConfig = {
         notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
         (you can put in a mnemonic here to set the deployer locally)
       */
-    },
-    rinkeby: {
-      chainId: 4,
-      url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: getAccounts(),
-      gasPrice: 40000000000,
-      zksync: false,
-    },
-    kovan: {
-      url: "https://kovan.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
-      accounts: getAccounts(),
-      zksync: false,
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_ID, // <---- YOUR INFURA ID! (or it won't work)
@@ -155,107 +149,11 @@ const hardhatConfig = {
       accounts: getAccounts(),
       zksync: false,
     },
-    matic: {
-      url: "https://rpc-mainnet.maticvigil.com/",
-      gasPrice: 1000000000,
-      accounts: getAccounts(),
-      zksync: false,
-    },
-    rinkebyArbitrum: {
-      url: "https://rinkeby.arbitrum.io/rpc",
-      gasPrice: 0,
-      accounts: getAccounts(),
-      companionNetworks: {
-        l1: "rinkeby",
-      },
-      zksync: false,
-    },
-    localArbitrum: {
-      url: "http://localhost:8547",
-      gasPrice: 0,
-      accounts: getAccounts(),
-      companionNetworks: {
-        l1: "localArbitrumL1",
-      },
-      zksync: false,
-    },
-    localArbitrumL1: {
-      url: "http://localhost:7545",
-      gasPrice: 0,
-      accounts: getAccounts(),
-      companionNetworks: {
-        l2: "localArbitrum",
-      },
-      zksync: false,
-    },
-    kovanOptimism: {
-      url: "https://kovan.optimism.io",
-      gasPrice: 0,
-      accounts: getAccounts(),
-      ovm: true,
-      companionNetworks: {
-        l1: "kovan",
-      },
-      zksync: false,
-    },
-    localOptimism: {
-      url: "http://localhost:8545",
-      gasPrice: 0,
-      accounts: getAccounts(),
-      ovm: true,
-      companionNetworks: {
-        l1: "localOptimismL1",
-      },
-      zksync: false,
-    },
-    localOptimismL1: {
-      url: "http://localhost:9545",
-      gasPrice: 0,
-      accounts: getAccounts(),
-      companionNetworks: {
-        l2: "localOptimism",
-      },
-      zksync: false,
-    },
-    localAvalanche: {
-      url: "http://localhost:9650/ext/bc/C/rpc",
-      gasPrice: 225000000000,
-      chainId: 43112,
-      accounts: getAccounts(),
-      zksync: false,
-    },
-    fujiAvalanche: {
-      url: "https://api.avax-test.network/ext/bc/C/rpc",
-      gasPrice: 225000000000,
-      chainId: 43113,
-      accounts: getAccounts(),
-      zksync: false,
-    },
-    mainnetAvalanche: {
-      url: "https://api.avax.network/ext/bc/C/rpc",
-      gasPrice: 225000000000,
-      chainId: 43114,
-      accounts: getAccounts(),
-      zksync: false,
-    },
-    testnetHarmony: {
-      url: "https://api.s0.b.hmny.io",
-      gasPrice: 1000000000,
-      chainId: 1666700000,
-      accounts: getAccounts(),
-      zksync: false,
-    },
-    mainnetHarmony: {
-      url: "https://api.harmony.one",
-      gasPrice: 1000000000,
-      chainId: 1666600000,
-      accounts: getAccounts(),
-      zksync: false,
-    },
+
     zkTestnet: {
       url: "https://zksync2-testnet.zksync.dev",
       ethNetwork:
-        "https://eth-goerli.g.alchemy.com/v2/" + process.env.ALCHEMY_API_KEY, // or a Goerli RPC endpoint from Infura/Alchemy/Chainstack etc.
+        "https://eth-goerli.g.alchemy.com/v2/" + process.env.INFURA_ID, // or a Goerli RPC endpoint from Infura/Alchemy/Chainstack etc.
       zksync: true,
       verifyURL:
         "https://zksync2-testnet-explorer.zksync.dev/contract_verification",
@@ -264,15 +162,15 @@ const hardhatConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.5.8",
-      },
-      {
-        version: "0.4.24",
-      },
-      {
         version: "0.8.1",
         settings: {},
       },
+      {
+        version: "0.5.8",
+      },
+      // {
+      //   version: "0.4.24",
+      // },
     ],
   },
   zksolc: {
@@ -293,19 +191,16 @@ const hardhatConfig = {
       default: 0,
       100: process.env.DEPLOYER_ADDRESS,
       goerli: process.env.DEPLOYER_ADDRESS,
-      zkTestnet: process.env.DEPLOYER_ADDRESS,
     },
     govern: {
       default: 1,
       xdai: governGnosis.address,
       goerli: governGoerli.address, // Govern address on Goerli
-      zkTestnet: defaultConfig.RootOwner.zkTestnet,
     },
     owner: {
       default: 1,
       xdai: defaultConfig.RootOwner.xdai,
       goerli: defaultConfig.RootOwner.goerli,
-      zkTestnet: defaultConfig.RootOwner.zkTestnet,
     }, // Goerli Gnosis Safe address
   },
 };

@@ -1,0 +1,11 @@
+{
+  "version": "v1",
+  "packages": {
+    "@matterlabs/hardhat-zksync-verify": {
+      "version": "0.1.4",
+      "signature": "66b26c515660b9b2ba021f36a5a0bd21",
+      "file": true,
+      "replaced": "^0.1.4"
+    }
+  }
+}
