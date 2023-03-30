@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { useToggleTheme } from 'src/hooks/use-toggle-theme';
 import { ThemeInterface } from '../styles/theme';
 
@@ -13,12 +13,8 @@ export const useThemeContext = () => useContext(ThemeContext)!;
 type Props = {
   children: React.ReactNode;
 };
-export const ThemeContextProvider = ({ children }: Props) => {
+export function ThemeContextProvider({ children }: Props) {
   const { currentTheme, setCurrentTheme } = useToggleTheme();
-
-  return (
-    <ThemeContext.Provider value={{ currentTheme, setCurrentTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+  const value = useMemo(() => ({ currentTheme, setCurrentTheme }), [currentTheme, setCurrentTheme]);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}

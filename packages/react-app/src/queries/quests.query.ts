@@ -11,6 +11,7 @@ const QuestEntityQuery = gql`
   query questEntity($ID: String) {
     questEntity(id: $ID, subgraphError: allow) {
       id
+      version
       questAddress
       questTitle
       questDescription
@@ -58,6 +59,7 @@ const QuestEntitiesQuery = (payload: any) => gql`
       subgraphError: allow
     ) {
       id
+      version
       questAddress
       questTitle
       questDescription
@@ -102,6 +104,7 @@ const QuestEntitiesLight = (payload: any) => gql`
       ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
      }) {
       id
+      version
       questAddress
       questRewardTokenAddress
       questCreateDepositToken

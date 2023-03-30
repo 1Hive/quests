@@ -2,14 +2,14 @@ import {
   QuestCreated,
   PlayDepositChanged,
   CreateDepositChanged,
-} from '../../generated/QuestFactoryV2/QuestFactory';
+} from "../../generated/QuestFactoryV2/QuestFactory";
 import {
   CreateDepositEntity,
   PlayDepositEntity,
   QuestEntity,
-} from '../../generated/schema';
-import { Bytes, ipfs } from '@graphprotocol/graph-ts';
-import { json } from '@graphprotocol/graph-ts';
+} from "../../generated/schema";
+import { Bytes, ipfs } from "@graphprotocol/graph-ts";
+import { json } from "@graphprotocol/graph-ts";
 
 export function handleCreateDepositChanged(event: CreateDepositChanged): void {
   let depositEntity = new CreateDepositEntity(
@@ -37,6 +37,7 @@ export function handlePlayDepositChanged(event: PlayDepositChanged): void {
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
+  questEntity.version = 1;
   questEntity.questAddress = event.params.questAddress.toHexString();
   questEntity.questTitle = event.params.questTitle;
   questEntity.questDetailsRef = event.params.questDetailsRef;
@@ -52,7 +53,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questMaxPlayers = event.params.maxPlayers;
 
   if (!event.params.questDetailsRef) {
-    questEntity.questDescription = '';
+    questEntity.questDescription = "";
   } else {
     // Fetching quest description with IPFS
     let questDataBytes: Bytes | null = null;
@@ -66,23 +67,23 @@ export function handleQuestCreated(event: QuestCreated): void {
       let jsonResult = json.try_fromBytes(questDataBytes);
       if (jsonResult.isOk) {
         let jsonObject = jsonResult.value.toObject();
-        let communicationLink = jsonObject.get('communicationLink');
-        let questDescription = jsonObject.get('description');
+        let communicationLink = jsonObject.get("communicationLink");
+        let questDescription = jsonObject.get("description");
         questEntity.questCommunicationLink = communicationLink
           ? communicationLink.toString()
-          : '';
+          : "";
         questEntity.questDescription = questDescription
           ? questDescription.toString()
-          : '';
+          : "";
       } else {
         let description = questDataBytes.toString();
         questEntity.questDescription = description
           ? description.toString()
-          : '';
+          : "";
       }
     } else {
       // Continue with empty description
-      questEntity.questDescription = '';
+      questEntity.questDescription = "";
     }
   }
 

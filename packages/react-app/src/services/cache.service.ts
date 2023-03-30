@@ -74,7 +74,7 @@ export async function cacheGovernQueueAddressForQuest(
     questData.address,
     async () => {
       // Retrieve governAddress from Quest contract
-      const quest = getQuestContract(questData.address!);
+      const quest = getQuestContract(questData);
       const governAddress = await quest.aragonGovernAddress();
 
       // Fetch who have the exec role for this govern (who being the bound governQueue)
