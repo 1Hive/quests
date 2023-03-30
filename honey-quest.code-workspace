@@ -12,6 +12,9 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[solidity]": {
       "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
     }
   },
   "extensions": {

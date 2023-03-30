@@ -27,8 +27,7 @@
   },
   "workspaces": {
     "packages": [
-      "packages/*",
-      "packages/subgraphs/quest-subgraph"
+      "packages/*"
     ],
     "nohoist": [
       "**/@graphprotocol/graph-ts",
