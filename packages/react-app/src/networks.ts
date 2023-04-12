@@ -45,8 +45,8 @@ export const networks = Object.freeze({
   } as NetworkModel,
   gnosisStaging: {
     stagingOf: 'gnosis',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
+    //   questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-staging',
+    //   governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-gnosis-staging',
   } as StagingNetworkModel,
   local: {
     networkId: 'local',
