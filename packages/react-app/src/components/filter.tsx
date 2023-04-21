@@ -5,6 +5,7 @@ import { QuestStatus } from 'src/enums/quest-status.enum';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
+import { QuestPlayStatus } from 'src/enums/quest-play-status.enum';
 import { DEFAULT_FILTER } from '../constants';
 import DateFieldInput from './field-input/date-field-input';
 import { FieldInput } from './field-input/field-input';
@@ -79,7 +80,11 @@ type Props = {
 };
 
 const QuestStatusOptions = [QuestStatus.Active, QuestStatus.Expired, QuestStatus.All];
-
+const QuestPlayStatusOptions = [
+  QuestPlayStatus.All,
+  QuestPlayStatus.Played,
+  QuestPlayStatus.Unplayed,
+];
 export function Filter({ compact }: Props) {
   const { filter, setFilter, toggleFilter } = useFilterContext();
   const theme = useTheme();
@@ -148,6 +153,23 @@ export function Filter({ compact }: Props) {
               borderColor={theme.border}
               selected={QuestStatusOptions.indexOf(filter.status)}
               onChange={(i: number) => setFilter({ ...filter, status: QuestStatusOptions[i] })}
+              wide
+              compact={compact}
+            />
+          </FieldInput>
+          <FieldInput
+            label={!compact ? 'Play Status' : ''}
+            wide={isSmallResolution}
+            id="filterPlayStatus"
+          >
+            <StatusDropdownStyled
+              id="filterPlayStatus"
+              items={QuestPlayStatusOptions}
+              borderColor={theme.border}
+              selected={QuestPlayStatusOptions.indexOf(filter.playStatus)}
+              onChange={(i: number) =>
+                setFilter({ ...filter, playStatus: QuestPlayStatusOptions[i] })
+              }
               wide
               compact={compact}
             />

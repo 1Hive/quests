@@ -70,6 +70,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
   if (!questEntity) return undefined;
   try {
     const questAddress = toChecksumAddress(questEntity.questAddress);
+    console.log(questEntity);
     const quest: QuestModel = {
       address: questAddress,
       title: questEntity.questTitle,
@@ -307,7 +308,14 @@ export async function fetchQuestsPaging(
   filter: FilterModel,
 ): Promise<QuestModel[]> {
   const queryResult = await fetchQuestEntities(currentIndex, count, filter);
-  const newQuests = await mapQuestList(queryResult);
+  const newQuests =
+    filter.playStatus === 'All'
+      ? await mapQuestList(queryResult)
+      : (await mapQuestList(queryResult)).filter((quest) =>
+          filter.playStatus === 'Played'
+            ? quest.players && quest.players.length > 0
+            : !quest.players,
+        );
   questList = questList.concat(newQuests);
   return newQuests;
 }
