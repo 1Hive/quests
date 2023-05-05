@@ -1,7 +1,6 @@
-import { TextInput, Markdown } from '@1hive/1hive-ui';
+import { TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import React, { ReactNode, useMemo } from 'react';
-import { CollapsableBlock } from 'src/components/collapsable-block';
+import React, { ReactNode } from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { FieldInput } from './field-input';
@@ -48,11 +47,8 @@ type Props = {
   compact?: boolean;
   css?: React.CSSProperties;
   maxLine?: number;
-  isMarkDown?: boolean;
   ellipsis?: ReactNode;
   tooltip?: React.ReactNode;
-  disableLinks?: boolean;
-  blockVisibility?: 'visible' | 'collapsed' | 'hidden';
   onBlur?: Function;
   error?: string | false;
 };
@@ -71,76 +67,11 @@ export default function TextFieldInput({
   compact = false,
   css,
   maxLine,
-  isMarkDown = false,
   ellipsis,
   tooltip,
   onBlur = noop,
   error,
-  disableLinks = false,
-  blockVisibility = 'visible',
 }: Props) {
-  const parsedValue = useMemo(
-    () => (isMarkDown ? value.replaceAll(/\n([^|])/g, '\n\n$1') : value),
-    [value, isMarkDown],
-  );
-  const readOnlyContent = (
-    <>
-      {isMarkDown ? (
-        <Markdown
-          normalized
-          content={parsedValue}
-          markdownToJsxOptions={(o: any) => ({
-            ...o,
-            wrapper: 'div',
-            overrides: {
-              p: {
-                component: 'div',
-              },
-              pre: {
-                component: CollapsableBlock,
-                props: {
-                  label: 'block',
-                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
-                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
-                  copyable: true,
-                  usePre: true,
-                },
-              },
-              code: {
-                component: CollapsableBlock,
-                props: {
-                  label: 'code block',
-                  type: 'code',
-                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
-                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
-                  copyable: true,
-                  usePre: true,
-                },
-              },
-              img: {
-                component: CollapsableBlock,
-                props: {
-                  label: 'image',
-                  type: 'image',
-                  visible: blockVisibility !== 'hidden' ? 'true' : undefined,
-                  collapsed: blockVisibility === 'collapsed' ? 'true' : undefined,
-                },
-              },
-              a: {
-                component: disableLinks ? 'span' : 'a',
-                props: {
-                  target: '_blank',
-                  tabIndex: '-1',
-                },
-              },
-            },
-          })}
-        />
-      ) : (
-        value
-      )}
-    </>
-  );
   const loadableContent = isEdit ? (
     <BlockStyled wide={wide}>
       <TextInput
@@ -160,11 +91,11 @@ export default function TextFieldInput({
       <div style={{ ...css, fontSize }}>
         {maxLine ? (
           <TextFieldWrapperStyled>
-            <MaxLineStyled maxLine={maxLine}>{readOnlyContent}</MaxLineStyled>
+            <MaxLineStyled maxLine={maxLine}>{value}</MaxLineStyled>
             {ellipsis}
           </TextFieldWrapperStyled>
         ) : (
-          readOnlyContent
+          value
         )}
       </div>
     </BlockStyled>

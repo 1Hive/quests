@@ -72,6 +72,13 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
     }
   }, [questData.playDeposit?.token]);
 
+  const buttonText = useMemo(() => {
+    if (questData.creatorAddress === walletAddress && !questData.players?.includes(walletAddress)) {
+      return 'Remove player';
+    }
+    return 'Opt out';
+  }, [questData.creatorAddress, questData.players, walletAddress]);
+
   const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
@@ -160,7 +167,7 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
               icon={<GiCrossedSwords />}
               className="open-unplay-button"
               onClick={() => setOpened(true)}
-              label="Opt out"
+              label={buttonText}
               mode="negative"
             />
           }

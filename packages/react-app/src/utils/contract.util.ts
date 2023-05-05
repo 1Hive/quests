@@ -29,7 +29,7 @@ export function getProviderOrSigner(ethersProvider: any, walletAddress?: string)
 function getContractsJson(network?: any) {
   network = network ?? getNetwork();
   return {
-    Celeste, // Only when not rinkeby (hardhat_contracts.json Celeste will override this one only on rinkeby)
+    Celeste, // Only when not goerli (hardhat_contracts.json Celeste will override this one only on goerli)
     ...contractsJson[network.chainId][network.networkId].contracts,
     ERC20,
     UniswapPair,
@@ -41,6 +41,7 @@ function getContract(
   contractName: string,
   contractAddressOverride?: string,
   walletAddress?: string,
+  abiIndex?: number,
 ): Contract {
   try {
     const id = (contractAddressOverride ?? contractName) + (walletAddress ?? '');
@@ -51,23 +52,26 @@ function getContract(
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
     let askedContract = contracts[contractName];
-    // Is array of contract, not abi
-    if (Array.isArray(askedContract) && askedContract[0].abi) {
-      if (!contractAddressOverride) {
+    if (Array.isArray(askedContract) && askedContract.length) {
+      if (abiIndex) {
         // If no contract address override, use the last one
-        askedContract = askedContract[askedContract.length - 1];
-      } else {
+        askedContract = askedContract[abiIndex];
+      } else if (contractAddressOverride) {
         askedContract = askedContract.find(
           (c) => c.address.toLowerCase() === contractAddressOverride.toLowerCase(),
         );
+      } else {
+        askedContract = askedContract[askedContract.length - 1]; // Use the last one
       }
     }
     const contractAddress: string = contractAddressOverride ?? askedContract.address;
-    const contractAbi = askedContract.abi ?? askedContract;
+
+    const contractAbi = askedContract.abi;
     const provider = getDefaultProvider();
 
     if (!contractAddress) throw new Error(`${contractName} address was not defined`);
-    if (!contractAbi) throw new Error(`${contractName} ABI was not defined`);
+    if (!contractAbi)
+      throw new Error(`${contractName} ABI was not defined, address: ${contractAddress}`);
 
     contract = new Contract(
       contractAddress,
@@ -125,8 +129,11 @@ export async function getTokenInfo(tokenAddress: string) {
   return null;
 }
 
-export function getQuestContract(questAddress: string, walletAddress?: string): Contract {
-  return getContract('Quest', questAddress, walletAddress);
+export function getQuestContract(
+  questData: { address?: string; version?: number },
+  walletAddress?: string,
+): Contract {
+  return getContract('Quest', questData.address, walletAddress, questData.version);
 }
 
 export function getUniswapPairContract(pairAddress: string) {
@@ -144,8 +151,8 @@ export async function getCelesteDisputeManagerContract(celesteAddressOverride?: 
   return getContract('CelesteDisputeManager', disputeManagerAddress);
 }
 
-export function getQuestContractInterface() {
-  return new ethers.utils.Interface(getContractsJson().Quest.abi);
+export function getQuestContractInterface(version?: number) {
+  return new ethers.utils.Interface(getContractsJson().Quest[version ?? 0].abi);
 }
 
 // #endregion
