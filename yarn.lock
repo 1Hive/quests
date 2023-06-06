@@ -4547,7 +4547,6 @@ __metadata:
     react-dev-utils: ^11.0.4
     react-device-detect: ^1.17.0
     react-dom: 17.0.2
-    react-focus-within: ^2.0.2
     react-hot-loader: ^4.13.0
     react-icons: ^4.2.0
     react-infinite-scroll-component: ^6.0.0
@@ -5864,35 +5863,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*":
-  version: 18.2.6
-  resolution: "@types/react@npm:18.2.6"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: dea9d232d8df7ac357367a69dcb557711ab3d5501807ffa77cebeee73d49ee94d095f298e36853c63ed47cce097eee4c7eae2aaa8c02fac3f0171ec1b523a819
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:17.0.2":
+"@types/react@npm:*, @types/react@npm:17.0.2":
   version: 17.0.2
   resolution: "@types/react@npm:17.0.2"
   dependencies:
     "@types/prop-types": "*"
     csstype: ^3.0.2
   checksum: a5198857165feddcbfc7d33e3322460ac62b8894d702414496a825b0c82272911ec33a42ef7c9d623a59308070eef4dfee6ff834b0674aa3f87eeb644196ee3b
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:^15.0.0 || ^16.0.0":
-  version: 16.14.41
-  resolution: "@types/react@npm:16.14.41"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: 48b721b41af4b4b6fa0433ddca27aee72bd8969e95c7bcb1fd2e9fda81e0a602dea5f855072f1458996d3e45ceeae0751d7d1f6687e6dd1698a6fc5c67cc7b82
   languageName: node
   linkType: hard
 
@@ -5911,13 +5888,6 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: e99fc7cc6265407987b30deda54c1c24bb1478803faf6037557a774b2f034c5b097ffd65847daa87e82a61a250d919f35c3588654b0fdaa816906650f596d1b0
-  languageName: node
-  linkType: hard
-
-"@types/scheduler@npm:*":
-  version: 0.16.3
-  resolution: "@types/scheduler@npm:0.16.3"
-  checksum: 2b0aec39c24268e3ce938c5db2f2e77f5c3dd280e05c262d9c2fe7d890929e4632a6b8e94334017b66b45e4f92a5aa42ba3356640c2a1175fa37bef2f5200767
   languageName: node
   linkType: hard
 
@@ -26890,18 +26860,6 @@ lint-action@wearerequired/lint-action:
   version: 2.0.4
   resolution: "react-fast-compare@npm:2.0.4"
   checksum: 06046595f90a4e3e3a56f40a8078c00aa71bdb064ddb98343f577f546aa22e888831fd45f009c93b34707cc842b4c637737e956fd13d6f80607ee92fb9cf9a1c
-  languageName: node
-  linkType: hard
-
-"react-focus-within@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "react-focus-within@npm:2.0.2"
-  dependencies:
-    "@types/react": ^15.0.0 || ^16.0.0
-    prop-types: ^15.6.1
-  peerDependencies:
-    react: ^15.0.0 || ^16.0.0
-  checksum: e188ad2ad0e1d7fef61529721e18e69bde2bd693fc0b156b4a7929d1ed1d9829977034986b4d4f2515c2d28ab591455ee6830e370c74a6906499a244fadce372
   languageName: node
   linkType: hard
 
