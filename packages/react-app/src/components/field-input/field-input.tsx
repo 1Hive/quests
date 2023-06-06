@@ -124,6 +124,7 @@ export function FieldInput({
       <>
         {isLoading ? (
           <SkeletonWrapperStyled>
+            {/* @ts-ignore */}
             <Skeleton />
           </SkeletonWrapperStyled>
         ) : (

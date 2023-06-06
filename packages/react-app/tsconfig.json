@@ -4,7 +4,11 @@
     "outDir": "build/dist",
     "module": "esnext",
     "target": "es6",
-    "lib": ["es6", "dom", "ES2021"],
+    "lib": [
+      "es6",
+      "dom",
+      "ES2021"
+    ],
     "sourceMap": true,
     "allowJs": true,
     "jsx": "react-jsx",
@@ -16,7 +20,6 @@
     "noImplicitAny": true,
     "importHelpers": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -37,5 +40,7 @@
     "jest",
     "src/setupTests.ts"
   ],
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
