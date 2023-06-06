@@ -1,5 +1,5 @@
 {
-  "name": "@1hive/quests-services",
+  "name": "@quests/services",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {

@@ -1,5 +1,5 @@
 {
-  "name": "@1hive/quests-hardhat",
+  "name": "@quests/hardhat",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
