@@ -30,7 +30,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "sourceRoot": "/",
-    "inlineSources": true
+    "inlineSources": true,
+    "ignoreDeprecations": "5.0"
   },
   "exclude": [
     "node_modules",
