@@ -156,5 +156,8 @@
     },
     "preset": "ts-jest",
     "testEnvironment": "node"
+  },
+  "engines": {
+    "node": "v16.15.0"
   }
 }
