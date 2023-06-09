@@ -26,13 +26,13 @@ import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput, { AmountFieldInputFormik } from '../field-input/amount-field-input';
-import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { WalletBalance } from '../wallet-balance';
 import Stepper from '../utils/stepper';
 import { HelpTooltip } from '../field-input/help-tooltip';
+import MarkdownFieldInput from '../field-input/markdown-field-input';
 
 // #region StyledComponents
 
@@ -323,7 +323,7 @@ export default function ScheduleClaimModal({
               }
               steps={[
                 <>
-                  <TextFieldInput
+                  <MarkdownFieldInput
                     id="evidence"
                     isEdit={!showPreview}
                     label={
@@ -350,11 +350,9 @@ export default function ScheduleClaimModal({
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.evidence && errors.evidence}
-                    multiline
                     wide
                     rows={10}
                     compact
-                    isMarkDown
                   />
                   {questData.status === QuestStatus.Archived ? (
                     archivedWarning
@@ -410,7 +408,7 @@ export default function ScheduleClaimModal({
                   </Outset>
                   <Outset>
                     <ContactInformationWrapperStyled>
-                      <TextFieldInput
+                      <MarkdownFieldInput
                         id="contactInformation"
                         isEdit
                         label="Contact information (optional)"
@@ -420,7 +418,6 @@ export default function ScheduleClaimModal({
                         placeHolder="e.g. discord, email, phone number, etc."
                         compact
                         wide
-                        isMarkDown
                       />
                     </ContactInformationWrapperStyled>
                     {willExpireBeforeClaim && expirationWarning}

@@ -35,6 +35,7 @@ import { WalletBalance } from '../wallet-balance';
 import { feedDummyQuestData } from '../utils/debug-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { FieldInput } from '../field-input/field-input';
+import MarkdownFieldInput from '../field-input/markdown-field-input';
 import { Outset } from '../utils/spacer-util';
 
 // #region StyledComponents
@@ -49,6 +50,9 @@ const ButtonLinkStyled = styled(Button)`
   background: transparent;
   padding-top: 4px;
   justify-content: flex-start;
+`;
+const MarkdownFieldInputStyled = styled(MarkdownFieldInput)`
+  width: 100%;
 `;
 
 const FormStyled = styled(Form)`
@@ -281,6 +285,14 @@ export default function QuestModal({
     }
   };
 
+  const descriptionTemplate = `[Summary of ~5 lines]
+
+## Specifications
+
+## Requirement / Deliverables
+
+## Reward agreement`;
+
   return (
     <>
       {flags.CREATE_QUEST && (
@@ -315,6 +327,7 @@ export default function QuestModal({
           <Formik
             initialValues={
               {
+                description: descriptionTemplate,
                 ...questDataState,
                 unlimited: true,
                 fallbackAddress: questDataState?.fallbackAddress,
@@ -419,7 +432,7 @@ export default function QuestModal({
                           error={touched.title && errors.title}
                         />
 
-                        <TextFieldInput
+                        <MarkdownFieldInputStyled
                           id="description"
                           label={
                             <>
@@ -458,7 +471,6 @@ export default function QuestModal({
                           }
                           value={values.description}
                           isEdit={!showPreview}
-                          placeHolder="Quest description"
                           blockVisibility={simulateSummary ? 'hidden' : 'visible'}
                           tooltip={
                             <>
@@ -481,9 +493,8 @@ export default function QuestModal({
                           onBlur={handleBlur}
                           error={touched.description && errors.description}
                           wide
-                          multiline
-                          isMarkDown
                           maxLine={simulateSummary ? MAX_LINE_DESCRIPTION : undefined}
+                          placeHolder="Quest description"
                         />
                       </>,
                       <>

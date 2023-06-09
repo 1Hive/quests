@@ -70,7 +70,6 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
   if (!questEntity) return undefined;
   try {
     const questAddress = toChecksumAddress(questEntity.questAddress);
-    console.log(questEntity);
     const quest: QuestModel = {
       address: questAddress,
       title: questEntity.questTitle,
@@ -111,6 +110,10 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     } else if (!quest.description) {
       // If failed to fetch ipfs description
       quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
+    }
+
+    if (quest?.maxPlayers !== undefined) {
+      quest.players = await getQuestContract(quest).getPlayers();
     }
 
     return quest;

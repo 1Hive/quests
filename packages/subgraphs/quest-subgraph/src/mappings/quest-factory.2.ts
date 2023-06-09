@@ -3,7 +3,6 @@ import {
   PlayDepositChanged,
   CreateDepositChanged,
 } from "../../generated/QuestFactoryV2/QuestFactory";
-
 import {
   QuestPlayed,
   QuestClaimed,
@@ -16,6 +15,8 @@ import {
   QuestEntity,
 } from "../../generated/schema";
 import { Bytes, ipfs, json, log } from "@graphprotocol/graph-ts";
+import { Bytes, ipfs } from "@graphprotocol/graph-ts";
+import { json } from "@graphprotocol/graph-ts";
 
 export function handleCreateDepositChanged(event: CreateDepositChanged): void {
   let depositEntity = new CreateDepositEntity(

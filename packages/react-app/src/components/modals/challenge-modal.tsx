@@ -25,9 +25,9 @@ import { TransactionType } from 'src/enums/transaction-type.enum';
 import ModalBase, { ModalCallback } from './modal-base';
 import * as QuestService from '../../services/quest.service';
 import AmountFieldInput from '../field-input/amount-field-input';
-import TextFieldInput from '../field-input/text-field-input';
 import { Outset } from '../utils/spacer-util';
 import { WalletBalance } from '../wallet-balance';
+import MarkdownFieldInput from '../field-input/markdown-field-input';
 
 // #region StyledComponents
 
@@ -334,7 +334,7 @@ export default function ChallengeModal({
         {({ values, handleSubmit, handleChange, errors, touched, handleBlur }) => (
           <FormStyled id="form-challenge" onSubmit={handleSubmit} ref={formRef}>
             <Outset gu16>
-              <TextFieldInput
+              <MarkdownFieldInput
                 id="reason"
                 isEdit={!showPreview}
                 label={
@@ -359,11 +359,9 @@ export default function ChallengeModal({
                 tooltip="Reason why this claim should be challenged."
                 value={values.reason}
                 onChange={handleChange}
-                multiline
                 error={touched.reason && errors.reason}
                 onBlur={handleBlur}
                 wide
-                isMarkDown
               />
             </Outset>
           </FormStyled>

@@ -1,8 +1,8 @@
 import { useTheme } from '@1hive/1hive-ui';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
+import { GUpx } from '../../utils/style.util';
 import { HelpTooltip } from './help-tooltip';
 
 const FieldStyled = styled.div<{

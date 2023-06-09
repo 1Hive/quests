@@ -28,6 +28,7 @@ import { DisputeModel } from '../../models/dispute.model';
 import TextFieldInput from '../field-input/text-field-input';
 import { HelpTooltip } from '../field-input/help-tooltip';
 import { CollapsableBlock } from '../collapsable-block';
+import MarkdownFieldInput from '../field-input/markdown-field-input';
 
 // #region StyledComponents
 
@@ -340,7 +341,7 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
                   </>
                 }
               >
-                <TextFieldInput id="evidenceOfCompletion" value={evidence} isMarkDown />
+                <MarkdownFieldInput id="evidenceOfCompletion" value={evidence} />
               </CollapsableBlock>
               <CollapsableBlock
                 hideState
@@ -355,7 +356,7 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
                   </>
                 }
               >
-                <TextFieldInput id="challengeReason" value={challenge.reason} isMarkDown />
+                <TextFieldInput id="challengeReason" value={challenge.reason} />
               </CollapsableBlock>
             </>
           )}

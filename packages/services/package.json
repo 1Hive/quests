@@ -1,5 +1,5 @@
 {
-  "name": "@1hive/quests-services",
+  "name": "@quests/services",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
@@ -14,6 +14,6 @@
     "run-graph-node": "cd graph-node && docker-compose up",
     "remove-graph-node": "cd graph-node && docker-compose down",
     "clean-graph-node": "rm -rf graph-node/data/",
-    "restart":"yarn remove-graph-node && yarn clean-graph-node || true && yarn run-graph-node"
+    "restart": "yarn remove-graph-node && yarn clean-graph-node || true && yarn run-graph-node"
   }
 }
