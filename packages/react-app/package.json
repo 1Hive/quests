@@ -125,11 +125,11 @@
     "ts-jest": "^27.1.4"
   },
   "scripts": {
-    "start": "cross-env HTTPS=true REACT_APP_STAGING=true npm run sync-assets && react-app-rewired start",
+    "start": "cross-env HTTPS=true REACT_APP_STAGING=true NODE_OPTIONS=--openssl-legacy-provider npm run sync-assets && react-app-rewired start",
     "start:local": "cross-env REACT_APP_DEFAULT_CHAIN_ID=1337 yarn start",
     "start:goerli": "cross-env REACT_APP_DEFAULT_CHAIN_ID=5 REACT_APP_STAGING=true yarn start",
     "start:gnosis": "cross-env REACT_APP_DEFAULT_CHAIN_ID=100 REACT_APP_STAGING=true yarn start",
-    "build": "npm run sync-assets && react-app-rewired build",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider npm run sync-assets && react-app-rewired build",
     "build:gnosis": "cross-env REACT_APP_DEFAULT_CHAIN_ID=100 && yarn build",
     "lint": "eslint src --no-error-on-unmatched-pattern --ext js,jsx,ts,tsx",
     "lint-fix": "eslint --fix src --no-error-on-unmatched-pattern",
