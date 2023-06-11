@@ -328,7 +328,7 @@ export default function Quest({
         )}
       </RowStyled>
       <SecondRowStyled>
-        {!isSummary && status === QuestStatus.Active && (
+        {!isSummary && (
           <>
             <DateFieldInput
               id="expireTime"
@@ -465,21 +465,20 @@ export default function Quest({
                       questData.creatorAddress === walletAddress ||
                       (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
                       questData.features.playableQuest &&
-                      questData.players?.length !== 0 && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                      questData.players?.length !== 0 && (
                         <OptoutModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {claimDeposit &&
-                      (isPlayingQuest || questData.maxPlayers === undefined) && ( // Bypass play feature if maxPlayers is not set
-                        <ScheduleClaimModal
-                          questData={{ ...questData, status }}
-                          questAddress={questData.address}
-                          questTotalBounty={bounty}
-                          claimDeposit={claimDeposit}
-                        />
-                      )}
+                    {claimDeposit && (isPlayingQuest || !questData.features.playableQuest) && (
+                      <ScheduleClaimModal
+                        questData={{ ...questData, status }}
+                        questAddress={questData.address}
+                        questTotalBounty={bounty}
+                        claimDeposit={claimDeposit}
+                      />
+                    )}
                   </>
                   <>
                     {(status === QuestStatus.Expired ||
