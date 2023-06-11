@@ -67,6 +67,7 @@ function MainView({ children }: Props) {
       </HeaderWrapperStyled>
       <ScrollViewStyled id="scroll-view">
         <ContentWrapperStyled isSmallResolution={below('medium')}>
+          {/* @ts-ignore */}
           {page ? children : <Skeleton /> /* TODO Put some spinner here */}
         </ContentWrapperStyled>
         <Footer />

@@ -325,7 +325,10 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
       <Outset gu16>
         <>
           {!challenge || !evidence ? (
-            <Skeleton />
+            <>
+              {/* @ts-ignore */}
+              <Skeleton />
+            </>
           ) : (
             <>
               <CollapsableBlock
