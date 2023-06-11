@@ -695,6 +695,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/plugin-proposal-private-property-in-object@npm:^7.21.11":
+  version: 7.21.11
+  resolution: "@babel/plugin-proposal-private-property-in-object@npm:7.21.11"
+  dependencies:
+    "@babel/helper-annotate-as-pure": ^7.18.6
+    "@babel/helper-create-class-features-plugin": ^7.21.0
+    "@babel/helper-plugin-utils": ^7.20.2
+    "@babel/plugin-syntax-private-property-in-object": ^7.14.5
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: 1b880543bc5f525b360b53d97dd30807302bb82615cd42bf931968f59003cac75629563d6b104868db50abd22235b3271fdf679fea5db59a267181a99cc0c265
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-proposal-unicode-property-regex@npm:^7.18.6, @babel/plugin-proposal-unicode-property-regex@npm:^7.4.4":
   version: 7.18.6
   resolution: "@babel/plugin-proposal-unicode-property-regex@npm:7.18.6"
@@ -4473,6 +4487,7 @@ __metadata:
     "@1hive/use-wallet": "npm:@1hive/use-wallet@1.1.2"
     "@babel/core": ^7.11.1
     "@babel/plugin-proposal-class-properties": ^7.7.4
+    "@babel/plugin-proposal-private-property-in-object": ^7.21.11
     "@babel/plugin-transform-react-jsx-source": ^7.12.13
     "@babel/preset-env": ^7.7.4
     "@babel/preset-react": ^7.7.4
