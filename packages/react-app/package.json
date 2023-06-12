@@ -114,7 +114,7 @@
     "ts-jest": "^27.1.4"
   },
   "scripts": {
-    "start": "NODE_OPTIONS=--openssl-legacy-provider && cross-env HTTPS=true REACT_APP_STAGING=true npm run sync-assets && react-app-rewired start",
+    "start": "cross-env HTTPS=true REACT_APP_STAGING=true npm run sync-assets && react-app-rewired start",
     "start:local": "cross-env REACT_APP_DEFAULT_CHAIN_ID=1337 yarn start",
     "start:goerli": "cross-env REACT_APP_DEFAULT_CHAIN_ID=5 REACT_APP_STAGING=true yarn start",
     "start:gnosis": "cross-env REACT_APP_DEFAULT_CHAIN_ID=100 REACT_APP_STAGING=true yarn start",
@@ -145,9 +145,6 @@
     },
     "preset": "ts-jest",
     "testEnvironment": "node"
-  },
-  "engines": {
-    "node": "v18.15.0"
   },
   "browserslist": {
     "production": [
