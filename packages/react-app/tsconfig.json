@@ -31,7 +31,12 @@
     "noEmit": true,
     "sourceRoot": "/",
     "inlineSources": true,
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "5.0",
+    "paths": {
+      "react": [
+        "./node_modules/@types/react"
+      ]
+    }
   },
   "exclude": [
     "node_modules",
