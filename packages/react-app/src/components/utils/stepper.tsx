@@ -54,7 +54,7 @@ export default function Stepper({ steps, submitButton, onNext, onBack }: Props) 
 
   const nextStep = () => {
     const isValid = onNext?.(currentStep, currentStep + 2 === steps?.length);
-    if (isValid) {
+    if (isValid || !onNext) {
       if (steps && steps[currentStep + 1]) {
         setCurrentStep(currentStep + 1);
       }

@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 const TopRightCornerStyled = styled.div`
   position: absolute;
   bottom: ${GUpx(2)};
-  right: ${GUpx(2)};
+  right: calc(50vw - 10px);
+  width: 40px;
 `;
 
 export function BackToTop() {
