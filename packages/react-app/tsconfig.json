@@ -31,12 +31,7 @@
     "noEmit": true,
     "sourceRoot": "/",
     "inlineSources": true,
-    "ignoreDeprecations": "5.0",
-    "paths": {
-      "react": [
-        "./node_modules/@types/react"
-      ]
-    }
+    "ignoreDeprecations": "5.0"
   },
   "exclude": [
     "node_modules",
