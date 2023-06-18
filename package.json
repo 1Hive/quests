@@ -11,25 +11,25 @@
   "private": true,
   "scripts": {
     "ci": "yarn install --pure-lockfile --immutable --skip-builds",
-    "lint": "yarn workspace @quests/react-app lint",
-    "chain": "yarn workspace @quests/hardhat chain",
-    "test": "yarn workspace @quests/hardhat test",
-    "start": "yarn workspace @quests/react-app start",
-    "build": "yarn workspace @quests/react-app build --max-old-space-size=12288",
-    "start:local": "yarn workspace @quests/react-app start:local",
-    "compile": "yarn workspace @quests/hardhat compile",
-    "coverage": "yarn workspace @quests/hardhat test-coverage",
-    "deploy:rinkeby": "yarn workspace @quests/hardhat deploy:rinkeby",
-    "deploy:local": "yarn workspace @quests/hardhat deploy:local",
+    "lint": "yarn workspace @1hive/quests-react-app lint",
+    "chain": "yarn workspace @1hive/quests-hardhat chain",
+    "test": "yarn workspace @1hive/quests-hardhat test",
+    "start": "yarn workspace @1hive/quests-react-app start",
+    "build": "yarn workspace @1hive/quests-react-app build --max-old-space-size=12288",
+    "start:local": "yarn workspace @1hive/quests-react-app start:local",
+    "compile": "yarn workspace @1hive/quests-hardhat compile",
+    "coverage": "yarn workspace @1hive/quests-hardhat test-coverage",
+    "deploy:rinkeby": "yarn workspace @1hive/quests-hardhat deploy:rinkeby",
+    "deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local",
     "graph-run-node": "cd docker/graph-node && docker-compose up",
     "graph-remove-node": "cd docker/graph-node && docker-compose down",
-    "e2e": "yarn workspace @quests/e2e test"
+    "e2e": "yarn workspace @1hive/e2e test"
   },
   "workspaces": {
     "packages": [
       "packages/*"
     ],
-    "installConfig.hoistingLimits": [
+    "nohoist": [
       "**/@graphprotocol/graph-ts",
       "**/@graphprotocol/graph-ts/**"
     ]
@@ -39,8 +39,5 @@
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   },
-  "packageManager": "yarn@3.5.1",
-  "dependencies": {
-    "node-gyp": "^9.3.1"
-  }
+  "packageManager": "yarn@3.5.1"
 }
