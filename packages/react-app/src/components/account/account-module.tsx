@@ -186,7 +186,6 @@ function AccountModule({ compact = false }: Props) {
         >
           {/* @ts-ignore */}
           <div ref={popoverFocusElement} tabIndex="0" css="outline: 0" id="account-wrapper">
-            {/* @ts-ignore */}
             <Transition
               native
               immediate={!animate}
