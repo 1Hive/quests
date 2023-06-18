@@ -5,6 +5,7 @@ import { Button, GU, IconConnect, springs } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { animated, Transition } from 'react-spring/renderprops';
+import { getNetwork } from 'src/networks';
 import styled from 'styled-components';
 import { useWallet } from '../../contexts/wallet.context';
 import { getUseWalletProviders, isConnected } from '../../utils/web3.utils';
@@ -13,7 +14,6 @@ import AccountButton from './account-button';
 import AccountScreenConnected from './screen-connected';
 import AccountModuleConnectingScreen from './screen-connecting';
 import ScreenProviders from './screen-providers';
-import { getNetwork } from '../../networks';
 
 const AccountWrapperStyled = styled.div`
   display: flex;
