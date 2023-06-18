@@ -1,6 +1,6 @@
 {
   "proxy": "https://cors-anywhere.herokuapp.com/",
-  "name": "@quests/react-app",
+  "name": "@1hive/quests-react-app",
   "version": "0.1.1-alpha",
   "license": "MIT",
   "homepage": ".",
@@ -48,12 +48,13 @@
     "moment-timezone": "^0.5.35",
     "node-sass": "^7.0.0",
     "prop-types": "^15.7.2",
-    "react": "17.0.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-app-rewire-hot-loader": "^2.0.1",
     "react-app-rewired": "^2.1.8",
     "react-dev-utils": "^11.0.4",
     "react-device-detect": "^1.17.0",
-    "react-dom": "17.0.2",
+    "react-focus-within": "^2.0.2",
     "react-hot-loader": "^4.13.0",
     "react-icons": "^4.2.0",
     "react-infinite-scroll-component": "^6.0.0",
@@ -62,14 +63,13 @@
     "react-scripts": "^4.0.2",
     "react-spring": "^8.0.27",
     "s3-folder-upload": "^2.3.5",
-    "styled-components": "5.2.1",
+    "styled-components": "^5.2.1",
     "tslib": "^2.3.1",
     "typescript": "^4.9.4",
     "urql": "1.8.2",
     "use-wallet": "npm:@1hive/use-wallet@1.1.2",
     "web3": "^1.3.5",
     "web3-utils": "^1.2.0",
-    "webpack": "4.44.2",
     "yup": "^0.32.11"
   },
   "devDependencies": {
@@ -85,8 +85,8 @@
     "@types/jest": "^27.4.1",
     "@types/lodash-es": "^4.17.5",
     "@types/node": "^16.11.0",
-    "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2",
     "@types/react-router-dom": "^5.3.1",
     "@types/styled-components": "^5.1.25",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -134,6 +134,13 @@
     "theme": "npx gulp less",
     "watch": "node ./scripts/watch.js",
     "ci": "yarn install --pure-lockfile --network-concurrency 1"
+  },
+  "resolutions": {
+    "styled-components": "^5",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
   },
   "jest": {
     "setupFiles": [
