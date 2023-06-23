@@ -29,6 +29,7 @@ export class QuestEntity extends Entity {
     this.set("questCreateDepositAmount", Value.fromBigInt(BigInt.zero()));
     this.set("questPlayDepositToken", Value.fromBytes(Bytes.empty()));
     this.set("questPlayDepositAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("questPlayers", Value.fromStringArray(new Array(0)));
   }
 
   save(): void {
@@ -224,6 +225,15 @@ export class QuestEntity extends Entity {
   set questPlayDepositAmount(value: BigInt) {
     this.set("questPlayDepositAmount", Value.fromBigInt(value));
   }
+
+  get questPlayers(): Array<string> {
+    let value = this.get("questPlayers");
+    return value!.toStringArray();
+  }
+
+  set questPlayers(value: Array<string>) {
+    this.set("questPlayers", Value.fromStringArray(value));
+  }
 }
 
 export class CreateDepositEntity extends Entity {
@@ -355,5 +365,81 @@ export class PlayDepositEntity extends Entity {
 
   set depositAmount(value: BigInt) {
     this.set("depositAmount", Value.fromBigInt(value));
+  }
+}
+
+export class QuestClaimEntity extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("questAddress", Value.fromString(""));
+    this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("evidenceIpfsHash", Value.fromBytes(Bytes.empty()));
+    this.set("player", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save QuestClaimEntity entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save QuestClaimEntity entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("QuestClaimEntity", id.toString(), this);
+    }
+  }
+
+  static load(id: string): QuestClaimEntity | null {
+    return changetype<QuestClaimEntity | null>(
+      store.get("QuestClaimEntity", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get questAddress(): string {
+    let value = this.get("questAddress");
+    return value!.toString();
+  }
+
+  set questAddress(value: string) {
+    this.set("questAddress", Value.fromString(value));
+  }
+
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value!.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
+  }
+
+  get evidenceIpfsHash(): Bytes {
+    let value = this.get("evidenceIpfsHash");
+    return value!.toBytes();
+  }
+
+  set evidenceIpfsHash(value: Bytes) {
+    this.set("evidenceIpfsHash", Value.fromBytes(value));
+  }
+
+  get player(): string {
+    let value = this.get("player");
+    return value!.toString();
+  }
+
+  set player(value: string) {
+    this.set("player", Value.fromString(value));
   }
 }
