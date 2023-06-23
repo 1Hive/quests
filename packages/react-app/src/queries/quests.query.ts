@@ -1,11 +1,13 @@
 import request from 'graphql-request';
 import gql from 'graphql-tag';
 import { GQL_MAX_INT_MS } from 'src/constants';
+import { QuestPlayStatus } from 'src/enums/quest-play-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
 import env from 'src/environment';
 import { FilterModel } from 'src/models/filter.model';
 import { getNetwork } from 'src/networks';
 import { msToSec } from 'src/utils/date.utils';
+import { useWallet } from 'use-wallet';
 
 const QuestEntityQuery = gql`
   query questEntity($ID: String) {
@@ -41,6 +43,7 @@ const QuestEntitiesQuery = (payload: any) => gql`
     $address: String
     $title: String
     $description: String
+    $walletAddress: String
     $blackList: [String]
     $whiteList: [String]
   ) {
@@ -52,6 +55,15 @@ const QuestEntitiesQuery = (payload: any) => gql`
         questExpireTimeSec_lte: $expireTimeUpper
         questTitle_contains_nocase: $title
         questDescription_contains_nocase: $description
+        # Test  
+        ${
+          payload.walletAddress !== undefined && payload.playStatus === QuestPlayStatus.Played
+            ? 'questPlayers_contains:[$walletAddress]'
+            : ''
+        }
+        ${payload.playStatus === QuestPlayStatus.Unplayed ? 'questPlayers_not:null' : ''}
+        
+        
         ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
         ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
       }
@@ -118,7 +130,7 @@ const QuestEntitiesLight = (payload: any) => gql`
   }
 `;
 
-export const fetchQuestEnity = (questAddress: string) => {
+export const fetchQuestEntity = (questAddress: string) => {
   const { questsSubgraph } = getNetwork();
   return request(questsSubgraph, QuestEntityQuery, {
     ID: questAddress.toLowerCase(), // Subgraph address are stored lowercase
@@ -129,10 +141,14 @@ export const fetchQuestEntities = async (
   currentIndex: number,
   count: number,
   filter: FilterModel,
+  walletAddress: string,
 ) => {
+  // const { walletAddress, walletConnected } = useWallet();
   const { questsSubgraph, networkId } = getNetwork();
   let expireTimeLowerMs = 0;
   let expireTimeUpperMs = GQL_MAX_INT_MS;
+  const { playStatus } = filter;
+
   if (filter.status === QuestStatus.Active) {
     expireTimeLowerMs = Math.max(filter.minExpireTime?.getTime() ?? 0, Date.now());
   } else if (filter.status === QuestStatus.Expired) {
@@ -158,10 +174,11 @@ export const fetchQuestEntities = async (
     expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
     title: filter.title,
     description: filter.description,
+    walletAddress: walletAddress?.toLowerCase(),
+    playStatus,
     blackList: blackList !== undefined ? blackList.toLowerCase().split(',') : undefined,
     whiteList: whiteList && whiteList !== '*' ? whiteList.toLowerCase().split(',') : undefined,
   };
-
   const res = await request(questsSubgraph, QuestEntitiesQuery(payload), payload);
 
   return res.questEntities;

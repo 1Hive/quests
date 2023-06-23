@@ -22,7 +22,7 @@ import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
 import { DashboardModel } from 'src/models/dashboard.model';
 import {
-  fetchQuestEnity,
+  fetchQuestEntity,
   fetchQuestEntities,
   fetchActiveQuestEntitiesLight,
   fetchQuestRewardTokens,
@@ -309,22 +309,23 @@ export async function fetchQuestsPaging(
   currentIndex: number,
   count: number,
   filter: FilterModel,
+  walletAddress: string,
 ): Promise<QuestModel[]> {
-  const queryResult = await fetchQuestEntities(currentIndex, count, filter);
+  const queryResult = await fetchQuestEntities(currentIndex, count, filter, walletAddress);
   const newQuests =
     filter.playStatus === 'All'
       ? await mapQuestList(queryResult)
       : (await mapQuestList(queryResult)).filter((quest) =>
           filter.playStatus === 'Played'
             ? quest.players && quest.players.length > 0
-            : !quest.players,
+            : quest.players === null,
         );
   questList = questList.concat(newQuests);
   return newQuests;
 }
 
 export async function fetchQuest(questAddress: string) {
-  const queryResult = await fetchQuestEnity(questAddress);
+  const queryResult = await fetchQuestEntity(questAddress);
   const claimResult = await fetchGovernQueueClaimsCount();
   return mapQuest(queryResult, claimResult);
 }
