@@ -90,7 +90,13 @@ const RowStyled = styled.div`
   flex-wrap: wrap-reverse;
   justify-content: space-between;
 `;
-
+const SecondRowStyled = styled.div`
+  display: flex;
+  padding-top: ${GUpx(1)};
+  width: 100%;
+  flex-wrap: wrap-reverse;
+  justify-content: space-evenly;
+`;
 const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => (compact ? GUpx(2) : GUpx(3))};
   width: 100%;
@@ -276,66 +282,86 @@ export default function Quest({
   );
 
   const fieldsRow = (
-    <RowStyled>
-      <HighlightBlocker>
-        <AddressFieldInputStyled
-          id="address"
-          label="Quest Address"
-          isLoading={isLoading || !questData}
-          value={questData?.address}
-          showExplorerLink={!isSummary}
-        />
-      </HighlightBlocker>
-      {isSummary && (
-        <NumberFieldInput
-          value={questData?.activeClaimCount}
-          label="Claims"
-          isLoading={isLoading}
-        />
-      )}
-      {!isSummary && (
-        <>
+    <>
+      <RowStyled>
+        <HighlightBlocker>
           <AddressFieldInputStyled
-            id="creator"
-            label="Creator"
+            id="address"
+            label="Quest Address"
             isLoading={isLoading || !questData}
-            value={questData?.creatorAddress}
+            value={questData?.address}
+            showExplorerLink={!isSummary}
           />
-          {questData?.maxPlayers != null && (
-            <TextFieldInput
-              id="players"
-              label="Players"
-              isLoading={isLoading || !questData}
-              value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+        </HighlightBlocker>
+        {isSummary && (
+          <>
+            <NumberFieldInput
+              value={questData?.activeClaimCount}
+              label="Claims"
+              isLoading={isLoading}
             />
-          )}
-          <DateFieldInput
-            id="creationTime"
-            label="Creation time"
-            isLoading={isLoading || !questData}
-            value={questData.creationTime}
-          />
-        </>
-      )}
-
-      <DateFieldInput
-        id="expireTime"
-        label="Expire time"
-        tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
-        isLoading={isLoading || !questData}
-        value={questData?.expireTime}
-      />
-
-      {!isSummary && status === QuestStatus.Active && (
-        <AmountFieldInput
-          id="claimDeposit"
-          label="Claim deposit"
-          tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-          value={claimDeposit}
-          isLoading={isLoading || !claimDeposit}
-        />
-      )}
-    </RowStyled>
+            <DateFieldInput
+              id="expireTime"
+              label="Expire time"
+              tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
+              isLoading={isLoading || !questData}
+              value={questData?.expireTime}
+            />
+          </>
+        )}
+        {!isSummary && (
+          <>
+            <AddressFieldInputStyled
+              id="creator"
+              label="Creator"
+              isLoading={isLoading || !questData}
+              value={questData?.creatorAddress}
+            />
+            <AddressFieldInputStyled
+              id="fallback-address"
+              label="Funds recovery address"
+              tooltip="Unused funds at the specified expiry time can be returned to this address."
+              isLoading={isLoading || !questData}
+              value={questData?.fallbackAddress}
+            />
+          </>
+        )}
+      </RowStyled>
+      <SecondRowStyled>
+        {!isSummary && (
+          <>
+            <DateFieldInput
+              id="expireTime"
+              label="Expire time"
+              tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
+              isLoading={isLoading || !questData}
+              value={questData?.expireTime}
+            />
+            <AmountFieldInput
+              id="claimDeposit"
+              label="Claim deposit"
+              tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
+              value={claimDeposit}
+              isLoading={isLoading || !claimDeposit}
+            />
+            {questData?.maxPlayers != null && (
+              <TextFieldInput
+                id="players"
+                label="Players"
+                isLoading={isLoading || !questData}
+                value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+              />
+            )}
+            <DateFieldInput
+              id="creationTime"
+              label="Creation time"
+              isLoading={isLoading || !questData}
+              value={questData.creationTime}
+            />
+          </>
+        )}
+      </SecondRowStyled>
+    </>
   );
   return (
     <CardWrapperStyed compact={below('medium')}>
@@ -438,21 +464,21 @@ export default function Quest({
                     {(isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||
                       (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
-                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                      questData.features.playableQuest &&
+                      questData.players?.length !== 0 && (
                         <OptoutModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {claimDeposit &&
-                      (isPlayingQuest || questData.maxPlayers === undefined) && ( // Bypass play feature if maxPlayers is not set
-                        <ScheduleClaimModal
-                          questData={{ ...questData, status }}
-                          questAddress={questData.address}
-                          questTotalBounty={bounty}
-                          claimDeposit={claimDeposit}
-                        />
-                      )}
+                    {claimDeposit && (isPlayingQuest || !questData.features.playableQuest) && (
+                      <ScheduleClaimModal
+                        questData={{ ...questData, status }}
+                        questAddress={questData.address}
+                        questTotalBounty={bounty}
+                        claimDeposit={claimDeposit}
+                      />
+                    )}
                   </>
                   <>
                     {(status === QuestStatus.Expired ||
