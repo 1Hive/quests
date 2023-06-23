@@ -275,7 +275,7 @@ export default function Quest({
     <div
       onMouseLeave={() => setHighlight(true)}
       onMouseEnter={() => setHighlight(false)}
-      className="max-width-10Button0"
+      className="max-width-100"
     >
       {children}
     </div>
@@ -327,8 +327,8 @@ export default function Quest({
           </>
         )}
       </RowStyled>
-      <SecondRowStyled>
-        {!isSummary && (
+      {!isSummary && (
+        <SecondRowStyled>
           <>
             <DateFieldInput
               id="expireTime"
@@ -359,8 +359,8 @@ export default function Quest({
               value={questData.creationTime}
             />
           </>
-        )}
-      </SecondRowStyled>
+        </SecondRowStyled>
+      )}
     </>
   );
   return (
