@@ -45,6 +45,11 @@ const FormStyled = styled(Form)`
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx(1)};
   width: fit-content;
+
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 const WrapperStyled = styled.div`
@@ -68,10 +73,6 @@ const ButtonLinkStyled = styled(Button)`
   font-weight: bold;
   background: transparent;
   padding-top: 4px;
-`;
-
-const ContactInformationWrapperStyled = styled.div`
-  max-width: 406px;
 `;
 
 const DepositInfoStyled = styled(Info)`
@@ -353,6 +354,7 @@ export default function ScheduleClaimModal({
                     wide
                     rows={10}
                     compact
+                    placeHolder='e.g. "I have completed the quest by killing the dragon."'
                   />
                   {questData.status === QuestStatus.Archived ? (
                     archivedWarning
@@ -407,19 +409,17 @@ export default function ScheduleClaimModal({
                     />
                   </Outset>
                   <Outset>
-                    <ContactInformationWrapperStyled>
-                      <MarkdownFieldInput
-                        id="contactInformation"
-                        isEdit
-                        label="Contact information (optional)"
-                        tooltip="The necessary contact information that the creator will use to communicate with you. (Optional)"
-                        value={values.contactInformation}
-                        onChange={handleChange}
-                        placeHolder="e.g. discord, email, phone number, etc."
-                        compact
-                        wide
-                      />
-                    </ContactInformationWrapperStyled>
+                    <MarkdownFieldInput
+                      id="contactInformation"
+                      isEdit
+                      label="Contact information (optional)"
+                      tooltip="The necessary contact information that the creator will use to communicate with you. (Optional)"
+                      value={values.contactInformation}
+                      onChange={handleChange}
+                      placeHolder="e.g. discord, email, phone number, etc."
+                      compact
+                      wide
+                    />
                     {willExpireBeforeClaim && expirationWarning}
                   </Outset>
                 </WrapperStyled>,
