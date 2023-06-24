@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./libraries/IExecutable.sol";
+import "hardhat/console.sol";
 
 contract Quest is IExecutable {
     using SafeMath for uint256;
@@ -22,7 +23,7 @@ contract Quest is IExecutable {
     address public aragonGovernAddress;
     address payable public fundsRecoveryAddress;
     uint32 public maxPlayers; // 0 for unlimited players
-
+    bool public isWhiteList;
     Models.Claim[] public claims;
     Models.Deposit public createDeposit;
     Models.Deposit public playDeposit;
@@ -33,6 +34,14 @@ contract Quest is IExecutable {
     event QuestClaimed(bytes evidence, address player, uint256 amount);
     event QuestPlayed(address player, uint256 timestamp);
     event QuestUnplayed(address player, uint256 timestamp);
+    event WhiteListChanged(address[] whiteListPlayers, uint256 timestamp);
+    modifier OnlyCreator() {
+        require(
+            msg.sender == questCreator,
+            "Only creator can call this function"
+        );
+        _;
+    }
 
     constructor(
         string memory _questTitle,
@@ -44,8 +53,18 @@ contract Quest is IExecutable {
         Models.Deposit memory _createDeposit,
         Models.Deposit memory _playDeposit,
         address _questCreator,
-        uint32 _maxPlayers
+        uint32 _maxPlayers,
+        bool _isWhiteList
     ) {
+        // uint32 check = _isWhiteList ? 1 : 0;
+        // console.log("check:", check);
+        // console.log("Max players:", maxPlayers);
+        // console.log("Maxplayers * check = ", maxPlayers * check);
+        require(
+            !(_maxPlayers > 0 && _isWhiteList),
+            // _maxPlayers * check == 0,
+            "ERROR: Can't create a whiteListed quest with max players greater than 0 (infinity)"
+        );
         questTitle = _questTitle;
         questDetailsRef = _questDetailsRef;
         rewardToken = _rewardToken;
@@ -58,6 +77,7 @@ contract Quest is IExecutable {
 
         isCreateDepositReleased = false;
         maxPlayers = _maxPlayers;
+        isWhiteList = _isWhiteList;
     }
 
     /*
@@ -170,6 +190,10 @@ contract Quest is IExecutable {
      */
     function play(address _player) external {
         require(
+            isWhiteList == false,
+            "ERROR: Can't self register and play a whitelisted Quest"
+        );
+        require(
             msg.sender == _player || msg.sender == questCreator,
             "ERROR: Sender not player nor creator"
         );
@@ -187,6 +211,15 @@ contract Quest is IExecutable {
         emit QuestPlayed(_player, block.timestamp);
     }
 
+    function setWhiteList(address[] memory _players) external OnlyCreator {
+        require(
+            isWhiteList == true,
+            "ERROR: Can't set the white list to a non-whitelisted contract"
+        );
+        playerList = _players;
+        emit WhiteListChanged(_players, block.timestamp);
+    }
+
     /**
      * Unregister a player from the quest. (sender could be the player or quest creator)
      * @param _player Player address.
@@ -197,6 +230,10 @@ contract Quest is IExecutable {
      * emit QuestUnplayed with player and timestamp
      */
     function unplay(address _player) external {
+        require(
+            isWhiteList == false,
+            "ERROR: can't unplay a whitelisted quest"
+        );
         require(
             msg.sender == _player || msg.sender == questCreator,
             "ERROR: Sender not player nor creator"

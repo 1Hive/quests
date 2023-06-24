@@ -21,7 +21,8 @@ export const deployQuest = async (
   playDepositToken: TokenMock,
   playDepositAmount: BigNumber,
   creator: SignerWithAddress,
-  maxPlayers: number = 0
+  maxPlayers: number = 0,
+  isWhiteList: boolean = false
 ) => {
   const quest = await new Quest__factory(creator).deploy(
     title,
@@ -33,7 +34,8 @@ export const deployQuest = async (
     { token: createDepositToken.address, amount: createDepositAmount },
     { token: playDepositToken.address, amount: playDepositAmount },
     creator.address,
-    maxPlayers
+    maxPlayers,
+    isWhiteList
   );
   await quest.deployed();
   await rewardToken.connect(quest.signer).mint(quest.address, initialBalance);

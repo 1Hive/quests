@@ -24,7 +24,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
     "createDeposit()": FunctionFragment;
-    "createQuest(string,bytes,address,uint256,address,uint32)": FunctionFragment;
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)": FunctionFragment;
     "owner()": FunctionFragment;
     "playDeposit()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -44,7 +44,15 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createQuest",
-    values: [string, BytesLike, string, BigNumberish, string, BigNumberish]
+    values: [
+      string,
+      BytesLike,
+      string,
+      BigNumberish,
+      string,
+      BigNumberish,
+      boolean
+    ]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -114,7 +122,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     "CreateDepositChanged(uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PlayDepositChanged(uint256,address,uint256)": EventFragment;
-    "QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address,uint256,address,uint32)": EventFragment;
+    "QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address,uint256,address,uint32,bool)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "CreateDepositChanged"): EventFragment;
@@ -156,16 +164,18 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -249,16 +259,18 @@ export class QuestFactory extends Contract {
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
     _maxPlayers: BigNumberish,
+    _isWhiteList: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createQuest(string,bytes,address,uint256,address,uint32)"(
+  "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
     _questTitle: string,
     _questDetailsRef: BytesLike,
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
     _maxPlayers: BigNumberish,
+    _isWhiteList: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -342,16 +354,18 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -442,7 +456,8 @@ export class QuestFactory extends Contract {
       playDepositToken: null,
       playDepositAmount: null,
       creator: null,
-      maxPlayers: null
+      maxPlayers: null,
+      isWhiteList: null
     ): EventFilter;
   };
 
@@ -462,16 +477,18 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -552,16 +569,18 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

@@ -31,6 +31,7 @@ interface QuestInterface extends ethers.utils.Interface {
     "fundsRecoveryAddress()": FunctionFragment;
     "getPlayers()": FunctionFragment;
     "isCreateDepositReleased()": FunctionFragment;
+    "isWhiteList()": FunctionFragment;
     "maxPlayers()": FunctionFragment;
     "play(address)": FunctionFragment;
     "playDeposit()": FunctionFragment;
@@ -39,6 +40,7 @@ interface QuestInterface extends ethers.utils.Interface {
     "questTitle()": FunctionFragment;
     "recoverFundsAndDeposit()": FunctionFragment;
     "rewardToken()": FunctionFragment;
+    "setWhiteList(address[])": FunctionFragment;
     "unplay(address)": FunctionFragment;
   };
 
@@ -76,6 +78,10 @@ interface QuestInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "isWhiteList",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "maxPlayers",
     values?: undefined
   ): string;
@@ -104,6 +110,10 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "rewardToken",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "setWhiteList",
+    values: [string[]]
+  ): string;
   encodeFunctionData(functionFragment: "unplay", values: [string]): string;
 
   decodeFunctionResult(
@@ -125,6 +135,10 @@ interface QuestInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "getPlayers", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isCreateDepositReleased",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isWhiteList",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "maxPlayers", data: BytesLike): Result;
@@ -150,17 +164,23 @@ interface QuestInterface extends ethers.utils.Interface {
     functionFragment: "rewardToken",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setWhiteList",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "unplay", data: BytesLike): Result;
 
   events: {
     "QuestClaimed(bytes,address,uint256)": EventFragment;
     "QuestPlayed(address,uint256)": EventFragment;
     "QuestUnplayed(address,uint256)": EventFragment;
+    "WhiteListChanged(address[],uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "QuestClaimed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "QuestPlayed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "QuestUnplayed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WhiteListChanged"): EventFragment;
 }
 
 export class Quest extends Contract {
@@ -250,6 +270,10 @@ export class Quest extends Contract {
 
     "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<[boolean]>;
 
+    isWhiteList(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "isWhiteList()"(overrides?: CallOverrides): Promise<[boolean]>;
+
     maxPlayers(overrides?: CallOverrides): Promise<[number]>;
 
     "maxPlayers()"(overrides?: CallOverrides): Promise<[number]>;
@@ -290,6 +314,16 @@ export class Quest extends Contract {
     rewardToken(overrides?: CallOverrides): Promise<[string]>;
 
     "rewardToken()"(overrides?: CallOverrides): Promise<[string]>;
+
+    setWhiteList(
+      _players: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setWhiteList(address[])"(
+      _players: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     unplay(
       _player: string,
@@ -375,6 +409,10 @@ export class Quest extends Contract {
 
   "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
 
+  isWhiteList(overrides?: CallOverrides): Promise<boolean>;
+
+  "isWhiteList()"(overrides?: CallOverrides): Promise<boolean>;
+
   maxPlayers(overrides?: CallOverrides): Promise<number>;
 
   "maxPlayers()"(overrides?: CallOverrides): Promise<number>;
@@ -415,6 +453,16 @@ export class Quest extends Contract {
   rewardToken(overrides?: CallOverrides): Promise<string>;
 
   "rewardToken()"(overrides?: CallOverrides): Promise<string>;
+
+  setWhiteList(
+    _players: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setWhiteList(address[])"(
+    _players: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   unplay(_player: string, overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -497,6 +545,10 @@ export class Quest extends Contract {
 
     "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<boolean>;
 
+    isWhiteList(overrides?: CallOverrides): Promise<boolean>;
+
+    "isWhiteList()"(overrides?: CallOverrides): Promise<boolean>;
+
     maxPlayers(overrides?: CallOverrides): Promise<number>;
 
     "maxPlayers()"(overrides?: CallOverrides): Promise<number>;
@@ -533,6 +585,13 @@ export class Quest extends Contract {
 
     "rewardToken()"(overrides?: CallOverrides): Promise<string>;
 
+    setWhiteList(_players: string[], overrides?: CallOverrides): Promise<void>;
+
+    "setWhiteList(address[])"(
+      _players: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     unplay(_player: string, overrides?: CallOverrides): Promise<void>;
 
     "unplay(address)"(
@@ -547,6 +606,8 @@ export class Quest extends Contract {
     QuestPlayed(player: null, timestamp: null): EventFilter;
 
     QuestUnplayed(player: null, timestamp: null): EventFilter;
+
+    WhiteListChanged(whiteListPlayers: null, timestamp: null): EventFilter;
   };
 
   estimateGas: {
@@ -604,6 +665,10 @@ export class Quest extends Contract {
 
     "isCreateDepositReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    isWhiteList(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "isWhiteList()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     maxPlayers(overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxPlayers()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -635,6 +700,13 @@ export class Quest extends Contract {
     rewardToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     "rewardToken()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setWhiteList(_players: string[], overrides?: Overrides): Promise<BigNumber>;
+
+    "setWhiteList(address[])"(
+      _players: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     unplay(_player: string, overrides?: Overrides): Promise<BigNumber>;
 
@@ -717,6 +789,10 @@ export class Quest extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    isWhiteList(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "isWhiteList()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     maxPlayers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "maxPlayers()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -757,6 +833,16 @@ export class Quest extends Contract {
     rewardToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "rewardToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setWhiteList(
+      _players: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setWhiteList(address[])"(
+      _players: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
     unplay(
       _player: string,

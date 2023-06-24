@@ -27,7 +27,8 @@ contract QuestFactory is Ownable {
         address playDepositToken,
         uint256 playDepositAmount,
         address creator,
-        uint32 maxPlayers
+        uint32 maxPlayers,
+        bool isWhiteList
     );
 
     event CreateDepositChanged(
@@ -94,7 +95,8 @@ contract QuestFactory is Ownable {
         IERC20 _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress,
-        uint32 _maxPlayers
+        uint32 _maxPlayers,
+        bool _isWhiteList
     ) external returns (address) {
         Quest quest = new Quest(
             _questTitle,
@@ -106,7 +108,8 @@ contract QuestFactory is Ownable {
             Models.Deposit(createDeposit.token, createDeposit.amount),
             Models.Deposit(playDeposit.token, playDeposit.amount),
             msg.sender,
-            _maxPlayers
+            _maxPlayers,
+            _isWhiteList
         );
 
         // Collect deposit from quest creator and send it to quest
@@ -124,7 +127,8 @@ contract QuestFactory is Ownable {
             address(playDeposit.token),
             playDeposit.amount,
             msg.sender,
-            _maxPlayers
+            _maxPlayers,
+            _isWhiteList
         );
 
         return address(quest);

@@ -78,6 +78,7 @@ describe("[Contract] QuestFactory", function () {
       const detailIPFS = "0x";
       const expireTime = 0; // Unix Epoch 0
       const maxPlayers = 1;
+      const isWhiteList = false;
       await createDepositToken
         .connect(owner)
         .approve(questFactoryContract.address, depositAmount);
@@ -91,7 +92,8 @@ describe("[Contract] QuestFactory", function () {
           rewardToken.address,
           expireTime,
           owner.address,
-          maxPlayers
+          maxPlayers,
+          isWhiteList
         )
       ).to.emit(questFactoryContract, "QuestCreated");
     });
@@ -102,6 +104,7 @@ describe("[Contract] QuestFactory", function () {
       const detailIPFS = "0x";
       const expireTime = 0; // Unix Epoch 0
       const maxPlayers = 1;
+      const isWhiteList = false;
 
       await createDepositToken
         .connect(owner)
@@ -115,7 +118,8 @@ describe("[Contract] QuestFactory", function () {
           rewardToken.address,
           expireTime,
           owner.address,
-          maxPlayers
+          maxPlayers,
+          isWhiteList
         )
       );
 
@@ -131,6 +135,7 @@ describe("[Contract] QuestFactory", function () {
       const detailIPFS = "0x";
       const expireTime = 0; // Unix Epoch 0
       const maxPlayers = 1;
+      const isWhiteList = false;
 
       await createDepositToken
         .connect(owner)
@@ -143,7 +148,8 @@ describe("[Contract] QuestFactory", function () {
           rewardToken.address,
           expireTime,
           owner.address,
-          maxPlayers
+          maxPlayers,
+          isWhiteList
         );
 
       // Assert
@@ -183,6 +189,7 @@ describe("[Contract] QuestFactory", function () {
     it("already created quests SHOULD keep old deposit WHEN change deposit", async () => {
       // Arrange
       const maxPlayers = 1;
+      const isWhiteList = false;
       await createDepositToken
         .connect(owner)
         .approve(questFactoryContract.address, depositAmount);
@@ -195,7 +202,8 @@ describe("[Contract] QuestFactory", function () {
             rewardToken.address,
             0,
             owner.address,
-            maxPlayers
+            maxPlayers,
+            isWhiteList
           )
       );
       const quest = new Quest__factory(owner).attach(questAddress);
@@ -243,6 +251,7 @@ describe("[Contract] QuestFactory", function () {
     it("already created quests SHOULD keep old deposit WHEN change deposit", async () => {
       // Arrange
       const maxPlayers = 1;
+      const isWhiteList = false;
       await createDepositToken
         .connect(owner)
         .approve(questFactoryContract.address, depositAmount);
@@ -255,7 +264,8 @@ describe("[Contract] QuestFactory", function () {
             rewardToken.address,
             0,
             owner.address,
-            maxPlayers
+            maxPlayers,
+            isWhiteList
           )
       );
       const quest = new Quest__factory(owner).attach(questAddress);
