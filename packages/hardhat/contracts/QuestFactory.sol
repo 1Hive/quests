@@ -27,8 +27,8 @@ contract QuestFactory is Ownable {
         address playDepositToken,
         uint256 playDepositAmount,
         address creator,
-        uint32 maxPlayers,
-        bool isWhiteList
+        uint32 maxPlayers
+        // bool isWhiteList
     );
 
     event CreateDepositChanged(
@@ -101,15 +101,17 @@ contract QuestFactory is Ownable {
         Quest quest = new Quest(
             _questTitle,
             _questDetailsRef,
-            _rewardToken,
-            _expireTime,
-            aragonGovernAddress,
-            _fundsRecoveryAddress,
             Models.Deposit(createDeposit.token, createDeposit.amount),
             Models.Deposit(playDeposit.token, playDeposit.amount),
-            msg.sender,
-            _maxPlayers,
-            _isWhiteList
+            Models.QuestParam(
+                msg.sender,
+                _maxPlayers,
+                _rewardToken,
+                _expireTime,
+                aragonGovernAddress,
+                _fundsRecoveryAddress,
+                _isWhiteList
+            )
         );
 
         // Collect deposit from quest creator and send it to quest
@@ -127,8 +129,8 @@ contract QuestFactory is Ownable {
             address(playDeposit.token),
             playDeposit.amount,
             msg.sender,
-            _maxPlayers,
-            _isWhiteList
+            _maxPlayers
+            // _isWhiteList
         );
 
         return address(quest);

@@ -12,4 +12,13 @@ library Models {
         address player;
         uint256 amount;
     }
+    struct QuestParam {
+        address questCreator;
+        uint32 maxPlayers;
+        IERC20 rewardToken;
+        uint256 expireTime;
+        address aragonGovernAddress;
+        address payable fundsRecoveryAddress;
+        bool isWhiteList;
+    }
 }

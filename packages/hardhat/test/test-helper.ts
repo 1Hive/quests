@@ -27,15 +27,19 @@ export const deployQuest = async (
   const quest = await new Quest__factory(creator).deploy(
     title,
     detailIpfsHash,
-    rewardToken.address,
-    expireTime,
-    aragonGovernAddress,
-    fundsRecoveryAddress,
+
     { token: createDepositToken.address, amount: createDepositAmount },
     { token: playDepositToken.address, amount: playDepositAmount },
-    creator.address,
-    maxPlayers,
-    isWhiteList
+
+    {
+      questCreator: creator.address,
+      maxPlayers: maxPlayers,
+      rewardToken: rewardToken.address,
+      expireTime: expireTime,
+      aragonGovernAddress: aragonGovernAddress,
+      fundsRecoveryAddress: fundsRecoveryAddress,
+      isWhiteList: isWhiteList,
+    }
   );
   await quest.deployed();
   await rewardToken.connect(quest.signer).mint(quest.address, initialBalance);

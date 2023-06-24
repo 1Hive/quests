@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./libraries/IExecutable.sol";
-import "hardhat/console.sol";
 
 contract Quest is IExecutable {
     using SafeMath for uint256;
@@ -46,38 +45,27 @@ contract Quest is IExecutable {
     constructor(
         string memory _questTitle,
         bytes memory _questDetailsRef,
-        IERC20 _rewardToken,
-        uint256 _expireTime,
-        address _aragonGovernAddress,
-        address payable _fundsRecoveryAddress,
         Models.Deposit memory _createDeposit,
         Models.Deposit memory _playDeposit,
-        address _questCreator,
-        uint32 _maxPlayers,
-        bool _isWhiteList
+        Models.QuestParam memory _questParam
     ) {
-        // uint32 check = _isWhiteList ? 1 : 0;
-        // console.log("check:", check);
-        // console.log("Max players:", maxPlayers);
-        // console.log("Maxplayers * check = ", maxPlayers * check);
         require(
-            !(_maxPlayers > 0 && _isWhiteList),
-            // _maxPlayers * check == 0,
+            !(_questParam.isWhiteList && _questParam.maxPlayers > 0),
             "ERROR: Can't create a whiteListed quest with max players greater than 0 (infinity)"
         );
         questTitle = _questTitle;
         questDetailsRef = _questDetailsRef;
-        rewardToken = _rewardToken;
-        expireTime = _expireTime;
-        aragonGovernAddress = _aragonGovernAddress;
-        fundsRecoveryAddress = _fundsRecoveryAddress;
-        questCreator = _questCreator;
+        rewardToken = _questParam.rewardToken;
+        expireTime = _questParam.expireTime;
+        aragonGovernAddress = _questParam.aragonGovernAddress;
+        fundsRecoveryAddress = _questParam.fundsRecoveryAddress;
+        questCreator = _questParam.questCreator;
         createDeposit = _createDeposit;
         playDeposit = _playDeposit;
 
         isCreateDepositReleased = false;
-        maxPlayers = _maxPlayers;
-        isWhiteList = _isWhiteList;
+        maxPlayers = _questParam.maxPlayers;
+        isWhiteList = _questParam.isWhiteList;
     }
 
     /*
