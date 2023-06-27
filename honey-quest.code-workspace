@@ -26,7 +26,7 @@
     }
   ],
   "settings": {
-    "typescript.tsdk": "WebApp/node_modules/typescript/lib",
+    "typescript.tsdk": "WebApp\\node_modules\\typescript\\lib",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[solidity]": {
       "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
