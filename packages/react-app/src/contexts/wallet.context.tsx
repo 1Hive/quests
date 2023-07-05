@@ -49,25 +49,12 @@ function WalletAugmented({ children }: Props) {
   );
 
   useEffect(() => {
-    console.log('#### useEffect', { isWrongNetwork });
     if (!isWrongNetwork) {
       const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
       if (lastWalletConnected) {
         handleConnect(lastWalletConnected);
       }
     }
-
-    const handleErr = (ev: ErrorEvent) => {
-      if (ev.error.name === 'ChainUnknownError') {
-        (window as any).globalError = ev.error;
-      }
-      console.log('#### handleErr', { globalError: (window as any).globalError, ev });
-    };
-    window.addEventListener('error', handleErr);
-
-    return () => {
-      window.removeEventListener('error', handleErr);
-    };
   }, []);
 
   const ethers = useMemo(() => {
@@ -99,7 +86,6 @@ function WalletAugmented({ children }: Props) {
     }
 
     setIsConnected(true);
-    (window as any).globalError = undefined;
 
     const ensRegistry = undefined; // network?.ensRegistry;
     return new EthersProviders.Web3Provider(ethereum, {
