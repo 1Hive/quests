@@ -17,7 +17,7 @@ export type WalletContextModel = {
   activatingId: string;
   isWrongNetwork: boolean;
   ethereum: any;
-  changeNetwork: (_chainId?: number) => void;
+  changeNetwork: (_chainId?: number, _forceSwitch?: boolean) => void;
   openWalletConnect: React.Dispatch<React.SetStateAction<boolean>>;
   walletConnectOpened: boolean;
 };
@@ -134,7 +134,7 @@ function WalletAugmented({ children }: Props) {
     setIsConnected(false);
   }
 
-  const changeNetwork = async (newChainId?: number) => {
+  const changeNetwork = async (newChainId?: number, forceSwitch: boolean = true) => {
     if (newChainId === chainId) {
       return;
     }
@@ -174,7 +174,11 @@ function WalletAugmented({ children }: Props) {
           } catch (addError) {
             Logger.error(addError);
             window.location.reload();
+            return;
           }
+        } else if (error.code === 4001 && !forceSwitch) {
+          // EIP-1193 userRejectedRequest error
+          return;
         }
       }
     }
@@ -211,7 +215,7 @@ function WalletAugmented({ children }: Props) {
 function WalletProvider({ children }: Props) {
   const connectors = getUseWalletConnectors();
   return (
-    <UseWalletProvider connectors={connectors}>
+    <UseWalletProvider connectors={connectors} autoConnect>
       <WalletAugmented>{children}</WalletAugmented>
     </UseWalletProvider>
   );
