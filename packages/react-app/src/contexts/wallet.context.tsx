@@ -7,7 +7,6 @@ import Web3 from 'web3';
 import { Logger } from 'src/utils/logger';
 import { getDefaultProvider, getExplorerUrl, getUseWalletConnectors } from '../utils/web3.utils';
 import { EXPECTED_CHAIN_ID } from '../constants';
-import { FaEthereum } from 'react-icons/fa';
 
 export type WalletContextModel = {
   walletConnected: boolean;
