@@ -35,8 +35,8 @@ type Props = {
 // Adds Ethers.js to the useWallet() object
 function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
-  const { ethereum } = wallet;
-  const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>();
+  const ethereum = wallet?.ethereum;
+  const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>(false);
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
   const [walletConnectOpened, openWalletConnect] = useState<boolean>(false);
@@ -44,10 +44,27 @@ function WalletAugmented({ children }: Props) {
   let timeoutInstance: number | undefined;
 
   useEffect(() => {
-    const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
-    if (lastWalletConnected) {
-      handleConnect(lastWalletConnected);
+    const handleErr = (ev: ErrorEvent) => {
+      if (ev.error.name === 'ChainUnknownError') {
+        (window as any).globalError = ev.error;
+      }
+    };
+    window.addEventListener('error', handleErr);
+    const globalErrorName = (window as any).globalError?.name;
+    if (globalErrorName === 'ChainUnknownError') {
+      setIsWrongNetwork(true);
+      setIsConnected(false);
+      setActivating(undefined);
+    } else {
+      const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
+      if (lastWalletConnected) {
+        handleConnect(lastWalletConnected);
+      }
     }
+
+    return () => {
+      window.removeEventListener('error', handleErr);
+    };
   }, []);
 
   const ethers = useMemo(() => {
@@ -70,18 +87,21 @@ function WalletAugmented({ children }: Props) {
 
     setActivating(undefined);
 
-    if (ethereum && +ethereum.chainId !== chainId) {
+    if (
+      (ethereum && +ethereum.chainId !== chainId) ||
+      (window as any).globalError?.name === 'ChainUnknownError'
+    ) {
       setIsWrongNetwork(true);
       return getDefaultProvider();
     }
-
-    setIsWrongNetwork(false);
 
     if (!ethereum) {
       return getDefaultProvider();
     }
 
     setIsConnected(true);
+    setIsWrongNetwork(false);
+    (window as any).globalError = undefined;
 
     const ensRegistry = undefined; // network?.ensRegistry;
     return new EthersProviders.Web3Provider(ethereum, {

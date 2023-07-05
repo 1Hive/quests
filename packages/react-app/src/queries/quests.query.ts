@@ -7,7 +7,6 @@ import env from 'src/environment';
 import { FilterModel } from 'src/models/filter.model';
 import { getNetwork } from 'src/networks';
 import { msToSec } from 'src/utils/date.utils';
-import { useWallet } from 'use-wallet';
 
 const QuestEntityQuery = gql`
   query questEntity($ID: String) {
@@ -55,15 +54,15 @@ const QuestEntitiesQuery = (payload: any) => gql`
         questExpireTimeSec_lte: $expireTimeUpper
         questTitle_contains_nocase: $title
         questDescription_contains_nocase: $description
-        # Test  
+        # Test
         ${
           payload.walletAddress !== undefined && payload.playStatus === QuestPlayStatus.Played
             ? 'questPlayers_contains:[$walletAddress]'
             : ''
         }
         ${payload.playStatus === QuestPlayStatus.Unplayed ? 'questPlayers_not:null' : ''}
-        
-        
+
+
         ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
         ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
       }
@@ -143,7 +142,6 @@ export const fetchQuestEntities = async (
   filter: FilterModel,
   walletAddress: string,
 ) => {
-  // const { walletAddress, walletConnected } = useWallet();
   const { questsSubgraph, networkId } = getNetwork();
   let expireTimeLowerMs = 0;
   let expireTimeUpperMs = GQL_MAX_INT_MS;
