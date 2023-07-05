@@ -7,6 +7,7 @@ import Web3 from 'web3';
 import { Logger } from 'src/utils/logger';
 import { getDefaultProvider, getExplorerUrl, getUseWalletConnectors } from '../utils/web3.utils';
 import { EXPECTED_CHAIN_ID } from '../constants';
+import { FaEthereum } from 'react-icons/fa';
 
 export type WalletContextModel = {
   walletConnected: boolean;
@@ -35,13 +36,13 @@ type Props = {
 // Adds Ethers.js to the useWallet() object
 function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
-  const ethereum = wallet?.ethereum;
-  const isWrongChainError = (window as any).globalError?.name === 'ChainUnknownError';
+  const ethereum = wallet?.ethereum ?? (window as any).ethereum;
+  const { chainId, networkId } = getNetwork();
+  const isWrongChainError = ethereum && +FaEthereum.chainId !== chainId;
   const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>(isWrongChainError);
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
   const [walletConnectOpened, openWalletConnect] = useState<boolean>(false);
-  const { chainId, networkId } = getNetwork();
   let timeoutInstance: number | undefined;
 
   useEffect(() => {
@@ -143,15 +144,9 @@ function WalletAugmented({ children }: Props) {
       newChainId = chainId;
     }
 
-    const ethConnection = ethereum ?? (window as any).ethereum;
-
-    if (
-      ethConnection &&
-      EXPECTED_CHAIN_ID.includes(newChainId) &&
-      +ethConnection.chainId !== newChainId
-    ) {
+    if (ethereum && EXPECTED_CHAIN_ID.includes(newChainId) && +ethereum.chainId !== newChainId) {
       try {
-        await ethConnection.request({
+        await ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: Web3.utils.toHex(newChainId) }],
         });
@@ -160,7 +155,7 @@ function WalletAugmented({ children }: Props) {
         if (error.code === 4902) {
           const network = getNetwork();
           try {
-            await ethConnection.request({
+            await ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [
                 {
