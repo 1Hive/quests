@@ -38,7 +38,7 @@ function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
   const ethereum = wallet?.ethereum ?? (window as any).ethereum;
   const { chainId, networkId } = getNetwork();
-  const isWrongChainError = ethereum && +FaEthereum.chainId !== chainId;
+  const isWrongChainError = ethereum && +ethereum.chainId !== chainId;
   const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>(isWrongChainError);
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
