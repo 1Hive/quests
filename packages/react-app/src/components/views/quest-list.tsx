@@ -75,7 +75,7 @@ const ScrollLabelStyled = styled.div`
 `;
 
 export default function QuestList() {
-  const { walletAddress, walletConnected } = useWallet();
+  const { walletAddress } = useWallet();
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newQuestLoading, setNewQuestLoading] = useState(false);
@@ -172,7 +172,6 @@ export default function QuestList() {
           setHasMore(res.length >= QUESTS_PAGE_SIZE);
         },
       );
-      console.log(walletAddress, walletConnected);
     }
   };
 

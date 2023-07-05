@@ -36,7 +36,8 @@ type Props = {
 function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
   const ethereum = wallet?.ethereum;
-  const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>(false);
+  const isWrongChainError = (window as any).globalError?.name === 'ChainUnknownError';
+  const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>(isWrongChainError);
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
   const [walletConnectOpened, openWalletConnect] = useState<boolean>(false);
@@ -44,23 +45,19 @@ function WalletAugmented({ children }: Props) {
   let timeoutInstance: number | undefined;
 
   useEffect(() => {
+    if (!isWrongChainError) {
+      const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
+      if (lastWalletConnected) {
+        handleConnect(lastWalletConnected);
+      }
+    }
+
     const handleErr = (ev: ErrorEvent) => {
       if (ev.error.name === 'ChainUnknownError') {
         (window as any).globalError = ev.error;
       }
     };
     window.addEventListener('error', handleErr);
-    const globalErrorName = (window as any).globalError?.name;
-    if (globalErrorName === 'ChainUnknownError') {
-      setIsWrongNetwork(true);
-      setIsConnected(false);
-      setActivating(undefined);
-    } else {
-      const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
-      if (lastWalletConnected) {
-        handleConnect(lastWalletConnected);
-      }
-    }
 
     return () => {
       window.removeEventListener('error', handleErr);
@@ -143,9 +140,16 @@ function WalletAugmented({ children }: Props) {
     if (!newChainId) {
       newChainId = chainId;
     }
-    if (ethereum && EXPECTED_CHAIN_ID.includes(newChainId) && +ethereum.chainId !== newChainId) {
+
+    const ethConnection = ethereum ?? (window as any).ethereum;
+
+    if (
+      ethConnection &&
+      EXPECTED_CHAIN_ID.includes(newChainId) &&
+      +ethConnection.chainId !== newChainId
+    ) {
       try {
-        await ethereum.request({
+        await ethConnection.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: Web3.utils.toHex(newChainId) }],
         });
@@ -154,7 +158,7 @@ function WalletAugmented({ children }: Props) {
         if (error.code === 4902) {
           const network = getNetwork();
           try {
-            await ethereum.request({
+            await ethConnection.request({
               method: 'wallet_addEthereumChain',
               params: [
                 {
@@ -205,7 +209,7 @@ function WalletAugmented({ children }: Props) {
 function WalletProvider({ children }: Props) {
   const connectors = getUseWalletConnectors();
   return (
-    <UseWalletProvider connectors={connectors} autoConnect>
+    <UseWalletProvider connectors={connectors}>
       <WalletAugmented>{children}</WalletAugmented>
     </UseWalletProvider>
   );
