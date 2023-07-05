@@ -45,6 +45,7 @@ function WalletAugmented({ children }: Props) {
   let timeoutInstance: number | undefined;
 
   useEffect(() => {
+    console.log('#### useEffect', (window as any).globalError);
     if (!isWrongChainError) {
       const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
       if (lastWalletConnected) {
@@ -56,6 +57,7 @@ function WalletAugmented({ children }: Props) {
       if (ev.error.name === 'ChainUnknownError') {
         (window as any).globalError = ev.error;
       }
+      console.log('#### handleErr', { globalError: (window as any).globalError, ev });
     };
     window.addEventListener('error', handleErr);
 
