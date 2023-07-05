@@ -37,16 +37,20 @@ function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
   const ethereum = wallet?.ethereum ?? (window as any).ethereum;
   const { chainId, networkId } = getNetwork();
-  const isWrongChainError = ethereum && +ethereum.chainId !== chainId;
-  const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>(isWrongChainError);
+
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
   const [walletConnectOpened, openWalletConnect] = useState<boolean>(false);
   let timeoutInstance: number | undefined;
 
+  const isWrongNetwork = useMemo(
+    () => ethereum?.chainId && +ethereum.chainId !== chainId,
+    [activatingId, ethereum?.chainId, chainId],
+  );
+
   useEffect(() => {
-    console.log('#### useEffect', (window as any).globalError);
-    if (!isWrongChainError) {
+    console.log('#### useEffect', { isWrongNetwork });
+    if (!isWrongNetwork) {
       const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
       if (lastWalletConnected) {
         handleConnect(lastWalletConnected);
@@ -86,11 +90,7 @@ function WalletAugmented({ children }: Props) {
 
     setActivating(undefined);
 
-    if (
-      (ethereum && +ethereum.chainId !== chainId) ||
-      (window as any).globalError?.name === 'ChainUnknownError'
-    ) {
-      setIsWrongNetwork(true);
+    if (isWrongNetwork) {
       return getDefaultProvider();
     }
 
@@ -99,7 +99,6 @@ function WalletAugmented({ children }: Props) {
     }
 
     setIsConnected(true);
-    setIsWrongNetwork(false);
     (window as any).globalError = undefined;
 
     const ensRegistry = undefined; // network?.ensRegistry;
@@ -108,7 +107,7 @@ function WalletAugmented({ children }: Props) {
       chainId,
       ensAddress: ensRegistry,
     });
-  }, [ethereum, chainId]);
+  }, [(window as any).ethereum, wallet?.ethereum, chainId]);
 
   const handleConnect = async (walletId?: string) => {
     setActivating(walletId ?? activatingId);
