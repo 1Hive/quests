@@ -9,6 +9,7 @@ import ClaimScreenshot from 'src/assets/ClaimScreenshot.png';
 import ChallengeScreenshot from 'src/assets/ChallengeScreenshot.png';
 import ResolveScreenshot from 'src/assets/ResolveScreenshot.png';
 import RecoverFundsScreenshot from 'src/assets/RecoverFundsScreenshot.png';
+import useImagePreloader from 'src/hooks/use-image-preloader';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { useThemeContext } from 'src/contexts/theme.context';
@@ -34,7 +35,7 @@ const OpenButtonStyled = styled(Button)<{ theme: ThemeInterface }>`
 const ExploreButtonStyled = styled(Button)<{ theme: ThemeInterface }>`
   &,
   span {
-    color: ${({ theme }) => theme.accentContent};
+    color: ${({ theme }) => theme.content};
   }
 `;
 
@@ -76,7 +77,9 @@ const SecondColStyled = styled.div<{ width?: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: ${({ width }) => width ?? '50%'};
+  height: 100%;
 `;
 
 const SideImageStyled = styled.img`
@@ -96,6 +99,16 @@ type Props = {
 export default function GuideModal({ onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const { currentTheme } = useThemeContext();
+
+  useImagePreloader([
+    Piggy,
+    QuestListScreenshot,
+    CreateQuestScreenshot,
+    ClaimScreenshot,
+    ChallengeScreenshot,
+    ResolveScreenshot,
+    RecoverFundsScreenshot,
+  ]);
 
   useEffect(() => {
     if (localStorage.getItem('alreadyVisisted') !== 'true') {
@@ -138,6 +151,7 @@ export default function GuideModal({ onClose = noop }: Props) {
                 label="🌟 Start exploring"
                 title="Start exploring"
                 mode="positive"
+                theme={currentTheme}
               />
             }
             steps={[
@@ -147,18 +161,17 @@ export default function GuideModal({ onClose = noop }: Props) {
                     id="page1"
                     value="#### Quests
 # Welcome 👋
-Here's a quick guide on how to use the Quests platform"
+Here's a 7 steps to understand how Quests works."
                   />
                 </FirstColStyled>
                 <SecondColStyled>
                   <SideImageStyled
                     style={{
                       width: 325,
-                      height: 430,
+                      height: '100%',
                     }}
                     src={backgroundLogo}
                     alt="logo"
-                    loading="lazy"
                   />
                 </SecondColStyled>
               </GuideStepStyled>,
@@ -187,35 +200,35 @@ Here's a quick guide on how to use the Quests platform"
                   />
                 </FirstColStyled>
                 <SecondColStyled>
-                  <SideImageStyled src={QuestListScreenshot} alt="quest list" loading="lazy" />
+                  <SideImageStyled src={QuestListScreenshot} alt="quest list" />
                 </SecondColStyled>
               </GuideStepStyled>,
               <GuideStepStyled>
                 <FirstColStyled width="45%">
                   <MarkdownFieldInput
                     id="page4"
-                    value='## Step 3: Create or Fund a Quest 💰
-- If you are a _Creator_, you can choose to create a quest. Click on the "Create Quest" button. And fill in the details & parameters.
-- If you are a _Patron_, you can choose to fund a quest. Go to the _detail view_ of a specific quest and click on the "Fund" button.'
+                    value="## Step 3: Create or Fund a Quest 💰
+- If you are a _Creator_, you can choose to create a quest. Click on the **Create Quest** button. And fill in the details & parameters.
+- If you are a _Patron_, you can choose to fund a quest. Go to the _detail view_ of a specific quest and click on the **Fund** button."
                   />
                 </FirstColStyled>
                 <SecondColStyled width="55%">
-                  <SideImageStyled src={CreateQuestScreenshot} alt="create quest" loading="lazy" />
+                  <SideImageStyled src={CreateQuestScreenshot} alt="create quest" />
                 </SecondColStyled>
               </GuideStepStyled>,
               <GuideStepStyled>
                 <FirstColStyled>
                   <MarkdownFieldInput
                     id="page5"
-                    value='## Step 4: Participate in a Quest 🌟
-- If you are a _Player_, you can choose to participate in a quest if its an open participation quest. Go to the _detail view_ of a specific quest and click on the "Play" button.
-- Then you will be elligible to claim the quest reward. Click on the "Claim quest" button.
+                    value="## Step 4: Participate in a Quest 🌟
+- If you are a _Player_, you can choose to participate in a quest if its an open participation quest. Go to the _detail view_ of a specific quest and click on the **Play** button.
+- Then you will be elligible to claim the quest reward. Click on the **Claim quest** button.
 - Provide evidence of completion as per the requirements specified in the quest description.
-- Specify the amount you want to claim.'
+- Specify the amount you want to claim."
                   />
                 </FirstColStyled>
                 <SecondColStyled>
-                  <SideImageStyled src={ClaimScreenshot} alt="claim" loading="lazy" />
+                  <SideImageStyled src={ClaimScreenshot} alt="claim" />
                 </SecondColStyled>
               </GuideStepStyled>,
               <GuideStepStyled>
@@ -228,7 +241,7 @@ Here's a quick guide on how to use the Quests platform"
                   />
                 </FirstColStyled>
                 <SecondColStyled>
-                  <SideImageStyled src={ChallengeScreenshot} alt="challenge" loading="lazy" />
+                  <SideImageStyled src={ChallengeScreenshot} alt="challenge" />
                 </SecondColStyled>
               </GuideStepStyled>,
               <GuideStepStyled>
@@ -236,13 +249,13 @@ Here's a quick guide on how to use the Quests platform"
                   <MarkdownFieldInput
                     id="page7"
                     value="## Step 6: Resolving Challenges 🧑‍⚖️
-- If a claim is challenged, it will be raised to _Celeste_ which will decide whether the work has been completed as expected.
-- If the challenge is resolved in favor of the _Player_, the claim will be fulfilled and the player will win the challenger's deposit.
-- If the challenge is resolved in favor of the _Challenger_, the claim is rejected and the challenger wins the player's deposit."
+- If a claim is challenged, it will be raised to **Celeste** which will decide whether the work has been completed as expected.
+- If the challenge is resolved in favor of the **Player**, the claim will be fulfilled and the player will win the challenger's deposit.
+- If the challenge is resolved in favor of the **Challenger**, the claim is rejected and the challenger wins the player's deposit."
                   />
                 </FirstColStyled>
                 <SecondColStyled>
-                  <SideImageStyled src={ResolveScreenshot} alt="Resolve challenge" loading="lazy" />
+                  <SideImageStyled src={ResolveScreenshot} alt="Resolve challenge" />
                 </SecondColStyled>
               </GuideStepStyled>,
               <GuideStepStyled>
@@ -250,16 +263,13 @@ Here's a quick guide on how to use the Quests platform"
                   <MarkdownFieldInput
                     id="page7"
                     value="## Step 7: Recover Funds 💸
-- Once a quest has expired, the _Creator_ can recover his deposit and the remaining funds will be send to the initially specified fallback address.
-##### 🌟 Remember, it's essential to thoroughly understand the rules and requirements of each quest before participating. Happy questing!"
+- Once a quest has expired, the **Creator** can recover his deposit and the remaining funds will be send to the initially specified fallback address.
+##### Remember, it's essential to thoroughly understand the rules and requirements of each quest before participating.
+#### Happy questing! 🌟"
                   />
                 </FirstColStyled>
                 <SecondColStyled>
-                  <SideImageStyled
-                    src={RecoverFundsScreenshot}
-                    alt="Recover funds"
-                    loading="lazy"
-                  />
+                  <SideImageStyled src={RecoverFundsScreenshot} alt="Recover funds" />
                 </SecondColStyled>
               </GuideStepStyled>,
             ]}

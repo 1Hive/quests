@@ -59,6 +59,7 @@ const StepperPagerWrapperStyled = styled.div<{ theme: ThemeInterface }>`
     border: 1px solid ${({ theme }) => theme.content};
     color: ${({ theme }) => theme.accentContent};
     text-align: center;
+    user-select: none;
 
     &:not(.active) {
       cursor: pointer;
@@ -155,7 +156,9 @@ export default function Stepper({
                 role="button"
                 className={currentStep === index ? 'active' : ''}
                 onClick={() => setStep(index)}
-                onKeyDown={() => setStep(index)}
+                onKeyDown={(ev) => {
+                  (ev.key === 'Enter' || ev.key === 'Space') && setStep(index);
+                }}
               >
                 <span>{index}</span>
               </div>
