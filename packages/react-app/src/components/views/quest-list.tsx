@@ -75,24 +75,26 @@ const ScrollLabelStyled = styled.div`
 `;
 
 export default function QuestList() {
-  const { walletAddress, walletConnected } = useWallet();
+  const { walletAddress } = useWallet();
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newQuestLoading, setNewQuestLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const { filter, refreshed, setFilter } = useFilterContext();
   const { currentTheme } = useThemeContext();
-  const { below } = useViewport();
+  const { below, width } = useViewport();
   const { transaction } = useTransactionContext();
   const { setPage } = usePageContext();
   const isMountedRef = useIsMountedRef();
   const network = getNetwork();
 
+  const isSmall = useMemo(() => below('medium'), [width]);
+
   const skeletonQuests: any[] = useMemo(() => {
     const fakeQuests = [];
     for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
       fakeQuests.push(
-        <QuestWrapperStyled singleColumn={below('medium')} key={`${i}`}>
+        <QuestWrapperStyled singleColumn={isSmall} key={`${i}`}>
           <Quest isLoading isSummary />
         </QuestWrapperStyled>,
       );
@@ -130,11 +132,6 @@ export default function QuestList() {
       }
     }
   }, [transaction?.status, transaction?.type]);
-
-  const searchWords = useMemo(
-    () => filter.search.split(/[&|]/gm).map((x) => x.trim()),
-    [filter.search],
-  );
 
   const fetchQuestUntilNew = (newQuestAddress: string) => {
     setTimeout(async () => {
@@ -179,7 +176,6 @@ export default function QuestList() {
           setHasMore(res.length >= QUESTS_PAGE_SIZE);
         },
       );
-      console.log(walletAddress, walletConnected);
     }
   };
 
@@ -201,7 +197,7 @@ export default function QuestList() {
     <MainView>
       <LineStyled>
         <Dashboard />
-        {!below('medium') && <Piggy />}
+        {!isSmall && <Piggy />}
       </LineStyled>
       <FilterWrapperStyled theme={currentTheme}>
         <Filter />
@@ -230,12 +226,12 @@ export default function QuestList() {
         pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
         releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
         scrollableTarget="scroll-view"
-        scrollThreshold={below('medium') ? '1000px' : '200px'}
+        scrollThreshold={isSmall ? '1000px' : '200px'}
       >
         <FlexContainerStyled>
           {newQuestLoading && skeletonQuests[0]}
           {quests.map((questData: QuestModel) => (
-            <QuestWrapperStyled singleColumn={below('medium')} key={questData.address}>
+            <QuestWrapperStyled singleColumn={isSmall} key={questData.address}>
               <Quest isSummary questData={questData} isLoading={!questData.address} />
             </QuestWrapperStyled>
           ))}

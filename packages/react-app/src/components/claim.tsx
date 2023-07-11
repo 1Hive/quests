@@ -74,7 +74,7 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
   const { walletAddress, walletConnected } = useWallet();
   const { transaction } = useTransactionContext();
   const [status, setStatus] = useState<ClaimStatus | undefined>(claim.state);
-  const { below } = useViewport();
+  const { below, width } = useViewport();
   const [waitForClose, setWaitForClose] = useState(false);
   const [actionButton, setActionButton] = useState<ReactNode>();
   const [challengeReason, setChallengeReason] = useState<string>();
@@ -91,6 +91,8 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
         : claim.state,
     );
   }, [claim.state, claimable]);
+
+  const isSmall = useMemo(() => below('medium'), [width]);
 
   const timer = useMemo(
     () =>
@@ -230,18 +232,18 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
           <div className="wide">
             <Outset>
               <ChildSpacer
-                size={below('medium') ? 0 : 16}
+                size={isSmall ? 0 : 16}
                 justify="start"
-                align={below('medium') ? 'start' : 'center'}
+                align={isSmall ? 'start' : 'center'}
                 buttonEnd
-                vertical={below('medium')}
+                vertical={isSmall}
               >
                 {status && (
                   <FieldInput label="Status" isLoading={isLoading || status === ClaimStatus.None}>
                     <StatusTag status={status} className="pl-0" />
                   </FieldInput>
                 )}
-                <AddressWrapperStyled isSmallScreen={below('medium')}>
+                <AddressWrapperStyled isSmallScreen={isSmall}>
                   <AddressFieldInput
                     id="playerAddress"
                     value={claim.playerAddress}

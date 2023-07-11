@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconInfo } from '@1hive/1hive-ui';
+import { Button, IconInfo, useViewport } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Piggy from 'src/assets/piggy.png';
 import QuestListScreenshot from 'src/assets/ListScreenshot.png';
 import CreateQuestScreenshot from 'src/assets/CreateQuestScreenshot.png';
@@ -25,7 +25,7 @@ const OpenButtonStyled = styled(Button)<{ theme: ThemeInterface }>`
   margin: ${GUpx(2)};
   z-index: 1;
   border-radius: 32px;
-  background-color: ${({ theme }) => theme.overlay};
+  background-color: ${({ theme }) => theme.surfaceContent};
   &,
   span {
     color: ${({ theme }) => theme.accentContent};
@@ -50,36 +50,34 @@ const BottomRightCornerStyled = styled.div`
   right: 0;
 `;
 
-const GuideStepStyled = styled.div`
+const GuideStepStyled = styled.div<{ isSmall: boolean }>`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap-reverse;
   justify-content: space-evenly;
   align-items: center;
-  height: 50vh;
+  ${({ isSmall }) => (isSmall ? '' : 'height: 50vh')};
 `;
 
-const FirstColStyled = styled.div<{ width?: string }>`
+const FirstColStyled = styled.div<{ isSmall: boolean }>`
   display: flex;
   flex-direction: column;
-  width: ${({ width }) => width ?? '50%'};
 
   &.centered {
     align-items: center;
   }
 
-  * {
-    padding-left: ${GUpx(1)};
-    padding-right: ${GUpx(1)};
-  }
+  width: ${({ isSmall }) => (isSmall ? '100%' : '50%')};
 `;
 
-const SecondColStyled = styled.div<{ width?: string }>`
+const SecondColStyled = styled.div<{ isSmall: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: ${({ width }) => width ?? '50%'};
   height: 100%;
+
+  width: ${({ isSmall }) => (isSmall ? '100%' : '50%')};
 `;
 
 const SideImageStyled = styled.img`
@@ -99,6 +97,9 @@ type Props = {
 export default function GuideModal({ onClose = noop }: Props) {
   const [opened, setOpened] = useState(false);
   const { currentTheme } = useThemeContext();
+  const { below, width } = useViewport();
+
+  const isSmall = useMemo(() => below('medium'), [width]);
 
   useImagePreloader([
     Piggy,
@@ -155,8 +156,8 @@ export default function GuideModal({ onClose = noop }: Props) {
               />
             }
             steps={[
-              <GuideStepStyled>
-                <FirstColStyled className="centered">
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall} className="centered">
                   <MarkdownFieldInput
                     id="page1"
                     value="#### Quests
@@ -164,19 +165,19 @@ export default function GuideModal({ onClose = noop }: Props) {
 Here's a 7 steps to understand how Quests works."
                   />
                 </FirstColStyled>
-                <SecondColStyled>
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled
                     style={{
-                      width: 325,
                       height: '100%',
+                      maxWidth: '310px',
                     }}
                     src={backgroundLogo}
                     alt="logo"
                   />
                 </SecondColStyled>
               </GuideStepStyled>,
-              <GuideStepStyled>
-                <FirstColStyled>
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page2"
                     value="## Step 1: Understand the Roles 🧑‍🚀
@@ -185,12 +186,12 @@ Here's a 7 steps to understand how Quests works."
 - **Patron**: These are people or organizations that fund a quest."
                   />
                 </FirstColStyled>
-                <SecondColStyled>
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled src={Piggy} alt="piggy" />
                 </SecondColStyled>
               </GuideStepStyled>,
-              <GuideStepStyled>
-                <FirstColStyled>
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page3"
                     value="## Step 2: View Quests 📖
@@ -199,12 +200,12 @@ Here's a 7 steps to understand how Quests works."
 - You can refine filters to find quests that are relevant to you."
                   />
                 </FirstColStyled>
-                <SecondColStyled>
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled src={QuestListScreenshot} alt="quest list" />
                 </SecondColStyled>
               </GuideStepStyled>,
-              <GuideStepStyled>
-                <FirstColStyled width="45%">
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page4"
                     value="## Step 3: Create or Fund a Quest 💰
@@ -212,12 +213,12 @@ Here's a 7 steps to understand how Quests works."
 - If you are a _Patron_, you can choose to fund a quest. Go to the _detail view_ of a specific quest and click on the **Fund** button."
                   />
                 </FirstColStyled>
-                <SecondColStyled width="55%">
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled src={CreateQuestScreenshot} alt="create quest" />
                 </SecondColStyled>
               </GuideStepStyled>,
-              <GuideStepStyled>
-                <FirstColStyled>
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page5"
                     value="## Step 4: Participate in a Quest 🌟
@@ -227,12 +228,12 @@ Here's a 7 steps to understand how Quests works."
 - Specify the amount you want to claim."
                   />
                 </FirstColStyled>
-                <SecondColStyled>
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled src={ClaimScreenshot} alt="claim" />
                 </SecondColStyled>
               </GuideStepStyled>,
-              <GuideStepStyled>
-                <FirstColStyled>
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page6"
                     value="## Step 5: Verification of a Quest 🕵️
@@ -240,12 +241,12 @@ Here's a 7 steps to understand how Quests works."
 - If you believe that the requirements have not been met, you can challenge the claim during the 7-day delay period."
                   />
                 </FirstColStyled>
-                <SecondColStyled>
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled src={ChallengeScreenshot} alt="challenge" />
                 </SecondColStyled>
               </GuideStepStyled>,
-              <GuideStepStyled>
-                <FirstColStyled>
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page7"
                     value="## Step 6: Resolving Challenges 🧑‍⚖️
@@ -254,12 +255,12 @@ Here's a 7 steps to understand how Quests works."
 - If the challenge is resolved in favor of the **Challenger**, the claim is rejected and the challenger wins the player's deposit."
                   />
                 </FirstColStyled>
-                <SecondColStyled>
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled src={ResolveScreenshot} alt="Resolve challenge" />
                 </SecondColStyled>
               </GuideStepStyled>,
-              <GuideStepStyled>
-                <FirstColStyled>
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page7"
                     value="## Step 7: Recover Funds 💸
@@ -268,7 +269,7 @@ Here's a 7 steps to understand how Quests works."
 #### Happy questing! 🌟"
                   />
                 </FirstColStyled>
-                <SecondColStyled>
+                <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled src={RecoverFundsScreenshot} alt="Recover funds" />
                 </SecondColStyled>
               </GuideStepStyled>,
