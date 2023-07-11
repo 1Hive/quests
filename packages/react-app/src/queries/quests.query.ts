@@ -158,7 +158,6 @@ export const fetchQuestEntities = async (
   filter: FilterModel,
   walletAddress: string,
 ) => {
-  // const { walletAddress, walletConnected } = useWallet();
   const { questsSubgraph, networkId } = getNetwork();
   let expireTimeLowerMs = 0;
   let expireTimeUpperMs = GQL_MAX_INT_MS;

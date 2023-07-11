@@ -17,7 +17,7 @@ export type WalletContextModel = {
   activatingId: string;
   isWrongNetwork: boolean;
   ethereum: any;
-  changeNetwork: (_chainId?: number) => void;
+  changeNetwork: (_chainId?: number, _forceSwitch?: boolean) => void;
   openWalletConnect: React.Dispatch<React.SetStateAction<boolean>>;
   walletConnectOpened: boolean;
 };
@@ -35,18 +35,25 @@ type Props = {
 // Adds Ethers.js to the useWallet() object
 function WalletAugmented({ children }: Props) {
   const wallet = useWallet();
-  const { ethereum } = wallet;
-  const [isWrongNetwork, setIsWrongNetwork] = useState<boolean>();
+  const ethereum = wallet?.ethereum ?? (window as any).ethereum;
+  const { chainId, networkId } = getNetwork();
+
   const [activatingId, setActivating] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
   const [walletConnectOpened, openWalletConnect] = useState<boolean>(false);
-  const { chainId, networkId } = getNetwork();
   let timeoutInstance: number | undefined;
 
+  const isWrongNetwork = useMemo(
+    () => ethereum?.chainId && +ethereum.chainId !== chainId,
+    [activatingId, ethereum?.chainId, chainId],
+  );
+
   useEffect(() => {
-    const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
-    if (lastWalletConnected) {
-      handleConnect(lastWalletConnected);
+    if (!isWrongNetwork) {
+      const lastWalletConnected = localStorage.getItem('LAST_WALLET_CONNECTOR');
+      if (lastWalletConnected) {
+        handleConnect(lastWalletConnected);
+      }
     }
   }, []);
 
@@ -70,12 +77,9 @@ function WalletAugmented({ children }: Props) {
 
     setActivating(undefined);
 
-    if (ethereum && +ethereum.chainId !== chainId) {
-      setIsWrongNetwork(true);
+    if (isWrongNetwork) {
       return getDefaultProvider();
     }
-
-    setIsWrongNetwork(false);
 
     if (!ethereum) {
       return getDefaultProvider();
@@ -89,7 +93,7 @@ function WalletAugmented({ children }: Props) {
       chainId,
       ensAddress: ensRegistry,
     });
-  }, [ethereum, chainId]);
+  }, [(window as any).ethereum, wallet?.ethereum, chainId]);
 
   const handleConnect = async (walletId?: string) => {
     setActivating(walletId ?? activatingId);
@@ -115,7 +119,7 @@ function WalletAugmented({ children }: Props) {
     setIsConnected(false);
   }
 
-  const changeNetwork = async (newChainId?: number) => {
+  const changeNetwork = async (newChainId?: number, forceSwitch: boolean = true) => {
     if (newChainId === chainId) {
       return;
     }
@@ -123,6 +127,7 @@ function WalletAugmented({ children }: Props) {
     if (!newChainId) {
       newChainId = chainId;
     }
+
     if (ethereum && EXPECTED_CHAIN_ID.includes(newChainId) && +ethereum.chainId !== newChainId) {
       try {
         await ethereum.request({
@@ -148,7 +153,11 @@ function WalletAugmented({ children }: Props) {
           } catch (addError) {
             Logger.error(addError);
             window.location.reload();
+            return;
           }
+        } else if (error.code === 4001 && !forceSwitch) {
+          // EIP-1193 userRejectedRequest error
+          return;
         }
       }
     }
