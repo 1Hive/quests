@@ -32,30 +32,48 @@ const QuestEntityQuery = gql`
 `;
 
 const QuestEntitiesQuery = (payload: any) => gql`
-  query questEntities(
+  query ${payload.search ? 'questSearch' : 'questEntities'}(
     $first: Int
     $skip: Int
     $expireTimeLower: Int
     $expireTimeUpper: Int
-    $address: String
-    $title: String
-    $description: String
+    ${
+      payload.search
+        ? `
+      $search: String
+      `
+        : `
+      $title: String
+      $description: String
+    `
+    }
     $blackList: [String]
     $whiteList: [String]
   ) {
-    questEntities(
+    ${payload.search ? 'questSearch' : 'questEntities'} (
       first: $first
-      skip: $skip
+      skip: $skip,
+      ${
+        payload.search
+          ? `
+        text: $search
+      `
+          : ''
+      }
       where: {
         questExpireTimeSec_gte: $expireTimeLower
         questExpireTimeSec_lte: $expireTimeUpper
-        questTitle_contains_nocase: $title
-        questDescription_contains_nocase: $description
         ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
         ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
       }
+      ${
+        payload.search
+          ? ''
+          : `
       orderBy: creationTimestamp
       orderDirection: desc
+      `
+      }
       subgraphError: allow
     ) {
       id
@@ -116,11 +134,12 @@ const QuestEntitiesLight = (payload: any) => gql`
   }
 `;
 
-export const fetchQuestEnity = (questAddress: string) => {
+export const fetchQuestEnity = async (questAddress: string) => {
   const { questsSubgraph } = getNetwork();
-  return request(questsSubgraph, QuestEntityQuery, {
+  const res = await request(questsSubgraph, QuestEntityQuery, {
     ID: questAddress.toLowerCase(), // Subgraph address are stored lowercase
-  }).then((res) => res.questEntity);
+  });
+  return res.questEntity;
 };
 
 export const fetchQuestEntities = async (
@@ -154,15 +173,19 @@ export const fetchQuestEntities = async (
     first: count,
     expireTimeLower: Math.round(expireTimeLowerMs / 1000),
     expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
-    title: filter.title,
-    description: filter.description,
+    search: filter.search
+      ? filter.search
+          .split(/[&|]/gm)
+          .map((segment) => `'${segment}'`)
+          .join('')
+      : undefined,
     blackList: blackList !== undefined ? blackList.toLowerCase().split(',') : undefined,
     whiteList: whiteList && whiteList !== '*' ? whiteList.toLowerCase().split(',') : undefined,
   };
 
   const res = await request(questsSubgraph, QuestEntitiesQuery(payload), payload);
 
-  return res.questEntities;
+  return res.questEntities ?? res.questSearch;
 };
 
 export const fetchQuestRewardTokens = () => {

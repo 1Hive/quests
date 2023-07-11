@@ -1,4 +1,4 @@
-import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import { Button, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState, useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { QuestStatus } from 'src/enums/quest-status.enum';
@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import { DEFAULT_FILTER } from '../constants';
 import DateFieldInput from './field-input/date-field-input';
 import { FieldInput } from './field-input/field-input';
+import TextFieldInput from './field-input/text-field-input';
 
 // #region StyledComponents
 
@@ -28,6 +29,8 @@ const FilterWrapperStyled = styled.div<{
   flex-wrap: ${({ colDisplay }) => (colDisplay ? 'wrap' : 'no-wrap')};
 
   padding: 0 ${GUpx(2)};
+
+  column-gap: ${GUpx(4)};
 
   ${({ isSmallResolution }) =>
     isSmallResolution
@@ -72,6 +75,11 @@ const ButtonLineStyled = styled.div<{ isSmallResolution: boolean }>`
   }
 `;
 
+const SearchTextInputWrapperStyled = styled.div<{ wide: boolean }>`
+  flex-grow: 1;
+  ${({ wide }) => wide && 'width: 100%;'}
+`;
+
 // #endregion
 
 type Props = {
@@ -96,36 +104,19 @@ export function Filter({ compact }: Props) {
     <>
       {(isFilterShown || !isSmallResolution) && (
         <FilterWrapperStyled colDisplay={isSmallResolution} isSmallResolution={isSmallResolution}>
-          <FieldInput
-            className="flex-grow"
-            label={!compact ? 'Title' : ''}
-            wide={isSmallResolution}
-            id="filterTitle"
-          >
-            <SearchInput
-              id="filterTitle"
-              placeholder="Search by title"
-              value={filter.title}
-              onChange={(title: string) => setFilter({ ...filter, title })}
+          <SearchTextInputWrapperStyled wide={isSmallResolution}>
+            <TextFieldInput
+              id="filterSearch"
+              label={!compact ? 'Search' : ''}
               wide
+              placeHolder="Search by title, description, or address"
+              value={filter.search}
+              onChange={(e: any) => setFilter({ ...filter, search: e.currentTarget.value })}
               compact={compact}
+              tooltip="Search accross title, description, and address and return in rank order. There is support for & (AND) and | (OR) operators."
+              isEdit
             />
-          </FieldInput>
-          <FieldInput
-            className="flex-grow"
-            label={!compact ? 'Description' : ''}
-            wide={isSmallResolution}
-            id="filterDescription"
-          >
-            <SearchInput
-              id="filterDescription"
-              placeholder="Search by description"
-              value={filter.description}
-              onChange={(description: string) => setFilter({ ...filter, description })}
-              wide
-              compact={compact}
-            />
-          </FieldInput>
+          </SearchTextInputWrapperStyled>
           <DateFieldInput
             id="minExpireTime"
             value={filter.minExpireTime}
