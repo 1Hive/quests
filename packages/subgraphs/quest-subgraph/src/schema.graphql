@@ -15,7 +15,7 @@ type _Schema_
     ]
   )
 
-type QuestEntity @entity(immutable: true) {
+type QuestEntity @entity(immutable: false) {
   id: ID!
   version: Int!
   questAddress: String!
@@ -33,6 +33,7 @@ type QuestEntity @entity(immutable: true) {
   questCreateDepositAmount: BigInt!
   questPlayDepositToken: Bytes!
   questPlayDepositAmount: BigInt!
+  questPlayers: [String!]!
 }
 
 type CreateDepositEntity @entity(immutable: true) {
@@ -47,4 +48,12 @@ type PlayDepositEntity @entity(immutable: true) {
   timestamp: BigInt!
   depositToken: Bytes!
   depositAmount: BigInt!
+}
+
+type QuestClaimEntity @entity(immutable: true) {
+  id: ID!
+  questAddress: String!
+  amount: BigInt!
+  evidenceIpfsHash: Bytes!
+  player: String!
 }

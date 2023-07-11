@@ -26,7 +26,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "sourceRoot": "/",
-    "inlineSources": true
+    "inlineSources": true,
+    "ignoreDeprecations": "5.0"
   },
   "exclude": [
     "node_modules",
@@ -37,5 +38,7 @@
     "jest",
     "src/setupTests.ts"
   ],
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

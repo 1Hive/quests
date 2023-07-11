@@ -20,6 +20,7 @@ import { getNetwork } from 'src/networks';
 import { Pages } from 'src/enums/pages.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
+import { useWallet } from 'src/contexts/wallet.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -74,6 +75,7 @@ const ScrollLabelStyled = styled.div`
 `;
 
 export default function QuestList() {
+  const { walletAddress, walletConnected } = useWallet();
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newQuestLoading, setNewQuestLoading] = useState(false);
@@ -167,27 +169,32 @@ export default function QuestList() {
     if (!isLoading) {
       setQuests([]);
       setIsLoading(true);
-      QuestService.fetchQuestsPaging(0, QUESTS_PAGE_SIZE, _filter ?? filter).then((res) => {
-        if (!isMountedRef.current) {
-          return;
-        }
-        setIsLoading(false);
-        setQuests(res);
-        setHasMore(res.length >= QUESTS_PAGE_SIZE);
-      });
+      QuestService.fetchQuestsPaging(0, QUESTS_PAGE_SIZE, _filter ?? filter, walletAddress).then(
+        (res) => {
+          if (!isMountedRef.current) {
+            return;
+          }
+          setIsLoading(false);
+          setQuests(res);
+          setHasMore(res.length >= QUESTS_PAGE_SIZE);
+        },
+      );
+      console.log(walletAddress, walletConnected);
     }
   };
 
   const loadMore = () => {
     setIsLoading(true);
-    QuestService.fetchQuestsPaging(quests.length, QUESTS_PAGE_SIZE, filter).then((res) => {
-      if (!isMountedRef.current) {
-        return;
-      }
-      setIsLoading(false);
-      setQuests(quests.concat(res));
-      setHasMore(res.length >= QUESTS_PAGE_SIZE);
-    });
+    QuestService.fetchQuestsPaging(quests.length, QUESTS_PAGE_SIZE, filter, walletAddress).then(
+      (res) => {
+        if (!isMountedRef.current) {
+          return;
+        }
+        setIsLoading(false);
+        setQuests(quests.concat(res));
+        setHasMore(res.length >= QUESTS_PAGE_SIZE);
+      },
+    );
   };
 
   return (
