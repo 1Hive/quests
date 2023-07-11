@@ -131,6 +131,11 @@ export default function QuestList() {
     }
   }, [transaction?.status, transaction?.type]);
 
+  const searchWords = useMemo(
+    () => filter.search.split(/[&|]/gm).map((x) => x.trim()),
+    [filter.search],
+  );
+
   const fetchQuestUntilNew = (newQuestAddress: string) => {
     setTimeout(async () => {
       const newQuest = await QuestService.fetchQuest(newQuestAddress);
@@ -141,8 +146,10 @@ export default function QuestList() {
         setNewQuestLoading(false);
         if (
           (filter.status === QuestStatus.All || filter.status === QuestStatus.Active) &&
-          (!filter.title || filter.title.includes(newQuest.title!)) &&
-          (!filter.description || filter.description.includes(newQuest.description!)) &&
+          (!filter.search ||
+            newQuest.title!.includes(filter.search) ||
+            newQuest.description!.includes(filter.search) ||
+            newQuest.address!.includes(filter.search)) &&
           (!filter.minExpireTime || filter.minExpireTime <= newQuest.expireTime)
         ) {
           setQuests([newQuest, ...quests]);

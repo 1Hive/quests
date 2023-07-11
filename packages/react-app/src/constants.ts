@@ -27,9 +27,7 @@ export const EXPECTED_CHAIN_ID = env('FORCE_CHAIN_ID') ? [+env('FORCE_CHAIN_ID')
 export const DEFAULT_PAGE = Pages.List;
 
 export const DEFAULT_FILTER = Object.freeze({
-  address: '',
-  title: '',
-  description: '',
+  search: '',
   minExpireTime: null,
   bounty: undefined,
   status: QuestStatus.Active,
