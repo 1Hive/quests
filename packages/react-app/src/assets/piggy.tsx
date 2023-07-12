@@ -12,9 +12,10 @@ export default function Piggy() {
   return (
     <WrapperStyled>
       <svg
-        width="237"
-        height="202"
-        viewBox="0 0 237 202"
+        width="100%"
+        height="100%"
+        // height="202"
+        // viewBox="0 0 237 202"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >

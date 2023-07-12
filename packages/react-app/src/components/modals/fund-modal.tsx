@@ -26,6 +26,10 @@ const FormStyled = styled(Form)`
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx(1)};
   width: fit-content;
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 type Props = {
