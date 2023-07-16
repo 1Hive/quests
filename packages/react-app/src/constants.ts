@@ -1,4 +1,5 @@
 import { Pages } from './enums/pages.enum';
+import { QuestPlayStatus } from './enums/quest-play-status.enum';
 import { QuestStatus } from './enums/quest-status.enum';
 import env from './environment';
 import { FilterModel } from './models/filter.model';
@@ -26,12 +27,11 @@ export const EXPECTED_CHAIN_ID = env('FORCE_CHAIN_ID') ? [+env('FORCE_CHAIN_ID')
 export const DEFAULT_PAGE = Pages.List;
 
 export const DEFAULT_FILTER = Object.freeze({
-  address: '',
-  title: '',
-  description: '',
+  search: '',
   minExpireTime: null,
   bounty: undefined,
   status: QuestStatus.Active,
+  playStatus: QuestPlayStatus.All,
 } as FilterModel);
 
 export const DEFAULT_CLAIM_EXECUTION_DELAY_MS = 1 * 60 * 1000; // Add 15 minutes by default

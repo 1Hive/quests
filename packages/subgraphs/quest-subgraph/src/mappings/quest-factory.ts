@@ -1,10 +1,16 @@
 import {
   QuestCreated,
   DepositChanged,
-} from '../../generated/QuestFactory/QuestFactory';
-import { CreateDepositEntity, QuestEntity } from '../../generated/schema';
-import { Bytes, ipfs } from '@graphprotocol/graph-ts';
-import { json } from '@graphprotocol/graph-ts';
+} from "../../generated/QuestFactory/QuestFactory";
+import {
+  CreateDepositEntity,
+  QuestClaimEntity,
+  QuestEntity,
+} from "../../generated/schema";
+import { Bytes, ipfs } from "@graphprotocol/graph-ts";
+import { json } from "@graphprotocol/graph-ts";
+import { QuestClaimed } from "../../generated/QuestFactory-Quest/Quest";
+
 export function handleDepositChanged(event: DepositChanged): void {
   let depositEntity = new CreateDepositEntity(
     `Create_${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
@@ -31,9 +37,10 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questCreateDepositAmount = event.params.depositAmount;
   questEntity.questCreator = event.params.creator;
   questEntity.questMaxPlayers = null;
+  questEntity.questPlayers = [];
 
   if (!event.params.questDetailsRef) {
-    questEntity.questDescription = '';
+    questEntity.questDescription = "";
   } else {
     // Fetching quest description with IPFS
     let questDataBytes: Bytes | null = null;
@@ -47,25 +54,36 @@ export function handleQuestCreated(event: QuestCreated): void {
       let jsonResult = json.try_fromBytes(questDataBytes);
       if (jsonResult.isOk) {
         let jsonObject = jsonResult.value.toObject();
-        let communicationLink = jsonObject.get('communicationLink');
-        let questDescription = jsonObject.get('description');
+        let communicationLink = jsonObject.get("communicationLink");
+        let questDescription = jsonObject.get("description");
         questEntity.questCommunicationLink = communicationLink
           ? communicationLink.toString()
-          : '';
+          : "";
         questEntity.questDescription = questDescription
           ? questDescription.toString()
-          : '';
+          : "";
       } else {
         let description = questDataBytes.toString();
         questEntity.questDescription = description
           ? description.toString()
-          : '';
+          : "";
       }
     } else {
       // Continue with empty description
-      questEntity.questDescription = '';
+      questEntity.questDescription = "";
     }
   }
 
   questEntity.save();
+}
+
+export function handleQuestClaimed(event: QuestClaimed): void {
+  const questClaimEntity = new QuestClaimEntity(
+    event.params._event.transaction.hash.toHex()
+  );
+  questClaimEntity.questAddress = event.params._event.address.toHexString();
+  questClaimEntity.amount = event.params.amount;
+  questClaimEntity.evidenceIpfsHash = event.params.evidence;
+  questClaimEntity.player = event.params.player.toHexString();
+  questClaimEntity.save();
 }

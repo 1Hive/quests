@@ -35,6 +35,11 @@ import MarkdownFieldInput from '../field-input/markdown-field-input';
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx(1)};
   width: fit-content;
+
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 const HeaderStyled = styled.div`

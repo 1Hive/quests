@@ -109,7 +109,6 @@ function Header({ children }: Props) {
                   Object.values(networks).find((network) => network.name === networkNames[i])!
                     .chainId!,
                 );
-                // window.location.reload();
               }}
             />
           )}

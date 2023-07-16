@@ -21,7 +21,7 @@ const TitleStyled = styled.div`
 
 const ModalStyled = styled(Modal)`
   padding: ${GUpx(1)};
-  z-index: 1;
+  z-index: 2;
 `;
 
 const TopRightCornerStyled = styled.div`
