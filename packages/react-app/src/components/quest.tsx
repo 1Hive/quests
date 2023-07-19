@@ -137,6 +137,7 @@ export default function Quest({
     fallbackAddress: ADDRESS_ZERO,
     creatorAddress: ADDRESS_ZERO,
     features: {},
+    isWhitelist: false,
   },
   isLoading = false,
   isSummary = false,
