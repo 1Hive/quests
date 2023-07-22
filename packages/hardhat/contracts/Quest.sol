@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.1;
+pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
@@ -10,14 +10,14 @@ import "./libraries/IExecutable.sol";
 
 contract Quest is IExecutable {
     using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
     using DepositLib for Models.Deposit;
 
     // Quest payload
     address public questCreator;
     string public questTitle;
     bytes public questDetailsRef;
-    IERC20 public rewardToken;
+    IERC20Upgradeable public rewardToken;
     uint256 public expireTime;
     address public aragonGovernAddress;
     address payable public fundsRecoveryAddress;

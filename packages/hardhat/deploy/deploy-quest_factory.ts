@@ -36,13 +36,13 @@ export default async (
     owner,
   ];
   console.log({ constructorArguments });
-  const deployResult = await deploy("QuestFactory", {
-    from: deployer,
-    args: constructorArguments,
-    log: true,
-    // gasLimit: 4000000,
-  });
-  await ethers.getContract("QuestFactory", deployResult.address);
+  var questFactory = await ethers.getContractFactory("QuestFactory");
+  var deployResult = await questFactory.deploy(
+    questFactory,
+    constructorArguments
+  );
+  deployResult.deployed();
+  await ethers.getContractAt("QuestFactory", deployResult.address);
 
   try {
     console.log("Verifying QuestFactory...");

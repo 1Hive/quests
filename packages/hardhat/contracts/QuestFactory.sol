@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.1;
+pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./Quest.sol";
 
-contract QuestFactory is Ownable {
+contract QuestFactoryy is OwnableUpgradeable {
     using DepositLib for Models.Deposit;
 
     address public aragonGovernAddress;
@@ -27,8 +28,8 @@ contract QuestFactory is Ownable {
         address playDepositToken,
         uint256 playDepositAmount,
         address creator,
-        uint32 maxPlayers
-        // bool isWhiteList
+        uint32 maxPlayers,
+        bool isWhiteList
     );
 
     event CreateDepositChanged(
@@ -39,14 +40,19 @@ contract QuestFactory is Ownable {
 
     event PlayDepositChanged(uint256 timestamp, address token, uint256 amount);
 
-    constructor(
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
         address _aragonGovernAddress,
-        IERC20 _createDepositToken,
+        IERC20Upgradeable _createDepositToken,
         uint256 _createDepositAmount,
-        IERC20 _playDepositToken,
+        IERC20Upgradeable _playDepositToken,
         uint256 _playDepositAmount,
         address _initialOwner
-    ) {
+    ) public initializer {
         aragonGovernAddress = _aragonGovernAddress;
         setCreateDeposit(_createDepositToken, _createDepositAmount);
         setPlayDeposit(_playDepositToken, _playDepositAmount);
@@ -61,7 +67,10 @@ contract QuestFactory is Ownable {
      * @param _depositAmount The deposit amount.
      * emit CreateDepositChanged
      */
-    function setCreateDeposit(IERC20 token, uint256 amount) public onlyOwner {
+    function setCreateDeposit(
+        IERC20Upgradeable token,
+        uint256 amount
+    ) public onlyOwner {
         createDeposit = Models.Deposit(token, amount);
         emit CreateDepositChanged(block.timestamp, address(token), amount);
     }
@@ -72,7 +81,10 @@ contract QuestFactory is Ownable {
      * @param _depositAmount The deposit amount.
      * emit PlayDepositChanged
      */
-    function setPlayDeposit(IERC20 token, uint256 amount) public onlyOwner {
+    function setPlayDeposit(
+        IERC20Upgradeable token,
+        uint256 amount
+    ) public onlyOwner {
         playDeposit = Models.Deposit(token, amount);
         emit PlayDepositChanged(block.timestamp, address(token), amount);
     }
@@ -92,7 +104,7 @@ contract QuestFactory is Ownable {
     function createQuest(
         string memory _questTitle,
         bytes memory _questDetailsRef,
-        IERC20 _rewardToken,
+        IERC20Upgradeable _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress,
         uint32 _maxPlayers,
@@ -129,8 +141,8 @@ contract QuestFactory is Ownable {
             address(playDeposit.token),
             playDeposit.amount,
             msg.sender,
-            _maxPlayers
-            // _isWhiteList
+            _maxPlayers,
+            _isWhiteList
         );
 
         return address(quest);

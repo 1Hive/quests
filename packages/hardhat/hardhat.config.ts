@@ -1,19 +1,17 @@
 import { config as dotenvConfig } from "dotenv";
 import "solidity-coverage";
 import "hardhat-deploy";
-import { utils } from "ethers";
 import fs from "fs";
 import chalk from "chalk";
-import "@nomiclabs/hardhat-waffle";
-import "@eth-optimism/hardhat-ovm";
-import "@nomiclabs/hardhat-web3";
 import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
+import "@nomiclabs/hardhat-ethers";
+import "@openzeppelin/hardhat-upgrades";
 import "hardhat-typechain";
+import "typechain";
 import { task, HardhatUserConfig, types } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
-import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
 import deployQuestFactory from "./deploy/deploy-quest_factory";
 import deployQuest from "./deploy/deploy-quest";
 import deployGovernQueue, {
@@ -38,8 +36,6 @@ dotenvConfig({
       )[0]
   ),
 });
-
-const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
 /*
       📡 This is where you configure your deploy configuration for 🏗 scaffold-eth
@@ -72,7 +68,7 @@ function mnemonic() {
   return "test test test test test test test test test test test junk";
 }
 
-function getAccounts(): HardhatNetworkAccountsUserConfig {
+function getAccounts() {
   if (process.env.PRIVATE_KEY) {
     return [process.env.PRIVATE_KEY as any];
   }
@@ -163,7 +159,6 @@ const hardhatConfig: HardhatUserConfig = {
       url: "https://kovan.optimism.io",
       gasPrice: 0,
       accounts: getAccounts(),
-      ovm: true,
       companionNetworks: {
         l1: "kovan",
       },
@@ -172,7 +167,6 @@ const hardhatConfig: HardhatUserConfig = {
       url: "http://localhost:8545",
       gasPrice: 0,
       accounts: getAccounts(),
-      ovm: true,
       companionNetworks: {
         l1: "localOptimismL1",
       },
@@ -222,7 +216,7 @@ const hardhatConfig: HardhatUserConfig = {
         version: "0.5.8",
       },
       {
-        version: "0.8.1",
+        version: "0.8.2",
         settings: {
           optimizer: {
             enabled: true,
@@ -231,9 +225,6 @@ const hardhatConfig: HardhatUserConfig = {
         },
       },
     ],
-  },
-  ovm: {
-    solcVersion: "0.7.6",
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
@@ -267,7 +258,7 @@ function debug(text) {
 
 task("wallet", "Create a wallet (pk) link", async (_, { ethers }) => {
   const randomWallet = ethers.Wallet.createRandom();
-  const privateKey = randomWallet._signingKey().privateKey;
+  const privateKey = randomWallet.signingKey.privateKey;
   console.log("🔐 WALLET Generated as " + randomWallet.address + "");
   console.log("🔗 http://localhost:3000/pk#" + privateKey);
 });
@@ -281,7 +272,7 @@ task("fundedwallet", "Create a wallet (pk) link and fund it with deployer?")
 
   .setAction(async (taskArgs, { network, ethers }) => {
     const randomWallet = ethers.Wallet.createRandom();
-    const privateKey = randomWallet._signingKey().privateKey;
+    const privateKey = randomWallet.signingKey.privateKey;
     console.log("🔐 WALLET Generated as " + randomWallet.address + "");
     const url = taskArgs.url ? taskArgs.url : "http://localhost:3000";
 
@@ -296,14 +287,15 @@ task("fundedwallet", "Create a wallet (pk) link and fund it with deployer?")
     const amount = taskArgs.amount ? taskArgs.amount : "0.01";
     const tx = {
       to: randomWallet.address,
-      value: ethers.utils.parseEther(amount),
+      value: utils.parseEther(amount),
     };
 
     // SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
     // IF NOT SEND USING LOCAL HARDHAT NODE:
     if (localDeployerMnemonic) {
-      let deployerWallet = ethers.Wallet.fromMnemonic(localDeployerMnemonic);
-      deployerWallet = deployerWallet.connect(ethers.provider);
+      let deployerWallet = ethers.Wallet.fromPhrase(localDeployerMnemonic);
+      const signers = await ethers.getSigners();
+      deployerWallet = deployerWallet.connect(signers[0].provider);
       console.log(
         "💵 Sending " +
           amount +
@@ -466,12 +458,12 @@ task(
     for (const n in hardhatConfig.networks) {
       // console.log(networks[n],n)
       try {
-        const provider = new ethers.providers.JsonRpcProvider(
+        const provider = new ethers.JsonRpcProvider(
           (hardhatConfig.networks[n] as HttpNetworkUserConfig).url
         );
         const balance = await provider.getBalance(address);
         console.log(" -- " + n + " --  -- -- 📡 ");
-        console.log("   balance: " + ethers.utils.formatEther(balance));
+        console.log("   balance: " + utils.formatEther(balance));
         console.log(
           "   nonce: " + (await provider.getTransactionCount(address))
         );
@@ -496,7 +488,7 @@ async function addr(ethers, addr) {
 }
 
 task("accounts", "Prints the list of accounts", async (_, { ethers }) => {
-  const accounts = await ethers.provider.listAccounts();
+  const accounts = await ethers.getSigners();
   accounts.forEach((account) => console.log(account));
 });
 
@@ -542,19 +534,16 @@ task("send", "Send ETH")
       to = await addr(ethers, taskArgs.to);
       debug(`Normalized to address: ${to}`);
     }
-
+    var signerAddress = await fromSigner.getAddress();
     const txRequest = {
-      from: await fromSigner.getAddress(),
+      from: signerAddress,
       to,
-      value: parseUnits(
-        taskArgs.amount ? taskArgs.amount : "0",
-        "ether"
-      ).toHexString(),
-      nonce: await fromSigner.getTransactionCount(),
+      value: parseUnits(taskArgs.amount ? taskArgs.amount : "0", "ether"),
+      nonce: await ethers.provider.getTransactionCount(signerAddress),
       gasPrice: parseUnits(
         taskArgs.gasPrice ? taskArgs.gasPrice : "1.001",
         "gwei"
-      ).toHexString(),
+      ),
       gasLimit: taskArgs.gasLimit ? taskArgs.gasLimit : 24000,
       chainId: network.config.chainId,
       data: undefined,
@@ -566,8 +555,7 @@ task("send", "Send ETH")
     }
 
     debug(
-      ethers.BigNumber.from(txRequest.gasPrice).div(1000000000).toHexString() +
-        " gwei"
+      BigNumber.from(txRequest.gasPrice).div(1000000000).toHexString() + " gwei"
     );
     debug(JSON.stringify(txRequest, null, 2));
 
@@ -1148,7 +1136,7 @@ task("deployCeleste:goerli")
       const { deployer, owner } = await getNamedAccounts();
       const constructorArguments = [
         args.feeToken,
-        ethers.utils.parseEther(args.feeAmount.toString()),
+        utils.parseEther(args.feeAmount.toString()),
       ];
       const result = await deployments.deploy("OwnableCeleste", {
         from: deployer,
