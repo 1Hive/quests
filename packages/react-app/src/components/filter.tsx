@@ -1,13 +1,15 @@
-import { Button, SearchInput, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
+import { Button, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
 import { useEffect, useState, useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { QuestStatus } from 'src/enums/quest-status.enum';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
+import { QuestPlayStatus } from 'src/enums/quest-play-status.enum';
 import { DEFAULT_FILTER } from '../constants';
 import DateFieldInput from './field-input/date-field-input';
 import { FieldInput } from './field-input/field-input';
+import TextFieldInput from './field-input/text-field-input';
 
 // #region StyledComponents
 
@@ -28,6 +30,8 @@ const FilterWrapperStyled = styled.div<{
   flex-wrap: ${({ colDisplay }) => (colDisplay ? 'wrap' : 'no-wrap')};
 
   padding: 0 ${GUpx(2)};
+
+  column-gap: ${GUpx(4)};
 
   ${({ isSmallResolution }) =>
     isSmallResolution
@@ -72,6 +76,11 @@ const ButtonLineStyled = styled.div<{ isSmallResolution: boolean }>`
   }
 `;
 
+const SearchTextInputWrapperStyled = styled.div<{ wide: boolean }>`
+  flex-grow: 1;
+  ${({ wide }) => wide && 'width: 100%;'}
+`;
+
 // #endregion
 
 type Props = {
@@ -79,7 +88,11 @@ type Props = {
 };
 
 const QuestStatusOptions = [QuestStatus.Active, QuestStatus.Expired, QuestStatus.All];
-
+const QuestPlayStatusOptions = [
+  QuestPlayStatus.All,
+  QuestPlayStatus.Played,
+  QuestPlayStatus.Unplayed,
+];
 export function Filter({ compact }: Props) {
   const { filter, setFilter, toggleFilter } = useFilterContext();
   const theme = useTheme();
@@ -96,36 +109,19 @@ export function Filter({ compact }: Props) {
     <>
       {(isFilterShown || !isSmallResolution) && (
         <FilterWrapperStyled colDisplay={isSmallResolution} isSmallResolution={isSmallResolution}>
-          <FieldInput
-            className="flex-grow"
-            label={!compact ? 'Title' : ''}
-            wide={isSmallResolution}
-            id="filterTitle"
-          >
-            <SearchInput
-              id="filterTitle"
-              placeholder="Search by title"
-              value={filter.title}
-              onChange={(title: string) => setFilter({ ...filter, title })}
+          <SearchTextInputWrapperStyled wide={isSmallResolution}>
+            <TextFieldInput
+              id="filterSearch"
+              label={!compact ? 'Search' : ''}
               wide
+              placeHolder="Search by title, description, or address"
+              value={filter.search}
+              onChange={(e: any) => setFilter({ ...filter, search: e.currentTarget.value })}
               compact={compact}
+              tooltip="Search accross title, description, and address and return in rank order. There is support for & (AND) and | (OR) operators."
+              isEdit
             />
-          </FieldInput>
-          <FieldInput
-            className="flex-grow"
-            label={!compact ? 'Description' : ''}
-            wide={isSmallResolution}
-            id="filterDescription"
-          >
-            <SearchInput
-              id="filterDescription"
-              placeholder="Search by description"
-              value={filter.description}
-              onChange={(description: string) => setFilter({ ...filter, description })}
-              wide
-              compact={compact}
-            />
-          </FieldInput>
+          </SearchTextInputWrapperStyled>
           <DateFieldInput
             id="minExpireTime"
             value={filter.minExpireTime}
@@ -148,6 +144,23 @@ export function Filter({ compact }: Props) {
               borderColor={theme.border}
               selected={QuestStatusOptions.indexOf(filter.status)}
               onChange={(i: number) => setFilter({ ...filter, status: QuestStatusOptions[i] })}
+              wide
+              compact={compact}
+            />
+          </FieldInput>
+          <FieldInput
+            label={!compact ? 'Play Status' : ''}
+            wide={isSmallResolution}
+            id="filterPlayStatus"
+          >
+            <StatusDropdownStyled
+              id="filterPlayStatus"
+              items={QuestPlayStatusOptions}
+              borderColor={theme.border}
+              selected={QuestPlayStatusOptions.indexOf(filter.playStatus)}
+              onChange={(i: number) =>
+                setFilter({ ...filter, playStatus: QuestPlayStatusOptions[i] })
+              }
               wide
               compact={compact}
             />

@@ -20,3 +20,22 @@
         - event: DepositChanged(uint256,address,uint256)
           handler: handleDepositChanged
       file: ./src/mappings/quest-factory.ts
+  - kind: ethereum/contract
+    name: {{name}}-Quest
+    network: {{network}}
+    source:
+      abi: Quest
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestClaimed
+      abis:
+        - name: Quest
+          file: ./abis/Quest.json
+      eventHandlers:
+        - event: QuestClaimed(bytes,address,uint256)
+          handler: handleQuestClaimed
+      file: ./src/mappings/quest-factory.ts

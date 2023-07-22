@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconPlus, useTheme, Info } from '@1hive/1hive-ui';
+import { Button, IconPlus, IconCross, useTheme, Info } from '@1hive/1hive-ui';
+
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MAX_LINE_DESCRIPTION } from 'src/constants';
@@ -77,10 +78,23 @@ const MaxPlayerLineStyled = styled.div`
   align-items: center;
 `;
 
-const PlayerWrapperStyled = styled.div`
+const MaxPlayerWrapperStyled = styled.div`
   padding-right: ${GUpx(2)};
 `;
-
+const PlayerWrapperStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  max-width: 425px;
+  Button {
+    margin-bottom: ${GUpx(1)};
+    min-height: 45px;
+    border: none;
+  }
+`;
+const AddWrapperStyled = styled.div`
+  display: flex;
+`;
 const DepositInfoStyled = styled(Info)`
   padding: ${GUpx(1)};
 `;
@@ -285,6 +299,19 @@ export default function QuestModal({
     }
   };
 
+  const addPlayerToWhitelist = (setValues: (_: QuestModel) => void, values: QuestModel) => {
+    values.players?.push('');
+    setValues(values);
+  };
+  const removePlayerFromWhitelist = (
+    setValues: (_: QuestModel) => void,
+    values: QuestModel,
+    index: number,
+  ) => {
+    values.players?.splice(index, 1);
+    setValues(values);
+  };
+
   const descriptionTemplate = `[Summary of ~5 lines]
 
 ## Specifications
@@ -331,12 +358,23 @@ export default function QuestModal({
                 ...questDataState,
                 unlimited: true,
                 fallbackAddress: questDataState?.fallbackAddress,
+                isWhitelist: false,
+                players: [''],
               } as QuestModel
             }
             onSubmit={onQuestSubmit}
             validate={validate}
           >
-            {({ values, handleChange, handleBlur, errors, touched, setTouched, handleSubmit }) => {
+            {({
+              values,
+              handleChange,
+              handleBlur,
+              errors,
+              touched,
+              setTouched,
+              handleSubmit,
+              setValues,
+            }) => {
               const onNext = (currentStep: number) => {
                 const stepErrors = validate(values);
                 if (currentStep === 0) {
@@ -545,7 +583,7 @@ export default function QuestModal({
                         />
                         <FieldInput error={touched.maxPlayers && errors.maxPlayers}>
                           <MaxPlayerLineStyled>
-                            <PlayerWrapperStyled>
+                            <MaxPlayerWrapperStyled>
                               <NumberFieldInput
                                 id="maxPlayers"
                                 label="Max players"
@@ -556,7 +594,7 @@ export default function QuestModal({
                                 tooltip="The max amount of players that can simultaneously work on this quest"
                                 disabled={values.unlimited}
                               />
-                            </PlayerWrapperStyled>
+                            </MaxPlayerWrapperStyled>
                             <CheckboxFieldInput
                               id="unlimited"
                               label="Unlimited"
@@ -568,6 +606,47 @@ export default function QuestModal({
                             />
                           </MaxPlayerLineStyled>
                         </FieldInput>
+                      </>,
+                      <>
+                        <CheckboxFieldInput
+                          id="isWhitelist"
+                          label="Exclusive players"
+                          onChange={handleChange}
+                          handleBlur={handleBlur}
+                          value={values.isWhitelist}
+                          isEdit
+                          tooltip="Select if you want a predefined list of players that can claim this quest. You can always add/remove players after quest creation"
+                        />
+                        {values.isWhitelist && (
+                          <>
+                            {values.players?.map((player, i) => (
+                              <PlayerWrapperStyled>
+                                <AddressFieldInput
+                                  id={`players[${i}]`}
+                                  label={`Player #${i + 1}`}
+                                  isEdit
+                                  value={values.players?.[i]}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  wide
+                                  error={touched.players?.[i] && errors.players?.[i]}
+                                />
+
+                                <Button
+                                  icon={<IconCross />}
+                                  onClick={() => removePlayerFromWhitelist(setValues, values, i)}
+                                />
+                              </PlayerWrapperStyled>
+                            ))}
+                            <AddWrapperStyled>
+                              <Button
+                                icon={<IconPlus />}
+                                label="Add"
+                                onClick={() => addPlayerToWhitelist(setValues, values)}
+                              />
+                            </AddWrapperStyled>
+                          </>
+                        )}
                       </>,
                     ]}
                   />

@@ -4,10 +4,17 @@ import {
   CreateDepositChanged,
 } from "../../generated/QuestFactoryV2/QuestFactory";
 import {
+  QuestPlayed,
+  QuestClaimed,
+  QuestUnplayed,
+} from "../../generated/QuestFactoryV2-Quest/Quest";
+import {
   CreateDepositEntity,
   PlayDepositEntity,
+  QuestClaimEntity,
   QuestEntity,
 } from "../../generated/schema";
+import { Bytes, ipfs, json, log } from "@graphprotocol/graph-ts";
 import { Bytes, ipfs } from "@graphprotocol/graph-ts";
 import { json } from "@graphprotocol/graph-ts";
 
@@ -51,6 +58,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questPlayDepositAmount = event.params.playDepositAmount;
   questEntity.questCreator = event.params.creator;
   questEntity.questMaxPlayers = event.params.maxPlayers;
+  questEntity.questPlayers = [];
 
   if (!event.params.questDetailsRef) {
     questEntity.questDescription = "";
@@ -88,4 +96,52 @@ export function handleQuestCreated(event: QuestCreated): void {
   }
 
   questEntity.save();
+}
+
+export function handleQuestPlayed(event: QuestPlayed): void {
+  const questAddress = event.address.toHex();
+  let questEntity = QuestEntity.load(questAddress);
+
+  if (!questEntity) {
+    log.error("Quest entity not found with address: {}", [questAddress]);
+    return;
+  }
+  let questPlayers = questEntity.questPlayers;
+  questPlayers.push(event.params.player.toHexString());
+  questEntity.questPlayers = questPlayers;
+  questEntity.save();
+}
+
+export function handleQuestUnplayed(event: QuestUnplayed): void {
+  const questAddress = event.address.toHex();
+  let questEntity = QuestEntity.load(questAddress);
+  if (!questEntity) {
+    log.error("Quest entity not found with address: {}", [questAddress]);
+    return;
+  }
+  let questPlayers = questEntity.questPlayers;
+  const indexToBeRemoved = questEntity.questPlayers.indexOf(
+    event.params.player.toHexString()
+  );
+  if (indexToBeRemoved === -1) {
+    log.error("Player not found in quest {} players list: {}", [
+      questAddress,
+      event.params.player.toHexString(),
+    ]);
+    return;
+  }
+  questPlayers.splice(indexToBeRemoved, 1);
+  questEntity.questPlayers = questPlayers;
+  questEntity.save();
+}
+
+export function handleQuestClaimed(event: QuestClaimed): void {
+  const questClaimEntity = new QuestClaimEntity(
+    event.params._event.transaction.hash.toHex()
+  );
+  questClaimEntity.questAddress = event.address.toHexString();
+  questClaimEntity.amount = event.params.amount;
+  questClaimEntity.evidenceIpfsHash = event.params.evidence;
+  questClaimEntity.player = event.params.player.toHexString();
+  questClaimEntity.save();
 }

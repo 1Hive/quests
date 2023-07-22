@@ -40,24 +40,24 @@ function App() {
   return (
     <AppStyled theme={currentTheme}>
       <PageContextProvider>
-        <WalletProvider>
-          <TransactionContextProvider>
-            <FilterContextProvider>
-              <Main
-                assetsUrl="/aragon-ui/"
-                layout={false}
-                scrollView={false}
-                theme={currentTheme ?? DEFAULT_THEME}
-              >
-                <BrowserRouter>
-                  <ErrorBoundary>
+        <TransactionContextProvider>
+          <FilterContextProvider>
+            <Main
+              assetsUrl="/aragon-ui/"
+              layout={false}
+              scrollView={false}
+              theme={currentTheme ?? DEFAULT_THEME}
+            >
+              <BrowserRouter>
+                <ErrorBoundary>
+                  <WalletProvider>
                     <Routes />
-                  </ErrorBoundary>
-                </BrowserRouter>
-              </Main>
-            </FilterContextProvider>
-          </TransactionContextProvider>
-        </WalletProvider>
+                  </WalletProvider>
+                </ErrorBoundary>
+              </BrowserRouter>
+            </Main>
+          </FilterContextProvider>
+        </TransactionContextProvider>
       </PageContextProvider>
     </AppStyled>
   );

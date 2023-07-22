@@ -15,7 +15,7 @@ type Props = {
 };
 
 class ErrorBoundary extends React.Component<Props> {
-  state = { hasError: false };
+  state: { hasError: boolean; error?: string | Error } = { hasError: false };
 
   static getDerivedStateFromError() {
     // Update state so the next render will show the fallback UI.
@@ -23,15 +23,21 @@ class ErrorBoundary extends React.Component<Props> {
   }
 
   componentDidCatch(error: Error) {
+    const { error: stateError } = this.state;
+    if (!error || stateError === error) return;
     Logger.exception(error, 'An error occured at the top level');
-    this.setState({ hasError: true });
+    this.setState({ hasError: true, error });
   }
 
   render() {
-    const { hasError } = this.state;
-    if (hasError) {
-      const { toast } = this.props;
-      toast('💣️ Oops. Something went wrong');
+    try {
+      const { hasError, error } = this.state;
+      if (hasError && error && !error.toString().includes('Unknown chain id')) {
+        const { toast } = this.props;
+        toast?.('💣️ Oops. Something went wrong');
+      }
+    } catch (error) {
+      Logger.exception(error, 'An error occured while trying to show the toast');
     }
     const { children } = this.props;
     return children;
