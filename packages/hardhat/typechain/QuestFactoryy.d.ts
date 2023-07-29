@@ -20,7 +20,7 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface QuestFactoryInterface extends ethers.utils.Interface {
+interface QuestFactoryyInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
     "createDeposit()": FunctionFragment;
@@ -33,7 +33,6 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     "setCreateDeposit(address,uint256)": FunctionFragment;
     "setPlayDeposit(address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "version()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -85,7 +84,6 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "aragonGovernAddress",
@@ -125,7 +123,6 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {
     "CreateDepositChanged(uint256,address,uint256)": EventFragment;
@@ -142,7 +139,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "QuestCreated"): EventFragment;
 }
 
-export class QuestFactory extends Contract {
+export class QuestFactoryy extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -153,7 +150,7 @@ export class QuestFactory extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: QuestFactoryInterface;
+  interface: QuestFactoryyInterface;
 
   functions: {
     aragonGovernAddress(overrides?: CallOverrides): Promise<[string]>;
@@ -269,10 +266,6 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
-
-    version(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "version()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
@@ -389,10 +382,6 @@ export class QuestFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  version(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "version()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   callStatic: {
     aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -507,10 +496,6 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -652,10 +637,6 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
-
-    version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -768,9 +749,5 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
-
-    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

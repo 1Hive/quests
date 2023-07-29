@@ -19,8 +19,7 @@ export default async (
     playDepositAmount: number;
   }
 ) => {
-  const { deploy } = deployments;
-  const { deployer, govern, owner } = await getNamedAccounts();
+  const { govern, owner } = await getNamedAccounts();
   const createDeposit = args
     ? { token: args.createDepositToken, amount: args.createDepositAmount }
     : defaultConfig.CreateQuestDeposit[network.name];

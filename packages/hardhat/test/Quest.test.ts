@@ -1,4 +1,3 @@
-// @ts-ignore
 import { ethers, network } from "hardhat";
 import { use, expect } from "chai";
 import { solidity } from "ethereum-waffle";
@@ -9,8 +8,8 @@ import {
   fromNumber,
 } from "./test-helper";
 import { TokenMock, TokenMock__factory } from "../typechain";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 
 use(solidity);
 
@@ -937,7 +936,7 @@ describe("[Contract] Quest", function () {
       );
     });
   });
-  describe.only("constructor()", () => {
+  describe("constructor()", () => {
     it("SHOULD revert if max players greater than 0 and isWhiteList", async () => {
       //Arrange
       const maxPlayers = 3;

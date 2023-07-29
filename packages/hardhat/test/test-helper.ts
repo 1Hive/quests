@@ -1,4 +1,4 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { BigNumber, ContractTransaction } from "ethers";
 import { ethers } from "hardhat";
 import { Address } from "hardhat-deploy/dist/types";

@@ -9,12 +9,13 @@ import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./Quest.sol";
 
-contract QuestFactoryy is OwnableUpgradeable {
+contract QuestFactory is OwnableUpgradeable {
     using DepositLib for Models.Deposit;
 
     address public aragonGovernAddress;
     Models.Deposit public createDeposit;
     Models.Deposit public playDeposit;
+    uint256 public constant version = 3;
 
     event QuestCreated(
         address questAddress,
@@ -53,6 +54,7 @@ contract QuestFactoryy is OwnableUpgradeable {
         uint256 _playDepositAmount,
         address _initialOwner
     ) public initializer {
+        __Ownable_init();
         aragonGovernAddress = _aragonGovernAddress;
         setCreateDeposit(_createDepositToken, _createDepositAmount);
         setPlayDeposit(_playDepositToken, _playDepositAmount);

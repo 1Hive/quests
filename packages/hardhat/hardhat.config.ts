@@ -5,8 +5,8 @@ import fs from "fs";
 import chalk from "chalk";
 import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
-import "@nomiclabs/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
+import "@nomiclabs/hardhat-ethers";
 import "hardhat-typechain";
 import "typechain";
 import { task, HardhatUserConfig, types } from "hardhat/config";
@@ -246,6 +246,10 @@ const hardhatConfig: HardhatUserConfig = {
       goerli: defaultConfig.RootOwner.goerli,
     }, // Goerli Gnosis Safe address
   },
+  typechain: {
+    outDir: "typechain",
+    target: "ethers-v5",
+  },
 };
 
 const DEBUG = false;
@@ -258,7 +262,7 @@ function debug(text) {
 
 task("wallet", "Create a wallet (pk) link", async (_, { ethers }) => {
   const randomWallet = ethers.Wallet.createRandom();
-  const privateKey = randomWallet.signingKey.privateKey;
+  const privateKey = randomWallet._signingKey().privateKey;
   console.log("🔐 WALLET Generated as " + randomWallet.address + "");
   console.log("🔗 http://localhost:3000/pk#" + privateKey);
 });
@@ -272,7 +276,7 @@ task("fundedwallet", "Create a wallet (pk) link and fund it with deployer?")
 
   .setAction(async (taskArgs, { network, ethers }) => {
     const randomWallet = ethers.Wallet.createRandom();
-    const privateKey = randomWallet.signingKey.privateKey;
+    const privateKey = randomWallet._signingKey().privateKey;
     console.log("🔐 WALLET Generated as " + randomWallet.address + "");
     const url = taskArgs.url ? taskArgs.url : "http://localhost:3000";
 
@@ -287,13 +291,13 @@ task("fundedwallet", "Create a wallet (pk) link and fund it with deployer?")
     const amount = taskArgs.amount ? taskArgs.amount : "0.01";
     const tx = {
       to: randomWallet.address,
-      value: utils.parseEther(amount),
+      value: ethers.utils.parseEther(amount),
     };
 
     // SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
     // IF NOT SEND USING LOCAL HARDHAT NODE:
     if (localDeployerMnemonic) {
-      let deployerWallet = ethers.Wallet.fromPhrase(localDeployerMnemonic);
+      let deployerWallet = ethers.Wallet.fromMnemonic(localDeployerMnemonic);
       const signers = await ethers.getSigners();
       deployerWallet = deployerWallet.connect(signers[0].provider);
       console.log(
@@ -458,12 +462,12 @@ task(
     for (const n in hardhatConfig.networks) {
       // console.log(networks[n],n)
       try {
-        const provider = new ethers.JsonRpcProvider(
+        const provider = new ethers.providers.JsonRpcProvider(
           (hardhatConfig.networks[n] as HttpNetworkUserConfig).url
         );
         const balance = await provider.getBalance(address);
         console.log(" -- " + n + " --  -- -- 📡 ");
-        console.log("   balance: " + utils.formatEther(balance));
+        console.log("   balance: " + ethers.utils.formatEther(balance));
         console.log(
           "   nonce: " + (await provider.getTransactionCount(address))
         );
@@ -477,8 +481,8 @@ task(
 );
 
 async function addr(ethers, addr) {
-  if (isAddress(addr)) {
-    return getAddress(addr);
+  if (ethers.isAddress(addr)) {
+    return ethers.getAddress(addr);
   }
   const accounts = await ethers.provider.listAccounts();
   if (accounts[addr] !== undefined) {
@@ -503,7 +507,7 @@ task("balance", "Prints an account's balance")
     const balance = await ethers.provider.getBalance(
       await addr(ethers, taskArgs.account)
     );
-    console.log(formatUnits(balance, "ether"), "ETH");
+    console.log(ethers.utils.formatUnits(balance, "ether"), "ETH");
   });
 
 function send(signer, txparams) {
@@ -538,9 +542,12 @@ task("send", "Send ETH")
     const txRequest = {
       from: signerAddress,
       to,
-      value: parseUnits(taskArgs.amount ? taskArgs.amount : "0", "ether"),
+      value: ethers.utils.parseUnits(
+        taskArgs.amount ? taskArgs.amount : "0",
+        "ether"
+      ),
       nonce: await ethers.provider.getTransactionCount(signerAddress),
-      gasPrice: parseUnits(
+      gasPrice: ethers.utils.parseUnits(
         taskArgs.gasPrice ? taskArgs.gasPrice : "1.001",
         "gwei"
       ),
@@ -555,7 +562,8 @@ task("send", "Send ETH")
     }
 
     debug(
-      BigNumber.from(txRequest.gasPrice).div(1000000000).toHexString() + " gwei"
+      ethers.BigNumber.from(txRequest.gasPrice).div(1000000000).toHexString() +
+        " gwei"
     );
     debug(JSON.stringify(txRequest, null, 2));
 
@@ -1067,7 +1075,7 @@ task("deployAll:goerli")
   .setAction(deployAll);
 
 task("grantGovernQueue").setAction(
-  async (_args, { web3, getNamedAccounts }) => {
+  async (_args, { ethers, getNamedAccounts }) => {
     const { owner } = await getNamedAccounts();
     const publicQueueFonctions = [
       "schedule",
@@ -1086,11 +1094,12 @@ task("grantGovernQueue").setAction(
     console.log("GovernQueue roles:");
     const publicGrant = "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF";
     let roles = [];
+    var governQueueAbiInterface = new ethers.utils.Interface(GovernQueueAbi);
     for (const obj of GovernQueueAbi) {
       if (obj.type !== "function" || !queueFonctions.includes(obj.name)) {
         continue;
       }
-      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      let signature = governQueueAbiInterface.getSighash(obj.name);
       roles.push({
         signature,
         address: ownerOnlyQueueFonctions.includes(obj.name)
@@ -1104,11 +1113,12 @@ task("grantGovernQueue").setAction(
       `[${roles.map((x) => `[0,"${x.signature}","${x.address}"]`).join(",")}]`
     );
     console.log("Govern roles:");
+    var governAbiInterface = new ethers.utils.Interface(GovernAbi);
     for (const obj of GovernAbi) {
       if (obj.type !== "function" || !aclGovernFunctions.includes(obj.name)) {
         continue;
       }
-      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      let signature = governAbiInterface.getSighash(obj.name);
       roles.push({
         signature,
         address: owner,
@@ -1136,7 +1146,7 @@ task("deployCeleste:goerli")
       const { deployer, owner } = await getNamedAccounts();
       const constructorArguments = [
         args.feeToken,
-        utils.parseEther(args.feeAmount.toString()),
+        ethers.utils.parseEther(args.feeAmount.toString()),
       ];
       const result = await deployments.deploy("OwnableCeleste", {
         from: deployer,
