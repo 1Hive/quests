@@ -73,6 +73,8 @@
         "queue-grant:gnosis": "hardhat grantGovernQueue --network xdai",
         "queue-grant:goerli": "hardhat grantGovernQueue --network goerli",
         "deploy-all:local": "hardhat deployAll:goerli",
+        "deploy-questFactory:goerli": "hardhat newQuestFactory:goerli --network goerli",
+        "deploy-questFactory:gnosis": "hardhat newQuestFactory:gnosis --network xdai",
         "console": "hardhat console",
         "watch": "node scripts/watch.js",
         "accounts": "hardhat accounts",

@@ -25,6 +25,7 @@ import exportContractResult from "./scripts/export-contract-result";
 import GovernAbi from "./abi/contracts/Externals/Govern.json";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
 import CelesteMockGoerli from "./deployments/goerli/OwnableCeleste.json";
+import upgradeQuestFactory from "./scripts/upgrade-quest-factory";
 
 dotenvConfig({
   path: resolve(
@@ -120,6 +121,7 @@ const hardhatConfig: HardhatUserConfig = {
       chainId: 5,
       url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
       accounts: getAccounts(),
+      gasPrice: 20000000000, // 20 Gwei
     },
     xdai: {
       chainId: 100,
@@ -227,7 +229,10 @@ const hardhatConfig: HardhatUserConfig = {
     ],
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    // @ts-ignore
+    apiKey: {
+      goerli: process.env.ETHERSCAN_API_KEY,
+    },
   },
   namedAccounts: {
     deployer: {
@@ -838,10 +843,15 @@ task("newQuestFactory:gnosis")
     types.float
   )
   .setAction(async (args, hre) => {
-    const deployResult = await deployQuestFactory(hre, args);
+    console.log("Starting by deploying the Quest template...");
+    await hre.run("newQuest");
+
+    console.log("Deploying proxy upgrade for QuestFactory...");
+    const address = await upgradeQuestFactory(hre, args);
+
     console.log(
-      "Deployed quest factory (" + hre.network.name + "):",
-      deployResult.address
+      "Deployed proxy upgrade for QuestFactory (" + hre.network.name + "):",
+      address
     );
   });
 
@@ -880,12 +890,15 @@ task("newQuestFactory:goerli")
     types.float
   )
   .setAction(async (args, hre) => {
-    console.log("Deploying QuestFactory...");
-    const deployResult = await deployQuestFactory(hre, args);
+    console.log("Starting by deploying the Quest template...");
+    await hre.run("newQuest");
+
+    console.log("Deploying proxy upgrade for QuestFactory...");
+    const address = await upgradeQuestFactory(hre, args);
 
     console.log(
-      "Deployed QuestFactory (" + hre.network.name + "):",
-      deployResult.address
+      "Deployed proxy upgrade for QuestFactory (" + hre.network.name + "):",
+      address
     );
   });
 
@@ -894,7 +907,7 @@ task("newQuest")
   .setAction(async (hre) => {
     const deployResult = await deployQuest(hre);
     console.log(
-      "Deployed quest (" + hre.network.name + "):",
+      "Deployed quest template (" + hre.network.name + "):",
       deployResult.address
     );
   });
