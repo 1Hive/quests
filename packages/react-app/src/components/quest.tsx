@@ -37,6 +37,7 @@ import { ActionsPlaceholder } from './actions-placeholder';
 import PlayModal from './modals/play-modal';
 import OptoutModal from './modals/optout-modal';
 import MarkdownFieldInput from './field-input/markdown-field-input';
+import PlayerListModal from './modals/player-list-modal';
 
 // #region StyledComponents
 
@@ -66,6 +67,15 @@ const CardStyled = styled(Card)<{ isSummary: boolean; highlight: boolean }>`
       }
       cursor: pointer;
     `}
+`;
+
+const PlayersWrapperStyled = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const PlayersModalWrapperStyled = styled.div`
+  margin-left: ${GUpx(3)};
 `;
 
 const QuestFooterStyled = styled.div`
@@ -346,12 +356,22 @@ export default function Quest({
               isLoading={isLoading || !claimDeposit}
             />
             {questData?.maxPlayers != null && (
-              <TextFieldInput
-                id="players"
-                label="Players"
-                isLoading={isLoading || !questData}
-                value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
-              />
+              <PlayersWrapperStyled>
+                <TextFieldInput
+                  id="players"
+                  label="Players"
+                  isLoading={isLoading || !questData}
+                  value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+                />
+                {players.length > 0 && !isSummary && (
+                  <PlayersModalWrapperStyled>
+                    <PlayerListModal
+                      playerList={players}
+                      isEdit={walletAddress === questData.creatorAddress}
+                    />
+                  </PlayersModalWrapperStyled>
+                )}
+              </PlayersWrapperStyled>
             )}
             <DateFieldInput
               id="creationTime"

@@ -96,6 +96,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
       maxPlayers: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers : undefined, // If null put undefined
       unlimited: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers === 0 : undefined,
+      isWhitelist: false,
       status: QuestStatus.Active,
       players: questEntity.questPlayers ?? [],
       governAddress: toChecksumAddress(questEntity.questGovernAddress),

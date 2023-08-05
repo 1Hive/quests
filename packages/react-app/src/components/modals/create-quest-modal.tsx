@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconPlus, IconCross, useTheme, Info } from '@1hive/1hive-ui';
+import { Button, IconPlus, useTheme, Info } from '@1hive/1hive-ui';
 
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -38,6 +38,7 @@ import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { FieldInput } from '../field-input/field-input';
 import MarkdownFieldInput from '../field-input/markdown-field-input';
 import { Outset } from '../utils/spacer-util';
+import AddressListFieldInput from '../address-list';
 
 // #region StyledComponents
 
@@ -81,20 +82,7 @@ const MaxPlayerLineStyled = styled.div`
 const MaxPlayerWrapperStyled = styled.div`
   padding-right: ${GUpx(2)};
 `;
-const PlayerWrapperStyled = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  max-width: 425px;
-  Button {
-    margin-bottom: ${GUpx(1)};
-    min-height: 45px;
-    border: none;
-  }
-`;
-const AddWrapperStyled = styled.div`
-  display: flex;
-`;
+
 const DepositInfoStyled = styled(Info)`
   padding: ${GUpx(1)};
 `;
@@ -297,19 +285,6 @@ export default function QuestModal({
         );
       }
     }
-  };
-
-  const addPlayerToWhitelist = (setValues: (_: QuestModel) => void, values: QuestModel) => {
-    values.players?.push('');
-    setValues(values);
-  };
-  const removePlayerFromWhitelist = (
-    setValues: (_: QuestModel) => void,
-    values: QuestModel,
-    index: number,
-  ) => {
-    values.players?.splice(index, 1);
-    setValues(values);
   };
 
   const descriptionTemplate = `[Summary of ~5 lines]
@@ -618,34 +593,18 @@ export default function QuestModal({
                           tooltip="Select if you want a predefined list of players that can claim this quest. You can always add/remove players after quest creation"
                         />
                         {values.isWhitelist && (
-                          <>
-                            {values.players?.map((player, i) => (
-                              <PlayerWrapperStyled>
-                                <AddressFieldInput
-                                  id={`players[${i}]`}
-                                  label={`Player #${i + 1}`}
-                                  isEdit
-                                  value={values.players?.[i]}
-                                  onChange={handleChange}
-                                  onBlur={handleBlur}
-                                  wide
-                                  error={touched.players?.[i] && errors.players?.[i]}
-                                />
-
-                                <Button
-                                  icon={<IconCross />}
-                                  onClick={() => removePlayerFromWhitelist(setValues, values, i)}
-                                />
-                              </PlayerWrapperStyled>
-                            ))}
-                            <AddWrapperStyled>
-                              <Button
-                                icon={<IconPlus />}
-                                label="Add"
-                                onClick={() => addPlayerToWhitelist(setValues, values)}
-                              />
-                            </AddWrapperStyled>
-                          </>
+                          <AddressListFieldInput
+                            id="players"
+                            values={values.players}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={errors.players}
+                            touched={touched.players}
+                            setValuesFormik={setValues}
+                            formikValues={values}
+                            isEdit
+                            label="Player"
+                          />
                         )}
                       </>,
                     ]}
