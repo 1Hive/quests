@@ -1,0 +1,49 @@
+- kind: ethereum/contract
+    name: {{name}}
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: QuestFactory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreatedProxy
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.proxy.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,address,[address,uint256],[address,uint256],address,uint32,bool,uint256)
+          handler: handleQuestCreated
+        - event: CreateDepositChanged(uint256,address,uint256)
+          handler: handleCreateDepositChanged
+        - event: PlayDepositChanged(uint256,address,uint256)
+          handler: handlePlayDepositChanged
+      file: ./src/mappings/quest-factory.proxy.ts
+  - kind: ethereum/contract
+    name: {{name}}-Quest
+    network: {{network}}
+    source:
+      abi: Quest
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestClaimedV2
+        - QuestPlayed
+        - QuestUnplayed
+      abis:
+        - name: Quest
+          file: ./abis/Quest.proxy.json
+      eventHandlers:
+        - event: QuestClaimed(bytes,address,uint256)
+          handler: handleQuestClaimed
+        - event: QuestPlayed(address,uint256)
+          handler: handleQuestPlayed
+        - event: QuestUnplayed(address,uint256)
+          handler: handleQuestUnplayed
+      file: ./src/mappings/quest-factory.proxy.ts

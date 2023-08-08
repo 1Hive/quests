@@ -24,13 +24,12 @@ contract QuestFactory is OwnableUpgradeable {
         address rewardTokenAddress,
         uint256 expireTime,
         address fundsRecoveryAddress,
-        address createDepositToken,
-        uint256 createDepositAmount,
-        address playDepositToken,
-        uint256 playDepositAmount,
+        Models.Deposit createDeposit,
+        Models.Deposit playDeposit,
         address creator,
         uint32 maxPlayers,
-        bool isWhiteList
+        bool isWhiteList,
+        uint256 version
     );
 
     event CreateDepositChanged(
@@ -138,13 +137,12 @@ contract QuestFactory is OwnableUpgradeable {
             address(_rewardToken),
             _expireTime,
             _fundsRecoveryAddress,
-            address(createDeposit.token),
-            createDeposit.amount,
-            address(playDeposit.token),
-            playDeposit.amount,
+            createDeposit,
+            playDeposit,
             msg.sender,
             _maxPlayers,
-            _isWhiteList
+            _isWhiteList,
+            version
         );
 
         return address(quest);

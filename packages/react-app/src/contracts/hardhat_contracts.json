@@ -8690,6 +8690,1926 @@
                 "type": "function"
               }
             ]
+          },
+          {
+            "address": "0x892A174aaCB3F532f093F4787fd698b17711D2b6",
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "string",
+                    "name": "_questTitle",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "_questDetailsRef",
+                    "type": "bytes"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_createDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_playDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "address",
+                        "name": "questCreator",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint32",
+                        "name": "maxPlayers",
+                        "type": "uint32"
+                      },
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "rewardToken",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "expireTime",
+                        "type": "uint256"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "aragonGovernAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "address payable",
+                        "name": "fundsRecoveryAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "bool",
+                        "name": "isWhiteList",
+                        "type": "bool"
+                      }
+                    ],
+                    "internalType": "struct Models.QuestParam",
+                    "name": "_questParam",
+                    "type": "tuple"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestClaimed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestPlayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestUnplayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address[]",
+                    "name": "whiteListPlayers",
+                    "type": "address[]"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "WhiteListChanged",
+                "type": "event"
+              },
+              {
+                "inputs": [],
+                "name": "aragonGovernAddress",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "executer",
+                    "type": "address"
+                  }
+                ],
+                "name": "canExecute",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "_evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "_amount",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "_claimAll",
+                    "type": "bool"
+                  }
+                ],
+                "name": "claim",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "claims",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "createDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "expireTime",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "fundsRecoveryAddress",
+                "outputs": [
+                  {
+                    "internalType": "address payable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "getPlayers",
+                "outputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "",
+                    "type": "address[]"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isCreateDepositReleased",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isWhiteList",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "maxPlayers",
+                "outputs": [
+                  {
+                    "internalType": "uint32",
+                    "name": "",
+                    "type": "uint32"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "play",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "playDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questCreator",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questDetailsRef",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "",
+                    "type": "bytes"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questTitle",
+                "outputs": [
+                  {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "recoverFundsAndDeposit",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "rewardToken",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "_players",
+                    "type": "address[]"
+                  }
+                ],
+                "name": "setWhiteList",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "unplay",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              }
+            ]
+          },
+          {
+            "address": "0x8EC909c98FADBBB9B4A78D66625e07c8BFc419b9",
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "string",
+                    "name": "_questTitle",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "_questDetailsRef",
+                    "type": "bytes"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_createDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_playDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "address",
+                        "name": "questCreator",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint32",
+                        "name": "maxPlayers",
+                        "type": "uint32"
+                      },
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "rewardToken",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "expireTime",
+                        "type": "uint256"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "aragonGovernAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "address payable",
+                        "name": "fundsRecoveryAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "bool",
+                        "name": "isWhiteList",
+                        "type": "bool"
+                      }
+                    ],
+                    "internalType": "struct Models.QuestParam",
+                    "name": "_questParam",
+                    "type": "tuple"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestClaimed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestPlayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestUnplayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address[]",
+                    "name": "whiteListPlayers",
+                    "type": "address[]"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "WhiteListChanged",
+                "type": "event"
+              },
+              {
+                "inputs": [],
+                "name": "aragonGovernAddress",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "executer",
+                    "type": "address"
+                  }
+                ],
+                "name": "canExecute",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "_evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "_amount",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "_claimAll",
+                    "type": "bool"
+                  }
+                ],
+                "name": "claim",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "claims",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "createDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "expireTime",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "fundsRecoveryAddress",
+                "outputs": [
+                  {
+                    "internalType": "address payable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "getPlayers",
+                "outputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "",
+                    "type": "address[]"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isCreateDepositReleased",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isWhiteList",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "maxPlayers",
+                "outputs": [
+                  {
+                    "internalType": "uint32",
+                    "name": "",
+                    "type": "uint32"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "play",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "playDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questCreator",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questDetailsRef",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "",
+                    "type": "bytes"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questTitle",
+                "outputs": [
+                  {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "recoverFundsAndDeposit",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "rewardToken",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "_players",
+                    "type": "address[]"
+                  }
+                ],
+                "name": "setWhiteList",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "unplay",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              }
+            ]
+          },
+          {
+            "address": "0xFE1fcb0b9F569F93437eebE78d64e87D67608485",
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "string",
+                    "name": "_questTitle",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "_questDetailsRef",
+                    "type": "bytes"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_createDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_playDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "address",
+                        "name": "questCreator",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint32",
+                        "name": "maxPlayers",
+                        "type": "uint32"
+                      },
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "rewardToken",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "expireTime",
+                        "type": "uint256"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "aragonGovernAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "address payable",
+                        "name": "fundsRecoveryAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "bool",
+                        "name": "isWhiteList",
+                        "type": "bool"
+                      }
+                    ],
+                    "internalType": "struct Models.QuestParam",
+                    "name": "_questParam",
+                    "type": "tuple"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestClaimed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestPlayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestUnplayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address[]",
+                    "name": "whiteListPlayers",
+                    "type": "address[]"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "WhiteListChanged",
+                "type": "event"
+              },
+              {
+                "inputs": [],
+                "name": "aragonGovernAddress",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "executer",
+                    "type": "address"
+                  }
+                ],
+                "name": "canExecute",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "_evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "_amount",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "_claimAll",
+                    "type": "bool"
+                  }
+                ],
+                "name": "claim",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "claims",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "createDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "expireTime",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "fundsRecoveryAddress",
+                "outputs": [
+                  {
+                    "internalType": "address payable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "getPlayers",
+                "outputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "",
+                    "type": "address[]"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isCreateDepositReleased",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isWhiteList",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "maxPlayers",
+                "outputs": [
+                  {
+                    "internalType": "uint32",
+                    "name": "",
+                    "type": "uint32"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "play",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "playDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questCreator",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questDetailsRef",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "",
+                    "type": "bytes"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questTitle",
+                "outputs": [
+                  {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "recoverFundsAndDeposit",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "rewardToken",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "_players",
+                    "type": "address[]"
+                  }
+                ],
+                "name": "setWhiteList",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "unplay",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              }
+            ]
+          },
+          {
+            "address": "0xC561b3ed53Ec7cF6ed6047F410D8Aa0dA90fB69A",
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "string",
+                    "name": "_questTitle",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "_questDetailsRef",
+                    "type": "bytes"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_createDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "token",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                      }
+                    ],
+                    "internalType": "struct Models.Deposit",
+                    "name": "_playDeposit",
+                    "type": "tuple"
+                  },
+                  {
+                    "components": [
+                      {
+                        "internalType": "address",
+                        "name": "questCreator",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint32",
+                        "name": "maxPlayers",
+                        "type": "uint32"
+                      },
+                      {
+                        "internalType": "contract IERC20Upgradeable",
+                        "name": "rewardToken",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "uint256",
+                        "name": "expireTime",
+                        "type": "uint256"
+                      },
+                      {
+                        "internalType": "address",
+                        "name": "aragonGovernAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "address payable",
+                        "name": "fundsRecoveryAddress",
+                        "type": "address"
+                      },
+                      {
+                        "internalType": "bool",
+                        "name": "isWhiteList",
+                        "type": "bool"
+                      }
+                    ],
+                    "internalType": "struct Models.QuestParam",
+                    "name": "_questParam",
+                    "type": "tuple"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestClaimed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestPlayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "QuestUnplayed",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "internalType": "address[]",
+                    "name": "whiteListPlayers",
+                    "type": "address[]"
+                  },
+                  {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "WhiteListChanged",
+                "type": "event"
+              },
+              {
+                "inputs": [],
+                "name": "aragonGovernAddress",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "executer",
+                    "type": "address"
+                  }
+                ],
+                "name": "canExecute",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "_evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "_amount",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "_claimAll",
+                    "type": "bool"
+                  }
+                ],
+                "name": "claim",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "claims",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "evidence",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "player",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "createDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "expireTime",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "fundsRecoveryAddress",
+                "outputs": [
+                  {
+                    "internalType": "address payable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "getPlayers",
+                "outputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "",
+                    "type": "address[]"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isCreateDepositReleased",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "isWhiteList",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "maxPlayers",
+                "outputs": [
+                  {
+                    "internalType": "uint32",
+                    "name": "",
+                    "type": "uint32"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "play",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "playDeposit",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questCreator",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questDetailsRef",
+                "outputs": [
+                  {
+                    "internalType": "bytes",
+                    "name": "",
+                    "type": "bytes"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "questTitle",
+                "outputs": [
+                  {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "recoverFundsAndDeposit",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [],
+                "name": "rewardToken",
+                "outputs": [
+                  {
+                    "internalType": "contract IERC20Upgradeable",
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address[]",
+                    "name": "_players",
+                    "type": "address[]"
+                  }
+                ],
+                "name": "setWhiteList",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_player",
+                    "type": "address"
+                  }
+                ],
+                "name": "unplay",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+              }
+            ]
           }
         ],
         "QuestFactory": {
@@ -8822,28 +10742,40 @@
                   "type": "address"
                 },
                 {
+                  "components": [
+                    {
+                      "internalType": "contract IERC20Upgradeable",
+                      "name": "token",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "amount",
+                      "type": "uint256"
+                    }
+                  ],
                   "indexed": false,
-                  "internalType": "address",
-                  "name": "createDepositToken",
-                  "type": "address"
+                  "internalType": "struct Models.Deposit",
+                  "name": "createDeposit",
+                  "type": "tuple"
                 },
                 {
+                  "components": [
+                    {
+                      "internalType": "contract IERC20Upgradeable",
+                      "name": "token",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "amount",
+                      "type": "uint256"
+                    }
+                  ],
                   "indexed": false,
-                  "internalType": "uint256",
-                  "name": "createDepositAmount",
-                  "type": "uint256"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "address",
-                  "name": "playDepositToken",
-                  "type": "address"
-                },
-                {
-                  "indexed": false,
-                  "internalType": "uint256",
-                  "name": "playDepositAmount",
-                  "type": "uint256"
+                  "internalType": "struct Models.Deposit",
+                  "name": "playDeposit",
+                  "type": "tuple"
                 },
                 {
                   "indexed": false,
@@ -8862,6 +10794,12 @@
                   "internalType": "bool",
                   "name": "isWhiteList",
                   "type": "bool"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "version",
+                  "type": "uint256"
                 }
               ],
               "name": "QuestCreated",

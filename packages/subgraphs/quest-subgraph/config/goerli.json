@@ -12,6 +12,12 @@
       "startBlock": 8240344,
       "address": "0xa6FEAF5CA07b6F367CF39a840F5A7E41d0AE613D",
       "customTemplate": "questFactory.2"
+    },
+    {
+      "name": "QuestFactoryProxy",
+      "startBlock": 9439525,
+      "address": "0xbfFEce7c884a488921F52Fb4dd0b0c61B77C9104",
+      "customTemplate": "questFactory.proxy"
     }
   ]
 }

@@ -12,7 +12,6 @@ import "typechain";
 import { task, HardhatUserConfig, types } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
-import deployQuestFactory from "./deploy/deploy-quest_factory";
 import deployQuest from "./deploy/deploy-quest";
 import deployGovernQueue, {
   generateQueueConfig,
@@ -29,30 +28,19 @@ import upgradeQuestFactory from "./scripts/upgrade-quest-factory";
 
 dotenvConfig({
   path: resolve(
-    __dirname,
-    fs
-      .readdirSync("../../")
-      .filter(
-        (allFilesPaths: string) => allFilesPaths.match(/\.env$/) !== null
-      )[0]
+    __dirname + "/../../",
+    fs.readdirSync("../../").filter((allFilesPaths: string) => {
+      let result = allFilesPaths.match(/\.env$/) !== null;
+      return result;
+    })[0]
   ),
 });
-
-/*
-      📡 This is where you configure your deploy configuration for 🏗 scaffold-eth
-
-      check out `packages/scripts/deploy.js` to customize your deployment
-
-      out of the box it will auto deploy anything in the `contracts` folder and named *.sol
-      plus it will use *.args for constructor args
-*/
 
 //
 // Select the network you want to deploy to here:
 //
 const defaultNetwork = "localhost";
 const mainnetGwei = 21;
-
 function mnemonic() {
   try {
     if (!process.env.MNEMONIC || !process.env.PRIVATE_KEY)
@@ -891,7 +879,7 @@ task("newQuestFactory:goerli")
   )
   .setAction(async (args, hre) => {
     console.log("Starting by deploying the Quest template...");
-    await hre.run("newQuest");
+    await hre.run("newQuest", hre);
 
     console.log("Deploying proxy upgrade for QuestFactory...");
     const address = await upgradeQuestFactory(hre, args);
