@@ -96,3 +96,54 @@ dataSources:
         - event: QuestUnplayed(address,uint256)
           handler: handleQuestUnplayed
       file: ./src/mappings/quest-factory.2.ts
+  - kind: ethereum/contract
+    name: QuestFactoryProxy
+    network: goerli
+    source:
+      address: "0xbfFEce7c884a488921F52Fb4dd0b0c61B77C9104"
+      abi: QuestFactory
+      startBlock: 9439525
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreatedProxy
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.proxy.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,address,(address,uint256),(address,uint256),address,uint32,bool,uint256)
+          handler: handleQuestCreated
+        - event: CreateDepositChanged(uint256,address,uint256)
+          handler: handleCreateDepositChanged
+        - event: PlayDepositChanged(uint256,address,uint256)
+          handler: handlePlayDepositChanged
+      file: ./src/mappings/quest-factory.proxy.ts
+  - kind: ethereum/contract
+    name: QuestFactoryProxy-Quest
+    network: goerli
+    source:
+      abi: Quest
+      startBlock: 9439525
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - QuestClaimedV2
+        - QuestPlayed
+        - QuestUnplayed
+      abis:
+        - name: Quest
+          file: ./abis/Quest.proxy.json
+      eventHandlers:
+        - event: QuestClaimed(bytes,address,uint256)
+          handler: handleQuestClaimed
+        - event: QuestPlayed(address,uint256)
+          handler: handleQuestPlayed
+        - event: QuestUnplayed(address,uint256)
+          handler: handleQuestUnplayed
+        - event: QuestWhiteListChanged(address[],uint256)
+          handler: handleQuestWhiteListChanged
+      file: ./src/mappings/quest-factory.proxy.ts

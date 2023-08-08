@@ -985,7 +985,7 @@ describe("[Contract] Quest", function () {
       );
       const act = () =>
         quest.connect(creator).setWhiteList([player.address, other.address]);
-      await expect(act()).to.emit(quest, "WhiteListChanged");
+      await expect(act()).to.emit(quest, "QuestWhiteListChanged");
       expect(await quest.getPlayers()).to.deep.eq([
         player.address,
         other.address,

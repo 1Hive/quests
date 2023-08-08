@@ -33,7 +33,7 @@ contract Quest is IExecutable {
     event QuestClaimed(bytes evidence, address player, uint256 amount);
     event QuestPlayed(address player, uint256 timestamp);
     event QuestUnplayed(address player, uint256 timestamp);
-    event WhiteListChanged(address[] whiteListPlayers, uint256 timestamp);
+    event QuestWhiteListChanged(address[] whiteListPlayers, uint256 timestamp);
     modifier OnlyCreator() {
         require(
             msg.sender == questCreator,
@@ -199,13 +199,21 @@ contract Quest is IExecutable {
         emit QuestPlayed(_player, block.timestamp);
     }
 
+    /***
+     * Set the white list of players allowed to play the quest.
+     * 
+     * requires sender to be the quest creator
+     * @param _players The list of players allowed to play the quest.
+     * 
+     * emit QuestWhiteListChanged with players and timestamp
+     */
     function setWhiteList(address[] memory _players) external OnlyCreator {
         require(
             isWhiteList == true,
             "ERROR: Can't set the white list to a non-whitelisted contract"
         );
         playerList = _players;
-        emit WhiteListChanged(_players, block.timestamp);
+        emit QuestWhiteListChanged(_players, block.timestamp);
     }
 
     /**

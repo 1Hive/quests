@@ -1,5 +1,5 @@
 {
-    "address": "0xC561b3ed53Ec7cF6ed6047F410D8Aa0dA90fB69A",
+    "address": "0x76E25d5bEBbaA5618Ab45E61918aDC45c8725C09",
     "abi": [
         {
             "inputs": [
@@ -172,7 +172,7 @@
                     "type": "uint256"
                 }
             ],
-            "name": "WhiteListChanged",
+            "name": "QuestWhiteListChanged",
             "type": "event"
         },
         {

@@ -15,7 +15,7 @@
         - name: QuestFactory
           file: ./abis/QuestFactory.proxy.json
       eventHandlers:
-        - event: QuestCreated(address,string,bytes,address,uint256,address,[address,uint256],[address,uint256],address,uint32,bool,uint256)
+        - event: QuestCreated(address,string,bytes,address,uint256,address,(address,uint256),(address,uint256),address,uint32,bool,uint256)
           handler: handleQuestCreated
         - event: CreateDepositChanged(uint256,address,uint256)
           handler: handleCreateDepositChanged
@@ -46,4 +46,6 @@
           handler: handleQuestPlayed
         - event: QuestUnplayed(address,uint256)
           handler: handleQuestUnplayed
+        - event: QuestWhiteListChanged(address[],uint256)
+          handler: handleQuestWhiteListChanged
       file: ./src/mappings/quest-factory.proxy.ts

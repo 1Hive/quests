@@ -12,9 +12,29 @@
                 "type": "bytes"
             },
             {
+                "internalType": "contract IERC20",
+                "name": "_rewardToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_expireTime",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_aragonGovernAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address payable",
+                "name": "_fundsRecoveryAddress",
+                "type": "address"
+            },
+            {
                 "components": [
                     {
-                        "internalType": "contract IERC20Upgradeable",
+                        "internalType": "contract IERC20",
                         "name": "token",
                         "type": "address"
                     },
@@ -31,7 +51,7 @@
             {
                 "components": [
                     {
-                        "internalType": "contract IERC20Upgradeable",
+                        "internalType": "contract IERC20",
                         "name": "token",
                         "type": "address"
                     },
@@ -46,46 +66,14 @@
                 "type": "tuple"
             },
             {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "questCreator",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint32",
-                        "name": "maxPlayers",
-                        "type": "uint32"
-                    },
-                    {
-                        "internalType": "contract IERC20Upgradeable",
-                        "name": "rewardToken",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "expireTime",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "aragonGovernAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address payable",
-                        "name": "fundsRecoveryAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "isWhiteList",
-                        "type": "bool"
-                    }
-                ],
-                "internalType": "struct Models.QuestParam",
-                "name": "_questParam",
-                "type": "tuple"
+                "internalType": "address",
+                "name": "_questCreator",
+                "type": "address"
+            },
+            {
+                "internalType": "uint32",
+                "name": "_maxPlayers",
+                "type": "uint32"
             }
         ],
         "stateMutability": "nonpayable",
@@ -152,25 +140,6 @@
             }
         ],
         "name": "QuestUnplayed",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "whiteListPlayers",
-                "type": "address[]"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "timestamp",
-                "type": "uint256"
-            }
-        ],
-        "name": "QuestWhiteListChanged",
         "type": "event"
     },
     {
@@ -267,7 +236,7 @@
         "name": "createDeposit",
         "outputs": [
             {
-                "internalType": "contract IERC20Upgradeable",
+                "internalType": "contract IERC20",
                 "name": "token",
                 "type": "address"
             },
@@ -334,19 +303,6 @@
     },
     {
         "inputs": [],
-        "name": "isWhiteList",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "maxPlayers",
         "outputs": [
             {
@@ -376,7 +332,7 @@
         "name": "playDeposit",
         "outputs": [
             {
-                "internalType": "contract IERC20Upgradeable",
+                "internalType": "contract IERC20",
                 "name": "token",
                 "type": "address"
             },
@@ -440,25 +396,12 @@
         "name": "rewardToken",
         "outputs": [
             {
-                "internalType": "contract IERC20Upgradeable",
+                "internalType": "contract IERC20",
                 "name": "",
                 "type": "address"
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address[]",
-                "name": "_players",
-                "type": "address[]"
-            }
-        ],
-        "name": "setWhiteList",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

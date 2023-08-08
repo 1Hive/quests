@@ -11,17 +11,6 @@ import { Bytes, ipfs } from "@graphprotocol/graph-ts";
 import { json } from "@graphprotocol/graph-ts";
 import { QuestClaimed } from "../../generated/QuestFactory-Quest/Quest";
 
-export function handleDepositChanged(event: DepositChanged): void {
-  let depositEntity = new CreateDepositEntity(
-    `Create_${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
-  );
-
-  depositEntity.timestamp = event.params.timestamp;
-  depositEntity.depositToken = event.params.token;
-  depositEntity.depositAmount = event.params.amount;
-
-  depositEntity.save();
-}
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
@@ -86,4 +75,16 @@ export function handleQuestClaimed(event: QuestClaimed): void {
   questClaimEntity.evidenceIpfsHash = event.params.evidence;
   questClaimEntity.player = event.params.player.toHexString();
   questClaimEntity.save();
+}
+
+export function handleDepositChanged(event: DepositChanged): void {
+  let depositEntity = new CreateDepositEntity(
+    `Create_${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
+  );
+
+  depositEntity.timestamp = event.params.timestamp;
+  depositEntity.depositToken = event.params.token;
+  depositEntity.depositAmount = event.params.amount;
+
+  depositEntity.save();
 }

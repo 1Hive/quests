@@ -174,13 +174,13 @@ interface QuestInterface extends ethers.utils.Interface {
     "QuestClaimed(bytes,address,uint256)": EventFragment;
     "QuestPlayed(address,uint256)": EventFragment;
     "QuestUnplayed(address,uint256)": EventFragment;
-    "WhiteListChanged(address[],uint256)": EventFragment;
+    "QuestWhiteListChanged(address[],uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "QuestClaimed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "QuestPlayed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "QuestUnplayed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "WhiteListChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "QuestWhiteListChanged"): EventFragment;
 }
 
 export class Quest extends Contract {
@@ -607,7 +607,7 @@ export class Quest extends Contract {
 
     QuestUnplayed(player: null, timestamp: null): EventFilter;
 
-    WhiteListChanged(whiteListPlayers: null, timestamp: null): EventFilter;
+    QuestWhiteListChanged(whiteListPlayers: null, timestamp: null): EventFilter;
   };
 
   estimateGas: {
