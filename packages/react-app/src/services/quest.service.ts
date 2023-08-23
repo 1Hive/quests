@@ -96,7 +96,7 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
       maxPlayers: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers : undefined, // If null put undefined
       unlimited: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers === 0 : undefined,
-      isWhitelist: false,
+      isWhitelist: questEntity.isWhitelist,
       status: QuestStatus.Active,
       players: questEntity.questPlayers ?? [],
       governAddress: toChecksumAddress(questEntity.questGovernAddress),
@@ -602,6 +602,7 @@ export async function saveQuest(
     questExpireTimeUtcSec,
     fallbackAddress,
     data.maxPlayers,
+    data.isWhitelist,
     {
       // gasLimit: 10000000,
     },
@@ -612,6 +613,16 @@ export async function saveQuest(
 // #endregion
 
 // #region Quest
+
+export async function setWhitelist(
+  walletAddress: string,
+  players: string[],
+  questAddress: string,
+  onTx?: onTxCallback,
+) {
+  const tx = await getQuestContract({ address: questAddress }, walletAddress).setWhiteList(players);
+  return handleTransaction(tx, onTx);
+}
 
 export async function recoverFundsAndDeposit(
   walletAddress: string,

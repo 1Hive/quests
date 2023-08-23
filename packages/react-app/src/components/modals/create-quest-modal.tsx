@@ -236,6 +236,7 @@ export default function QuestModal({
             creatorAddress: walletAddress,
             rewardToken: values.bounty!.token,
             maxPlayers: values.unlimited ? 0 : values.maxPlayers,
+            isWhitelist: values.isWhitelist,
           },
           undefined,
           (txHash) => {
@@ -273,6 +274,28 @@ export default function QuestModal({
 
         if (isMountedRef.current) {
           setQuestDataState(emptyQuestData);
+        }
+
+        if (values.isWhitelist && values.players?.length) {
+          let whitelistTxPayload: TransactionModel = {
+            modalId,
+            message: `Setting whitelisted players...`,
+            status: TransactionStatus.WaitingForSignature,
+            type: TransactionType.QuestSetWhitelist,
+          };
+          setTransaction(whitelistTxPayload);
+          await QuestService.setWhitelist(
+            walletAddress,
+            values.players,
+            newQuestAddress,
+            (txHash) => {
+              whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
+              setTransaction({
+                ...whitelistTxPayload,
+                status: TransactionStatus.Pending,
+              });
+            },
+          );
         }
       } catch (e: any) {
         setTransaction(
