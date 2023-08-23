@@ -129,7 +129,8 @@ export default function PlayerListModal({
                   : 'View Player List'
               }
               mode="strong"
-              title="Player List"
+              title={!isEdit && !players.length ? 'No players' : 'View players'}
+              disabled={!isEdit && !players.length}
             />
           </OpenButtonWrapperStyled>
         }

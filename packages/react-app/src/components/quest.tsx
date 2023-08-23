@@ -462,16 +462,15 @@ export default function Quest({
                   <>
                     {((players.length > 0 && !isSummary) ||
                       walletAddress === questData.creatorAddress) && (
-                      // <PlayersModalWrapperStyled>
                       <PlayerListModal
                         questData={questData}
-                        isEdit={walletAddress === questData.creatorAddress}
+                        isEdit={walletAddress === questData.creatorAddress && questData.isWhitelist}
                       />
                     )}
-                    {/* </PlayersModalWrapperStyled> */}
+
                     <FundModal quest={questData} />
                     {(((!isPlayingQuest || questData.creatorAddress === walletAddress) &&
-                      questData.isWhitelist) ||
+                      !questData.isWhitelist) ||
                       (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
                       questData.features?.playableQuest && (
                         <PlayModal
