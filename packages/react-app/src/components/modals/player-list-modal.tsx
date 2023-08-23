@@ -6,6 +6,12 @@ import { useMemo, useState } from 'react';
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
 import { setWhitelist } from 'src/services/quest.service';
+import { TransactionStatus } from 'src/enums/transaction-status.enum';
+import { TransactionType } from 'src/enums/transaction-type.enum';
+import { TransactionModel } from 'src/models/transaction.model';
+import { QuestModel } from 'src/models/quest.model';
+import { useTransactionContext } from 'src/contexts/transaction.context';
+import { useWallet } from 'src/contexts/wallet.context';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
@@ -46,15 +52,23 @@ const AddWrapperStyled = styled.div`
 // #endregion
 
 type Props = {
-  playerList: string[] | undefined;
+  questData: QuestModel;
   isEdit: boolean;
   onClose?: ModalCallback;
+  onSubmit?: Function;
 };
 
-export default function PlayerListModal({ playerList, isEdit, onClose = noop }: Props) {
+export default function PlayerListModal({
+  questData,
+  isEdit,
+  onClose = noop,
+  onSubmit = noop,
+}: Props) {
   const [opened, setOpened] = useState(false);
-  const [players, setPlayers] = useState<string[]>(playerList ?? ['']);
+  const [players, setPlayers] = useState<string[]>(questData.players ?? ['']);
   const modalId = useMemo(() => uniqueId('whitelist-modal'), []);
+  const { setTransaction } = useTransactionContext();
+  const { walletAddress } = useWallet();
 
   const onModalClosed = (success: boolean) => {
     setOpened(false);
@@ -79,7 +93,25 @@ export default function PlayerListModal({ playerList, isEdit, onClose = noop }: 
     setPlayers(newList);
   };
 
-  const onWhitelistSubmit = () => {};
+  const onWhitelistSubmit = async () => {
+    if (players.length) {
+      let whitelistTxPayload: TransactionModel = {
+        modalId,
+        message: `Setting whitelisted players...`,
+        status: TransactionStatus.WaitingForSignature,
+        type: TransactionType.QuestSetWhitelist,
+      };
+      setTransaction(whitelistTxPayload);
+      await setWhitelist(walletAddress, players, questData.address!, (txHash) => {
+        whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
+        setTransaction({
+          ...whitelistTxPayload,
+          status: TransactionStatus.Pending,
+        });
+      });
+    }
+  };
+
   return (
     <>
       <ModalBase
@@ -120,7 +152,12 @@ export default function PlayerListModal({ playerList, isEdit, onClose = noop }: 
           {isEdit && (
             <AddWrapperStyled>
               <Button icon={<IconPlus />} label="Add" onClick={() => addPlayerToWhitelist()} />
-              <Button icon={<IconCheck />} onClick={() => onWhitelistSubmit()} />
+              <Button
+                icon={<IconPlus />}
+                label="Confirm list"
+                mode="strong"
+                onClick={() => onWhitelistSubmit()}
+              />
             </AddWrapperStyled>
           )}
         </Outset>
