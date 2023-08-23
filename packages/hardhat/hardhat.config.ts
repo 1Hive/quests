@@ -804,32 +804,6 @@ task("newQuestFactory:gnosis")
     "Address of the govern",
     governGnosis.address
   )
-  .addOptionalParam(
-    "initialOwner",
-    "Initial owner of the QuestFactory (will be able to change deposits)"
-  )
-  .addOptionalParam(
-    "createDepositToken",
-    "Address of the create quest deposit (default is HNY)",
-    defaultConfig.CreateQuestDeposit.xdai.token
-  )
-  .addOptionalParam(
-    "createDepositAmount",
-    "Amount of the quest create deposit token",
-    defaultConfig.CreateQuestDeposit.xdai.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "playDepositToken",
-    "Address of the play quest deposit (default is HNY)",
-    defaultConfig.PlayQuestDeposit.xdai.token
-  )
-  .addOptionalParam(
-    "playDepositAmount",
-    "Amount of the quest play deposit token",
-    defaultConfig.PlayQuestDeposit.xdai.amount,
-    types.float
-  )
   .setAction(async (args, hre) => {
     console.log("Starting by deploying the Quest template...");
     await hre.run("newQuest");
@@ -849,33 +823,6 @@ task("newQuestFactory:goerli")
     "governAddress",
     "Address of the govern",
     "0xe43217F71e496475660a3391FFbD1367e354e002"
-  )
-  .addOptionalParam(
-    "initialOwner",
-    "Initial owner of the QuestFactory (will be able to change deposits)",
-    defaultConfig.RootOwner.goerli
-  )
-  .addOptionalParam(
-    "createDepositToken",
-    "Address of the create quest deposit",
-    defaultConfig.CreateQuestDeposit.goerli.token
-  )
-  .addOptionalParam(
-    "createDepositAmount",
-    "Address of the govern",
-    defaultConfig.CreateQuestDeposit.goerli.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "playDepositToken",
-    "Address of the play quest deposit",
-    defaultConfig.PlayQuestDeposit.goerli.token
-  )
-  .addOptionalParam(
-    "playDepositAmount",
-    "Address of the govern",
-    defaultConfig.PlayQuestDeposit.goerli.amount,
-    types.float
   )
   .setAction(async (args, hre) => {
     console.log("Starting by deploying the Quest template...");

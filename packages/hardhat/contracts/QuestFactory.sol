@@ -45,21 +45,9 @@ contract QuestFactory is OwnableUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(
-        address _aragonGovernAddress,
-        IERC20Upgradeable _createDepositToken,
-        uint256 _createDepositAmount,
-        IERC20Upgradeable _playDepositToken,
-        uint256 _playDepositAmount,
-        address _initialOwner
-    ) public initializer {
+    function initialize(address _aragonGovernAddress) public initializer {
         __Ownable_init();
         aragonGovernAddress = _aragonGovernAddress;
-        setCreateDeposit(_createDepositToken, _createDepositAmount);
-        setPlayDeposit(_playDepositToken, _playDepositAmount);
-        if (_initialOwner != msg.sender) {
-            transferOwnership(_initialOwner);
-        }
     }
 
     /*

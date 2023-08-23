@@ -620,7 +620,12 @@ export async function setWhitelist(
   questAddress: string,
   onTx?: onTxCallback,
 ) {
-  const tx = await getQuestContract({ address: questAddress }, walletAddress).setWhiteList(players);
+  const tx = await getQuestContract({ address: questAddress }, walletAddress).setWhiteList(
+    players,
+    {
+      // gasLimit: 10000000,
+    },
+  );
   return handleTransaction(tx, onTx);
 }
 
