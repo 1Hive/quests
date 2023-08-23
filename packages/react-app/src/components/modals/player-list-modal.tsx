@@ -12,9 +12,11 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { QuestModel } from 'src/models/quest.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
+import { toChecksumAddress } from 'web3-utils';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
+import { FieldInput } from '../field-input/field-input';
 
 // #region StyledComponents
 
@@ -34,6 +36,7 @@ const OpenButtonWrapperStyled = styled.div`
 `;
 
 const PlayerWrapperStyled = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
@@ -69,12 +72,13 @@ export default function PlayerListModal({
   const modalId = useMemo(() => uniqueId('whitelist-modal'), []);
   const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
+  const [error, setError] = useState<string>();
 
   const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
   };
-  //
+
   const onChange = (value: string, index: number) => {
     const newList = [...players];
     newList[index] = value;
@@ -94,28 +98,35 @@ export default function PlayerListModal({
   };
 
   const onWhitelistSubmit = async () => {
-    if (players.length) {
-      let whitelistTxPayload: TransactionModel = {
-        modalId,
-        message: `Setting whitelisted players...`,
-        status: TransactionStatus.WaitingForSignature,
-        type: TransactionType.QuestSetWhitelist,
-      };
-      setTransaction(whitelistTxPayload);
-      const receipt = await setWhitelist(walletAddress, players, questData.address!, (txHash) => {
-        whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
-        setTransaction({
-          ...whitelistTxPayload,
-          status: TransactionStatus.Pending,
-        });
+    if (questData.isWhitelist) {
+      players.forEach((player) => {
+        try {
+          toChecksumAddress(player);
+        } catch {
+          setError('One of the player address is not valid');
+        }
       });
+    }
+    let whitelistTxPayload: TransactionModel = {
+      modalId,
+      message: `Updating the quest players...`,
+      status: TransactionStatus.WaitingForSignature,
+      type: TransactionType.QuestSetWhitelist,
+    };
+    setTransaction(whitelistTxPayload);
+    const receipt = await setWhitelist(walletAddress, players, questData.address!, (txHash) => {
+      whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
       setTransaction({
         ...whitelistTxPayload,
-        status: receipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
-        args: { questAddress: questData.address, players },
+        status: TransactionStatus.Pending,
       });
-      onSubmit();
-    }
+    });
+    setTransaction({
+      ...whitelistTxPayload,
+      status: receipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
+      args: { questAddress: questData.address, players },
+    });
+    onSubmit();
   };
 
   return (
@@ -144,21 +155,22 @@ export default function PlayerListModal({
         size="small"
       >
         <Outset gu16>
-          {players.map((player, i) => (
-            <PlayerWrapperStyled>
-              <AddressFieldInput
-                id={`players[${i}]`}
-                label={`Player #${i + 1}`}
-                isEdit={isEdit}
-                value={player}
-                onChange={(e: any) => onChange(e.target.value, i)}
-                wide
-              />
-              {isEdit && (
-                <Button icon={<IconCross />} onClick={() => removePlayerFromWhitelist(i)} />
-              )}
-            </PlayerWrapperStyled>
-          ))}
+          <FieldInput label="Players" error={error} direction="column" wide align="flex-start">
+            {players.map((player, i) => (
+              <PlayerWrapperStyled>
+                <AddressFieldInput
+                  id={`players[${i}]`}
+                  isEdit={isEdit}
+                  value={player}
+                  onChange={(e: any) => onChange(e.target.value, i)}
+                  wide
+                />
+                {isEdit && (
+                  <Button icon={<IconCross />} onClick={() => removePlayerFromWhitelist(i)} />
+                )}
+              </PlayerWrapperStyled>
+            ))}
+          </FieldInput>
 
           {isEdit && (
             <AddWrapperStyled>
