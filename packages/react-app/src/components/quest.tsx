@@ -75,7 +75,7 @@ const PlayersWrapperStyled = styled.div`
 `;
 
 const PlayersModalWrapperStyled = styled.div`
-  margin-left: ${GUpx(3)};
+  /* margin-left: ${GUpx(3)}; */
 `;
 
 const QuestFooterStyled = styled.div`
@@ -363,14 +363,14 @@ export default function Quest({
                   isLoading={isLoading || !questData}
                   value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
                 />
-                {players.length > 0 && !isSummary && (
+                {/* {players.length > 0 && !isSummary && (
                   <PlayersModalWrapperStyled>
                     <PlayerListModal
                       playerList={players}
                       isEdit={walletAddress === questData.creatorAddress}
                     />
                   </PlayersModalWrapperStyled>
-                )}
+                )} */}
               </PlayersWrapperStyled>
             )}
             <DateFieldInput
@@ -472,6 +472,15 @@ export default function Quest({
               {walletConnected ? (
                 <>
                   <>
+                    {((players.length > 0 && !isSummary) ||
+                      walletAddress === questData.creatorAddress) && (
+                      // <PlayersModalWrapperStyled>
+                      <PlayerListModal
+                        playerList={players}
+                        isEdit={walletAddress === questData.creatorAddress}
+                      />
+                    )}
+                    {/* </PlayersModalWrapperStyled> */}
                     <FundModal quest={questData} />
                     {(!isPlayingQuest ||
                       questData.creatorAddress === walletAddress ||

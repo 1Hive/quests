@@ -205,6 +205,9 @@ export default function QuestModal({
   };
 
   const onQuestSubmit = async (values: QuestModel) => {
+    const totalTransactionSteps =
+      (values.bounty?.parsedAmount ? 1 : 0) + (values.players ? 1 : 0) + 2;
+
     validate(values); // Validate one last time before submitting
     if (isFormValid) {
       if (!questDeposit?.token) throw new Error('Quest deposit token is not set');
@@ -213,7 +216,7 @@ export default function QuestModal({
         modalId,
         questDeposit?.token,
         questFactoryAddress,
-        `Approving quest deposit (1/${values.bounty?.parsedAmount ? '3' : '2'})`,
+        `Approving quest deposit (1/${totalTransactionSteps})`,
         walletAddress,
         setTransaction,
       );
@@ -222,7 +225,7 @@ export default function QuestModal({
       try {
         let txPayload: TransactionModel = {
           modalId,
-          message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
+          message: `Creating Quest (2/${values.bounty?.parsedAmount ? '4' : '3'})`,
           status: TransactionStatus.WaitingForSignature,
           type: TransactionType.QuestCreate,
         };
@@ -266,7 +269,7 @@ export default function QuestModal({
             modalId,
             values.bounty,
             newQuestAddress,
-            `Sending funds to the Quest (3/3)`,
+            `Sending funds to the Quest (3/${totalTransactionSteps})`,
             walletAddress,
             setTransaction,
           );

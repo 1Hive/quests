@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { GUpx } from 'src/utils/style.util';
 import styled from 'styled-components';
-// import * as QuestService from '../../services/quest.service';
+import { setWhitelist } from 'src/services/quest.service';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
@@ -13,7 +13,7 @@ import ModalBase, { ModalCallback } from './modal-base';
 // #region StyledComponents
 
 const OpenButtonStyled = styled(Button)`
-  margin: ${GUpx(1)};
+  margin: 0 ${GUpx(1)};
   width: fit-content;
 
   &,
@@ -78,6 +78,8 @@ export default function PlayerListModal({ playerList, isEdit, onClose = noop }: 
     newList.splice(index, 1);
     setPlayers(newList);
   };
+
+  const onWhitelistSubmit = () => {};
   return (
     <>
       <ModalBase
@@ -118,6 +120,7 @@ export default function PlayerListModal({ playerList, isEdit, onClose = noop }: 
           {isEdit && (
             <AddWrapperStyled>
               <Button icon={<IconPlus />} label="Add" onClick={() => addPlayerToWhitelist()} />
+              <Button icon={<IconCheck />} onClick={() => onWhitelistSubmit()} />
             </AddWrapperStyled>
           )}
         </Outset>

@@ -54,7 +54,8 @@ function getContract(
     let askedContract = contracts[contractName];
     if (Array.isArray(askedContract) && askedContract.length) {
       if (abiIndex) {
-        askedContract = askedContract[abiIndex ?? askedContract.length - 1];
+        // If no contract address override, use the last one
+        askedContract = askedContract[abiIndex];
       } else if (contractAddressOverride) {
         askedContract = askedContract.find(
           (c) => c.address.toLowerCase() === contractAddressOverride.toLowerCase(),
