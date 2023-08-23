@@ -109,6 +109,7 @@ export default function PlayerListModal({
           status: TransactionStatus.Pending,
         });
       });
+      onSubmit();
     }
   };
 
@@ -122,7 +123,11 @@ export default function PlayerListModal({
             <OpenButtonStyled
               onClick={() => setOpened(true)}
               icon={<IconGroup />}
-              label="View Player List"
+              label={
+                walletAddress === questData.creatorAddress && questData.isWhitelist
+                  ? 'Edit Player List'
+                  : 'View Player List'
+              }
               mode="strong"
               title="Player List"
             />
