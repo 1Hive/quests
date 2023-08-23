@@ -74,10 +74,6 @@ const PlayersWrapperStyled = styled.div`
   align-items: center;
 `;
 
-const PlayersModalWrapperStyled = styled.div`
-  /* margin-left: ${GUpx(3)}; */
-`;
-
 const QuestFooterStyled = styled.div`
   width: 100%;
   text-align: right;
@@ -255,7 +251,7 @@ export default function Quest({
         if (!depositReleased && questData.createDeposit) {
           depositLocked.push(questData.createDeposit);
         }
-        if (players.length && questData.playDeposit) {
+        if (players.length && questData.playDeposit && !questData.isWhitelist) {
           // Multiply by the number of players (each one has a deposit locked)
           questData.playDeposit.amount = questData.playDeposit.amount.mul(players.length);
           depositLocked.push(questData.playDeposit);
@@ -363,14 +359,6 @@ export default function Quest({
                   isLoading={isLoading || !questData}
                   value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
                 />
-                {/* {players.length > 0 && !isSummary && (
-                  <PlayersModalWrapperStyled>
-                    <PlayerListModal
-                      playerList={players}
-                      isEdit={walletAddress === questData.creatorAddress}
-                    />
-                  </PlayersModalWrapperStyled>
-                )} */}
               </PlayersWrapperStyled>
             )}
             <DateFieldInput

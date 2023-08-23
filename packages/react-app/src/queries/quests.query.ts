@@ -29,6 +29,7 @@ const QuestEntityQuery = gql`
       questFundsRecoveryAddress
       questMaxPlayers
       questPlayers
+      questIsWhiteListed
     }
   }
 `;
