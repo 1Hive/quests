@@ -102,12 +102,17 @@ export default function PlayerListModal({
         type: TransactionType.QuestSetWhitelist,
       };
       setTransaction(whitelistTxPayload);
-      await setWhitelist(walletAddress, players, questData.address!, (txHash) => {
+      const receipt = await setWhitelist(walletAddress, players, questData.address!, (txHash) => {
         whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
         setTransaction({
           ...whitelistTxPayload,
           status: TransactionStatus.Pending,
         });
+      });
+      setTransaction({
+        ...whitelistTxPayload,
+        status: receipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
+        args: { questAddress: questData.address, players },
       });
       onSubmit();
     }

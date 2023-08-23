@@ -194,13 +194,20 @@ export default function Quest({
       if (transaction?.status === TransactionStatus.Confirmed) {
         switch (transaction?.type) {
           case TransactionType.QuestPlay:
-            if (transaction.args?.player) {
-              setPlayers((prev) => [...prev, transaction.args!.player!]);
+            if (transaction.args?.players?.length) {
+              setPlayers((prev) => [...prev, transaction.args!.players![0]]);
             }
             break;
           case TransactionType.QuestUnplay:
-            if (transaction.args?.player) {
-              setPlayers((prev) => prev?.filter((_player) => _player !== transaction.args!.player));
+            if (transaction.args?.players?.length) {
+              setPlayers((prev) =>
+                prev?.filter((_player) => _player !== transaction.args!.players![0]),
+              );
+            }
+            break;
+          case TransactionType.QuestSetWhitelist:
+            if (transaction.args?.players) {
+              setPlayers(transaction.args?.players);
             }
             break;
           case TransactionType.ClaimChallengeResolve:
@@ -462,13 +469,11 @@ export default function Quest({
                   <>
                     {((players.length > 0 && !isSummary) ||
                       walletAddress === questData.creatorAddress) && (
-                      // <PlayersModalWrapperStyled>
                       <PlayerListModal
                         questData={questData}
                         isEdit={walletAddress === questData.creatorAddress}
                       />
                     )}
-                    {/* </PlayersModalWrapperStyled> */}
                     <FundModal quest={questData} />
                     {(((!isPlayingQuest || questData.creatorAddress === walletAddress) &&
                       questData.isWhitelist) ||
