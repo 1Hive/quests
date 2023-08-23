@@ -464,14 +464,14 @@ export default function Quest({
                       walletAddress === questData.creatorAddress) && (
                       // <PlayersModalWrapperStyled>
                       <PlayerListModal
-                        playerList={players}
+                        questData={questData}
                         isEdit={walletAddress === questData.creatorAddress}
                       />
                     )}
                     {/* </PlayersModalWrapperStyled> */}
                     <FundModal quest={questData} />
-                    {(!isPlayingQuest ||
-                      questData.creatorAddress === walletAddress ||
+                    {(((!isPlayingQuest || questData.creatorAddress === walletAddress) &&
+                      questData.isWhitelist) ||
                       (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
                       questData.features?.playableQuest && (
                         <PlayModal
@@ -479,8 +479,8 @@ export default function Quest({
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {(isPlayingQuest ||
-                      questData.creatorAddress === walletAddress ||
+                    {(((isPlayingQuest || questData.creatorAddress === walletAddress) &&
+                      questData.isWhitelist) ||
                       (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
                       questData.features.playableQuest &&
                       questData.players?.length !== 0 && (
