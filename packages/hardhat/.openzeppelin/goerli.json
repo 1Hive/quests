@@ -335,6 +335,128 @@
             "label": "createDeposit",
             "offset": 0,
             "slot": "102",
+            "type": "t_struct(Deposit)2534_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:16"
+          },
+          {
+            "label": "playDeposit",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_struct(Deposit)2534_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:17"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)378": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_struct(Deposit)2534_storage": {
+            "label": "struct Models.Deposit",
+            "members": [
+              {
+                "label": "token",
+                "type": "t_contract(IERC20Upgradeable)378",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "de52b0ea94600e22bb1a04240f6f598b21211a05d4828563b15fc5a57f57de0a": {
+      "address": "0x9f2FD32105e18E9047E0C110D8De2bd8442eCe51",
+      "txHash": "0x7c0402440a6035002c44f30978473f022ca57da789cb208d77ab22fefc9f62ab",
+      "layout": {
+        "solcVersion": "0.8.2",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "aragonGovernAddress",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:15"
+          },
+          {
+            "label": "createDeposit",
+            "offset": 0,
+            "slot": "102",
             "type": "t_struct(Deposit)3246_storage",
             "contract": "QuestFactory",
             "src": "contracts\\QuestFactory.sol:16"

@@ -32,7 +32,6 @@ export const buildQuestFactoryConstructorArguments = async ({
 export default async (
   {
     getNamedAccounts,
-    deployments,
     ethers,
     network,
     run,
@@ -40,10 +39,6 @@ export default async (
   }: HardhatRuntimeEnvironment,
   args?: {
     governAddress: string;
-    createDepositToken: string;
-    createDepositAmount: number;
-    playDepositToken: string;
-    playDepositAmount: number;
   }
 ) => {
   const constructorArguments = await buildQuestFactoryConstructorArguments({
