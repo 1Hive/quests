@@ -11,6 +11,7 @@ export type TransactionModel = {
     containerId?: string;
     disputeState?: number;
     player?: string;
+    players?: string;
   };
   type: TransactionType;
 };

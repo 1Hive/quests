@@ -198,6 +198,17 @@ export default function QuestModal({
 
     if (data.expireTime.getTime() < Date.now())
       errors.expireTime = 'Expiration have to be later than now';
+
+    if (data.isWhitelist && data.players?.length) {
+      data.players.forEach((player) => {
+        try {
+          toChecksumAddress(player);
+        } catch (error) {
+          errors.players = 'One of the player address is not valid';
+        }
+      });
+    }
+
     debounceSave(data);
 
     setIsFormValid(Object.keys(errors).length === 0);
@@ -282,7 +293,7 @@ export default function QuestModal({
         if (values.isWhitelist && values.players?.length) {
           let whitelistTxPayload: TransactionModel = {
             modalId,
-            message: `Setting whitelisted players...`,
+            message: `Setting quest players (${totalTransactionSteps}/${totalTransactionSteps})`,
             status: TransactionStatus.WaitingForSignature,
             type: TransactionType.QuestSetWhitelist,
           };
@@ -299,6 +310,13 @@ export default function QuestModal({
               });
             },
           );
+          setTransaction({
+            ...txPayload,
+            status: txReceiptSaveQuest?.status
+              ? TransactionStatus.Confirmed
+              : TransactionStatus.Failed,
+            args: { questAddress: newQuestAddress, players: values.players },
+          });
         }
       } catch (e: any) {
         setTransaction(

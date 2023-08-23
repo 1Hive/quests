@@ -5,8 +5,10 @@ import { noop } from 'lodash-es';
 import { QuestModel } from 'src/models/quest.model';
 import React, { BaseSyntheticEvent } from 'react';
 import { AddressFieldInput } from './field-input/address-field-input';
+import { FieldInput } from './field-input/field-input';
 
-const PlayerWrapperStyled = styled.div`
+const AddressListWrapperStyled = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
@@ -49,7 +51,6 @@ export default function AddressListFieldInput({
   formikValues,
   setValuesFormik,
 }: Props) {
-  // const [addressList, setAddressList] = useState<string[]>(values);
   const addPlayerToWhitelist = () => {
     values!.push('');
     setValuesFormik?.(formikValues);
@@ -60,25 +61,30 @@ export default function AddressListFieldInput({
   };
 
   return (
-    <>
+    <FieldInput
+      id="players"
+      label="Players"
+      error={touched && error}
+      direction="column"
+      align="flex-start"
+      wide
+    >
       {formikValues ? (
         <>
           {values.map((player, i) => (
-            <PlayerWrapperStyled>
+            <AddressListWrapperStyled>
               <AddressFieldInput
                 id={`${id}[${i}]`}
-                label={`${label} #${i + 1}`}
                 isEdit={isEdit}
                 value={player}
                 onChange={onChange}
                 onBlur={onBlur}
                 wide
-                error={touched && error && touched[i] && error[i]}
               />
               {isEdit && (
                 <Button icon={<IconCross />} onClick={() => removePlayerFromWhitelist(i)} />
               )}
-            </PlayerWrapperStyled>
+            </AddressListWrapperStyled>
           ))}
 
           {isEdit && (
@@ -90,7 +96,7 @@ export default function AddressListFieldInput({
       ) : (
         <>
           {values.map((player, i) => (
-            <PlayerWrapperStyled>
+            <AddressListWrapperStyled>
               <AddressFieldInput
                 id={`${id}[${i}]`}
                 label={`${label} #${i + 1}`}
@@ -102,7 +108,7 @@ export default function AddressListFieldInput({
               {isEdit && (
                 <Button icon={<IconCross />} onClick={() => removePlayerFromWhitelist(i)} />
               )}
-            </PlayerWrapperStyled>
+            </AddressListWrapperStyled>
           ))}
 
           {isEdit && (
@@ -112,6 +118,6 @@ export default function AddressListFieldInput({
           )}
         </>
       )}
-    </>
+    </FieldInput>
   );
 }
