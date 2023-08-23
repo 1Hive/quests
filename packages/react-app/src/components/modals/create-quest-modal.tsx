@@ -236,7 +236,7 @@ export default function QuestModal({
       try {
         let txPayload: TransactionModel = {
           modalId,
-          message: `Creating Quest (2/${values.bounty?.parsedAmount ? '4' : '3'})`,
+          message: `Creating Quest (2/${totalTransactionSteps})`,
           status: TransactionStatus.WaitingForSignature,
           type: TransactionType.QuestCreate,
         };
