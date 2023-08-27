@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconPlus, IconCross, IconGroup } from '@1hive/1hive-ui';
+import { Button, IconPlus, IconCross, IconGroup, IconCheck } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useMemo, useState } from 'react';
 
@@ -50,6 +50,8 @@ const PlayerWrapperStyled = styled.div`
 
 const AddWrapperStyled = styled.div`
   display: flex;
+  justify-content: space-between;
+  padding-top: ${GUpx(1)};
 `;
 
 // #endregion
@@ -176,9 +178,9 @@ export default function PlayerListModal({
             <AddWrapperStyled>
               <Button icon={<IconPlus />} label="Add" onClick={() => addPlayerToWhitelist()} />
               <Button
-                icon={<IconPlus />}
+                icon={<IconCheck />}
                 label="Confirm list"
-                mode="strong"
+                mode="positive"
                 onClick={() => onWhitelistSubmit()}
               />
             </AddWrapperStyled>

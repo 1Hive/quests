@@ -258,7 +258,7 @@ export default function Quest({
         if (!depositReleased && questData.createDeposit) {
           depositLocked.push(questData.createDeposit);
         }
-        if (players.length && questData.playDeposit && !questData.isWhitelist) {
+        if (players.length && questData.playDeposit && questData.isWhitelist) {
           // Multiply by the number of players (each one has a deposit locked)
           questData.playDeposit.amount = questData.playDeposit.amount.mul(players.length);
           depositLocked.push(questData.playDeposit);
