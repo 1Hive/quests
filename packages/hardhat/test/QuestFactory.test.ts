@@ -44,32 +44,6 @@ describe("[Contract] QuestFactory", function () {
       .mint(owner.address, fromNumber(1000));
   });
 
-  it("SHOULD transfer ownership WHEN initialOwner is different than deployer", async function () {
-    // Arrange
-    const contractFactory = await ethers.getContractFactory(
-      "QuestFactory",
-      owner
-    );
-    // Act
-    const contract = (await upgrades.deployProxy(
-      contractFactory,
-      [
-        owner.address,
-        createDepositToken.address,
-        depositAmount,
-        playDepositToken.address,
-        depositAmount,
-        stranger.address,
-      ],
-      {
-        initializer: "initialize",
-      }
-    )) as QuestFactory;
-    await contract.deployed();
-    // Assert
-    expect(await contract.owner()).to.equal(stranger.address);
-  });
-
   describe("Methods", () => {
     beforeEach(async function () {
       const contractFactory = await ethers.getContractFactory(
@@ -78,18 +52,19 @@ describe("[Contract] QuestFactory", function () {
       );
       questFactoryContract = (await upgrades.deployProxy(
         contractFactory,
-        [
-          owner.address,
-          createDepositToken.address,
-          depositAmount,
-          playDepositToken.address,
-          depositAmount,
-          owner.address,
-        ],
+        [owner.address],
         {
           initializer: "initialize",
         }
       )) as QuestFactory;
+      questFactoryContract.setCreateDeposit(
+        createDepositToken.address,
+        depositAmount
+      );
+      questFactoryContract.setPlayDeposit(
+        playDepositToken.address,
+        depositAmount
+      );
       await questFactoryContract.deployed();
     });
 

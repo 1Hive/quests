@@ -1,5 +1,4 @@
 import { config as dotenvConfig } from "dotenv";
-import "solidity-coverage";
 import "hardhat-deploy";
 import fs from "fs";
 import chalk from "chalk";
@@ -9,6 +8,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-ethers";
 import "hardhat-typechain";
 import "typechain";
+import "solidity-coverage";
 import { task, HardhatUserConfig, types } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";

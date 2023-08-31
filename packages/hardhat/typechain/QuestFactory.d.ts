@@ -25,7 +25,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     "aragonGovernAddress()": FunctionFragment;
     "createDeposit()": FunctionFragment;
     "createQuest(string,bytes,address,uint256,address,uint32,bool)": FunctionFragment;
-    "initialize(address,address,uint256,address,uint256,address)": FunctionFragment;
+    "initialize(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "playDeposit()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -56,10 +56,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
       boolean
     ]
   ): string;
-  encodeFunctionData(
-    functionFragment: "initialize",
-    values: [string, string, BigNumberish, string, BigNumberish, string]
-  ): string;
+  encodeFunctionData(functionFragment: "initialize", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "playDeposit",
@@ -192,21 +189,11 @@ export class QuestFactory extends Contract {
 
     initialize(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,uint256,address,uint256,address)"(
+    "initialize(address)"(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -311,21 +298,11 @@ export class QuestFactory extends Contract {
 
   initialize(
     _aragonGovernAddress: string,
-    _createDepositToken: string,
-    _createDepositAmount: BigNumberish,
-    _playDepositToken: string,
-    _playDepositAmount: BigNumberish,
-    _initialOwner: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,uint256,address,uint256,address)"(
+  "initialize(address)"(
     _aragonGovernAddress: string,
-    _createDepositToken: string,
-    _createDepositAmount: BigNumberish,
-    _playDepositToken: string,
-    _playDepositAmount: BigNumberish,
-    _initialOwner: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -430,21 +407,11 @@ export class QuestFactory extends Contract {
 
     initialize(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,uint256,address,uint256,address)"(
+    "initialize(address)"(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -578,21 +545,11 @@ export class QuestFactory extends Contract {
 
     initialize(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "initialize(address,address,uint256,address,uint256,address)"(
+    "initialize(address)"(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -694,21 +651,11 @@ export class QuestFactory extends Contract {
 
     initialize(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,uint256,address,uint256,address)"(
+    "initialize(address)"(
       _aragonGovernAddress: string,
-      _createDepositToken: string,
-      _createDepositAmount: BigNumberish,
-      _playDepositToken: string,
-      _playDepositAmount: BigNumberish,
-      _initialOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
