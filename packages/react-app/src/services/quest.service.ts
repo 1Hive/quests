@@ -514,6 +514,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
     questPlayDepositToken: string;
     questPlayDepositAmount: string;
     questMaxPlayers: string;
+    questIsWhiteListed: string;
   }[];
   const funds = (
     await Promise.all(
@@ -526,7 +527,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
         ];
 
         // If max player is not null then the quest is playable
-        if (quest.questMaxPlayers) {
+        if (quest.questMaxPlayers && !quest.questIsWhiteListed) {
           const questPlayers = await getQuestContract({
             address: quest.questAddress,
             version: quest.version,

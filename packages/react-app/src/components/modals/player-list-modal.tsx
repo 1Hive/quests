@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconPlus, IconCross, IconGroup, IconCheck } from '@1hive/1hive-ui';
+import { Button, IconGroup, IconCheck } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useMemo, useState } from 'react';
 
@@ -13,10 +13,9 @@ import { QuestModel } from 'src/models/quest.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
-import { AddressFieldInput } from '../field-input/address-field-input';
 import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
-import { FieldInput } from '../field-input/field-input';
+import AddressListFieldInput from '../field-input/address-list-field-input';
 
 // #region StyledComponents
 
@@ -35,20 +34,7 @@ const OpenButtonWrapperStyled = styled.div`
   flex-direction: column;
 `;
 
-const PlayerWrapperStyled = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  max-width: 425px;
-  Button {
-    margin-bottom: ${GUpx(1)};
-    min-height: 45px;
-    border: none;
-  }
-`;
-
-const AddWrapperStyled = styled.div`
+const ConfirmWrapperStyled = styled.div`
   display: flex;
   justify-content: space-between;
   padding-top: ${GUpx(1)};
@@ -79,24 +65,6 @@ export default function PlayerListModal({
   const onModalClosed = (success: boolean) => {
     setOpened(false);
     onClose(success);
-  };
-
-  const onChange = (value: string, index: number) => {
-    const newList = [...players];
-    newList[index] = value;
-    setPlayers(newList);
-  };
-
-  const addPlayerToWhitelist = () => {
-    const newList = [...players];
-    newList.push('');
-    setPlayers(newList);
-  };
-
-  const removePlayerFromWhitelist = (index: number) => {
-    const newList = [...players];
-    newList.splice(index, 1);
-    setPlayers(newList);
   };
 
   const onWhitelistSubmit = async () => {
@@ -155,37 +123,27 @@ export default function PlayerListModal({
         onModalClosed={onModalClosed}
         isOpened={opened}
         size="small"
-      >
-        <Outset gu16>
-          <FieldInput label="Players" error={error} direction="column" wide align="flex-start">
-            {players.map((player, i) => (
-              <PlayerWrapperStyled>
-                <AddressFieldInput
-                  id={`players[${i}]`}
-                  isEdit={isEdit}
-                  value={player}
-                  onChange={(e: any) => onChange(e.target.value, i)}
-                  wide
-                />
-                {isEdit && (
-                  <Button icon={<IconCross />} onClick={() => removePlayerFromWhitelist(i)} />
-                )}
-              </PlayerWrapperStyled>
-            ))}
-          </FieldInput>
-
-          {isEdit && (
-            <AddWrapperStyled>
-              <Button icon={<IconPlus />} label="Add" onClick={() => addPlayerToWhitelist()} />
+        buttons={
+          isEdit && (
+            <ConfirmWrapperStyled>
               <Button
                 icon={<IconCheck />}
                 label="Confirm list"
                 mode="positive"
                 onClick={() => onWhitelistSubmit()}
               />
-            </AddWrapperStyled>
-          )}
-        </Outset>
+            </ConfirmWrapperStyled>
+          )
+        }
+      >
+        <AddressListFieldInput
+          label="Players"
+          id="players"
+          onChange={setPlayers}
+          isEdit={isEdit}
+          value={players}
+          error={error}
+        />
       </ModalBase>
     </>
   );

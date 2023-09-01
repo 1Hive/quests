@@ -32,7 +32,6 @@ import { isQuestExpired, processQuestState as computeQuestState } from '../servi
 import { StatusTag } from './status-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
-import NumberFieldInput from './field-input/number-field-input';
 import { ActionsPlaceholder } from './actions-placeholder';
 import PlayModal from './modals/play-modal';
 import OptoutModal from './modals/optout-modal';
@@ -258,7 +257,7 @@ export default function Quest({
         if (!depositReleased && questData.createDeposit) {
           depositLocked.push(questData.createDeposit);
         }
-        if (players.length && questData.playDeposit && questData.isWhitelist) {
+        if (players.length && questData.playDeposit && !questData.isWhitelist) {
           // Multiply by the number of players (each one has a deposit locked)
           questData.playDeposit.amount = questData.playDeposit.amount.mul(players.length);
           depositLocked.push(questData.playDeposit);
@@ -309,11 +308,14 @@ export default function Quest({
         </HighlightBlocker>
         {isSummary && (
           <>
-            <NumberFieldInput
-              value={questData?.activeClaimCount}
-              label="Claims"
-              isLoading={isLoading}
-            />
+            <PlayersWrapperStyled>
+              <TextFieldInput
+                id="players"
+                label="Players"
+                isLoading={isLoading || !questData}
+                value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+              />
+            </PlayersWrapperStyled>
             <DateFieldInput
               id="expireTime"
               label="Expire time"
@@ -358,16 +360,14 @@ export default function Quest({
               value={claimDeposit}
               isLoading={isLoading || !claimDeposit}
             />
-            {questData?.maxPlayers != null && (
-              <PlayersWrapperStyled>
-                <TextFieldInput
-                  id="players"
-                  label="Players"
-                  isLoading={isLoading || !questData}
-                  value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
-                />
-              </PlayersWrapperStyled>
-            )}
+            <PlayersWrapperStyled>
+              <TextFieldInput
+                id="players"
+                label="Players"
+                isLoading={isLoading || !questData}
+                value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+              />
+            </PlayersWrapperStyled>
             <DateFieldInput
               id="creationTime"
               label="Creation time"
