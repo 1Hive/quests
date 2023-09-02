@@ -967,6 +967,7 @@ describe("[Contract] Quest", function () {
   });
   describe("setWhiteList()", () => {
     it("SHOULD set the player list to the one in the parameters", async () => {
+      //Arrange
       const quest = await deployQuest(
         "fakeTitle",
         "0x",
@@ -983,9 +984,11 @@ describe("[Contract] Quest", function () {
         0,
         true
       );
+      //Act
       const act = () =>
         quest.connect(creator).setWhiteList([player.address, other.address]);
-      await expect(act()).to.emit(quest, "QuestWhiteListChanged");
+      //Assert
+        await expect(act()).to.emit(quest, "QuestWhiteListChanged");
       expect(await quest.getPlayers()).to.deep.eq([
         player.address,
         other.address,
@@ -993,7 +996,35 @@ describe("[Contract] Quest", function () {
       expect(await quest.canExecute(player.address)).to.eq(true);
       expect(await quest.canExecute(other.address)).to.eq(true);
     });
+    it("SHOULD revert if one or more players is already in list", async () => {
+      //Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epochNow + 3600, // in 1 hour
+        govern.address,
+        creator.address,
+        fromNumber(0),
+        createDepositToken,
+        depositAmount,
+        playDepositToken,
+        depositAmount,
+        creator,
+        0,
+        true
+      );
+      //Act
+      await quest.connect(creator).setWhiteList([player.address, other.address]);
+      const act = async () =>
+      await quest.connect(creator).setWhiteList([player.address]);
+      //Assert
+      await expect(act()).to.be.revertedWith(
+      "ERROR: One or more players is already in whitelist"
+    );
+    });
     it("SHOULD revert if it's not a whitelisted quest", async () => {
+      //Arrange
       const quest = await deployQuest(
         "fakeTitle",
         "0x",
@@ -1010,16 +1041,12 @@ describe("[Contract] Quest", function () {
         0,
         false
       );
-      // const act = () =>
-      //     quest
-      //       .connect(govern)
-      //       .claim(evidence, player.address, claimAmount, false);
-
-      //   // Assert
-      //   await expect(act()).to.be.revertedWith("ERROR: No evidence");
+      //Act
       const act = () =>
         quest.connect(creator).setWhiteList([player.address, other.address]);
-      await expect(act()).to.be.revertedWith(
+      
+      //Assert
+        await expect(act()).to.be.revertedWith(
         "ERROR: Can't set the white list to a non-whitelisted contract"
       );
     });

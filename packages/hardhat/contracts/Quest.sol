@@ -212,6 +212,18 @@ contract Quest is IExecutable {
             isWhiteList == true,
             "ERROR: Can't set the white list to a non-whitelisted contract"
         );
+        
+        bool playerInList = false;
+        
+        for(uint32 i =0;i<_players.length;i++){
+            
+            if(findIndexOfPlayer(_players[i])!=-1){
+                playerInList = true;
+            }
+        }
+
+        require(playerInList == false,"ERROR: One or more players is already in whitelist");
+        
         playerList = _players;
         emit QuestWhiteListChanged(_players, block.timestamp);
     }
