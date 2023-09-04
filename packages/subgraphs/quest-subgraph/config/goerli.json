@@ -1,17 +1,23 @@
 {
-  "network": "goerli",
-  "dataSources": [
-    {
-      "name": "QuestFactory",
-      "startBlock": 7543619,
-      "address": "0x4DfE6C03132BD14D95b87803e232AcA352a715b4",
-      "customTemplate": "questFactory"
-    },
-    {
-      "name": "QuestFactoryV2",
-      "startBlock": 8240344,
-      "address": "0xa6FEAF5CA07b6F367CF39a840F5A7E41d0AE613D",
-      "customTemplate": "questFactory.2"
-    }
-  ]
+    "network": "goerli",
+    "dataSources": [
+        {
+            "name": "QuestFactory",
+            "startBlock": 7543619,
+            "address": "0x4DfE6C03132BD14D95b87803e232AcA352a715b4",
+            "customTemplate": "questFactory"
+        },
+        {
+            "name": "QuestFactoryV2",
+            "startBlock": 8240344,
+            "address": "0xa6FEAF5CA07b6F367CF39a840F5A7E41d0AE613D",
+            "customTemplate": "questFactory.2"
+        },
+        {
+            "name": "QuestFactoryProxy",
+            "startBlock": 9564173,
+            "address": "0x05301D6787430d26bb0D6430Bd98a59B955a27D0",
+            "customTemplate": "questFactory.proxy"
+        }
+    ]
 }

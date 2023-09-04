@@ -20,7 +20,7 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface IERC20PermitInterface extends ethers.utils.Interface {
+interface IERC20PermitUpgradeableInterface extends ethers.utils.Interface {
   functions: {
     "DOMAIN_SEPARATOR()": FunctionFragment;
     "nonces(address)": FunctionFragment;
@@ -55,7 +55,7 @@ interface IERC20PermitInterface extends ethers.utils.Interface {
   events: {};
 }
 
-export class IERC20Permit extends Contract {
+export class IERC20PermitUpgradeable extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -66,7 +66,7 @@ export class IERC20Permit extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: IERC20PermitInterface;
+  interface: IERC20PermitUpgradeableInterface;
 
   functions: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;

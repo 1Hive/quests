@@ -1,4 +1,4 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { BigNumber, ContractTransaction } from "ethers";
 import { ethers } from "hardhat";
 import { Address } from "hardhat-deploy/dist/types";
@@ -21,19 +21,25 @@ export const deployQuest = async (
   playDepositToken: TokenMock,
   playDepositAmount: BigNumber,
   creator: SignerWithAddress,
-  maxPlayers: number = 0
+  maxPlayers: number = 0,
+  isWhiteList: boolean = false
 ) => {
   const quest = await new Quest__factory(creator).deploy(
     title,
     detailIpfsHash,
-    rewardToken.address,
-    expireTime,
-    aragonGovernAddress,
-    fundsRecoveryAddress,
+
     { token: createDepositToken.address, amount: createDepositAmount },
     { token: playDepositToken.address, amount: playDepositAmount },
-    creator.address,
-    maxPlayers
+
+    {
+      questCreator: creator.address,
+      maxPlayers: maxPlayers,
+      rewardToken: rewardToken.address,
+      expireTime: expireTime,
+      aragonGovernAddress: aragonGovernAddress,
+      fundsRecoveryAddress: fundsRecoveryAddress,
+      isWhiteList: isWhiteList,
+    }
   );
   await quest.deployed();
   await rewardToken.connect(quest.signer).mint(quest.address, initialBalance);

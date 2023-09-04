@@ -32,11 +32,11 @@ import { isQuestExpired, processQuestState as computeQuestState } from '../servi
 import { StatusTag } from './status-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
-import NumberFieldInput from './field-input/number-field-input';
 import { ActionsPlaceholder } from './actions-placeholder';
 import PlayModal from './modals/play-modal';
 import OptoutModal from './modals/optout-modal';
 import MarkdownFieldInput from './field-input/markdown-field-input';
+import PlayerListModal from './modals/player-list-modal';
 
 // #region StyledComponents
 
@@ -66,6 +66,11 @@ const CardStyled = styled(Card)<{ isSummary: boolean; highlight: boolean }>`
       }
       cursor: pointer;
     `}
+`;
+
+const PlayersWrapperStyled = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const QuestFooterStyled = styled.div`
@@ -137,6 +142,7 @@ export default function Quest({
     fallbackAddress: ADDRESS_ZERO,
     creatorAddress: ADDRESS_ZERO,
     features: {},
+    isWhitelist: false,
   },
   isLoading = false,
   isSummary = false,
@@ -187,13 +193,20 @@ export default function Quest({
       if (transaction?.status === TransactionStatus.Confirmed) {
         switch (transaction?.type) {
           case TransactionType.QuestPlay:
-            if (transaction.args?.player) {
-              setPlayers((prev) => [...prev, transaction.args!.player!]);
+            if (transaction.args?.players?.length) {
+              setPlayers((prev) => [...prev, transaction.args!.players![0]]);
             }
             break;
           case TransactionType.QuestUnplay:
-            if (transaction.args?.player) {
-              setPlayers((prev) => prev?.filter((_player) => _player !== transaction.args!.player));
+            if (transaction.args?.players?.length) {
+              setPlayers((prev) =>
+                prev?.filter((_player) => _player !== transaction.args!.players![0]),
+              );
+            }
+            break;
+          case TransactionType.QuestSetWhitelist:
+            if (transaction.args?.players) {
+              setPlayers(transaction.args?.players);
             }
             break;
           case TransactionType.ClaimChallengeResolve:
@@ -244,7 +257,7 @@ export default function Quest({
         if (!depositReleased && questData.createDeposit) {
           depositLocked.push(questData.createDeposit);
         }
-        if (players.length && questData.playDeposit) {
+        if (players.length && questData.playDeposit && !questData.isWhitelist) {
           // Multiply by the number of players (each one has a deposit locked)
           questData.playDeposit.amount = questData.playDeposit.amount.mul(players.length);
           depositLocked.push(questData.playDeposit);
@@ -295,11 +308,14 @@ export default function Quest({
         </HighlightBlocker>
         {isSummary && (
           <>
-            <NumberFieldInput
-              value={questData?.activeClaimCount}
-              label="Claims"
-              isLoading={isLoading}
-            />
+            <PlayersWrapperStyled>
+              <TextFieldInput
+                id="players"
+                label="Players"
+                isLoading={isLoading || !questData}
+                value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+              />
+            </PlayersWrapperStyled>
             <DateFieldInput
               id="expireTime"
               label="Expire time"
@@ -344,14 +360,14 @@ export default function Quest({
               value={claimDeposit}
               isLoading={isLoading || !claimDeposit}
             />
-            {questData?.maxPlayers != null && (
+            <PlayersWrapperStyled>
               <TextFieldInput
                 id="players"
                 label="Players"
                 isLoading={isLoading || !questData}
                 value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
               />
-            )}
+            </PlayersWrapperStyled>
             <DateFieldInput
               id="creationTime"
               label="Creation time"
@@ -451,9 +467,16 @@ export default function Quest({
               {walletConnected ? (
                 <>
                   <>
+                    {((players.length > 0 && !isSummary) ||
+                      walletAddress === questData.creatorAddress) && (
+                      <PlayerListModal
+                        questData={questData}
+                        isEdit={walletAddress === questData.creatorAddress && questData.isWhitelist}
+                      />
+                    )}
                     <FundModal quest={questData} />
-                    {(!isPlayingQuest ||
-                      questData.creatorAddress === walletAddress ||
+                    {(((!isPlayingQuest || questData.creatorAddress === walletAddress) &&
+                      !questData.isWhitelist) ||
                       (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
                       questData.features?.playableQuest && (
                         <PlayModal
@@ -461,8 +484,8 @@ export default function Quest({
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {(isPlayingQuest ||
-                      questData.creatorAddress === walletAddress ||
+                    {(((isPlayingQuest || questData.creatorAddress === walletAddress) &&
+                      questData.isWhitelist) ||
                       (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
                       questData.features.playableQuest &&
                       questData.players?.length !== 0 && (

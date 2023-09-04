@@ -3,27 +3,17 @@ import "@nomiclabs/hardhat-etherscan";
 import defaultConfig from "../default-config.json";
 import exportContractResult from "../scripts/export-contract-result";
 
-export default async (
-  {
-    getNamedAccounts,
-    deployments,
-    ethers,
-    network,
-    run,
-  }: HardhatRuntimeEnvironment,
-  args?: {
-    governAddress: string;
-    createDepositToken: string;
-    createDepositAmount: number;
-    playDepositToken: string;
-    playDepositAmount: number;
-  }
-) => {
-  const { deploy } = deployments;
-  const { deployer, govern, owner } = await getNamedAccounts();
+export const buildQuestFactoryConstructorArguments = async ({
+  getNamedAccounts,
+  args,
+  network,
+  ethers,
+}) => {
+  const { govern, owner } = await getNamedAccounts();
   const createDeposit = args
     ? { token: args.createDepositToken, amount: args.createDepositAmount }
     : defaultConfig.CreateQuestDeposit[network.name];
+  console.log(network.name);
   const playDeposit = args
     ? { token: args.playDepositToken, amount: args.playDepositAmount }
     : defaultConfig.PlayQuestDeposit[network.name];
@@ -36,13 +26,37 @@ export default async (
     owner,
   ];
   console.log({ constructorArguments });
-  const deployResult = await deploy("QuestFactory", {
-    from: deployer,
-    args: constructorArguments,
-    log: true,
-    // gasLimit: 4000000,
+  return constructorArguments;
+};
+
+export default async (
+  {
+    getNamedAccounts,
+    ethers,
+    network,
+    run,
+    upgrades,
+  }: HardhatRuntimeEnvironment,
+  args?: {
+    governAddress: string;
+  }
+) => {
+  const constructorArguments = await buildQuestFactoryConstructorArguments({
+    getNamedAccounts,
+    args,
+    network,
+    ethers,
   });
-  await ethers.getContract("QuestFactory", deployResult.address);
+  const abi =
+    require(`../artifacts/contracts/QuestFactory.sol/QuestFactory.json`).abi;
+  var contractFactory = await ethers.getContractFactory("QuestFactory");
+  var deployResult = await upgrades.deployProxy(
+    contractFactory,
+    constructorArguments,
+    { initializer: "initialize" }
+  );
+  deployResult.deployed();
+  await ethers.getContractAt("QuestFactory", deployResult.address);
 
   try {
     console.log("Verifying QuestFactory...");
@@ -51,7 +65,7 @@ export default async (
         () =>
           run("verify:verify", {
             address: deployResult.address,
-            constructorArguments,
+            constructorArguments: [],
           })
             .then(res)
             .catch(rej),
@@ -62,9 +76,9 @@ export default async (
     console.error("Failed when verifying the QuestFactory contract", error);
   }
 
-  exportContractResult(network, "Quest", {
+  exportContractResult(network, "QuestFactory", {
     address: deployResult.address,
-    abi: deployResult.abi,
+    abi: abi,
   });
 
   return deployResult;

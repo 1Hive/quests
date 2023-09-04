@@ -7,16 +7,13 @@ export default async ({
   deployments,
   network,
   run,
+  ethers,
 }: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const constructorArguments = [
     "ASDF",
     "0x00",
-    "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
-    1700122574,
-    "0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd",
-    "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
     {
       token: "0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd",
       amount: "100000000000000000",
@@ -25,14 +22,22 @@ export default async ({
       token: "0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd",
       amount: "100000000000000000",
     },
-    "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
-    0,
+    {
+      questCreator: "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
+      maxPlayers: 0,
+      rewardToken: "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
+      expireTime: 1700122574,
+      aragonGovernAddress: "0x6e7c3BC98bee14302AA2A98B4c5C86b13eB4b6Cd",
+      fundsRecoveryAddress: "0xdf456B614fE9FF1C7c0B380330Da29C96d40FB02",
+      isWhiteList: false,
+    },
   ];
+  const balance = await ethers.provider.getBalance(deployer);
   const deployResult = await deploy("Quest", {
     from: deployer,
     args: constructorArguments,
     log: true,
-    // gasLimit: 4000000,
+    // gasLimit: 30000000,
   });
 
   console.log({ constructorArguments });

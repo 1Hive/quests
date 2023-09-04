@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import { Button, IconPlus, useTheme, Info } from '@1hive/1hive-ui';
+import { Button, IconPlus, useTheme, Info, DropDown } from '@1hive/1hive-ui';
+
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MAX_LINE_DESCRIPTION } from 'src/constants';
@@ -24,6 +25,8 @@ import { QuestStatus } from 'src/enums/quest-status.enum';
 import { QuestViewMode } from 'src/enums/quest-view-mode.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { TransactionType } from 'src/enums/transaction-type.enum';
+import { TOKENS } from 'src/tokens';
+import { ThemeInterface } from 'src/styles/theme';
 import ModalBase, { ModalCallback } from './modal-base';
 import Stepper from '../utils/stepper';
 import { DateFieldInputFormik } from '../field-input/date-field-input';
@@ -32,11 +35,12 @@ import NumberFieldInput from '../field-input/number-field-input';
 import { AddressFieldInput } from '../field-input/address-field-input';
 import TextFieldInput from '../field-input/text-field-input';
 import { WalletBalance } from '../wallet-balance';
-import { feedDummyQuestData } from '../utils/debug-util';
+import { feedDummyQuestData, isDevelopement } from '../utils/debug-util';
 import CheckboxFieldInput from '../field-input/checkbox-field-input';
 import { FieldInput } from '../field-input/field-input';
 import MarkdownFieldInput from '../field-input/markdown-field-input';
 import { Outset } from '../utils/spacer-util';
+import AddressListFieldInput from '../field-input/address-list-field-input';
 
 // #region StyledComponents
 
@@ -61,6 +65,7 @@ const FormStyled = styled(Form)`
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
+
   #description {
     height: 200px;
   }
@@ -77,13 +82,36 @@ const MaxPlayerLineStyled = styled.div`
   align-items: center;
 `;
 
-const PlayerWrapperStyled = styled.div`
+const MaxPlayerWrapperStyled = styled.div`
   padding-right: ${GUpx(2)};
 `;
 
 const DepositInfoStyled = styled(Info)`
   padding: ${GUpx(1)};
 `;
+
+const TwoColumnStyled = styled.div<{ theme: ThemeInterface }>`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+
+  & > div {
+    width: 48%;
+
+    &.disabled {
+      opacity: 0.25;
+    }
+  }
+
+  & > div:first-child {
+    margin-right: 4%;
+    padding-right: 4%;
+    border-right: 1px solid ${({ theme }) => theme.border};
+  }
+`;
+
+const RegistrationModeDropdownStyled = styled(DropDown)``;
 
 // #endregion
 
@@ -111,7 +139,7 @@ export default function QuestModal({
   const [showPreview, setShowPreview] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('');
   const { walletAddress } = useWallet();
-  const { questFactoryAddress } = getNetwork();
+  const { questFactoryAddress, networkId } = getNetwork();
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const { setTransaction } = useTransactionContext();
@@ -196,6 +224,17 @@ export default function QuestModal({
 
     if (data.expireTime.getTime() < Date.now())
       errors.expireTime = 'Expiration have to be later than now';
+
+    if (data.isWhitelist && data.players?.length) {
+      data.players.forEach((player) => {
+        try {
+          toChecksumAddress(player);
+        } catch (error) {
+          errors.players = 'One of the player address is not valid';
+        }
+      });
+    }
+
     debounceSave(data);
 
     setIsFormValid(Object.keys(errors).length === 0);
@@ -203,6 +242,11 @@ export default function QuestModal({
   };
 
   const onQuestSubmit = async (values: QuestModel) => {
+    const totalTransactionSteps =
+      (values.bounty?.parsedAmount ? 1 : 0) +
+      (values.players?.length && values.players[0] !== '' ? 1 : 0) +
+      2;
+
     validate(values); // Validate one last time before submitting
     if (isFormValid) {
       if (!questDeposit?.token) throw new Error('Quest deposit token is not set');
@@ -211,7 +255,7 @@ export default function QuestModal({
         modalId,
         questDeposit?.token,
         questFactoryAddress,
-        `Approving quest deposit (1/${values.bounty?.parsedAmount ? '3' : '2'})`,
+        `Approving quest deposit (1/${totalTransactionSteps})`,
         walletAddress,
         setTransaction,
       );
@@ -220,7 +264,7 @@ export default function QuestModal({
       try {
         let txPayload: TransactionModel = {
           modalId,
-          message: `Creating Quest (2/${values.bounty?.parsedAmount ? '3' : '2'})`,
+          message: `Creating Quest (2/${totalTransactionSteps})`,
           status: TransactionStatus.WaitingForSignature,
           type: TransactionType.QuestCreate,
         };
@@ -234,6 +278,7 @@ export default function QuestModal({
             creatorAddress: walletAddress,
             rewardToken: values.bounty!.token,
             maxPlayers: values.unlimited ? 0 : values.maxPlayers,
+            isWhitelist: values.isWhitelist,
           },
           undefined,
           (txHash) => {
@@ -263,7 +308,7 @@ export default function QuestModal({
             modalId,
             values.bounty,
             newQuestAddress,
-            `Sending funds to the Quest (3/3)`,
+            `Sending funds to the Quest (3/${totalTransactionSteps})`,
             walletAddress,
             setTransaction,
           );
@@ -271,6 +316,37 @@ export default function QuestModal({
 
         if (isMountedRef.current) {
           setQuestDataState(emptyQuestData);
+        }
+
+        if (values.isWhitelist && values.players?.length) {
+          let whitelistTxPayload: TransactionModel = {
+            modalId,
+            message: `Setting quest players (${
+              values.bounty?.parsedAmount ? 4 : 3
+            }/${totalTransactionSteps})`,
+            status: TransactionStatus.WaitingForSignature,
+            type: TransactionType.QuestSetWhitelist,
+          };
+          setTransaction(whitelistTxPayload);
+          await QuestService.setWhitelist(
+            walletAddress,
+            values.players,
+            newQuestAddress,
+            (txHash) => {
+              whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
+              setTransaction({
+                ...whitelistTxPayload,
+                status: TransactionStatus.Pending,
+              });
+            },
+          );
+          setTransaction({
+            ...whitelistTxPayload,
+            status: txReceiptSaveQuest?.status
+              ? TransactionStatus.Confirmed
+              : TransactionStatus.Failed,
+            args: { questAddress: newQuestAddress, players: values.players },
+          });
         }
       } catch (e: any) {
         setTransaction(
@@ -331,12 +407,29 @@ export default function QuestModal({
                 ...questDataState,
                 unlimited: true,
                 fallbackAddress: questDataState?.fallbackAddress,
+                isWhitelist: false,
+                players: [''],
+                bounty: isDevelopement()
+                  ? {
+                      token: TOKENS[networkId][0],
+                      parsedAmount: 0,
+                    }
+                  : undefined,
               } as QuestModel
             }
             onSubmit={onQuestSubmit}
             validate={validate}
           >
-            {({ values, handleChange, handleBlur, errors, touched, setTouched, handleSubmit }) => {
+            {({
+              values,
+              handleChange,
+              handleBlur,
+              errors,
+              touched,
+              setTouched,
+              handleSubmit,
+              setFieldValue,
+            }) => {
               const onNext = (currentStep: number) => {
                 const stepErrors = validate(values);
                 if (currentStep === 0) {
@@ -543,31 +636,73 @@ export default function QuestModal({
                           placeHolder="Quest communication link"
                           wide
                         />
-                        <FieldInput error={touched.maxPlayers && errors.maxPlayers}>
-                          <MaxPlayerLineStyled>
-                            <PlayerWrapperStyled>
-                              <NumberFieldInput
-                                id="maxPlayers"
-                                label="Max players"
-                                isEdit
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.maxPlayers}
-                                tooltip="The max amount of players that can simultaneously work on this quest"
-                                disabled={values.unlimited}
-                              />
-                            </PlayerWrapperStyled>
-                            <CheckboxFieldInput
-                              id="unlimited"
-                              label="Unlimited"
-                              onChange={handleChange}
-                              handleBlur={handleBlur}
-                              value={values.unlimited}
-                              isEdit
-                              tooltip="Select for unlimited amount of players"
-                            />
-                          </MaxPlayerLineStyled>
+                      </>,
+                      <>
+                        <FieldInput
+                          label="Registration mode"
+                          tooltip={
+                            <>
+                              Registration mode determines who can participate in the quest.
+                              <br />
+                              <b>Open</b> - Anyone can participate in the quest
+                              <br />
+                              <b>Restricted</b> - Only whitelisted addresses can participate in the
+                              quest (can be adjusted later)
+                            </>
+                          }
+                        >
+                          <RegistrationModeDropdownStyled
+                            id="isWhitelist"
+                            items={['Open', 'Restricted']}
+                            borderColor={theme.border}
+                            selected={values.isWhitelist ? 1 : 0}
+                            onChange={(selected: number) =>
+                              setFieldValue('isWhitelist', selected === 1)
+                            }
+                          />
                         </FieldInput>
+                        <TwoColumnStyled theme={theme}>
+                          <div className={values.isWhitelist ? 'disabled' : ''}>
+                            <FieldInput error={touched.maxPlayers && errors.maxPlayers}>
+                              <MaxPlayerLineStyled>
+                                <MaxPlayerWrapperStyled>
+                                  <NumberFieldInput
+                                    id="maxPlayers"
+                                    label="Max players"
+                                    isEdit
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    value={values.maxPlayers}
+                                    tooltip="The max amount of players that can simultaneously work on this quest"
+                                    disabled={values.unlimited}
+                                  />
+                                </MaxPlayerWrapperStyled>
+                                <CheckboxFieldInput
+                                  id="unlimited"
+                                  label="Unlimited"
+                                  onChange={handleChange}
+                                  handleBlur={handleBlur}
+                                  value={values.unlimited}
+                                  isEdit
+                                  tooltip="Select for unlimited amount of players"
+                                />
+                              </MaxPlayerLineStyled>
+                            </FieldInput>
+                          </div>
+                          <div className={values.isWhitelist ? '' : 'disabled'}>
+                            <AddressListFieldInput
+                              id="players"
+                              label="Players"
+                              value={values.players}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              error={errors.players}
+                              touched={touched.players}
+                              isFormik
+                              isEdit
+                            />
+                          </div>
+                        </TwoColumnStyled>
                       </>,
                     ]}
                   />

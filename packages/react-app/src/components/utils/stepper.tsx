@@ -152,6 +152,7 @@ export default function Stepper({
           <StepperPagerWrapperStyled theme={currentTheme}>
             {steps?.map((step, index) => (
               <div
+                key={Math.random().toString()}
                 tabIndex={0}
                 role="button"
                 className={currentStep === index ? 'active' : ''}

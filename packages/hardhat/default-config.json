@@ -1,68 +1,88 @@
 {
-  "GovernQueueFactory": {
-    "xdai": "0xA6591419f78C044979bf63Aa81edD5e100C0E957",
-    "goerli": "0xEA6015008c7926E84C76b70344EbD31a48A6fd2c"
-  },
-  "GovernFactory": {
-    "xdai": "0x8De393cd9F84D7989A1164191a1f6CDd5D2a7F9B",
-    "goerli": "0xd0A50194CeFf1A33E2a831F80EBfa2b11aC44B78"
-  },
-  "CreateQuestDeposit": {
-    "xdai": {
-      "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 2
+    "GovernQueueFactory": {
+        "xdai": "0xA6591419f78C044979bf63Aa81edD5e100C0E957",
+        "goerli": "0xEA6015008c7926E84C76b70344EbD31a48A6fd2c"
     },
-    "goerli": {
-      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
-      "amount": 0.01
-    }
-  },
-  "PlayQuestDeposit": {
-    "xdai": {
-      "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.5
+    "GovernFactory": {
+        "xdai": "0x8De393cd9F84D7989A1164191a1f6CDd5D2a7F9B",
+        "goerli": "0xd0A50194CeFf1A33E2a831F80EBfa2b11aC44B78"
     },
-    "goerli": {
-      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
-      "amount": 0.01
-    }
-  },
-  "ScheduleDeposit": {
-    "xdai": {
-      "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.5
+    "CreateQuestDeposit": {
+        "xdai": {
+            "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+            "amount": 2
+        },
+        "goerli": {
+            "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
+            "amount": 0.01
+        },
+        "localhost": {
+            "token": "0x0000000000000000000000000000000000000000",
+            "amount": 0
+        }
     },
-    "goerli": {
-      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
-      "amount": 0.01
-    }
-  },
-  "ChallengeDeposit": {
-    "xdai": {
-      "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
-      "amount": 0.3
+    "PlayQuestDeposit": {
+        "xdai": {
+            "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+            "amount": 0.5
+        },
+        "goerli": {
+            "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
+            "amount": 0.01
+        },
+        "localhost": {
+            "token": "0x0000000000000000000000000000000000000000",
+            "amount": 0
+        }
     },
-    "goerli": {
-      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
-      "amount": 0.01
+    "ScheduleDeposit": {
+        "xdai": {
+            "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+            "amount": 0.5
+        },
+        "goerli": {
+            "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
+            "amount": 0.01
+        },
+        "localhost": {
+            "token": "0x0000000000000000000000000000000000000000",
+            "amount": 0
+        }
+    },
+    "ChallengeDeposit": {
+        "xdai": {
+            "token": "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+            "amount": 0.3
+        },
+        "goerli": {
+            "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
+            "amount": 0.01
+        },
+        "localhost": {
+            "token": "0x0000000000000000000000000000000000000000",
+            "amount": 0
+        }
+    },
+    "ChallengeFee": {
+        "goerli": {
+            "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
+            "amount": 0.05
+        },
+        "localhost": {
+            "token": "0x0000000000000000000000000000000000000000",
+            "amount": 0
+        }
+    },
+    "RootOwner": {
+        "xdai": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
+        "goerli": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0"
+    },
+    "ClaimDelay": {
+        "xdai": 604800,
+        "goerli": 300
+    },
+    "CelesteResolver": {
+        "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
+        "goerli": "0xCDD144eac3dD79667a1cAADFDc4Edaa75D0Eb81f"
     }
-  },
-  "ChallengeFee": {
-    "goerli": {
-      "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
-      "amount": 0.05
-    }
-  },
-  "RootOwner": {
-    "xdai": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0",
-    "goerli": "0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0"
-  },
-  "ClaimDelay": {
-    "xdai": 604800,
-    "goerli": 300
-  },
-  "CelesteResolver": {
-    "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
-    "goerli": "0xCDD144eac3dD79667a1cAADFDc4Edaa75D0Eb81f"
-  }
 }

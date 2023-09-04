@@ -20,7 +20,7 @@ import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
-interface OwnableInterface extends ethers.utils.Interface {
+interface OwnableUpgradeableInterface extends ethers.utils.Interface {
   functions: {
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -48,13 +48,15 @@ interface OwnableInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "Initialized(uint8)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
 
-export class Ownable extends Contract {
+export class OwnableUpgradeable extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -65,7 +67,7 @@ export class Ownable extends Contract {
   removeAllListeners(eventName: EventFilter | string): this;
   removeListener(eventName: any, listener: Listener): this;
 
-  interface: OwnableInterface;
+  interface: OwnableUpgradeableInterface;
 
   functions: {
     owner(overrides?: CallOverrides): Promise<[string]>;
@@ -126,6 +128,8 @@ export class Ownable extends Contract {
   };
 
   filters: {
+    Initialized(version: null): EventFilter;
+
     OwnershipTransferred(
       previousOwner: string | null,
       newOwner: string | null
