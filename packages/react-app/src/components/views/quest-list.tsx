@@ -30,7 +30,10 @@ import background from '../../assets/background.svg';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
   width: 100%;
-
+  margin: ${GUpx(1)};
+  div {
+    font-size: 25px !important;
+  }
   button {
     width: fit-content;
     margin: auto;
@@ -80,7 +83,7 @@ export default function QuestList() {
   const [isLoading, setIsLoading] = useState(false);
   const [newQuestLoading, setNewQuestLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filter, refreshed, setFilter } = useFilterContext();
+  const { filter, refreshed, setFilter, dirty } = useFilterContext();
   const { currentTheme } = useThemeContext();
   const { below, width } = useViewport();
   const { transaction } = useTransactionContext();
@@ -108,11 +111,13 @@ export default function QuestList() {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     debounceRefresh(filter);
     return () => debounceRefresh.cancel();
   }, [filter, network.networkId]);
 
   useEffect(() => {
+    setIsLoading(true);
     debounceRefresh();
     return () => debounceRefresh.cancel();
   }, [refreshed, network.networkId]);
@@ -200,7 +205,7 @@ export default function QuestList() {
         {!isSmall && <Piggy />}
       </LineStyled>
       <FilterWrapperStyled theme={currentTheme}>
-        <Filter />
+        <Filter onRefresh={() => refresh()} />
       </FilterWrapperStyled>
       <InfiniteScroll
         loader={<ScrollLabelStyled>{!isLoading && <>Scroll to load more</>}</ScrollLabelStyled>}
@@ -208,14 +213,17 @@ export default function QuestList() {
         next={loadMore}
         hasMore={hasMore}
         endMessage={
+          !isLoading &&
           !newQuestLoading &&
           (quests.length ? (
             <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
-            <Outset gu64 className="flex-center wide">
+            <Outset className="flex-center wide">
               <EmptyStateCardStyled
-                text="No quests found"
-                action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
+                text={dirty ? 'No quests found. Try changing the filter.' : 'No quests 🌟'}
+                action={
+                  dirty && <Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />
+                }
               />
             </Outset>
           ))

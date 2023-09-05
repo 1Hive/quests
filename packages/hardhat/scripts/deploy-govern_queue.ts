@@ -1,7 +1,6 @@
 import GovernQueueFactoryAbi from "../abi/contracts/Externals/GovernQueueFactory.json";
 import { HardhatRuntimeEnvironment, Network } from "hardhat/types";
-import fs from "fs";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import exportContractResult from "./export-contract-result";
 import GovernQueueAbi from "../abi/contracts/Externals/GovernQueue.json";
 

@@ -29,6 +29,7 @@ const QuestEntityQuery = gql`
       questFundsRecoveryAddress
       questMaxPlayers
       questPlayers
+      questIsWhiteListed
     }
   }
 `;
@@ -102,6 +103,7 @@ const QuestEntitiesQuery = (payload: any) => gql`
       questFundsRecoveryAddress
       questMaxPlayers
       questPlayers
+      questIsWhiteListed
     }
   }
 `;
@@ -140,6 +142,7 @@ const QuestEntitiesLight = (payload: any) => gql`
       questPlayDepositToken
       questPlayDepositAmount
       questMaxPlayers
+      questIsWhiteListed
     }
   }
 `;

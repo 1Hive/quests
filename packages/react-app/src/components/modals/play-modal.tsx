@@ -110,7 +110,7 @@ export default function PlayModal({ questData, onClose = noop }: Props) {
         message: 'Playing quest (2/2)',
         status: TransactionStatus.WaitingForSignature,
         type: TransactionType.QuestPlay,
-        args: { questAddress: questData.address, player: values.player || walletAddress },
+        args: { questAddress: questData.address, players: [values.player || walletAddress] },
       };
       if (!isMountedRef.current) return;
       setTransaction(txPayload);

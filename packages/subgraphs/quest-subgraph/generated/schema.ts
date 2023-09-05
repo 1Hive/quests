@@ -30,6 +30,7 @@ export class QuestEntity extends Entity {
     this.set("questPlayDepositToken", Value.fromBytes(Bytes.empty()));
     this.set("questPlayDepositAmount", Value.fromBigInt(BigInt.zero()));
     this.set("questPlayers", Value.fromStringArray(new Array(0)));
+    this.set("questIsWhiteListed", Value.fromBoolean(false));
   }
 
   save(): void {
@@ -233,6 +234,15 @@ export class QuestEntity extends Entity {
 
   set questPlayers(value: Array<string>) {
     this.set("questPlayers", Value.fromStringArray(value));
+  }
+
+  get questIsWhiteListed(): boolean {
+    let value = this.get("questIsWhiteListed");
+    return value!.toBoolean();
+  }
+
+  set questIsWhiteListed(value: boolean) {
+    this.set("questIsWhiteListed", Value.fromBoolean(value));
   }
 }
 

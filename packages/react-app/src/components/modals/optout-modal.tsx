@@ -99,7 +99,7 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
         message: 'Opting out quest',
         status: TransactionStatus.WaitingForSignature,
         type: TransactionType.QuestUnplay,
-        args: { questAddress: questData.address, player: values.player || walletAddress },
+        args: { questAddress: questData.address, players: [values.player || walletAddress] },
       };
       setTransaction(txPayload);
       const txReceipt = await QuestService.unplayQuest(

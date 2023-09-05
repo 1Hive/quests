@@ -168,8 +168,8 @@ Here's a 7 steps to understand how Quests works."
                 <SecondColStyled isSmall={isSmall}>
                   <SideImageStyled
                     style={{
-                      height: '100%',
-                      maxWidth: '310px',
+                      height: '90%',
+                      maxWidth: '60%',
                     }}
                     src={backgroundLogo}
                     alt="logo"

@@ -16,7 +16,8 @@
     "deploy:gnosis": "yarn manifest:gnosis && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-gnosis",
     "deploy:staging-gnosis": "yarn manifest:gnosis && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
     "deploy:local": "graph deploy --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020 corantin/quests-subgraph",
-    "hardhat:deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local && yarn workspace @1hive/quests-hardhat"
+    "hardhat:deploy:local": "yarn workspace @1hive/quests-hardhat deploy:local && yarn workspace @1hive/quests-hardhat",
+    "graph": "graph"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.23.2",
