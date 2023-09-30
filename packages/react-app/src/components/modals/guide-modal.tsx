@@ -208,9 +208,9 @@ Here's a 7 steps to understand how Quests works."
                 <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page4"
-                    value="## Step 3: Create or Fund a Quest 💰
+                    value="## Step 3: Create a Quest 💰
 - If you are a _Creator_, you can choose to create a quest. Click on the **Create Quest** button. And fill in the details & parameters.
-- If you are a _Patron_, you can choose to fund a quest. Go to the _detail view_ of a specific quest and click on the **Fund** button."
+- You have the option to create an *Open* or *Restricted* Quest. A *restricted* Quest has a list of players who are allowed to claim. This list is created and can be modified anytime by the Quest creator"
                   />
                 </FirstColStyled>
                 <SecondColStyled isSmall={isSmall}>
@@ -221,7 +221,19 @@ Here's a 7 steps to understand how Quests works."
                 <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
                     id="page5"
-                    value="## Step 4: Participate in a Quest 🌟
+                    value="## Step 4: Fund a Quest 💰
+- If you are a _Patron_, you can choose to fund a quest. Go to the _detail view_ of a specific quest and click on the **Fund** button."
+                  />
+                </FirstColStyled>
+                <SecondColStyled isSmall={isSmall}>
+                  <SideImageStyled src={CreateQuestScreenshot} alt="create quest" />
+                </SecondColStyled>
+              </GuideStepStyled>,
+              <GuideStepStyled isSmall={isSmall}>
+                <FirstColStyled isSmall={isSmall}>
+                  <MarkdownFieldInput
+                    id="page6"
+                    value="## Step 5: Participate in a Quest 🌟
 - If you are a _Player_, you can choose to participate in a quest if its an open participation quest. Go to the _detail view_ of a specific quest and click on the **Play** button.
 - Then you will be elligible to claim the quest reward. Click on the **Claim quest** button.
 - Provide evidence of completion as per the requirements specified in the quest description.
@@ -235,8 +247,8 @@ Here's a 7 steps to understand how Quests works."
               <GuideStepStyled isSmall={isSmall}>
                 <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
-                    id="page6"
-                    value="## Step 5: Verification of a Quest 🕵️
+                    id="page7"
+                    value="## Step 6: Verification of a Quest 🕵️
 - Anyone can verify a quest. Check if the evidence provided by a player meets the requirements specified in the quest.
 - If you believe that the requirements have not been met, you can challenge the claim during the 7-day delay period."
                   />
@@ -248,8 +260,8 @@ Here's a 7 steps to understand how Quests works."
               <GuideStepStyled isSmall={isSmall}>
                 <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
-                    id="page7"
-                    value="## Step 6: Resolving Challenges 🧑‍⚖️
+                    id="page8"
+                    value="## Step 7: Resolving Challenges 🧑‍⚖️
 - If a claim is challenged, it will be raised to **Celeste** which will decide whether the work has been completed as expected.
 - If the challenge is resolved in favor of the **Player**, the claim will be fulfilled and the player will win the challenger's deposit.
 - If the challenge is resolved in favor of the **Challenger**, the claim is rejected and the challenger wins the player's deposit."
@@ -262,8 +274,8 @@ Here's a 7 steps to understand how Quests works."
               <GuideStepStyled isSmall={isSmall}>
                 <FirstColStyled isSmall={isSmall}>
                   <MarkdownFieldInput
-                    id="page7"
-                    value="## Step 7: Recover Funds 💸
+                    id="page9"
+                    value="## Step 8: Recover Funds 💸
 - Once a quest has expired, the **Creator** can recover his deposit and the remaining funds will be send to the initially specified fallback address.
 ##### Remember, it's essential to thoroughly understand the rules and requirements of each quest before participating.
 #### Happy questing! 🌟"
