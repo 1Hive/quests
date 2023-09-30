@@ -66,7 +66,7 @@
     "ChallengeFee": {
         "goerli": {
             "token": "0x2d467a24095B262787f58ce97d9B130ce7232B57",
-            "amount": 0.05
+            "amount": 0.2
         },
         "localhost": {
             "token": "0x0000000000000000000000000000000000000000",
@@ -83,6 +83,6 @@
     },
     "CelesteResolver": {
         "xdai": "0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85",
-        "goerli": "0xCDD144eac3dD79667a1cAADFDc4Edaa75D0Eb81f"
+        "goerli": "0xb802fBfb9e880fa0C57443F5ff12239101Eb90f3"
     }
 }

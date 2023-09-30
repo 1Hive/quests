@@ -126,6 +126,7 @@ enum ContainerState {
   Challenged
   Rejected
   Vetoed
+  Canceled
   Executed
 }
 
@@ -159,7 +160,7 @@ type ContainerEventResolve implements ContainerEvent @entity {
   id: ID!
   container: Container!
   createdAt: BigInt!
-  approved: Boolean!
+  ruling: Int!
 }
 
 type ContainerEventRule implements ContainerEvent @entity {

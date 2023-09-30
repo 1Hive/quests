@@ -57,13 +57,18 @@ export default function AddressListFieldInput({
   );
 
   const addPlayerToWhitelist = () => {
-    setValueState([...valueState, { key: Math.random().toString(), value: '' }]);
-    onChange(isFormik ? createEventWithValue() : valueState.map((x) => x.value));
+    const newList = [...valueState, { key: Math.random().toString(), value: '' }];
+    setValueState(newList);
+    onChange(isFormik ? createEventWithValue() : newList.map((x) => x.value));
   };
 
   const removePlayerFromWhitelist = (indexToRemove: number) => {
-    setValueState([...valueState.filter((_, index) => index !== indexToRemove)]);
-    onChange(isFormik ? createEventWithValue() : valueState.map((x) => x.value));
+    const newList = [...valueState.filter((_, index) => index !== indexToRemove)];
+    if (newList.length === 0) {
+      newList.push({ key: Math.random().toString(), value: '' });
+    }
+    setValueState(newList);
+    onChange(isFormik ? createEventWithValue() : newList.map((x) => x.value));
   };
 
   const handleChange = (v: string, i: number) => {
@@ -73,7 +78,7 @@ export default function AddressListFieldInput({
     if (isFormik) {
       onChange(createEventWithValue());
     } else {
-      onChange(valueState.map((x) => x.value));
+      onChange(newList.map((x) => x.value));
     }
   };
 
@@ -107,13 +112,7 @@ export default function AddressListFieldInput({
             onBlur={onBlur}
             wide
           />
-          {isEdit && (
-            <Button
-              icon={<IconCross />}
-              onClick={() => removePlayerFromWhitelist(i)}
-              disabled={i === 0}
-            />
-          )}
+          {isEdit && <Button icon={<IconCross />} onClick={() => removePlayerFromWhitelist(i)} />}
         </AddressListWrapperStyled>
       ))}
 

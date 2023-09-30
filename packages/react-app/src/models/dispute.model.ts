@@ -1,4 +1,5 @@
 export type DisputeModel = {
   id: number;
-  state: number;
+  finalRuling: number;
+  ruled: boolean;
 };
