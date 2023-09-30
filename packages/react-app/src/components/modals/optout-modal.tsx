@@ -27,12 +27,7 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 
 const FormStyled = styled(Form)`
   width: 100%;
-  padding: 32px 16px 0 32px;
-
-  &,
-  span {
-    color: #242424;
-  }
+  padding: 16px 0;
 `;
 
 const OpenButtonStyled = styled(Button)`
