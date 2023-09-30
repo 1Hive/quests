@@ -125,9 +125,12 @@ export default function Claim({ claim, isLoading, challengeDeposit, questData }:
             {
               // Second arg is the dispute resolution result
               const newState =
+                // eslint-disable-next-line no-nested-ternary
                 transaction.args.disputeState === DisputeStatus.DisputeRuledForChallenger
                   ? ClaimStatus.Rejected
-                  : ClaimStatus.Executed;
+                  : transaction.args.disputeState === DisputeStatus.DisputeRuledForSubmitter
+                  ? ClaimStatus.Executed
+                  : ClaimStatus.Cancelled;
               setStatus(newState);
             }
             break;

@@ -100,8 +100,12 @@ contract Quest is IExecutable {
             } else {
                 _amount = balance;
             }
+
             // Claim all but let play deposits of each player if they are same token
-            if (address(rewardToken) == address(playDeposit.token)) {
+            if (
+                address(rewardToken) == address(playDeposit.token) &&
+                !isWhiteList
+            ) {
                 (, uint256 result) = _amount.trySub(
                     playDeposit.amount * playerList.length
                 );
@@ -143,8 +147,8 @@ contract Quest is IExecutable {
 
         uint256 balance = rewardToken.balanceOf(address(this));
 
-        // Claim all but let the create deposit if they are same token
-        if (address(rewardToken) == address(playDeposit.token)) {
+        // Restore all but let the player deposit still locked if they are same token
+        if (address(rewardToken) == address(playDeposit.token) && !isWhiteList) {
             (, balance) = balance.trySub(
                 playDeposit.amount * playerList.length
             );
@@ -201,10 +205,10 @@ contract Quest is IExecutable {
 
     /***
      * Set the white list of players allowed to play the quest.
-     * 
+     *
      * requires sender to be the quest creator
      * @param _players The list of players allowed to play the quest.
-     * 
+     *
      * emit QuestWhiteListChanged with players and timestamp
      */
     function setWhiteList(address[] memory _players) external OnlyCreator {
@@ -212,18 +216,23 @@ contract Quest is IExecutable {
             isWhiteList == true,
             "ERROR: Can't set the white list to a non-whitelisted contract"
         );
-        
-        bool playerInList = false;
-        
-        for(uint32 i =0;i<_players.length;i++){
-            
-            if(findIndexOfPlayer(_players[i])!=-1){
-                playerInList = true;
-            }
+
+        bool duplicatedPlayers = false;
+
+        for(uint i = 0; i < _players.length; i++) {
+          address temp = _players[i];
+          for(uint j = 0; j < _players.length; j++) {
+              if((j != i) && (temp == _players[j])) {
+                duplicatedPlayers = true;
+              }
+          }
         }
 
-        require(playerInList == false,"ERROR: One or more players is already in whitelist");
-        
+        require(
+            duplicatedPlayers == false,
+            "ERROR: One or more players is already in whitelist"
+        );
+
         playerList = _players;
         emit QuestWhiteListChanged(_players, block.timestamp);
     }

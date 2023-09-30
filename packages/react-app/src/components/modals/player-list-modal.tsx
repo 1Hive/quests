@@ -1,5 +1,4 @@
-/* eslint-disable no-nested-ternary */
-import { Button, IconGroup, IconCheck } from '@1hive/1hive-ui';
+import { Button, IconGroup, EmptyStateCard } from '@1hive/1hive-ui';
 import { noop, uniqueId } from 'lodash-es';
 import { useMemo, useState } from 'react';
 
@@ -13,7 +12,6 @@ import { QuestModel } from 'src/models/quest.model';
 import { useTransactionContext } from 'src/contexts/transaction.context';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
-import { Outset } from '../utils/spacer-util';
 import ModalBase, { ModalCallback } from './modal-base';
 import AddressListFieldInput from '../field-input/address-list-field-input';
 
@@ -37,7 +35,18 @@ const OpenButtonWrapperStyled = styled.div`
 const ConfirmWrapperStyled = styled.div`
   display: flex;
   justify-content: space-between;
-  padding-top: ${GUpx(1)};
+`;
+
+const EmptyStateCardStyled = styled(EmptyStateCard)`
+  width: 100%;
+  border: none;
+  div {
+    font-size: 25px !important;
+  }
+`;
+
+const AddressListFieldInputStyled = styled(AddressListFieldInput)`
+  margin-bottom: ${GUpx(2)};
 `;
 
 // #endregion
@@ -57,10 +66,11 @@ export default function PlayerListModal({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [players, setPlayers] = useState<string[]>(questData.players ?? ['']);
-  const modalId = useMemo(() => uniqueId('whitelist-modal'), []);
+  const modalId = useMemo(() => uniqueId('player-list-modal'), []);
   const { setTransaction } = useTransactionContext();
   const { walletAddress } = useWallet();
   const [error, setError] = useState<string>();
+  const [touched, setTouched] = useState<boolean>();
 
   const onModalClosed = (success: boolean) => {
     setOpened(false);
@@ -68,15 +78,8 @@ export default function PlayerListModal({
   };
 
   const onWhitelistSubmit = async () => {
-    if (questData.isWhitelist) {
-      players.forEach((player) => {
-        try {
-          toChecksumAddress(player);
-        } catch {
-          setError('One of the player address is not valid');
-        }
-      });
-    }
+    const filteredPlayers = players.filter((p) => !!p && p !== '');
+    validate(filteredPlayers);
     let whitelistTxPayload: TransactionModel = {
       modalId,
       message: `Updating the quest players...`,
@@ -84,19 +87,37 @@ export default function PlayerListModal({
       type: TransactionType.QuestSetWhitelist,
     };
     setTransaction(whitelistTxPayload);
-    const receipt = await setWhitelist(walletAddress, players, questData.address!, (txHash) => {
-      whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
-      setTransaction({
-        ...whitelistTxPayload,
-        status: TransactionStatus.Pending,
-      });
-    });
+    const receipt = await setWhitelist(
+      walletAddress,
+      filteredPlayers,
+      questData.address!,
+      (txHash) => {
+        whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
+        setTransaction({
+          ...whitelistTxPayload,
+          status: TransactionStatus.Pending,
+        });
+      },
+    );
     setTransaction({
       ...whitelistTxPayload,
       status: receipt?.status ? TransactionStatus.Confirmed : TransactionStatus.Failed,
-      args: { questAddress: questData.address, players },
+      args: { questAddress: questData.address, players: filteredPlayers },
     });
     onSubmit();
+  };
+
+  const validate = (newList: string[]) => {
+    setError(undefined);
+    newList
+      .filter((p) => !!p && p !== '')
+      .forEach((player) => {
+        try {
+          toChecksumAddress(player);
+        } catch {
+          setError('One of the player address is not valid');
+        }
+      });
   };
 
   return (
@@ -115,8 +136,7 @@ export default function PlayerListModal({
                   : 'View Player List'
               }
               mode="strong"
-              title={!isEdit && !players.length ? 'No players' : 'View players'}
-              disabled={!isEdit && !players.length}
+              title="View players"
             />
           </OpenButtonWrapperStyled>
         }
@@ -127,23 +147,37 @@ export default function PlayerListModal({
           isEdit && (
             <ConfirmWrapperStyled>
               <Button
-                icon={<IconCheck />}
+                icon={<IconGroup />}
                 label="Confirm list"
-                mode="positive"
+                mode="strong"
                 onClick={() => onWhitelistSubmit()}
+                disabled={touched && !!error}
+                title={touched && !!error ? 'Invalid form' : 'Confirm list'}
               />
             </ConfirmWrapperStyled>
           )
         }
       >
-        <AddressListFieldInput
-          label="Players"
-          id="players"
-          onChange={setPlayers}
-          isEdit={isEdit}
-          value={players}
-          error={error}
-        />
+        {isEdit || players.length ? (
+          <AddressListFieldInputStyled
+            label="Players"
+            id="players"
+            onChange={(newList: string[]) => {
+              setPlayers(newList);
+              validate(newList);
+            }}
+            onBlur={() => setTouched(true)}
+            isEdit={isEdit}
+            value={players}
+            error={error}
+            touched={touched}
+          />
+        ) : (
+          <EmptyStateCardStyled
+            text="No players"
+            action={<Button onClick={() => setOpened(false)} label="Close" />}
+          />
+        )}
       </ModalBase>
     </>
   );

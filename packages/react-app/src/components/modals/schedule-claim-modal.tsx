@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import { Button, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo, useCallback } from 'react';
@@ -11,7 +10,6 @@ import { GUpx } from 'src/utils/style.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
-
 import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
@@ -313,7 +311,7 @@ export default function ScheduleClaimModal({
                     key="confirmButton"
                     icon={<FaMoneyBillWave />}
                     label="Claim Quest"
-                    mode="positive"
+                    mode="strong"
                     type="submit"
                     form="form-claim"
                     className="m-8 submit-claim-button"

@@ -158,7 +158,7 @@ export default function ExecuteClaimModal({
             label="Execute"
             disabled={claim.state === ClaimStatus.Challenged}
             title="Trigger claim operation in the chain"
-            mode="positive"
+            mode="strong"
           />
         }
         onModalClosed={onModalClosed}

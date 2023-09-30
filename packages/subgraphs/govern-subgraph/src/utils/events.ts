@@ -16,17 +16,20 @@ import {
   Scheduled as ScheduledEvent,
   Vetoed as VetoedEvent,
 } from "../../generated/GovernQueue/GovernQueue";
+import { Resolved as ResolvedEventV3 } from "../../generated/GovernQueueV3/GovernQueue";
 import { buildId, buildEventHandlerId } from "./ids";
 import { Bytes } from "@graphprotocol/graph-ts";
 
-function finalizeContainerEvent<T, U>(
+export function finalizeContainerEvent<T, U>(
   container: ContainerEntity,
   containerEvent: U,
   ethereumEvent: T
 ): U {
+  // @ts-ignore
   containerEvent.createdAt = ethereumEvent.block.timestamp;
+  // @ts-ignore
   containerEvent.container = container.id;
-
+  // @ts-ignore
   containerEvent.save();
 
   return containerEvent;
@@ -83,27 +86,6 @@ export function handleContainerEventExecute(
     ethereumEvent
   );
 }
-
-export function handleContainerEventResolve(
-  container: ContainerEntity,
-  ethereumEvent: ResolvedEvent
-): ContainerEventResolve {
-  let eventId = buildEventHandlerId(
-    container.id,
-    "resolve",
-    ethereumEvent.transactionLogIndex.toHexString()
-  );
-
-  let containerEvent = new ContainerEventResolve(eventId);
-  containerEvent.approved = ethereumEvent.params.approved;
-
-  return finalizeContainerEvent<ResolvedEvent, ContainerEventResolve>(
-    container,
-    containerEvent,
-    ethereumEvent
-  );
-}
-
 export function handleContainerEventRule(
   container: ContainerEntity,
   ethereumEvent: RuledEvent
