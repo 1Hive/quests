@@ -143,12 +143,8 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
   }, [claim.container]);
 
   useEffect(() => {
-    if (dispute?.state !== undefined)
-      setRuled(
-        dispute.state === DisputeStatus.DisputeRuledForChallenger ||
-          dispute.state === DisputeStatus.DisputeRuledForSubmitter,
-      );
-  }, [dispute?.state]);
+    if (dispute !== undefined) setRuled(dispute.ruled);
+  }, [dispute?.ruled]);
 
   useEffect(() => {
     if (challenge && claim) {
@@ -170,7 +166,7 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
         args: {
           questAddress: claim.questAddress,
           containerId: claim.container.id,
-          disputeState: dispute!.state,
+          disputeState: dispute!.finalRuling,
         },
       };
       setTransaction(txPayload);
@@ -241,11 +237,24 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
   const finalRuling = useMemo(
     () => (
       <FinalRulingWrapper>
-        {dispute?.state !== undefined && (
+        {dispute?.finalRuling !== undefined && (
           <RulingInfoStyled mode={isRuled ? 'info' : 'warning'}>
             <FinalRulingStyled>
               {isRuled ? (
-                'Ruled in favor of'
+                dispute.finalRuling === DisputeStatus.DisputeNotRuledOrAbstainFromVoting ? (
+                  <>
+                    Dispute has been executed with outcome: Abstained from voting.
+                    <br />
+                    Each parts will recover their stake.
+                  </>
+                ) : (
+                  <>
+                    Ruled in favor of
+                    {dispute.finalRuling === DisputeStatus.DisputeRuledForChallenger
+                      ? challenger
+                      : player}
+                  </>
+                )
               ) : (
                 <>
                   Ruling in progress, please come back later...
@@ -265,13 +274,11 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
                 </>
               )}
             </FinalRulingStyled>
-            {dispute.state === DisputeStatus.DisputeRuledForChallenger && challenger}
-            {dispute.state === DisputeStatus.DisputeRuledForSubmitter && player}
           </RulingInfoStyled>
         )}
       </FinalRulingWrapper>
     ),
-    [isRuled, dispute?.state, player, challenger],
+    [isRuled, dispute?.finalRuling, player, challenger],
   );
 
   return (
@@ -311,7 +318,7 @@ export default function ResolveChallengeModal({ claim, questData, onClose = noop
             key="confirmButton"
             icon={<IconFlag />}
             label="Resolve"
-            mode="positive"
+            mode="strong"
             disabled={!walletConnected || !isRuled || claim.state !== ClaimStatus.Challenged}
             onClick={resolveChallengeTx}
             title={

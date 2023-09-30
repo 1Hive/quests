@@ -1,4 +1,4 @@
-import { Modal, textStyle, Button, useViewport } from '@1hive/1hive-ui';
+import { Modal, textStyle, Button } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTransactionContext } from 'src/contexts/transaction.context';
@@ -76,11 +76,11 @@ export default function ModalBase({
   const width = useMemo(() => {
     switch (size) {
       case 'small':
-        return '25vw';
+        return '40vw';
       case 'large':
         return '75vw';
       default:
-        return '50vw';
+        return '60vw';
     }
   }, [size]);
 

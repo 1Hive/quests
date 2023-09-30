@@ -34,6 +34,10 @@ import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
 import { PlayModel } from 'src/models/play.model';
 import { QuestModel } from 'src/models/quest.model';
+import {
+  CelesteCourtConfigEntitiesQuery,
+  CelesteDisputeEntityQuery,
+} from 'src/queries/celeste-entity.query';
 import { ADDRESS_ZERO, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -60,6 +64,7 @@ import {
   cacheGovernQueueAddressForQuest,
 } from './cache.service';
 import { loadFeatureSupport } from './feature-support.service';
+import { isDevelopement } from 'src/components/utils/debug-util';
 
 let questList: QuestModel[] = [];
 
@@ -577,6 +582,69 @@ export async function fetchCreateQuestDeposit(walletAddress: string) {
   });
 }
 
+// #region Celeste
+
+export async function fetchChallengeFee(
+  celesteAddressOverride?: string,
+): Promise<TokenAmountModel | null> {
+  const { celesteSubgraph } = getNetwork();
+  let feeToken;
+  let feeAmount;
+  if (celesteSubgraph) {
+    const result = await request(celesteSubgraph, CelesteCourtConfigEntitiesQuery, {
+      first: 1,
+      skip: 0,
+    });
+    feeToken = result.courtConfigs[0].feeToken.id;
+    feeAmount = result.courtConfigs[0].settleFee;
+  } else {
+    const celesteContract = await getCelesteContract(celesteAddressOverride);
+    if (!celesteContract) return null;
+    [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  }
+  const token = await getTokenInfo(feeToken);
+  if (!token) return null;
+  return toTokenAmountModel({
+    ...token,
+    amount: feeAmount,
+  });
+}
+
+export async function fetchChallengeDispute(
+  challenge: ChallengeModel,
+): Promise<DisputeModel | null> {
+  const { celesteSubgraph } = getNetwork();
+  let finalRuling;
+  let ruled = false;
+  if (celesteSubgraph) {
+    const result = await request(celesteSubgraph, CelesteDisputeEntityQuery, {
+      ID: challenge.disputeId,
+    });
+    finalRuling = result.dispute.finalRuling;
+    ruled = result.dispute.state === 'Ruled';
+  } else {
+    const celesteDisputeManagerContract = await getCelesteDisputeManagerContract(
+      challenge.resolver,
+    );
+    if (!celesteDisputeManagerContract) {
+      return null;
+    }
+    if (challenge.disputeId === undefined) {
+      throw new Error('Dispute does not exist yet, please try again later');
+    }
+    const result = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
+    finalRuling = result.finalRuling; // 2: Abstained, 3: Rejected, 4: Approved
+    ruled = result.ruled === 2; // DisputeState.Ruled
+  }
+  return {
+    id: challenge.disputeId!,
+    finalRuling,
+    ruled,
+  };
+}
+
+// #endregion
+
 // #endregion
 
 // #region QuestFactory
@@ -605,7 +673,7 @@ export async function saveQuest(
     data.maxPlayers,
     data.isWhitelist,
     {
-      // gasLimit: 10000000,
+      gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -624,7 +692,7 @@ export async function setWhitelist(
   const tx = await getQuestContract({ address: questAddress }, walletAddress).setWhiteList(
     players,
     {
-      // gasLimit: 10000000,
+      gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -640,7 +708,7 @@ export async function recoverFundsAndDeposit(
   if (!questContract) return null;
   Logger.debug('Recovering quest unused funds and deposit...', { quest });
   const tx = await questContract.recoverFundsAndDeposit({
-    gasLimit: 1000000,
+    gasLimit: 10000000,
   });
   return handleTransaction(tx, onTx);
 }
@@ -815,7 +883,7 @@ export async function scheduleQuestClaim(
   const container = await generateScheduleContainer(walletAddress, claimData, questData);
   Logger.debug('Scheduling quest claim...', { container });
   const tx = (await governQueueContract.schedule(container, {
-    gasLimit: 1000000,
+    gasLimit: 10000000,
   })) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
@@ -836,7 +904,7 @@ export async function executeQuestClaim(
       payload: claimData.container!.payload,
     },
     {
-      gasLimit: 1000000,
+      gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -858,7 +926,7 @@ export async function challengeQuestClaim(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
     {
-      gasLimit: 1000000,
+      gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -898,51 +966,9 @@ export async function resolveClaimChallenge(
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
   const tx = await governQueueContract.resolve(container, dispute.id, {
-    gasLimit: 1000000,
+    gasLimit: 10000000,
   });
   return handleTransaction(tx, onTx);
-}
-
-// #endregion
-
-// #region Celeste
-
-export async function fetchChallengeFee(
-  celesteAddressOverride?: string,
-): Promise<TokenAmountModel | null> {
-  const celesteContract = await getCelesteContract(celesteAddressOverride);
-  if (!celesteContract) return null;
-  const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
-  const token = await getTokenInfo(feeToken);
-  if (!token) return null;
-  return toTokenAmountModel({
-    ...token,
-    amount: feeAmount,
-  });
-}
-
-export async function fetchChallengeDispute(
-  challenge: ChallengeModel,
-): Promise<DisputeModel | null> {
-  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract(challenge.resolver);
-  if (!celesteDisputeManagerContract) {
-    return null;
-  }
-  if (challenge.disputeId === undefined) {
-    throw new Error('Dispute does not exist yet, please try again later');
-  }
-  let finalRuling;
-  try {
-    const result = await celesteDisputeManagerContract.computeRuling(challenge.disputeId);
-    finalRuling = result.finalRuling;
-  } catch (error) {
-    const result = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
-    finalRuling = result.finalRuling;
-  }
-  return {
-    id: challenge.disputeId,
-    state: finalRuling,
-  };
 }
 
 // #endregion

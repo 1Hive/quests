@@ -226,13 +226,15 @@ export default function QuestModal({
       errors.expireTime = 'Expiration have to be later than now';
 
     if (data.isWhitelist && data.players?.length) {
-      data.players.forEach((player) => {
-        try {
-          toChecksumAddress(player);
-        } catch (error) {
-          errors.players = 'One of the player address is not valid';
-        }
-      });
+      data.players
+        .filter((p) => !!p && p !== '')
+        .forEach((player) => {
+          try {
+            toChecksumAddress(player);
+          } catch (error) {
+            errors.players = 'One of the player address is not valid';
+          }
+        });
     }
 
     debounceSave(data);
@@ -318,7 +320,9 @@ export default function QuestModal({
           setQuestDataState(emptyQuestData);
         }
 
-        if (values.isWhitelist && values.players?.length) {
+        const players = values.players?.filter((p) => !!p && p !== '');
+
+        if (values.isWhitelist && players?.length) {
           let whitelistTxPayload: TransactionModel = {
             modalId,
             message: `Setting quest players (${
@@ -328,24 +332,19 @@ export default function QuestModal({
             type: TransactionType.QuestSetWhitelist,
           };
           setTransaction(whitelistTxPayload);
-          await QuestService.setWhitelist(
-            walletAddress,
-            values.players,
-            newQuestAddress,
-            (txHash) => {
-              whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
-              setTransaction({
-                ...whitelistTxPayload,
-                status: TransactionStatus.Pending,
-              });
-            },
-          );
+          await QuestService.setWhitelist(walletAddress, players, newQuestAddress, (txHash) => {
+            whitelistTxPayload = { ...whitelistTxPayload, hash: txHash };
+            setTransaction({
+              ...whitelistTxPayload,
+              status: TransactionStatus.Pending,
+            });
+          });
           setTransaction({
             ...whitelistTxPayload,
             status: txReceiptSaveQuest?.status
               ? TransactionStatus.Confirmed
               : TransactionStatus.Failed,
-            args: { questAddress: newQuestAddress, players: values.players },
+            args: { questAddress: newQuestAddress, players },
           });
         }
       } catch (e: any) {

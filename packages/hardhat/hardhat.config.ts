@@ -12,7 +12,7 @@ import "solidity-coverage";
 import { task, HardhatUserConfig, types } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
-import deployQuest from "./deploy/deploy-quest";
+import deployQuest, { questConstructorArguments } from "./deploy/deploy-quest";
 import deployGovernQueue, {
   generateQueueConfig,
 } from "./scripts/deploy-govern_queue";
@@ -25,6 +25,7 @@ import GovernAbi from "./abi/contracts/Externals/Govern.json";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
 import CelesteMockGoerli from "./deployments/goerli/OwnableCeleste.json";
 import upgradeQuestFactory from "./scripts/upgrade-quest-factory";
+import { verifyContractWithRetry } from "./scripts/verify-contract";
 
 dotenvConfig({
   path: resolve(
@@ -806,15 +807,30 @@ task("newQuestFactory:gnosis")
   )
   .setAction(async (args, hre) => {
     console.log("Starting by deploying the Quest template...");
-    await hre.run("newQuest");
+    const questDeployResult = await hre.run("newQuest");
 
     console.log("Deploying proxy upgrade for QuestFactory...");
-    const address = await upgradeQuestFactory(hre, args);
+    const questFactoryDeployResult = await upgradeQuestFactory(hre, args);
 
     console.log(
       "Deployed proxy upgrade for QuestFactory (" + hre.network.name + "):",
-      address
+      questFactoryDeployResult.address
     );
+
+    Promise.all([
+      verifyContractWithRetry(
+        "Quest",
+        hre.run,
+        questDeployResult.address,
+        questDeployResult.args
+      ),
+      verifyContractWithRetry(
+        "QuestFactory",
+        hre.run,
+        questFactoryDeployResult.address,
+        questFactoryDeployResult.args
+      ),
+    ]);
   });
 
 task("newQuestFactory:goerli")
@@ -826,15 +842,30 @@ task("newQuestFactory:goerli")
   )
   .setAction(async (args, hre) => {
     console.log("Starting by deploying the Quest template...");
-    await hre.run("newQuest", hre);
+    const questDeployResult = await hre.run("newQuest", hre);
 
     console.log("Deploying proxy upgrade for QuestFactory...");
-    const address = await upgradeQuestFactory(hre, args);
+    const questFactoryDeployResult = await upgradeQuestFactory(hre, args);
 
     console.log(
       "Deployed proxy upgrade for QuestFactory (" + hre.network.name + "):",
-      address
+      questFactoryDeployResult.address
     );
+
+    await Promise.all([
+      verifyContractWithRetry(
+        "Quest",
+        hre.run,
+        questDeployResult.address,
+        questDeployResult.args
+      ),
+      verifyContractWithRetry(
+        "QuestFactory",
+        hre.run,
+        questFactoryDeployResult.address,
+        questFactoryDeployResult.args
+      ),
+    ]);
   });
 
 task("newQuest")
@@ -845,6 +876,7 @@ task("newQuest")
       "Deployed quest template (" + hre.network.name + "):",
       deployResult.address
     );
+    return deployResult;
   });
 
 async function deployAll(
@@ -1130,32 +1162,26 @@ task("deployCeleste:goerli")
     }
   );
 
-task(
-  "verify-quests-contracts",
-  "Verify contracts with etherscan api"
-).setAction(async (_args, { run, network }) => {
-  const questFactoryDeploy = require(`./deployments/${network.name.toLowerCase()}/QuestFactory.json`);
-  const questDeploy = require(`./deployments/${network.name.toLowerCase()}/Quest.json`);
-  console.log("Quest", {
-    address: questDeploy.address,
-    constructorArguments: questDeploy.args,
-  });
-  try {
-    await run("verify:verify", {
-      address: questFactoryDeploy.address,
-      constructorArguments: questFactoryDeploy.args,
-    });
-  } catch (error) {
-    console.error("Failed when verifying QuestFactory contract", error);
+task("verify-contracts", "Verify contracts with etherscan api").setAction(
+  async (_args, { run, network }) => {
+    const questFactoryDeploy = require(`./deployments/${network.name.toLowerCase()}/QuestFactory.json`);
+    const questDeploy = require(`./deployments/${network.name.toLowerCase()}/Quest.json`);
+
+    await Promise.all([
+      verifyContractWithRetry(
+        "Quest",
+        run,
+        questDeploy.address,
+        questConstructorArguments
+      ),
+      verifyContractWithRetry(
+        "QuestFactory",
+        run,
+        questFactoryDeploy.address,
+        [] // Proxy contract has no constructor
+      ),
+    ]);
   }
-  try {
-    await run("verify:verify", {
-      address: questDeploy.address,
-      constructorArguments: questDeploy.args,
-    });
-  } catch (error) {
-    console.error("Failed when verifying Quest contract", error);
-  }
-});
+);
 
 module.exports = hardhatConfig;

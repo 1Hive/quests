@@ -35,7 +35,7 @@ const OpenButtonStyled = styled(Button)<{ theme: ThemeInterface }>`
 const ExploreButtonStyled = styled(Button)<{ theme: ThemeInterface }>`
   &,
   span {
-    color: ${({ theme }) => theme.content};
+    color: ${({ theme }) => theme.accentContent};
   }
 `;
 
@@ -148,7 +148,10 @@ export default function GuideModal({ onClose = noop }: Props) {
             showPager
             submitButton={
               <ExploreButtonStyled
-                onClick={() => setOpened(false)}
+                onClick={() => {
+                  setOpened(false);
+                  onModalClosed(true);
+                }}
                 label="🌟 Start exploring"
                 title="Start exploring"
                 mode="positive"

@@ -1,6 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { buildQuestFactoryConstructorArguments } from "../deploy/deploy-quest_factory";
 import exportContractResult from "../scripts/export-contract-result";
+import { verifyContractWithRetry } from "../scripts/verify-contract";
 
 export default async function upgradeQuestFactory(
   {
@@ -16,50 +17,26 @@ export default async function upgradeQuestFactory(
     createDepositAmount: number;
     playDepositToken: string;
     playDepositAmount: number;
+    newProxy: boolean;
   }
 ) {
   const QuestFactoryProxy = require(`../deployments/${network.name}/QuestFactory.json`);
   const abi =
     require(`../artifacts/contracts/QuestFactory.sol/QuestFactory.json`).abi;
 
-  const constructorArguments = buildQuestFactoryConstructorArguments({
-    getNamedAccounts,
-    args,
-    network,
-    ethers,
-  });
+  const { govern } = await getNamedAccounts();
 
   const contractFactory = await ethers.getContractFactory("QuestFactory");
   const newContractUpgrade = await upgrades.upgradeProxy(
     QuestFactoryProxy.address,
     contractFactory
   );
-  newContractUpgrade.deployed();
-
-  console.log({ constructorArguments });
-
-  try {
-    console.log("Verifying QuestFactory...");
-    await new Promise((res, rej) => {
-      setTimeout(
-        () =>
-          run("verify:verify", {
-            address: newContractUpgrade.address,
-            constructorArguments: [],
-          })
-            .then(res)
-            .catch(rej),
-        30000
-      ); // Wait for contract to be deployed
-    });
-  } catch (error) {
-    console.error("Failed when verifying the Quest contract", error);
-  }
+  await newContractUpgrade.deployed();
 
   exportContractResult(network, "QuestFactory", {
     address: QuestFactoryProxy.address,
     abi: abi,
   });
 
-  return newContractUpgrade.address;
+  return { address: newContractUpgrade.address, args: [] };
 }

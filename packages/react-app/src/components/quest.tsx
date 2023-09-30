@@ -466,62 +466,58 @@ export default function Quest({
             <QuestFooterStyled>
               {walletConnected ? (
                 <>
-                  <>
-                    {((players.length > 0 && !isSummary) ||
-                      walletAddress === questData.creatorAddress) && (
-                      <PlayerListModal
-                        questData={questData}
-                        isEdit={walletAddress === questData.creatorAddress && questData.isWhitelist}
-                      />
-                    )}
-                    <FundModal quest={questData} />
-                    {(((!isPlayingQuest || questData.creatorAddress === walletAddress) &&
-                      !questData.isWhitelist) ||
-                      (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
-                      questData.features?.playableQuest && (
+                  {questData.isWhitelist && (
+                    <PlayerListModal
+                      questData={questData}
+                      isEdit={walletAddress === questData.creatorAddress && questData.isWhitelist}
+                    />
+                  )}
+                  <FundModal quest={questData} />
+                  {questData.features.playableQuest && !questData.isWhitelist && (
+                    <>
+                      {(!isPlayingQuest ||
+                        questData.creatorAddress === walletAddress ||
+                        (waitForClose && transaction?.type === TransactionType.QuestPlay)) && (
                         <PlayModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {(((isPlayingQuest || questData.creatorAddress === walletAddress) &&
-                      questData.isWhitelist) ||
-                      (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
-                      questData.features.playableQuest &&
-                      questData.players?.length !== 0 && (
+                      {(isPlayingQuest ||
+                        questData.creatorAddress === walletAddress ||
+                        (waitForClose && transaction?.type === TransactionType.QuestUnplay)) && (
                         <OptoutModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {claimDeposit && (isPlayingQuest || !questData.features.playableQuest) && (
-                      <ScheduleClaimModal
-                        questData={{ ...questData, status }}
-                        questAddress={questData.address}
-                        questTotalBounty={bounty}
-                        claimDeposit={claimDeposit}
-                      />
-                    )}
-                  </>
-                  <>
-                    {(status === QuestStatus.Expired ||
-                      (waitForClose &&
-                        transaction?.type === TransactionType.QuestReclaimFunds)) && (
-                      <RecoverFundsModal
-                        bounty={bounty}
-                        questData={{ ...questData, status }}
-                        isDepositReleased={isCreateDepositReleased}
-                        onClose={() => setWaitForClose(false)}
-                        pendingClaims={
-                          !!claims?.find(
-                            (claim) =>
-                              claim.state === ClaimStatus.Scheduled ||
-                              claim.state === ClaimStatus.AvailableToExecute,
-                          )
-                        }
-                      />
-                    )}
-                  </>
+                    </>
+                  )}
+
+                  {claimDeposit && (isPlayingQuest || !questData.features.playableQuest) && (
+                    <ScheduleClaimModal
+                      questData={{ ...questData, status }}
+                      questAddress={questData.address}
+                      questTotalBounty={bounty}
+                      claimDeposit={claimDeposit}
+                    />
+                  )}
+                  {(status === QuestStatus.Expired ||
+                    (waitForClose && transaction?.type === TransactionType.QuestReclaimFunds)) && (
+                    <RecoverFundsModal
+                      bounty={bounty}
+                      questData={{ ...questData, status }}
+                      isDepositReleased={isCreateDepositReleased}
+                      onClose={() => setWaitForClose(false)}
+                      pendingClaims={
+                        !!claims?.find(
+                          (claim) =>
+                            claim.state === ClaimStatus.Scheduled ||
+                            claim.state === ClaimStatus.AvailableToExecute,
+                        )
+                      }
+                    />
+                  )}
                 </>
               ) : (
                 <ActionsPlaceholder />
