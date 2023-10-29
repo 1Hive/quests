@@ -2,7 +2,7 @@ import { request } from 'graphql-request';
 import { FilterModel } from 'src/models/filter.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
-import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
+import { hexToBytes, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueChallengeReasonQuery,
   GovernQueueChallengesQuery,
@@ -64,7 +64,6 @@ import {
   cacheGovernQueueAddressForQuest,
 } from './cache.service';
 import { loadFeatureSupport } from './feature-support.service';
-import { isDevelopement } from 'src/components/utils/debug-util';
 
 let questList: QuestModel[] = [];
 
@@ -78,9 +77,9 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     const quest: QuestModel = {
       address: questAddress,
       title: questEntity.questTitle,
-      description: questEntity.questDescription || undefined, // if '' -> undefined
-      communicationLink: questEntity.questCommunicationLink,
-      detailsRefIpfs: toAscii(questEntity.questDetailsRef),
+      description: questEntity.questMetadata.questDescription,
+      communicationLink: questEntity.questMetadata.questCommunicationLink,
+      detailsRefIpfs: questEntity.questMetadata.id,
       rewardToken: (await getTokenInfo(questEntity.questRewardTokenAddress)) ?? undefined,
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
       creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
@@ -110,13 +109,6 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     };
 
     loadFeatureSupport(quest);
-
-    if (!quest.detailsRefIpfs) {
-      quest.description = '[No description]';
-    } else if (!quest.description) {
-      // If failed to fetch ipfs description
-      quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
-    }
 
     if (quest?.maxPlayers !== undefined) {
       quest.players = await getQuestContract(quest).getPlayers();

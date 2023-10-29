@@ -32,7 +32,8 @@ export default async ({
 }: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-
+  // Get another deployed contract address
+  const { address: tokenAddress } = await deployments.get("DeedNFT");
   const deployResult = await deploy("Quest", {
     from: deployer,
     args: questConstructorArguments,

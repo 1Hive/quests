@@ -54,6 +54,18 @@ export class Quest__claimsResult {
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
   }
+
+  getEvidence(): Bytes {
+    return this.value0;
+  }
+
+  getPlayer(): Address {
+    return this.value1;
+  }
+
+  getAmount(): BigInt {
+    return this.value2;
+  }
 }
 
 export class Quest__depositResult {
@@ -70,6 +82,14 @@ export class Quest__depositResult {
     map.set("value0", ethereum.Value.fromAddress(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
+  }
+
+  getToken(): Address {
+    return this.value0;
+  }
+
+  getAmount(): BigInt {
+    return this.value1;
   }
 }
 

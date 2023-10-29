@@ -466,12 +466,10 @@ export default function Quest({
             <QuestFooterStyled>
               {walletConnected ? (
                 <>
-                  {questData.isWhitelist && (
-                    <PlayerListModal
-                      questData={questData}
-                      isEdit={walletAddress === questData.creatorAddress && questData.isWhitelist}
-                    />
-                  )}
+                  <PlayerListModal
+                    questData={questData}
+                    isEdit={walletAddress === questData.creatorAddress && questData.isWhitelist}
+                  />
                   <FundModal quest={questData} />
                   {questData.features.playableQuest && !questData.isWhitelist && (
                     <>

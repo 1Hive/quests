@@ -11,8 +11,8 @@
     "build": "graph codegen && graph build",
     "create-local": "graph create --node http://0.0.0.0:8020/ corantin/quests-subgraph",
     "remove-local": "graph remove --node http://0.0.0.0:8020/ corantin/quests-subgraph",
-    "deploy:goerli": "yarn manifest:goerli && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-goerli",
-    "deploy:staging-goerli": "yarn manifest:goerli && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-goerli-staging",
+    "deploy:goerli": "graph deploy --studio quests-goerli",
+    "deploy:staging-goerli": "graph deploy --studio quest-goerli-staging",
     "deploy:gnosis": "yarn manifest:gnosis && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-gnosis",
     "deploy:staging-gnosis": "yarn manifest:gnosis && graph deploy --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ corantin/quests-subgraph-staging",
     "deploy:local": "graph deploy --ipfs http://0.0.0.0:5001 --node http://0.0.0.0:8020 corantin/quests-subgraph",
@@ -20,8 +20,8 @@
     "graph": "graph"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.23.2",
-    "@graphprotocol/graph-ts": "^0.23.1",
+    "@graphprotocol/graph-cli": "^0.60.0",
+    "@graphprotocol/graph-ts": "^0.31.0",
     "configstore": "^6.0.0",
     "inquirer": "^8.2.4",
     "js-yaml": "^4.1.0",

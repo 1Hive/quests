@@ -5,19 +5,19 @@ import {
 import {
   CreateDepositEntity,
   QuestClaimEntity,
+  QuestMetadata,
   QuestEntity,
 } from "../../generated/schema";
-import { Bytes, ipfs } from "@graphprotocol/graph-ts";
-import { json } from "@graphprotocol/graph-ts";
+import { Bytes, dataSource, json, log } from "@graphprotocol/graph-ts";
 import { QuestClaimed } from "../../generated/QuestFactory-Quest/Quest";
-
+import { QuestMetadata as QuestMetadataTemplate } from "../../generated/templates";
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
   questEntity.version = 0;
   questEntity.questAddress = event.params.questAddress.toHexString();
   questEntity.questTitle = event.params.questTitle;
-  questEntity.questDetailsRef = event.params.questDetailsRef;
+  questEntity.questMetadata = event.params.questDetailsRef.toString();
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
   questEntity.creationTimestamp = event.block.timestamp;
@@ -27,43 +27,36 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questCreator = event.params.creator;
   questEntity.questMaxPlayers = null;
   questEntity.questPlayers = [];
+  questEntity.questIsWhiteListed = false;
 
-  if (!event.params.questDetailsRef) {
-    questEntity.questDescription = "";
-  } else {
-    // Fetching quest description with IPFS
-    let questDataBytes: Bytes | null = null;
-    let tryCount = 0;
-    while (!questDataBytes && tryCount < 3) {
-      // 3 tries in total (180 sec for each try)
-      questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
-      tryCount = tryCount + 1;
-    }
-    if (questDataBytes) {
-      let jsonResult = json.try_fromBytes(questDataBytes);
-      if (jsonResult.isOk) {
-        let jsonObject = jsonResult.value.toObject();
-        let communicationLink = jsonObject.get("communicationLink");
-        let questDescription = jsonObject.get("description");
-        questEntity.questCommunicationLink = communicationLink
-          ? communicationLink.toString()
-          : "";
-        questEntity.questDescription = questDescription
-          ? questDescription.toString()
-          : "";
-      } else {
-        let description = questDataBytes.toString();
-        questEntity.questDescription = description
-          ? description.toString()
-          : "";
-      }
-    } else {
-      // Continue with empty description
-      questEntity.questDescription = "";
-    }
-  }
+  QuestMetadataTemplate.create(questEntity.questMetadata);
+
+  log.info("Quest created [2]: {}", [event.params.questAddress.toHex()]);
 
   questEntity.save();
+}
+
+export function handleQuestMetadata(content: Bytes): void {
+  let detailMetadata = new QuestMetadata(dataSource.stringParam());
+  const res = json.try_fromBytes(content);
+  if (res.isOk) {
+    let jsonObject = res.value.toObject();
+    let communicationLink = jsonObject.get("communicationLink");
+    let questDescription = jsonObject.get("description");
+    detailMetadata.questCommunicationLink = communicationLink
+      ? communicationLink.toString()
+      : "";
+    detailMetadata.questDescription = questDescription
+      ? questDescription.toString()
+      : "";
+  } else {
+    let description = content.toString();
+    detailMetadata.questDescription = description ? description.toString() : "";
+  }
+
+  log.info("Quest description metadata: {}", [detailMetadata.id]);
+
+  detailMetadata.save();
 }
 
 export function handleQuestClaimed(event: QuestClaimed): void {
@@ -81,10 +74,8 @@ export function handleDepositChanged(event: DepositChanged): void {
   let depositEntity = new CreateDepositEntity(
     `Create_${event.params.timestamp.toString()}_${event.params.token.toHex()}_${event.params.amount.toHex()}`
   );
-
   depositEntity.timestamp = event.params.timestamp;
   depositEntity.depositToken = event.params.token;
   depositEntity.depositAmount = event.params.amount;
-
   depositEntity.save();
 }

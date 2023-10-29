@@ -1,11 +1,113 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 features:
   - fullTextSearch
   - nonFatalErrors
-  - ipfsOnEthereumContracts
 schema:
   file: ./src/schema.graphql
+templates:
+  - name: QuestMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/quest-factory.ts
+      handler: handleQuestMetadata
+      entities:
+        - QuestMetadata
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.proxy.json
 dataSources:
+  - kind: ethereum/contract
+    name: QuestFactory
+    network: goerli
+    source:
+      address: "0x4DfE6C03132BD14D95b87803e232AcA352a715b4"
+      abi: QuestFactory
+      startBlock: 7543619
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreated
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address)
+          handler: handleQuestCreated
+        - event: DepositChanged(uint256,address,uint256)
+          handler: handleDepositChanged
+      file: ./src/mappings/quest-factory.ts
+  - kind: ethereum/contract
+    name: QuestFactory-Quest
+    network: goerli
+    source:
+      abi: Quest
+      startBlock: 7543619
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - QuestClaimed
+      abis:
+        - name: Quest
+          file: ./abis/Quest.json
+      eventHandlers:
+        - event: QuestClaimed(bytes,address,uint256)
+          handler: handleQuestClaimed
+      file: ./src/mappings/quest-factory.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV2
+    network: goerli
+    source:
+      address: "0xa6FEAF5CA07b6F367CF39a840F5A7E41d0AE613D"
+      abi: QuestFactory
+      startBlock: 8240344
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - QuestCreatedV2
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.2.json
+      eventHandlers:
+        - event: QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address,uint256,address,uint32)
+          handler: handleQuestCreated
+        - event: CreateDepositChanged(uint256,address,uint256)
+          handler: handleCreateDepositChanged
+        - event: PlayDepositChanged(uint256,address,uint256)
+          handler: handlePlayDepositChanged
+      file: ./src/mappings/quest-factory.2.ts
+  - kind: ethereum/contract
+    name: QuestFactoryV2-Quest
+    network: goerli
+    source:
+      abi: Quest
+      startBlock: 8240344
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - QuestClaimedV2
+        - QuestPlayed
+        - QuestUnplayed
+      abis:
+        - name: Quest
+          file: ./abis/Quest.2.json
+      eventHandlers:
+        - event: QuestClaimed(bytes,address,uint256)
+          handler: handleQuestClaimed
+        - event: QuestPlayed(address,uint256)
+          handler: handleQuestPlayed
+        - event: QuestUnplayed(address,uint256)
+          handler: handleQuestUnplayed
+      file: ./src/mappings/quest-factory.2.ts
   - kind: ethereum/contract
     name: QuestFactoryProxy
     network: goerli
@@ -15,7 +117,7 @@ dataSources:
       startBlock: 9564173
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - QuestCreatedProxy
@@ -38,7 +140,7 @@ dataSources:
       startBlock: 9564173
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - QuestClaimedV2

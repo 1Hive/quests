@@ -15,10 +15,12 @@ const QuestEntityQuery = gql`
       version
       questAddress
       questTitle
-      questDescription
-      questCommunicationLink
       questExpireTimeSec
-      questDetailsRef
+      questMetadata {
+        id
+        questDescription
+        questCommunicationLink
+      }
       questRewardTokenAddress
       creationTimestamp
       questCreateDepositToken
@@ -90,9 +92,12 @@ const QuestEntitiesQuery = (payload: any) => gql`
       version
       questAddress
       questTitle
-      questDescription
       questExpireTimeSec
-      questDetailsRef
+      questMetadata {
+        id
+        questDescription
+        questCommunicationLink
+      }
       questRewardTokenAddress
       creationTimestamp
       questCreateDepositToken

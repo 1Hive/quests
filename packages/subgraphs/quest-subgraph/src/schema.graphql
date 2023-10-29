@@ -6,24 +6,25 @@ type _Schema_
     include: [
       {
         entity: "QuestEntity"
-        fields: [
-          { name: "questAddress" }
-          { name: "questTitle" }
-          { name: "questDescription" }
-        ]
+        fields: [{ name: "questAddress" }, { name: "questTitle" }]
       }
+      { entity: "QuestMetadata", fields: [{ name: "questDescription" }] }
     ]
   )
+
+type QuestMetadata @entity(immutable: false) {
+  id: ID!
+  questDescription: String!
+  questCommunicationLink: String
+}
 
 type QuestEntity @entity(immutable: false) {
   id: ID!
   version: Int!
   questAddress: String!
   questTitle: String!
-  questDescription: String!
-  questCommunicationLink: String
+  questMetadata: QuestMetadata!
   questExpireTimeSec: BigInt
-  questDetailsRef: Bytes!
   questRewardTokenAddress: Bytes!
   creationTimestamp: BigInt!
   questFundsRecoveryAddress: Bytes!
@@ -31,8 +32,8 @@ type QuestEntity @entity(immutable: false) {
   questMaxPlayers: BigInt
   questCreateDepositToken: Bytes!
   questCreateDepositAmount: BigInt!
-  questPlayDepositToken: Bytes!
-  questPlayDepositAmount: BigInt!
+  questPlayDepositToken: Bytes
+  questPlayDepositAmount: BigInt
   questPlayers: [String!]!
   questIsWhiteListed: Boolean!
 }

@@ -1,7 +1,8 @@
 import { QuestCreated } from "../../generated/QuestFactoryProxy/QuestFactory";
 import { QuestWhiteListChanged } from "../../generated/QuestFactoryProxy-Quest/Quest";
 import { QuestEntity } from "../../generated/schema";
-import { Bytes, ipfs, json, log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
+import { QuestMetadata as QuestMetadataTemplate } from "../../generated/templates";
 import {
   handleCreateDepositChanged,
   handlePlayDepositChanged,
@@ -24,7 +25,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.version = event.params.version.toI32();
   questEntity.questAddress = event.params.questAddress.toHexString();
   questEntity.questTitle = event.params.questTitle;
-  questEntity.questDetailsRef = event.params.questDetailsRef;
+  questEntity.questMetadata = event.params.questDetailsRef.toString();
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
   questEntity.creationTimestamp = event.block.timestamp;
@@ -38,40 +39,9 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questPlayers = [];
   questEntity.questIsWhiteListed = event.params.isWhiteList;
 
-  if (!event.params.questDetailsRef) {
-    questEntity.questDescription = "";
-  } else {
-    // Fetching quest description with IPFS
-    let questDataBytes: Bytes | null = null;
-    let tryCount = 0;
-    while (!questDataBytes && tryCount < 3) {
-      // 3 tries in total (180 sec for each try)
-      questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
-      tryCount = tryCount + 1;
-    }
-    if (questDataBytes) {
-      let jsonResult = json.try_fromBytes(questDataBytes);
-      if (jsonResult.isOk) {
-        let jsonObject = jsonResult.value.toObject();
-        let communicationLink = jsonObject.get("communicationLink");
-        let questDescription = jsonObject.get("description");
-        questEntity.questCommunicationLink = communicationLink
-          ? communicationLink.toString()
-          : "";
-        questEntity.questDescription = questDescription
-          ? questDescription.toString()
-          : "";
-      } else {
-        let description = questDataBytes.toString();
-        questEntity.questDescription = description
-          ? description.toString()
-          : "";
-      }
-    } else {
-      // Continue with empty description
-      questEntity.questDescription = "";
-    }
-  }
+  QuestMetadataTemplate.create(questEntity.questMetadata);
+
+  log.info("Quest created [proxy]: {}", [event.params.questAddress.toHex()]);
 
   questEntity.save();
 }
@@ -81,6 +51,7 @@ export function handleQuestWhiteListChanged(
 ): void {
   const questAddress = event.address.toHex();
   let questEntity = QuestEntity.load(questAddress);
+
   if (!questEntity) {
     log.error("Quest entity not found with address: {}", [questAddress]);
     return;
