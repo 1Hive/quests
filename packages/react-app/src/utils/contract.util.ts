@@ -51,18 +51,21 @@ function getContract(
     }
     const network = getNetwork();
     if (!contracts) contracts = getContractsJson(network);
-    let askedContract = contracts[contractName];
-    if (Array.isArray(askedContract) && askedContract.length) {
+    let askedContract;
+    const contractImplementations = contracts[contractName];
+    if (Array.isArray(contractImplementations) && contractImplementations.length) {
       if (abiIndex) {
-        // If no contract address override, use the last one
-        askedContract = askedContract[abiIndex];
+        askedContract = contractImplementations[abiIndex];
       } else if (contractAddressOverride) {
-        askedContract = askedContract.find(
-          (c) => c.address.toLowerCase() === contractAddressOverride.toLowerCase(),
+        askedContract = contractImplementations.find(
+          (c) => c.address?.toLowerCase() === contractAddressOverride.toLowerCase(),
         );
-      } else {
-        askedContract = askedContract[askedContract.length - 1]; // Use the last one
       }
+      if (!askedContract) {
+        askedContract = contractImplementations[contractImplementations.length - 1]; // Use the last one
+      }
+    } else {
+      askedContract = contractImplementations;
     }
     const contractAddress: string = contractAddressOverride ?? askedContract.address;
 

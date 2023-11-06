@@ -26,6 +26,11 @@ import ModalBase, { ModalCallback } from './modal-base';
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx(1)};
   width: fit-content;
+
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 const OpenButtonWrapperStyled = styled.div`
@@ -153,7 +158,7 @@ export default function ExecuteClaimModal({
             label="Execute"
             disabled={claim.state === ClaimStatus.Challenged}
             title="Trigger claim operation in the chain"
-            mode="positive"
+            mode="strong"
           />
         }
         onModalClosed={onModalClosed}

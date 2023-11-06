@@ -19,9 +19,13 @@ const TitleStyled = styled.div`
   ${textStyle('title3')}
 `;
 
-const ModalStyled = styled(Modal)`
+const ModalStyled = styled(Modal)<{ width: string }>`
   padding: ${GUpx(1)};
-  z-index: 1;
+  z-index: 2;
+
+  & > div > div > div {
+    width: ${({ cssWidth }) => cssWidth} !important;
+  }
 `;
 
 const TopRightCornerStyled = styled.div`
@@ -72,11 +76,11 @@ export default function ModalBase({
   const width = useMemo(() => {
     switch (size) {
       case 'small':
-        return 600;
+        return '40vw';
       case 'large':
-        return 1500;
+        return '75vw';
       default:
-        return 900;
+        return '60vw';
     }
   }, [size]);
 
@@ -142,9 +146,9 @@ export default function ModalBase({
       <div id={openButtonId}>{openButton}</div>
       {isOpenedState && (
         <ModalStyled
+          width={width}
           visible
           onClose={(e: any) => handleOnClose(e)}
-          width={(viewport: VisualViewport) => Math.min(viewport.width - 16, width)}
           style={css}
           id={id}
           tabIndex="-1"

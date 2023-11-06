@@ -5,18 +5,31 @@
 import { Contract, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 
-import type { Ownable } from "../Ownable";
+import type { OwnableUpgradeable } from "../OwnableUpgradeable";
 
-export class Ownable__factory {
+export class OwnableUpgradeable__factory {
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): Ownable {
-    return new Contract(address, _abi, signerOrProvider) as Ownable;
+  ): OwnableUpgradeable {
+    return new Contract(address, _abi, signerOrProvider) as OwnableUpgradeable;
   }
 }
 
 const _abi = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "version",
+        type: "uint8",
+      },
+    ],
+    name: "Initialized",
+    type: "event",
+  },
   {
     anonymous: false,
     inputs: [

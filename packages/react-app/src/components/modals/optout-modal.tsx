@@ -27,7 +27,7 @@ import { AmountFieldInputFormik } from '../field-input/amount-field-input';
 
 const FormStyled = styled(Form)`
   width: 100%;
-  padding: 32px 16px 0 32px;
+  padding: 16px 0;
 `;
 
 const OpenButtonStyled = styled(Button)`
@@ -94,7 +94,7 @@ export default function OptoutModal({ questData, onClose = noop }: Props) {
         message: 'Opting out quest',
         status: TransactionStatus.WaitingForSignature,
         type: TransactionType.QuestUnplay,
-        args: { questAddress: questData.address, player: values.player || walletAddress },
+        args: { questAddress: questData.address, players: [values.player || walletAddress] },
       };
       setTransaction(txPayload);
       const txReceipt = await QuestService.unplayQuest(

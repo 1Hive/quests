@@ -5,14 +5,18 @@
 import { Contract, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 
-import type { IERC20Permit } from "../IERC20Permit";
+import type { IERC20PermitUpgradeable } from "../IERC20PermitUpgradeable";
 
-export class IERC20Permit__factory {
+export class IERC20PermitUpgradeable__factory {
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IERC20Permit {
-    return new Contract(address, _abi, signerOrProvider) as IERC20Permit;
+  ): IERC20PermitUpgradeable {
+    return new Contract(
+      address,
+      _abi,
+      signerOrProvider
+    ) as IERC20PermitUpgradeable;
   }
 }
 

@@ -1,7 +1,18 @@
 import { TextInput } from '@1hive/1hive-ui';
 import { noop } from 'lodash-es';
 import { ReactNode } from 'react';
+import styled from 'styled-components';
 import { FieldInput } from './field-input';
+
+// #region StyledComponents
+
+const WrapperStyled = styled.div`
+  input.disabled {
+    opacity: 0.5;
+  }
+`;
+
+// #endregion
 
 type Props = {
   id?: string;
@@ -52,18 +63,21 @@ export default function NumberFieldInput({
       error={error}
     >
       {isEdit ? (
-        <TextInput
-          id={id}
-          type="number"
-          wide={wide}
-          onChange={onChange}
-          placeHolder={placeHolder}
-          onBlur={onBlur}
-          disabled={disabled}
-          max={max}
-          min={min}
-          isRequired={isRequired}
-        />
+        <WrapperStyled>
+          <TextInput
+            id={id}
+            type={disabled ? 'text' : 'number'}
+            wide={wide}
+            onChange={onChange}
+            placeHolder={placeHolder}
+            onBlur={onBlur}
+            disabled={disabled}
+            max={max}
+            min={min}
+            isRequired={isRequired}
+            value={disabled ? '∞' : value}
+          />
+        </WrapperStyled>
       ) : (
         value + suffix
       )}

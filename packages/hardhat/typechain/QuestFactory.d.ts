@@ -24,7 +24,8 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   functions: {
     "aragonGovernAddress()": FunctionFragment;
     "createDeposit()": FunctionFragment;
-    "createQuest(string,bytes,address,uint256,address,uint32)": FunctionFragment;
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)": FunctionFragment;
+    "initialize(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "playDeposit()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -32,6 +33,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     "setCreateDeposit(address,uint256)": FunctionFragment;
     "setPlayDeposit(address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "version()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -44,8 +46,17 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createQuest",
-    values: [string, BytesLike, string, BigNumberish, string, BigNumberish]
+    values: [
+      string,
+      BytesLike,
+      string,
+      BigNumberish,
+      string,
+      BigNumberish,
+      boolean
+    ]
   ): string;
+  encodeFunctionData(functionFragment: "initialize", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "playDeposit",
@@ -71,6 +82,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "aragonGovernAddress",
@@ -84,6 +96,7 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     functionFragment: "createQuest",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "playDeposit",
@@ -109,15 +122,18 @@ interface QuestFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {
     "CreateDepositChanged(uint256,address,uint256)": EventFragment;
+    "Initialized(uint8)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PlayDepositChanged(uint256,address,uint256)": EventFragment;
-    "QuestCreated(address,string,bytes,address,uint256,address,address,uint256,address,uint256,address,uint32)": EventFragment;
+    "QuestCreated(address,string,bytes,address,uint256,address,tuple,tuple,address,uint32,bool,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "CreateDepositChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PlayDepositChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "QuestCreated"): EventFragment;
@@ -156,16 +172,28 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    initialize(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "initialize(address)"(
+      _aragonGovernAddress: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -228,6 +256,10 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    version(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "version()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
@@ -249,16 +281,28 @@ export class QuestFactory extends Contract {
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
     _maxPlayers: BigNumberish,
+    _isWhiteList: boolean,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createQuest(string,bytes,address,uint256,address,uint32)"(
+  "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
     _questTitle: string,
     _questDetailsRef: BytesLike,
     _rewardToken: string,
     _expireTime: BigNumberish,
     _fundsRecoveryAddress: string,
     _maxPlayers: BigNumberish,
+    _isWhiteList: boolean,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  initialize(
+    _aragonGovernAddress: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "initialize(address)"(
+    _aragonGovernAddress: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -322,6 +366,10 @@ export class QuestFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  version(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "version()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   callStatic: {
     aragonGovernAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -342,18 +390,30 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    initialize(
+      _aragonGovernAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "initialize(address)"(
+      _aragonGovernAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -414,6 +474,10 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -422,6 +486,8 @@ export class QuestFactory extends Contract {
       token: null,
       amount: null
     ): EventFilter;
+
+    Initialized(version: null): EventFilter;
 
     OwnershipTransferred(
       previousOwner: string | null,
@@ -437,12 +503,12 @@ export class QuestFactory extends Contract {
       rewardTokenAddress: null,
       expireTime: null,
       fundsRecoveryAddress: null,
-      createDepositToken: null,
-      createDepositAmount: null,
-      playDepositToken: null,
-      playDepositAmount: null,
+      createDeposit: null,
+      playDeposit: null,
       creator: null,
-      maxPlayers: null
+      maxPlayers: null,
+      isWhiteList: null,
+      version: null
     ): EventFilter;
   };
 
@@ -462,16 +528,28 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    initialize(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "initialize(address)"(
+      _aragonGovernAddress: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -530,6 +608,10 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -552,16 +634,28 @@ export class QuestFactory extends Contract {
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createQuest(string,bytes,address,uint256,address,uint32)"(
+    "createQuest(string,bytes,address,uint256,address,uint32,bool)"(
       _questTitle: string,
       _questDetailsRef: BytesLike,
       _rewardToken: string,
       _expireTime: BigNumberish,
       _fundsRecoveryAddress: string,
       _maxPlayers: BigNumberish,
+      _isWhiteList: boolean,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    initialize(
+      _aragonGovernAddress: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(address)"(
+      _aragonGovernAddress: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -620,5 +714,9 @@ export class QuestFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

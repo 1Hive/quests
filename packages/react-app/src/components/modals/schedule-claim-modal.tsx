@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import { Button, Info } from '@1hive/1hive-ui';
 import { debounce, noop, uniqueId } from 'lodash-es';
 import { useState, useRef, useMemo, useCallback } from 'react';
@@ -11,7 +10,6 @@ import { GUpx } from 'src/utils/style.util';
 import { useWallet } from 'src/contexts/wallet.context';
 import { toChecksumAddress } from 'web3-utils';
 import { computeTransactionErrorMessage } from 'src/utils/errors.util';
-
 import { FormErrors } from 'src/models/form-errors';
 import { approveTokenTransaction } from 'src/services/transaction-handler';
 import { useIsMountedRef } from 'src/hooks/use-mounted.hook';
@@ -45,6 +43,11 @@ const FormStyled = styled(Form)`
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx(1)};
   width: fit-content;
+
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 const WrapperStyled = styled.div`
@@ -68,10 +71,6 @@ const ButtonLinkStyled = styled(Button)`
   font-weight: bold;
   background: transparent;
   padding-top: 4px;
-`;
-
-const ContactInformationWrapperStyled = styled.div`
-  max-width: 406px;
 `;
 
 const DepositInfoStyled = styled(Info)`
@@ -312,7 +311,7 @@ export default function ScheduleClaimModal({
                     key="confirmButton"
                     icon={<FaMoneyBillWave />}
                     label="Claim Quest"
-                    mode="positive"
+                    mode="strong"
                     type="submit"
                     form="form-claim"
                     className="m-8 submit-claim-button"
@@ -353,6 +352,7 @@ export default function ScheduleClaimModal({
                     wide
                     rows={10}
                     compact
+                    placeHolder='e.g. "I have completed the quest by killing the dragon."'
                   />
                   {questData.status === QuestStatus.Archived ? (
                     archivedWarning
@@ -407,19 +407,17 @@ export default function ScheduleClaimModal({
                     />
                   </Outset>
                   <Outset>
-                    <ContactInformationWrapperStyled>
-                      <MarkdownFieldInput
-                        id="contactInformation"
-                        isEdit
-                        label="Contact information (optional)"
-                        tooltip="The necessary contact information that the creator will use to communicate with you. (Optional)"
-                        value={values.contactInformation}
-                        onChange={handleChange}
-                        placeHolder="e.g. discord, email, phone number, etc."
-                        compact
-                        wide
-                      />
-                    </ContactInformationWrapperStyled>
+                    <MarkdownFieldInput
+                      id="contactInformation"
+                      isEdit
+                      label="Contact information (optional)"
+                      tooltip="The necessary contact information that the creator will use to communicate with you. (Optional)"
+                      value={values.contactInformation}
+                      onChange={handleChange}
+                      placeHolder="e.g. discord, email, phone number, etc."
+                      compact
+                      wide
+                    />
                     {willExpireBeforeClaim && expirationWarning}
                   </Outset>
                 </WrapperStyled>,

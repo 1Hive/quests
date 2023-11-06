@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import { isEqual } from 'lodash';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { FilterModel } from 'src/models/filter.model';
 import { DEFAULT_FILTER } from '../constants';
 
@@ -9,6 +10,7 @@ type FilterContextModel = {
   triggerRefresh: () => void;
   isFilterShown: boolean;
   toggleFilter: (_shown?: boolean) => void;
+  dirty: boolean;
 };
 
 const FilterContext = createContext<FilterContextModel | undefined>(undefined);
@@ -21,6 +23,11 @@ export const FilterContextProvider = ({ children }: Props) => {
   const [filter, setFilter] = useState<FilterModel>(DEFAULT_FILTER);
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [isFilterShown, setIsFilterShown] = useState(false); // Only for mobile view
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    setDirty(!isEqual(filter, DEFAULT_FILTER));
+  }, [filter]);
 
   const toggleFilter = (shown?: boolean) => {
     setIsFilterShown(shown ?? !isFilterShown);
@@ -39,6 +46,7 @@ export const FilterContextProvider = ({ children }: Props) => {
         refreshed: refreshCounter,
         isFilterShown,
         toggleFilter,
+        dirty,
       }}
     >
       {children}

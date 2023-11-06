@@ -1,6 +1,6 @@
 # Do not edit subgraph.yaml,this is a generated file.
 # Instead, edit subgraph.template.yaml and run `yarn manifest-<network>-[staging]`
-specVersion: 0.0.2
+specVersion: 0.0.5
 description: A template for Aragon subgraphs
 repository: https://github.com/aragon/govern
 schema:

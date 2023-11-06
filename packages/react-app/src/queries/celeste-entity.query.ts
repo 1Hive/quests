@@ -16,11 +16,11 @@ export const CelesteCourtConfigEntitiesQuery = gql`
 `;
 
 export const CelesteDisputeEntityQuery = gql`
-  query dispute($ID: String) {
+  query dispute($ID: Int) {
     dispute(id: $ID) {
       id
-      ruledAt
       state
+      finalRuling
     }
   }
 `;

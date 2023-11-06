@@ -11,6 +11,7 @@ import { Pages } from 'src/enums/pages.enum';
 import Header from './header';
 import Footer from './footer';
 import { BackToTop } from './back-to-top';
+import GuideModal from './modals/guide-modal';
 
 // #region StyledComponents
 
@@ -70,6 +71,7 @@ function MainView({ children }: Props) {
           {page ? children : <Skeleton /> /* TODO Put some spinner here */}
         </ContentWrapperStyled>
         <Footer />
+        <GuideModal />
       </ScrollViewStyled>
       <BackToTop />
     </Root.Provider>

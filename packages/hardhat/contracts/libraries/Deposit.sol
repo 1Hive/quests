@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
+// Solidity: Package Default Dependencies Directory = "node_modules"
 
-pragma solidity ^0.8.1;
+pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./Models.sol";
 
 library DepositLib {
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /*
      * Collect deposit from signer and send it to _to address.

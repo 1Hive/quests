@@ -6,6 +6,7 @@ export enum TransactionType {
   QuestReclaimFunds = 'QuestReclaimFunds',
   QuestPlay = 'QuestPlay',
   QuestUnplay = 'QuestUnplay',
+  QuestSetWhitelist = 'QuestSetWhitelist',
   ClaimSchedule = 'ClaimSchedule',
   ClaimExecute = 'ClaimExecute',
   ClaimVeto = 'ClaimVeto',
