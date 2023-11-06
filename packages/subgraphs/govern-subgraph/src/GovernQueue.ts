@@ -1,11 +1,4 @@
-import {
-  Address,
-  Bytes,
-  BigInt,
-  ipfs,
-  json,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, Bytes, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   Challenged as ChallengedEvent,
   Configured as ConfiguredEvent,
@@ -52,9 +45,13 @@ import {
 import { loadOrCreateGovern } from "./Govern";
 
 export function handleScheduled(event: ScheduledEvent): void {
+  log.info("handleScheduled, {}", [event.params.containerHash.toHex()]);
   let queue = loadOrCreateQueue(event.address);
   let payload = loadOrCreatePayload(event.params.containerHash);
-  let container = loadOrCreateContainer(event.params.containerHash);
+  let container = loadOrCreateContainer(
+    event.params.containerHash,
+    event.address.toHex()
+  );
   let executor = loadOrCreateGovern(event.params.payload.executor);
 
   // Builds each of the actions bundled in the payload,
@@ -68,27 +65,6 @@ export function handleScheduled(event: ScheduledEvent): void {
   payload.allowFailuresMap = event.params.payload.allowFailuresMap;
   payload.proof = event.params.payload.proof;
 
-  let proofIpfsHex = event.params.payload.proof.toHexString().substring(2);
-
-  // if cidString is ipfs v1 version hex from the cid's raw bytes and
-  // we add `f` as a multibase prefix and remove `0x`
-  let result = ipfs.cat("f" + proofIpfsHex + "/metadata.json");
-  if (!result) {
-    // if cidString is ipfs v0 version hex from the cid's raw bytes,
-    // we add:
-    // 1. 112 (0x70 in hex) which is dag-pb format.
-    // 2. 01 because we want to use v1 version
-    // 3. f since cidString is already hex, we only add `f` without converting anything.
-    result = ipfs.cat("f0170" + proofIpfsHex + "/metadata.json");
-  }
-
-  if (result) {
-    // log.debug('title {}', [result.toHex()])
-    // let data = json.fromBytes(result as Bytes)
-    // payload.title = data.toObject().get('title').toString()
-    payload.title = result.toHex();
-  }
-
   container.payload = payload.id;
   container.state = SCHEDULED_STATUS;
   container.createdAt = event.block.timestamp;
@@ -99,7 +75,7 @@ export function handleScheduled(event: ScheduledEvent): void {
   let config = loadConfig(queue.config);
   let scheduleDeposit = loadCollateral(config.scheduleDeposit);
 
-  handleContainerEventSchedule(container, event, scheduleDeposit as Collateral);
+  handleContainerEventSchedule(container, event, scheduleDeposit);
 
   executor.save();
   payload.save();
@@ -108,14 +84,19 @@ export function handleScheduled(event: ScheduledEvent): void {
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  let container = loadOrCreateContainer(event.params.containerHash);
+  log.info("handleExecuted, {}", [event.params.containerHash.toHex()]);
+  let container = loadOrCreateContainer(
+    event.params.containerHash,
+    event.address.toHex()
+  );
   container.state = EXECUTED_STATUS;
   container.save();
 }
 
 export function handleChallenged(event: ChallengedEvent): void {
+  log.info("handleChallenged, {}", [event.params.containerHash.toHex()]);
   let queue = loadOrCreateQueue(event.address);
-  let container = loadOrCreateContainer(event.params.containerHash);
+  let container = loadOrCreateContainer(event.params.containerHash, queue.id);
 
   container.state = CHALLENGED_STATUS;
 
@@ -132,7 +113,11 @@ export function handleChallenged(event: ChallengedEvent): void {
 }
 
 export function handleResolved(event: ResolvedEvent): void {
-  let container = loadOrCreateContainer(event.params.containerHash);
+  log.info("handleResolved, {}", [event.params.containerHash.toHex()]);
+  let container = loadOrCreateContainer(
+    event.params.containerHash,
+    event.address.toHex()
+  );
 
   container.state = event.params.approved ? APPROVED_STATUS : REJECTED_STATUS;
 
@@ -155,8 +140,12 @@ export function handleResolved(event: ResolvedEvent): void {
 }
 
 export function handleVetoed(event: VetoedEvent): void {
+  log.info("handleVetoed, {}", [event.params.containerHash.toHex()]);
   let queue = loadOrCreateQueue(event.address);
-  let container = loadOrCreateContainer(event.params.containerHash);
+  let container = loadOrCreateContainer(
+    event.params.containerHash,
+    event.address.toHex()
+  );
 
   container.state = VETOED_STATUS;
 
@@ -167,11 +156,11 @@ export function handleVetoed(event: VetoedEvent): void {
 }
 
 export function handleConfigured(event: ConfiguredEvent): void {
+  log.info("handleConfigured, {}", [event.transaction.hash.toHex()]);
   let queue = loadOrCreateQueue(event.address);
 
   let configId = buildId(event);
   let config = new Config(configId);
-
   let scheduleDeposit = new Collateral(
     buildIndexedId(event.transaction.hash.toHex(), 1)
   );
@@ -186,13 +175,13 @@ export function handleConfigured(event: ConfiguredEvent): void {
 
   // Grab Schedule Token info
   let data = getERC20Info(event.params.config.scheduleDeposit.token);
-  scheduleDeposit.decimals = data.decimals;
+  scheduleDeposit.decimals = data.decimals!.toI32();
   scheduleDeposit.name = data.name;
   scheduleDeposit.symbol = data.symbol;
 
   // Grab challenge Token info
   data = getERC20Info(event.params.config.challengeDeposit.token);
-  challengeDeposit.decimals = data.decimals;
+  challengeDeposit.decimals = data.decimals!.toI32();
   challengeDeposit.name = data.name;
   challengeDeposit.symbol = data.symbol;
 
@@ -203,6 +192,7 @@ export function handleConfigured(event: ConfiguredEvent): void {
   config.rules = event.params.config.rules;
   config.maxCalldataSize = event.params.config.maxCalldataSize;
 
+  scheduleDeposit.save();
   queue.config = config.id;
 
   scheduleDeposit.save();
@@ -214,14 +204,16 @@ export function handleConfigured(event: ConfiguredEvent): void {
 // MiniACL Events
 
 export function handleFrozen(event: FrozenEvent): void {
+  log.info("handleFrozen, {}", [event.transaction.hash.toHex()]);
   let queue = loadOrCreateQueue(event.address);
 
-  let roles = queue.roles!;
+  let roles = queue.roles;
 
   frozenRoles(roles, event.params.role);
 }
 
 export function handleGranted(event: GrantedEvent): void {
+  log.info("handleGranted, {}", [event.transaction.hash.toHex()]);
   let queue = loadOrCreateQueue(event.address);
 
   let role = roleGranted(event.address, event.params.role, event.params.who);
@@ -235,6 +227,7 @@ export function handleGranted(event: GrantedEvent): void {
 }
 
 export function handleRevoked(event: RevokedEvent): void {
+  log.info("handleRevoked, {}", [event.transaction.hash.toHex()]);
   let queue = loadOrCreateQueue(event.address);
 
   let role = roleRevoked(event.address, event.params.role, event.params.who);
@@ -249,6 +242,7 @@ export function handleRevoked(event: RevokedEvent): void {
 
 // create a dummy config when creating queue to avoid not-null error
 export function createDummyConfig(queueId: string): string {
+  log.info("createDummyConfig, {}", [queueId]);
   let ZERO = BigInt.fromI32(0);
 
   let configId = queueId;
@@ -266,69 +260,91 @@ export function createDummyConfig(queueId: string): string {
   config.scheduleDeposit = scheduleDeposit.id;
   config.challengeDeposit = challengeDeposit.id;
   config.resolver = ZERO_ADDRESS;
-  config.rules = Bytes.fromI32(0) as Bytes;
+  config.rules = Bytes.fromI32(0);
   config.maxCalldataSize = BigInt.fromI32(0);
   scheduleDeposit.save();
   challengeDeposit.save();
   config.save();
 
-  return config.id!;
+  return config.id;
 }
 
 export function loadOrCreateQueue(queueAddress: Address): GovernQueue {
+  log.info("loadOrCreateQueue, {}", [queueAddress.toHex()]);
   let queueId = queueAddress.toHex();
   // Create queue
   let queue = GovernQueue.load(queueId);
   if (queue === null) {
+    log.info("loadOrCreateQueue, create new queue, {}", [queueId]);
     queue = new GovernQueue(queueId);
     queue.address = queueAddress;
     queue.config = createDummyConfig(queueId);
     queue.roles = [];
   }
-
   queue.nonce = GovernQueueContract.bind(queueAddress).nonce();
 
-  return queue!;
+  return queue;
 }
 
-export function loadOrCreateContainer(containerHash: Bytes): Container {
+export function loadOrCreateContainer(
+  containerHash: Bytes,
+  queue: string
+): Container {
+  log.info("loadOrCreateContainer, {}", [containerHash.toHex()]);
   let ContainerId = containerHash.toHex();
   // Create container
   let container = Container.load(ContainerId);
   if (container === null) {
+    log.info("loadOrCreateContainer, create new container, {}", [ContainerId]);
     container = new Container(ContainerId);
     container.state = NONE_STATUS;
+    container.queue = queue;
+    container.config = createDummyConfig(queue);
+    container.payload = "temp";
+    container.createdAt = BigInt.fromI32(0);
   }
-  return container!;
+  return container;
 }
 
-function loadOrCreatePayload(containerHash: Bytes): Payload {
+export function loadOrCreatePayload(containerHash: Bytes): Payload {
+  log.info("loadOrCreatePayload, {}", [containerHash.toHex()]);
   let PayloadId = containerHash.toHex();
   // Create payload
   let payload = Payload.load(PayloadId);
   if (payload === null) {
+    log.info("loadOrCreatePayload, create new payload, {}", [PayloadId]);
     payload = new Payload(PayloadId);
+    payload.nonce = BigInt.fromI32(0);
+    payload.executionTime = BigInt.fromI32(0);
+    payload.submitter = ZERO_ADDRESS;
+    payload.executor = ZERO_ADDRESS.toHex();
+    payload.allowFailuresMap = Bytes.fromI32(0);
+    payload.proof = Bytes.fromI32(0);
   }
-  return payload!;
+
+  return payload;
 }
 
-function loadConfig(configAddress: string): Config {
+export function loadConfig(configAddress: string): Config {
+  log.info("loadConfig, {}", [configAddress]);
   let config = Config.load(configAddress);
   if (config === null) {
     throw new Error("Config not found.");
   }
-  return config!;
+  return config;
 }
 
-function loadCollateral(collateralAddress: string): Collateral {
+export function loadCollateral(collateralAddress: string): Collateral {
+  log.info("loadCollateral, {}", [collateralAddress]);
   let collateral = Collateral.load(collateralAddress);
   if (collateral === null) {
     throw new Error("Collateral not found.");
   }
-  return collateral!;
+  return collateral;
 }
 
-function buildActions(event: ScheduledEvent): void {
+export function buildActions(event: ScheduledEvent): void {
+  log.info("buildActions, {}", [event.transaction.hash.toHex()]);
   let actions = event.params.payload.actions;
   for (let index = 0; index < actions.length; index++) {
     let actionId = buildIndexedId(event.params.containerHash.toHex(), index);

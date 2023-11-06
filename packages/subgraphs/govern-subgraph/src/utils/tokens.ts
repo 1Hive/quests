@@ -1,11 +1,11 @@
-import { ethereum } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/GovernQueue/ERC20";
 import { Address } from "@graphprotocol/graph-ts";
 
 class ERCInfo {
-  decimals: i32;
-  name: string;
-  symbol: string;
+  decimals: BigInt | null;
+  name: string | null;
+  symbol: string | null;
 }
 
 export function getERC20Info(address: Address): ERCInfo {
@@ -16,7 +16,7 @@ export function getERC20Info(address: Address): ERCInfo {
   let symbol = token.try_symbol();
 
   return {
-    decimals: decimals.reverted ? null : decimals.value,
+    decimals: decimals.reverted ? null : BigInt.fromI32(decimals.value),
     name: name.reverted ? null : name.value,
     symbol: decimals.reverted ? null : symbol.value,
   };

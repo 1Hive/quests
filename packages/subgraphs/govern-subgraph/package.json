@@ -10,7 +10,7 @@
     "manifest:gnosis": "node ./scripts/mustache gnosis",
     "build": "graph build",
     "codegen": "graph codegen",
-    "deploy:goerli": "dotenv -- cross-var yarn manifest:goerli && graph deploy corantin/govern-goerli --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
+    "deploy:goerli": "graph deploy --studio govern-goerli",
     "deploy:goerli-staging": "dotenv -- cross-var yarn manifest:goerli && graph deploy corantin/govern-goerli-staging --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
     "deploy:gnosis": "dotenv -- cross-var yarn manifest:gnosis && graph deploy corantin/govern-1hive-xdai --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
     "deploy:gnosis-staging": "dotenv -- cross-var yarn manifest:gnosis && graph deploy corantin/govern-1hive-gnosis-staging --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %THE_GRAPH_ACCESS_TOKEN%",
@@ -19,8 +19,8 @@
     "graph": "graph"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.19.0",
-    "@graphprotocol/graph-ts": "^0.19.0",
+    "@graphprotocol/graph-cli": "^0.60.0",
+    "@graphprotocol/graph-ts": "^0.31.0",
     "mustache": "^4.2.0"
   },
   "dependencies": {

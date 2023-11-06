@@ -11,7 +11,7 @@ export const networks = Object.freeze({
     name: 'Goerli tesnet',
     explorer: 'etherscan',
     questsSubgraph: 'https://api.studio.thegraph.com/query/33583/quests-goerli/version/latest',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli',
+    governSubgraph: 'https://api.studio.thegraph.com/query/33583/govern-goerli/version/latest',
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     questFactoryAddress: HardhatDeployement[5].goerli.contracts.QuestFactory.address,
     celesteAddress: HardhatDeployement[5].goerli.contracts.Celeste.address,
@@ -24,7 +24,7 @@ export const networks = Object.freeze({
   },
   goerliStaging: {
     stagingOf: 'goerli',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli-staging',
+    // governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli-staging',
   } as StagingNetworkModel,
   gnosis: {
     networkId: 'xdai',

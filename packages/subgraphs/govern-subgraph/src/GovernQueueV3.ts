@@ -1,11 +1,6 @@
-import {
-  ContainerEventResolve,
-} from "../generated/schema";
+import { ContainerEventResolve } from "../generated/schema";
 
-import {
-  Resolved as ResolvedEvent,
-} from "../generated/GovernQueueV3/GovernQueue";
-
+import { Resolved as ResolvedEvent } from "../generated/GovernQueueV3/GovernQueue";
 
 import { buildEventHandlerId } from "./utils/ids";
 import { finalizeContainerEvent } from "./utils/events";
@@ -17,14 +12,17 @@ import {
 
 import { loadOrCreateContainer } from "./GovernQueue";
 
-export * from "./GovernQueue";
+export * from "./GovernQueueV2";
 
 export function handleResolved(event: ResolvedEvent): void {
-  let container = loadOrCreateContainer(event.params.containerHash);
+  let container = loadOrCreateContainer(
+    event.params.containerHash,
+    event.address.toHex()
+  );
 
-  if (event.params.ruling == 4) {
+  if (event.params.ruling.toI32() == 4) {
     container.state = APPROVED_STATUS;
-  } else if (event.params.ruling == 3) {
+  } else if (event.params.ruling.toI32() == 3) {
     container.state = REJECTED_STATUS;
   } else {
     container.state = CANCELLED_STATUS;
@@ -37,7 +35,7 @@ export function handleResolved(event: ResolvedEvent): void {
   );
 
   let containerEvent = new ContainerEventResolve(eventId);
-  containerEvent.ruling = event.params.ruling;
+  containerEvent.ruling = event.params.ruling.toI32();
 
   finalizeContainerEvent<ResolvedEvent, ContainerEventResolve>(
     container,
