@@ -126,7 +126,7 @@ dataSources:
           handler: handleResolved
         - event: Revoked(indexed bytes4,indexed address,indexed address)
           handler: handleRevoked
-      file: ./src/GovernQueue.ts
+      file: ./src/GovernQueueV2.ts
   - kind: ethereum/contract
     name: GovernQueueV3
     network: goerli
