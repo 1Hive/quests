@@ -1,11 +1,29 @@
 {
   "folders": [
-    { "name": "WebApp", "path": "./packages/react-app" },
-    { "name": "Hardhat", "path": "./packages/hardhat" },
-    { "name": "Subgraph", "path": "./packages/subgraphs" },
-    { "name": "Services", "path": "./packages/services" },
-    { "name": "E2E", "path": "./packages/e2e" },
-    { "name": "Root", "path": "." }
+    {
+      "name": "WebApp",
+      "path": "./packages/react-app"
+    },
+    {
+      "name": "Hardhat",
+      "path": "./packages/hardhat"
+    },
+    {
+      "name": "Subgraph",
+      "path": "./packages/subgraphs"
+    },
+    {
+      "name": "Services",
+      "path": "./packages/services"
+    },
+    {
+      "name": "E2E",
+      "path": "./packages/e2e"
+    },
+    {
+      "name": "Root",
+      "path": "."
+    }
   ],
   "settings": {
     "typescript.tsdk": "WebApp/node_modules/typescript/lib",
@@ -15,6 +33,9 @@
     },
     "[json]": {
       "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[properties]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
     }
   },
   "extensions": {

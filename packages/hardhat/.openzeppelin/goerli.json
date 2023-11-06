@@ -1,0 +1,768 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0xa7F867D22420faB2D684351b9C95f7128e138d52",
+    "txHash": "0x8be132f70dd70e5c0968f5a6b417f87bc75c3c0754ba876faab1b18f64d25456"
+  },
+  "proxies": [
+    {
+      "address": "0x6bc0CD1e98B66b5644f0720f7dF7786746628C5d",
+      "txHash": "0x41ea17ea8558f65e3628d0f46dac6bb0a4018588e9a942fca53dcdfedc42c7a9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xBd66CcFceAE3836885F74295C922Da2d8cdD7940",
+      "txHash": "0x0686abbde2960577f4df420458f582e26cefbbaf60f1225522736cf7ad9566f9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3E4E6Ea969722382f76858D2eF0cf89E45a848e1",
+      "txHash": "0x36291cd05033fcbeab07ec5e3abbfa84036bd2a1eeace0980a332b989e933c4a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xbfFEce7c884a488921F52Fb4dd0b0c61B77C9104",
+      "txHash": "0x79ea242422293cb66ecc3f08d3f929760ba90dbb1c272a3eacd9bb4c74a337c3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x05301D6787430d26bb0D6430Bd98a59B955a27D0",
+      "txHash": "0xcea8f557f3c834b08b05f85965ad21d2fec5717be730ae5a0fddf016c0b7d5d7",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "32a98c90f0fb31631d3da5e565a60b3bcf5d152d3dc81b21ecd5cc0c8c42df91": {
+      "address": "0xF2574ba0570E38edf3917eB7f7f1314d40609612",
+      "txHash": "0xed9e2a5d5913c781f2d16c62217339c4ffe12156c04a1676819e15e855142bab",
+      "layout": {
+        "solcVersion": "0.8.2",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "aragonGovernAddress",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:15"
+          },
+          {
+            "label": "createDeposit",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_struct(Deposit)3257_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:16"
+          },
+          {
+            "label": "playDeposit",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_struct(Deposit)3257_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:17"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)378": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_struct(Deposit)3257_storage": {
+            "label": "struct Models.Deposit",
+            "members": [
+              {
+                "label": "token",
+                "type": "t_contract(IERC20Upgradeable)378",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "f79f007915555548f0a15b15684b2d233289de453b81e4943b45d8bc59f15406": {
+      "address": "0xf8f927FE67bD8b0a9B0673f4Ae9f04b2e51a5974",
+      "txHash": "0x56fafd877ad959504d65e4ad13ca314041ae0392350a8a87c7f6d65d461b0044",
+      "layout": {
+        "solcVersion": "0.8.2",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "aragonGovernAddress",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:15"
+          },
+          {
+            "label": "createDeposit",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_struct(Deposit)3246_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:16"
+          },
+          {
+            "label": "playDeposit",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_struct(Deposit)3246_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:17"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)378": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_struct(Deposit)3246_storage": {
+            "label": "struct Models.Deposit",
+            "members": [
+              {
+                "label": "token",
+                "type": "t_contract(IERC20Upgradeable)378",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "5e9ff64d2f8c29ea479b86854efdb27d8660c24701351b95a6f3997727ae61d1": {
+      "address": "0x01cf8920D51B579b10e1d8CeaB2afc25708d8C15",
+      "txHash": "0x93edc2c4e9818257200d9919bca42993174c7f15c2b1419525a935f38d6e5d2c",
+      "layout": {
+        "solcVersion": "0.8.2",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "aragonGovernAddress",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:15"
+          },
+          {
+            "label": "createDeposit",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_struct(Deposit)2534_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:16"
+          },
+          {
+            "label": "playDeposit",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_struct(Deposit)2534_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:17"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)378": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_struct(Deposit)2534_storage": {
+            "label": "struct Models.Deposit",
+            "members": [
+              {
+                "label": "token",
+                "type": "t_contract(IERC20Upgradeable)378",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "de52b0ea94600e22bb1a04240f6f598b21211a05d4828563b15fc5a57f57de0a": {
+      "address": "0x9f2FD32105e18E9047E0C110D8De2bd8442eCe51",
+      "txHash": "0x7c0402440a6035002c44f30978473f022ca57da789cb208d77ab22fefc9f62ab",
+      "layout": {
+        "solcVersion": "0.8.2",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "aragonGovernAddress",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:15"
+          },
+          {
+            "label": "createDeposit",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_struct(Deposit)2534_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:16"
+          },
+          {
+            "label": "playDeposit",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_struct(Deposit)2534_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:17"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)378": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_struct(Deposit)2534_storage": {
+            "label": "struct Models.Deposit",
+            "members": [
+              {
+                "label": "token",
+                "type": "t_contract(IERC20Upgradeable)378",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "15d09e1816c744d7dd732ea12cbe4a1feac663fedbcaacfa0eeb4fb90aa46134": {
+      "address": "0xe80ef86aA1C151c6bfc4f90F41dcec1EDB0b5a12",
+      "txHash": "0xb09c4df25c571070c578d3960ea684210aaa5b6b9b31ab8c6b56b4e68473568c",
+      "layout": {
+        "solcVersion": "0.8.2",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "aragonGovernAddress",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:15"
+          },
+          {
+            "label": "createDeposit",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_struct(Deposit)2546_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:16"
+          },
+          {
+            "label": "playDeposit",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_struct(Deposit)2546_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:17"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)378": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_struct(Deposit)2546_storage": {
+            "label": "struct Models.Deposit",
+            "members": [
+              {
+                "label": "token",
+                "type": "t_contract(IERC20Upgradeable)378",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "e47fe87f5e73b3947c18776f366d3f57f96d6eb7597480f31caccc70f0b7f078": {
+      "address": "0x0665F2dBE58DdC50FcA848A16A9f39b2C4Ff9d42",
+      "txHash": "0x8e0a03ad8beeb1f959832f986fe49ee3879d3cf165f15c16af1810cebbac9ee9",
+      "layout": {
+        "solcVersion": "0.8.2",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "aragonGovernAddress",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:15"
+          },
+          {
+            "label": "createDeposit",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_struct(Deposit)2568_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:16"
+          },
+          {
+            "label": "playDeposit",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_struct(Deposit)2568_storage",
+            "contract": "QuestFactory",
+            "src": "contracts\\QuestFactory.sol:17"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)378": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_struct(Deposit)2568_storage": {
+            "label": "struct Models.Deposit",
+            "members": [
+              {
+                "label": "token",
+                "type": "t_contract(IERC20Upgradeable)378",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}

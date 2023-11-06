@@ -1,10 +1,11 @@
 import { Button, DropDown, useTheme, useViewport } from '@1hive/1hive-ui';
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useFilterContext } from 'src/contexts/filter.context';
 import { QuestStatus } from 'src/enums/quest-status.enum';
 import { ThemeInterface } from 'src/styles/theme';
 import { GUpx } from 'src/utils/style.util';
 import styled, { css } from 'styled-components';
+import { QuestPlayStatus } from 'src/enums/quest-play-status.enum';
 import { DEFAULT_FILTER } from '../constants';
 import DateFieldInput from './field-input/date-field-input';
 import { FieldInput } from './field-input/field-input';
@@ -84,21 +85,21 @@ const SearchTextInputWrapperStyled = styled.div<{ wide: boolean }>`
 
 type Props = {
   compact?: boolean;
+  onRefresh(): void;
 };
 
 const QuestStatusOptions = [QuestStatus.Active, QuestStatus.Expired, QuestStatus.All];
-
-export function Filter({ compact }: Props) {
-  const { filter, setFilter, toggleFilter } = useFilterContext();
+const QuestPlayStatusOptions = [
+  QuestPlayStatus.All,
+  QuestPlayStatus.Played,
+  QuestPlayStatus.Unplayed,
+];
+export function Filter({ compact, onRefresh }: Props) {
+  const { filter, setFilter, toggleFilter, dirty } = useFilterContext();
   const theme = useTheme();
   const { below, width } = useViewport();
   const { isFilterShown } = useFilterContext();
   const isSmallResolution = useMemo(() => below('medium'), [width]);
-  const [isFilteringOriginalState, setIsFilteringOriginalState] = useState(false);
-
-  useEffect(() => {
-    setIsFilteringOriginalState(filter === DEFAULT_FILTER);
-  }, [filter]);
 
   return (
     <>
@@ -143,14 +144,33 @@ export function Filter({ compact }: Props) {
               compact={compact}
             />
           </FieldInput>
+          <FieldInput
+            label={!compact ? 'Play Status' : ''}
+            wide={isSmallResolution}
+            id="filterPlayStatus"
+            tooltip="Filter by quests you have played or not played"
+          >
+            <StatusDropdownStyled
+              id="filterPlayStatus"
+              items={QuestPlayStatusOptions}
+              borderColor={theme.border}
+              selected={QuestPlayStatusOptions.indexOf(filter.playStatus)}
+              onChange={(i: number) =>
+                setFilter({ ...filter, playStatus: QuestPlayStatusOptions[i] })
+              }
+              wide
+              compact={compact}
+            />
+          </FieldInput>
           <ButtonLineStyled isSmallResolution={isSmallResolution}>
             <Button
               label="Reset"
               mode="strong"
-              disabled={isFilteringOriginalState}
+              disabled={!dirty}
               wide={below('medium')}
               onClick={() => setFilter(DEFAULT_FILTER)}
             />
+            <Button label="Refresh" wide={below('medium')} onClick={() => onRefresh()} />
             {isSmallResolution && <Button label="Close" onClick={() => toggleFilter(false)} />}
           </ButtonLineStyled>
         </FilterWrapperStyled>

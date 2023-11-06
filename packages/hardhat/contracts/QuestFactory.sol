@@ -1,19 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.1;
+pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./libraries/Deposit.sol";
 import "./libraries/Models.sol";
 import "./Quest.sol";
 
-contract QuestFactory is Ownable {
+contract QuestFactory is OwnableUpgradeable {
     using DepositLib for Models.Deposit;
 
     address public aragonGovernAddress;
     Models.Deposit public createDeposit;
     Models.Deposit public playDeposit;
+    uint256 public constant version = 3;
 
     event QuestCreated(
         address questAddress,
@@ -22,12 +24,12 @@ contract QuestFactory is Ownable {
         address rewardTokenAddress,
         uint256 expireTime,
         address fundsRecoveryAddress,
-        address createDepositToken,
-        uint256 createDepositAmount,
-        address playDepositToken,
-        uint256 playDepositAmount,
+        Models.Deposit createDeposit,
+        Models.Deposit playDeposit,
         address creator,
-        uint32 maxPlayers
+        uint32 maxPlayers,
+        bool isWhiteList,
+        uint256 version
     );
 
     event CreateDepositChanged(
@@ -38,20 +40,14 @@ contract QuestFactory is Ownable {
 
     event PlayDepositChanged(uint256 timestamp, address token, uint256 amount);
 
-    constructor(
-        address _aragonGovernAddress,
-        IERC20 _createDepositToken,
-        uint256 _createDepositAmount,
-        IERC20 _playDepositToken,
-        uint256 _playDepositAmount,
-        address _initialOwner
-    ) {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address _aragonGovernAddress) public initializer {
+        __Ownable_init();
         aragonGovernAddress = _aragonGovernAddress;
-        setCreateDeposit(_createDepositToken, _createDepositAmount);
-        setPlayDeposit(_playDepositToken, _playDepositAmount);
-        if (_initialOwner != msg.sender) {
-            transferOwnership(_initialOwner);
-        }
     }
 
     /*
@@ -60,7 +56,10 @@ contract QuestFactory is Ownable {
      * @param _depositAmount The deposit amount.
      * emit CreateDepositChanged
      */
-    function setCreateDeposit(IERC20 token, uint256 amount) public onlyOwner {
+    function setCreateDeposit(
+        IERC20Upgradeable token,
+        uint256 amount
+    ) public onlyOwner {
         createDeposit = Models.Deposit(token, amount);
         emit CreateDepositChanged(block.timestamp, address(token), amount);
     }
@@ -71,7 +70,10 @@ contract QuestFactory is Ownable {
      * @param _depositAmount The deposit amount.
      * emit PlayDepositChanged
      */
-    function setPlayDeposit(IERC20 token, uint256 amount) public onlyOwner {
+    function setPlayDeposit(
+        IERC20Upgradeable token,
+        uint256 amount
+    ) public onlyOwner {
         playDeposit = Models.Deposit(token, amount);
         emit PlayDepositChanged(block.timestamp, address(token), amount);
     }
@@ -91,22 +93,26 @@ contract QuestFactory is Ownable {
     function createQuest(
         string memory _questTitle,
         bytes memory _questDetailsRef,
-        IERC20 _rewardToken,
+        IERC20Upgradeable _rewardToken,
         uint256 _expireTime,
         address payable _fundsRecoveryAddress,
-        uint32 _maxPlayers
+        uint32 _maxPlayers,
+        bool _isWhiteList
     ) external returns (address) {
         Quest quest = new Quest(
             _questTitle,
             _questDetailsRef,
-            _rewardToken,
-            _expireTime,
-            aragonGovernAddress,
-            _fundsRecoveryAddress,
             Models.Deposit(createDeposit.token, createDeposit.amount),
             Models.Deposit(playDeposit.token, playDeposit.amount),
-            msg.sender,
-            _maxPlayers
+            Models.QuestParam(
+                msg.sender,
+                _maxPlayers,
+                _rewardToken,
+                _expireTime,
+                aragonGovernAddress,
+                _fundsRecoveryAddress,
+                _isWhiteList
+            )
         );
 
         // Collect deposit from quest creator and send it to quest
@@ -119,12 +125,12 @@ contract QuestFactory is Ownable {
             address(_rewardToken),
             _expireTime,
             _fundsRecoveryAddress,
-            address(createDeposit.token),
-            createDeposit.amount,
-            address(playDeposit.token),
-            playDeposit.amount,
+            createDeposit,
+            playDeposit,
             msg.sender,
-            _maxPlayers
+            _maxPlayers,
+            _isWhiteList,
+            version
         );
 
         return address(quest);

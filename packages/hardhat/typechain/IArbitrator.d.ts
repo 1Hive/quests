@@ -24,8 +24,8 @@ interface IArbitratorInterface extends ethers.utils.Interface {
   functions: {
     "getDisputeFees()": FunctionFragment;
     "submitEvidence(uint256,address,bytes)": FunctionFragment;
-    "closeEvidencePeriod(uint256)": FunctionFragment;
     "createDispute(uint256,bytes)": FunctionFragment;
+    "closeEvidencePeriod(address,uint256)": FunctionFragment;
     "rule(uint256)": FunctionFragment;
   };
 
@@ -38,12 +38,12 @@ interface IArbitratorInterface extends ethers.utils.Interface {
     values: [BigNumberish, string, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "closeEvidencePeriod",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "createDispute",
     values: [BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closeEvidencePeriod",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "rule", values: [BigNumberish]): string;
 
@@ -56,11 +56,11 @@ interface IArbitratorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "closeEvidencePeriod",
+    functionFragment: "createDispute",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "createDispute",
+    functionFragment: "closeEvidencePeriod",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "rule", data: BytesLike): Result;
@@ -116,16 +116,6 @@ export class IArbitrator extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
     createDispute(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
@@ -135,6 +125,18 @@ export class IArbitrator extends Contract {
     "createDispute(uint256,bytes)"(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -183,16 +185,6 @@ export class IArbitrator extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  closeEvidencePeriod(
-    _disputeId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "closeEvidencePeriod(uint256)"(
-    _disputeId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   createDispute(
     _possibleRulings: BigNumberish,
     _metadata: BytesLike,
@@ -202,6 +194,18 @@ export class IArbitrator extends Contract {
   "createDispute(uint256,bytes)"(
     _possibleRulings: BigNumberish,
     _metadata: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeEvidencePeriod(
+    _subject: string,
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeEvidencePeriod(address,uint256)"(
+    _subject: string,
+    _disputeId: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -250,16 +254,6 @@ export class IArbitrator extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     createDispute(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
@@ -271,6 +265,18 @@ export class IArbitrator extends Contract {
       _metadata: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     rule(
       _disputeId: BigNumberish,
@@ -304,16 +310,6 @@ export class IArbitrator extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
     createDispute(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
@@ -323,6 +319,18 @@ export class IArbitrator extends Contract {
     "createDispute(uint256,bytes)"(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -355,16 +363,6 @@ export class IArbitrator extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
     createDispute(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
@@ -374,6 +372,18 @@ export class IArbitrator extends Contract {
     "createDispute(uint256,bytes)"(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

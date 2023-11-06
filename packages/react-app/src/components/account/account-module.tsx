@@ -158,7 +158,7 @@ function AccountModule({ compact = false }: Props) {
         <Button
           icon={<IconConnect />}
           label={`Switch wallet to ${name}`}
-          onClick={() => wallet.changeNetwork()}
+          onClick={() => wallet.changeNetwork(undefined, false)}
           display={compact ? 'icon' : 'all'}
           mode="strong"
         />

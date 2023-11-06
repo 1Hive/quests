@@ -10,8 +10,8 @@ export const networks = Object.freeze({
     chainId: 5,
     name: 'Goerli tesnet',
     explorer: 'etherscan',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-goerli',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli',
+    questsSubgraph: 'https://api.studio.thegraph.com/query/33583/quests-goerli/version/latest',
+    governSubgraph: 'https://api.studio.thegraph.com/query/33583/govern-goerli/version/latest',
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     questFactoryAddress: HardhatDeployement[5].goerli.contracts.QuestFactory.address,
     celesteAddress: HardhatDeployement[5].goerli.contracts.Celeste.address,
@@ -24,8 +24,7 @@ export const networks = Object.freeze({
   },
   goerliStaging: {
     stagingOf: 'goerli',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-goerli-staging',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli-staging',
+    // governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-goerli-staging',
   } as StagingNetworkModel,
   gnosis: {
     networkId: 'xdai',
@@ -35,6 +34,7 @@ export const networks = Object.freeze({
     questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-gnosis',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai',
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/honeyswap-xdai',
+    celesteSubgraph: 'https://api.studio.thegraph.com/query/40931/celeste-gnosis/version/latest',
     questFactoryAddress: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,
     celesteAddress: '0x44E4fCFed14E1285c9e0F6eae77D5fDd0F196f85',
     managerAddress: '0x7375Ed576952BD6CeD060EeE2Db763130eA13bA0',

@@ -27,16 +27,18 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     "disputes(uint256)": FunctionFragment;
     "feeToken()": FunctionFragment;
     "feeAmount()": FunctionFragment;
+    "draft(uint256)": FunctionFragment;
     "getDisputeFees()": FunctionFragment;
     "submitEvidence(uint256,address,bytes)": FunctionFragment;
-    "closeEvidencePeriod(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
+    "heartbeat(uint64)": FunctionFragment;
     "computeRuling(uint256)": FunctionFragment;
     "createDispute(uint256,bytes)": FunctionFragment;
+    "closeEvidencePeriod(address,uint256)": FunctionFragment;
     "rule(uint256)": FunctionFragment;
     "getDisputeManager()": FunctionFragment;
     "currentId()": FunctionFragment;
-    "setFee(address,uint256)": FunctionFragment;
+    "delayStartTime(uint64)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "setOwner", values: [string]): string;
@@ -50,6 +52,7 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "feeToken", values?: undefined): string;
   encodeFunctionData(functionFragment: "feeAmount", values?: undefined): string;
+  encodeFunctionData(functionFragment: "draft", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "getDisputeFees",
     values?: undefined
@@ -58,11 +61,11 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     functionFragment: "submitEvidence",
     values: [BigNumberish, string, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "closeEvidencePeriod",
+    functionFragment: "heartbeat",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "computeRuling",
     values: [BigNumberish]
@@ -71,6 +74,10 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     functionFragment: "createDispute",
     values: [BigNumberish, BytesLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "closeEvidencePeriod",
+    values: [string, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "rule", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "getDisputeManager",
@@ -78,8 +85,8 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "currentId", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "setFee",
-    values: [string, BigNumberish]
+    functionFragment: "delayStartTime",
+    values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
@@ -90,6 +97,7 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "disputes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feeToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feeAmount", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "draft", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getDisputeFees",
     data: BytesLike
@@ -98,11 +106,8 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     functionFragment: "submitEvidence",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "closeEvidencePeriod",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "heartbeat", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "computeRuling",
     data: BytesLike
@@ -111,15 +116,54 @@ interface OwnableCelesteInterface extends ethers.utils.Interface {
     functionFragment: "createDispute",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeEvidencePeriod",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "rule", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getDisputeManager",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "currentId", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setFee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "delayStartTime",
+    data: BytesLike
+  ): Result;
 
-  events: {};
+  events: {
+    "Heartbeat(uint64,uint64)": EventFragment;
+    "StartTimeDelayed(uint64,uint64)": EventFragment;
+    "DisputeStateChanged(uint256,uint8)": EventFragment;
+    "EvidenceSubmitted(uint256,address,bytes)": EventFragment;
+    "EvidencePeriodClosed(uint256,uint64)": EventFragment;
+    "NewDispute(uint256,address,uint64,uint64,bytes)": EventFragment;
+    "JurorDrafted(uint256,uint256,address)": EventFragment;
+    "RulingAppealed(uint256,uint256,uint8)": EventFragment;
+    "RulingAppealConfirmed(uint256,uint256,uint64,uint256)": EventFragment;
+    "RulingComputed(uint256,uint8)": EventFragment;
+    "PenaltiesSettled(uint256,uint256,uint256)": EventFragment;
+    "RewardSettled(uint256,uint256,address,uint256,uint256)": EventFragment;
+    "AppealDepositSettled(uint256,uint256)": EventFragment;
+    "MaxJurorsPerDraftBatchChanged(uint64,uint64)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "Heartbeat"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "StartTimeDelayed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DisputeStateChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EvidenceSubmitted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EvidencePeriodClosed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewDispute"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "JurorDrafted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RulingAppealed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RulingAppealConfirmed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RulingComputed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PenaltiesSettled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RewardSettled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "AppealDepositSettled"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "MaxJurorsPerDraftBatchChanged"
+  ): EventFragment;
 }
 
 export class OwnableCeleste extends Contract {
@@ -176,6 +220,16 @@ export class OwnableCeleste extends Contract {
 
     "feeAmount()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    draft(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "draft(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getDisputeFees(
       overrides?: CallOverrides
     ): Promise<[string, string, BigNumber]>;
@@ -198,29 +252,29 @@ export class OwnableCeleste extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
+    heartbeat(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "heartbeat(uint64)"(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     computeRuling(
       _disputeId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     "computeRuling(uint256)"(
       _disputeId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     createDispute(
       _possibleRulings: BigNumberish,
@@ -231,6 +285,18 @@ export class OwnableCeleste extends Contract {
     "createDispute(uint256,bytes)"(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -252,15 +318,13 @@ export class OwnableCeleste extends Contract {
 
     "currentId()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    setFee(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    delayStartTime(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "setFee(address,uint256)"(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    "delayStartTime(uint64)"(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
@@ -302,6 +366,16 @@ export class OwnableCeleste extends Contract {
 
   "feeAmount()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  draft(
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "draft(uint256)"(
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   getDisputeFees(
     overrides?: CallOverrides
   ): Promise<[string, string, BigNumber]>;
@@ -324,29 +398,29 @@ export class OwnableCeleste extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  closeEvidencePeriod(
-    _disputeId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "closeEvidencePeriod(uint256)"(
-    _disputeId: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   owner(overrides?: CallOverrides): Promise<string>;
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
+  heartbeat(
+    _maxRequestedTransitions: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "heartbeat(uint64)"(
+    _maxRequestedTransitions: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   computeRuling(
     _disputeId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   "computeRuling(uint256)"(
     _disputeId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<[string, number] & { subject: string; finalRuling: number }>;
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   createDispute(
     _possibleRulings: BigNumberish,
@@ -357,6 +431,18 @@ export class OwnableCeleste extends Contract {
   "createDispute(uint256,bytes)"(
     _possibleRulings: BigNumberish,
     _metadata: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeEvidencePeriod(
+    _subject: string,
+    _disputeId: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeEvidencePeriod(address,uint256)"(
+    _subject: string,
+    _disputeId: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -378,15 +464,13 @@ export class OwnableCeleste extends Contract {
 
   "currentId()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  setFee(
-    _feeToken: string,
-    _feeAmount: BigNumberish,
+  delayStartTime(
+    _newFirstTermStartTime: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "setFee(address,uint256)"(
-    _feeToken: string,
-    _feeAmount: BigNumberish,
+  "delayStartTime(uint64)"(
+    _newFirstTermStartTime: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -428,6 +512,13 @@ export class OwnableCeleste extends Contract {
 
     "feeAmount()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    draft(_disputeId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    "draft(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     getDisputeFees(
       overrides?: CallOverrides
     ): Promise<[string, string, BigNumber]>;
@@ -450,19 +541,19 @@ export class OwnableCeleste extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
+
+    heartbeat(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "heartbeat(uint64)"(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     computeRuling(
       _disputeId: BigNumberish,
@@ -486,6 +577,18 @@ export class OwnableCeleste extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     rule(
       _disputeId: BigNumberish,
       overrides?: CallOverrides
@@ -504,20 +607,97 @@ export class OwnableCeleste extends Contract {
 
     "currentId()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setFee(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    delayStartTime(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setFee(address,uint256)"(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    "delayStartTime(uint64)"(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
-  filters: {};
+  filters: {
+    Heartbeat(previousTermId: null, currentTermId: null): EventFilter;
+
+    StartTimeDelayed(
+      previousStartTime: null,
+      currentStartTime: null
+    ): EventFilter;
+
+    DisputeStateChanged(
+      disputeId: BigNumberish | null,
+      state: BigNumberish | null
+    ): EventFilter;
+
+    EvidenceSubmitted(
+      disputeId: BigNumberish | null,
+      submitter: string | null,
+      evidence: null
+    ): EventFilter;
+
+    EvidencePeriodClosed(
+      disputeId: BigNumberish | null,
+      termId: BigNumberish | null
+    ): EventFilter;
+
+    NewDispute(
+      disputeId: BigNumberish | null,
+      subject: string | null,
+      draftTermId: BigNumberish | null,
+      jurorsNumber: null,
+      metadata: null
+    ): EventFilter;
+
+    JurorDrafted(
+      disputeId: BigNumberish | null,
+      roundId: BigNumberish | null,
+      juror: string | null
+    ): EventFilter;
+
+    RulingAppealed(
+      disputeId: BigNumberish | null,
+      roundId: BigNumberish | null,
+      ruling: null
+    ): EventFilter;
+
+    RulingAppealConfirmed(
+      disputeId: BigNumberish | null,
+      roundId: BigNumberish | null,
+      draftTermId: BigNumberish | null,
+      jurorsNumber: null
+    ): EventFilter;
+
+    RulingComputed(
+      disputeId: BigNumberish | null,
+      ruling: BigNumberish | null
+    ): EventFilter;
+
+    PenaltiesSettled(
+      disputeId: BigNumberish | null,
+      roundId: BigNumberish | null,
+      collectedTokens: null
+    ): EventFilter;
+
+    RewardSettled(
+      disputeId: BigNumberish | null,
+      roundId: BigNumberish | null,
+      juror: null,
+      tokens: null,
+      fees: null
+    ): EventFilter;
+
+    AppealDepositSettled(
+      disputeId: BigNumberish | null,
+      roundId: BigNumberish | null
+    ): EventFilter;
+
+    MaxJurorsPerDraftBatchChanged(
+      previousMaxJurorsPerDraftBatch: null,
+      currentMaxJurorsPerDraftBatch: null
+    ): EventFilter;
+  };
 
   estimateGas: {
     setOwner(_owner: string, overrides?: Overrides): Promise<BigNumber>;
@@ -554,6 +734,13 @@ export class OwnableCeleste extends Contract {
 
     "feeAmount()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    draft(_disputeId: BigNumberish, overrides?: Overrides): Promise<BigNumber>;
+
+    "draft(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getDisputeFees(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getDisputeFees()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -572,28 +759,28 @@ export class OwnableCeleste extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    heartbeat(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "heartbeat(uint64)"(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     computeRuling(
       _disputeId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides
     ): Promise<BigNumber>;
 
     "computeRuling(uint256)"(
       _disputeId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides
     ): Promise<BigNumber>;
 
     createDispute(
@@ -605,6 +792,18 @@ export class OwnableCeleste extends Contract {
     "createDispute(uint256,bytes)"(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -623,15 +822,13 @@ export class OwnableCeleste extends Contract {
 
     "currentId()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setFee(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    delayStartTime(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "setFee(address,uint256)"(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    "delayStartTime(uint64)"(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
   };
@@ -677,6 +874,16 @@ export class OwnableCeleste extends Contract {
 
     "feeAmount()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    draft(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "draft(uint256)"(
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getDisputeFees(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getDisputeFees()"(
@@ -697,28 +904,28 @@ export class OwnableCeleste extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    closeEvidencePeriod(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "closeEvidencePeriod(uint256)"(
-      _disputeId: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    heartbeat(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "heartbeat(uint64)"(
+      _maxRequestedTransitions: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     computeRuling(
       _disputeId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     "computeRuling(uint256)"(
       _disputeId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     createDispute(
@@ -730,6 +937,18 @@ export class OwnableCeleste extends Contract {
     "createDispute(uint256,bytes)"(
       _possibleRulings: BigNumberish,
       _metadata: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeEvidencePeriod(
+      _subject: string,
+      _disputeId: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeEvidencePeriod(address,uint256)"(
+      _subject: string,
+      _disputeId: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -753,15 +972,13 @@ export class OwnableCeleste extends Contract {
 
     "currentId()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    setFee(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    delayStartTime(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "setFee(address,uint256)"(
-      _feeToken: string,
-      _feeAmount: BigNumberish,
+    "delayStartTime(uint64)"(
+      _newFirstTermStartTime: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };

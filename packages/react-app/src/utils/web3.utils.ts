@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { BigNumber, ethers } from 'ethers';
 import { noop } from 'lodash-es';
 import { TokenAmountModel } from 'src/models/token-amount.model';

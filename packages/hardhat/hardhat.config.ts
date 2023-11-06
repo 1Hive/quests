@@ -1,21 +1,17 @@
 import { config as dotenvConfig } from "dotenv";
-import "solidity-coverage";
 import "hardhat-deploy";
-import { utils } from "ethers";
 import fs from "fs";
 import chalk from "chalk";
-import "@nomiclabs/hardhat-waffle";
-import "@eth-optimism/hardhat-ovm";
-import "@nomiclabs/hardhat-web3";
-import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
+import "@openzeppelin/hardhat-upgrades";
+import "@nomiclabs/hardhat-ethers";
 import "hardhat-typechain";
+import "typechain";
+import "solidity-coverage";
 import { task, HardhatUserConfig, types } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
-import { HardhatNetworkAccountsUserConfig } from "../../node_modules/hardhat/src/types/config";
-import deployQuestFactory from "./deploy/deploy-quest_factory";
-import deployQuest from "./deploy/deploy-quest";
+import deployQuest, { questConstructorArguments } from "./deploy/deploy-quest";
 import deployGovernQueue, {
   generateQueueConfig,
 } from "./scripts/deploy-govern_queue";
@@ -27,35 +23,24 @@ import exportContractResult from "./scripts/export-contract-result";
 import GovernAbi from "./abi/contracts/Externals/Govern.json";
 import GovernQueueAbi from "./abi/contracts/Externals/GovernQueue.json";
 import CelesteMockGoerli from "./deployments/goerli/OwnableCeleste.json";
+import upgradeQuestFactory from "./scripts/upgrade-quest-factory";
+import { verifyContractWithRetry } from "./scripts/verify-contract";
 
 dotenvConfig({
   path: resolve(
-    __dirname,
-    fs
-      .readdirSync("../../")
-      .filter(
-        (allFilesPaths: string) => allFilesPaths.match(/\.env$/) !== null
-      )[0]
+    __dirname + "/../../",
+    fs.readdirSync("../../").filter((allFilesPaths: string) => {
+      let result = allFilesPaths.match(/\.env$/) !== null;
+      return result;
+    })[0]
   ),
 });
-
-const { isAddress, getAddress, formatUnits, parseUnits } = utils;
-
-/*
-      📡 This is where you configure your deploy configuration for 🏗 scaffold-eth
-
-      check out `packages/scripts/deploy.js` to customize your deployment
-
-      out of the box it will auto deploy anything in the `contracts` folder and named *.sol
-      plus it will use *.args for constructor args
-*/
 
 //
 // Select the network you want to deploy to here:
 //
 const defaultNetwork = "localhost";
 const mainnetGwei = 21;
-
 function mnemonic() {
   try {
     if (!process.env.MNEMONIC || !process.env.PRIVATE_KEY)
@@ -72,7 +57,7 @@ function mnemonic() {
   return "test test test test test test test test test test test junk";
 }
 
-function getAccounts(): HardhatNetworkAccountsUserConfig {
+function getAccounts() {
   if (process.env.PRIVATE_KEY) {
     return [process.env.PRIVATE_KEY as any];
   }
@@ -124,6 +109,7 @@ const hardhatConfig: HardhatUserConfig = {
       chainId: 5,
       url: "https://eth-goerli.g.alchemy.com/v2/E6EdrejZ7PPswowaPl3AfLkdFGEXm1PJ",
       accounts: getAccounts(),
+      gasPrice: 20000000000, // 20 Gwei
     },
     xdai: {
       chainId: 100,
@@ -163,7 +149,6 @@ const hardhatConfig: HardhatUserConfig = {
       url: "https://kovan.optimism.io",
       gasPrice: 0,
       accounts: getAccounts(),
-      ovm: true,
       companionNetworks: {
         l1: "kovan",
       },
@@ -172,7 +157,6 @@ const hardhatConfig: HardhatUserConfig = {
       url: "http://localhost:8545",
       gasPrice: 0,
       accounts: getAccounts(),
-      ovm: true,
       companionNetworks: {
         l1: "localOptimismL1",
       },
@@ -222,7 +206,7 @@ const hardhatConfig: HardhatUserConfig = {
         version: "0.5.8",
       },
       {
-        version: "0.8.1",
+        version: "0.8.2",
         settings: {
           optimizer: {
             enabled: true,
@@ -232,11 +216,11 @@ const hardhatConfig: HardhatUserConfig = {
       },
     ],
   },
-  ovm: {
-    solcVersion: "0.7.6",
-  },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    // @ts-ignore
+    apiKey: {
+      goerli: process.env.ETHERSCAN_API_KEY,
+    },
   },
   namedAccounts: {
     deployer: {
@@ -254,6 +238,10 @@ const hardhatConfig: HardhatUserConfig = {
       xdai: defaultConfig.RootOwner.xdai,
       goerli: defaultConfig.RootOwner.goerli,
     }, // Goerli Gnosis Safe address
+  },
+  typechain: {
+    outDir: "typechain",
+    target: "ethers-v5",
   },
 };
 
@@ -303,7 +291,8 @@ task("fundedwallet", "Create a wallet (pk) link and fund it with deployer?")
     // IF NOT SEND USING LOCAL HARDHAT NODE:
     if (localDeployerMnemonic) {
       let deployerWallet = ethers.Wallet.fromMnemonic(localDeployerMnemonic);
-      deployerWallet = deployerWallet.connect(ethers.provider);
+      const signers = await ethers.getSigners();
+      deployerWallet = deployerWallet.connect(signers[0].provider);
       console.log(
         "💵 Sending " +
           amount +
@@ -485,8 +474,8 @@ task(
 );
 
 async function addr(ethers, addr) {
-  if (isAddress(addr)) {
-    return getAddress(addr);
+  if (ethers.isAddress(addr)) {
+    return ethers.getAddress(addr);
   }
   const accounts = await ethers.provider.listAccounts();
   if (accounts[addr] !== undefined) {
@@ -496,7 +485,7 @@ async function addr(ethers, addr) {
 }
 
 task("accounts", "Prints the list of accounts", async (_, { ethers }) => {
-  const accounts = await ethers.provider.listAccounts();
+  const accounts = await ethers.getSigners();
   accounts.forEach((account) => console.log(account));
 });
 
@@ -511,7 +500,7 @@ task("balance", "Prints an account's balance")
     const balance = await ethers.provider.getBalance(
       await addr(ethers, taskArgs.account)
     );
-    console.log(formatUnits(balance, "ether"), "ETH");
+    console.log(ethers.utils.formatUnits(balance, "ether"), "ETH");
   });
 
 function send(signer, txparams) {
@@ -542,19 +531,19 @@ task("send", "Send ETH")
       to = await addr(ethers, taskArgs.to);
       debug(`Normalized to address: ${to}`);
     }
-
+    var signerAddress = await fromSigner.getAddress();
     const txRequest = {
-      from: await fromSigner.getAddress(),
+      from: signerAddress,
       to,
-      value: parseUnits(
+      value: ethers.utils.parseUnits(
         taskArgs.amount ? taskArgs.amount : "0",
         "ether"
-      ).toHexString(),
-      nonce: await fromSigner.getTransactionCount(),
-      gasPrice: parseUnits(
+      ),
+      nonce: await ethers.provider.getTransactionCount(signerAddress),
+      gasPrice: ethers.utils.parseUnits(
         taskArgs.gasPrice ? taskArgs.gasPrice : "1.001",
         "gwei"
-      ).toHexString(),
+      ),
       gasLimit: taskArgs.gasLimit ? taskArgs.gasLimit : 24000,
       chainId: network.config.chainId,
       data: undefined,
@@ -815,38 +804,32 @@ task("newQuestFactory:gnosis")
     "Address of the govern",
     governGnosis.address
   )
-  .addOptionalParam(
-    "initialOwner",
-    "Initial owner of the QuestFactory (will be able to change deposits)"
-  )
-  .addOptionalParam(
-    "createDepositToken",
-    "Address of the create quest deposit (default is HNY)",
-    defaultConfig.CreateQuestDeposit.xdai.token
-  )
-  .addOptionalParam(
-    "createDepositAmount",
-    "Amount of the quest create deposit token",
-    defaultConfig.CreateQuestDeposit.xdai.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "playDepositToken",
-    "Address of the play quest deposit (default is HNY)",
-    defaultConfig.PlayQuestDeposit.xdai.token
-  )
-  .addOptionalParam(
-    "playDepositAmount",
-    "Amount of the quest play deposit token",
-    defaultConfig.PlayQuestDeposit.xdai.amount,
-    types.float
-  )
   .setAction(async (args, hre) => {
-    const deployResult = await deployQuestFactory(hre, args);
+    console.log("Starting by deploying the Quest template...");
+    const questDeployResult = await hre.run("newQuest");
+
+    console.log("Deploying proxy upgrade for QuestFactory...");
+    const questFactoryDeployResult = await upgradeQuestFactory(hre, args);
+
     console.log(
-      "Deployed quest factory (" + hre.network.name + "):",
-      deployResult.address
+      "Deployed proxy upgrade for QuestFactory (" + hre.network.name + "):",
+      questFactoryDeployResult.address
     );
+
+    Promise.all([
+      verifyContractWithRetry(
+        "Quest",
+        hre.run,
+        questDeployResult.address,
+        questDeployResult.args
+      ),
+      verifyContractWithRetry(
+        "QuestFactory",
+        hre.run,
+        questFactoryDeployResult.address,
+        questFactoryDeployResult.args
+      ),
+    ]);
   });
 
 task("newQuestFactory:goerli")
@@ -856,41 +839,32 @@ task("newQuestFactory:goerli")
     "Address of the govern",
     "0xe43217F71e496475660a3391FFbD1367e354e002"
   )
-  .addOptionalParam(
-    "initialOwner",
-    "Initial owner of the QuestFactory (will be able to change deposits)",
-    defaultConfig.RootOwner.goerli
-  )
-  .addOptionalParam(
-    "createDepositToken",
-    "Address of the create quest deposit",
-    defaultConfig.CreateQuestDeposit.goerli.token
-  )
-  .addOptionalParam(
-    "createDepositAmount",
-    "Address of the govern",
-    defaultConfig.CreateQuestDeposit.goerli.amount,
-    types.float
-  )
-  .addOptionalParam(
-    "playDepositToken",
-    "Address of the play quest deposit",
-    defaultConfig.PlayQuestDeposit.goerli.token
-  )
-  .addOptionalParam(
-    "playDepositAmount",
-    "Address of the govern",
-    defaultConfig.PlayQuestDeposit.goerli.amount,
-    types.float
-  )
   .setAction(async (args, hre) => {
-    console.log("Deploying QuestFactory...");
-    const deployResult = await deployQuestFactory(hre, args);
+    console.log("Starting by deploying the Quest template...");
+    const questDeployResult = await hre.run("newQuest", hre);
+
+    console.log("Deploying proxy upgrade for QuestFactory...");
+    const questFactoryDeployResult = await upgradeQuestFactory(hre, args);
 
     console.log(
-      "Deployed QuestFactory (" + hre.network.name + "):",
-      deployResult.address
+      "Deployed proxy upgrade for QuestFactory (" + hre.network.name + "):",
+      questFactoryDeployResult.address
     );
+
+    await Promise.all([
+      verifyContractWithRetry(
+        "Quest",
+        hre.run,
+        questDeployResult.address,
+        questDeployResult.args
+      ),
+      verifyContractWithRetry(
+        "QuestFactory",
+        hre.run,
+        questFactoryDeployResult.address,
+        questFactoryDeployResult.args
+      ),
+    ]);
   });
 
 task("newQuest")
@@ -898,9 +872,10 @@ task("newQuest")
   .setAction(async (hre) => {
     const deployResult = await deployQuest(hre);
     console.log(
-      "Deployed quest (" + hre.network.name + "):",
+      "Deployed quest template (" + hre.network.name + "):",
       deployResult.address
     );
+    return deployResult;
   });
 
 async function deployAll(
@@ -1079,7 +1054,7 @@ task("deployAll:goerli")
   .setAction(deployAll);
 
 task("grantGovernQueue").setAction(
-  async (_args, { web3, getNamedAccounts }) => {
+  async (_args, { ethers, getNamedAccounts }) => {
     const { owner } = await getNamedAccounts();
     const publicQueueFonctions = [
       "schedule",
@@ -1098,11 +1073,12 @@ task("grantGovernQueue").setAction(
     console.log("GovernQueue roles:");
     const publicGrant = "0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF";
     let roles = [];
+    var governQueueAbiInterface = new ethers.utils.Interface(GovernQueueAbi);
     for (const obj of GovernQueueAbi) {
       if (obj.type !== "function" || !queueFonctions.includes(obj.name)) {
         continue;
       }
-      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      let signature = governQueueAbiInterface.getSighash(obj.name);
       roles.push({
         signature,
         address: ownerOnlyQueueFonctions.includes(obj.name)
@@ -1116,11 +1092,12 @@ task("grantGovernQueue").setAction(
       `[${roles.map((x) => `[0,"${x.signature}","${x.address}"]`).join(",")}]`
     );
     console.log("Govern roles:");
+    var governAbiInterface = new ethers.utils.Interface(GovernAbi);
     for (const obj of GovernAbi) {
       if (obj.type !== "function" || !aclGovernFunctions.includes(obj.name)) {
         continue;
       }
-      let signature = web3.eth.abi.encodeFunctionSignature(obj as any);
+      let signature = governAbiInterface.getSighash(obj.name);
       roles.push({
         signature,
         address: owner,
@@ -1184,32 +1161,26 @@ task("deployCeleste:goerli")
     }
   );
 
-task(
-  "verify-quests-contracts",
-  "Verify contracts with etherscan api"
-).setAction(async (_args, { run, network }) => {
-  const questFactoryDeploy = require(`./deployments/${network.name.toLowerCase()}/QuestFactory.json`);
-  const questDeploy = require(`./deployments/${network.name.toLowerCase()}/Quest.json`);
-  console.log("Quest", {
-    address: questDeploy.address,
-    constructorArguments: questDeploy.args,
-  });
-  try {
-    await run("verify:verify", {
-      address: questFactoryDeploy.address,
-      constructorArguments: questFactoryDeploy.args,
-    });
-  } catch (error) {
-    console.error("Failed when verifying QuestFactory contract", error);
+task("verify-contracts", "Verify contracts with etherscan api").setAction(
+  async (_args, { run, network }) => {
+    const questFactoryDeploy = require(`./deployments/${network.name.toLowerCase()}/QuestFactory.json`);
+    const questDeploy = require(`./deployments/${network.name.toLowerCase()}/Quest.json`);
+
+    await Promise.all([
+      verifyContractWithRetry(
+        "Quest",
+        run,
+        questDeploy.address,
+        questConstructorArguments
+      ),
+      verifyContractWithRetry(
+        "QuestFactory",
+        run,
+        questFactoryDeploy.address,
+        [] // Proxy contract has no constructor
+      ),
+    ]);
   }
-  try {
-    await run("verify:verify", {
-      address: questDeploy.address,
-      constructorArguments: questDeploy.args,
-    });
-  } catch (error) {
-    console.error("Failed when verifying Quest contract", error);
-  }
-});
+);
 
 module.exports = hardhatConfig;

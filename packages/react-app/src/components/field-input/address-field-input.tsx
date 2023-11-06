@@ -101,6 +101,7 @@ export function AddressFieldInput({
           adornment={<EthIdenticonStyled isEdit={isEdit} address={value} scale={1.66} />}
           adornmentPosition={isEdit ? 'end' : 'start'}
           adornmentSettings={{ padding: 0, width: 36 }}
+          title={value}
         />
       ) : (
         <TextCopyStyled

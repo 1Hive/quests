@@ -1,10 +1,3 @@
-/**
- *Submitted for verification at Etherscan.io on 2022-01-07
- */
-
-// Brought from https://github.com/aragon/aragonOS/blob/v4.3.0/contracts/lib/token/GovernERC20.sol
-// Adapted to use pragma ^0.5.8 and satisfy our linter rules
-
 pragma solidity ^0.5.8;
 
 /**
@@ -70,9 +63,13 @@ interface IArbitrator {
 
     /**
      * @dev Close the evidence period of a dispute
+     * @param _subject Arbitrable instance submitting the dispute
      * @param _disputeId Identification number of the dispute to close its evidence submitting period
      */
-    function closeEvidencePeriod(uint256 _disputeId) external;
+    function closeEvidencePeriod(
+        IArbitrable _subject,
+        uint256 _disputeId
+    ) external;
 
     /**
      * @notice Rule dispute #`_disputeId` if ready
@@ -82,7 +79,7 @@ interface IArbitrator {
      */
     function rule(
         uint256 _disputeId
-    ) external returns (address subject, uint256 ruling);
+    ) external returns (IArbitrable subject, uint256 ruling);
 
     /**
      * @dev Tell the dispute fees information to create a dispute
@@ -202,6 +199,20 @@ library SafeGovernERC20 {
     }
 }
 
+contract IArbitrable {
+    /**
+     * @dev Emitted when an IArbitrable instance's dispute is ruled by an IArbitrator
+     * @param arbitrator IArbitrator instance ruling the dispute
+     * @param disputeId Identification number of the dispute being ruled by the arbitrator
+     * @param ruling Ruling given by the arbitrator
+     */
+    event Ruled(
+        IArbitrator indexed arbitrator,
+        uint256 indexed disputeId,
+        uint256 ruling
+    );
+}
+
 // File: contracts/ownable-celeste/OwnableCeleste.sol
 
 pragma solidity ^0.5.8;
@@ -226,20 +237,109 @@ contract OwnableCeleste is IArbitrator {
     }
 
     struct Dispute {
-        address subject;
+        IArbitrable subject;
         State state;
+    }
+
+    enum DisputeState {
+        PreDraft,
+        Adjudicating,
+        Ruled
+    }
+
+    enum AdjudicationState {
+        Invalid,
+        Committing,
+        Revealing,
+        Appealing,
+        ConfirmingAppeal,
+        Ended
+    }
+
+    /**
+     * @dev Ensure a dispute exists
+     * @param _disputeId Identification number of the dispute to be ensured
+     */
+    modifier disputeExists(uint256 _disputeId) {
+        require(_disputeId <= currentId, "DM_DISPUTE_DOES_NOT_EXIST");
+        _;
     }
 
     GovernERC20 public feeToken;
     uint256 public feeAmount;
     uint256 public currentId;
     address public owner;
+    // Last ensured term id
+    uint64 private termId;
     mapping(uint256 => Dispute) public disputes;
+    address feesUpdater;
 
     modifier onlyOwner() {
         require(msg.sender == owner, "ERR:NOT_OWNER");
         _;
     }
+
+    // Events
+    event Heartbeat(uint64 previousTermId, uint64 currentTermId);
+    event StartTimeDelayed(uint64 previousStartTime, uint64 currentStartTime);
+
+    event DisputeStateChanged(
+        uint256 indexed disputeId,
+        DisputeState indexed state
+    );
+    event EvidenceSubmitted(
+        uint256 indexed disputeId,
+        address indexed submitter,
+        bytes evidence
+    );
+    event EvidencePeriodClosed(
+        uint256 indexed disputeId,
+        uint64 indexed termId
+    );
+    event NewDispute(
+        uint256 indexed disputeId,
+        IArbitrable indexed subject,
+        uint64 indexed draftTermId,
+        uint64 jurorsNumber,
+        bytes metadata
+    );
+    event JurorDrafted(
+        uint256 indexed disputeId,
+        uint256 indexed roundId,
+        address indexed juror
+    );
+    event RulingAppealed(
+        uint256 indexed disputeId,
+        uint256 indexed roundId,
+        uint8 ruling
+    );
+    event RulingAppealConfirmed(
+        uint256 indexed disputeId,
+        uint256 indexed roundId,
+        uint64 indexed draftTermId,
+        uint256 jurorsNumber
+    );
+    event RulingComputed(uint256 indexed disputeId, uint8 indexed ruling);
+    event PenaltiesSettled(
+        uint256 indexed disputeId,
+        uint256 indexed roundId,
+        uint256 collectedTokens
+    );
+    event RewardSettled(
+        uint256 indexed disputeId,
+        uint256 indexed roundId,
+        address juror,
+        uint256 tokens,
+        uint256 fees
+    );
+    event AppealDepositSettled(
+        uint256 indexed disputeId,
+        uint256 indexed roundId
+    );
+    event MaxJurorsPerDraftBatchChanged(
+        uint64 previousMaxJurorsPerDraftBatch,
+        uint64 currentMaxJurorsPerDraftBatch
+    );
 
     constructor(GovernERC20 _feeToken, uint256 _feeAmount) public {
         owner = msg.sender;
@@ -247,8 +347,69 @@ contract OwnableCeleste is IArbitrator {
         feeAmount = _feeAmount;
     }
 
-    function setOwner(address _owner) public onlyOwner {
-        owner = _owner;
+    /**
+     * @dev Draft jurors for the next round of a dispute
+     * @param _disputeId Identification number of the dispute to be drafted
+     */
+    function draft(uint256 _disputeId) external disputeExists(_disputeId) {
+        emit JurorDrafted(_disputeId, 0, address(this));
+        emit DisputeStateChanged(_disputeId, DisputeState.Adjudicating);
+    }
+
+    /**
+     * @notice Transition up to `_maxRequestedTransitions` terms
+     * @param _maxRequestedTransitions Max number of term transitions allowed by the sender
+     * @return Identification number of the term ID after executing the heartbeat transitions
+     */
+    function heartbeat(
+        uint64 _maxRequestedTransitions
+    ) external returns (uint64) {
+        uint64 previousTermId = termId;
+        uint64 currentTermId = previousTermId + _maxRequestedTransitions;
+        termId = currentTermId;
+        emit Heartbeat(previousTermId, currentTermId);
+        return termId;
+    }
+
+    /**
+     * @notice Delay the Court start time to `_newFirstTermStartTime`
+     * @param _newFirstTermStartTime New timestamp in seconds when the court will open
+     */
+    function delayStartTime(uint64 _newFirstTermStartTime) public {
+        emit StartTimeDelayed(0, _newFirstTermStartTime);
+    }
+
+    /**
+     * @notice Close the evidence period of dispute #`_disputeId`
+     * @param _subject IArbitrable instance requesting to close the evidence submission period
+     * @param _disputeId Identification number of the dispute to close its evidence submitting period
+     */
+    function closeEvidencePeriod(
+        IArbitrable _subject,
+        uint256 _disputeId
+    ) external {
+        Dispute storage dispute = disputes[_disputeId];
+        require(dispute.subject == _subject, "DM_SUBJECT_NOT_DISPUTE_SUBJECT");
+        emit EvidencePeriodClosed(_disputeId, 0);
+    }
+
+    /**
+     * @notice Submit evidence for a dispute #`_disputeId`
+     * @param _disputeId Identification number of the dispute receiving new evidence
+     * @param _submitter Address of the account submitting the evidence
+     * @param _evidence Data submitted for the evidence of the dispute
+     */
+    function submitEvidence(
+        uint256 _disputeId,
+        address _submitter,
+        bytes calldata _evidence
+    ) external disputeExists(_disputeId) {
+        Dispute storage dispute = disputes[_disputeId];
+        require(
+            dispute.subject == IArbitrable(msg.sender),
+            "DM_SUBJECT_NOT_DISPUTE_SUBJECT"
+        );
+        emit EvidenceSubmitted(_disputeId, _submitter, _evidence);
     }
 
     /**
@@ -262,14 +423,21 @@ contract OwnableCeleste is IArbitrator {
         bytes calldata _metadata
     ) external returns (uint256) {
         uint256 disputeId = currentId;
-        disputes[disputeId] = Dispute(msg.sender, State.DISPUTED);
+        disputes[disputeId] = Dispute(IArbitrable(msg.sender), State.DISPUTED);
         currentId++;
 
         require(
             feeToken.safeTransferFrom(msg.sender, address(this), feeAmount),
             "ERR:DEPOSIT_FAILED"
         );
+
+        emit NewDispute(disputeId, IArbitrable(msg.sender), 0, 3, _metadata);
+
         return disputeId;
+    }
+
+    function setOwner(address _owner) public onlyOwner {
+        owner = _owner;
     }
 
     function decideDispute(
@@ -288,24 +456,6 @@ contract OwnableCeleste is IArbitrator {
     }
 
     /**
-     * @dev Submit evidence for a dispute
-     * @param _disputeId Id of the dispute in the Protocol
-     * @param _submitter Address of the account submitting the evidence
-     * @param _evidence Data submitted for the evidence related to the dispute
-     */
-    function submitEvidence(
-        uint256 _disputeId,
-        address _submitter,
-        bytes calldata _evidence
-    ) external {}
-
-    /**
-     * @dev Close the evidence period of a dispute
-     * @param _disputeId Identification number of the dispute to close its evidence submitting period
-     */
-    function closeEvidencePeriod(uint256 _disputeId) external {}
-
-    /**
      * @notice Rule dispute #`_disputeId` if ready
      * @param _disputeId Identification number of the dispute to be ruled
      * @return subject Arbitrable instance associated to the dispute
@@ -313,7 +463,7 @@ contract OwnableCeleste is IArbitrator {
      */
     function rule(
         uint256 _disputeId
-    ) external returns (address subject, uint256 ruling) {
+    ) external returns (IArbitrable subject, uint256 ruling) {
         Dispute storage dispute = disputes[_disputeId];
 
         if (dispute.state == State.DISPUTES_RULING_CHALLENGER) {
@@ -347,14 +497,9 @@ contract OwnableCeleste is IArbitrator {
 
     function computeRuling(
         uint256 _disputeId
-    ) external view returns (address subject, State finalRuling) {
+    ) external returns (IArbitrable subject, State finalRuling) {
         Dispute storage dispute = disputes[_disputeId];
         subject = dispute.subject;
         finalRuling = dispute.state;
-    }
-
-    function setFee(address _feeToken, uint256 _feeAmount) external onlyOwner {
-        feeAmount = _feeAmount;
-        feeToken = GovernERC20(_feeToken);
     }
 }

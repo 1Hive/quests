@@ -2,7 +2,7 @@
 export enum DisputeStatus {
   NotDisputed = 0,
   Disputed = 1,
-  DisputeNotRuled = 2,
+  DisputeNotRuledOrAbstainFromVoting = 2, // Could be used when Abstain from voting state
   DisputeRuledForChallenger = 3,
   DisputeRuledForSubmitter = 4,
 }

@@ -11,13 +11,12 @@ import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
 import background from './assets/background.svg';
 import backgroundMotif from './assets/background-motif.svg';
-import { isDarkTheme } from './utils/style.util';
 import { useThemeContext } from './contexts/theme.context';
 
 // #region StyledComponents
 
 const AppStyled = styled.div`
-  ${({ theme }: any) => isDarkTheme(theme) && `background-image: url(${background});`};
+  background-image: url(${background});
 
   &::after {
     content: '';
@@ -38,26 +37,26 @@ function App() {
   const { currentTheme } = useThemeContext();
 
   return (
-    <AppStyled theme={currentTheme}>
+    <AppStyled>
       <PageContextProvider>
-        <WalletProvider>
-          <TransactionContextProvider>
-            <FilterContextProvider>
-              <Main
-                assetsUrl="/aragon-ui/"
-                layout={false}
-                scrollView={false}
-                theme={currentTheme ?? DEFAULT_THEME}
-              >
-                <BrowserRouter>
-                  <ErrorBoundary>
+        <TransactionContextProvider>
+          <FilterContextProvider>
+            <Main
+              assetsUrl="/aragon-ui/"
+              layout={false}
+              scrollView={false}
+              theme={currentTheme ?? DEFAULT_THEME}
+            >
+              <BrowserRouter>
+                <ErrorBoundary>
+                  <WalletProvider>
                     <Routes />
-                  </ErrorBoundary>
-                </BrowserRouter>
-              </Main>
-            </FilterContextProvider>
-          </TransactionContextProvider>
-        </WalletProvider>
+                  </WalletProvider>
+                </ErrorBoundary>
+              </BrowserRouter>
+            </Main>
+          </FilterContextProvider>
+        </TransactionContextProvider>
       </PageContextProvider>
     </AppStyled>
   );

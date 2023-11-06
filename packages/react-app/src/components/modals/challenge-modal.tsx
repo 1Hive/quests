@@ -38,6 +38,11 @@ const FormStyled = styled(Form)`
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx(1)};
   width: fit-content;
+
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 const OpenButtonWrapperStyled = styled.div`
@@ -362,6 +367,7 @@ export default function ChallengeModal({
                 error={touched.reason && errors.reason}
                 onBlur={handleBlur}
                 wide
+                placeHolder="Explain with precision how this claim does not met the quest requirement..."
               />
             </Outset>
           </FormStyled>

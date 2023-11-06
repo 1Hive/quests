@@ -123,6 +123,14 @@ export class QuestFactory__depositResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
+
+  getToken(): Address {
+    return this.value0;
+  }
+
+  getAmount(): BigInt {
+    return this.value1;
+  }
 }
 
 export class QuestFactory extends ethereum.SmartContract {

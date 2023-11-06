@@ -65,20 +65,6 @@ const _abi = [
     constant: false,
     inputs: [
       {
-        name: "_disputeId",
-        type: "uint256",
-      },
-    ],
-    name: "closeEvidencePeriod",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
         name: "_possibleRulings",
         type: "uint256",
       },
@@ -94,6 +80,24 @@ const _abi = [
         type: "uint256",
       },
     ],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: "_subject",
+        type: "address",
+      },
+      {
+        name: "_disputeId",
+        type: "uint256",
+      },
+    ],
+    name: "closeEvidencePeriod",
+    outputs: [],
     payable: false,
     stateMutability: "nonpayable",
     type: "function",

@@ -4,12 +4,83 @@ import {
   CreateDepositChanged,
 } from "../../generated/QuestFactoryV2/QuestFactory";
 import {
+  QuestPlayed,
+  QuestUnplayed,
+} from "../../generated/QuestFactoryV2-Quest/Quest";
+import {
   CreateDepositEntity,
   PlayDepositEntity,
   QuestEntity,
 } from "../../generated/schema";
-import { Bytes, ipfs } from "@graphprotocol/graph-ts";
-import { json } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
+import { QuestMetadata as QuestMetadataTemplate } from "../../generated/templates";
+import { handleQuestClaimed } from "./quest-factory";
+
+// Reuse old version since no change needed for this QuestFactory version
+export { handleQuestClaimed };
+
+export function handleQuestCreated(event: QuestCreated): void {
+  let questEntity = new QuestEntity(event.params.questAddress.toHex());
+  questEntity.version = 1;
+  questEntity.questAddress = event.params.questAddress.toHexString();
+  questEntity.questTitle = event.params.questTitle;
+  questEntity.questMetadata = event.params.questDetailsRef.toString();
+  questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
+  questEntity.questExpireTimeSec = event.params.expireTime;
+  questEntity.creationTimestamp = event.block.timestamp;
+  questEntity.questFundsRecoveryAddress = event.params.fundsRecoveryAddress;
+  questEntity.questCreateDepositToken = event.params.createDepositToken;
+  questEntity.questCreateDepositAmount = event.params.createDepositAmount;
+  questEntity.questPlayDepositToken = event.params.playDepositToken;
+  questEntity.questPlayDepositAmount = event.params.playDepositAmount;
+  questEntity.questCreator = event.params.creator;
+  questEntity.questMaxPlayers = event.params.maxPlayers;
+  questEntity.questIsWhiteListed = false;
+  questEntity.questPlayers = [];
+
+  QuestMetadataTemplate.create(questEntity.questMetadata);
+
+  log.info("Quest created [2]: {}", [event.params.questAddress.toHex()]);
+
+  questEntity.save();
+}
+
+export function handleQuestPlayed(event: QuestPlayed): void {
+  const questAddress = event.address.toHex();
+  let questEntity = QuestEntity.load(questAddress);
+
+  if (!questEntity) {
+    log.error("Quest entity not found with address: {}", [questAddress]);
+    return;
+  }
+  let questPlayers = questEntity.questPlayers;
+  questPlayers.push(event.params.player.toHexString());
+  questEntity.questPlayers = questPlayers;
+  questEntity.save();
+}
+
+export function handleQuestUnplayed(event: QuestUnplayed): void {
+  const questAddress = event.address.toHex();
+  let questEntity = QuestEntity.load(questAddress);
+  if (!questEntity) {
+    log.error("Quest entity not found with address: {}", [questAddress]);
+    return;
+  }
+  let questPlayers = questEntity.questPlayers;
+  const indexToBeRemoved = questEntity.questPlayers.indexOf(
+    event.params.player.toHexString()
+  );
+  if (indexToBeRemoved === -1) {
+    log.error("Player not found in quest {} players list: {}", [
+      questAddress,
+      event.params.player.toHexString(),
+    ]);
+    return;
+  }
+  questPlayers.splice(indexToBeRemoved, 1);
+  questEntity.questPlayers = questPlayers;
+  questEntity.save();
+}
 
 export function handleCreateDepositChanged(event: CreateDepositChanged): void {
   let depositEntity = new CreateDepositEntity(
@@ -33,59 +104,4 @@ export function handlePlayDepositChanged(event: PlayDepositChanged): void {
   depositEntity.depositAmount = event.params.amount;
 
   depositEntity.save();
-}
-
-export function handleQuestCreated(event: QuestCreated): void {
-  let questEntity = new QuestEntity(event.params.questAddress.toHex());
-  questEntity.version = 1;
-  questEntity.questAddress = event.params.questAddress.toHexString();
-  questEntity.questTitle = event.params.questTitle;
-  questEntity.questDetailsRef = event.params.questDetailsRef;
-  questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
-  questEntity.questExpireTimeSec = event.params.expireTime;
-  questEntity.creationTimestamp = event.block.timestamp;
-  questEntity.questFundsRecoveryAddress = event.params.fundsRecoveryAddress;
-  questEntity.questCreateDepositToken = event.params.createDepositToken;
-  questEntity.questCreateDepositAmount = event.params.createDepositAmount;
-  questEntity.questPlayDepositToken = event.params.playDepositToken;
-  questEntity.questPlayDepositAmount = event.params.playDepositAmount;
-  questEntity.questCreator = event.params.creator;
-  questEntity.questMaxPlayers = event.params.maxPlayers;
-
-  if (!event.params.questDetailsRef) {
-    questEntity.questDescription = "";
-  } else {
-    // Fetching quest description with IPFS
-    let questDataBytes: Bytes | null = null;
-    let tryCount = 0;
-    while (!questDataBytes && tryCount < 3) {
-      // 3 tries in total (180 sec for each try)
-      questDataBytes = ipfs.cat(event.params.questDetailsRef.toString());
-      tryCount = tryCount + 1;
-    }
-    if (questDataBytes) {
-      let jsonResult = json.try_fromBytes(questDataBytes);
-      if (jsonResult.isOk) {
-        let jsonObject = jsonResult.value.toObject();
-        let communicationLink = jsonObject.get("communicationLink");
-        let questDescription = jsonObject.get("description");
-        questEntity.questCommunicationLink = communicationLink
-          ? communicationLink.toString()
-          : "";
-        questEntity.questDescription = questDescription
-          ? questDescription.toString()
-          : "";
-      } else {
-        let description = questDataBytes.toString();
-        questEntity.questDescription = description
-          ? description.toString()
-          : "";
-      }
-    } else {
-      // Continue with empty description
-      questEntity.questDescription = "";
-    }
-  }
-
-  questEntity.save();
 }

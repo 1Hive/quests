@@ -1,10 +1,22 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 features:
   - fullTextSearch
   - nonFatalErrors
-  - ipfsOnEthereumContracts
 schema:
   file: ./src/schema.graphql
+templates:
+  - name: QuestDetailMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/quest-factory.ts
+      handler: handleQuestMetadata
+      entities:
+        - QuestMetadata
+      abis:
+        - name: QuestFactory
+          file: ./abis/QuestFactory.proxy.json
 dataSources:
 {{#dataSources}}
   {{&subTemplate}}

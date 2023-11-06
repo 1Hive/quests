@@ -2,7 +2,7 @@ import { request } from 'graphql-request';
 import { FilterModel } from 'src/models/filter.model';
 import { TokenAmountModel } from 'src/models/token-amount.model';
 import { getNetwork } from 'src/networks';
-import { hexToBytes, toAscii, toChecksumAddress } from 'web3-utils';
+import { hexToBytes, toChecksumAddress } from 'web3-utils';
 import {
   GovernQueueChallengeReasonQuery,
   GovernQueueChallengesQuery,
@@ -22,7 +22,7 @@ import { DisputeModel } from 'src/models/dispute.model';
 import { arrayDistinct } from 'src/utils/array.util';
 import { DashboardModel } from 'src/models/dashboard.model';
 import {
-  fetchQuestEnity,
+  fetchQuestEntity,
   fetchQuestEntities,
   fetchActiveQuestEntitiesLight,
   fetchQuestRewardTokens,
@@ -34,6 +34,10 @@ import { ClaimStatus } from 'src/enums/claim-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
 import { PlayModel } from 'src/models/play.model';
 import { QuestModel } from 'src/models/quest.model';
+import {
+  CelesteCourtConfigEntitiesQuery,
+  CelesteDisputeEntityQuery,
+} from 'src/queries/celeste-entity.query';
 import { ADDRESS_ZERO, DEFAULT_CLAIM_EXECUTION_DELAY_MS } from '../constants';
 import { Logger } from '../utils/logger';
 import { fromBigNumber, toBigNumber } from '../utils/web3.utils';
@@ -73,9 +77,9 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     const quest: QuestModel = {
       address: questAddress,
       title: questEntity.questTitle,
-      description: questEntity.questDescription || undefined, // if '' -> undefined
-      communicationLink: questEntity.questCommunicationLink,
-      detailsRefIpfs: toAscii(questEntity.questDetailsRef),
+      description: questEntity.questMetadata.questDescription,
+      communicationLink: questEntity.questMetadata.questCommunicationLink,
+      detailsRefIpfs: questEntity.questMetadata.id,
       rewardToken: (await getTokenInfo(questEntity.questRewardTokenAddress)) ?? undefined,
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
       creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms
@@ -96,21 +100,15 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
       activeClaimCount: claimCountMap.get(questAddress) ?? 0,
       maxPlayers: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers : undefined, // If null put undefined
       unlimited: questEntity.questMaxPlayers ? +questEntity.questMaxPlayers === 0 : undefined,
+      isWhitelist: questEntity.questIsWhiteListed,
       status: QuestStatus.Active,
-      players: [],
+      players: questEntity.questPlayers ?? [],
       governAddress: toChecksumAddress(questEntity.questGovernAddress),
       version: questEntity.version,
       features: {},
     };
 
     loadFeatureSupport(quest);
-
-    if (!quest.detailsRefIpfs) {
-      quest.description = '[No description]';
-    } else if (!quest.description) {
-      // If failed to fetch ipfs description
-      quest.description = formatIpfsMarkdownLink(quest.detailsRefIpfs, 'See description');
-    }
 
     if (quest?.maxPlayers !== undefined) {
       quest.players = await getQuestContract(quest).getPlayers();
@@ -309,15 +307,23 @@ export async function fetchQuestsPaging(
   currentIndex: number,
   count: number,
   filter: FilterModel,
+  walletAddress: string,
 ): Promise<QuestModel[]> {
-  const queryResult = await fetchQuestEntities(currentIndex, count, filter);
-  const newQuests = await mapQuestList(queryResult);
+  const queryResult = await fetchQuestEntities(currentIndex, count, filter, walletAddress);
+  const newQuests =
+    filter.playStatus === 'All'
+      ? await mapQuestList(queryResult)
+      : (await mapQuestList(queryResult)).filter((quest) =>
+          filter.playStatus === 'Played'
+            ? quest.players && quest.players.length > 0
+            : quest.players === null,
+        );
   questList = questList.concat(newQuests);
   return newQuests;
 }
 
 export async function fetchQuest(questAddress: string) {
-  const queryResult = await fetchQuestEnity(questAddress);
+  const queryResult = await fetchQuestEntity(questAddress);
   const claimResult = await fetchGovernQueueClaimsCount();
   return mapQuest(queryResult, claimResult);
 }
@@ -505,6 +511,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
     questPlayDepositToken: string;
     questPlayDepositAmount: string;
     questMaxPlayers: string;
+    questIsWhiteListed: string;
   }[];
   const funds = (
     await Promise.all(
@@ -517,7 +524,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
         ];
 
         // If max player is not null then the quest is playable
-        if (quest.questMaxPlayers) {
+        if (quest.questMaxPlayers && !quest.questIsWhiteListed) {
           const questPlayers = await getQuestContract({
             address: quest.questAddress,
             version: quest.version,
@@ -567,6 +574,69 @@ export async function fetchCreateQuestDeposit(walletAddress: string) {
   });
 }
 
+// #region Celeste
+
+export async function fetchChallengeFee(
+  celesteAddressOverride?: string,
+): Promise<TokenAmountModel | null> {
+  const { celesteSubgraph } = getNetwork();
+  let feeToken;
+  let feeAmount;
+  if (celesteSubgraph) {
+    const result = await request(celesteSubgraph, CelesteCourtConfigEntitiesQuery, {
+      first: 1,
+      skip: 0,
+    });
+    feeToken = result.courtConfigs[0].feeToken.id;
+    feeAmount = result.courtConfigs[0].settleFee;
+  } else {
+    const celesteContract = await getCelesteContract(celesteAddressOverride);
+    if (!celesteContract) return null;
+    [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
+  }
+  const token = await getTokenInfo(feeToken);
+  if (!token) return null;
+  return toTokenAmountModel({
+    ...token,
+    amount: feeAmount,
+  });
+}
+
+export async function fetchChallengeDispute(
+  challenge: ChallengeModel,
+): Promise<DisputeModel | null> {
+  const { celesteSubgraph } = getNetwork();
+  let finalRuling;
+  let ruled = false;
+  if (celesteSubgraph) {
+    const result = await request(celesteSubgraph, CelesteDisputeEntityQuery, {
+      ID: challenge.disputeId,
+    });
+    finalRuling = result.dispute.finalRuling;
+    ruled = result.dispute.state === 'Ruled';
+  } else {
+    const celesteDisputeManagerContract = await getCelesteDisputeManagerContract(
+      challenge.resolver,
+    );
+    if (!celesteDisputeManagerContract) {
+      return null;
+    }
+    if (challenge.disputeId === undefined) {
+      throw new Error('Dispute does not exist yet, please try again later');
+    }
+    const result = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
+    finalRuling = result.finalRuling; // 2: Abstained, 3: Rejected, 4: Approved
+    ruled = result.ruled === 2; // DisputeState.Ruled
+  }
+  return {
+    id: challenge.disputeId!,
+    finalRuling,
+    ruled,
+  };
+}
+
+// #endregion
+
 // #endregion
 
 // #region QuestFactory
@@ -593,8 +663,9 @@ export async function saveQuest(
     questExpireTimeUtcSec,
     fallbackAddress,
     data.maxPlayers,
+    data.isWhitelist,
     {
-      // gasLimit: 10000000,
+      gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -603,6 +674,21 @@ export async function saveQuest(
 // #endregion
 
 // #region Quest
+
+export async function setWhitelist(
+  walletAddress: string,
+  players: string[],
+  questAddress: string,
+  onTx?: onTxCallback,
+) {
+  const tx = await getQuestContract({ address: questAddress }, walletAddress).setWhiteList(
+    players,
+    {
+      gasLimit: 10000000,
+    },
+  );
+  return handleTransaction(tx, onTx);
+}
 
 export async function recoverFundsAndDeposit(
   walletAddress: string,
@@ -614,7 +700,7 @@ export async function recoverFundsAndDeposit(
   if (!questContract) return null;
   Logger.debug('Recovering quest unused funds and deposit...', { quest });
   const tx = await questContract.recoverFundsAndDeposit({
-    gasLimit: 1000000,
+    gasLimit: 10000000,
   });
   return handleTransaction(tx, onTx);
 }
@@ -789,7 +875,7 @@ export async function scheduleQuestClaim(
   const container = await generateScheduleContainer(walletAddress, claimData, questData);
   Logger.debug('Scheduling quest claim...', { container });
   const tx = (await governQueueContract.schedule(container, {
-    gasLimit: 1000000,
+    gasLimit: 10000000,
   })) as ContractTransaction;
   return handleTransaction(tx, onTx);
 }
@@ -810,7 +896,7 @@ export async function executeQuestClaim(
       payload: claimData.container!.payload,
     },
     {
-      gasLimit: 1000000,
+      gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -832,7 +918,7 @@ export async function challengeQuestClaim(
     { config: container.config, payload: container.payload },
     challengeReasonIpfs,
     {
-      gasLimit: 1000000,
+      gasLimit: 10000000,
     },
   );
   return handleTransaction(tx, onTx);
@@ -872,51 +958,9 @@ export async function resolveClaimChallenge(
   if (!governQueueContract) return null;
   Logger.debug('Resolving claim challenge...', { container, dispute });
   const tx = await governQueueContract.resolve(container, dispute.id, {
-    gasLimit: 1000000,
+    gasLimit: 10000000,
   });
   return handleTransaction(tx, onTx);
-}
-
-// #endregion
-
-// #region Celeste
-
-export async function fetchChallengeFee(
-  celesteAddressOverride?: string,
-): Promise<TokenAmountModel | null> {
-  const celesteContract = await getCelesteContract(celesteAddressOverride);
-  if (!celesteContract) return null;
-  const [, feeToken, feeAmount] = await celesteContract.getDisputeFees();
-  const token = await getTokenInfo(feeToken);
-  if (!token) return null;
-  return toTokenAmountModel({
-    ...token,
-    amount: feeAmount,
-  });
-}
-
-export async function fetchChallengeDispute(
-  challenge: ChallengeModel,
-): Promise<DisputeModel | null> {
-  const celesteDisputeManagerContract = await getCelesteDisputeManagerContract(challenge.resolver);
-  if (!celesteDisputeManagerContract) {
-    return null;
-  }
-  if (challenge.disputeId === undefined) {
-    throw new Error('Dispute does not exist yet, please try again later');
-  }
-  let finalRuling;
-  try {
-    const result = await celesteDisputeManagerContract.computeRuling(challenge.disputeId);
-    finalRuling = result.finalRuling;
-  } catch (error) {
-    const result = await celesteDisputeManagerContract.getDispute(challenge.disputeId);
-    finalRuling = result.finalRuling;
-  }
-  return {
-    id: challenge.disputeId,
-    state: finalRuling,
-  };
 }
 
 // #endregion

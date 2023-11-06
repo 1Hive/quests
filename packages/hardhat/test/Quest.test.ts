@@ -1,4 +1,3 @@
-// @ts-ignore
 import { ethers, network } from "hardhat";
 import { use, expect } from "chai";
 import { solidity } from "ethereum-waffle";
@@ -9,8 +8,8 @@ import {
   fromNumber,
 } from "./test-helper";
 import { TokenMock, TokenMock__factory } from "../typechain";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 
 use(solidity);
 
@@ -190,10 +189,54 @@ describe("[Contract] Quest", function () {
       );
       expect(await sameToken.balanceOf(other.address)).to.eq(questFunds);
     });
+
+    describe("WHEN quest is whitelist only", () => {
+      it("SHOULDn't keep players deposits", async () => {
+        // Arrange
+        const sameToken = rewardToken;
+        const quest = await deployQuest(
+          "fakeTitle",
+          "0x",
+          sameToken,
+          network.name === "hardhat" ? epochNow + 60 * 5 : epoch0, // expired in 5 min
+          govern.address,
+          other.address,
+          questFunds,
+          createDepositToken,
+          depositAmount,
+          sameToken,
+          depositAmount,
+          creator,
+          undefined,
+          true
+        );
+
+        if (network.name === "hardhat") {
+          await quest.connect(creator).setWhiteList([player.address]);
+
+          // Set next block timestamp to 10 minutes later (quest will be expired)
+          await time.setNextBlockTimestamp(epochNow + 60 * 11);
+        } else {
+          console.warn(
+            "Non hardhat network, skipping not supported fast foward"
+          );
+        }
+
+        // Act
+        await quest.recoverFundsAndDeposit();
+
+        // Assert
+        expect(await sameToken.balanceOf(quest.address)).to.eq(0); // no deposit remains even if still have players
+        expect(await createDepositToken.balanceOf(creator.address)).to.eq(
+          depositAmount
+        );
+        expect(await sameToken.balanceOf(other.address)).to.eq(questFunds);
+      });
+    });
   });
 
   describe("claim()", function () {
-    describe("questFund is 1000", function () {
+    describe("WHEN questFund is 1000", function () {
       const questFunds = fromNumber(1000);
 
       it("SHOULD transfer amount to player", async function () {
@@ -512,6 +555,49 @@ describe("[Contract] Quest", function () {
         depositAmount.mul(3) // 1 create and 2 player deposits
       );
     });
+
+    describe("WHEN quest is whitelist only AND player claims all", () => {
+      it("SHOULDn't let player deposit if same token", async () => {
+        // Arrange
+        const sameToken = rewardToken;
+        const quest = await deployQuest(
+          "fakeTitle",
+          "0x",
+          sameToken,
+          epochNow + 3600, // 1 hour from now
+          govern.address,
+          creator.address,
+          fromNumber(1),
+          sameToken,
+          depositAmount,
+          sameToken,
+          depositAmount,
+          creator,
+          undefined,
+          true
+        );
+        await sameToken
+          .connect(creator)
+          .mint(creator.address, fromNumber(1000));
+        await sameToken
+          .connect(creator)
+          .approve(quest.address, depositAmount.mul(2));
+
+        await quest
+          .connect(creator)
+          .setWhiteList([player.address, other.address]); // Add 2 player
+
+        // Act
+        await quest
+          .connect(govern)
+          .claim(hashToBytes("evidence1"), player.address, 0, true);
+
+        // Assert
+        expect(await rewardToken.balanceOf(quest.address)).to.eq(
+          depositAmount.mul(1) // 1 create and no players deposits
+        );
+      });
+    });
   });
 
   describe("play()", () => {
@@ -734,6 +820,40 @@ describe("[Contract] Quest", function () {
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: Player already exists");
     });
+
+    it("SHOULD revert if it's a whitelisted quest", async () => {
+      // Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epochNow + 3600, // in 1 hour
+        govern.address,
+        creator.address,
+        fromNumber(0),
+        createDepositToken,
+        depositAmount,
+        playDepositToken,
+        depositAmount,
+        creator,
+        0,
+        true
+      );
+      const playerInitialBalance = fromNumber(1000);
+      await playDepositToken
+        .connect(player)
+        .mint(player.address, playerInitialBalance);
+      await playDepositToken
+        .connect(player)
+        .approve(quest.address, depositAmount);
+      // Act
+      const act = () => quest.connect(player).play(player.address);
+
+      // Assert
+      await expect(act()).to.be.revertedWith(
+        "ERROR: Can't self register and play a whitelisted Quest"
+      );
+    });
   });
 
   describe("unplay()", () => {
@@ -868,6 +988,161 @@ describe("[Contract] Quest", function () {
 
       // Assert
       await expect(act()).to.be.revertedWith("ERROR: player not in list");
+    });
+
+    it("SHOULD revert WHEN quest is whitelisted", async () => {
+      // Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epochNow + 3600, // in 1 hour
+        govern.address,
+        creator.address,
+        fromNumber(0),
+        createDepositToken,
+        depositAmount,
+        playDepositToken,
+        depositAmount,
+        creator,
+        0,
+        true
+      );
+      const playerInitialBalance = fromNumber(1000);
+      await playDepositToken
+        .connect(player)
+        .mint(player.address, playerInitialBalance);
+      await playDepositToken
+        .connect(player)
+        .approve(quest.address, depositAmount);
+
+      // Act
+      const act = () => quest.connect(player).unplay(player.address);
+
+      // Assert
+      await expect(act()).to.be.revertedWith(
+        "ERROR: can't unplay a whitelisted quest"
+      );
+    });
+  });
+
+  describe("constructor()", () => {
+    it("SHOULD revert if max players greater than 0 and isWhiteList", async () => {
+      //Arrange
+      const maxPlayers = 3;
+
+      //Act
+      const act = () =>
+        deployQuest(
+          "fakeTitle",
+          "0x",
+          rewardToken,
+          epochNow + 3600, // in 1 hour
+          govern.address,
+          creator.address,
+          fromNumber(0),
+          createDepositToken,
+          depositAmount,
+          playDepositToken,
+          depositAmount,
+          creator,
+          maxPlayers,
+          true
+        );
+      //Assert
+      await expect(act()).to.be.revertedWith(
+        "ERROR: Can't create a whiteListed quest with max players greater than 0 (infinity)"
+      );
+    });
+  });
+
+  describe("setWhiteList()", () => {
+    it("SHOULD set the player list to the one in the parameters", async () => {
+      //Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epochNow + 3600, // in 1 hour
+        govern.address,
+        creator.address,
+        fromNumber(0),
+        createDepositToken,
+        depositAmount,
+        playDepositToken,
+        depositAmount,
+        creator,
+        undefined,
+        true
+      );
+      //Act
+      const act = () =>
+        quest.connect(creator).setWhiteList([player.address, other.address]);
+      //Assert
+      await expect(act()).to.emit(quest, "QuestWhiteListChanged");
+      expect(await quest.getPlayers()).to.deep.eq([
+        player.address,
+        other.address,
+      ]);
+      expect(await quest.canExecute(player.address)).to.eq(true);
+      expect(await quest.canExecute(other.address)).to.eq(true);
+    });
+
+    it("SHOULD revert if duplicated address in given list", async () => {
+      //Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epochNow + 3600, // in 1 hour
+        govern.address,
+        creator.address,
+        fromNumber(0),
+        createDepositToken,
+        depositAmount,
+        playDepositToken,
+        depositAmount,
+        creator,
+        undefined,
+        true
+      );
+
+      //Act
+      const act = () =>
+        quest.connect(creator).setWhiteList([player.address, player.address]);
+
+      //Assert
+      await expect(act()).to.be.revertedWith(
+        "ERROR: One or more players is already in whitelist"
+      );
+    });
+
+    it("SHOULD revert if it's not a whitelisted quest", async () => {
+      //Arrange
+      const quest = await deployQuest(
+        "fakeTitle",
+        "0x",
+        rewardToken,
+        epochNow + 3600, // in 1 hour
+        govern.address,
+        creator.address,
+        fromNumber(0),
+        createDepositToken,
+        depositAmount,
+        playDepositToken,
+        depositAmount,
+        creator,
+        undefined,
+        false
+      );
+      //Act
+      const act = () =>
+        quest.connect(creator).setWhiteList([player.address, other.address]);
+
+      //Assert
+      await expect(act()).to.be.revertedWith(
+        "ERROR: Can't set the white list to a non-whitelisted contract"
+      );
     });
   });
 

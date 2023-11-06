@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import {
   Executed as ExecutedEvent,
   Frozen as FrozenEvent,
@@ -12,12 +12,15 @@ import { Govern, Deposit, Withdraw } from "../generated/schema";
 import { frozenRoles, roleGranted, roleRevoked } from "./lib/MiniACL";
 import { loadOrCreateContainer } from "./GovernQueue";
 import { handleContainerEventExecute } from "./utils/events";
-import { buildId, buildIndexedId } from "./utils/ids";
+import { buildId } from "./utils/ids";
 import { ZERO_ADDRESS } from "./utils/constants";
 
 export function handleExecuted(event: ExecutedEvent): void {
   let govern = loadOrCreateGovern(event.address);
-  let container = loadOrCreateContainer(event.params.memo);
+  let container = loadOrCreateContainer(
+    event.params.memo,
+    event.address.toHex()
+  );
 
   handleContainerEventExecute(container, event);
 
@@ -71,7 +74,7 @@ export function handleWithdrawn(event: WithdrawnEvent): void {
 export function handleFrozen(event: FrozenEvent): void {
   let govern = loadOrCreateGovern(event.address);
 
-  let roles = govern.roles!;
+  let roles = govern.roles;
 
   frozenRoles(roles, event.params.role);
 }
@@ -113,5 +116,5 @@ export function loadOrCreateGovern(entity: Address): Govern {
     govern.address = entity;
     govern.roles = [];
   }
-  return govern!;
+  return govern;
 }

@@ -20,6 +20,7 @@ import { getNetwork } from 'src/networks';
 import { Pages } from 'src/enums/pages.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
+import { useWallet } from 'src/contexts/wallet.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
 import MainView from '../main-view';
@@ -29,7 +30,10 @@ import background from '../../assets/background.svg';
 
 const EmptyStateCardStyled = styled(EmptyStateCard)`
   width: 100%;
-
+  margin: ${GUpx(1)};
+  div {
+    font-size: 25px !important;
+  }
   button {
     width: fit-content;
     margin: auto;
@@ -74,23 +78,26 @@ const ScrollLabelStyled = styled.div`
 `;
 
 export default function QuestList() {
+  const { walletAddress } = useWallet();
   const [quests, setQuests] = useState<QuestModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newQuestLoading, setNewQuestLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const { filter, refreshed, setFilter } = useFilterContext();
+  const { filter, refreshed, setFilter, dirty } = useFilterContext();
   const { currentTheme } = useThemeContext();
-  const { below } = useViewport();
+  const { below, width } = useViewport();
   const { transaction } = useTransactionContext();
   const { setPage } = usePageContext();
   const isMountedRef = useIsMountedRef();
   const network = getNetwork();
 
+  const isSmall = useMemo(() => below('medium'), [width]);
+
   const skeletonQuests: any[] = useMemo(() => {
     const fakeQuests = [];
     for (let i = 0; i < QUESTS_PAGE_SIZE; i += 1) {
       fakeQuests.push(
-        <QuestWrapperStyled singleColumn={below('medium')} key={`${i}`}>
+        <QuestWrapperStyled singleColumn={isSmall} key={`${i}`}>
           <Quest isLoading isSummary />
         </QuestWrapperStyled>,
       );
@@ -104,11 +111,13 @@ export default function QuestList() {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     debounceRefresh(filter);
     return () => debounceRefresh.cancel();
   }, [filter, network.networkId]);
 
   useEffect(() => {
+    setIsLoading(true);
     debounceRefresh();
     return () => debounceRefresh.cancel();
   }, [refreshed, network.networkId]);
@@ -128,11 +137,6 @@ export default function QuestList() {
       }
     }
   }, [transaction?.status, transaction?.type]);
-
-  const searchWords = useMemo(
-    () => filter.search.split(/[&|]/gm).map((x) => x.trim()),
-    [filter.search],
-  );
 
   const fetchQuestUntilNew = (newQuestAddress: string) => {
     setTimeout(async () => {
@@ -167,37 +171,41 @@ export default function QuestList() {
     if (!isLoading) {
       setQuests([]);
       setIsLoading(true);
-      QuestService.fetchQuestsPaging(0, QUESTS_PAGE_SIZE, _filter ?? filter).then((res) => {
-        if (!isMountedRef.current) {
-          return;
-        }
-        setIsLoading(false);
-        setQuests(res);
-        setHasMore(res.length >= QUESTS_PAGE_SIZE);
-      });
+      QuestService.fetchQuestsPaging(0, QUESTS_PAGE_SIZE, _filter ?? filter, walletAddress).then(
+        (res) => {
+          if (!isMountedRef.current) {
+            return;
+          }
+          setIsLoading(false);
+          setQuests(res);
+          setHasMore(res.length >= QUESTS_PAGE_SIZE);
+        },
+      );
     }
   };
 
   const loadMore = () => {
     setIsLoading(true);
-    QuestService.fetchQuestsPaging(quests.length, QUESTS_PAGE_SIZE, filter).then((res) => {
-      if (!isMountedRef.current) {
-        return;
-      }
-      setIsLoading(false);
-      setQuests(quests.concat(res));
-      setHasMore(res.length >= QUESTS_PAGE_SIZE);
-    });
+    QuestService.fetchQuestsPaging(quests.length, QUESTS_PAGE_SIZE, filter, walletAddress).then(
+      (res) => {
+        if (!isMountedRef.current) {
+          return;
+        }
+        setIsLoading(false);
+        setQuests(quests.concat(res));
+        setHasMore(res.length >= QUESTS_PAGE_SIZE);
+      },
+    );
   };
 
   return (
     <MainView>
       <LineStyled>
         <Dashboard />
-        {!below('medium') && <Piggy />}
+        {!isSmall && <Piggy />}
       </LineStyled>
       <FilterWrapperStyled theme={currentTheme}>
-        <Filter />
+        <Filter onRefresh={() => refresh()} />
       </FilterWrapperStyled>
       <InfiniteScroll
         loader={<ScrollLabelStyled>{!isLoading && <>Scroll to load more</>}</ScrollLabelStyled>}
@@ -205,14 +213,17 @@ export default function QuestList() {
         next={loadMore}
         hasMore={hasMore}
         endMessage={
+          !isLoading &&
           !newQuestLoading &&
           (quests.length ? (
             <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
-            <Outset gu64 className="flex-center wide">
+            <Outset className="flex-center wide">
               <EmptyStateCardStyled
-                text="No quests found"
-                action={<Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />}
+                text={dirty ? 'No quests found. Try changing the filter.' : 'No quests 🌟'}
+                action={
+                  dirty && <Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />
+                }
               />
             </Outset>
           ))
@@ -223,12 +234,12 @@ export default function QuestList() {
         pullDownToRefreshContent={<h3 className="center">&#8595; Pull down to refresh</h3>}
         releaseToRefreshContent={<h3 className="center">&#8593; Release to refresh</h3>}
         scrollableTarget="scroll-view"
-        scrollThreshold={below('medium') ? '1000px' : '200px'}
+        scrollThreshold={isSmall ? '1000px' : '200px'}
       >
         <FlexContainerStyled>
           {newQuestLoading && skeletonQuests[0]}
           {quests.map((questData: QuestModel) => (
-            <QuestWrapperStyled singleColumn={below('medium')} key={questData.address}>
+            <QuestWrapperStyled singleColumn={isSmall} key={questData.address}>
               <Quest isSummary questData={questData} isLoading={!questData.address} />
             </QuestWrapperStyled>
           ))}
