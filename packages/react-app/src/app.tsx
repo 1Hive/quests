@@ -39,7 +39,7 @@ function App() {
   const { currentTheme } = useThemeContext();
 
   return (
-    <AppStyled theme={currentTheme}>
+    <AppStyled theme={currentTheme} key="app">
       <PageContextProvider>
         <TransactionContextProvider>
           <FilterContextProvider>
