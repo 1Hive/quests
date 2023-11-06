@@ -56,7 +56,6 @@ interface IArbitrator {
      * @param _evidence Data submitted for the evidence related to the dispute
      */
     function submitEvidence(
-        IArbitrable _subject,
         uint256 _disputeId,
         address _submitter,
         bytes calldata _evidence
@@ -64,6 +63,7 @@ interface IArbitrator {
 
     /**
      * @dev Close the evidence period of a dispute
+     * @param _subject Arbitrable instance submitting the dispute
      * @param _disputeId Identification number of the dispute to close its evidence submitting period
      */
     function closeEvidencePeriod(
@@ -395,7 +395,6 @@ contract OwnableCeleste is IArbitrator {
 
     /**
      * @notice Submit evidence for a dispute #`_disputeId`
-     * @param _subject Arbitrable instance submitting the dispute
      * @param _disputeId Identification number of the dispute receiving new evidence
      * @param _submitter Address of the account submitting the evidence
      * @param _evidence Data submitted for the evidence of the dispute
@@ -405,9 +404,11 @@ contract OwnableCeleste is IArbitrator {
         address _submitter,
         bytes calldata _evidence
     ) external disputeExists(_disputeId) {
-        IArbitrable _subject = IArbitrable(msg.sender);
         Dispute storage dispute = disputes[_disputeId];
-        require(dispute.subject == _subject, "DM_SUBJECT_NOT_DISPUTE_SUBJECT");
+        require(
+            dispute.subject == IArbitrable(msg.sender),
+            "DM_SUBJECT_NOT_DISPUTE_SUBJECT"
+        );
         emit EvidenceSubmitted(_disputeId, _submitter, _evidence);
     }
 

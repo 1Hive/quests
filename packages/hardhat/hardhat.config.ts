@@ -2,7 +2,6 @@ import { config as dotenvConfig } from "dotenv";
 import "hardhat-deploy";
 import fs from "fs";
 import chalk from "chalk";
-import "@tenderly/hardhat-tenderly";
 import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-ethers";
