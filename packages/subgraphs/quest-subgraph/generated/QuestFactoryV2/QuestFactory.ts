@@ -161,6 +161,14 @@ export class QuestFactory__createDepositResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
+
+  getToken(): Address {
+    return this.value0;
+  }
+
+  getAmount(): BigInt {
+    return this.value1;
+  }
 }
 
 export class QuestFactory__playDepositResult {
@@ -177,6 +185,14 @@ export class QuestFactory__playDepositResult {
     map.set("value0", ethereum.Value.fromAddress(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
+  }
+
+  getToken(): Address {
+    return this.value0;
+  }
+
+  getAmount(): BigInt {
+    return this.value1;
   }
 }
 

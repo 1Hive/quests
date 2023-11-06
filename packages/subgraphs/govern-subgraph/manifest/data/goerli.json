@@ -14,8 +14,14 @@
     },
     {
       "name": "GovernQueueV2",
-      "startBlock": 7985656,
+      "startBlock": 7986054,
       "address": "0xc73BCDc0FF18Fb903FCd34de4BFfE37BE66b4E8f",
+      "customTemplate": "GovernQueue"
+    },
+    {
+      "name": "GovernQueueV3",
+      "startBlock": 9638502,
+      "address": "0xce38877414ffd60c1a1e20ddb1d52fa5840d9ca6",
       "customTemplate": "GovernQueue"
     }
   ]

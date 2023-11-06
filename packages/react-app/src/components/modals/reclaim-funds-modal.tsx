@@ -28,6 +28,11 @@ import { AddressFieldInput } from '../field-input/address-field-input';
 const OpenButtonStyled = styled(Button)`
   margin: 0 ${GUpx(1)};
   width: fit-content;
+
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 const RowStyled = styled.div`

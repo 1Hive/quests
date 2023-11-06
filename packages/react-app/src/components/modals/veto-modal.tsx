@@ -30,6 +30,10 @@ const FormStyled = styled(Form)`
 const OpenButtonStyled = styled(Button)`
   margin: ${GUpx(1)};
   width: fit-content;
+  &,
+  span {
+    color: #242424;
+  }
 `;
 
 const OpenButtonWrapperStyled = styled.div`

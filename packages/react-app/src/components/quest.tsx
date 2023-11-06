@@ -32,11 +32,11 @@ import { isQuestExpired, processQuestState as computeQuestState } from '../servi
 import { StatusTag } from './status-tag';
 import { AddressFieldInput } from './field-input/address-field-input';
 import { ConditionalWrapper } from './utils/util';
-import NumberFieldInput from './field-input/number-field-input';
 import { ActionsPlaceholder } from './actions-placeholder';
 import PlayModal from './modals/play-modal';
 import OptoutModal from './modals/optout-modal';
 import MarkdownFieldInput from './field-input/markdown-field-input';
+import PlayerListModal from './modals/player-list-modal';
 
 // #region StyledComponents
 
@@ -68,6 +68,11 @@ const CardStyled = styled(Card)<{ isSummary: boolean; highlight: boolean }>`
     `}
 `;
 
+const PlayersWrapperStyled = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const QuestFooterStyled = styled.div`
   width: 100%;
   text-align: right;
@@ -90,7 +95,13 @@ const RowStyled = styled.div`
   flex-wrap: wrap-reverse;
   justify-content: space-between;
 `;
-
+const SecondRowStyled = styled.div`
+  display: flex;
+  padding-top: ${GUpx(1)};
+  width: 100%;
+  flex-wrap: wrap-reverse;
+  justify-content: space-evenly;
+`;
 const ContentWrapperStyled = styled.div<{ compact: boolean }>`
   padding: ${({ compact }) => (compact ? GUpx(2) : GUpx(3))};
   width: 100%;
@@ -131,6 +142,7 @@ export default function Quest({
     fallbackAddress: ADDRESS_ZERO,
     creatorAddress: ADDRESS_ZERO,
     features: {},
+    isWhitelist: false,
   },
   isLoading = false,
   isSummary = false,
@@ -181,13 +193,20 @@ export default function Quest({
       if (transaction?.status === TransactionStatus.Confirmed) {
         switch (transaction?.type) {
           case TransactionType.QuestPlay:
-            if (transaction.args?.player) {
-              setPlayers((prev) => [...prev, transaction.args!.player!]);
+            if (transaction.args?.players?.length) {
+              setPlayers((prev) => [...prev, transaction.args!.players![0]]);
             }
             break;
           case TransactionType.QuestUnplay:
-            if (transaction.args?.player) {
-              setPlayers((prev) => prev?.filter((_player) => _player !== transaction.args!.player));
+            if (transaction.args?.players?.length) {
+              setPlayers((prev) =>
+                prev?.filter((_player) => _player !== transaction.args!.players![0]),
+              );
+            }
+            break;
+          case TransactionType.QuestSetWhitelist:
+            if (transaction.args?.players) {
+              setPlayers(transaction.args?.players);
             }
             break;
           case TransactionType.ClaimChallengeResolve:
@@ -238,7 +257,7 @@ export default function Quest({
         if (!depositReleased && questData.createDeposit) {
           depositLocked.push(questData.createDeposit);
         }
-        if (players.length && questData.playDeposit) {
+        if (players.length && questData.playDeposit && !questData.isWhitelist) {
           // Multiply by the number of players (each one has a deposit locked)
           questData.playDeposit.amount = questData.playDeposit.amount.mul(players.length);
           depositLocked.push(questData.playDeposit);
@@ -269,73 +288,96 @@ export default function Quest({
     <div
       onMouseLeave={() => setHighlight(true)}
       onMouseEnter={() => setHighlight(false)}
-      className="max-width-10Button0"
+      className="max-width-100"
     >
       {children}
     </div>
   );
 
   const fieldsRow = (
-    <RowStyled>
-      <HighlightBlocker>
-        <AddressFieldInputStyled
-          id="address"
-          label="Quest Address"
-          isLoading={isLoading || !questData}
-          value={questData?.address}
-          showExplorerLink={!isSummary}
-        />
-      </HighlightBlocker>
-      {isSummary && (
-        <NumberFieldInput
-          value={questData?.activeClaimCount}
-          label="Claims"
-          isLoading={isLoading}
-        />
-      )}
-      {!isSummary && (
-        <>
+    <>
+      <RowStyled>
+        <HighlightBlocker>
           <AddressFieldInputStyled
-            id="creator"
-            label="Creator"
+            id="address"
+            label="Quest Address"
             isLoading={isLoading || !questData}
-            value={questData?.creatorAddress}
+            value={questData?.address}
+            showExplorerLink={!isSummary}
           />
-          {questData?.maxPlayers != null && (
-            <TextFieldInput
-              id="players"
-              label="Players"
+        </HighlightBlocker>
+        {isSummary && (
+          <>
+            <PlayersWrapperStyled>
+              <TextFieldInput
+                id="players"
+                label="Players"
+                isLoading={isLoading || !questData}
+                value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+              />
+            </PlayersWrapperStyled>
+            <DateFieldInput
+              id="expireTime"
+              label="Expire time"
+              tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
               isLoading={isLoading || !questData}
-              value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+              value={questData?.expireTime}
             />
-          )}
-          <DateFieldInput
-            id="creationTime"
-            label="Creation time"
-            isLoading={isLoading || !questData}
-            value={questData.creationTime}
-          />
-        </>
+          </>
+        )}
+        {!isSummary && (
+          <>
+            <AddressFieldInputStyled
+              id="creator"
+              label="Creator"
+              isLoading={isLoading || !questData}
+              value={questData?.creatorAddress}
+            />
+            <AddressFieldInputStyled
+              id="fallback-address"
+              label="Funds recovery address"
+              tooltip="Unused funds at the specified expiry time can be returned to this address."
+              isLoading={isLoading || !questData}
+              value={questData?.fallbackAddress}
+            />
+          </>
+        )}
+      </RowStyled>
+      {!isSummary && (
+        <SecondRowStyled>
+          <>
+            <DateFieldInput
+              id="expireTime"
+              label="Expire time"
+              tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
+              isLoading={isLoading || !questData}
+              value={questData?.expireTime}
+            />
+            <AmountFieldInput
+              id="claimDeposit"
+              label="Claim deposit"
+              tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
+              value={claimDeposit}
+              isLoading={isLoading || !claimDeposit}
+            />
+            <PlayersWrapperStyled>
+              <TextFieldInput
+                id="players"
+                label="Players"
+                isLoading={isLoading || !questData}
+                value={`${players.length} / ${questData.unlimited ? '∞' : questData.maxPlayers}`}
+              />
+            </PlayersWrapperStyled>
+            <DateFieldInput
+              id="creationTime"
+              label="Creation time"
+              isLoading={isLoading || !questData}
+              value={questData.creationTime}
+            />
+          </>
+        </SecondRowStyled>
       )}
-
-      <DateFieldInput
-        id="expireTime"
-        label="Expire time"
-        tooltip="The expiry time for the quest completion. Past expiry time, funds will only be sendable to the fallback address."
-        isLoading={isLoading || !questData}
-        value={questData?.expireTime}
-      />
-
-      {!isSummary && status === QuestStatus.Active && (
-        <AmountFieldInput
-          id="claimDeposit"
-          label="Claim deposit"
-          tooltip="This amount will be staked when claiming a bounty. If the claim is challenged and ruled in favor of the challenger, you will lose this deposit."
-          value={claimDeposit}
-          isLoading={isLoading || !claimDeposit}
-        />
-      )}
-    </RowStyled>
+    </>
   );
   return (
     <CardWrapperStyed compact={below('medium')}>
@@ -424,55 +466,56 @@ export default function Quest({
             <QuestFooterStyled>
               {walletConnected ? (
                 <>
-                  <>
-                    <FundModal quest={questData} />
-                    {(!isPlayingQuest ||
-                      questData.creatorAddress === walletAddress ||
-                      (waitForClose && transaction?.type === TransactionType.QuestPlay)) &&
-                      questData.features?.playableQuest && (
+                  <PlayerListModal
+                    questData={questData}
+                    isEdit={walletAddress === questData.creatorAddress && questData.isWhitelist}
+                  />
+                  <FundModal quest={questData} />
+                  {questData.features.playableQuest && !questData.isWhitelist && (
+                    <>
+                      {(!isPlayingQuest ||
+                        questData.creatorAddress === walletAddress ||
+                        (waitForClose && transaction?.type === TransactionType.QuestPlay)) && (
                         <PlayModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {(isPlayingQuest ||
-                      questData.creatorAddress === walletAddress ||
-                      (waitForClose && transaction?.type === TransactionType.QuestUnplay)) &&
-                      questData.maxPlayers !== undefined && ( // Make sure maxPlayers is set (play feature is available on this quest)
+                      {(isPlayingQuest ||
+                        questData.creatorAddress === walletAddress ||
+                        (waitForClose && transaction?.type === TransactionType.QuestUnplay)) && (
                         <OptoutModal
                           questData={{ ...questData, players }}
                           onClose={() => setWaitForClose(false)}
                         />
                       )}
-                    {claimDeposit &&
-                      (isPlayingQuest || questData.maxPlayers === undefined) && ( // Bypass play feature if maxPlayers is not set
-                        <ScheduleClaimModal
-                          questData={{ ...questData, status }}
-                          questAddress={questData.address}
-                          questTotalBounty={bounty}
-                          claimDeposit={claimDeposit}
-                        />
-                      )}
-                  </>
-                  <>
-                    {(status === QuestStatus.Expired ||
-                      (waitForClose &&
-                        transaction?.type === TransactionType.QuestReclaimFunds)) && (
-                      <RecoverFundsModal
-                        bounty={bounty}
-                        questData={{ ...questData, status }}
-                        isDepositReleased={isCreateDepositReleased}
-                        onClose={() => setWaitForClose(false)}
-                        pendingClaims={
-                          !!claims?.find(
-                            (claim) =>
-                              claim.state === ClaimStatus.Scheduled ||
-                              claim.state === ClaimStatus.AvailableToExecute,
-                          )
-                        }
-                      />
-                    )}
-                  </>
+                    </>
+                  )}
+
+                  {claimDeposit && (isPlayingQuest || !questData.features.playableQuest) && (
+                    <ScheduleClaimModal
+                      questData={{ ...questData, status }}
+                      questAddress={questData.address}
+                      questTotalBounty={bounty}
+                      claimDeposit={claimDeposit}
+                    />
+                  )}
+                  {(status === QuestStatus.Expired ||
+                    (waitForClose && transaction?.type === TransactionType.QuestReclaimFunds)) && (
+                    <RecoverFundsModal
+                      bounty={bounty}
+                      questData={{ ...questData, status }}
+                      isDepositReleased={isCreateDepositReleased}
+                      onClose={() => setWaitForClose(false)}
+                      pendingClaims={
+                        !!claims?.find(
+                          (claim) =>
+                            claim.state === ClaimStatus.Scheduled ||
+                            claim.state === ClaimStatus.AvailableToExecute,
+                        )
+                      }
+                    />
+                  )}
                 </>
               ) : (
                 <ActionsPlaceholder />

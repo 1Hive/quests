@@ -7,6 +7,7 @@ export type NetworkModel = {
   explorer: 'etherscan' | 'blockscout' | 'polygonscan' | 'gnosisscan';
   questsSubgraph: string;
   governSubgraph: string;
+  celesteSubgraph?: string;
   tokenPairSubgraph: string;
   questFactoryAddress: string;
   celesteAddress: string;
