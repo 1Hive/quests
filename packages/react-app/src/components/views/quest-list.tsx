@@ -129,11 +129,6 @@ export default function QuestList() {
     }
   }, [transaction?.status, transaction?.type]);
 
-  const searchWords = useMemo(
-    () => filter.search.split(/[&|]/gm).map((x) => x.trim()),
-    [filter.search],
-  );
-
   const fetchQuestUntilNew = (newQuestAddress: string) => {
     setTimeout(async () => {
       const newQuest = await QuestService.fetchQuest(newQuestAddress);
