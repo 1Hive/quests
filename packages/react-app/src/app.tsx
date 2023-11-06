@@ -13,10 +13,11 @@ import background from './assets/background.svg';
 import backgroundMotif from './assets/background-motif.svg';
 import { isDarkTheme } from './utils/style.util';
 import { useThemeContext } from './contexts/theme.context';
+import { ThemeInterface } from './styles/theme';
 
 // #region StyledComponents
 
-const AppStyled = styled.div`
+const AppStyled = styled.div<{ theme: ThemeInterface }>`
   ${({ theme }: any) => isDarkTheme(theme) && `background-image: url(${background});`};
 
   &::after {
