@@ -11,14 +11,12 @@ import { WalletProvider } from './contexts/wallet.context';
 import Routes from './Routes';
 import background from './assets/background.svg';
 import backgroundMotif from './assets/background-motif.svg';
-import { isDarkTheme } from './utils/style.util';
 import { useThemeContext } from './contexts/theme.context';
-import { ThemeInterface } from './styles/theme';
 
 // #region StyledComponents
 
-const AppStyled = styled.div<{ theme: ThemeInterface }>`
-  ${({ theme }: any) => isDarkTheme(theme) && `background-image: url(${background});`};
+const AppStyled = styled.div`
+  background-image: url(${background});
 
   &::after {
     content: '';
@@ -39,7 +37,7 @@ function App() {
   const { currentTheme } = useThemeContext();
 
   return (
-    <AppStyled theme={currentTheme} key="app">
+    <AppStyled>
       <PageContextProvider>
         <TransactionContextProvider>
           <FilterContextProvider>

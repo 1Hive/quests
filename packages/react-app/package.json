@@ -7,7 +7,7 @@
   "dependencies": {
     "@1hive/1hive-ui": "^1.0.2",
     "@1hive/use-wallet": "npm:@1hive/use-wallet@1.1.2",
-    "@babel/runtime": "7.18.0",
+    "@babel/runtime": "^7.23.2",
     "@babel/types": "^7.15.6",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/free-brands-svg-icons": "^6.1.1",
