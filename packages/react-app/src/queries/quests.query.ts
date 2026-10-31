@@ -1,6 +1,5 @@
 import request from 'graphql-request';
 import gql from 'graphql-tag';
-import { GQL_MAX_INT_MS } from 'src/constants';
 import { QuestPlayStatus } from 'src/enums/quest-play-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
 import env from 'src/environment';
@@ -42,7 +41,7 @@ const QuestEntitiesQuery = (payload: any) => gql`
     $first: Int
     $skip: Int
     $expireTimeLower: Int
-    $expireTimeUpper: Int
+    ${payload.expireTimeUpper !== undefined ? '$expireTimeUpper: Int' : ''}
     ${payload.search ? '$search: String' : ''}
     ${
       payload.walletAddress !== undefined && payload.playStatus === QuestPlayStatus.Played
@@ -57,7 +56,7 @@ const QuestEntitiesQuery = (payload: any) => gql`
       skip: $skip,
       where: {
         questExpireTimeSec_gte: $expireTimeLower
-        questExpireTimeSec_lte: $expireTimeUpper
+        ${payload.expireTimeUpper !== undefined ? 'questExpireTimeSec_lte: $expireTimeUpper' : ''}
         ${
           payload.search
             ? 'or: [{ questTitle_contains_nocase: $search }, { questAddress_contains_nocase: $search }, { questMetadata_: { questDescription_contains_nocase: $search } }]'
@@ -155,7 +154,7 @@ export const fetchQuestEntities = async (
 ) => {
   const { questsSubgraph, networkId } = getNetwork();
   let expireTimeLowerMs = 0;
-  let expireTimeUpperMs = GQL_MAX_INT_MS;
+  let expireTimeUpperMs: number | undefined;
   const { playStatus } = filter;
 
   if (filter.status === QuestStatus.Active) {
@@ -180,7 +179,8 @@ export const fetchQuestEntities = async (
     skip: currentIndex,
     first: count,
     expireTimeLower: Math.round(expireTimeLowerMs / 1000),
-    expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
+    expireTimeUpper:
+      expireTimeUpperMs === undefined ? undefined : Math.round(expireTimeUpperMs / 1000),
     walletAddress: walletAddress?.toLowerCase(),
     playStatus,
     search: filter.search?.trim() || undefined,
