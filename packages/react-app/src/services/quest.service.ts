@@ -699,17 +699,23 @@ export async function saveQuest(
   });
 
   const questExpireTimeUtcSec = Math.round(data.expireTime!.getTime() / 1000); // Ms to UTC timestamp
-  const tx = await getQuestFactoryContract(walletAddress)?.createQuest(
+  const factory = getQuestFactoryContract(walletAddress);
+  if (!factory) throw new Error('Quest factory is not available');
+
+  // Gnosis still uses the v2 factory, whose createQuest has no whitelist argument.
+  const supportsWhitelist = factory.interface.getFunction('createQuest').inputs.length === 7;
+  if (data.isWhitelist && !supportsWhitelist) {
+    throw new Error('Restricted registration is not supported by this Quest factory');
+  }
+  const tx = await factory.createQuest(
     data.title,
     ipfsHash, // Push description to IPFS and push hash to quest contract
-    typeof data.rewardToken === 'string' ? data.expireTime : data.rewardToken!.token,
+    typeof data.rewardToken === 'string' ? data.rewardToken : data.rewardToken!.token,
     questExpireTimeUtcSec,
     fallbackAddress,
     data.maxPlayers,
-    data.isWhitelist,
-    {
-      gasLimit: 10000000,
-    },
+    ...(supportsWhitelist ? [data.isWhitelist] : []),
+    { gasLimit: 10000000 },
   );
   return handleTransaction(tx, onTx);
 }
