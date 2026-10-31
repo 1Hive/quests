@@ -1,14 +1,13 @@
 specVersion: 0.0.4
 features:
   - fullTextSearch
-  - nonFatalErrors
   - ipfsOnEthereumContracts
 schema:
   file: ./src/schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: QuestFactory
-    network: xdai
+    network: gnosis
     source:
       address: "0x5Be5286FEFE6a44f394b551B6AC9255D42e974fe"
       abi: QuestFactory
@@ -30,7 +29,7 @@ dataSources:
       file: ./src/mappings/quest-factory.ts
   - kind: ethereum/contract
     name: QuestFactoryV2
-    network: xdai
+    network: gnosis
     source:
       address: "0x2fc3f4A630cD6962A22033436Fd63D93B180c076"
       abi: QuestFactory

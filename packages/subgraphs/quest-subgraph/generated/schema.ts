@@ -8,27 +8,14 @@ import {
   store,
   Bytes,
   BigInt,
-  BigDecimal
+  BigDecimal,
+  Int8,
 } from "@graphprotocol/graph-ts";
 
 export class QuestEntity extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
-
-    this.set("version", Value.fromI32(0));
-    this.set("questAddress", Value.fromString(""));
-    this.set("questTitle", Value.fromString(""));
-    this.set("questDescription", Value.fromString(""));
-    this.set("questDetailsRef", Value.fromBytes(Bytes.empty()));
-    this.set("questRewardTokenAddress", Value.fromBytes(Bytes.empty()));
-    this.set("creationTimestamp", Value.fromBigInt(BigInt.zero()));
-    this.set("questFundsRecoveryAddress", Value.fromBytes(Bytes.empty()));
-    this.set("questCreator", Value.fromBytes(Bytes.empty()));
-    this.set("questCreateDepositToken", Value.fromBytes(Bytes.empty()));
-    this.set("questCreateDepositAmount", Value.fromBigInt(BigInt.zero()));
-    this.set("questPlayDepositToken", Value.fromBytes(Bytes.empty()));
-    this.set("questPlayDepositAmount", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -37,11 +24,16 @@ export class QuestEntity extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save QuestEntity entity with non-string ID. " +
-          'Considering using .toHex() to convert the "id" to a string.'
+        `Entities of type QuestEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("QuestEntity", id.toString(), this);
     }
+  }
+
+  static loadInBlock(id: string): QuestEntity | null {
+    return changetype<QuestEntity | null>(
+      store.get_in_block("QuestEntity", id),
+    );
   }
 
   static load(id: string): QuestEntity | null {
@@ -50,7 +42,11 @@ export class QuestEntity extends Entity {
 
   get id(): string {
     let value = this.get("id");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set id(value: string) {
@@ -59,7 +55,11 @@ export class QuestEntity extends Entity {
 
   get version(): i32 {
     let value = this.get("version");
-    return value!.toI32();
+    if (!value || value.kind == ValueKind.NULL) {
+      return 0;
+    } else {
+      return value.toI32();
+    }
   }
 
   set version(value: i32) {
@@ -68,7 +68,11 @@ export class QuestEntity extends Entity {
 
   get questAddress(): string {
     let value = this.get("questAddress");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set questAddress(value: string) {
@@ -77,7 +81,11 @@ export class QuestEntity extends Entity {
 
   get questTitle(): string {
     let value = this.get("questTitle");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set questTitle(value: string) {
@@ -86,7 +94,11 @@ export class QuestEntity extends Entity {
 
   get questDescription(): string {
     let value = this.get("questDescription");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set questDescription(value: string) {
@@ -129,7 +141,11 @@ export class QuestEntity extends Entity {
 
   get questDetailsRef(): Bytes {
     let value = this.get("questDetailsRef");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set questDetailsRef(value: Bytes) {
@@ -138,7 +154,11 @@ export class QuestEntity extends Entity {
 
   get questRewardTokenAddress(): Bytes {
     let value = this.get("questRewardTokenAddress");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set questRewardTokenAddress(value: Bytes) {
@@ -147,7 +167,11 @@ export class QuestEntity extends Entity {
 
   get creationTimestamp(): BigInt {
     let value = this.get("creationTimestamp");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set creationTimestamp(value: BigInt) {
@@ -156,7 +180,11 @@ export class QuestEntity extends Entity {
 
   get questFundsRecoveryAddress(): Bytes {
     let value = this.get("questFundsRecoveryAddress");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set questFundsRecoveryAddress(value: Bytes) {
@@ -165,7 +193,11 @@ export class QuestEntity extends Entity {
 
   get questCreator(): Bytes {
     let value = this.get("questCreator");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set questCreator(value: Bytes) {
@@ -191,7 +223,11 @@ export class QuestEntity extends Entity {
 
   get questCreateDepositToken(): Bytes {
     let value = this.get("questCreateDepositToken");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set questCreateDepositToken(value: Bytes) {
@@ -200,7 +236,11 @@ export class QuestEntity extends Entity {
 
   get questCreateDepositAmount(): BigInt {
     let value = this.get("questCreateDepositAmount");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set questCreateDepositAmount(value: BigInt) {
@@ -209,7 +249,11 @@ export class QuestEntity extends Entity {
 
   get questPlayDepositToken(): Bytes {
     let value = this.get("questPlayDepositToken");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set questPlayDepositToken(value: Bytes) {
@@ -218,7 +262,11 @@ export class QuestEntity extends Entity {
 
   get questPlayDepositAmount(): BigInt {
     let value = this.get("questPlayDepositAmount");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set questPlayDepositAmount(value: BigInt) {
@@ -230,10 +278,6 @@ export class CreateDepositEntity extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
-
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
-    this.set("depositToken", Value.fromBytes(Bytes.empty()));
-    this.set("depositAmount", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -242,22 +286,31 @@ export class CreateDepositEntity extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save CreateDepositEntity entity with non-string ID. " +
-          'Considering using .toHex() to convert the "id" to a string.'
+        `Entities of type CreateDepositEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("CreateDepositEntity", id.toString(), this);
     }
   }
 
+  static loadInBlock(id: string): CreateDepositEntity | null {
+    return changetype<CreateDepositEntity | null>(
+      store.get_in_block("CreateDepositEntity", id),
+    );
+  }
+
   static load(id: string): CreateDepositEntity | null {
     return changetype<CreateDepositEntity | null>(
-      store.get("CreateDepositEntity", id)
+      store.get("CreateDepositEntity", id),
     );
   }
 
   get id(): string {
     let value = this.get("id");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set id(value: string) {
@@ -266,7 +319,11 @@ export class CreateDepositEntity extends Entity {
 
   get timestamp(): BigInt {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set timestamp(value: BigInt) {
@@ -275,7 +332,11 @@ export class CreateDepositEntity extends Entity {
 
   get depositToken(): Bytes {
     let value = this.get("depositToken");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set depositToken(value: Bytes) {
@@ -284,7 +345,11 @@ export class CreateDepositEntity extends Entity {
 
   get depositAmount(): BigInt {
     let value = this.get("depositAmount");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set depositAmount(value: BigInt) {
@@ -296,10 +361,6 @@ export class PlayDepositEntity extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
-
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
-    this.set("depositToken", Value.fromBytes(Bytes.empty()));
-    this.set("depositAmount", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -308,22 +369,31 @@ export class PlayDepositEntity extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save PlayDepositEntity entity with non-string ID. " +
-          'Considering using .toHex() to convert the "id" to a string.'
+        `Entities of type PlayDepositEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("PlayDepositEntity", id.toString(), this);
     }
   }
 
+  static loadInBlock(id: string): PlayDepositEntity | null {
+    return changetype<PlayDepositEntity | null>(
+      store.get_in_block("PlayDepositEntity", id),
+    );
+  }
+
   static load(id: string): PlayDepositEntity | null {
     return changetype<PlayDepositEntity | null>(
-      store.get("PlayDepositEntity", id)
+      store.get("PlayDepositEntity", id),
     );
   }
 
   get id(): string {
     let value = this.get("id");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set id(value: string) {
@@ -332,7 +402,11 @@ export class PlayDepositEntity extends Entity {
 
   get timestamp(): BigInt {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set timestamp(value: BigInt) {
@@ -341,7 +415,11 @@ export class PlayDepositEntity extends Entity {
 
   get depositToken(): Bytes {
     let value = this.get("depositToken");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set depositToken(value: Bytes) {
@@ -350,7 +428,11 @@ export class PlayDepositEntity extends Entity {
 
   get depositAmount(): BigInt {
     let value = this.get("depositAmount");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set depositAmount(value: BigInt) {

@@ -3,7 +3,7 @@ import {
   DepositChanged,
 } from '../../generated/QuestFactory/QuestFactory';
 import { CreateDepositEntity, QuestEntity } from '../../generated/schema';
-import { Bytes, ipfs } from '@graphprotocol/graph-ts';
+import { BigInt, Bytes, ipfs } from '@graphprotocol/graph-ts';
 import { json } from '@graphprotocol/graph-ts';
 export function handleDepositChanged(event: DepositChanged): void {
   let depositEntity = new CreateDepositEntity(
@@ -29,6 +29,8 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questFundsRecoveryAddress = event.params.fundsRecoveryAddress;
   questEntity.questCreateDepositToken = event.params.depositToken;
   questEntity.questCreateDepositAmount = event.params.depositAmount;
+  questEntity.questPlayDepositToken = Bytes.empty();
+  questEntity.questPlayDepositAmount = BigInt.zero();
   questEntity.questCreator = event.params.creator;
   questEntity.questMaxPlayers = null;
 

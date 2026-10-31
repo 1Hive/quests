@@ -19,7 +19,6 @@ const FOLDER_PARTIALS = 'src/dataSources';
 var argv = minimist(process.argv.slice(2));
 console.log(argv);
 
-import Configstore from 'configstore';
 import { spawn } from 'child_process';
 import { exit } from 'process';
 import Mustache from 'mustache';

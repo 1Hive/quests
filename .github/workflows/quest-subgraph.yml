@@ -1,0 +1,26 @@
+name: Quest subgraph
+on:
+  push:
+    paths:
+      - 'packages/subgraphs/quest-subgraph/**'
+      - '.github/workflows/quest-subgraph.yml'
+  pull_request:
+    paths:
+      - 'packages/subgraphs/quest-subgraph/**'
+      - '.github/workflows/quest-subgraph.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/subgraphs/quest-subgraph
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: packages/subgraphs/quest-subgraph/.nvmrc
+          cache: npm
+          cache-dependency-path: packages/subgraphs/quest-subgraph/package-lock.json
+      - run: npm ci
+      - run: npm run manifest:gnosis
+      - run: npm run build
