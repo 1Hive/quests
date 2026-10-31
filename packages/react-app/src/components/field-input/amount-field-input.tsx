@@ -135,8 +135,6 @@ const TokenAmountBadge = React.memo(
             minimumFractionDigits: 2,
           }).format(usdValue || amount);
           temp += ` (${usdFormat})`;
-        } else if (usdValue === undefined) {
-          temp += ' (*)';
         }
       }
 
@@ -155,9 +153,7 @@ const TokenAmountBadge = React.memo(
         size="mini"
         label={label}
         title={`Copy : ${token.token}${
-          usdValue === undefined
-            ? `\n* This token don't have pair with our stable list (see footer)`
-            : ''
+          usdValue === undefined ? '\nUSD value is unavailable for this token.' : ''
         }`}
         onClick={onBadgeClick}
       />
