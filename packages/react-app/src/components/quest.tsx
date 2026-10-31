@@ -235,7 +235,6 @@ export default function Quest({
   }, [questData.status]);
 
   useEffect(() => {
-    if (questData.showcaseId) return;
     if (!questData.rewardToken) {
       setBounty(undefined);
     } else if (questData.address) {
@@ -298,17 +297,15 @@ export default function Quest({
   const fieldsRow = (
     <>
       <RowStyled>
-        {!questData.showcaseId && (
-          <HighlightBlocker>
-            <AddressFieldInputStyled
-              id="address"
-              label="Quest Address"
-              isLoading={isLoading || !questData}
-              value={questData?.address}
-              showExplorerLink={!isSummary}
-            />
-          </HighlightBlocker>
-        )}
+        <HighlightBlocker>
+          <AddressFieldInputStyled
+            id="address"
+            label="Quest Address"
+            isLoading={isLoading || !questData}
+            value={questData?.address}
+            showExplorerLink={!isSummary}
+          />
+        </HighlightBlocker>
         {isSummary && (
           <>
             <PlayersWrapperStyled>
@@ -392,7 +389,7 @@ export default function Quest({
         id={questData?.address}
       >
         <ConditionalWrapper
-          condition={isSummary && !isLoading && !questData.showcaseId}
+          condition={isSummary && !isLoading}
           wrapper={(children) => (
             <ClickableDivStyled
               className="quest"
@@ -416,12 +413,12 @@ export default function Quest({
                 <BountyWrapperStyled>
                   <HighlightBlocker>
                     <AmountFieldInput
-                      id={`bounty-${questData?.address ?? questData?.showcaseId}`}
-                      key={`bounty-${questData?.address ?? questData?.showcaseId}`}
+                      id={`bounty-${questData?.address}`}
+                      key={`bounty-${questData?.address}`}
                       className="bounty"
                       compact
                       tagOnly
-                      showUsd={!questData.showcaseId}
+                      showUsd
                       value={questData?.bounty}
                       isLoading={isLoading || !bounty}
                     />
