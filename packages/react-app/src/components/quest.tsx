@@ -127,15 +127,6 @@ const HeaderWrapperStyled = styled.div`
   flex-direction: column;
 `;
 
-const ShowcaseLabelStyled = styled.p`
-  margin: 0 0 ${GUpx(1)};
-  color: ${({ theme }) => theme.positive};
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-`;
-
 // #endregion
 
 type Props = {
@@ -414,11 +405,6 @@ export default function Quest({
         >
           <ContentWrapperStyled compact={below('medium')}>
             <HeaderWrapperStyled>
-              {questData.showcaseId && (
-                <ShowcaseLabelStyled>
-                  Showcase example · mock HNY · no on-chain funds
-                </ShowcaseLabelStyled>
-              )}
               <StatusTag status={questData?.status} />
               <RowStyled className="pb-0">
                 <TextFieldInput
