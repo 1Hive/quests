@@ -25,6 +25,8 @@ jobs:
         run: yarn install --frozen-lockfile --ignore-engines --ignore-scripts
       - name: Lint
         run: yarn lint
+      - name: Build Gnosis app
+        run: yarn workspace @1hive/quests-react-app build:gnosis
 
   coverage:
     name: Contract coverage
