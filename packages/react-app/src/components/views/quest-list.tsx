@@ -20,6 +20,7 @@ import { getNetwork } from 'src/networks';
 import { Pages } from 'src/enums/pages.enum';
 import { TransactionStatus } from 'src/enums/transaction-status.enum';
 import { QuestStatus } from 'src/enums/quest-status.enum';
+import { filterShowcaseQuests } from 'src/showcase-quests';
 import { useWallet } from 'src/contexts/wallet.context';
 import { useFilterContext } from '../../contexts/filter.context';
 import { Outset } from '../utils/spacer-util';
@@ -90,6 +91,10 @@ export default function QuestList() {
   const { setPage } = usePageContext();
   const isMountedRef = useIsMountedRef();
   const network = getNetwork();
+  const displayQuests = [
+    ...(network.chainId === 100 ? filterShowcaseQuests(filter) : []),
+    ...quests,
+  ];
 
   const isSmall = useMemo(() => below('medium'), [width]);
 
@@ -198,6 +203,8 @@ export default function QuestList() {
     );
   };
 
+  const emptyStateText = dirty ? 'No quests found. Try changing the filter.' : 'No quests 🌟';
+
   return (
     <MainView>
       <LineStyled>
@@ -209,18 +216,18 @@ export default function QuestList() {
       </FilterWrapperStyled>
       <InfiniteScroll
         loader={<ScrollLabelStyled>{!isLoading && <>Scroll to load more</>}</ScrollLabelStyled>}
-        dataLength={quests.length}
+        dataLength={displayQuests.length}
         next={loadMore}
         hasMore={hasMore}
         endMessage={
           !isLoading &&
           !newQuestLoading &&
-          (quests.length ? (
+          (displayQuests.length ? (
             <ScrollLabelStyled>No more quests found</ScrollLabelStyled>
           ) : (
             <Outset className="flex-center wide">
               <EmptyStateCardStyled
-                text={dirty ? 'No quests found. Try changing the filter.' : 'No quests 🌟'}
+                text={emptyStateText}
                 action={
                   dirty && <Button onClick={() => setFilter(DEFAULT_FILTER)} label="Reset filter" />
                 }
@@ -238,9 +245,16 @@ export default function QuestList() {
       >
         <FlexContainerStyled>
           {newQuestLoading && skeletonQuests[0]}
-          {quests.map((questData: QuestModel) => (
-            <QuestWrapperStyled singleColumn={isSmall} key={questData.address}>
-              <Quest isSummary questData={questData} isLoading={!questData.address} />
+          {displayQuests.map((questData: QuestModel) => (
+            <QuestWrapperStyled
+              singleColumn={isSmall}
+              key={questData.showcaseId ?? questData.address}
+            >
+              <Quest
+                isSummary
+                questData={questData}
+                isLoading={!questData.address && !questData.showcaseId}
+              />
             </QuestWrapperStyled>
           ))}
           {isLoading && skeletonQuests}

@@ -5,6 +5,8 @@ import { TokenAmountModel } from './token-amount.model';
 import { DepositModel } from './deposit-model';
 
 export type QuestModel = {
+  // Display-only example identifier. No contract is associated with it.
+  showcaseId?: string;
   // User defined
   title?: string;
   description?: string;

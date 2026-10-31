@@ -127,6 +127,15 @@ const HeaderWrapperStyled = styled.div`
   flex-direction: column;
 `;
 
+const ShowcaseLabelStyled = styled.p`
+  margin: 0 0 ${GUpx(1)};
+  color: ${({ theme }) => theme.positive};
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+`;
+
 // #endregion
 
 type Props = {
@@ -235,6 +244,7 @@ export default function Quest({
   }, [questData.status]);
 
   useEffect(() => {
+    if (questData.showcaseId) return;
     if (!questData.rewardToken) {
       setBounty(undefined);
     } else if (questData.address) {
@@ -297,15 +307,17 @@ export default function Quest({
   const fieldsRow = (
     <>
       <RowStyled>
-        <HighlightBlocker>
-          <AddressFieldInputStyled
-            id="address"
-            label="Quest Address"
-            isLoading={isLoading || !questData}
-            value={questData?.address}
-            showExplorerLink={!isSummary}
-          />
-        </HighlightBlocker>
+        {!questData.showcaseId && (
+          <HighlightBlocker>
+            <AddressFieldInputStyled
+              id="address"
+              label="Quest Address"
+              isLoading={isLoading || !questData}
+              value={questData?.address}
+              showExplorerLink={!isSummary}
+            />
+          </HighlightBlocker>
+        )}
         {isSummary && (
           <>
             <PlayersWrapperStyled>
@@ -389,7 +401,7 @@ export default function Quest({
         id={questData?.address}
       >
         <ConditionalWrapper
-          condition={isSummary && !isLoading}
+          condition={isSummary && !isLoading && !questData.showcaseId}
           wrapper={(children) => (
             <ClickableDivStyled
               className="quest"
@@ -402,6 +414,11 @@ export default function Quest({
         >
           <ContentWrapperStyled compact={below('medium')}>
             <HeaderWrapperStyled>
+              {questData.showcaseId && (
+                <ShowcaseLabelStyled>
+                  Showcase example · mock HNY · no on-chain funds
+                </ShowcaseLabelStyled>
+              )}
               <StatusTag status={questData?.status} />
               <RowStyled className="pb-0">
                 <TextFieldInput
@@ -413,12 +430,12 @@ export default function Quest({
                 <BountyWrapperStyled>
                   <HighlightBlocker>
                     <AmountFieldInput
-                      id={`bounty-${questData?.address}`}
-                      key={`bounty-${questData?.address}`}
+                      id={`bounty-${questData?.address ?? questData?.showcaseId}`}
+                      key={`bounty-${questData?.address ?? questData?.showcaseId}`}
                       className="bounty"
                       compact
                       tagOnly
-                      showUsd
+                      showUsd={!questData.showcaseId}
                       value={questData?.bounty}
                       isLoading={isLoading || !bounty}
                     />
