@@ -585,11 +585,24 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   const totalFunds = funds
     .map((x) => {
       if (isTestNetwork && x.usdValue === undefined) {
-        return x.parsedAmount; // fallabck to 1$ value for rinkeby environment
+        return x.parsedAmount; // fallback to 1$ value for test networks
       }
-      return x.usdValue ?? 0;
+      return x.usdValue;
     })
     .filter((x) => x !== undefined) as number[];
+
+  const unpricedFunds = Object.values(
+    funds.reduce((totals, fund) => {
+      if (!isTestNetwork && fund.usdValue === undefined && fund.parsedAmount > 0) {
+        const token = fund.token.token.toLowerCase();
+        if (!totals[token]) {
+          totals[token] = { symbol: fund.token.symbol, amount: 0 };
+        }
+        totals[token].amount += fund.parsedAmount;
+      }
+      return totals;
+    }, {} as Record<string, { symbol: string; amount: number }>),
+  );
 
   BigNumber.prototype.toJSON = function toJSON() {
     return fromBigNumber(this, 18);
@@ -601,6 +614,7 @@ export async function getDashboardInfo(): Promise<DashboardModel> {
   return {
     questCount: result.questEntities.length,
     totalFunds: totalFundsSummed,
+    unpricedFunds,
   };
 }
 

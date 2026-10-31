@@ -50,6 +50,8 @@ export default function Dashboard() {
   const [dashboardModel, setDashboardModel] = useState<DashboardModel>();
   const { walletConnected } = useWallet();
   const { networkId } = getNetwork();
+  const unpricedFunds = dashboardModel?.unpricedFunds ?? [];
+  const showTokenAmount = unpricedFunds.length === 1 && dashboardModel?.totalFunds === 0;
 
   useEffect(() => {
     let isSubscribed = true;
@@ -68,15 +70,36 @@ export default function Dashboard() {
       <ChildSpacer justify="space-around" align="center">
         <FieldInput
           label={<LabelStyled>Bounty Pool</LabelStyled>}
-          tooltip="Total of the quest bounties converted into USD"
+          tooltip={
+            unpricedFunds.length
+              ? 'Bounties held by open quests, excluding deposits. USD conversion is unavailable for some tokens.'
+              : 'Total of the quest bounties converted into USD'
+          }
           isLoading={!dashboardModel}
         >
           <TextStyled theme={theme}>
-            {dashboardModel?.totalFunds?.toLocaleString('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            })}
+            {showTokenAmount
+              ? `${unpricedFunds[0].amount.toLocaleString('en-US', { maximumFractionDigits: 4 })} ${
+                  unpricedFunds[0].symbol
+                }`
+              : dashboardModel?.totalFunds?.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                })}
           </TextStyled>
+          {!showTokenAmount && unpricedFunds.length > 0 && (
+            <div>
+              +{' '}
+              {unpricedFunds
+                .map(
+                  (fund) =>
+                    `${fund.amount.toLocaleString('en-US', { maximumFractionDigits: 4 })} ${
+                      fund.symbol
+                    }`,
+                )
+                .join(', ')}
+            </div>
+          )}
         </FieldInput>
         <FieldInput
           label={<LabelStyled>Open Quests</LabelStyled>}
