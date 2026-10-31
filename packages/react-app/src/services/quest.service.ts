@@ -64,6 +64,13 @@ import {
   cacheGovernQueueAddressForQuest,
 } from './cache.service';
 import { loadFeatureSupport } from './feature-support.service';
+import {
+  fetchOnchainChallenge,
+  fetchOnchainContainers,
+  fetchOnchainQueue,
+  fetchOnchainVetoReason,
+  invalidateOnchainGovernSnapshot,
+} from './govern-onchain.service';
 
 let questList: QuestModel[] = [];
 
@@ -132,6 +139,7 @@ async function mapQuestList(quests: any[]): Promise<QuestModel[]> {
 async function fetchGovernQueue(
   questData: QuestModel,
 ): Promise<{ nonce: number; config: ConfigModel }> {
+  if (getNetwork().chainId === 100) return fetchOnchainQueue(questData);
   const { governSubgraph } = getNetwork();
   const governQueueAddress = await getGovernQueueAddressFromQuest(questData);
 
@@ -156,10 +164,12 @@ async function fetchGovernQueue(
 }
 
 export async function fetchGovernQueueClaimsCount(): Promise<Map<string, number>> {
-  const { governSubgraph } = getNetwork();
-  const result = await request(governSubgraph, ClaimContainersLightQuery);
+  const claims =
+    getNetwork().chainId === 100
+      ? await fetchOnchainContainers()
+      : (await request(getNetwork().governSubgraph, ClaimContainersLightQuery)).containers;
   const countMap = new Map<string, number>();
-  result.containers.forEach((claim: any) => {
+  claims.forEach((claim: any) => {
     const questAddress = toChecksumAddress(claim.payload.actions[0].to);
     countMap.set(questAddress, (countMap.get(questAddress) ?? 0) + 1);
   });
@@ -167,6 +177,7 @@ export async function fetchGovernQueueClaimsCount(): Promise<Map<string, number>
 }
 
 async function fetchClaimContainers(): Promise<ContainerModel[]> {
+  if (getNetwork().chainId === 100) return fetchOnchainContainers();
   const { governSubgraph } = getNetwork();
   const result = await request(governSubgraph, ClaimContainersQuery);
 
@@ -233,8 +244,10 @@ async function handleTransaction(
   }
   Logger.info('Tx hash', tx.hash);
   const receipt = (await tx.wait()) as ethers.ContractReceipt;
-  if (receipt.status) Logger.debug('Tx receipt', receipt);
-  else {
+  if (receipt.status) {
+    if (getNetwork().chainId === 100) invalidateOnchainGovernSnapshot();
+    Logger.debug('Tx receipt', receipt);
+  } else {
     Logger.error('Transaction failed', { txReceipt: receipt });
   }
   return receipt;
@@ -422,6 +435,23 @@ export async function fetchChallenge(
   container: ContainerModel,
   quest: QuestModel,
 ): Promise<ChallengeModel | null> {
+  if (getNetwork().chainId === 100) {
+    const queueAddress = await getGovernQueueAddressFromQuest(quest);
+    const result = await fetchOnchainChallenge(container.id, queueAddress);
+    if (!result) return null;
+    const reason = await getObjectFromIpfs(result.reason, ipfsTheGraph);
+    return {
+      deposit: {
+        parsedAmount: fromBigNumber(result.collateral.amount, result.collateral.decimals),
+        token: result.collateral,
+      },
+      reason: reason ?? formatIpfsMarkdownLink(result.reason, 'See reason'),
+      createdAt: result.createdAt,
+      resolver: result.resolver,
+      challengerAddress: toChecksumAddress(result.challenger),
+      disputeId: result.disputeId,
+    };
+  }
   const { governSubgraph } = getNetwork();
   const governQueueAddress = await getGovernQueueAddressFromQuest(quest);
   const result = await request(governSubgraph, GovernQueueChallengesQuery, {
@@ -454,6 +484,9 @@ export async function fetchChallenge(
  */
 export async function getGovernQueueAddressFromQuest(questData?: QuestModel) {
   if (!questData?.address) {
+    if (getNetwork().chainId === 100) {
+      throw new Error('A quest is required to find its Gnosis Govern queue');
+    }
     // Fetch the last created govern queue
     const { governSubgraph } = getNetwork();
     const result = await request(governSubgraph, GovernQueueEntities);
@@ -464,6 +497,12 @@ export async function getGovernQueueAddressFromQuest(questData?: QuestModel) {
 }
 
 export async function fetchChallengeReason(container: ContainerModel): Promise<string | undefined> {
+  if (getNetwork().chainId === 100) {
+    const challenge = await fetchOnchainChallenge(container.id);
+    if (!challenge) return undefined;
+    const reason = await getObjectFromIpfs(challenge.reason, ipfsTheGraph);
+    return `[ Dispute#${challenge.disputeId} / Challenger:${challenge.challenger} ]\n${reason}`;
+  }
   const { governSubgraph } = getNetwork();
   const result = await request(governSubgraph, GovernQueueChallengeReasonQuery, {
     containerId: container.id.toLowerCase(),
@@ -478,6 +517,10 @@ export async function fetchChallengeReason(container: ContainerModel): Promise<s
 }
 
 export async function fetchVetoReason(container: ContainerModel): Promise<string | undefined> {
+  if (getNetwork().chainId === 100) {
+    const reason = await fetchOnchainVetoReason(container.id);
+    return reason ? getObjectFromIpfs(reason, ipfsTheGraph) : undefined;
+  }
   const { governSubgraph } = getNetwork();
   const result = await request(governSubgraph, GovernQueueVetoReasonsQuery, {
     containerId: container.id.toLowerCase(),

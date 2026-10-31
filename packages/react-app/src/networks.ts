@@ -32,7 +32,7 @@ export const networks = Object.freeze({
     name: 'Gnosis',
     explorer: 'gnosisscan',
     questsSubgraph: 'https://api.studio.thegraph.com/query/33583/quests/version/latest',
-    governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai',
+    governSubgraph: '', // Govern queue reads on Gnosis use contract calls and events.
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/honeyswap-xdai',
     celesteSubgraph: 'https://api.studio.thegraph.com/query/40931/celeste-gnosis/version/latest',
     questFactoryAddress: HardhatDeployement[100]?.xdai.contracts.QuestFactory.address,

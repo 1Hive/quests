@@ -8,6 +8,7 @@ import { Logger } from 'src/utils/logger';
 import request from 'graphql-request';
 import { getQuestContract } from 'src/utils/contract.util';
 import { GovernEntity } from 'src/queries/govern-queue-entity.query';
+import { getOnchainQueueAddress } from './govern-onchain.service';
 import { fetchRoutePairWithStable } from './uniswap.service';
 
 const cacheVersion = 2;
@@ -73,6 +74,7 @@ export async function cacheGovernQueueAddressForQuest(
     'queue-address-for-quest',
     questData.address,
     async () => {
+      if (getNetwork().chainId === 100) return getOnchainQueueAddress(questData);
       // Retrieve governAddress from Quest contract
       const quest = getQuestContract(questData);
       const governAddress = await quest.aragonGovernAddress();
