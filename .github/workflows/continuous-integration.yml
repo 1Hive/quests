@@ -9,20 +9,20 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 16
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version-file: .nvmrc
       - name: Cache yarn modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-yarn-v${{ secrets.YARN_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}
       - name: Case Sensitivity Checker
         uses: credfeto/action-case-checker@v1.1
       - name: Install
-        run: yarn install
+        run: yarn install --frozen-lockfile --ignore-engines --ignore-scripts
       - name: Lint
         run: yarn lint
 
@@ -30,21 +30,21 @@ jobs:
     name: Contract coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version-file: .nvmrc
 
       - name: Cache yarn modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-yarn-v${{ secrets.YARN_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}
 
       - name: Cache contracts
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             packages/*/cache
@@ -53,7 +53,7 @@ jobs:
           key: ${{ runner.os }}-contracts-v${{ secrets.CONTRACTS_CACHE_VERSION }}-${{ hashFiles('packages/*/contracts/**/*.sol') }}
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile --ignore-engines --ignore-scripts
 
       - name: Build contracts
         run: yarn compile

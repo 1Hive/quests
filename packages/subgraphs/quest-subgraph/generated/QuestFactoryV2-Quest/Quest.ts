@@ -7,7 +7,7 @@ import {
   Entity,
   Bytes,
   Address,
-  BigInt
+  BigInt,
 } from "@graphprotocol/graph-ts";
 
 export class QuestClaimed extends ethereum.Event {
@@ -171,7 +171,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.call(
       "aragonGovernAddress",
       "aragonGovernAddress():(address)",
-      []
+      [],
     );
 
     return result[0].toAddress();
@@ -181,7 +181,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.tryCall(
       "aragonGovernAddress",
       "aragonGovernAddress():(address)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -192,7 +192,7 @@ export class Quest extends ethereum.SmartContract {
 
   canExecute(executer: Address): boolean {
     let result = super.call("canExecute", "canExecute(address):(bool)", [
-      ethereum.Value.fromAddress(executer)
+      ethereum.Value.fromAddress(executer),
     ]);
 
     return result[0].toBoolean();
@@ -200,7 +200,7 @@ export class Quest extends ethereum.SmartContract {
 
   try_canExecute(executer: Address): ethereum.CallResult<boolean> {
     let result = super.tryCall("canExecute", "canExecute(address):(bool)", [
-      ethereum.Value.fromAddress(executer)
+      ethereum.Value.fromAddress(executer),
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -213,13 +213,13 @@ export class Quest extends ethereum.SmartContract {
     let result = super.call(
       "claims",
       "claims(uint256):(bytes,address,uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      [ethereum.Value.fromUnsignedBigInt(param0)],
     );
 
     return new Quest__claimsResult(
       result[0].toBytes(),
       result[1].toAddress(),
-      result[2].toBigInt()
+      result[2].toBigInt(),
     );
   }
 
@@ -227,7 +227,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.tryCall(
       "claims",
       "claims(uint256):(bytes,address,uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      [ethereum.Value.fromUnsignedBigInt(param0)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -237,8 +237,8 @@ export class Quest extends ethereum.SmartContract {
       new Quest__claimsResult(
         value[0].toBytes(),
         value[1].toAddress(),
-        value[2].toBigInt()
-      )
+        value[2].toBigInt(),
+      ),
     );
   }
 
@@ -246,12 +246,12 @@ export class Quest extends ethereum.SmartContract {
     let result = super.call(
       "createDeposit",
       "createDeposit():(address,uint256)",
-      []
+      [],
     );
 
     return new Quest__createDepositResult(
       result[0].toAddress(),
-      result[1].toBigInt()
+      result[1].toBigInt(),
     );
   }
 
@@ -259,14 +259,14 @@ export class Quest extends ethereum.SmartContract {
     let result = super.tryCall(
       "createDeposit",
       "createDeposit():(address,uint256)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Quest__createDepositResult(value[0].toAddress(), value[1].toBigInt())
+      new Quest__createDepositResult(value[0].toAddress(), value[1].toBigInt()),
     );
   }
 
@@ -289,7 +289,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.call(
       "fundsRecoveryAddress",
       "fundsRecoveryAddress():(address)",
-      []
+      [],
     );
 
     return result[0].toAddress();
@@ -299,7 +299,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.tryCall(
       "fundsRecoveryAddress",
       "fundsRecoveryAddress():(address)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -327,7 +327,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.call(
       "isCreateDepositReleased",
       "isCreateDepositReleased():(bool)",
-      []
+      [],
     );
 
     return result[0].toBoolean();
@@ -337,7 +337,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.tryCall(
       "isCreateDepositReleased",
       "isCreateDepositReleased():(bool)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -365,12 +365,12 @@ export class Quest extends ethereum.SmartContract {
     let result = super.call(
       "playDeposit",
       "playDeposit():(address,uint256)",
-      []
+      [],
     );
 
     return new Quest__playDepositResult(
       result[0].toAddress(),
-      result[1].toBigInt()
+      result[1].toBigInt(),
     );
   }
 
@@ -378,14 +378,14 @@ export class Quest extends ethereum.SmartContract {
     let result = super.tryCall(
       "playDeposit",
       "playDeposit():(address,uint256)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Quest__playDepositResult(value[0].toAddress(), value[1].toBigInt())
+      new Quest__playDepositResult(value[0].toAddress(), value[1].toBigInt()),
     );
   }
 
@@ -414,7 +414,7 @@ export class Quest extends ethereum.SmartContract {
     let result = super.tryCall(
       "questDetailsRef",
       "questDetailsRef():(bytes)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -497,13 +497,13 @@ export class ConstructorCall__Inputs {
 
   get _createDeposit(): ConstructorCall_createDepositStruct {
     return changetype<ConstructorCall_createDepositStruct>(
-      this._call.inputValues[6].value.toTuple()
+      this._call.inputValues[6].value.toTuple(),
     );
   }
 
   get _playDeposit(): ConstructorCall_playDepositStruct {
     return changetype<ConstructorCall_playDepositStruct>(
-      this._call.inputValues[7].value.toTuple()
+      this._call.inputValues[7].value.toTuple(),
     );
   }
 

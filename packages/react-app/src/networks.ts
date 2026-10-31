@@ -31,7 +31,7 @@ export const networks = Object.freeze({
     chainId: 100,
     name: 'Gnosis',
     explorer: 'gnosisscan',
-    questsSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/quests-subgraph-gnosis',
+    questsSubgraph: 'https://api.studio.thegraph.com/query/33583/quests/version/latest',
     governSubgraph: 'https://api.thegraph.com/subgraphs/name/corantin/govern-1hive-xdai',
     tokenPairSubgraph: 'https://api.thegraph.com/subgraphs/name/1hive/honeyswap-xdai',
     celesteSubgraph: 'https://api.studio.thegraph.com/query/40931/celeste-gnosis/version/latest',

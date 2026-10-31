@@ -2,12 +2,12 @@
 
 import { DataSourceTemplate, DataSourceContext } from "@graphprotocol/graph-ts";
 
-export class QuestMetadata extends DataSourceTemplate {
+export class QuestDetailMetadata extends DataSourceTemplate {
   static create(cid: string): void {
-    DataSourceTemplate.create("QuestMetadata", [cid]);
+    DataSourceTemplate.create("QuestDetailMetadata", [cid]);
   }
 
   static createWithContext(cid: string, context: DataSourceContext): void {
-    DataSourceTemplate.createWithContext("QuestMetadata", [cid], context);
+    DataSourceTemplate.createWithContext("QuestDetailMetadata", [cid], context);
   }
 }

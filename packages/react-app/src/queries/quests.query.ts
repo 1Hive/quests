@@ -10,12 +10,13 @@ import { msToSec } from 'src/utils/date.utils';
 
 const QuestEntityQuery = gql`
   query questEntity($ID: String) {
-    questEntity(id: $ID, subgraphError: allow) {
+    questEntity(id: $ID) {
       id
       version
       questAddress
       questTitle
       questExpireTimeSec
+      questDetailsRef
       questMetadata {
         id
         questDescription
@@ -37,38 +38,31 @@ const QuestEntityQuery = gql`
 `;
 
 const QuestEntitiesQuery = (payload: any) => gql`
-  query ${payload.search ? 'questSearch' : 'questEntities'}(
+  query questEntities(
     $first: Int
     $skip: Int
     $expireTimeLower: Int
     $expireTimeUpper: Int
+    ${payload.search ? '$search: String' : ''}
     ${
-      payload.search
-        ? `
-      $search: String
-      `
-        : `
-      $title: String
-      $description: String
-    `
+      payload.walletAddress !== undefined && payload.playStatus === QuestPlayStatus.Played
+        ? '$walletAddress: String'
+        : ''
     }
-    $walletAddress: String
-    $blackList: [String]
-    $whiteList: [String]
+    ${payload.blackList !== undefined ? '$blackList: [String]' : ''}
+    ${payload.whiteList !== undefined ? '$whiteList: [String]' : ''}
   ) {
-    ${payload.search ? 'questSearch' : 'questEntities'} (
+    questEntities (
       first: $first
       skip: $skip,
-      ${
-        payload.search
-          ? `
-        text: $search
-      `
-          : ''
-      }
       where: {
         questExpireTimeSec_gte: $expireTimeLower
         questExpireTimeSec_lte: $expireTimeUpper
+        ${
+          payload.search
+            ? 'or: [{ questTitle_contains_nocase: $search }, { questAddress_contains_nocase: $search }, { questMetadata_: { questDescription_contains_nocase: $search } }]'
+            : ''
+        }
         ${
           payload.walletAddress !== undefined && payload.playStatus === QuestPlayStatus.Played
             ? 'questPlayers_contains:[$walletAddress]'
@@ -78,21 +72,15 @@ const QuestEntitiesQuery = (payload: any) => gql`
         ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
         ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
       }
-      ${
-        payload.search
-          ? ''
-          : `
       orderBy: creationTimestamp
       orderDirection: desc
-      `
-      }
-      subgraphError: allow
     ) {
       id
       version
       questAddress
       questTitle
       questExpireTimeSec
+      questDetailsRef
       questMetadata {
         id
         questDescription
@@ -114,14 +102,13 @@ const QuestEntitiesQuery = (payload: any) => gql`
 `;
 
 const QuestRewardTokens = (payload: any) => gql`
-  query questEntities($first: Int, $blackList: [String], $whiteList: [String]) {
+  query questEntities($first: Int ${
+    payload.blackList !== undefined ? '$blackList: [String]' : ''
+  } ${payload.whiteList !== undefined ? '$whiteList: [String]' : ''}) {
     questEntities(first: $first, orderBy: creationTimestamp, orderDirection: desc, where: {
         ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
         ${payload.whiteList !== undefined ? 'questAddress_in: $whiteList' : ''}
       }
-      orderBy: creationTimestamp
-      orderDirection: desc
-      subgraphError: allow
     ) {
       questRewardTokenAddress
     }
@@ -131,8 +118,8 @@ const QuestRewardTokens = (payload: any) => gql`
 const QuestEntitiesLight = (payload: any) => gql`
   query questEntities(
     $expireTimeLower: Int
-    $blackList: [String]
-    $whiteList: [String]) {
+    ${payload.blackList !== undefined ? '$blackList: [String]' : ''}
+    ${payload.whiteList !== undefined ? '$whiteList: [String]' : ''}) {
     questEntities(where: {
       questExpireTimeSec_gt: $expireTimeLower
       ${payload.blackList !== undefined ? 'questAddress_not_in: $blackList' : ''}
@@ -196,18 +183,13 @@ export const fetchQuestEntities = async (
     expireTimeUpper: Math.round(expireTimeUpperMs / 1000),
     walletAddress: walletAddress?.toLowerCase(),
     playStatus,
-    search: filter.search
-      ? filter.search
-          .split(/[&|]/gm)
-          .map((segment) => `'${segment}'`)
-          .join('')
-      : undefined,
+    search: filter.search?.trim() || undefined,
     blackList: blackList !== undefined ? blackList.toLowerCase().split(',') : undefined,
     whiteList: whiteList && whiteList !== '*' ? whiteList.toLowerCase().split(',') : undefined,
   };
   const res = await request(questsSubgraph, QuestEntitiesQuery(payload), payload);
 
-  return res.questEntities ?? res.questSearch;
+  return res.questEntities;
 };
 
 export const fetchQuestRewardTokens = () => {

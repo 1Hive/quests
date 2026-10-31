@@ -14,18 +14,26 @@ Clone the repository
 git clone git@github.com:1hive/quests
 ```
 
-Install the dependencies
+Use Node 26 and install the dependencies. The legacy E2E package pins a
+Node 16 engine, so the workspace install ignores dependency engine checks.
 
 ```sh
-yarn
+nvm use
+yarn install --frozen-lockfile --ignore-engines --ignore-scripts
 ```
 
 Start the project
 
 ```sh
-# Goerli testnet
-yarn start:goerli
+# Gnosis Chain
+yarn workspace @1hive/quests-react-app start:gnosis
 ```
+
+The Gnosis Quest subgraph is deployed in [Graph Studio](https://thegraph.com/studio/subgraph/quests/).
+For build and deployment steps, see
+[the Quest subgraph README](packages/subgraphs/quest-subgraph/README.md).
+The application still references hosted Govern and token pair subgraphs, so
+those integrations need migration before the complete app can be restored.
 
 ### Docs
 

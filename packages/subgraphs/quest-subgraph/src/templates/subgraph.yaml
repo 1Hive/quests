@@ -1,7 +1,4 @@
 specVersion: 0.0.5
-features:
-  - fullTextSearch
-  - nonFatalErrors
 schema:
   file: ./src/schema.graphql
 templates:

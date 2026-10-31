@@ -8,7 +8,8 @@ import {
   store,
   Bytes,
   BigInt,
-  BigDecimal
+  BigDecimal,
+  Int8,
 } from "@graphprotocol/graph-ts";
 
 export class QuestMetadata extends Entity {
@@ -23,7 +24,7 @@ export class QuestMetadata extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type QuestMetadata must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type QuestMetadata must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("QuestMetadata", id.toString(), this);
     }
@@ -31,7 +32,7 @@ export class QuestMetadata extends Entity {
 
   static loadInBlock(id: string): QuestMetadata | null {
     return changetype<QuestMetadata | null>(
-      store.get_in_block("QuestMetadata", id)
+      store.get_in_block("QuestMetadata", id),
     );
   }
 
@@ -95,7 +96,7 @@ export class QuestEntity extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type QuestEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type QuestEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("QuestEntity", id.toString(), this);
     }
@@ -103,7 +104,7 @@ export class QuestEntity extends Entity {
 
   static loadInBlock(id: string): QuestEntity | null {
     return changetype<QuestEntity | null>(
-      store.get_in_block("QuestEntity", id)
+      store.get_in_block("QuestEntity", id),
     );
   }
 
@@ -163,8 +164,25 @@ export class QuestEntity extends Entity {
     this.set("questTitle", Value.fromString(value));
   }
 
-  get questMetadata(): string {
+  get questMetadata(): string | null {
     let value = this.get("questMetadata");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set questMetadata(value: string | null) {
+    if (!value) {
+      this.unset("questMetadata");
+    } else {
+      this.set("questMetadata", Value.fromString(<string>value));
+    }
+  }
+
+  get questDetailsRef(): string {
+    let value = this.get("questDetailsRef");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -172,8 +190,8 @@ export class QuestEntity extends Entity {
     }
   }
 
-  set questMetadata(value: string) {
-    this.set("questMetadata", Value.fromString(value));
+  set questDetailsRef(value: string) {
+    this.set("questDetailsRef", Value.fromString(value));
   }
 
   get questExpireTimeSec(): BigInt | null {
@@ -288,30 +306,38 @@ export class QuestEntity extends Entity {
     this.set("questCreateDepositAmount", Value.fromBigInt(value));
   }
 
-  get questPlayDepositToken(): Bytes {
+  get questPlayDepositToken(): Bytes | null {
     let value = this.get("questPlayDepositToken");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBytes();
     }
   }
 
-  set questPlayDepositToken(value: Bytes) {
-    this.set("questPlayDepositToken", Value.fromBytes(value));
+  set questPlayDepositToken(value: Bytes | null) {
+    if (!value) {
+      this.unset("questPlayDepositToken");
+    } else {
+      this.set("questPlayDepositToken", Value.fromBytes(<Bytes>value));
+    }
   }
 
-  get questPlayDepositAmount(): BigInt {
+  get questPlayDepositAmount(): BigInt | null {
     let value = this.get("questPlayDepositAmount");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return null;
     } else {
       return value.toBigInt();
     }
   }
 
-  set questPlayDepositAmount(value: BigInt) {
-    this.set("questPlayDepositAmount", Value.fromBigInt(value));
+  set questPlayDepositAmount(value: BigInt | null) {
+    if (!value) {
+      this.unset("questPlayDepositAmount");
+    } else {
+      this.set("questPlayDepositAmount", Value.fromBigInt(<BigInt>value));
+    }
   }
 
   get questPlayers(): Array<string> {
@@ -353,7 +379,7 @@ export class CreateDepositEntity extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type CreateDepositEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type CreateDepositEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("CreateDepositEntity", id.toString(), this);
     }
@@ -361,13 +387,13 @@ export class CreateDepositEntity extends Entity {
 
   static loadInBlock(id: string): CreateDepositEntity | null {
     return changetype<CreateDepositEntity | null>(
-      store.get_in_block("CreateDepositEntity", id)
+      store.get_in_block("CreateDepositEntity", id),
     );
   }
 
   static load(id: string): CreateDepositEntity | null {
     return changetype<CreateDepositEntity | null>(
-      store.get("CreateDepositEntity", id)
+      store.get("CreateDepositEntity", id),
     );
   }
 
@@ -436,7 +462,7 @@ export class PlayDepositEntity extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type PlayDepositEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type PlayDepositEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("PlayDepositEntity", id.toString(), this);
     }
@@ -444,13 +470,13 @@ export class PlayDepositEntity extends Entity {
 
   static loadInBlock(id: string): PlayDepositEntity | null {
     return changetype<PlayDepositEntity | null>(
-      store.get_in_block("PlayDepositEntity", id)
+      store.get_in_block("PlayDepositEntity", id),
     );
   }
 
   static load(id: string): PlayDepositEntity | null {
     return changetype<PlayDepositEntity | null>(
-      store.get("PlayDepositEntity", id)
+      store.get("PlayDepositEntity", id),
     );
   }
 
@@ -519,7 +545,7 @@ export class QuestClaimEntity extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type QuestClaimEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type QuestClaimEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
       store.set("QuestClaimEntity", id.toString(), this);
     }
@@ -527,13 +553,13 @@ export class QuestClaimEntity extends Entity {
 
   static loadInBlock(id: string): QuestClaimEntity | null {
     return changetype<QuestClaimEntity | null>(
-      store.get_in_block("QuestClaimEntity", id)
+      store.get_in_block("QuestClaimEntity", id),
     );
   }
 
   static load(id: string): QuestClaimEntity | null {
     return changetype<QuestClaimEntity | null>(
-      store.get("QuestClaimEntity", id)
+      store.get("QuestClaimEntity", id),
     );
   }
 

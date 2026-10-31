@@ -77,9 +77,9 @@ async function mapQuest(questEntity: any, claimCountMap: Map<string, number>) {
     const quest: QuestModel = {
       address: questAddress,
       title: questEntity.questTitle,
-      description: questEntity.questMetadata.questDescription,
-      communicationLink: questEntity.questMetadata.questCommunicationLink,
-      detailsRefIpfs: questEntity.questMetadata.id,
+      description: questEntity.questMetadata?.questDescription,
+      communicationLink: questEntity.questMetadata?.questCommunicationLink,
+      detailsRefIpfs: questEntity.questDetailsRef,
       rewardToken: (await getTokenInfo(questEntity.questRewardTokenAddress)) ?? undefined,
       expireTime: new Date(questEntity.questExpireTimeSec * 1000), // sec to Ms
       creationTime: new Date(questEntity.creationTimestamp * 1000), // sec to Ms

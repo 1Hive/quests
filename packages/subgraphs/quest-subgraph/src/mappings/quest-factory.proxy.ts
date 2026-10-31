@@ -2,7 +2,7 @@ import { QuestCreated } from "../../generated/QuestFactoryProxy/QuestFactory";
 import { QuestWhiteListChanged } from "../../generated/QuestFactoryProxy-Quest/Quest";
 import { QuestEntity } from "../../generated/schema";
 import { log } from "@graphprotocol/graph-ts";
-import { QuestMetadata as QuestMetadataTemplate } from "../../generated/templates";
+import { QuestDetailMetadata as QuestMetadataTemplate } from "../../generated/templates";
 import {
   handleCreateDepositChanged,
   handlePlayDepositChanged,
@@ -26,6 +26,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questAddress = event.params.questAddress.toHexString();
   questEntity.questTitle = event.params.questTitle;
   questEntity.questMetadata = event.params.questDetailsRef.toString();
+  questEntity.questDetailsRef = event.params.questDetailsRef.toString();
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
   questEntity.creationTimestamp = event.block.timestamp;
@@ -39,7 +40,9 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questPlayers = [];
   questEntity.questIsWhiteListed = event.params.isWhiteList;
 
-  QuestMetadataTemplate.create(questEntity.questMetadata);
+  if (questEntity.questDetailsRef.length > 0) {
+    QuestMetadataTemplate.create(questEntity.questDetailsRef);
+  }
 
   log.info("Quest created [proxy]: {}", [event.params.questAddress.toHex()]);
 

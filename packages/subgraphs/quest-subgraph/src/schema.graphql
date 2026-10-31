@@ -1,18 +1,4 @@
-type _Schema_
-  @fulltext(
-    name: "questSearch"
-    language: en
-    algorithm: rank
-    include: [
-      {
-        entity: "QuestEntity"
-        fields: [{ name: "questAddress" }, { name: "questTitle" }]
-      }
-      { entity: "QuestMetadata", fields: [{ name: "questDescription" }] }
-    ]
-  )
-
-type QuestMetadata @entity(immutable: false) {
+type QuestMetadata @entity(immutable: true) {
   id: ID!
   questDescription: String!
   questCommunicationLink: String
@@ -23,7 +9,8 @@ type QuestEntity @entity(immutable: false) {
   version: Int!
   questAddress: String!
   questTitle: String!
-  questMetadata: QuestMetadata!
+  questMetadata: QuestMetadata
+  questDetailsRef: String!
   questExpireTimeSec: BigInt
   questRewardTokenAddress: Bytes!
   creationTimestamp: BigInt!

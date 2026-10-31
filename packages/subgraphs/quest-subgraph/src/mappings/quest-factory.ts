@@ -10,7 +10,7 @@ import {
 } from "../../generated/schema";
 import { Bytes, dataSource, json, log } from "@graphprotocol/graph-ts";
 import { QuestClaimed } from "../../generated/QuestFactory-Quest/Quest";
-import { QuestMetadata as QuestMetadataTemplate } from "../../generated/templates";
+import { QuestDetailMetadata as QuestMetadataTemplate } from "../../generated/templates";
 
 export function handleQuestCreated(event: QuestCreated): void {
   let questEntity = new QuestEntity(event.params.questAddress.toHex());
@@ -18,6 +18,7 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questAddress = event.params.questAddress.toHexString();
   questEntity.questTitle = event.params.questTitle;
   questEntity.questMetadata = event.params.questDetailsRef.toString();
+  questEntity.questDetailsRef = event.params.questDetailsRef.toString();
   questEntity.questRewardTokenAddress = event.params.rewardTokenAddress;
   questEntity.questExpireTimeSec = event.params.expireTime;
   questEntity.creationTimestamp = event.block.timestamp;
@@ -29,7 +30,9 @@ export function handleQuestCreated(event: QuestCreated): void {
   questEntity.questPlayers = [];
   questEntity.questIsWhiteListed = false;
 
-  QuestMetadataTemplate.create(questEntity.questMetadata);
+  if (questEntity.questDetailsRef.length > 0) {
+    QuestMetadataTemplate.create(questEntity.questDetailsRef);
+  }
 
   log.info("Quest created [2]: {}", [event.params.questAddress.toHex()]);
 
