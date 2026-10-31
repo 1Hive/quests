@@ -2,6 +2,9 @@
   "proxy": "https://cors-anywhere.herokuapp.com/",
   "name": "@1hive/quests-react-app",
   "version": "0.1.1-alpha",
+  "engines": {
+    "node": "26.x"
+  },
   "license": "MIT",
   "homepage": ".",
   "dependencies": {
@@ -133,7 +136,7 @@
     "ship": "yarn surge",
     "theme": "npx gulp less",
     "watch": "node ./scripts/watch.js",
-    "ci": "cd ../.. && yarn install --frozen-lockfile --ignore-engines --ignore-scripts --network-concurrency 1"
+    "ci": "yarn install --frozen-lockfile --ignore-engines --ignore-scripts --network-concurrency 1"
   },
   "resolutions": {
     "styled-components": "^5",
